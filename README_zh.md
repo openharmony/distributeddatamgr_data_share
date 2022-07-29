@@ -1,29 +1,52 @@
-# 本地数据管理组件
+# 数据共享
+
 ## 简介
-### [关系型数据库（Relational Database，RDB）](relational_store/README_zh.md) 
 
-是一种基于关系模型来管理数据的数据库。OpenHarmony关系型数据库基于SQLite组件提供了一套完整的对本地数据库进行管理的机制。
-### [首选项（Preferences）](preferences/README_zh.md) 
+**数据共享（Data Share）** 提供了向其他应用共享以及管理其数据的方法，支持同个设备上不同应用之间的数据共享。
 
-主要提供轻量级Key-Value操作，支持本地应用存储少量数据，数据存储在本地文件中，同时也加载在内存中，所以访问速度更快，效率更高。首选项提供非关系型数据存储，不宜存储大量数据，经常用于操作键值对形式数据的场景。
-### [数据共享（DataShare）](data_share/README_zh.md) 
+**图 1**  逻辑架构图
 
-主要用于应用管理其自身数据，同时支持同个设备上不同应用间的数据共享。
-### [轻量系统KV数据库（Lightweight KV store）](kv_store/README_zh.md) 
+![](figures/zh-cn_dataShare.png)
 
-依托当前公共基础库提供的KV存储能力开发，为轻量系统设备应用提供键值对数据管理能力。在有进程的平台上，KV存储提供的参数管理，供单进程访问不能被其他进程使用。在此类平台上，KV存储作为基础库加载在应用进程，以保障不被其他进程访问。
+- DataShareExtAbility模块为数据提供方，实现跨应用数据共享的相关业务。
+- DataShareHelper模块为数据访问方，提供各种访问数据的接口，包括增删改查等。
+- 数据访问方与提供方通过IPC进行通信，数据提供方可以通过数据库实现，也可以通过其他数据存储方式实现。
+- ResultSet模块通过共享内存实现，用于存储查询数据得到的结果集，并提供了遍历结果集的方法。
+
 ## 目录
 
 ```
-//foundation/distributeddatamgr/appdatamgr
-├── data_share                # 数据共享（DataShare）
-├── kv_store                  # 轻量系统KV数据库（Lightweight KV store）
-├── preferences               # 首选项（Preferences）
-└── relational_store          # 关系型数据库（RDB）
+/foundation/distributeddatamgr/data_share
+├── frameworks                                   # 框架代码
+│   ├── js
+│   │   └── napi                                 # NAPI代码存放目录
+│   │       ├── common                           # 公用NAPI代码存放目录
+│   │       ├── dataShare                        # 客户端NAPI代码存放目录
+│   │       ├── datashare_ext_ability            # DataShareExtentionAbility模块JS代码存放目录
+│   │       └── datashare_ext_ability_context    # DataShareExtentionAbilityContext模块JS代码存放目录
+│   └── native
+│       ├── common
+│       ├── consumer
+│       └── provider
+└── interfaces                                   # 对外接口存放目录
+    └── inner_api                                # 对内部子系统暴露的头文件存放目录
+        ├── common                               # 公用对内部子系统暴露的头文件存放目录
+        ├── consumer                             # 客户端对内部子系统暴露的头文件存放目录
+        └── provider                             # 服务端对内部子系统暴露的头文件存放目录
 ```
+
+
+
+
+## 约束
+
+- DataShare受到数据提供方所使用数据库的一些限制。例如支持的数据模型、Key的长度、Value的长度、每个应用程序支持同时打开数据库的最大数量等，都会受到使用的数据库的限制。
+- 因DataShare内部实现依赖于IPC通信，所以数据集、谓词、结果集等的载荷受到IPC通信的约束与限制。
+
 ## 相关仓
-- [分布式数据管理子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E5%88%86%E5%B8%83%E5%BC%8F%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
 
-- [**distributeddatamgr\_appdatamgr**](https://gitee.com/openharmony/distributeddatamgr_appdatamgr/blob/master/README_zh.md)
+[分布式数据管理子系统](https://gitee.com/openharmony/distributeddatamgr_data_share/blob/master/README_zh.md)
 
-- [third\_party\_sqlite](https://gitee.com/openharmony/third_party_sqlite)
+[distributeddatamgr_datamgr](https://gitee.com/openharmony/distributeddatamgr_datamgr/blob/master/README_zh.md)
+
+[**distributeddatamgr_data_share**](https://gitee.com/openharmony/distributeddatamgr_data_share/blob/master/README_zh.md)
