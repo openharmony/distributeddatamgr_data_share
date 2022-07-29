@@ -39,7 +39,9 @@ void UnwrapDataSharePredicates(DataSharePredicates &predicates, napi_env env, na
         LOG_ERROR("UnwrapDataSharePredicates GetNativePredicates retval Marshalling failed.");
         return;
     }
-    predicates = *tempPredicates;
+    const std::list<OperationItem> &list = tempPredicates->GetOperationList();
+    auto predicate = std::make_shared<DataSharePredicates>(list);
+    predicates = *predicate;
 }
 
 bool UnwrapValuesBucketArrayFromJS(napi_env env, napi_value param, std::vector<DataShareValuesBucket> &value)
