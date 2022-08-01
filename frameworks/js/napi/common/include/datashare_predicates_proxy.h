@@ -75,9 +75,6 @@ private:
     napi_env env_;
     napi_ref wrapper_;
 };
-
-napi_value GetNapiObject(napi_env env, std::shared_ptr<DataShareAbsPredicates> predicates);
-DataShareAbsPredicates *GetNativePredicatesObject(const napi_env &env, const napi_value &arg);
 } // namespace DataShare
 } // namespace OHOS
 #endif // DATASHARE_PREDICATES_PROXY_H

@@ -35,31 +35,31 @@ public:
     }
     void PutString(const std::string &columnName, const std::string &value)
     {
-        valuesMap.insert(std::make_pair(columnName, DataShareValueObject(value)));
+        Put(columnName, value);
     }
     void PutInt(const std::string &columnName, int value)
     {
-        valuesMap.insert(std::make_pair(columnName, DataShareValueObject(value)));
+        Put(columnName, value);
     }
     void PutLong(const std::string &columnName, int64_t value)
     {
-        valuesMap.insert(std::make_pair(columnName, DataShareValueObject(value)));
+        Put(columnName, value);
     }
     void PutDouble(const std::string &columnName, double value)
     {
-        valuesMap.insert(std::make_pair(columnName, DataShareValueObject(value)));
+        Put(columnName, value);
     }
     void PutBool(const std::string &columnName, bool value)
     {
-        valuesMap.insert(std::make_pair(columnName, DataShareValueObject(value)));
+        Put(columnName, value);
     }
     void PutBlob(const std::string &columnName, const std::vector<uint8_t> &value)
     {
-        valuesMap.insert(std::make_pair(columnName, DataShareValueObject(value)));
+        Put(columnName, value);
     }
     void PutNull(const std::string &columnName)
     {
-        valuesMap.insert(std::make_pair(columnName, DataShareValueObject()));
+        Put(columnName);
     }
 
     void Delete(const std::string &columnName)

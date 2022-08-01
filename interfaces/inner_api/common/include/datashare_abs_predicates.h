@@ -16,6 +16,7 @@
 #ifndef DATASHARE_ABSPREDICATES_H
 #define DATASHARE_ABSPREDICATES_H
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <list>

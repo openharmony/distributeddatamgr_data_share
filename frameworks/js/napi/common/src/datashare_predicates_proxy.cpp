@@ -186,7 +186,7 @@ napi_value DataSharePredicatesProxy::EqualTo(napi_env env, napi_callback_info in
         LOG_ERROR("napi_typeof status : %{public}d", status);
         return thiz;
     }
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -230,7 +230,7 @@ napi_value DataSharePredicatesProxy::NotEqualTo(napi_env env, napi_callback_info
         LOG_ERROR("napi_typeof status : %{public}d", status);
         return thiz;
     }
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -264,7 +264,7 @@ napi_value DataSharePredicatesProxy::BeginWrap(napi_env env, napi_callback_info 
     LOG_DEBUG("DataSharePredicatesProxy::BeginWrap on called.");
     napi_value thiz;
     napi_get_cb_info(env, info, nullptr, nullptr, &thiz, nullptr);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -278,7 +278,7 @@ napi_value DataSharePredicatesProxy::EndWrap(napi_env env, napi_callback_info in
     LOG_DEBUG("DataSharePredicatesProxy::EndWrap on called.");
     napi_value thiz;
     napi_get_cb_info(env, info, nullptr, nullptr, &thiz, nullptr);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -292,7 +292,7 @@ napi_value DataSharePredicatesProxy::Or(napi_env env, napi_callback_info info)
     LOG_DEBUG("DataSharePredicatesProxy::Or on called.");
     napi_value thiz;
     napi_get_cb_info(env, info, nullptr, nullptr, &thiz, nullptr);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -306,7 +306,7 @@ napi_value DataSharePredicatesProxy::And(napi_env env, napi_callback_info info)
     LOG_DEBUG("DataSharePredicatesProxy::And on called.");
     napi_value thiz;
     napi_get_cb_info(env, info, nullptr, nullptr, &thiz, nullptr);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -326,7 +326,7 @@ napi_value DataSharePredicatesProxy::Contains(napi_env env, napi_callback_info i
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
     std::string value = DataShareJSUtils::ConvertAny2String(env, args[1]);
 
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -345,7 +345,7 @@ napi_value DataSharePredicatesProxy::BeginsWith(napi_env env, napi_callback_info
     NAPI_ASSERT(env, argc > ARGC_ONE, "DataSharePredicatesProxy::BeginsWith Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
     std::string value = DataShareJSUtils::ConvertAny2String(env, args[1]);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -364,7 +364,7 @@ napi_value DataSharePredicatesProxy::EndsWith(napi_env env, napi_callback_info i
     NAPI_ASSERT(env, argc > ARGC_ONE, "DataSharePredicatesProxy::EndsWith Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
     std::string value = DataShareJSUtils::ConvertAny2String(env, args[1]);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -382,7 +382,7 @@ napi_value DataSharePredicatesProxy::IsNull(napi_env env, napi_callback_info inf
     napi_get_cb_info(env, info, &argc, args, &thiz, nullptr);
     NAPI_ASSERT(env, argc > ARGC_ZERO, "DataSharePredicatesProxy::IsNull Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -400,7 +400,7 @@ napi_value DataSharePredicatesProxy::IsNotNull(napi_env env, napi_callback_info 
     napi_get_cb_info(env, info, &argc, args, &thiz, nullptr);
     NAPI_ASSERT(env, argc > ARGC_ZERO, "DataSharePredicatesProxy::IsNotNull Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -419,7 +419,7 @@ napi_value DataSharePredicatesProxy::Like(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, argc > ARGC_ONE, "DataSharePredicatesProxy::Like Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
     std::string value = DataShareJSUtils::ConvertAny2String(env, args[1]);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -438,7 +438,7 @@ napi_value DataSharePredicatesProxy::Unlike(napi_env env, napi_callback_info inf
     NAPI_ASSERT(env, argc > ARGC_ONE, "DataSharePredicatesProxy::Unlike Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
     std::string value = DataShareJSUtils::ConvertAny2String(env, args[1]);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -457,7 +457,7 @@ napi_value DataSharePredicatesProxy::Glob(napi_env env, napi_callback_info info)
     NAPI_ASSERT(env, argc > ARGC_ONE, "DataSharePredicatesProxy::Glob Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
     std::string value = DataShareJSUtils::ConvertAny2String(env, args[1]);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -477,7 +477,7 @@ napi_value DataSharePredicatesProxy::Between(napi_env env, napi_callback_info in
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
     std::string low = DataShareJSUtils::ConvertAny2String(env, args[1]);
     std::string high = DataShareJSUtils::ConvertAny2String(env, args[2]);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -497,7 +497,7 @@ napi_value DataSharePredicatesProxy::NotBetween(napi_env env, napi_callback_info
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
     std::string low = DataShareJSUtils::ConvertAny2String(env, args[1]);
     std::string high = DataShareJSUtils::ConvertAny2String(env, args[2]);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -521,7 +521,7 @@ napi_value DataSharePredicatesProxy::GreaterThan(napi_env env, napi_callback_inf
         LOG_ERROR("napi_typeof status : %{public}d", status);
         return thiz;
     }
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -559,7 +559,7 @@ napi_value DataSharePredicatesProxy::LessThan(napi_env env, napi_callback_info i
         LOG_ERROR("napi_typeof status : %{public}d", status);
         return thiz;
     }
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -597,7 +597,7 @@ napi_value DataSharePredicatesProxy::GreaterThanOrEqualTo(napi_env env, napi_cal
         LOG_ERROR("napi_typeof status : %{public}d", status);
         return thiz;
     }
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -635,7 +635,7 @@ napi_value DataSharePredicatesProxy::LessThanOrEqualTo(napi_env env, napi_callba
         LOG_ERROR("napi_typeof status : %{public}d", status);
         return thiz;
     }
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -667,7 +667,7 @@ napi_value DataSharePredicatesProxy::OrderByAsc(napi_env env, napi_callback_info
     napi_get_cb_info(env, info, &argc, args, &thiz, nullptr);
     NAPI_ASSERT(env, argc > ARGC_ZERO, "DataSharePredicatesProxy::OrderByAsc Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -685,7 +685,7 @@ napi_value DataSharePredicatesProxy::OrderByDesc(napi_env env, napi_callback_inf
     napi_get_cb_info(env, info, &argc, args, &thiz, nullptr);
     NAPI_ASSERT(env, argc > ARGC_ZERO, "DataSharePredicatesProxy::OrderByDesc Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -699,7 +699,7 @@ napi_value DataSharePredicatesProxy::Distinct(napi_env env, napi_callback_info i
     LOG_DEBUG("DataSharePredicatesProxy::Distinct on called.");
     napi_value thiz;
     napi_get_cb_info(env, info, nullptr, nullptr, &thiz, nullptr);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -722,7 +722,7 @@ napi_value DataSharePredicatesProxy::Limit(napi_env env, napi_callback_info info
     int offset = 0;
     status = napi_get_value_int32(env, args[1], &offset);
     LOG_INFO("offset, napi_get_value_int32 : %{public}d", offset);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -741,7 +741,7 @@ napi_value DataSharePredicatesProxy::GroupBy(napi_env env, napi_callback_info in
     NAPI_ASSERT(env, argc > ARGC_ZERO, "DataSharePredicatesProxy::GroupBy Invalid argvs!");
     std::vector<std::string> fields = DataShareJSUtils::Convert2StrVector(env,
         args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -759,7 +759,7 @@ napi_value DataSharePredicatesProxy::IndexedBy(napi_env env, napi_callback_info 
     napi_get_cb_info(env, info, &argc, args, &thiz, nullptr);
     NAPI_ASSERT(env, argc > ARGC_ZERO, "DataSharePredicatesProxy::IndexedBy Invalid argvs!");
     std::string indexName = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -779,7 +779,7 @@ napi_value DataSharePredicatesProxy::In(napi_env env, napi_callback_info info)
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
     std::vector<std::string> values = DataShareJSUtils::Convert2StrVector(env,
         args[1], DataShareJSUtils::DEFAULT_BUF_SIZE);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -799,7 +799,7 @@ napi_value DataSharePredicatesProxy::NotIn(napi_env env, napi_callback_info info
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
     std::vector<std::string> values = DataShareJSUtils::Convert2StrVector(env,
         args[1], DataShareJSUtils::DEFAULT_BUF_SIZE);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -817,7 +817,7 @@ napi_value DataSharePredicatesProxy::PrefixKey(napi_env env, napi_callback_info 
     napi_get_cb_info(env, info, &argc, args, &thiz, nullptr);
     NAPI_ASSERT(env, argc > ARGC_ZERO, "DataSharePredicatesProxy::PrefixKey Invalid argvs!");
     std::string prefix = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
@@ -836,24 +836,13 @@ napi_value DataSharePredicatesProxy::InKeys(napi_env env, napi_callback_info inf
     NAPI_ASSERT(env, argc > ARGC_ZERO, "DataSharePredicatesProxy::InKeys Invalid argvs!");
     std::vector<std::string> keys = DataShareJSUtils::Convert2StrVector(env,
         args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
-    std::shared_ptr<DataShareAbsPredicates> nativePredicates = GetNativePredicates(env, info);
+    auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
         return thiz;
     }
     nativePredicates->InKeys(keys);
     return thiz;
-}
-
-napi_value GetNapiObject(napi_env env, std::shared_ptr<DataShareAbsPredicates> predicates)
-{
-    return DataSharePredicatesProxy::NewInstance(env, predicates);
-}
-
-DataShareAbsPredicates *GetNativePredicatesObject(const napi_env &env, const napi_value &arg)
-{
-    auto predicates = DataSharePredicatesProxy::GetNativePredicates(env, arg);
-    return predicates.get();
 }
 } // namespace DataShare
 } // namespace OHOS

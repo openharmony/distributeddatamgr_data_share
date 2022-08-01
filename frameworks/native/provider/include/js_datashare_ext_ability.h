@@ -16,6 +16,7 @@
 #ifndef JS_DATASHARE_EXT_ABILITY_H
 #define JS_DATASHARE_EXT_ABILITY_H
 
+#include <memory>
 #include "datashare_result_set.h"
 #include "datashare_predicates.h"
 #include "datashare_ext_ability.h"

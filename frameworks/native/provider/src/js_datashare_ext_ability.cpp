@@ -796,7 +796,7 @@ napi_value JsDataShareExtAbility::MakePredicates(napi_env env, const DataSharePr
         LOG_ERROR("%{public}s No memory allocated for predicates", __func__);
         return nullptr;
     }
-    napi_value napiPredicates = GetNapiObject(env, predicatesPtr);
+    napi_value napiPredicates = NewInstance(env, predicatesPtr);
     if (napiPredicates == nullptr) {
         LOG_ERROR("%{public}s failed to make new instance of DataSharePredicates.", __func__);
     }

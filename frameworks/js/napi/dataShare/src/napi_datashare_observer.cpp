@@ -14,6 +14,7 @@
  */
 #include "napi_datashare_observer.h"
 
+#include <memory>
 #include "datashare_log.h"
 
 namespace OHOS {
