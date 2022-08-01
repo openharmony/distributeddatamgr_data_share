@@ -70,60 +70,44 @@ public:
     {
         return type;
     }
-    int GetInt(int &val) const
+    templete<typename T>
+    int Get(T &val, DataShareValueObjectType typeIn) const
     {
-        if (type != DataShareValueObjectType::TYPE_INT) {
+        if (type != typeIn) {
             return INVALID_TYPE;
         }
 
-        int64_t v = std::get<int64_t>(value);
+        val = *this;
+        return NO_ERROR;
+    }
+    int GetInt(int &val) const
+    {
+        int64_t v = 0;
+        if (!Get(v, DataShareValueObjectType::TYPE_INT)) {
+            return INVALID_TYPE;
+        }
         val = static_cast<int>(v);
         return NO_ERROR;
     }
     int GetLong(int64_t &val) const
     {
-        if (type != DataShareValueObjectType::TYPE_INT) {
-            return INVALID_TYPE;
-        }
-
-        val = std::get<int64_t>(value);
-        return NO_ERROR;
+        return Get(val, DataShareValueObjectType::TYPE_INT);
     }
     int GetDouble(double &val) const
     {
-        if (type != DataShareValueObjectType::TYPE_DOUBLE) {
-            return INVALID_TYPE;
-        }
-
-        val = std::get<double>(value);
-        return NO_ERROR;
+        return Get(val, DataShareValueObjectType::TYPE_DOUBLE);
     }
     int GetBool(bool &val) const
     {
-        if (type != DataShareValueObjectType::TYPE_BOOL) {
-            return INVALID_TYPE;
-        }
-
-        val = std::get<bool>(value);
-        return NO_ERROR;
+        return Get(val, DataShareValueObjectType::TYPE_BOOL);
     }
     int GetString(std::string &val) const
     {
-        if (type != DataShareValueObjectType::TYPE_STRING) {
-            return INVALID_TYPE;
-        }
-
-        val = std::get<std::string>(value);
-        return NO_ERROR;
+        return Get(val, DataShareValueObjectType::TYPE_STRING);
     }
     int GetBlob(std::vector<uint8_t> &val) const
     {
-        if (type != DataShareValueObjectType::TYPE_BLOB) {
-            return INVALID_TYPE;
-        }
-
-        val = std::get<std::vector<uint8_t>>(value);
-        return NO_ERROR;
+        return Get(val, DataShareValueObjectType::TYPE_BLOB);
     }
 
     operator int () const
