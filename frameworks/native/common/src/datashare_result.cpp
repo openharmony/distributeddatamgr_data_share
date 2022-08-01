@@ -16,11 +16,9 @@
 #include "datashare_result.h"
 
 #include "datashare_log.h"
-#include "parcel_macro.h"
 
 namespace OHOS {
 namespace DataShare {
-using namespace AppExecFwk;
 /**
  * @brief A constructor used to create a DataShareResult instance
  * with the input parameter count specified.
@@ -114,22 +112,10 @@ bool DataShareResult::Marshalling(Parcel &parcel) const
 {
     // uri_
     if (uri_.ToString().empty()) {
-        WRITE_PARCEL_AND_RETURN_FALSE_IF_FAIL(Int32, parcel, VALUE_NULL);
-    } else {
-        if (!parcel.WriteInt32(VALUE_OBJECT)) {
-            return false;
-        }
-        if (!parcel.WriteParcelable(&uri_)) {
-            return false;
-        }
+        return parcel.WriteInt32(VALUE_NULL) && parcel.WriteInt32(count_);
     }
 
-    // count_
-    if (!parcel.WriteInt32(count_)) {
-        return false;
-    }
-
-    return true;
+    return parcel.WriteInt32(VALUE_OBJECT) && parcel.WriteParcelable(&uri_) && parcel.WriteInt32(count_);
 }
 
 /**

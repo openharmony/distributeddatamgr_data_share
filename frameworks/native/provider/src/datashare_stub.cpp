@@ -16,12 +16,9 @@
 #include "datashare_stub.h"
 
 #include "data_ability_observer_interface.h"
-#include "data_ability_operation.h"
-#include "data_ability_predicates.h"
 #include "datashare_log.h"
 #include "ipc_types.h"
 #include "ishared_result_set.h"
-#include "values_bucket.h"
 #include "itypes_util.h"
 
 namespace OHOS {

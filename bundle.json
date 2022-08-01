@@ -58,10 +58,8 @@
                 "hiviewdfx_hilog_native",
                 "libuv",
                 "ipc",
-                "bundle_framework",
                 "utils_base",
-                "ability_base",
-                "eventhandler"
+                "ability_base"
             ],
             "third_party": []
         },
