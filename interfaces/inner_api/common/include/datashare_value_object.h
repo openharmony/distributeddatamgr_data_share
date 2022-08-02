@@ -70,14 +70,14 @@ public:
     {
         return type;
     }
-    templete<typename T>
+    template<typename T>
     int Get(T &val, DataShareValueObjectType typeIn) const
     {
         if (type != typeIn) {
             return INVALID_TYPE;
         }
 
-        val = *this;
+        val = std::get<T>(value);
         return NO_ERROR;
     }
     int GetInt(int &val) const

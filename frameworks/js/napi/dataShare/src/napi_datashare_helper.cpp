@@ -34,13 +34,14 @@ std::list<std::shared_ptr<DataShareHelper>> g_dataShareHelperList;
 
 DataSharePredicates UnwrapDataSharePredicates(napi_env env, napi_value value)
 {
+    auto predicate = std::make_shared<DataSharePredicates>();
     auto tempPredicates = DataSharePredicatesProxy::GetNativePredicates(env, value);
     if (tempPredicates == nullptr) {
         LOG_ERROR("UnwrapDataSharePredicates GetNativePredicates retval Marshalling failed.");
-        return;
+        return *predicate;
     }
     const std::list<OperationItem> &operations  = tempPredicates->GetOperationList();
-    auto predicate = std::make_shared<DataSharePredicates>(list);
+    predicate = std::make_shared<DataSharePredicates>(operations);
     return *predicate;
 }
 
