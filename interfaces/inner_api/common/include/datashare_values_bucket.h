@@ -62,19 +62,9 @@ public:
         Put(columnName);
     }
 
-    void Delete(const std::string &columnName)
-    {
-        valuesMap.erase(columnName);
-    }
-
     void Clear()
     {
         valuesMap.clear();
-    }
-
-    int Size() const
-    {
-        return valuesMap.size();
     }
 
     bool IsEmpty() const
