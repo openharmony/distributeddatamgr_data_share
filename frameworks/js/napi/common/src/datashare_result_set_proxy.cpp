@@ -109,7 +109,9 @@ napi_value DataShareResultSetProxy::Initialize(napi_env env, napi_callback_info 
     auto *proxy = new DataShareResultSetProxy();
     auto finalize = [](napi_env env, void *data, void *hint) {
         DataShareResultSetProxy *proxy = reinterpret_cast<DataShareResultSetProxy *>(data);
-        delete proxy;
+        if (proxy != nullptr) {
+            delete proxy;
+        }
     };
     napi_status status = napi_wrap(env, self, proxy, finalize, nullptr, nullptr);
     if (status != napi_ok) {
