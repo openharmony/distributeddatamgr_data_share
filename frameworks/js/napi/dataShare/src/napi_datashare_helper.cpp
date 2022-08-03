@@ -83,17 +83,8 @@ std::vector<DataShareValuesBucket> GetValuesBucketArray(napi_env env, napi_value
 napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG("Napi_CreateDataShareHelper in");
-    struct CreateContextInfo {
-        napi_ref ref = nullptr;
-        bool isStageMode = true;
-        std::string strUri = "";
-        std::shared_ptr<Context> contextF = nullptr;
-        std::shared_ptr<OHOS::AbilityRuntime::Context> contextS = nullptr;
-        std::shared_ptr<DataShareHelper> dataShareHelper = nullptr;
-    };
     auto ctxInfo = std::make_shared<CreateContextInfo>();
     auto input = [ctxInfo](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
-        LOG_DEBUG("CreateDataShareHelper parser to native params %{public}d", static_cast<int>(argc));
         NAPI_ASSERT_BASE(env, (argc > 1) && (argc < 4), " need 2 or 3 parameters!", napi_invalid_arg);
         bool isStageMode = false;
         napi_status status = AbilityRuntime::IsStageContext(env, argv[PARAM0], isStageMode);
