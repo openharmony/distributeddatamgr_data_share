@@ -85,13 +85,32 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
     LOG_DEBUG("Napi_CreateDataShareHelper in");
     struct CreateContextInfo {
         napi_ref ref = nullptr;
+        bool isStageMode = true;
+        std::string strUri = "";
+        std::shared_ptr<Context> contextF = nullptr;
+        std::shared_ptr<OHOS::AbilityRuntime::Context> contextS = nullptr;
+        std::shared_ptr<DataShareHelper> dataShareHelper = nullptr;
     };
     auto ctxInfo = std::make_shared<CreateContextInfo>();
     auto input = [ctxInfo](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         LOG_DEBUG("CreateDataShareHelper parser to native params %{public}d", static_cast<int>(argc));
         NAPI_ASSERT_BASE(env, (argc > 1) && (argc < 4), " need 2 or 3 parameters!", napi_invalid_arg);
+        bool isStageMode = false;
+        napi_status status = AbilityRuntime::IsStageContext(env, argv[PARAM0], isStageMode);
+        if (status != napi_ok || !isStageMode) {
+            ctxInfo->isStageMode = false;
+            auto ability = OHOS::AbilityRuntime::GetCurrentAbility(env);
+            ctxInfo->strUri = DataShareJSUtils::Convert2String(env, argv[PARAM0]);
+            NAPI_ASSERT_BASE(env, ability != nullptr, "failed to get native ability", napi_invalid_arg);
+            ctxInfo->contextF = ability->GetContext();
+        } else {
+            ctxInfo->contextS = OHOS::AbilityRuntime::GetStageModeContext(env, argv[PARAM0]);
+            ctxInfo->strUri = DataShareJSUtils::Convert2String(env, argv[PARAM1]);
+            NAPI_ASSERT_BASE(env, ctxInfo->contextS != nullptr, "failed to get native context", napi_invalid_arg);
+        }
+
         napi_value helperProxy = nullptr;
-        napi_status status = napi_new_instance(env, GetConstructor(env), argc, argv, &helperProxy);
+        status = napi_new_instance(env, GetConstructor(env), argc, argv, &helperProxy);
         if ((helperProxy == nullptr) || (status != napi_ok)) {
             return napi_generic_failure;
         }
@@ -99,13 +118,29 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         return napi_ok;
     };
     auto output = [ctxInfo](napi_env env, napi_value *result) -> napi_status {
+        NAPI_ASSERT_BASE(env, ctxInfo->dataShareHelper != nullptr, "dataShareHelper is nullptr", napi_invalid_arg);
+        g_dataShareHelperList.emplace_back(ctxInfo->dataShareHelper);
         napi_status status = napi_get_reference_value(env, ctxInfo->ref, result);
         napi_delete_reference(env, ctxInfo->ref);
+        NapiDataShareHelper *proxy = nullptr;
+        status = napi_unwrap(env, *result, reinterpret_cast<void **>(&proxy));
+        if (proxy == nullptr) {
+            LOG_ERROR("proxy is nullptr");
+            return status;
+        }
+        proxy->datashareHelper_ = std::move(ctxInfo->dataShareHelper);
         return status;
+    };
+    auto exec = [ctxInfo](AsyncCall::Context *ctx) {
+        if (ctxInfo->isStageMode && ctxInfo->contextS != nullptr) {
+            ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextS, ctxInfo->strUri);
+        } else if (!ctxInfo->isStageMode && ctxInfo->contextF != nullptr) {
+            ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextF, ctxInfo->strUri);
+        }
     };
     auto context = std::make_shared<AsyncCall::Context>(input, output);
     AsyncCall asyncCall(env, info, context);
-    return asyncCall.Call(env);
+    return asyncCall.Call(env, exec);
 }
 
 napi_value NapiDataShareHelper::GetConstructor(napi_env env)
@@ -142,24 +177,6 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
     NAPI_ASSERT(env, argc > 1, "Wrong number of arguments");
 
     auto *proxy = new NapiDataShareHelper();
-    std::string strUri;
-    bool isStageMode = false;
-    napi_status status = AbilityRuntime::IsStageContext(env, argv[PARAM0], isStageMode);
-    if (status != napi_ok || !isStageMode) {
-        auto ability = OHOS::AbilityRuntime::GetCurrentAbility(env);
-        strUri = DataShareJSUtils::Convert2String(env, argv[PARAM0]);
-        NAPI_ASSERT(env, ability != nullptr, "DataShareHelperConstructor: failed to get native ability");
-        LOG_INFO("FA Model: strUri = %{public}s", strUri.c_str());
-        proxy->datashareHelper_ = DataShareHelper::Creator(ability->GetContext(), strUri);
-    } else {
-        auto context = OHOS::AbilityRuntime::GetStageModeContext(env, argv[PARAM0]);
-        strUri = DataShareJSUtils::Convert2String(env, argv[PARAM1]);
-        NAPI_ASSERT(env, context != nullptr, "DataShareHelperConstructor: failed to get native context");
-        LOG_INFO("Stage Model: strUri = %{public}s", strUri.c_str());
-        proxy->datashareHelper_ = DataShareHelper::Creator(context, strUri);
-    }
-    NAPI_ASSERT(env, proxy->datashareHelper_ != nullptr, "proxy->datashareHelper_ is nullptr");
-    g_dataShareHelperList.emplace_back(proxy->datashareHelper_);
     auto finalize = [](napi_env env, void * data, void * hint) {
         NapiDataShareHelper *proxy = reinterpret_cast<NapiDataShareHelper *>(data);
         if (proxy != nullptr) {
