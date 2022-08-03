@@ -66,7 +66,7 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
     {
         std::unique_lock<std::mutex> lock(uvEntry->mutex);
         if (uvEntry->condition.wait_for(lock, std::chrono::seconds(WAIT_TIME), [uvEntry] { return uvEntry->done; })) {
-            LOG_INFO("Wait uv_queue_work timeout.");
+            LOG_INFO("function ended successfully");
         }
         CheckFuncAndExec(uvEntry->retFunc);
         if (!uvEntry->done && !uv_cancel((uv_req_t*)&work)) {
