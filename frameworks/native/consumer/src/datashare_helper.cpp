@@ -29,6 +29,7 @@ constexpr int INVALID_VALUE = -1;
 }  // namespace
 
 std::mutex DataShareHelper::oplock_;
+std::mutex DataShareHelper::deathlock_;
 
 DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token,
     const Uri &uri, const sptr<IDataShare> &dataShareProxy, sptr<DataShareConnection> dataShareConnection)
@@ -56,6 +57,7 @@ void DataShareHelper::AddDataShareDeathRecipient(const sptr<IRemoteObject> &toke
         LOG_INFO("token is nullptr");
         return;
     }
+    std::lock_guard<std::mutex> lock_l(deathlock_);
     if (callerDeathRecipient_ != nullptr) {
         LOG_INFO("exist callerDeathRecipient_.");
         return;
@@ -72,6 +74,7 @@ void DataShareHelper::AddDataShareDeathRecipient(const sptr<IRemoteObject> &toke
 void DataShareHelper::OnSchedulerDied(const wptr<IRemoteObject> &remote)
 {
     LOG_INFO("start.");
+    std::lock_guard<std::mutex> lock_l(deathlock_);
     if (callerDeathRecipient_ != nullptr) {
         dataShareProxy_->AsObject()->RemoveDeathRecipient(callerDeathRecipient_);
         callerDeathRecipient_ = nullptr;
