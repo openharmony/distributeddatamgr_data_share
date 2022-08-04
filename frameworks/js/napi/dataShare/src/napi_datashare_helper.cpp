@@ -128,7 +128,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextF, ctxInfo->strUri);
         }
     };
-    auto context = std::make_shared<AsyncCall::Context>(input, output, ctxInfo->ref);
+    auto context = std::make_shared<AsyncCall::Context>(input, output, &(ctxInfo->ref));
     AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
