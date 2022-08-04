@@ -45,8 +45,6 @@
 
 ## 相关仓
 
-[分布式数据管理子系统](https://gitee.com/openharmony/distributeddatamgr_data_share/blob/master/README_zh.md)
-
-[distributeddatamgr_datamgr](https://gitee.com/openharmony/distributeddatamgr_datamgr/blob/master/README_zh.md)
+[分布式数据管理子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/分布式数据管理子系统.md)
 
 [**distributeddatamgr_data_share**](https://gitee.com/openharmony/distributeddatamgr_data_share/blob/master/README_zh.md)
