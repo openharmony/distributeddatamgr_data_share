@@ -142,6 +142,7 @@ void AsyncCall::DeleteContext(napi_env env, AsyncContext *context)
     }
     if (context->ctx->createRef_ != nullptr) {
         napi_delete_reference(env, context->ctx->createRef_);
+        context->ctx->createRef_ = nullptr;
     }
     delete context;
 }
