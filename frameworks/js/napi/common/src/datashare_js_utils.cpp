@@ -251,8 +251,10 @@ std::string DataShareJSUtils::UnwrapStringFromJS(napi_env env, napi_value param,
         value = defaultValue;
     }
 
-    delete[] buf;
-    buf = nullptr;
+    if (buf != nullptr) {
+        delete[] buf;
+        buf = nullptr;
+    }
     return value;
 }
 } // namespace DataShare
