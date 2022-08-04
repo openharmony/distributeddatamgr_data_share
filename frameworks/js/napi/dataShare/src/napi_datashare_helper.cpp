@@ -112,7 +112,6 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         NAPI_ASSERT_BASE(env, ctxInfo->dataShareHelper != nullptr, "dataShareHelper is nullptr", napi_invalid_arg);
         g_dataShareHelperList.emplace_back(ctxInfo->dataShareHelper);
         napi_status status = napi_get_reference_value(env, ctxInfo->ref, result);
-        napi_delete_reference(env, ctxInfo->ref);
         NapiDataShareHelper *proxy = nullptr;
         status = napi_unwrap(env, *result, reinterpret_cast<void **>(&proxy));
         if (proxy == nullptr) {
@@ -120,6 +119,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             return status;
         }
         proxy->datashareHelper_ = std::move(ctxInfo->dataShareHelper);
+        napi_delete_reference(env, ctxInfo->ref);
         return status;
     };
     auto exec = [ctxInfo](AsyncCall::Context *ctx) {
