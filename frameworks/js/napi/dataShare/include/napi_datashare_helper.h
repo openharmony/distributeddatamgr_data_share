@@ -48,12 +48,18 @@ private:
     std::map<std::string, sptr<NAPIDataShareObserver>> observerMap_;
 
     struct CreateContextInfo {
+        napi_env env = nullptr;
         napi_ref ref = nullptr;
         bool isStageMode = true;
         std::string strUri = "";
         std::shared_ptr<Context> contextF = nullptr;
         std::shared_ptr<OHOS::AbilityRuntime::Context> contextS = nullptr;
         std::shared_ptr<DataShareHelper> dataShareHelper = nullptr;
+        ~CreateContextInfo() {
+            if (env != nullptr && ref != nullptr) {
+                napi_delete_reference(env, ref);
+            }
+        }
     };
 
     struct ContextInfo : public AsyncCall::Context {

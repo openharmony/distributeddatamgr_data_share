@@ -30,8 +30,7 @@ public:
         using InputAction = std::function<napi_status(napi_env, size_t, napi_value *, napi_value)>;
         using OutputAction = std::function<napi_status(napi_env, napi_value *)>;
         using ExecAction = std::function<void(Context *)>;
-        Context(InputAction input, OutputAction output, napi_ref *createRef = nullptr)
-            : input_(std::move(input)), output_(std::move(output)), createRef_(createRef)  {};
+        Context(InputAction input, OutputAction output): input_(std::move(input)), output_(std::move(output))  {};
         virtual ~Context() {};
         void SetAction(InputAction input, OutputAction output = nullptr)
         {
@@ -73,7 +72,6 @@ public:
         InputAction input_ = nullptr;
         OutputAction output_ = nullptr;
         ExecAction exec_ = nullptr;
-        napi_ref *createRef_ = nullptr;
     };
 
     // The default AsyncCallback in the parameters is at the end position.

@@ -106,6 +106,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             return napi_generic_failure;
         }
         napi_create_reference(env, helperProxy, 1, &(ctxInfo->ref));
+        ctxInfo->env = env;
         return napi_ok;
     };
     auto output = [ctxInfo](napi_env env, napi_value *result) -> napi_status {
@@ -128,7 +129,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextF, ctxInfo->strUri);
         }
     };
-    auto context = std::make_shared<AsyncCall::Context>(input, output, &(ctxInfo->ref));
+    auto context = std::make_shared<AsyncCall::Context>(input, output);
     AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
