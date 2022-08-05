@@ -55,7 +55,8 @@ private:
         std::shared_ptr<Context> contextF = nullptr;
         std::shared_ptr<OHOS::AbilityRuntime::Context> contextS = nullptr;
         std::shared_ptr<DataShareHelper> dataShareHelper = nullptr;
-        ~CreateContextInfo() {
+        ~CreateContextInfo()
+        {
             if (env != nullptr && ref != nullptr) {
                 napi_delete_reference(env, ref);
             }
