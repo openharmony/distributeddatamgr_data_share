@@ -313,16 +313,7 @@ std::vector<std::string> JsDataShareExtAbility::GetFileTypes(const Uri &uri, con
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* nativeMimeTypeFilter = reinterpret_cast<NativeValue*>(napiMimeTypeFilter);
     NativeValue* argv[] = {nativeUri, nativeMimeTypeFilter};
-    NativeValue* nativeResult = CallObjectMethod("getFileTypes", argv, ARGC_TWO);
-    if (nativeResult == nullptr) {
-        LOG_ERROR("%{public}s call getFileTypes with return null.", __func__);
-        return ret;
-    }
-
-    if (!OHOS::AppExecFwk::UnwrapArrayStringFromJS(env, reinterpret_cast<napi_value>(nativeResult), ret)) {
-        LOG_ERROR("%{public}s call UnwrapArrayStringFromJS failed", __func__);
-        return ret;
-    }
+    CallObjectMethod("getFileTypes", argv, ARGC_TWO);
 
     LOG_INFO("end.");
     return ret;
@@ -351,13 +342,8 @@ int JsDataShareExtAbility::OpenFile(const Uri &uri, const std::string &mode)
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* nativeMode = reinterpret_cast<NativeValue*>(napiMode);
     NativeValue* argv[] = {nativeUri, nativeMode};
-    NativeValue* nativeResult = CallObjectMethod("openFile", argv, ARGC_TWO);
-    if (nativeResult == nullptr) {
-        LOG_ERROR("%{public}s call openFile with return null.", __func__);
-        return ret;
-    }
+    CallObjectMethod("openFile", argv, ARGC_TWO);
 
-    ret = OHOS::AppExecFwk::UnwrapInt32FromJS(env, reinterpret_cast<napi_value>(nativeResult));
     LOG_INFO("end.");
     return ret;
 }
@@ -385,13 +371,8 @@ int JsDataShareExtAbility::OpenRawFile(const Uri &uri, const std::string &mode)
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* nativeMode = reinterpret_cast<NativeValue*>(napiMode);
     NativeValue* argv[] = {nativeUri, nativeMode};
-    NativeValue* nativeResult = CallObjectMethod("openRawFile", argv, ARGC_TWO, false);
-    if (nativeResult == nullptr) {
-        LOG_ERROR("%{public}s call openRawFile with return null.", __func__);
-        return ret;
-    }
+    CallObjectMethod("openRawFile", argv, ARGC_TWO, false);
 
-    ret = OHOS::AppExecFwk::UnwrapInt32FromJS(env, reinterpret_cast<napi_value>(nativeResult));
     LOG_INFO("end.");
     return ret;
 }
@@ -423,13 +404,8 @@ int JsDataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &v
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* nativeValue = reinterpret_cast<NativeValue*>(napiValue);
     NativeValue* argv[] = {nativeUri, nativeValue};
-    NativeValue* nativeResult = CallObjectMethod("insert", argv, ARGC_TWO);
-    if (nativeResult == nullptr) {
-        LOG_ERROR("%{public}s call insert with return null.", __func__);
-        return ret;
-    }
+    CallObjectMethod("insert", argv, ARGC_TWO);
 
-    ret = OHOS::AppExecFwk::UnwrapInt32FromJS(env, reinterpret_cast<napi_value>(nativeResult));
     LOG_INFO("end.");
     return ret;
 }
@@ -471,13 +447,8 @@ int JsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pre
     NativeValue* nativePredicates = reinterpret_cast<NativeValue*>(napiPredicates);
     NativeValue* nativeValue = reinterpret_cast<NativeValue*>(napiValue);
     NativeValue* argv[] = {nativeUri, nativePredicates, nativeValue};
-    NativeValue* nativeResult = CallObjectMethod("update", argv, ARGC_THREE);
-    if (nativeResult == nullptr) {
-        LOG_ERROR("%{public}s call update with return null.", __func__);
-        return ret;
-    }
+    CallObjectMethod("update", argv, ARGC_THREE);
 
-    ret = OHOS::AppExecFwk::UnwrapInt32FromJS(env, reinterpret_cast<napi_value>(nativeResult));
     LOG_INFO("end.");
     return ret;
 }
@@ -510,13 +481,8 @@ int JsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &pre
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* nativePredicates = reinterpret_cast<NativeValue*>(napiPredicates);
     NativeValue* argv[] = {nativeUri, nativePredicates};
-    NativeValue* nativeResult = CallObjectMethod("delete", argv, ARGC_TWO);
-    if (nativeResult == nullptr) {
-        LOG_ERROR("%{public}s call delete with return null.", __func__);
-        return ret;
-    }
+    CallObjectMethod("delete", argv, ARGC_TWO);
 
-    ret = OHOS::AppExecFwk::UnwrapInt32FromJS(env, reinterpret_cast<napi_value>(nativeResult));
     LOG_INFO("end.");
     return ret;
 }
@@ -558,23 +524,10 @@ std::shared_ptr<DataShareResultSet> JsDataShareExtAbility::Query(const Uri &uri,
     NativeValue* nativePredicates = reinterpret_cast<NativeValue*>(napiPredicates);
     NativeValue* nativeColumns = reinterpret_cast<NativeValue*>(napiColumns);
     NativeValue* argv[] = {nativeUri, nativePredicates, nativeColumns};
-    NativeValue* nativeResult = CallObjectMethod("query", argv, ARGC_THREE);
-    if (nativeResult == nullptr) {
-        LOG_ERROR("%{public}s call query with return null.", __func__);
-        return ret;
-    }
+    CallObjectMethod("query", argv, ARGC_THREE);
 
-    ResultSetBridge::Creator *proxy = nullptr;
-    napi_unwrap(env, reinterpret_cast<napi_value>(nativeResult), reinterpret_cast<void **>(&proxy));
-    if (proxy == nullptr) {
-        LOG_ERROR("unwrap ResultSetBridge::Creator proxy is null.");
-        return nullptr;
-    }
-
-    std::shared_ptr<ResultSetBridge> bridge = proxy->Create();
-    LOG_INFO("ret == nullptr : %{public}d.", bridge == nullptr);
-    std::shared_ptr<DataShareResultSet> resultSet = std::make_shared<DataShareResultSet>(bridge);
-    return resultSet;
+    LOG_INFO("end.");
+    return std::make_shared<DataShareResultSet>();
 }
 
 std::string JsDataShareExtAbility::GetType(const Uri &uri)
@@ -592,13 +545,8 @@ std::string JsDataShareExtAbility::GetType(const Uri &uri)
     }
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* argv[] = {nativeUri};
-    NativeValue* nativeResult = CallObjectMethod("getType", argv, ARGC_ONE);
-    if (nativeResult == nullptr) {
-        LOG_ERROR("%{public}s call getType with return null.", __func__);
-        return ret;
-    }
+    CallObjectMethod("getType", argv, ARGC_ONE);
 
-    ret = OHOS::AppExecFwk::UnwrapStringFromJS(env, reinterpret_cast<napi_value>(nativeResult));
     LOG_INFO("end.");
     return ret;
 }
@@ -647,13 +595,8 @@ int JsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataSha
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* nativeValues = reinterpret_cast<NativeValue*>(napiValues);
     NativeValue* argv[] = {nativeUri, nativeValues};
-    NativeValue* nativeResult = CallObjectMethod("batchInsert", argv, ARGC_TWO);
-    if (nativeResult == nullptr) {
-        LOG_ERROR("%{public}s call batchInsert with return null.", __func__);
-        return ret;
-    }
+    CallObjectMethod("batchInsert", argv, ARGC_TWO);
 
-    ret = OHOS::AppExecFwk::UnwrapInt32FromJS(env, reinterpret_cast<napi_value>(nativeResult));
     LOG_INFO("end.");
     return ret;
 }
@@ -730,13 +673,8 @@ Uri JsDataShareExtAbility::NormalizeUri(const Uri &uri)
     }
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* argv[] = {nativeUri};
-    NativeValue* nativeResult = CallObjectMethod("normalizeUri", argv, ARGC_ONE);
-    if (nativeResult == nullptr) {
-        LOG_ERROR("%{public}s call normalizeUri with return null.", __func__);
-        return ret;
-    }
+    CallObjectMethod("normalizeUri", argv, ARGC_ONE);
 
-    ret = Uri(OHOS::AppExecFwk::UnwrapStringFromJS(env, reinterpret_cast<napi_value>(nativeResult)));
     LOG_INFO("end.");
     return ret;
 }
@@ -756,13 +694,8 @@ Uri JsDataShareExtAbility::DenormalizeUri(const Uri &uri)
     }
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* argv[] = {nativeUri};
-    NativeValue* nativeResult = CallObjectMethod("denormalizeUri", argv, ARGC_ONE);
-    if (nativeResult == nullptr) {
-        LOG_ERROR("%{public}s call denormalizeUri with return null.", __func__);
-        return ret;
-    }
+    CallObjectMethod("denormalizeUri", argv, ARGC_ONE);
 
-    ret = Uri(OHOS::AppExecFwk::UnwrapStringFromJS(env, reinterpret_cast<napi_value>(nativeResult)));
     LOG_INFO("end.");
     return ret;
 }
