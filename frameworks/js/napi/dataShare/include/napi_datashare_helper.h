@@ -16,6 +16,7 @@
 #ifndef NAPI_DATASHARE_HELPER_H
 #define NAPI_DATASHARE_HELPER_H
 
+#include <memory>
 #include "async_call.h"
 #include "datashare_helper.h"
 #include "data_share_common.h"

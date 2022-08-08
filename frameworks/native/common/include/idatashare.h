@@ -16,6 +16,7 @@
 #ifndef I_DATASHARE_H
 #define I_DATASHARE_H
 
+#include <memory>
 #include <string_ex.h>
 #include <iremote_broker.h>
 #include "uri.h"

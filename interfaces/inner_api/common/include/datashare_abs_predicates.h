@@ -16,6 +16,7 @@
 #ifndef DATASHARE_ABSPREDICATES_H
 #define DATASHARE_ABSPREDICATES_H
 
+#include <memory>
 #include <string>
 #include <vector>
 #include <list>
@@ -25,6 +26,9 @@ namespace OHOS {
 namespace DataShare {
 class DataShareAbsPredicates {
 public:
+    struct JsProxy {
+        std::shared_ptr<DataShareAbsPredicates> predicates_;
+    };
     virtual ~DataShareAbsPredicates() {}
     virtual DataShareAbsPredicates *EqualTo(const std::string &field, const DataSharePredicatesObject &value) = 0;
     virtual DataShareAbsPredicates *NotEqualTo(const std::string &field, const DataSharePredicatesObject &value) = 0;
@@ -46,6 +50,7 @@ public:
     virtual DataShareAbsPredicates *IsNull(const std::string &field) = 0;
     virtual DataShareAbsPredicates *IsNotNull(const std::string &field) = 0;
     virtual DataShareAbsPredicates *Like(const std::string &field, const std::string &value) = 0;
+    virtual DataShareAbsPredicates *Unlike(const std::string &field, const std::string &value) = 0;
     virtual DataShareAbsPredicates *Glob(const std::string &field, const std::string &value) = 0;
     virtual DataShareAbsPredicates *Between(const std::string &field,
         const std::string &low, const std::string &high) = 0;

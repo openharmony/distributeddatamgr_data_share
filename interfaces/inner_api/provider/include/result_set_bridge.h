@@ -16,6 +16,7 @@
 #ifndef DATASHARE_RESULT_SET_BRIDGE_H
 #define DATASHARE_RESULT_SET_BRIDGE_H
 
+#include <memory>
 #include <string>
 namespace OHOS {
 namespace DataShare {

@@ -17,6 +17,7 @@
 #define DATASHARE_I_SHARED_RESULT_SET_STUB_H
 #include <functional>
 #include <future>
+#include <memory>
 #include "safe_block_queue.h"
 #include "ishared_result_set.h"
 #include "iremote_stub.h"

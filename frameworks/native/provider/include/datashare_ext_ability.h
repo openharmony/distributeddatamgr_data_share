@@ -16,6 +16,7 @@
 #ifndef DATASHARE_EXT_ABILITY_H
 #define DATASHARE_EXT_ABILITY_H
 
+#include <memory>
 #include "extension_base.h"
 #include "datashare_values_bucket.h"
 #include "datashare_result.h"

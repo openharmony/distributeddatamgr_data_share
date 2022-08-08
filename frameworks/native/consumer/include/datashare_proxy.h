@@ -17,6 +17,7 @@
 #define DATASHARE_PROXY_H
 
 #include <iremote_proxy.h>
+#include <memory>
 #include "idatashare.h"
 
 namespace OHOS {

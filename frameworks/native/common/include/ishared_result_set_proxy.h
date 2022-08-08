@@ -15,6 +15,7 @@
 
 #ifndef DATASHARE_I_SHARED_RESULT_SET_PROXY_H
 #define DATASHARE_I_SHARED_RESULT_SET_PROXY_H
+#include <memory>
 #include "ishared_result_set.h"
 #include "iremote_proxy.h"
 #include "datashare_errno.h"

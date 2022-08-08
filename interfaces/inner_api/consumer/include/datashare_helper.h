@@ -18,6 +18,7 @@
 
 #include <mutex>
 #include <map>
+#include <memory>
 #include <string>
 
 #include "context.h"
