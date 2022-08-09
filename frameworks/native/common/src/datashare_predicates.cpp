@@ -22,8 +22,8 @@ DataSharePredicates::DataSharePredicates()
 {
 }
 
-DataSharePredicates::DataSharePredicates(Predicates &predicates)
-    : predicates_(predicates)
+DataSharePredicates::DataSharePredicates(const std::list<OperationItem> &operList)
+    : operationList_(operList)
 {
 }
 
@@ -368,19 +368,11 @@ DataSharePredicates *DataSharePredicates::InKeys(const std::vector<std::string> 
 }
 
 /**
- * Obtains the table name.
- */
-std::string DataSharePredicates::GetTableName() const
-{
-    return predicates_.tableName;
-}
-
-/**
  * GetOperationList
  */
 const std::list<OperationItem>& DataSharePredicates::GetOperationList() const
 {
-    return predicates_.operationList;
+    return operationList_;
 }
 
 /**
@@ -488,72 +480,12 @@ void DataSharePredicates::SetOperationList(OperationType operationType, const Da
     operationItem.para2 = para2;
     operationItem.para3 = para3;
     operationItem.parameterCount = parameterCount;
-    predicates_.operationList.push_back(operationItem);
+    operationList_.push_back(operationItem);
     if (settingMode_ != PREDICATES_METHOD) {
         ClearQueryLanguage();
         settingMode_ = PREDICATES_METHOD;
     }
     LOG_DEBUG("DataSharePredicates::SetOperationList END settingMode_%{public}d", settingMode_);
-}
-
-/**
- * Write DataSharePredicates object to Parcel.
- */
-bool DataSharePredicates::Marshalling(OHOS::Parcel &parcel) const
-{
-    LOG_DEBUG("DataSharePredicates::Marshalling Start");
-    parcel.WriteInt32(predicates_.operationList.size());
-    for (auto &it : predicates_.operationList) {
-        parcel.WriteInt64(static_cast<int64_t>(it.operation));
-        parcel.WriteParcelable(&it.para1);
-        parcel.WriteParcelable(&it.para2);
-        parcel.WriteParcelable(&it.para3);
-        parcel.WriteInt64(static_cast<int64_t>(it.parameterCount));
-    }
-    parcel.WriteString(whereClause_);
-    parcel.WriteStringVector(whereArgs_);
-    parcel.WriteString(order_);
-    parcel.WriteInt64(static_cast<int64_t>(settingMode_));
-    LOG_DEBUG("DataSharePredicates::Marshalling End");
-    return true;
-}
-
-/**
- * Read from Parcel object.
- */
-DataSharePredicates* DataSharePredicates::Unmarshalling(OHOS::Parcel &parcel)
-{
-    LOG_DEBUG("DataSharePredicates::Unmarshalling Start");
-    Predicates predicates {};
-    OperationItem listitem {};
-    std::string whereClause = "";
-    std::vector<std::string> whereArgs;
-    std::string order = "";
-    int64_t settingMode = INVALID_MODE;
-    int listSize = parcel.ReadInt32();
-    for (int i = 0; i < listSize; i++) {
-        listitem.operation = static_cast<OperationType>(parcel.ReadInt64());
-        DataSharePredicatesObject *parameter1 = parcel.ReadParcelable<DataSharePredicatesObject>();
-        listitem.para1 = *parameter1;
-        DataSharePredicatesObject *parameter2 = parcel.ReadParcelable<DataSharePredicatesObject>();
-        listitem.para2 = *parameter2;
-        DataSharePredicatesObject *parameter3 = parcel.ReadParcelable<DataSharePredicatesObject>();
-        listitem.para3 = *parameter3;
-        listitem.parameterCount = static_cast<ParameterCount>(parcel.ReadInt64());
-        predicates.operationList.push_back(listitem);
-    }
-    parcel.ReadString(whereClause);
-    parcel.ReadStringVector(&whereArgs);
-    parcel.ReadString(order);
-    parcel.ReadInt64(settingMode);
-    SettingMode settingmode = static_cast<SettingMode>(settingMode);
-    auto predicatesObject = new DataSharePredicates(predicates);
-    predicatesObject->SetWhereClause(whereClause);
-    predicatesObject->SetWhereArgs(whereArgs);
-    predicatesObject->SetOrder(order);
-    predicatesObject->SetSettingMode(settingmode);
-    LOG_DEBUG("DataSharePredicates::Unmarshalling End");
-    return predicatesObject;
 }
 } // namespace DataShare
 } // namespace OHOS

@@ -19,6 +19,7 @@
 #include "datashare_log.h"
 #include "ipc_types.h"
 #include "ishared_result_set.h"
+#include "itypes_util.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -137,12 +138,12 @@ ErrCode DataShareStub::CmdInsert(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("DataShareStub uri is nullptr");
         return ERR_INVALID_VALUE;
     }
-    std::shared_ptr<DataShareValuesBucket> value(DataShareValuesBucket::Unmarshalling(data));
-    if (value == nullptr) {
-        LOG_ERROR("ReadParcelable value is nullptr");
+    DataShareValuesBucket value;
+    if (!ITypesUtil::Unmarshalling(data, value)) {
+        LOG_ERROR("Unmarshalling value is nullptr");
         return ERR_INVALID_VALUE;
     }
-    int index = Insert(*uri, *value);
+    int index = Insert(*uri, value);
     if (!reply.WriteInt32(index)) {
         LOG_ERROR("fail to WriteInt32 index");
         return ERR_INVALID_VALUE;
@@ -158,18 +159,17 @@ ErrCode DataShareStub::CmdUpdate(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("DataShareStub uri is nullptr");
         return ERR_INVALID_VALUE;
     }
-    std::shared_ptr<DataSharePredicates> predicates(
-        data.ReadParcelable<DataSharePredicates>());
-    if (predicates == nullptr) {
-        LOG_ERROR("ReadParcelable predicates is nullptr");
+    DataSharePredicates predicates;
+    if (!ITypesUtil::Unmarshalling(data, predicates)) {
+        LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
-    std::shared_ptr<DataShareValuesBucket> value(DataShareValuesBucket::Unmarshalling(data));
-    if (value == nullptr) {
-        LOG_ERROR("ReadParcelable value is nullptr");
+    DataShareValuesBucket value;
+    if (!ITypesUtil::Unmarshalling(data, value)) {
+        LOG_ERROR("Unmarshalling value is nullptr");
         return ERR_INVALID_VALUE;
     }
-    int index = Update(*uri, *predicates, *value);
+    int index = Update(*uri, predicates, value);
     if (!reply.WriteInt32(index)) {
         LOG_ERROR("fail to WriteInt32 index");
         return ERR_INVALID_VALUE;
@@ -184,13 +184,12 @@ ErrCode DataShareStub::CmdDelete(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("DataShareStub uri is nullptr");
         return ERR_INVALID_VALUE;
     }
-    std::shared_ptr<DataSharePredicates> predicates(
-        data.ReadParcelable<DataSharePredicates>());
-    if (predicates == nullptr) {
-        LOG_ERROR("ReadParcelable predicates is nullptr");
+    DataSharePredicates predicates;
+    if (!ITypesUtil::Unmarshalling(data, predicates)) {
+        LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
-    int index = Delete(*uri, *predicates);
+    int index = Delete(*uri, predicates);
     if (!reply.WriteInt32(index)) {
         LOG_ERROR("fail to WriteInt32 index");
         return ERR_INVALID_VALUE;
@@ -205,10 +204,9 @@ ErrCode DataShareStub::CmdQuery(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("DataShareStub uri is nullptr");
         return ERR_INVALID_VALUE;
     }
-    std::shared_ptr<DataSharePredicates> predicates(
-        data.ReadParcelable<DataSharePredicates>());
-    if (predicates == nullptr) {
-        LOG_ERROR("ReadParcelable predicates is nullptr");
+    DataSharePredicates predicates;
+    if (!ITypesUtil::Unmarshalling(data, predicates)) {
+        LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
     std::vector<std::string> columns;
@@ -216,7 +214,7 @@ ErrCode DataShareStub::CmdQuery(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to ReadStringVector columns");
         return ERR_INVALID_VALUE;
     }
-    auto resultSet = Query(*uri, *predicates, columns);
+    auto resultSet = Query(*uri, predicates, columns);
     if (resultSet == nullptr) {
         LOG_ERROR("fail to WriteParcelable resultSet");
         return ERR_INVALID_VALUE;
@@ -261,12 +259,12 @@ ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
 
     std::vector<DataShareValuesBucket> values;
     for (int i = 0; i < count; i++) {
-        std::unique_ptr<DataShareValuesBucket> value(DataShareValuesBucket::Unmarshalling(data));
-        if (value == nullptr) {
-            LOG_ERROR("DataShareStub value is nullptr, index = %{public}d", i);
+        DataShareValuesBucket value;
+        if (!ITypesUtil::Unmarshalling(data, value)) {
+            LOG_ERROR("Unmarshalling value is nullptr");
             return ERR_INVALID_VALUE;
         }
-        values.emplace_back(*value);
+        values.emplace_back(value);
     }
 
     int ret = BatchInsert(*uri, values);
