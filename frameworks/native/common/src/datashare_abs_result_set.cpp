@@ -14,7 +14,6 @@
  */
 #define LOG_TAG "DataShareAbsResultSet"
 #include "datashare_abs_result_set.h"
-#include <algorithm>
 #include <vector>
 #include "datashare_errno.h"
 #include "datashare_log.h"
