@@ -20,9 +20,8 @@
 
 #include "ability_connect_callback.h"
 #include "datashare_ext_ability_context.h"
-#include "native_engine/native_engine.h"
-#include "native_engine/native_value.h"
-
+class NativeEngine;
+class NativeValue;
 namespace OHOS {
 namespace DataShare {
 using namespace AbilityRuntime;

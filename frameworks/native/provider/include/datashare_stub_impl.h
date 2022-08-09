@@ -20,7 +20,6 @@
 #include "datashare_stub.h"
 #include "datashare_uv_queue.h"
 #include "js_datashare_ext_ability.h"
-#include "native_engine/native_value.h"
 
 namespace OHOS {
 namespace DataShare {

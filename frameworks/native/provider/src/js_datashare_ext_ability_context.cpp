@@ -26,6 +26,7 @@
 #include "napi_remote_object.h"
 #include "napi_common_start_options.h"
 #include "start_options.h"
+#include "native_engine/native_value.h"
 
 namespace OHOS {
 namespace DataShare {

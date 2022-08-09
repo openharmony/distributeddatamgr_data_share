@@ -12,11 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#define LOG_TAG "DataShareAbsResultSet"
 #include "datashare_abs_result_set.h"
+#include <algorithm>
 #include <vector>
-#include "datashare_log.h"
 #include "datashare_errno.h"
+#include "datashare_log.h"
 
 namespace OHOS {
 namespace DataShare {
