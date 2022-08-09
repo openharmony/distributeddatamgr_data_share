@@ -18,6 +18,7 @@
 
 #include "datashare_value_object.h"
 
+#include <parcel.h>
 #include <map>
 #include <set>
 
@@ -28,59 +29,27 @@ public:
     DataShareValuesBucket() = default;
     explicit DataShareValuesBucket(std::map<std::string, DataShareValueObject> &values) : valuesMap(values){};
     ~DataShareValuesBucket() = default;
-
     void Put(const std::string &columnName, const DataShareValueObject &value = {})
     {
         valuesMap.insert(std::make_pair(columnName, value));
     }
-    void PutString(const std::string &columnName, const std::string &value)
-    {
-        Put(columnName, value);
-    }
-    void PutInt(const std::string &columnName, int value)
-    {
-        Put(columnName, value);
-    }
-    void PutLong(const std::string &columnName, int64_t value)
-    {
-        Put(columnName, value);
-    }
-    void PutDouble(const std::string &columnName, double value)
-    {
-        Put(columnName, value);
-    }
-    void PutBool(const std::string &columnName, bool value)
-    {
-        Put(columnName, value);
-    }
-    void PutBlob(const std::string &columnName, const std::vector<uint8_t> &value)
-    {
-        Put(columnName, value);
-    }
-    void PutNull(const std::string &columnName)
-    {
-        Put(columnName);
-    }
+    void PutString(const std::string &columnName, const std::string &value);
+    void PutInt(const std::string &columnName, int value);
+    void PutLong(const std::string &columnName, int64_t value);
+    void PutDouble(const std::string &columnName, double value);
+    void PutBool(const std::string &columnName, bool value);
+    void PutBlob(const std::string &columnName, const std::vector<uint8_t> &value);
+    void PutNull(const std::string &columnName);
+    void Delete(const std::string &columnName);
+    void Clear();
+    int Size() const;
+    bool IsEmpty() const;
+    bool HasColumn(const std::string &columnName) const;
+    bool GetObject(const std::string &columnName, DataShareValueObject &value) const;
+    void GetAll(std::map<std::string, DataShareValueObject> &valuesMap) const;
 
-    void Clear()
-    {
-        valuesMap.clear();
-    }
-
-    bool IsEmpty() const
-    {
-        return valuesMap.empty();
-    }
-
-    bool GetObject(const std::string &columnName, DataShareValueObject &value) const
-    {
-        auto iter = valuesMap.find(columnName);
-        if (iter == valuesMap.end()) {
-            return false;
-        }
-        value = iter->second;
-        return true;
-    }
+    static bool Marshalling(const DataShareValuesBucket &valuesBucket, Parcel &parcel);
+    static DataShareValuesBucket *Unmarshalling(Parcel &parcel);
 
     std::map<std::string, DataShareValueObject> valuesMap;
 };

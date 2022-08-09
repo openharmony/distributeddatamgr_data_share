@@ -18,16 +18,17 @@
 
 #include "datashare_abs_predicates.h"
 
+#include <parcel.h>
 #include <string>
 
 #include "datashare_predicates_object.h"
 
 namespace OHOS {
 namespace DataShare {
-class DataSharePredicates : public DataShareAbsPredicates {
+class DataSharePredicates : public virtual DataShareAbsPredicates, public virtual OHOS::Parcelable {
 public:
     DataSharePredicates();
-    explicit DataSharePredicates(const std::list<OperationItem> &operList);
+    explicit DataSharePredicates(Predicates &predicates);
     ~DataSharePredicates();
     DataSharePredicates *EqualTo(const std::string &field, const DataSharePredicatesObject &value)override;
     DataSharePredicates *NotEqualTo(const std::string &field, const DataSharePredicatesObject &value)override;
@@ -47,7 +48,7 @@ public:
     DataSharePredicates *IsNull(const std::string &field)override;
     DataSharePredicates *IsNotNull(const std::string &field)override;
     DataSharePredicates *Like(const std::string &field, const std::string &value)override;
-    DataSharePredicates *Unlike(const std::string &field, const std::string &value)override;
+    DataSharePredicates *Unlike(const std::string &field, const std::string &value);
     DataSharePredicates *Glob(const std::string &field, const std::string &value)override;
     DataSharePredicates *Between(const std::string &field, const std::string &low, const std::string &high)override;
     DataSharePredicates *NotBetween(const std::string &field, const std::string &low, const std::string &high)override;
@@ -67,13 +68,16 @@ public:
     std::string GetOrder() const override;
     int SetOrder(const std::string &order)override;
     SettingMode GetSettingMode() const override;
-    void SetSettingMode(const SettingMode &settingMode);
+    bool Marshalling(OHOS::Parcel &parcel) const override;
+    static DataSharePredicates *Unmarshalling(OHOS::Parcel &parcel);
+    std::string GetTableName() const;
 
 private:
     void SetOperationList(OperationType operationType, const DataSharePredicatesObject &para1,
         const DataSharePredicatesObject &para2, const DataSharePredicatesObject &para3, ParameterCount parameterCount);
     void ClearQueryLanguage();
-    std::list<OperationItem> operationList_;
+    void SetSettingMode(const SettingMode &settingMode);
+    Predicates predicates_;
     std::string whereClause_;
     std::vector<std::string> whereArgs_;
     std::string order_;

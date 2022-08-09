@@ -27,7 +27,8 @@ napi_value DataShareValueBucketNewInstance(napi_env env, DataShareValuesBucket &
 {
     napi_value ret;
     NAPI_CALL(env, napi_create_object(env, &ret));
-    std::map<std::string, DataShareValueObject> valuesMap = valuesBucket.valuesMap;
+    std::map<std::string, DataShareValueObject> valuesMap;
+    valuesBucket.GetAll(valuesMap);
     std::map<std::string, DataShareValueObject>::iterator it;
     for (it = valuesMap.begin(); it != valuesMap.end(); ++it) {
         std::string key = it->first;
@@ -38,23 +39,28 @@ napi_value DataShareValueBucketNewInstance(napi_env env, DataShareValuesBucket &
                     value = nullptr;
                 } break;
             case DataShareValueObjectType::TYPE_INT: {
-                    int64_t intVal = valueObject;
+                    int64_t intVal = 0;
+                    valueObject.GetLong(intVal);
                     value = DataShareJSUtils::Convert2JSValue(env, intVal);
                 } break;
             case DataShareValueObjectType::TYPE_DOUBLE: {
-                    double doubleVal = valueObject;
+                    double doubleVal = 0L;
+                    valueObject.GetDouble(doubleVal);
                     value = DataShareJSUtils::Convert2JSValue(env, doubleVal);
                 } break;
             case DataShareValueObjectType::TYPE_BLOB: {
-                    std::vector<uint8_t> blobVal = valueObject;
+                    std::vector<uint8_t> blobVal;
+                    valueObject.GetBlob(blobVal);
                     value = DataShareJSUtils::Convert2JSValue(env, blobVal);
                 } break;
             case DataShareValueObjectType::TYPE_BOOL: {
-                    bool boolVal  = valueObject;
+                    bool boolVal = false;
+                    valueObject.GetBool(boolVal);
                     value = DataShareJSUtils::Convert2JSValue(env, boolVal);
                 } break;
             default: {
-                    std::string strVal = valueObject;
+                    std::string strVal = "";
+                    valueObject.GetString(strVal);
                     value = DataShareJSUtils::Convert2JSValue(env, strVal);
                 } break;
         }
@@ -73,11 +79,11 @@ void SetValuesBucketObject(
         std::string valueString = DataShareJSUtils::UnwrapStringFromJS(env, value);
         LOG_INFO("ValueObject type:%{public}d, key:%{public}s, value:%{public}s",
             valueType, keyStr.c_str(), valueString.c_str());
-        valuesBucket.Put(keyStr, valueString);
+        valuesBucket.PutString(keyStr, valueString);
     } else if (valueType == napi_number) {
         double valueNumber = 0;
         napi_get_value_double(env, value, &valueNumber);
-        valuesBucket.Put(keyStr, valueNumber);
+        valuesBucket.PutDouble(keyStr, valueNumber);
         LOG_INFO(
             "ValueObject type:%{public}d, key:%{public}s, value:%{public}lf", valueType, keyStr.c_str(), valueNumber);
     } else if (valueType == napi_boolean) {
@@ -85,13 +91,13 @@ void SetValuesBucketObject(
         napi_get_value_bool(env, value, &valueBool);
         LOG_INFO(
             "ValueObject type:%{public}d, key:%{public}s, value:%{public}d", valueType, keyStr.c_str(), valueBool);
-        valuesBucket.Put(keyStr, valueBool);
+        valuesBucket.PutBool(keyStr, valueBool);
     } else if (valueType == napi_null) {
-        valuesBucket.Put(keyStr);
+        valuesBucket.PutNull(keyStr);
         LOG_INFO("ValueObject type:%{public}d, key:%{public}s, value:null", valueType, keyStr.c_str());
     } else if (valueType == napi_object) {
         LOG_INFO("ValueObject type:%{public}d, key:%{public}s, value:Uint8Array", valueType, keyStr.c_str());
-        valuesBucket.Put(keyStr, DataShareJSUtils::Convert2U8Vector(env, value));
+        valuesBucket.PutBlob(keyStr, DataShareJSUtils::Convert2U8Vector(env, value));
     } else {
         LOG_ERROR("valuesBucket error");
     }

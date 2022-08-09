@@ -74,6 +74,11 @@ typedef struct {
     ParameterCount parameterCount;
 } OperationItem;
 
+typedef struct {
+    std::string tableName;
+    std::list<OperationItem> operationList;
+} Predicates;
+
 typedef enum {
     INVALID_MODE,
     QUERY_LANGUAGE,

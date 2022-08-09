@@ -32,17 +32,14 @@ constexpr int MAX_ARGC = 6;
 
 std::list<std::shared_ptr<DataShareHelper>> g_dataShareHelperList;
 
-DataSharePredicates UnwrapDataSharePredicates(napi_env env, napi_value value)
+void UnwrapDataSharePredicates(DataSharePredicates &predicates, napi_env env, napi_value value)
 {
-    auto predicate = std::make_shared<DataSharePredicates>();
     auto tempPredicates = DataSharePredicatesProxy::GetNativePredicates(env, value);
     if (tempPredicates == nullptr) {
         LOG_ERROR("UnwrapDataSharePredicates GetNativePredicates retval Marshalling failed.");
-        return *predicate;
+        return;
     }
-    const std::list<OperationItem> &operations  = tempPredicates->GetOperationList();
-    predicate = std::make_shared<DataSharePredicates>(operations);
-    return *predicate;
+    predicates = *tempPredicates;
 }
 
 bool UnwrapValuesBucketArrayFromJS(napi_env env, napi_value param, std::vector<DataShareValuesBucket> &value)
@@ -300,7 +297,7 @@ napi_value NapiDataShareHelper::Napi_Delete(napi_env env, napi_callback_info inf
             LOG_INFO("wrong type, should be napi_string");
         }
 
-        context->predicates = UnwrapDataSharePredicates(env, argv[PARAM1]);
+        UnwrapDataSharePredicates(context->predicates, env, argv[PARAM1]);
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
@@ -342,7 +339,7 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
             LOG_INFO("wrong type, should be napi_string");
         }
 
-        context->predicates = UnwrapDataSharePredicates(env, argv[PARAM1]);
+        UnwrapDataSharePredicates(context->predicates, env, argv[PARAM1]);
 
         context->columns = DataShareJSUtils::Convert2StrVector(env, argv[PARAM2], DataShareJSUtils::DEFAULT_BUF_SIZE);
         return napi_ok;
@@ -387,7 +384,7 @@ napi_value NapiDataShareHelper::Napi_Update(napi_env env, napi_callback_info inf
             LOG_INFO("wrong type, should be napi_string");
         }
 
-        context->predicates = UnwrapDataSharePredicates(env, argv[PARAM1]);
+        UnwrapDataSharePredicates(context->predicates, env, argv[PARAM1]);
 
         context->valueBucket.Clear();
         GetValueBucketObject(context->valueBucket, env, argv[PARAM2]);

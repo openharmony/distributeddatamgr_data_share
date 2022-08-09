@@ -15,7 +15,6 @@
 
 #include "datashare_operation.h"
 #include "datashare_log.h"
-#include "itypes_util.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -292,7 +291,7 @@ bool DataShareOperation::Marshalling(Parcel &out) const
             return false;
         }
 
-        if (!ITypesUtil::Marshalling(*valuesBucket_, out)) {
+        if (!DataShareValuesBucket::Marshalling(*valuesBucket_, out)) {
             LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
             return false;
         }
@@ -308,7 +307,7 @@ bool DataShareOperation::Marshalling(Parcel &out) const
             LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
             return false;
         }
-        if (!ITypesUtil::Marshalling(*dataSharePredicates_, out)) {
+        if (!out.WriteParcelable(dataSharePredicates_.get())) {
             LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
             return false;
         }
@@ -323,7 +322,7 @@ bool DataShareOperation::Marshalling(Parcel &out) const
             LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
             return false;
         }
-        if (!ITypesUtil::Marshalling(*valuesBucketReferences_, out)) {
+        if (!DataShareValuesBucket::Marshalling(*valuesBucketReferences_, out)) {
             LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
             return false;
         }
@@ -407,9 +406,7 @@ bool DataShareOperation::ReadFromParcel(Parcel &in)
     LOG_DEBUG("DataShareOperation::ReadFromParcel empty is %{public}s",
         empty == VALUE_OBJECT ? "VALUE_OBJECT" : "VALUE_NULL");
     if (empty == VALUE_OBJECT) {
-        DataShareValuesBucket valuesBucket;
-        ITypesUtil::Unmarshalling(in, valuesBucket);
-        valuesBucket_.reset(&valuesBucket);
+        valuesBucket_.reset(DataShareValuesBucket::Unmarshalling(in));
     } else {
         valuesBucket_.reset();
     }
@@ -421,9 +418,7 @@ bool DataShareOperation::ReadFromParcel(Parcel &in)
     LOG_DEBUG("DataShareOperation::ReadFromParcel empty is %{public}s",
         empty == VALUE_OBJECT ? "VALUE_OBJECT" : "VALUE_NULL");
     if (empty == VALUE_OBJECT) {
-        DataSharePredicates tmpPredicates;
-        ITypesUtil::Unmarshalling(in, tmpPredicates);
-        dataSharePredicates_.reset(&tmpPredicates);
+        dataSharePredicates_.reset(in.ReadParcelable<DataSharePredicates>());
     } else {
         dataSharePredicates_.reset();
     }
@@ -435,9 +430,7 @@ bool DataShareOperation::ReadFromParcel(Parcel &in)
     LOG_DEBUG("DataShareOperation::ReadFromParcel empty is %{public}s",
         (empty == VALUE_OBJECT) ? "VALUE_OBJECT" : "VALUE_NULL");
     if (empty == VALUE_OBJECT) {
-        DataShareValuesBucket valuesBucket;
-        ITypesUtil::Unmarshalling(in, valuesBucket);
-        valuesBucket_.reset(&valuesBucket);
+        valuesBucketReferences_.reset(DataShareValuesBucket::Unmarshalling(in));
     } else {
         valuesBucketReferences_.reset();
     }
