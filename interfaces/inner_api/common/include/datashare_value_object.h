@@ -16,14 +16,13 @@
 #ifndef DATASHARE_VALUE_OBJECT_H
 #define DATASHARE_VALUE_OBJECT_H
 
+#include <parcel.h>
 #include <variant>
 #include <string>
 #include <vector>
 
 namespace OHOS {
 namespace DataShare {
-constexpr int INVALID_TYPE = -1;
-constexpr int NO_ERROR = 0;
 enum DataShareValueObjectType : int32_t {
     TYPE_NULL = 0,
     TYPE_INT,
@@ -39,11 +38,11 @@ public:
     ~DataShareValueObject() = default;
     DataShareValueObject(DataShareValueObject &&object) noexcept : type(object.type), value(std::move(object.value)) {};
     DataShareValueObject(const DataShareValueObject &object) : type(object.type), value(object.value) {};
-    DataShareValueObject(int val) : type(TYPE_INT), value(static_cast<int64_t>(val)) {};
+    DataShareValueObject(int val) : DataShareValueObject(static_cast<int64_t>(val)) {};
     DataShareValueObject(int64_t val) : type(TYPE_INT), value(val) {};
     DataShareValueObject(double val) : type(TYPE_DOUBLE), value(val) {};
     DataShareValueObject(bool val) : type(TYPE_BOOL), value(val) {};
-    DataShareValueObject(std::string val) : type(TYPE_STRING), value(std::move(val)) {};
+    DataShareValueObject(const std::string &val) : type(TYPE_STRING), value(val) {};
     DataShareValueObject(const char *val) : DataShareValueObject(std::string(val)) {};
     DataShareValueObject(std::vector<uint8_t> blob) : type(TYPE_BLOB), value(std::move(blob)) {};
     DataShareValueObject &operator=(DataShareValueObject &&object) noexcept
@@ -66,54 +65,19 @@ public:
         return *this;
     }
 
-    DataShareValueObjectType GetType() const
-    {
-        return type;
-    }
-    template<typename T>
-    int Get(T &val, DataShareValueObjectType typeIn) const
-    {
-        if (type != typeIn) {
-            return INVALID_TYPE;
-        }
-
-        val = std::get<T>(value);
-        return NO_ERROR;
-    }
-    int GetInt(int &val) const
-    {
-        int64_t v = 0;
-        if (!Get(v, DataShareValueObjectType::TYPE_INT)) {
-            return INVALID_TYPE;
-        }
-        val = static_cast<int>(v);
-        return NO_ERROR;
-    }
-    int GetLong(int64_t &val) const
-    {
-        return Get(val, DataShareValueObjectType::TYPE_INT);
-    }
-    int GetDouble(double &val) const
-    {
-        return Get(val, DataShareValueObjectType::TYPE_DOUBLE);
-    }
-    int GetBool(bool &val) const
-    {
-        return Get(val, DataShareValueObjectType::TYPE_BOOL);
-    }
-    int GetString(std::string &val) const
-    {
-        return Get(val, DataShareValueObjectType::TYPE_STRING);
-    }
-    int GetBlob(std::vector<uint8_t> &val) const
-    {
-        return Get(val, DataShareValueObjectType::TYPE_BLOB);
-    }
+    DataShareValueObjectType GetType() const;
+    int GetInt(int &val) const;
+    int GetLong(int64_t &val) const;
+    int GetDouble(double &val) const;
+    int GetBool(bool &val) const;
+    int GetString(std::string &val) const;
+    int GetBlob(std::vector<uint8_t> &val) const;
+    static bool Marshalling(const DataShareValueObject &valueObject, Parcel &parcel);
+    static DataShareValueObject *Unmarshalling(Parcel &parcel);
 
     operator int () const
     {
-        int64_t val = std::get<int64_t>(value);
-        return static_cast<int>(val);
+        return static_cast<int>(std::get<int64_t>(value));
     }
     operator int64_t () const
     {

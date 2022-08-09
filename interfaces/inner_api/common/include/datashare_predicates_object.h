@@ -16,6 +16,7 @@
 #ifndef DATASHARE_PREDICATES_OBJECT_H
 #define DATASHARE_PREDICATES_OBJECT_H
 
+#include <parcel.h>
 #include <variant>
 #include <string>
 #include <vector>
@@ -35,48 +36,36 @@ enum class DataSharePredicatesObjectType {
     TYPE_STRING_VECTOR,
 };
 
-using ObjectType = DataSharePredicatesObjectType;
-class DataSharePredicatesObject {
+class DataSharePredicatesObject : public virtual OHOS::Parcelable {
 public:
-    DataSharePredicatesObject() : type(ObjectType::TYPE_NULL) {}
-    ~DataSharePredicatesObject() = default;
-    DataSharePredicatesObject(DataSharePredicatesObject &&val) noexcept : type(val.type), value(std::move(val.value)) {}
-    DataSharePredicatesObject(const DataSharePredicatesObject &val) : type(val.type), value(val.value) {}
-    DataSharePredicatesObject &operator=(DataSharePredicatesObject &&object) noexcept
-    {
-        if (this == &object) {
-            return *this;
-        }
-        type = object.type;
-        value = std::move(object.value);
-        object.type = ObjectType::TYPE_NULL;
-        return *this;
-    }
-    DataSharePredicatesObject &operator=(const DataSharePredicatesObject &object)
-    {
-        if (this == &object) {
-            return *this;
-        }
-        type = object.type;
-        value = object.value;
-        return *this;
-    }
-    DataSharePredicatesObject(int val) : type(ObjectType::TYPE_INT), value(val) {}
-    DataSharePredicatesObject(int64_t val) : type(ObjectType::TYPE_LONG), value(val) {}
-    DataSharePredicatesObject(double val) : type(ObjectType::TYPE_DOUBLE), value(val) {}
-    DataSharePredicatesObject(bool val) : type(ObjectType::TYPE_BOOL), value(val) {}
-    DataSharePredicatesObject(const char *val) : type(ObjectType::TYPE_STRING), value(std::string(val)) {}
-    DataSharePredicatesObject(std::string val) : type(ObjectType::TYPE_STRING), value(std::move(val)) {}
-    DataSharePredicatesObject(const std::vector<int> &val) : type(ObjectType::TYPE_INT_VECTOR), value(val) {}
-    DataSharePredicatesObject(const std::vector<int64_t> &val) : type(ObjectType::TYPE_LONG_VECTOR), value(val) {}
-    DataSharePredicatesObject(const std::vector<double> &val) : type(ObjectType::TYPE_DOUBLE_VECTOR), value(val) {}
-    DataSharePredicatesObject(const std::vector<std::string> &val) : type(ObjectType::TYPE_STRING_VECTOR), value(val) {}
+    DataSharePredicatesObject();
+    ~DataSharePredicatesObject();
+    DataSharePredicatesObject(DataSharePredicatesObject &&DataSharePredicatesObject) noexcept;
+    DataSharePredicatesObject(const DataSharePredicatesObject &DataSharePredicatesObject);
+    DataSharePredicatesObject &operator=(DataSharePredicatesObject &&DataSharePredicatesObject) noexcept;
+    DataSharePredicatesObject &operator=(const DataSharePredicatesObject &DataSharePredicatesObject);
+    DataSharePredicatesObject(int val);
+    DataSharePredicatesObject(int64_t val);
+    DataSharePredicatesObject(double val);
+    DataSharePredicatesObject(bool val);
+    DataSharePredicatesObject(const std::string &val);
+    DataSharePredicatesObject(const std::vector<int> &val);
+    DataSharePredicatesObject(const std::vector<int64_t> &val);
+    DataSharePredicatesObject(const std::vector<double> &val);
+    DataSharePredicatesObject(const std::vector<std::string> &val);
 
-    DataSharePredicatesObjectType GetType() const
-    {
-        return type;
-    }
-
+    DataSharePredicatesObjectType GetType() const;
+    int GetInt(int &val) const;
+    int GetLong(int64_t &val) const;
+    int GetDouble(double &val) const;
+    int GetBool(bool &val) const;
+    int GetString(std::string &val) const;
+    int GetIntVector(std::vector<int> &val) const;
+    int GetLongVector(std::vector<int64_t> &val) const;
+    int GetDoubleVector(std::vector<double> &val) const;
+    int GetStringVector(std::vector<std::string> &val) const;
+    bool Marshalling(Parcel &parcel) const override;
+    static DataSharePredicatesObject *Unmarshalling(Parcel &parcel);
     DataSharePredicatesObjectType type;
     std::variant<std::monostate, int, int64_t, double, std::string, bool, std::vector<int>, std::vector<int64_t>,
         std::vector<std::string>, std::vector<double>> value;
@@ -117,6 +106,11 @@ public:
     {
         return std::get<std::vector<double>>(value);
     }
+
+private:
+    void MarshallingVector(Parcel &parcel) const;
+    static void UnmarshallingVector(DataSharePredicatesObjectType type, DataSharePredicatesObject *pValueObject,
+        Parcel &parcel);
 };
 } // namespace DataShare
 } // namespace OHOS
