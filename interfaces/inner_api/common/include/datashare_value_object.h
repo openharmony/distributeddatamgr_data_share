@@ -34,17 +34,17 @@ enum DataShareValueObjectType : int32_t {
 
 class DataShareValueObject {
 public:
-    DataShareValueObject() : type(TYPE_NULL){};
+    DataShareValueObject() : type(TYPE_NULL) {};
     ~DataShareValueObject() = default;
-    DataShareValueObject(DataShareValueObject &&object) noexcept : type(object.type), value(std::move(object.value)){};
-    DataShareValueObject(const DataShareValueObject &object) : type(object.type), value(object.value){};
+    DataShareValueObject(DataShareValueObject &&object) noexcept : type(object.type), value(std::move(object.value)) {};
+    DataShareValueObject(const DataShareValueObject &object) : type(object.type), value(object.value) {};
     DataShareValueObject(int val) : DataShareValueObject(static_cast<int64_t>(val)) {};
-    DataShareValueObject(int64_t val) : type(TYPE_INT), value(val){};
-    DataShareValueObject(double val) : type(TYPE_DOUBLE), value(val){};
-    DataShareValueObject(bool val) : type(TYPE_BOOL), value(val){};
-    DataShareValueObject(const std::string &val) : type(TYPE_STRING), value(val){};
-    DataShareValueObject(const char *val) : DataShareValueObject(std::string(val)){};
-    DataShareValueObject(std::vector<uint8_t> blob) : type(TYPE_BLOB), value(std::move(blob)){};
+    DataShareValueObject(int64_t val) : type(TYPE_INT), value(val) {};
+    DataShareValueObject(double val) : type(TYPE_DOUBLE), value(val) {};
+    DataShareValueObject(bool val) : type(TYPE_BOOL), value(val) {};
+    DataShareValueObject(const std::string &val) : type(TYPE_STRING), value(val) {};
+    DataShareValueObject(const char *val) : DataShareValueObject(std::string(val)) {};
+    DataShareValueObject(std::vector<uint8_t> blob) : type(TYPE_BLOB), value(std::move(blob)) {};
     DataShareValueObject &operator=(DataShareValueObject &&object) noexcept
     {
         if (this == &object) {
