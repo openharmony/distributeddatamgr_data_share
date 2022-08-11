@@ -17,6 +17,7 @@
 #define NATIVE_DATASHARE_COMMON_INCLUDE_RESULT_SET_H
 
 #include <string>
+#include <vector>
 namespace OHOS {
 namespace DataShare {
 /* Value returned by getDataType(int) */

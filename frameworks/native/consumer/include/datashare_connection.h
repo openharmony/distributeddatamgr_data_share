@@ -17,6 +17,7 @@
 #define DATASHARE_CONNECTION_H
 
 #include <memory>
+#include <condition_variable>
 
 #include "ability_connect_callback_stub.h"
 #include "event_handler.h"

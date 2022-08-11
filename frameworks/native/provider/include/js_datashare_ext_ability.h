@@ -21,8 +21,9 @@
 #include "datashare_predicates.h"
 #include "datashare_ext_ability.h"
 #include "js_runtime.h"
-#include "native_engine/native_reference.h"
-#include "native_engine/native_value.h"
+#include "napi/native_api.h"
+#include "napi/native_common.h"
+#include "napi/native_node_api.h"
 
 namespace OHOS {
 namespace DataShare {

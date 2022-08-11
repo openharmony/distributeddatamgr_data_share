@@ -17,6 +17,8 @@
 #define DATASHARE_UV_QUEUE_H
 
 #include <functional>
+#include <condition_variable>
+#include <mutex>
 
 #include "napi/native_api.h"
 #include "napi/native_common.h"
