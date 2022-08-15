@@ -66,6 +66,8 @@ void DataShareConnection::OnAbilityConnectDone(
 void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
     LOG_INFO("called begin");
+    std::unique_lock<std::mutex> lock(condition_.mutex);
+    condition_.condition.notify_all();
     dataShareProxy_ = nullptr;
     isConnected_.store(false);
     LOG_INFO("called end");
@@ -94,9 +96,14 @@ void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
 void DataShareConnection::DisconnectDataShareExtAbility()
 {
     LOG_INFO("called begin");
+    std::unique_lock<std::mutex> lock(condition_.mutex);
     dataShareProxy_ = nullptr;
     isConnected_.store(false);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(this);
+    if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
+        [this] { return dataShareProxy_ == nullptr; })) {
+        LOG_INFO("disconnect ability ended successfully");
+    }
     LOG_INFO("called end, ret=%{public}d", ret);
 }
 
