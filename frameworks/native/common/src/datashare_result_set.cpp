@@ -42,6 +42,10 @@ DataShareResultSet::DataShareResultSet(std::shared_ptr<ResultSetBridge> &bridge)
     std::string name = "DataShare" + std::to_string(blockId_++);
     blockWriter_ = std::make_shared<DataShareBlockWriterImpl>(name, DEFAULT_SHARE_BLOCK_SIZE);
     sharedBlock_ = blockWriter_->GetBlock();
+    std::vector<std::string> columnNames;
+    bridge_->GetAllColumnNames(columnNames);
+    sharedBlock_->Clear();
+    sharedBlock_->SetColumnNum(columnNames.size());
 }
 
 DataShareResultSet::~DataShareResultSet()
