@@ -61,7 +61,7 @@ std::shared_ptr<DataShareOperationBuilder> DataShareOperationBuilder::WithValues
         return nullptr;
     }
 
-    valuesBucket_.reset(new (std::nothrow) DataShareValuesBucket(values->valuesMap));
+    valuesBucket_ = std::make_shared<DataShareValuesBucket>(values->valuesMap);
     LOG_DEBUG("DataShareOperationBuilder::WithValuesBucket end");
     return shared_from_this();
 }

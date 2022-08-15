@@ -30,7 +30,6 @@ public:
     static bool Marshalling(const DataShareValuesBucket &valuesBucket, Parcel &parcel);
     static bool Unmarshalling(Parcel &parcel, DataShareValuesBucket &valuesBucket);
 
-private:
     static bool Marshalling(const OperationItem &operationItem, Parcel &parcel);
     static bool Unmarshalling(Parcel &parcel, OperationItem &operationItem);
 

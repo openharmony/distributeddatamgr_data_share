@@ -70,45 +70,6 @@ public:
     {
         return type;
     }
-    template<typename T>
-    int Get(T &val, DataShareValueObjectType typeIn) const
-    {
-        if (type != typeIn) {
-            return INVALID_TYPE;
-        }
-
-        val = std::get<T>(value);
-        return NO_ERROR;
-    }
-    int GetInt(int &val) const
-    {
-        int64_t v = 0;
-        if (!Get(v, DataShareValueObjectType::TYPE_INT)) {
-            return INVALID_TYPE;
-        }
-        val = static_cast<int>(v);
-        return NO_ERROR;
-    }
-    int GetLong(int64_t &val) const
-    {
-        return Get(val, DataShareValueObjectType::TYPE_INT);
-    }
-    int GetDouble(double &val) const
-    {
-        return Get(val, DataShareValueObjectType::TYPE_DOUBLE);
-    }
-    int GetBool(bool &val) const
-    {
-        return Get(val, DataShareValueObjectType::TYPE_BOOL);
-    }
-    int GetString(std::string &val) const
-    {
-        return Get(val, DataShareValueObjectType::TYPE_STRING);
-    }
-    int GetBlob(std::vector<uint8_t> &val) const
-    {
-        return Get(val, DataShareValueObjectType::TYPE_BLOB);
-    }
 
     operator int () const
     {

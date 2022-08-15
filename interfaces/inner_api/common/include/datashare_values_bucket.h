@@ -33,34 +33,6 @@ public:
     {
         valuesMap.insert(std::make_pair(columnName, value));
     }
-    void PutString(const std::string &columnName, const std::string &value)
-    {
-        Put(columnName, value);
-    }
-    void PutInt(const std::string &columnName, int value)
-    {
-        Put(columnName, value);
-    }
-    void PutLong(const std::string &columnName, int64_t value)
-    {
-        Put(columnName, value);
-    }
-    void PutDouble(const std::string &columnName, double value)
-    {
-        Put(columnName, value);
-    }
-    void PutBool(const std::string &columnName, bool value)
-    {
-        Put(columnName, value);
-    }
-    void PutBlob(const std::string &columnName, const std::vector<uint8_t> &value)
-    {
-        Put(columnName, value);
-    }
-    void PutNull(const std::string &columnName)
-    {
-        Put(columnName);
-    }
 
     void Clear()
     {
@@ -72,14 +44,15 @@ public:
         return valuesMap.empty();
     }
 
-    bool GetObject(const std::string &columnName, DataShareValueObject &value) const
+    DataShareValueObject Get(const std::string &columnName, bool &isValid) const
     {
         auto iter = valuesMap.find(columnName);
         if (iter == valuesMap.end()) {
-            return false;
+            isValid = false;
+            return {};
         }
-        value = iter->second;
-        return true;
+        isValid = true;
+        return iter->second;
     }
 
     std::map<std::string, DataShareValueObject> valuesMap;
