@@ -81,7 +81,11 @@ void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
     LOG_INFO("called begin");
     std::unique_lock<std::mutex> lock(condition_.mutex);
     AAFwk::Want want;
-    want.SetUri(uri);
+    if (uri_.ToString().empty()) {
+        want.SetUri(uri);
+    } else {
+        want.SetUri(uri_);
+    }
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, this, token);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ != nullptr; })) {
