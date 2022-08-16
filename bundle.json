@@ -65,14 +65,15 @@
         },
         "build": {
             "sub_component": [
-                "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_abilitykit",
+                "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_consumer",
+                "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_provider",
                 "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_ext_ability_module",
                 "//foundation/distributeddatamgr/data_share/frameworks/js/napi:datashare_napi_packages",
                 "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common"
             ],
             "inner_kits": [
                 {
-                    "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_abilitykit",
+                    "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_consumer",
                     "header": {
                         "header_files": [
                             "datashare_helper.h",
@@ -82,7 +83,7 @@
                     }
                 },
                 {
-                    "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_abilitykit",
+                    "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_provider",
                     "header": {
                         "header_files": [
                             "result_set_bridge.h"

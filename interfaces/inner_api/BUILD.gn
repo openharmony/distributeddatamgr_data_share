@@ -49,13 +49,47 @@ config("ability_public_config") {
   ]
 }
 
-ohos_shared_library("datashare_abilitykit") {
+ohos_shared_library("datashare_consumer") {
   include_dirs = []
 
   sources = [
     "${datashare_native_consumer_path}/src/datashare_connection.cpp",
     "${datashare_native_consumer_path}/src/datashare_helper.cpp",
     "${datashare_native_consumer_path}/src/datashare_proxy.cpp",
+  ]
+  configs = [ ":ability_config" ]
+  public_configs = [ ":ability_public_config" ]
+
+  deps = [
+    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
+    "${ability_runtime_path}/frameworks/native/appkit:app_context",
+    "${datashare_innerapi_path}/common:datashare_common",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_context_native",
+    "ability_runtime:ability_manager",
+    "c_utils:utils",
+    "ipc:ipc_core",
+    "ipc_js:rpc",
+    "relational_store:native_appdatafwk",
+  ]
+
+  public_deps = [
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
+    "//foundation/arkui/napi:ace_napi",
+  ]
+
+  subsystem_name = "distributeddatamgr"
+  part_name = "data_share"
+}
+
+ohos_shared_library("datashare_provider") {
+  include_dirs = []
+
+  sources = [
     "${datashare_native_provider_path}/src/datashare_ext_ability.cpp",
     "${datashare_native_provider_path}/src/datashare_ext_ability_context.cpp",
     "${datashare_native_provider_path}/src/datashare_stub.cpp",
@@ -78,7 +112,6 @@ ohos_shared_library("datashare_abilitykit") {
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_context_native",
-    "ability_runtime:ability_manager",
     "ability_runtime:runtime",
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
@@ -105,7 +138,7 @@ ohos_shared_library("datashare_ext_ability_module") {
   public_configs = [ ":ability_public_config" ]
 
   deps = [
-    ":datashare_abilitykit",
+    ":datashare_provider",
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
   ]
 
