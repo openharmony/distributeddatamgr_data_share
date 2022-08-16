@@ -89,7 +89,6 @@ private:
     std::atomic<bool> isConnected_ = {false};
     sptr<IDataShare> dataShareProxy_;
     ConnectCondition condition_;
-    Uri uri_;
 };
 }  // namespace DataShare
 }  // namespace OHOS
