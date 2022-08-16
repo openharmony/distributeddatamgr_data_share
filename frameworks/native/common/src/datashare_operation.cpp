@@ -255,114 +255,26 @@ bool DataShareOperation::IsInterruptionAllowed() const
 }
 bool DataShareOperation::Marshalling(Parcel &out) const
 {
-    LOG_DEBUG("DataShareOperation::Marshalling start");
+    LOG_DEBUG("Start");
     if (!out.WriteInt32(type_)) {
-        LOG_ERROR("DataShareOperation::Marshalling WriteInt32(type_) error");
+        LOG_ERROR("Write type_ error");
         return false;
     }
     if (!out.WriteInt32(expectedCount_)) {
-        LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
+        LOG_ERROR("Write expectedCount_ error");
         return false;
     }
 
     if (!out.WriteBool(interrupted_)) {
-        LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
+        LOG_ERROR("Write interrupted_ error");
         return false;
     }
 
-    if (uri_ != nullptr) {
-        if (!out.WriteInt32(VALUE_OBJECT)) {
-            LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
-            return false;
-        }
-
-        if (!out.WriteParcelable(uri_.get())) {
-            LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
-            return false;
-        }
-    } else {
-        if (!out.WriteInt32(VALUE_NULL)) {
-            return false;
-        }
+    if (!Marshalling(out, uri_) || !Marshalling(out, valuesBucket_) || !Marshalling(out, dataSharePredicates_) ||
+        !Marshalling(out, valuesBucketReferences_) || !Marshalling(out, dataSharePredicatesBackReferences_)) {
+        return false;
     }
 
-    if (valuesBucket_ != nullptr) {
-        if (!out.WriteInt32(VALUE_OBJECT)) {
-            LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
-            return false;
-        }
-
-        if (!ITypesUtil::Marshalling(*valuesBucket_, out)) {
-            LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
-            return false;
-        }
-    } else {
-        if (!out.WriteInt32(VALUE_NULL)) {
-            LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
-            return false;
-        }
-    }
-
-    if (dataSharePredicates_ != nullptr) {
-        if (!out.WriteInt32(VALUE_OBJECT)) {
-            LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
-            return false;
-        }
-        if (!ITypesUtil::Marshalling(*dataSharePredicates_, out)) {
-            LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
-            return false;
-        }
-    } else {
-        if (!out.WriteInt32(VALUE_NULL)) {
-            return false;
-        }
-    }
-
-    if (valuesBucketReferences_ != nullptr) {
-        if (!out.WriteInt32(VALUE_OBJECT)) {
-            LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
-            return false;
-        }
-        if (!ITypesUtil::Marshalling(*valuesBucketReferences_, out)) {
-            LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
-            return false;
-        }
-    } else {
-        if (!out.WriteInt32(VALUE_NULL)) {
-            return false;
-        }
-    }
-
-    int referenceSize = 0;
-    if (!dataSharePredicatesBackReferences_.empty()) {
-        referenceSize = (int)dataSharePredicatesBackReferences_.size();
-        if (!out.WriteInt32(referenceSize)) {
-            LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
-            return false;
-        }
-        if (referenceSize >= REFERENCE_THRESHOLD) {
-            LOG_INFO("DataShareOperation::Marshalling referenceSize >= REFERENCE_THRESHOLD");
-            return true;
-        }
-        for (auto &it : dataSharePredicatesBackReferences_) {
-            if (!out.WriteInt32(it.first)) {
-                LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
-                return false;
-            }
-            if (!out.WriteInt32(it.second)) {
-                LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
-                return false;
-            }
-        }
-    } else {
-        LOG_DEBUG("DataShareOperation::Marshalling dataSharePredicatesBackReferences_ is empty");
-        if (!out.WriteInt32(referenceSize)) {
-            LOG_ERROR("DataShareOperation::Marshalling WriteInt32(VALUE_OBJECT) error");
-            return false;
-        }
-    }
-
-    LOG_DEBUG("DataShareOperation::Marshalling end");
     return true;
 }
 DataShareOperation *DataShareOperation::Unmarshalling(Parcel &in)
@@ -379,92 +291,20 @@ DataShareOperation *DataShareOperation::Unmarshalling(Parcel &in)
 }
 bool DataShareOperation::ReadFromParcel(Parcel &in)
 {
-    LOG_DEBUG("DataShareOperation::ReadFromParcel start");
+    LOG_DEBUG("Start");
     if (!in.ReadInt32(type_)) {
-        LOG_ERROR("DataShareOperation::ReadFromParcel ReadInt32(type_) error");
+        LOG_ERROR("Read type_ error");
         return false;
     }
     if (!in.ReadInt32(expectedCount_)) {
-        LOG_ERROR("DataShareOperation::ReadFromParcel ReadInt32(empty) error");
+        LOG_ERROR("Read expectedCount_ error");
         return false;
     }
     interrupted_ = in.ReadBool();
-    int empty = VALUE_NULL;
-    if (!in.ReadInt32(empty)) {
-        LOG_ERROR("DataShareOperation::ReadFromParcel ReadInt32(empty) error");
+    if (!ReadFromParcel(in, uri_) || !ReadFromParcel(in, valuesBucket_) || !ReadFromParcel(in, dataSharePredicates_) ||
+        !ReadFromParcel(in, valuesBucketReferences_) || !ReadFromParcel(in, dataSharePredicatesBackReferences_)) {
         return false;
     }
-    if (empty == VALUE_OBJECT) {
-        uri_.reset(in.ReadParcelable<Uri>());
-    } else {
-        uri_.reset();
-    }
-    empty = VALUE_NULL;
-    if (!in.ReadInt32(empty)) {
-        LOG_ERROR("DataShareOperation::ReadFromParcel ReadInt32(empty) error");
-        return false;
-    }
-    LOG_DEBUG("DataShareOperation::ReadFromParcel empty is %{public}s",
-        empty == VALUE_OBJECT ? "VALUE_OBJECT" : "VALUE_NULL");
-    if (empty == VALUE_OBJECT) {
-        DataShareValuesBucket valuesBucket;
-        ITypesUtil::Unmarshalling(in, valuesBucket);
-        valuesBucket_.reset(&valuesBucket);
-    } else {
-        valuesBucket_.reset();
-    }
-    empty = VALUE_NULL;
-    if (!in.ReadInt32(empty)) {
-        LOG_ERROR("DataShareOperation::ReadFromParcel ReadInt32(empty) error");
-        return false;
-    }
-    LOG_DEBUG("DataShareOperation::ReadFromParcel empty is %{public}s",
-        empty == VALUE_OBJECT ? "VALUE_OBJECT" : "VALUE_NULL");
-    if (empty == VALUE_OBJECT) {
-        DataSharePredicates tmpPredicates;
-        ITypesUtil::Unmarshalling(in, tmpPredicates);
-        dataSharePredicates_.reset(&tmpPredicates);
-    } else {
-        dataSharePredicates_.reset();
-    }
-    empty = VALUE_NULL;
-    if (!in.ReadInt32(empty)) {
-        LOG_ERROR("DataShareOperation::ReadFromParcel ReadInt32(empty) error");
-        return false;
-    }
-    LOG_DEBUG("DataShareOperation::ReadFromParcel empty is %{public}s",
-        (empty == VALUE_OBJECT) ? "VALUE_OBJECT" : "VALUE_NULL");
-    if (empty == VALUE_OBJECT) {
-        DataShareValuesBucket valuesBucket;
-        ITypesUtil::Unmarshalling(in, valuesBucket);
-        valuesBucket_.reset(&valuesBucket);
-    } else {
-        valuesBucketReferences_.reset();
-    }
-    int referenceSize = 0;
-    if (!in.ReadInt32(referenceSize)) {
-        LOG_ERROR("DataShareOperation::ReadFromParcel end");
-        return false;
-    }
-    if (referenceSize >= REFERENCE_THRESHOLD) {
-        LOG_INFO("DataShareOperation::ReadFromParcel referenceSize:%{public}d >= REFERENCE_THRESHOLD:%{public}d",
-            referenceSize, REFERENCE_THRESHOLD);
-        return true;
-    }
-    for (int i = 0; i < REFERENCE_THRESHOLD && i < referenceSize; ++i) {
-        int first = 0;
-        int second = 0;
-        if (!in.ReadInt32(first)) {
-            LOG_ERROR("DataShareOperation::ReadFromParcel end");
-            return false;
-        }
-        if (!in.ReadInt32(second)) {
-            LOG_ERROR("DataShareOperation::ReadFromParcel end");
-            return false;
-        }
-        dataSharePredicatesBackReferences_.insert(std::make_pair(first, second));
-    }
-    LOG_DEBUG("DataShareOperation::ReadFromParcel end");
     return true;
 }
 std::shared_ptr<DataShareOperation> DataShareOperation::CreateFromParcel(Parcel &in)
@@ -484,6 +324,181 @@ void DataShareOperation::PutMap(Parcel &in)
         }
     }
     LOG_DEBUG("DataShareOperation::PutMap end");
+}
+
+bool DataShareOperation::Marshalling(Parcel &out, const std::shared_ptr<Uri> uri) const
+{
+    if (uri != nullptr) {
+        if (!out.WriteInt32(VALUE_OBJECT)) {
+            LOG_ERROR("Write VALUE_OBJECT error");
+            return false;
+        }
+
+        if (!out.WriteParcelable(uri.get())) {
+            LOG_ERROR("Write uri error");
+            return false;
+        }
+    } else {
+        if (!out.WriteInt32(VALUE_NULL)) {
+            LOG_ERROR("Write VALUE_NULL error");
+            return false;
+        }
+    }
+    return true;
+}
+
+bool DataShareOperation::ReadFromParcel(Parcel &in, std::shared_ptr<Uri> &uri)
+{
+    int isEmpty = VALUE_NULL;
+    if (!in.ReadInt32(isEmpty)) {
+        LOG_ERROR("Read isEmpty error");
+        return false;
+    }
+    if (isEmpty == VALUE_OBJECT) {
+        uri.reset(in.ReadParcelable<Uri>());
+    } else {
+        uri.reset();
+    }
+    return true;
+}
+
+bool DataShareOperation::Marshalling(Parcel &out, const std::shared_ptr<DataShareValuesBucket> valuesBucket) const
+{
+    if (valuesBucket != nullptr) {
+        if (!out.WriteInt32(VALUE_OBJECT)) {
+            LOG_ERROR("Write VALUE_OBJECT error");
+            return false;
+        }
+
+        if (!ITypesUtil::Marshalling(*valuesBucket, out)) {
+            LOG_ERROR("Write valuesBucket error");
+            return false;
+        }
+    } else {
+        if (!out.WriteInt32(VALUE_NULL)) {
+            LOG_ERROR("Write VALUE_NULL error");
+            return false;
+        }
+    }
+    return true;
+}
+
+bool DataShareOperation::ReadFromParcel(Parcel &in, std::shared_ptr<DataShareValuesBucket> &valuesBucket)
+{
+    int isEmpty = VALUE_NULL;
+    if (!in.ReadInt32(isEmpty)) {
+        LOG_ERROR("Read isEmpty error");
+        return false;
+    }
+    if (isEmpty == VALUE_OBJECT) {
+        DataShareValuesBucket vb;
+        if (!ITypesUtil::Unmarshalling(in, vb)) {
+            return false;
+        }
+        valuesBucket.reset(&vb);
+    } else {
+        valuesBucket.reset();
+    }
+    return true;
+}
+
+bool DataShareOperation::Marshalling(Parcel &out, const std::shared_ptr<DataSharePredicates> dataSharePredicates) const
+{
+    if (dataSharePredicates != nullptr) {
+        if (!out.WriteInt32(VALUE_OBJECT)) {
+            LOG_ERROR("Write VALUE_OBJECT error");
+            return false;
+        }
+        if (!ITypesUtil::Marshalling(*dataSharePredicates, out)) {
+            LOG_ERROR("Write dataSharePredicates error");
+            return false;
+        }
+    } else {
+        if (!out.WriteInt32(VALUE_NULL)) {
+            LOG_ERROR("Write VALUE_NULL error");
+            return false;
+        }
+    }
+    return true;
+}
+
+bool DataShareOperation::ReadFromParcel(Parcel &in, std::shared_ptr<DataSharePredicates> &dataSharePredicates)
+{
+    int isEmpty = VALUE_NULL;
+    if (!in.ReadInt32(isEmpty)) {
+        LOG_ERROR("Read isEmpty error");
+        return false;
+    }
+    if (isEmpty == VALUE_OBJECT) {
+        DataSharePredicates tmpPredicates;
+        if (!ITypesUtil::Unmarshalling(in, tmpPredicates)) {
+            return false;
+        }
+        dataSharePredicates.reset(&tmpPredicates);
+    } else {
+        dataSharePredicates.reset();
+    }
+    return true;
+}
+
+bool DataShareOperation::Marshalling(Parcel &out, const std::map<int, int> dataSharePredicatesBackReferences) const
+{
+    int referenceSize = 0;
+    if (!dataSharePredicatesBackReferences.empty()) {
+        referenceSize = (int)dataSharePredicatesBackReferences.size();
+        if (!out.WriteInt32(referenceSize)) {
+            LOG_ERROR("Write referenceSize error");
+            return false;
+        }
+        if (referenceSize >= REFERENCE_THRESHOLD) {
+            LOG_INFO("referenceSize >= REFERENCE_THRESHOLD");
+            return true;
+        }
+        for (auto &it : dataSharePredicatesBackReferences) {
+            if (!out.WriteInt32(it.first)) {
+                LOG_ERROR("Write first error");
+                return false;
+            }
+            if (!out.WriteInt32(it.second)) {
+                LOG_ERROR("Write second error");
+                return false;
+            }
+        }
+    } else {
+        LOG_DEBUG("dataSharePredicatesBackReferences is empty");
+        if (!out.WriteInt32(referenceSize)) {
+            LOG_ERROR("Write referenceSize error");
+            return false;
+        }
+    }
+    return true;
+}
+
+bool DataShareOperation::ReadFromParcel(Parcel &in, std::map<int, int> &dataSharePredicatesBackReferences)
+{
+    int referenceSize = 0;
+    if (!in.ReadInt32(referenceSize)) {
+            LOG_ERROR("Read referenceSize error");
+        return false;
+    }
+    if (referenceSize >= REFERENCE_THRESHOLD) {
+        LOG_INFO("referenceSize >= REFERENCE_THRESHOLD");
+        return true;
+    }
+    for (int i = 0; i < REFERENCE_THRESHOLD && i < referenceSize; ++i) {
+        int first = 0;
+        int second = 0;
+        if (!in.ReadInt32(first)) {
+                LOG_ERROR("Read first error");
+            return false;
+        }
+        if (!in.ReadInt32(second)) {
+                LOG_ERROR("Read second error");
+            return false;
+        }
+        dataSharePredicatesBackReferences.insert(std::make_pair(first, second));
+    }
+    return true;
 }
 }  // namespace DataShare
 }  // namespace OHOS
