@@ -76,7 +76,9 @@ void DataShareHelper::OnSchedulerDied(const wptr<IRemoteObject> &remote)
     LOG_INFO("start.");
     std::lock_guard<std::mutex> lock_l(deathlock_);
     if (callerDeathRecipient_ != nullptr) {
-        dataShareProxy_->AsObject()->RemoveDeathRecipient(callerDeathRecipient_);
+        if (dataShareProxy_ != nullptr) {
+            dataShareProxy_->AsObject()->RemoveDeathRecipient(callerDeathRecipient_);
+        }
         callerDeathRecipient_ = nullptr;
     }
     dataShareProxy_ = nullptr;
