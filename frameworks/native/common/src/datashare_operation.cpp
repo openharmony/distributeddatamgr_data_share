@@ -478,7 +478,7 @@ bool DataShareOperation::ReadFromParcel(Parcel &in, std::map<int, int> &dataShar
 {
     int referenceSize = 0;
     if (!in.ReadInt32(referenceSize)) {
-            LOG_ERROR("Read referenceSize error");
+        LOG_ERROR("Read referenceSize error");
         return false;
     }
     if (referenceSize >= REFERENCE_THRESHOLD) {
@@ -489,11 +489,11 @@ bool DataShareOperation::ReadFromParcel(Parcel &in, std::map<int, int> &dataShar
         int first = 0;
         int second = 0;
         if (!in.ReadInt32(first)) {
-                LOG_ERROR("Read first error");
+            LOG_ERROR("Read first error");
             return false;
         }
         if (!in.ReadInt32(second)) {
-                LOG_ERROR("Read second error");
+            LOG_ERROR("Read second error");
             return false;
         }
         dataSharePredicatesBackReferences.insert(std::make_pair(first, second));

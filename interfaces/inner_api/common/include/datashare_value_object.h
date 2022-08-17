@@ -73,28 +73,51 @@ public:
 
     operator int () const
     {
-        int64_t val = std::get<int64_t>(value);
-        return static_cast<int>(val);
+        if (std::get_if<int64_t>(&value)) {
+            return static_cast<int>(std::get<int64_t>(value));
+        } else {
+            return {};
+        }
     }
     operator int64_t () const
     {
-        return std::get<int64_t>(value);
+        if (std::get_if<int64_t>(&value)) {
+            return std::get<int64_t>(value);
+        } else {
+            return {};
+        }
     }
     operator double () const
     {
-        return std::get<double>(value);
+        if (std::get_if<double>(&value)) {
+            return std::get<double>(value);
+        } else {
+            return {};
+        }
     }
     operator bool () const
     {
-        return std::get<bool>(value);
+        if (std::get_if<bool>(&value)) {
+            return std::get<bool>(value);
+        } else {
+            return {};
+        }
     }
     operator std::string () const
     {
-        return std::get<std::string>(value);
+        if (std::get_if<std::string>(&value)) {
+            return std::get<std::string>(value);
+        } else {
+            return {};
+        }
     }
     operator std::vector<uint8_t> () const
     {
-        return std::get<std::vector<uint8_t>>(value);
+        if (std::get_if<std::vector<uint8_t>>(&value)) {
+            return std::get<std::vector<uint8_t>>(value);
+        } else {
+            return {};
+        }
     }
     DataShareValueObjectType type;
     std::variant<std::monostate, int, int64_t, double, std::string, bool, std::vector<uint8_t>> value;
