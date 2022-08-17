@@ -66,7 +66,9 @@ void DataShareConnection::OnAbilityConnectDone(
 void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
     LOG_INFO("called begin");
+    std::unique_lock<std::mutex> lock(condition_.mutex);
     dataShareProxy_ = nullptr;
+    condition_.condition.notify_all();
     isConnected_.store(false);
     LOG_INFO("called end");
 }
@@ -79,7 +81,11 @@ void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
     LOG_INFO("called begin");
     std::unique_lock<std::mutex> lock(condition_.mutex);
     AAFwk::Want want;
-    want.SetUri(uri);
+    if (uri_.ToString().empty()) {
+        want.SetUri(uri);
+    } else {
+        want.SetUri(uri_);
+    }
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, this, token);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ != nullptr; })) {
@@ -94,9 +100,13 @@ void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
 void DataShareConnection::DisconnectDataShareExtAbility()
 {
     LOG_INFO("called begin");
-    dataShareProxy_ = nullptr;
+    std::unique_lock<std::mutex> lock(condition_.mutex);
     isConnected_.store(false);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(this);
+    if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
+        [this] { return dataShareProxy_ == nullptr; })) {
+        LOG_INFO("disconnect ability ended successfully");
+    }
     LOG_INFO("called end, ret=%{public}d", ret);
 }
 
