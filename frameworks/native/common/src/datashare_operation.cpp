@@ -316,17 +316,18 @@ std::shared_ptr<DataShareOperation> DataShareOperation::CreateFromParcel(Parcel 
 }
 void DataShareOperation::PutMap(Parcel &in)
 {
-    LOG_DEBUG("DataShareOperation::PutMap start");
+    LOG_DEBUG("Start");
     int count = in.ReadInt32();
     if (count > 0 && count < REFERENCE_THRESHOLD) {
         for (int i = 0; i < count; ++i) {
             dataSharePredicatesBackReferences_.insert(std::make_pair(in.ReadInt32(), in.ReadInt32()));
         }
+        return;
     }
-    LOG_DEBUG("DataShareOperation::PutMap end");
+    LOG_WARN("count <= 0 or count >= REFERENCE_THRESHOLD");
 }
 
-bool DataShareOperation::Marshalling(Parcel &out, const std::shared_ptr<Uri> uri) const
+bool DataShareOperation::Marshalling(Parcel &out, const std::shared_ptr<Uri> &uri) const
 {
     if (uri != nullptr) {
         if (!out.WriteInt32(VALUE_OBJECT)) {
@@ -362,7 +363,7 @@ bool DataShareOperation::ReadFromParcel(Parcel &in, std::shared_ptr<Uri> &uri)
     return true;
 }
 
-bool DataShareOperation::Marshalling(Parcel &out, const std::shared_ptr<DataShareValuesBucket> valuesBucket) const
+bool DataShareOperation::Marshalling(Parcel &out, const std::shared_ptr<DataShareValuesBucket> &valuesBucket) const
 {
     if (valuesBucket != nullptr) {
         if (!out.WriteInt32(VALUE_OBJECT)) {
@@ -402,7 +403,7 @@ bool DataShareOperation::ReadFromParcel(Parcel &in, std::shared_ptr<DataShareVal
     return true;
 }
 
-bool DataShareOperation::Marshalling(Parcel &out, const std::shared_ptr<DataSharePredicates> dataSharePredicates) const
+bool DataShareOperation::Marshalling(Parcel &out, const std::shared_ptr<DataSharePredicates> &dataSharePredicates) const
 {
     if (dataSharePredicates != nullptr) {
         if (!out.WriteInt32(VALUE_OBJECT)) {
@@ -441,7 +442,7 @@ bool DataShareOperation::ReadFromParcel(Parcel &in, std::shared_ptr<DataSharePre
     return true;
 }
 
-bool DataShareOperation::Marshalling(Parcel &out, const std::map<int, int> dataSharePredicatesBackReferences) const
+bool DataShareOperation::Marshalling(Parcel &out, const std::map<int, int> &dataSharePredicatesBackReferences) const
 {
     int referenceSize = 0;
     if (!dataSharePredicatesBackReferences.empty()) {

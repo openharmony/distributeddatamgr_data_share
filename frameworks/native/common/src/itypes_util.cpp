@@ -92,15 +92,12 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataSharePredicates &predicates)
         LOG_ERROR("predicate read mode failed");
         return false;
     }
-    auto predicate = new DataSharePredicates(operations);
-    if (predicate == nullptr) {
-        return false;
-    }
-    predicate->SetWhereClause(whereClause);
-    predicate->SetWhereArgs(whereArgs);
-    predicate->SetOrder(order);
-    predicate->SetSettingMode(static_cast<SettingMode>(mode));
-    predicates = *predicate;
+    DataSharePredicates tmpPredicates(operations);
+    tmpPredicates.SetWhereClause(whereClause);
+    tmpPredicates.SetWhereArgs(whereArgs);
+    tmpPredicates.SetOrder(order);
+    tmpPredicates.SetSettingMode(static_cast<SettingMode>(mode));
+    predicates = tmpPredicates;
     return true;
 }
 
@@ -208,9 +205,6 @@ bool ITypesUtil::Marshalling(const DataSharePredicatesObject &predicatesObject, 
         return false;
     }
     switch (predicatesObject.GetType()) {
-        case DataSharePredicatesObjectType::TYPE_NULL: {
-            break;
-        }
         case DataSharePredicatesObjectType::TYPE_INT: {
             if (!parcel.WriteInt32(predicatesObject)) {
                 LOG_ERROR("predicatesObject WriteInt32 failed");
@@ -289,9 +283,6 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataSharePredicatesObject &predic
     }
     predicatesObject.type = static_cast<DataSharePredicatesObjectType>(type);
     switch (predicatesObject.type) {
-        case DataSharePredicatesObjectType::TYPE_NULL: {
-            break;
-        }
         case DataSharePredicatesObjectType::TYPE_INT: {
             predicatesObject.value = parcel.ReadInt32();
             break;
@@ -361,9 +352,6 @@ bool ITypesUtil::Marshalling(const DataShareValueObject &valueObject, Parcel &pa
         return false;
     }
     switch (valueObject.type) {
-        case DataShareValueObjectType::TYPE_NULL: {
-            break;
-        }
         case DataShareValueObjectType::TYPE_INT: {
             if (!parcel.WriteInt64(std::get<int64_t>(valueObject.value))) {
                 LOG_ERROR("valueObject WriteInt64 failed");
@@ -414,9 +402,6 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataShareValueObject &valueObject
     }
     valueObject.type = static_cast<DataShareValueObjectType>(type);
     switch (valueObject.type) {
-        case DataShareValueObjectType::TYPE_NULL: {
-            break;
-        }
         case DataShareValueObjectType::TYPE_INT: {
             valueObject.value = parcel.ReadInt64();
             break;
