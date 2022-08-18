@@ -99,7 +99,7 @@ DataSharePredicates *DataSharePredicates::LessThanOrEqualTo(const std::string &f
 DataSharePredicates *DataSharePredicates::In(const std::string &field, const DataSharePredicatesObjects &value)
 {
     LOG_DEBUG("Start");
-    SetOperationList(IN, field, value);
+    SetOperationList(SQL_IN, field, value);
     return this;
 }
 
