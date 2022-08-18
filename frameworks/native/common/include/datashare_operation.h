@@ -145,13 +145,13 @@ public:
 private:
     void PutMap(Parcel &in);
     bool ReadFromParcel(Parcel &in);
-    bool Marshalling(Parcel &out, const std::shared_ptr<Uri> uri) const;
+    bool Marshalling(Parcel &out, const std::shared_ptr<Uri> &uri) const;
     bool ReadFromParcel(Parcel &in, std::shared_ptr<Uri> &uri);
-    bool Marshalling(Parcel &out, const std::shared_ptr<DataShareValuesBucket> valuesBucket) const;
+    bool Marshalling(Parcel &out, const std::shared_ptr<DataShareValuesBucket> &valuesBucket) const;
     bool ReadFromParcel(Parcel &in, std::shared_ptr<DataShareValuesBucket> &valuesBucket);
-    bool Marshalling(Parcel &out, const std::shared_ptr<DataSharePredicates> dataSharePredicates) const;
+    bool Marshalling(Parcel &out, const std::shared_ptr<DataSharePredicates> &dataSharePredicates) const;
     bool ReadFromParcel(Parcel &in, std::shared_ptr<DataSharePredicates> &dataSharePredicates);
-    bool Marshalling(Parcel &out, const std::map<int, int> dataSharePredicatesBackReferences) const;
+    bool Marshalling(Parcel &out, const std::map<int, int> &dataSharePredicatesBackReferences) const;
     bool ReadFromParcel(Parcel &in, std::map<int, int> &dataSharePredicatesBackReferences);
 
 private:
