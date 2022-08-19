@@ -21,6 +21,7 @@
 #include <string>
 
 #include "datashare_predicates_object.h"
+#include "datashare_predicates_objects.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -36,8 +37,8 @@ public:
     DataSharePredicates *GreaterThanOrEqualTo(const std::string &field,
         const DataSharePredicatesObject &value) override;
     DataSharePredicates *LessThanOrEqualTo(const std::string &field, const DataSharePredicatesObject &value) override;
-    DataSharePredicates *In(const std::string &field, const DataSharePredicatesObject &values) override;
-    DataSharePredicates *NotIn(const std::string &field, const DataSharePredicatesObject &values) override;
+    DataSharePredicates *In(const std::string &field, const DataSharePredicatesObjects &values) override;
+    DataSharePredicates *NotIn(const std::string &field, const DataSharePredicatesObjects &values) override;
     DataSharePredicates *BeginWrap() override;
     DataSharePredicates *EndWrap() override;
     DataSharePredicates *Or() override;
@@ -71,8 +72,11 @@ public:
     void SetSettingMode(const SettingMode &settingMode);
 
 private:
+    void SetOperationList(OperationType operationType, const DataSharePredicatesObjects &param);
+    void SetOperationList(OperationType operationType, const DataSharePredicatesObject &param1,
+        const DataSharePredicatesObjects &param2);
     void SetOperationList(OperationType operationType, const DataSharePredicatesObject &para1,
-        const DataSharePredicatesObject &para2, const DataSharePredicatesObject &para3, ParameterCount parameterCount);
+        const DataSharePredicatesObject &para2, const DataSharePredicatesObject &para3);
     void ClearQueryLanguage();
     std::list<OperationItem> operationList_;
     std::string whereClause_;

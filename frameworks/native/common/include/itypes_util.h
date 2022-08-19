@@ -36,6 +36,9 @@ public:
     static bool Marshalling(const DataSharePredicatesObject &predicatesObject, Parcel &parcel);
     static bool Unmarshalling(Parcel &parcel, DataSharePredicatesObject &predicatesObject);
 
+    static bool Marshalling(const DataSharePredicatesObjects &predicatesObject, Parcel &parcel);
+    static bool Unmarshalling(Parcel &parcel, DataSharePredicatesObjects &predicatesObject);
+
     static bool Marshalling(const DataShareValueObject &valueObject, Parcel &parcel);
     static bool Unmarshalling(Parcel &parcel, DataShareValueObject &valueObject);
 };

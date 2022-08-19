@@ -20,16 +20,9 @@
 #include <string>
 #include <vector>
 #include "datashare_predicates_object.h"
+#include "datashare_predicates_objects.h"
 namespace OHOS {
 namespace DataShare {
-typedef enum {
-    ZERO_COUNT = 0x0,
-    ONE_COUNT,
-    TWO_COUNT,
-    THREE_COUNT,
-    INVALID_COUNT,
-} ParameterCount;
-
 typedef enum {
     INVALID_OPERATION = 0x0,
     EQUAL_TO,
@@ -68,10 +61,8 @@ typedef enum {
 
 typedef struct {
     OperationType operation;
-    DataSharePredicatesObject para1;
-    DataSharePredicatesObject para2;
-    DataSharePredicatesObject para3;
-    ParameterCount parameterCount;
+    std::vector<DataSharePredicatesObject> singleParams;
+    std::vector<DataSharePredicatesObjects> multiParams;
 } OperationItem;
 
 typedef enum {

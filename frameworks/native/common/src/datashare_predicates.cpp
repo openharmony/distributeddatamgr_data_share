@@ -36,9 +36,8 @@ DataSharePredicates::~DataSharePredicates()
  */
 DataSharePredicates *DataSharePredicates::EqualTo(const std::string &field, const DataSharePredicatesObject &value)
 {
-    LOG_DEBUG("%{public}s call field%{public}s", __func__, field.c_str());
-    SetOperationList(EQUAL_TO, field, value, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::EqualTo End");
+    LOG_DEBUG("field : %{public}s", field.c_str());
+    SetOperationList(EQUAL_TO, field, value, {});
     return this;
 }
 
@@ -47,9 +46,8 @@ DataSharePredicates *DataSharePredicates::EqualTo(const std::string &field, cons
  */
 DataSharePredicates *DataSharePredicates::NotEqualTo(const std::string &field, const DataSharePredicatesObject &value)
 {
-    LOG_DEBUG("%{public}s call field%{public}s", __func__, field.c_str());
-    SetOperationList(NOT_EQUAL_TO, field, value, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::NotEqualTo End");
+    LOG_DEBUG("field : %{public}s", field.c_str());
+    SetOperationList(NOT_EQUAL_TO, field, value, {});
     return this;
 }
 
@@ -58,9 +56,8 @@ DataSharePredicates *DataSharePredicates::NotEqualTo(const std::string &field, c
  */
 DataSharePredicates *DataSharePredicates::GreaterThan(const std::string &field, const DataSharePredicatesObject &value)
 {
-    LOG_DEBUG("%{public}s call field%{public}s", __func__, field.c_str());
-    SetOperationList(GREATER_THAN, field, value, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::GreaterThan End");
+    LOG_DEBUG("field : %{public}s", field.c_str());
+    SetOperationList(GREATER_THAN, field, value, {});
     return this;
 }
 
@@ -69,9 +66,8 @@ DataSharePredicates *DataSharePredicates::GreaterThan(const std::string &field, 
  */
 DataSharePredicates *DataSharePredicates::LessThan(const std::string &field, const DataSharePredicatesObject &value)
 {
-    LOG_DEBUG("%{public}s call field%{public}s", __func__, field.c_str());
-    SetOperationList(LESS_THAN, field, value, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::LessThan End");
+    LOG_DEBUG("field : %{public}s", field.c_str());
+    SetOperationList(LESS_THAN, field, value, {});
     return this;
 }
 
@@ -81,9 +77,8 @@ DataSharePredicates *DataSharePredicates::LessThan(const std::string &field, con
 DataSharePredicates *DataSharePredicates::GreaterThanOrEqualTo(const std::string &field,
     const DataSharePredicatesObject &value)
 {
-    LOG_DEBUG("%{public}s call field%{public}s", __func__, field.c_str());
-    SetOperationList(GREATER_THAN_OR_EQUAL_TO, field, value, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::GreaterThanOrEqualTo End");
+    LOG_DEBUG("field : %{public}s", field.c_str());
+    SetOperationList(GREATER_THAN_OR_EQUAL_TO, field, value, {});
     return this;
 }
 
@@ -93,31 +88,28 @@ DataSharePredicates *DataSharePredicates::GreaterThanOrEqualTo(const std::string
 DataSharePredicates *DataSharePredicates::LessThanOrEqualTo(const std::string &field,
     const DataSharePredicatesObject &value)
 {
-    LOG_DEBUG("%{public}s call field%{public}s", __func__, field.c_str());
-    SetOperationList(LESS_THAN_OR_EQUAL_TO, field, value, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::LessThanOrEqualTo End");
+    LOG_DEBUG("field : %{public}s", field.c_str());
+    SetOperationList(LESS_THAN_OR_EQUAL_TO, field, value, {});
     return this;
 }
 
 /**
  * In
  */
-DataSharePredicates *DataSharePredicates::In(const std::string &field, const DataSharePredicatesObject &value)
+DataSharePredicates *DataSharePredicates::In(const std::string &field, const DataSharePredicatesObjects &value)
 {
-    LOG_DEBUG("DataSharePredicates::In Start field%{public}s", field.c_str());
-    SetOperationList(IN, field, value, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::In End");
+    LOG_DEBUG("field : %{public}s", field.c_str());
+    SetOperationList(IN, field, value);
     return this;
 }
 
 /**
  * NotIn
  */
-DataSharePredicates *DataSharePredicates::NotIn(const std::string &field, const DataSharePredicatesObject &value)
+DataSharePredicates *DataSharePredicates::NotIn(const std::string &field, const DataSharePredicatesObjects &value)
 {
-    LOG_DEBUG("DataSharePredicates::NotIn Start field%{public}s", field.c_str());
-    SetOperationList(NOT_IN, field, value, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::NotIn End");
+    LOG_DEBUG("field : %{public}s", field.c_str());
+    SetOperationList(NOT_IN, field, value);
     return this;
 }
 
@@ -126,9 +118,8 @@ DataSharePredicates *DataSharePredicates::NotIn(const std::string &field, const 
  */
 DataSharePredicates *DataSharePredicates::BeginWrap()
 {
-    LOG_DEBUG("DataSharePredicates::BeginWrap Start");
-    SetOperationList(BEGIN_WARP, {}, {}, {}, ZERO_COUNT);
-    LOG_DEBUG("DataSharePredicates::BeginWrap End");
+    LOG_DEBUG("Start");
+    SetOperationList(BEGIN_WARP, {}, {}, {});
     return this;
 }
 
@@ -137,9 +128,8 @@ DataSharePredicates *DataSharePredicates::BeginWrap()
  */
 DataSharePredicates *DataSharePredicates::EndWrap()
 {
-    LOG_DEBUG("DataSharePredicates::EndWrap Start");
-    SetOperationList(END_WARP, {}, {}, {}, ZERO_COUNT);
-    LOG_DEBUG("DataSharePredicates::EndWrap End");
+    LOG_DEBUG("Start");
+    SetOperationList(END_WARP, {}, {}, {});
     return this;
 }
 
@@ -148,9 +138,8 @@ DataSharePredicates *DataSharePredicates::EndWrap()
  */
 DataSharePredicates *DataSharePredicates::Or()
 {
-    LOG_DEBUG("DataSharePredicates::Or Start");
-    SetOperationList(OR, {}, {}, {}, ZERO_COUNT);
-    LOG_DEBUG("DataSharePredicates::Or End");
+    LOG_DEBUG("Start");
+    SetOperationList(OR, {}, {}, {});
     return this;
 }
 
@@ -159,9 +148,8 @@ DataSharePredicates *DataSharePredicates::Or()
  */
 DataSharePredicates *DataSharePredicates::And()
 {
-    LOG_DEBUG("DataSharePredicates::And Start");
-    SetOperationList(AND, {}, {}, {}, ZERO_COUNT);
-    LOG_DEBUG("DataSharePredicates::And End");
+    LOG_DEBUG("Start");
+    SetOperationList(AND, {}, {}, {});
     return this;
 }
 
@@ -170,9 +158,8 @@ DataSharePredicates *DataSharePredicates::And()
  */
 DataSharePredicates *DataSharePredicates::Contains(const std::string &field, const std::string &value)
 {
-    LOG_DEBUG("DataSharePredicates::Contains Start field%{public}s,value%{public}s", field.c_str(), value.c_str());
-    SetOperationList(CONTAINS, field, value, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::Contains End");
+    LOG_DEBUG("field : %{public}s, value : %{public}s", field.c_str(), value.c_str());
+    SetOperationList(CONTAINS, field, value, {});
     return this;
 }
 
@@ -181,9 +168,8 @@ DataSharePredicates *DataSharePredicates::Contains(const std::string &field, con
  */
 DataSharePredicates *DataSharePredicates::BeginsWith(const std::string &field, const std::string &value)
 {
-    LOG_DEBUG("DataSharePredicates::BeginsWith Start field%{public}s,value%{public}s", field.c_str(), value.c_str());
-    SetOperationList(BEGIN_WITH, field, value, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::BeginsWith End");
+    LOG_DEBUG("field : %{public}s, value : %{public}s", field.c_str(), value.c_str());
+    SetOperationList(BEGIN_WITH, field, value, {});
     return this;
 }
 
@@ -192,9 +178,8 @@ DataSharePredicates *DataSharePredicates::BeginsWith(const std::string &field, c
  */
 DataSharePredicates *DataSharePredicates::EndsWith(const std::string &field, const std::string &value)
 {
-    LOG_DEBUG("DataSharePredicates::EndsWith Start field%{public}s,value%{public}s", field.c_str(), value.c_str());
-    SetOperationList(END_WITH, field, value, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::EndsWith End");
+    LOG_DEBUG("field : %{public}s, value : %{public}s", field.c_str(), value.c_str());
+    SetOperationList(END_WITH, field, value, {});
     return this;
 }
 
@@ -203,9 +188,8 @@ DataSharePredicates *DataSharePredicates::EndsWith(const std::string &field, con
  */
 DataSharePredicates *DataSharePredicates::IsNull(const std::string &field)
 {
-    LOG_DEBUG("DataSharePredicates::IsNull Start field%{public}s", field.c_str());
-    SetOperationList(IS_NULL, field, {}, {}, ONE_COUNT);
-    LOG_DEBUG("DataSharePredicates::IsNull End");
+    LOG_DEBUG("field : %{public}s", field.c_str());
+    SetOperationList(IS_NULL, field, {}, {});
     return this;
 }
 
@@ -214,9 +198,8 @@ DataSharePredicates *DataSharePredicates::IsNull(const std::string &field)
  */
 DataSharePredicates *DataSharePredicates::IsNotNull(const std::string &field)
 {
-    LOG_DEBUG("DataSharePredicates::IsNotNull Start field%{public}s", field.c_str());
-    SetOperationList(IS_NOT_NULL, field, {}, {}, ONE_COUNT);
-    LOG_DEBUG("DataSharePredicates::IsNotNull End");
+    LOG_DEBUG("field : %{public}s", field.c_str());
+    SetOperationList(IS_NOT_NULL, field, {}, {});
     return this;
 }
 
@@ -225,9 +208,8 @@ DataSharePredicates *DataSharePredicates::IsNotNull(const std::string &field)
  */
 DataSharePredicates *DataSharePredicates::Like(const std::string &field, const std::string &value)
 {
-    LOG_DEBUG("DataSharePredicates::Like Start field%{public}s value%{public}s", field.c_str(), value.c_str());
-    SetOperationList(LIKE, field, value, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::Like End");
+    LOG_DEBUG("field : %{public}s, value : %{public}s", field.c_str(), value.c_str());
+    SetOperationList(LIKE, field, value, {});
     return this;
 }
 
@@ -236,9 +218,8 @@ DataSharePredicates *DataSharePredicates::Like(const std::string &field, const s
  */
 DataSharePredicates *DataSharePredicates::Unlike(const std::string &field, const std::string &value)
 {
-    LOG_DEBUG("DataSharePredicates::Unlike Start field%{public}s value%{public}s", field.c_str(), value.c_str());
-    SetOperationList(UNLIKE, field, value, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::Unlike End");
+    LOG_DEBUG("field : %{public}s, value : %{public}s", field.c_str(), value.c_str());
+    SetOperationList(UNLIKE, field, value, {});
     return this;
 }
 
@@ -247,9 +228,8 @@ DataSharePredicates *DataSharePredicates::Unlike(const std::string &field, const
  */
 DataSharePredicates *DataSharePredicates::Glob(const std::string &field, const std::string &value)
 {
-    LOG_DEBUG("DataSharePredicates::Glob Start field%{public}s value%{public}s", field.c_str(), value.c_str());
-    SetOperationList(GLOB, field, value, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::Glob End");
+    LOG_DEBUG("field : %{public}s, value : %{public}s", field.c_str(), value.c_str());
+    SetOperationList(GLOB, field, value, {});
     return this;
 }
 
@@ -259,10 +239,8 @@ DataSharePredicates *DataSharePredicates::Glob(const std::string &field, const s
 DataSharePredicates *DataSharePredicates::Between(const std::string &field,
     const std::string &low, const std::string &high)
 {
-    LOG_DEBUG("DataSharePredicates::Between Start field%{public}s low%{public}s high%{public}s",
-        field.c_str(), low.c_str(), high.c_str());
-    SetOperationList(BETWEEN, field, low, high, THREE_COUNT);
-    LOG_DEBUG("DataSharePredicates::Between End");
+    LOG_DEBUG("field : %{public}s, low : %{public}s, high : %{public}s", field.c_str(), low.c_str(), high.c_str());
+    SetOperationList(BETWEEN, field, low, high);
     return this;
 }
 
@@ -272,10 +250,8 @@ DataSharePredicates *DataSharePredicates::Between(const std::string &field,
 DataSharePredicates *DataSharePredicates::NotBetween(const std::string &field,
     const std::string &low, const std::string &high)
 {
-    LOG_DEBUG("DataSharePredicates::NotBetween Start field%{public}s low%{public}s high%{public}s",
-        field.c_str(), low.c_str(), high.c_str());
-    SetOperationList(NOTBETWEEN, field, low, high, THREE_COUNT);
-    LOG_DEBUG("DataSharePredicates::NotBetween End");
+    LOG_DEBUG("field : %{public}s, low : %{public}s, high : %{public}s", field.c_str(), low.c_str(), high.c_str());
+    SetOperationList(NOTBETWEEN, field, low, high);
     return this;
 }
 
@@ -284,9 +260,8 @@ DataSharePredicates *DataSharePredicates::NotBetween(const std::string &field,
  */
 DataSharePredicates *DataSharePredicates::OrderByAsc(const std::string &field)
 {
-    LOG_DEBUG("DataSharePredicates::OrderByAsc Start field%{public}s", field.c_str());
-    SetOperationList(ORDER_BY_ASC, field, {}, {}, ONE_COUNT);
-    LOG_DEBUG("DataSharePredicates::OrderByAsc End");
+    LOG_DEBUG("field : %{public}s", field.c_str());
+    SetOperationList(ORDER_BY_ASC, field, {}, {});
     return this;
 }
 
@@ -295,9 +270,8 @@ DataSharePredicates *DataSharePredicates::OrderByAsc(const std::string &field)
  */
 DataSharePredicates *DataSharePredicates::OrderByDesc(const std::string &field)
 {
-    LOG_DEBUG("DataSharePredicates::OrderByDesc Start field%{public}s", field.c_str());
-    SetOperationList(ORDER_BY_DESC, field, {}, {}, ONE_COUNT);
-    LOG_DEBUG("DataSharePredicates::OrderByDesc End");
+    LOG_DEBUG("field : %{public}s", field.c_str());
+    SetOperationList(ORDER_BY_DESC, field, {}, {});
     return this;
 }
 
@@ -306,9 +280,8 @@ DataSharePredicates *DataSharePredicates::OrderByDesc(const std::string &field)
  */
 DataSharePredicates *DataSharePredicates::Distinct()
 {
-    LOG_DEBUG("DataSharePredicates::Distinct Start");
-    SetOperationList(DISTINCT, {}, {}, {}, ZERO_COUNT);
-    LOG_DEBUG("DataSharePredicates::Distinct End");
+    LOG_DEBUG("Start");
+    SetOperationList(DISTINCT, {}, {}, {});
     return this;
 }
 
@@ -317,9 +290,8 @@ DataSharePredicates *DataSharePredicates::Distinct()
  */
 DataSharePredicates *DataSharePredicates::Limit(const int number, const int offset)
 {
-    LOG_DEBUG("DataSharePredicates::Limit Start number : %{public}d, offset : %{public}d", number, offset);
-    SetOperationList(LIMIT, number, offset, {}, TWO_COUNT);
-    LOG_DEBUG("DataSharePredicates::Limit End");
+    LOG_DEBUG("number : %{public}d, offset : %{public}d", number, offset);
+    SetOperationList(LIMIT, number, offset, {});
     return this;
 }
 
@@ -328,9 +300,8 @@ DataSharePredicates *DataSharePredicates::Limit(const int number, const int offs
  */
 DataSharePredicates *DataSharePredicates::GroupBy(const std::vector<std::string> &fields)
 {
-    LOG_DEBUG("DataSharePredicates::GroupBy Start fields%{public}s", fields.at(0).c_str());
-    SetOperationList(GROUP_BY, fields, {}, {}, ONE_COUNT);
-    LOG_DEBUG("DataSharePredicates::GroupBy End");
+    LOG_DEBUG("fields size : %{public}d", static_cast<int>(fields.size()));
+    SetOperationList(GROUP_BY, fields);
     return this;
 }
 
@@ -339,9 +310,8 @@ DataSharePredicates *DataSharePredicates::GroupBy(const std::vector<std::string>
  */
 DataSharePredicates *DataSharePredicates::IndexedBy(const std::string &indexName)
 {
-    LOG_DEBUG("DataSharePredicates::IndexedBy Start indexName%{public}s", indexName.c_str());
-    SetOperationList(INDEXED_BY, indexName, {}, {}, ONE_COUNT);
-    LOG_DEBUG("DataSharePredicates::IndexedBy End");
+    LOG_DEBUG("indexName : %{public}s", indexName.c_str());
+    SetOperationList(INDEXED_BY, indexName, {}, {});
     return this;
 }
 
@@ -350,9 +320,8 @@ DataSharePredicates *DataSharePredicates::IndexedBy(const std::string &indexName
  */
 DataSharePredicates *DataSharePredicates::KeyPrefix(const std::string &prefix)
 {
-    LOG_DEBUG("DataSharePredicates::KeyPrefix Start prefix%{public}s", prefix.c_str());
-    SetOperationList(KEY_PREFIX, prefix, {}, {}, ONE_COUNT);
-    LOG_DEBUG("DataSharePredicates::KeyPrefix End");
+    LOG_DEBUG("prefix : %{public}s", prefix.c_str());
+    SetOperationList(KEY_PREFIX, prefix, {}, {});
     return this;
 }
 
@@ -361,9 +330,8 @@ DataSharePredicates *DataSharePredicates::KeyPrefix(const std::string &prefix)
  */
 DataSharePredicates *DataSharePredicates::InKeys(const std::vector<std::string> &keys)
 {
-    LOG_DEBUG("DataSharePredicates::InKeys Start keys%{public}s", keys.at(0).c_str());
-    SetOperationList(IN_KEY, keys, {}, {}, ONE_COUNT);
-    LOG_DEBUG("DataSharePredicates::InKeys End");
+    LOG_DEBUG("keys : %{public}d", static_cast<int>(keys.size()));
+    SetOperationList(IN_KEY, keys);
     return this;
 }
 
@@ -432,7 +400,7 @@ std::string DataSharePredicates::GetOrder() const
  */
 int DataSharePredicates::SetOrder(const std::string &order)
 {
-    LOG_DEBUG("DataSharePredicates::SetOrder Start order%{public}s", order.c_str());
+    LOG_DEBUG("order : %{public}s", order.c_str());
     if ((settingMode_ != PREDICATES_METHOD) && (!order.empty())) {
         this->order_ = order;
         settingMode_ = QUERY_LANGUAGE;
@@ -471,21 +439,47 @@ SettingMode DataSharePredicates::GetSettingMode() const
  * SetOperationList
  */
 void DataSharePredicates::SetOperationList(OperationType operationType, const DataSharePredicatesObject &para1,
-    const DataSharePredicatesObject &para2, const DataSharePredicatesObject &para3, ParameterCount parameterCount)
+    const DataSharePredicatesObject &para2, const DataSharePredicatesObject &para3)
 {
-    LOG_DEBUG("DataSharePredicates::SetOperationList Start");
+    LOG_DEBUG("Start");
     OperationItem operationItem {};
     operationItem.operation = operationType;
-    operationItem.para1 = para1;
-    operationItem.para2 = para2;
-    operationItem.para3 = para3;
-    operationItem.parameterCount = parameterCount;
+    operationItem.singleParams.push_back(para1);
+    operationItem.singleParams.push_back(para2);
+    operationItem.singleParams.push_back(para3);
     operationList_.push_back(operationItem);
     if (settingMode_ != PREDICATES_METHOD) {
         ClearQueryLanguage();
         settingMode_ = PREDICATES_METHOD;
     }
-    LOG_DEBUG("DataSharePredicates::SetOperationList END settingMode_%{public}d", settingMode_);
+}
+
+void DataSharePredicates::SetOperationList(OperationType operationType, const DataSharePredicatesObjects &param)
+{
+    LOG_DEBUG("Start");
+    OperationItem operationItem {};
+    operationItem.operation = operationType;
+    operationItem.multiParams.push_back(param);
+    operationList_.push_back(operationItem);
+    if (settingMode_ != PREDICATES_METHOD) {
+        ClearQueryLanguage();
+        settingMode_ = PREDICATES_METHOD;
+    }
+}
+
+void DataSharePredicates::SetOperationList(OperationType operationType, const DataSharePredicatesObject &param1,
+    const DataSharePredicatesObjects &param2)
+{
+    LOG_DEBUG("Start");
+    OperationItem operationItem {};
+    operationItem.operation = operationType;
+    operationItem.singleParams.push_back(param1);
+    operationItem.multiParams.push_back(param2);
+    operationList_.push_back(operationItem);
+    if (settingMode_ != PREDICATES_METHOD) {
+        ClearQueryLanguage();
+        settingMode_ = PREDICATES_METHOD;
+    }
 }
 } // namespace DataShare
 } // namespace OHOS
