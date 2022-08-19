@@ -74,7 +74,7 @@ public:
 
     operator std::vector<int> () const
     {
-        if (std::get_if<std::vector<int>>(&value)) {
+        if (std::get_if<std::vector<int>>(&value) != nullptr) {
             return std::get<std::vector<int>>(value);
         } else {
             return {};
@@ -82,7 +82,7 @@ public:
     }
     operator std::vector<int64_t> () const
     {
-        if (std::get_if<std::vector<int64_t>>(&value)) {
+        if (std::get_if<std::vector<int64_t>>(&value) != nullptr) {
             return std::get<std::vector<int64_t>>(value);
         } else {
             return {};
@@ -90,7 +90,7 @@ public:
     }
     operator std::vector<double> () const
     {
-        if (std::get_if<std::vector<double>>(&value)) {
+        if (std::get_if<std::vector<double>>(&value) != nullptr) {
             return std::get<std::vector<double>>(value);
         } else {
             return {};
@@ -98,7 +98,7 @@ public:
     }
     operator std::vector<std::string> () const
     {
-        if (std::get_if<std::vector<std::string>>(&value)) {
+        if (std::get_if<std::vector<std::string>>(&value) != nullptr) {
             return std::get<std::vector<std::string>>(value);
         } else {
             return {};

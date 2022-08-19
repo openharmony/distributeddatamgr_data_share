@@ -74,7 +74,7 @@ public:
 
     operator int () const
     {
-        if (std::get_if<int>(&value)) {
+        if (std::get_if<int>(&value) != nullptr) {
             return std::get<int>(value);
         } else {
             return {};
@@ -82,7 +82,7 @@ public:
     }
     operator int64_t () const
     {
-        if (std::get_if<int64_t>(&value)) {
+        if (std::get_if<int64_t>(&value) != nullptr) {
             return std::get<int64_t>(value);
         } else {
             return {};
@@ -90,7 +90,7 @@ public:
     }
     operator double () const
     {
-        if (std::get_if<double>(&value)) {
+        if (std::get_if<double>(&value) != nullptr) {
             return std::get<double>(value);
         } else {
             return {};
@@ -98,7 +98,7 @@ public:
     }
     operator bool () const
     {
-        if (std::get_if<bool>(&value)) {
+        if (std::get_if<bool>(&value) != nullptr) {
             return std::get<bool>(value);
         } else {
             return {};
@@ -106,7 +106,7 @@ public:
     }
     operator std::string () const
     {
-        if (std::get_if<std::string>(&value)) {
+        if (std::get_if<std::string>(&value) != nullptr) {
             return std::get<std::string>(value);
         } else {
             return {};
