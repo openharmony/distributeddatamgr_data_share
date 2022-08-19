@@ -17,30 +17,30 @@
 #define DATASHARE_PREDICATES_PROXY_H
 
 #include <memory>
-#include "datashare_predicates.h"
+#include "datashare_abs_predicates.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
 
 namespace OHOS {
 namespace DataShare {
-class DataSharePredicatesProxy {
+class DataSharePredicatesProxy : private DataShareAbsPredicates::JsProxy {
 public:
     static void Init(napi_env env, napi_value exports);
-    static napi_value NewInstance(napi_env env, std::shared_ptr<DataSharePredicates> value);
-    static std::shared_ptr<DataSharePredicates> GetNativePredicates(
+    static napi_value NewInstance(napi_env env, std::shared_ptr<DataShareAbsPredicates> value);
+    static std::shared_ptr<DataShareAbsPredicates> GetNativePredicates(
         const napi_env &env, const napi_value &arg);
     static void Destructor(napi_env env, void *nativeObject, void *finalize_hint);
 
     DataSharePredicatesProxy();
-    std::shared_ptr<DataSharePredicates> GetPredicates() const;
     static napi_value GetConstructor(napi_env env);
 
 private:
     ~DataSharePredicatesProxy();
 
     static napi_value New(napi_env env, napi_callback_info info);
-    static std::shared_ptr<DataSharePredicates> GetNativePredicates(napi_env env, napi_callback_info info);
+    static std::shared_ptr<DataShareAbsPredicates> GetNativePredicates(napi_env env, napi_callback_info info);
+
     static napi_value EqualTo(napi_env env, napi_callback_info info);
     static napi_value NotEqualTo(napi_env env, napi_callback_info info);
     static napi_value BeginWrap(napi_env env, napi_callback_info info);
@@ -72,13 +72,9 @@ private:
     static napi_value PrefixKey(napi_env env, napi_callback_info info);
     static napi_value InKeys(napi_env env, napi_callback_info info);
 
-    std::shared_ptr<DataSharePredicates> predicates_;
     napi_env env_;
     napi_ref wrapper_;
 };
-
-napi_value GetNapiObject(napi_env env, std::shared_ptr<DataSharePredicates> predicates);
-DataSharePredicates *GetNativePredicatesObject(const napi_env &env, const napi_value &arg);
 } // namespace DataShare
 } // namespace OHOS
 #endif // DATASHARE_PREDICATES_PROXY_H
