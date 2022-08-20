@@ -17,7 +17,7 @@
 #define DATASHARE_ABS_RESULT_SET_H
 
 #include <string>
-#include "result_set.h"
+#include "basic/result_set.h"
 
 namespace OHOS {
 namespace DataShare {

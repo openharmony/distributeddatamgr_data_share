@@ -95,6 +95,7 @@
                     "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common",
                     "header": {
                         "header_files": [
+			    "basic/result_set.h",
                             "datashare_errno.h",
                             "datashare_abs_predicates.h",
                             "datashare_predicates_def.h",
