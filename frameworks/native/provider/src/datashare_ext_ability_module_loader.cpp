@@ -26,6 +26,14 @@ Extension *DataShareExtAbilityModuleLoader::Create(const std::unique_ptr<Runtime
     return DataShareExtAbility::Create(runtime);
 }
 
+std::map<std::string, std::string> DataShareExtAbilityModuleLoader::GetParams()
+{
+    std::map<std::string, std::string> params;
+    params.insert(std::pair<std::string, std::string>("type", "5"));
+    params.insert(std::pair<std::string, std::string>("name", "DataShareExtAbility"));
+    return params;
+}
+
 extern "C" __attribute__((visibility("default"))) void* OHOS_EXTENSION_GetExtensionModule()
 {
     return &DataShareExtAbilityModuleLoader::GetInstance();
