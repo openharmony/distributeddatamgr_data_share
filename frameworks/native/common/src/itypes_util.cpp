@@ -156,25 +156,13 @@ bool ITypesUtil::Marshalling(const OperationItem &operationItem, Parcel &parcel)
         LOG_ERROR("invalid param count");
         return false;
     }
-    if (!parcel.WriteInt32(operationItem.singleParams.size())) {
-        LOG_ERROR("predicate write singleParams size failed");
+    if (!Marshalling(operationItem.singleParams, parcel)) {
+        LOG_ERROR("predicate write singleParams failed");
         return false;
     }
-    for (auto i = 0; i < operationItem.singleParams.size(); i++) {
-        if (!Marshalling(operationItem.singleParams[i], parcel)) {
-            LOG_ERROR("predicate write single params failed");
-            return false;
-        }
-    }
-    if (!parcel.WriteInt32(operationItem.multiParams.size())) {
-        LOG_ERROR("predicate write multiParams size failed");
+    if (!Marshalling(operationItem.multiParams, parcel)) {
+        LOG_ERROR("predicate write multiParams failed");
         return false;
-    }
-    for (auto i = 0; i < operationItem.multiParams.size(); i++) {
-        if (!Marshalling(operationItem.multiParams[i], parcel)) {
-            LOG_ERROR("predicate write multi params failed");
-            return false;
-        }
     }
     return true;
 }
@@ -186,31 +174,13 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, OperationItem &operationItem)
         LOG_ERROR("operationItem read operation failed");
         return false;
     }
-    int32_t size = parcel.ReadInt32();
-    if (size < 0) {
-        LOG_ERROR("predicate read singleParams size failed");
+    if (!Unmarshalling(parcel, operationItem.singleParams)) {
+        LOG_ERROR("Unmarshalling singleParams failed");
         return false;
     }
-    for (auto i = 0; i < size; i++) {
-        DataSharePredicatesObject param;
-        if (!Unmarshalling(parcel, param)) {
-            LOG_ERROR("Unmarshalling singleParam failed");
-            return false;
-        }
-        operationItem.singleParams.push_back(param);
-    }
-    size = parcel.ReadInt32();
-    if (size < 0) {
-        LOG_ERROR("predicate read multiParams size failed");
+    if (!Unmarshalling(parcel, operationItem.multiParams)) {
+        LOG_ERROR("Unmarshalling multiParams failed");
         return false;
-    }
-    for (auto i = 0; i < size; i++) {
-        DataSharePredicatesObjects param;
-        if (!Unmarshalling(parcel, param)) {
-            LOG_ERROR("Unmarshalling multiParam failed");
-            return false;
-        }
-        operationItem.multiParams.push_back(param);
     }
     return true;
 }
@@ -474,6 +444,41 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataShareValueObject &valueObject
         }
         default:
             break;
+    }
+    return true;
+}
+
+template <typename T>
+bool ITypesUtil::Marshalling(const std::vector<T> &params, Parcel &parcel)
+{
+    if (!parcel.WriteInt32(params.size())) {
+        LOG_ERROR("predicate write params size failed");
+        return false;
+    }
+    for (auto i = 0; i < params.size(); i++) {
+        if (!Marshalling(params[i], parcel)) {
+            LOG_ERROR("predicate write params failed");
+            return false;
+        }
+    }
+    return true;
+}
+
+template <typename T>
+bool ITypesUtil::Unmarshalling(Parcel &parcel, std::vector<T> &params)
+{
+    int32_t size = parcel.ReadInt32();
+    if (size < 0) {
+        LOG_ERROR("predicate read params size failed");
+        return false;
+    }
+    for (auto i = 0; i < size; i++) {
+        T param;
+        if (!Unmarshalling(parcel, param)) {
+            LOG_ERROR("Unmarshalling param failed");
+            return false;
+        }
+        params.push_back(param);
     }
     return true;
 }

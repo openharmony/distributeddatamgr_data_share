@@ -41,6 +41,11 @@ public:
 
     static bool Marshalling(const DataShareValueObject &valueObject, Parcel &parcel);
     static bool Unmarshalling(Parcel &parcel, DataShareValueObject &valueObject);
+
+template <typename T>
+    static bool Marshalling(const std::vector<T> &params, Parcel &parcel);
+template <typename T>
+    static bool Unmarshalling(Parcel &parcel, std::vector<T> &params);
 };
 } // namespace OHOS::DataShare
 #endif
