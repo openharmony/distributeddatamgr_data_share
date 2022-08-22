@@ -37,8 +37,10 @@ class DataShareValueObject {
 public:
     DataShareValueObject() : type(TYPE_NULL) {};
     ~DataShareValueObject() = default;
-    DataShareValueObject(DataShareValueObject &&object) noexcept
-        : type(object.type), value(std::move(object.value)) { object.type = DataShareValueObjectType::TYPE_NULL; };
+    DataShareValueObject(DataShareValueObject &&object) noexcept : type(object.type), value(std::move(object.value))
+    {
+        object.type = DataShareValueObjectType::TYPE_NULL;
+    };
     DataShareValueObject(const DataShareValueObject &object) : type(object.type), value(object.value) {};
     DataShareValueObject(int val) : type(TYPE_INT), value(static_cast<int64_t>(val)) {};
     DataShareValueObject(int64_t val) : type(TYPE_INT), value(val) {};
