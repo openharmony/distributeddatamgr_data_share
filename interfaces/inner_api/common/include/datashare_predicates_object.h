@@ -36,7 +36,8 @@ class DataSharePredicatesObject {
 public:
     DataSharePredicatesObject() : type(ObjectType::TYPE_NULL) {}
     ~DataSharePredicatesObject() = default;
-    DataSharePredicatesObject(DataSharePredicatesObject &&val) noexcept : type(val.type), value(std::move(val.value)) {}
+    DataSharePredicatesObject(DataSharePredicatesObject &&val) noexcept
+        : type(val.type), value(std::move(val.value)) { val.type = ObjectType::TYPE_NULL; }
     DataSharePredicatesObject(const DataSharePredicatesObject &val) : type(val.type), value(val.value) {}
     DataSharePredicatesObject &operator=(DataSharePredicatesObject &&object) noexcept
     {
