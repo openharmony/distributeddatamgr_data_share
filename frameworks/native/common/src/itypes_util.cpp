@@ -467,9 +467,13 @@ bool ITypesUtil::Marshalling(const std::vector<T> &params, Parcel &parcel)
 template <typename T>
 bool ITypesUtil::Unmarshalling(Parcel &parcel, std::vector<T> &params)
 {
-    int32_t size = parcel.ReadInt32();
-    if (size < 0) {
+    size_t size = static_cast<size_t>(parcel.ReadInt32());
+    if (static_cast<int32_t>(size) < 0) {
         LOG_ERROR("predicate read params size failed");
+        return false;
+    }
+    if ((size > parcel.GetReadableBytes()) || (params.max_size() < size)) {
+        LOG_ERROR("Read params failed, size : %{public}zu", size);
         return false;
     }
     for (auto i = 0; i < size; i++) {
