@@ -23,16 +23,12 @@
 namespace OHOS {
 namespace DataShare {
 enum class DataSharePredicatesObjectType {
-    TYPE_NULL = 0,
+    TYPE_NULL = 0x00,
     TYPE_INT,
     TYPE_DOUBLE,
     TYPE_STRING,
     TYPE_BOOL,
     TYPE_LONG,
-    TYPE_INT_VECTOR,
-    TYPE_LONG_VECTOR,
-    TYPE_DOUBLE_VECTOR,
-    TYPE_STRING_VECTOR,
 };
 
 using ObjectType = DataSharePredicatesObjectType;
@@ -40,7 +36,10 @@ class DataSharePredicatesObject {
 public:
     DataSharePredicatesObject() : type(ObjectType::TYPE_NULL) {}
     ~DataSharePredicatesObject() = default;
-    DataSharePredicatesObject(DataSharePredicatesObject &&val) noexcept : type(val.type), value(std::move(val.value)) {}
+    DataSharePredicatesObject(DataSharePredicatesObject &&val) noexcept : type(val.type), value(std::move(val.value))
+    {
+        val.type = ObjectType::TYPE_NULL;
+    }
     DataSharePredicatesObject(const DataSharePredicatesObject &val) : type(val.type), value(val.value) {}
     DataSharePredicatesObject &operator=(DataSharePredicatesObject &&object) noexcept
     {
@@ -67,10 +66,6 @@ public:
     DataSharePredicatesObject(bool val) : type(ObjectType::TYPE_BOOL), value(val) {}
     DataSharePredicatesObject(const char *val) : type(ObjectType::TYPE_STRING), value(std::string(val)) {}
     DataSharePredicatesObject(std::string val) : type(ObjectType::TYPE_STRING), value(std::move(val)) {}
-    DataSharePredicatesObject(const std::vector<int> &val) : type(ObjectType::TYPE_INT_VECTOR), value(val) {}
-    DataSharePredicatesObject(const std::vector<int64_t> &val) : type(ObjectType::TYPE_LONG_VECTOR), value(val) {}
-    DataSharePredicatesObject(const std::vector<double> &val) : type(ObjectType::TYPE_DOUBLE_VECTOR), value(val) {}
-    DataSharePredicatesObject(const std::vector<std::string> &val) : type(ObjectType::TYPE_STRING_VECTOR), value(val) {}
 
     DataSharePredicatesObjectType GetType() const
     {
@@ -78,44 +73,47 @@ public:
     }
 
     DataSharePredicatesObjectType type;
-    std::variant<std::monostate, int, int64_t, double, std::string, bool, std::vector<int>, std::vector<int64_t>,
-        std::vector<std::string>, std::vector<double>> value;
+    std::variant<std::monostate, int, int64_t, double, std::string, bool> value;
 
     operator int () const
     {
-        return std::get<int>(value);
+        if (std::get_if<int>(&value) != nullptr) {
+            return std::get<int>(value);
+        } else {
+            return {};
+        }
     }
     operator int64_t () const
     {
-        return std::get<int64_t>(value);
+        if (std::get_if<int64_t>(&value) != nullptr) {
+            return std::get<int64_t>(value);
+        } else {
+            return {};
+        }
     }
     operator double () const
     {
-        return std::get<double>(value);
+        if (std::get_if<double>(&value) != nullptr) {
+            return std::get<double>(value);
+        } else {
+            return {};
+        }
     }
     operator bool () const
     {
-        return std::get<bool>(value);
+        if (std::get_if<bool>(&value) != nullptr) {
+            return std::get<bool>(value);
+        } else {
+            return {};
+        }
     }
     operator std::string () const
     {
-        return std::get<std::string>(value);
-    }
-    operator std::vector<int> () const
-    {
-        return std::get<std::vector<int>>(value);
-    }
-    operator std::vector<int64_t> () const
-    {
-        return std::get<std::vector<int64_t>>(value);
-    }
-    operator std::vector<std::string> () const
-    {
-        return std::get<std::vector<std::string>>(value);
-    }
-    operator std::vector<double> () const
-    {
-        return std::get<std::vector<double>>(value);
+        if (std::get_if<std::string>(&value) != nullptr) {
+            return std::get<std::string>(value);
+        } else {
+            return {};
+        }
     }
 };
 } // namespace DataShare

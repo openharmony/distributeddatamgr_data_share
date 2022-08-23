@@ -17,6 +17,7 @@
 #include "datashare_log.h"
 
 namespace OHOS::DataShare {
+constexpr size_t MAX_PARAM_COUNT = 3;
 bool ITypesUtil::Marshalling(const DataSharePredicates &predicates, Parcel &parcel)
 {
     LOG_DEBUG("Marshalling DataSharePredicates Start");
@@ -151,20 +152,16 @@ bool ITypesUtil::Marshalling(const OperationItem &operationItem, Parcel &parcel)
         LOG_ERROR("predicate write operation failed");
         return false;
     }
-    if (!parcel.WriteInt64(static_cast<int64_t>(operationItem.parameterCount))) {
-        LOG_ERROR("predicate write parameterCount failed");
+    if (operationItem.singleParams.size() > MAX_PARAM_COUNT || operationItem.multiParams.size() > MAX_PARAM_COUNT) {
+        LOG_ERROR("invalid param count");
         return false;
     }
-    if (!Marshalling(operationItem.para1, parcel)) {
-        LOG_ERROR("predicate write para1 failed");
+    if (!Marshalling(operationItem.singleParams, parcel)) {
+        LOG_ERROR("predicate write singleParams failed");
         return false;
     }
-    if (!Marshalling(operationItem.para2, parcel)) {
-        LOG_ERROR("predicate write para2 failed");
-        return false;
-    }
-    if (!Marshalling(operationItem.para3, parcel)) {
-        LOG_ERROR("predicate write para3 failed");
+    if (!Marshalling(operationItem.multiParams, parcel)) {
+        LOG_ERROR("predicate write multiParams failed");
         return false;
     }
     return true;
@@ -177,22 +174,12 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, OperationItem &operationItem)
         LOG_ERROR("operationItem read operation failed");
         return false;
     }
-    operationItem.parameterCount = static_cast<ParameterCount>(parcel.ReadInt64());
-    if (operationItem.parameterCount < ParameterCount::ZERO_COUNT ||
-        operationItem.parameterCount >= ParameterCount::INVALID_COUNT) {
-        LOG_ERROR("operationItem read parameterCount failed");
+    if (!Unmarshalling(parcel, operationItem.singleParams)) {
+        LOG_ERROR("Unmarshalling singleParams failed");
         return false;
     }
-    if (!Unmarshalling(parcel, operationItem.para1)) {
-        LOG_ERROR("operationItem read para1 failed");
-        return false;
-    }
-    if (!Unmarshalling(parcel, operationItem.para2)) {
-        LOG_ERROR("operationItem read para2 failed");
-        return false;
-    }
-    if (!Unmarshalling(parcel, operationItem.para3)) {
-        LOG_ERROR("operationItem read para3 failed");
+    if (!Unmarshalling(parcel, operationItem.multiParams)) {
+        LOG_ERROR("Unmarshalling multiParams failed");
         return false;
     }
     return true;
@@ -240,34 +227,6 @@ bool ITypesUtil::Marshalling(const DataSharePredicatesObject &predicatesObject, 
             }
             break;
         }
-        case DataSharePredicatesObjectType::TYPE_INT_VECTOR: {
-            if (!parcel.WriteInt32Vector(predicatesObject)) {
-                LOG_ERROR("predicatesObject WriteInt32Vector failed");
-                return false;
-            }
-            break;
-        }
-        case DataSharePredicatesObjectType::TYPE_LONG_VECTOR: {
-            if (!parcel.WriteInt64Vector(predicatesObject)) {
-                LOG_ERROR("predicatesObject WriteInt64Vector failed");
-                return false;
-            }
-            break;
-        }
-        case DataSharePredicatesObjectType::TYPE_DOUBLE_VECTOR: {
-            if (!parcel.WriteDoubleVector(predicatesObject)) {
-                LOG_ERROR("predicatesObject WriteDoubleVector failed");
-                return false;
-            }
-            break;
-        }
-        case DataSharePredicatesObjectType::TYPE_STRING_VECTOR: {
-            if (!parcel.WriteStringVector(predicatesObject)) {
-                LOG_ERROR("predicatesObject WriteStringVector failed");
-                return false;
-            }
-            break;
-        }
         default:
             break;
     }
@@ -303,7 +262,63 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataSharePredicatesObject &predic
             predicatesObject.value = parcel.ReadBool();
             break;
         }
-        case DataSharePredicatesObjectType::TYPE_INT_VECTOR: {
+        default:
+            break;
+    }
+    return true;
+}
+
+bool ITypesUtil::Marshalling(const DataSharePredicatesObjects &predicatesObject, Parcel &parcel)
+{
+    if (!parcel.WriteInt16((int16_t)predicatesObject.GetType())) {
+        LOG_ERROR("predicatesObject write type failed");
+        return false;
+    }
+    switch (predicatesObject.GetType()) {
+        case DataSharePredicatesObjectsType::TYPE_INT_VECTOR: {
+            if (!parcel.WriteInt32Vector(predicatesObject)) {
+                LOG_ERROR("predicatesObject WriteInt32Vector failed");
+                return false;
+            }
+            break;
+        }
+        case DataSharePredicatesObjectsType::TYPE_LONG_VECTOR: {
+            if (!parcel.WriteInt64Vector(predicatesObject)) {
+                LOG_ERROR("predicatesObject WriteInt64Vector failed");
+                return false;
+            }
+            break;
+        }
+        case DataSharePredicatesObjectsType::TYPE_DOUBLE_VECTOR: {
+            if (!parcel.WriteDoubleVector(predicatesObject)) {
+                LOG_ERROR("predicatesObject WriteDoubleVector failed");
+                return false;
+            }
+            break;
+        }
+        case DataSharePredicatesObjectsType::TYPE_STRING_VECTOR: {
+            if (!parcel.WriteStringVector(predicatesObject)) {
+                LOG_ERROR("predicatesObject WriteStringVector failed");
+                return false;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+    return true;
+}
+
+bool ITypesUtil::Unmarshalling(Parcel &parcel, DataSharePredicatesObjects &predicatesObject)
+{
+    int16_t type = parcel.ReadInt16();
+    if (type < (int16_t)DataSharePredicatesObjectsType::TYPE_NULL) {
+        LOG_ERROR("predicatesObject read type failed");
+        return false;
+    }
+    predicatesObject.type = static_cast<DataSharePredicatesObjectsType>(type);
+    switch (predicatesObject.type) {
+        case DataSharePredicatesObjectsType::TYPE_INT_VECTOR: {
             std::vector<int> intval {};
             if (!parcel.ReadInt32Vector(&intval)) {
                 LOG_ERROR("predicatesObject ReadInt32Vector value failed");
@@ -312,7 +327,7 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataSharePredicatesObject &predic
             predicatesObject.value = intval;
             break;
         }
-        case DataSharePredicatesObjectType::TYPE_LONG_VECTOR: {
+        case DataSharePredicatesObjectsType::TYPE_LONG_VECTOR: {
             std::vector<int64_t> int64val {};
             if (!parcel.ReadInt64Vector(&int64val)) {
                 LOG_ERROR("predicatesObject ReadInt64Vector value failed");
@@ -321,7 +336,7 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataSharePredicatesObject &predic
             predicatesObject.value = int64val;
             break;
         }
-        case DataSharePredicatesObjectType::TYPE_DOUBLE_VECTOR: {
+        case DataSharePredicatesObjectsType::TYPE_DOUBLE_VECTOR: {
             std::vector<double> doubleval {};
             if (!parcel.ReadDoubleVector(&doubleval)) {
                 LOG_ERROR("predicatesObject ReadDoubleVector value failed");
@@ -330,7 +345,7 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataSharePredicatesObject &predic
             predicatesObject.value = doubleval;
             break;
         }
-        case DataSharePredicatesObjectType::TYPE_STRING_VECTOR: {
+        case DataSharePredicatesObjectsType::TYPE_STRING_VECTOR: {
             std::vector<std::string> stringval {};
             if (!parcel.ReadStringVector(&stringval)) {
                 LOG_ERROR("predicatesObject ReadDoubReadStringVectorleVector value failed");
@@ -429,6 +444,46 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataShareValueObject &valueObject
         }
         default:
             break;
+    }
+    return true;
+}
+
+template <typename T>
+bool ITypesUtil::Marshalling(const std::vector<T> &params, Parcel &parcel)
+{
+    if (!parcel.WriteInt32(params.size())) {
+        LOG_ERROR("predicate write params size failed");
+        return false;
+    }
+    for (auto i = 0; i < params.size(); i++) {
+        if (!Marshalling(params[i], parcel)) {
+            LOG_ERROR("predicate write params failed");
+            return false;
+        }
+    }
+    return true;
+}
+
+template <typename T>
+bool ITypesUtil::Unmarshalling(Parcel &parcel, std::vector<T> &params)
+{
+    size_t size = static_cast<size_t>(parcel.ReadInt32());
+    if (static_cast<int32_t>(size) < 0) {
+        LOG_ERROR("predicate read params size failed");
+        return false;
+    }
+    if ((size > parcel.GetReadableBytes()) || (params.max_size() < size)) {
+        LOG_ERROR("Read params failed, size : %{public}zu", size);
+        return false;
+    }
+    params.resize(static_cast<int32_t>(size));
+    for (auto i = 0; i < size; i++) {
+        T param;
+        if (!Unmarshalling(parcel, param)) {
+            LOG_ERROR("Unmarshalling param failed");
+            return false;
+        }
+        params[static_cast<int32_t>(i)] = param;
     }
     return true;
 }

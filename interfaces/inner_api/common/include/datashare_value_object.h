@@ -37,7 +37,10 @@ class DataShareValueObject {
 public:
     DataShareValueObject() : type(TYPE_NULL) {};
     ~DataShareValueObject() = default;
-    DataShareValueObject(DataShareValueObject &&object) noexcept : type(object.type), value(std::move(object.value)) {};
+    DataShareValueObject(DataShareValueObject &&object) noexcept : type(object.type), value(std::move(object.value))
+    {
+        object.type = DataShareValueObjectType::TYPE_NULL;
+    };
     DataShareValueObject(const DataShareValueObject &object) : type(object.type), value(object.value) {};
     DataShareValueObject(int val) : type(TYPE_INT), value(static_cast<int64_t>(val)) {};
     DataShareValueObject(int64_t val) : type(TYPE_INT), value(val) {};
@@ -73,7 +76,7 @@ public:
 
     operator int () const
     {
-        if (std::get_if<int64_t>(&value)) {
+        if (std::get_if<int64_t>(&value) != nullptr) {
             return static_cast<int>(std::get<int64_t>(value));
         } else {
             return {};
@@ -81,7 +84,7 @@ public:
     }
     operator int64_t () const
     {
-        if (std::get_if<int64_t>(&value)) {
+        if (std::get_if<int64_t>(&value) != nullptr) {
             return std::get<int64_t>(value);
         } else {
             return {};
@@ -89,7 +92,7 @@ public:
     }
     operator double () const
     {
-        if (std::get_if<double>(&value)) {
+        if (std::get_if<double>(&value) != nullptr) {
             return std::get<double>(value);
         } else {
             return {};
@@ -97,7 +100,7 @@ public:
     }
     operator bool () const
     {
-        if (std::get_if<bool>(&value)) {
+        if (std::get_if<bool>(&value) != nullptr) {
             return std::get<bool>(value);
         } else {
             return {};
@@ -105,7 +108,7 @@ public:
     }
     operator std::string () const
     {
-        if (std::get_if<std::string>(&value)) {
+        if (std::get_if<std::string>(&value) != nullptr) {
             return std::get<std::string>(value);
         } else {
             return {};
@@ -113,7 +116,7 @@ public:
     }
     operator std::vector<uint8_t> () const
     {
-        if (std::get_if<std::vector<uint8_t>>(&value)) {
+        if (std::get_if<std::vector<uint8_t>>(&value) != nullptr) {
             return std::get<std::vector<uint8_t>>(value);
         } else {
             return {};
