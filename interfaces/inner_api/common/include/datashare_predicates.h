@@ -75,8 +75,8 @@ private:
     void SetOperationList(OperationType operationType, const DataSharePredicatesObjects &param);
     void SetOperationList(OperationType operationType, const DataSharePredicatesObject &param1,
         const DataSharePredicatesObjects &param2);
-    void SetOperationList(OperationType operationType, const DataSharePredicatesObject &para1,
-        const DataSharePredicatesObject &para2, const DataSharePredicatesObject &para3);
+    void SetOperationList(OperationType operationType, const DataSharePredicatesObject &para1 = {},
+        const DataSharePredicatesObject &para2 = {}, const DataSharePredicatesObject &para3 = {});
     void ClearQueryLanguage();
     std::list<OperationItem> operationList_;
     std::string whereClause_;

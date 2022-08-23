@@ -476,13 +476,14 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, std::vector<T> &params)
         LOG_ERROR("Read params failed, size : %{public}zu", size);
         return false;
     }
+    params.resize(static_cast<int32_t>(size));
     for (auto i = 0; i < size; i++) {
         T param;
         if (!Unmarshalling(parcel, param)) {
             LOG_ERROR("Unmarshalling param failed");
             return false;
         }
-        params.push_back(param);
+        params[static_cast<int32_t>(i)] = param;
     }
     return true;
 }

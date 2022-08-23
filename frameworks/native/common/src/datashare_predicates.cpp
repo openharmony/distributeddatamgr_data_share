@@ -37,7 +37,7 @@ DataSharePredicates::~DataSharePredicates()
 DataSharePredicates *DataSharePredicates::EqualTo(const std::string &field, const DataSharePredicatesObject &value)
 {
     LOG_DEBUG("Start");
-    SetOperationList(EQUAL_TO, field, value, {});
+    SetOperationList(EQUAL_TO, field, value);
     return this;
 }
 
@@ -47,7 +47,7 @@ DataSharePredicates *DataSharePredicates::EqualTo(const std::string &field, cons
 DataSharePredicates *DataSharePredicates::NotEqualTo(const std::string &field, const DataSharePredicatesObject &value)
 {
     LOG_DEBUG("Start");
-    SetOperationList(NOT_EQUAL_TO, field, value, {});
+    SetOperationList(NOT_EQUAL_TO, field, value);
     return this;
 }
 
@@ -57,7 +57,7 @@ DataSharePredicates *DataSharePredicates::NotEqualTo(const std::string &field, c
 DataSharePredicates *DataSharePredicates::GreaterThan(const std::string &field, const DataSharePredicatesObject &value)
 {
     LOG_DEBUG("Start");
-    SetOperationList(GREATER_THAN, field, value, {});
+    SetOperationList(GREATER_THAN, field, value);
     return this;
 }
 
@@ -67,7 +67,7 @@ DataSharePredicates *DataSharePredicates::GreaterThan(const std::string &field, 
 DataSharePredicates *DataSharePredicates::LessThan(const std::string &field, const DataSharePredicatesObject &value)
 {
     LOG_DEBUG("Start");
-    SetOperationList(LESS_THAN, field, value, {});
+    SetOperationList(LESS_THAN, field, value);
     return this;
 }
 
@@ -78,7 +78,7 @@ DataSharePredicates *DataSharePredicates::GreaterThanOrEqualTo(const std::string
     const DataSharePredicatesObject &value)
 {
     LOG_DEBUG("Start");
-    SetOperationList(GREATER_THAN_OR_EQUAL_TO, field, value, {});
+    SetOperationList(GREATER_THAN_OR_EQUAL_TO, field, value);
     return this;
 }
 
@@ -89,7 +89,7 @@ DataSharePredicates *DataSharePredicates::LessThanOrEqualTo(const std::string &f
     const DataSharePredicatesObject &value)
 {
     LOG_DEBUG("Start");
-    SetOperationList(LESS_THAN_OR_EQUAL_TO, field, value, {});
+    SetOperationList(LESS_THAN_OR_EQUAL_TO, field, value);
     return this;
 }
 
@@ -119,7 +119,7 @@ DataSharePredicates *DataSharePredicates::NotIn(const std::string &field, const 
 DataSharePredicates *DataSharePredicates::BeginWrap()
 {
     LOG_DEBUG("Start");
-    SetOperationList(BEGIN_WARP, {}, {}, {});
+    SetOperationList(BEGIN_WARP);
     return this;
 }
 
@@ -129,7 +129,7 @@ DataSharePredicates *DataSharePredicates::BeginWrap()
 DataSharePredicates *DataSharePredicates::EndWrap()
 {
     LOG_DEBUG("Start");
-    SetOperationList(END_WARP, {}, {}, {});
+    SetOperationList(END_WARP);
     return this;
 }
 
@@ -139,7 +139,7 @@ DataSharePredicates *DataSharePredicates::EndWrap()
 DataSharePredicates *DataSharePredicates::Or()
 {
     LOG_DEBUG("Start");
-    SetOperationList(OR, {}, {}, {});
+    SetOperationList(OR);
     return this;
 }
 
@@ -149,7 +149,7 @@ DataSharePredicates *DataSharePredicates::Or()
 DataSharePredicates *DataSharePredicates::And()
 {
     LOG_DEBUG("Start");
-    SetOperationList(AND, {}, {}, {});
+    SetOperationList(AND);
     return this;
 }
 
@@ -159,7 +159,7 @@ DataSharePredicates *DataSharePredicates::And()
 DataSharePredicates *DataSharePredicates::Contains(const std::string &field, const std::string &value)
 {
     LOG_DEBUG("Start");
-    SetOperationList(CONTAINS, field, value, {});
+    SetOperationList(CONTAINS, field, value);
     return this;
 }
 
@@ -169,7 +169,7 @@ DataSharePredicates *DataSharePredicates::Contains(const std::string &field, con
 DataSharePredicates *DataSharePredicates::BeginsWith(const std::string &field, const std::string &value)
 {
     LOG_DEBUG("Start");
-    SetOperationList(BEGIN_WITH, field, value, {});
+    SetOperationList(BEGIN_WITH, field, value);
     return this;
 }
 
@@ -179,7 +179,7 @@ DataSharePredicates *DataSharePredicates::BeginsWith(const std::string &field, c
 DataSharePredicates *DataSharePredicates::EndsWith(const std::string &field, const std::string &value)
 {
     LOG_DEBUG("Start");
-    SetOperationList(END_WITH, field, value, {});
+    SetOperationList(END_WITH, field, value);
     return this;
 }
 
@@ -189,7 +189,7 @@ DataSharePredicates *DataSharePredicates::EndsWith(const std::string &field, con
 DataSharePredicates *DataSharePredicates::IsNull(const std::string &field)
 {
     LOG_DEBUG("Start");
-    SetOperationList(IS_NULL, field, {}, {});
+    SetOperationList(IS_NULL, field);
     return this;
 }
 
@@ -199,7 +199,7 @@ DataSharePredicates *DataSharePredicates::IsNull(const std::string &field)
 DataSharePredicates *DataSharePredicates::IsNotNull(const std::string &field)
 {
     LOG_DEBUG("Start");
-    SetOperationList(IS_NOT_NULL, field, {}, {});
+    SetOperationList(IS_NOT_NULL, field);
     return this;
 }
 
@@ -209,7 +209,7 @@ DataSharePredicates *DataSharePredicates::IsNotNull(const std::string &field)
 DataSharePredicates *DataSharePredicates::Like(const std::string &field, const std::string &value)
 {
     LOG_DEBUG("Start");
-    SetOperationList(LIKE, field, value, {});
+    SetOperationList(LIKE, field, value);
     return this;
 }
 
@@ -219,7 +219,7 @@ DataSharePredicates *DataSharePredicates::Like(const std::string &field, const s
 DataSharePredicates *DataSharePredicates::Unlike(const std::string &field, const std::string &value)
 {
     LOG_DEBUG("Start");
-    SetOperationList(UNLIKE, field, value, {});
+    SetOperationList(UNLIKE, field, value);
     return this;
 }
 
@@ -229,7 +229,7 @@ DataSharePredicates *DataSharePredicates::Unlike(const std::string &field, const
 DataSharePredicates *DataSharePredicates::Glob(const std::string &field, const std::string &value)
 {
     LOG_DEBUG("Start");
-    SetOperationList(GLOB, field, value, {});
+    SetOperationList(GLOB, field, value);
     return this;
 }
 
@@ -261,7 +261,7 @@ DataSharePredicates *DataSharePredicates::NotBetween(const std::string &field,
 DataSharePredicates *DataSharePredicates::OrderByAsc(const std::string &field)
 {
     LOG_DEBUG("Start");
-    SetOperationList(ORDER_BY_ASC, field, {}, {});
+    SetOperationList(ORDER_BY_ASC, field);
     return this;
 }
 
@@ -271,7 +271,7 @@ DataSharePredicates *DataSharePredicates::OrderByAsc(const std::string &field)
 DataSharePredicates *DataSharePredicates::OrderByDesc(const std::string &field)
 {
     LOG_DEBUG("Start");
-    SetOperationList(ORDER_BY_DESC, field, {}, {});
+    SetOperationList(ORDER_BY_DESC, field);
     return this;
 }
 
@@ -281,7 +281,7 @@ DataSharePredicates *DataSharePredicates::OrderByDesc(const std::string &field)
 DataSharePredicates *DataSharePredicates::Distinct()
 {
     LOG_DEBUG("Start");
-    SetOperationList(DISTINCT, {}, {}, {});
+    SetOperationList(DISTINCT);
     return this;
 }
 
@@ -291,7 +291,7 @@ DataSharePredicates *DataSharePredicates::Distinct()
 DataSharePredicates *DataSharePredicates::Limit(const int number, const int offset)
 {
     LOG_DEBUG("Start");
-    SetOperationList(LIMIT, number, offset, {});
+    SetOperationList(LIMIT, number, offset);
     return this;
 }
 
@@ -311,7 +311,7 @@ DataSharePredicates *DataSharePredicates::GroupBy(const std::vector<std::string>
 DataSharePredicates *DataSharePredicates::IndexedBy(const std::string &indexName)
 {
     LOG_DEBUG("Start");
-    SetOperationList(INDEXED_BY, indexName, {}, {});
+    SetOperationList(INDEXED_BY, indexName);
     return this;
 }
 
@@ -321,7 +321,7 @@ DataSharePredicates *DataSharePredicates::IndexedBy(const std::string &indexName
 DataSharePredicates *DataSharePredicates::KeyPrefix(const std::string &prefix)
 {
     LOG_DEBUG("Start");
-    SetOperationList(KEY_PREFIX, prefix, {}, {});
+    SetOperationList(KEY_PREFIX, prefix);
     return this;
 }
 
