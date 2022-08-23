@@ -40,111 +40,94 @@ DataShareOperationBuilder::~DataShareOperationBuilder()
 
 std::shared_ptr<DataShareOperation> DataShareOperationBuilder::Build()
 {
-    LOG_DEBUG("DataShareOperationBuilder::Build start");
+    LOG_DEBUG("Start");
     if (type_ != DataShareOperation::TYPE_UPDATE || (valuesBucket_ != nullptr && !valuesBucket_->IsEmpty())) {
         std::shared_ptr<DataShareOperation> operation = std::make_shared<DataShareOperation>(shared_from_this());
-        LOG_DEBUG("DataShareOperationBuilder::Build end");
+        LOG_DEBUG("return operation");
         return operation;
     }
-    LOG_ERROR("DataShareOperationBuilder::Build return nullptr");
+    LOG_ERROR("return nullptr");
     return nullptr;
 }
 std::shared_ptr<DataShareOperationBuilder> DataShareOperationBuilder::WithValuesBucket(
     std::shared_ptr<DataShareValuesBucket> &values)
 {
-    LOG_DEBUG("DataShareOperationBuilder::WithValuesBucket start");
+    LOG_DEBUG("Start");
     if (type_ != DataShareOperation::TYPE_INSERT && type_ != DataShareOperation::TYPE_UPDATE &&
         type_ != DataShareOperation::TYPE_ASSERT) {
-        LOG_ERROR(
-            "DataShareOperationBuilder::WithValuesBucket only inserts, updates can have values, type=%{public}d",
-            type_);
+        LOG_ERROR("Only inserts, updates can have values, type=%{public}d", type_);
         return nullptr;
     }
 
     valuesBucket_ = std::make_shared<DataShareValuesBucket>(values->valuesMap);
-    LOG_DEBUG("DataShareOperationBuilder::WithValuesBucket end");
+    LOG_DEBUG("End successfully");
     return shared_from_this();
 }
 
 std::shared_ptr<DataShareOperationBuilder> DataShareOperationBuilder::WithPredicates(
     std::shared_ptr<DataSharePredicates> &predicates)
 {
-    LOG_DEBUG("DataShareOperationBuilder::WithPredicates start");
+    LOG_DEBUG("Start");
     if (type_ != DataShareOperation::TYPE_DELETE && type_ != DataShareOperation::TYPE_UPDATE &&
         type_ != DataShareOperation::TYPE_ASSERT) {
-        LOG_ERROR(
-            "DataShareOperationBuilder::withPredicates only deletes and updates can have selections, type=%{public}d",
-            type_);
+        LOG_ERROR("Only deletes and updates can have selections, type=%{public}d", type_);
         return nullptr;
     }
     dataSharePredicates_ = predicates;
-    LOG_DEBUG("DataShareOperationBuilder::WithPredicates end");
+    LOG_DEBUG("End successfully");
     return shared_from_this();
 }
 std::shared_ptr<DataShareOperationBuilder> DataShareOperationBuilder::WithExpectedCount(int count)
 {
-    LOG_DEBUG("DataShareOperationBuilder::WithExpectedCount start");
-    LOG_INFO("DataShareOperationBuilder::WithExpectedCount expectedCount:%{public}d", count);
+    LOG_DEBUG("Start");
+    LOG_INFO("expectedCount:%{public}d", count);
     if (type_ != DataShareOperation::TYPE_UPDATE && type_ != DataShareOperation::TYPE_DELETE &&
         type_ != DataShareOperation::TYPE_ASSERT) {
-        LOG_ERROR("DataShareOperationBuilder::withExpectedCount only updates, deletes can have expected counts, "
-            "type=%{public}d",
-            type_);
+        LOG_ERROR("Only updates, deletes can have expected counts, type=%{public}d", type_);
         return nullptr;
     }
     expectedCount_ = count;
-    LOG_DEBUG("DataShareOperationBuilder::WithExpectedCount end");
+    LOG_DEBUG("End successfully");
     return shared_from_this();
 }
 std::shared_ptr<DataShareOperationBuilder> DataShareOperationBuilder::WithPredicatesBackReference(
     int requestArgIndex, int previousResult)
 {
-    LOG_DEBUG("DataShareOperationBuilder::WithPredicatesBackReference start");
-    LOG_INFO("DataShareOperationBuilder::WithPredicatesBackReference requestArgIndex:%{public}d, "
-        "previousResult:%{public}d",
-        requestArgIndex,
-        previousResult);
+    LOG_DEBUG("Start");
+    LOG_INFO("requestArgIndex=%{public}d, previousResult=%{public}d", requestArgIndex, previousResult);
     if (type_ != DataShareOperation::TYPE_UPDATE && type_ != DataShareOperation::TYPE_DELETE &&
         type_ != DataShareOperation::TYPE_ASSERT) {
-        LOG_ERROR(
-            "DataShareOperationBuilder::withPredicatesBackReference only updates, deletes, and asserts can have "
-            "select back-references, type=%{public}d",
-            type_);
+        LOG_ERROR("Only updates, deletes, and asserts can have select back-references, type=%{public}d", type_);
         return nullptr;
     }
     dataSharePredicatesBackReferences_.insert(std::make_pair(requestArgIndex, previousResult));
-    LOG_DEBUG("DataShareOperationBuilder::WithPredicatesBackReference end");
+    LOG_DEBUG("End successfully");
     return shared_from_this();
 }
 std::shared_ptr<DataShareOperationBuilder> DataShareOperationBuilder::WithValueBackReferences(
     std::shared_ptr<DataShareValuesBucket> &backReferences)
 {
-    LOG_DEBUG("DataShareOperationBuilder::WithValueBackReferences start");
+    LOG_DEBUG("Start");
     if (type_ != DataShareOperation::TYPE_INSERT && type_ != DataShareOperation::TYPE_UPDATE &&
         type_ != DataShareOperation::TYPE_ASSERT) {
-        LOG_ERROR("DataShareOperationBuilder::withValueBackReferences only inserts, updates, and asserts can have "
-            "value back-references, type=%{public}d",
-            type_);
+        LOG_ERROR("Only inserts, updates, and asserts can have value back-references, type=%{public}d", type_);
         return nullptr;
     }
     valuesBucketReferences_ = backReferences;
-    LOG_DEBUG("DataShareOperationBuilder::WithValueBackReferences end");
+    LOG_DEBUG("End successfully");
     return shared_from_this();
 }
 std::shared_ptr<DataShareOperationBuilder> DataShareOperationBuilder::WithInterruptionAllowed(bool interrupted)
 {
-    LOG_DEBUG("DataShareOperationBuilder::WithInterruptionAllowed start");
-    LOG_INFO("DataShareOperationBuilder::WithInterruptionAllowed  interrupted=%{public}d", interrupted);
+    LOG_DEBUG("Start");
+    LOG_INFO("interrupted=%{public}d", interrupted);
     if (type_ != DataShareOperation::TYPE_INSERT && type_ != DataShareOperation::TYPE_UPDATE &&
         type_ != DataShareOperation::TYPE_ASSERT && type_ != DataShareOperation::TYPE_DELETE) {
-        LOG_ERROR(
-            "DataShareOperationBuilder::withInterruptionAllowed only inserts, updates, delete, and asserts can "
-            "have value back-references, type=%{public}d",
-            type_);
+        LOG_ERROR("Only inserts, updates, delete, and asserts can have value back-references, type=%{public}d", type_);
         return nullptr;
     }
     interrupted_ = interrupted;
-    LOG_DEBUG("DataShareOperationBuilder::WithInterruptionAllowed end");
+    LOG_DEBUG("End successfully");
     return shared_from_this();
 }
 }  // namespace DataShare

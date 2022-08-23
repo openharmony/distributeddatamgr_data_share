@@ -67,16 +67,27 @@ int DataShareStub::OnRemoteRequest(uint32_t code, MessageParcel& data, MessagePa
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
+bool ReadUri(std::shared_ptr<Uri> &uri, MessageParcel &data)
+{
+    std::shared_ptr<Uri> tmpUri(data.ReadParcelable<Uri>());
+    if (tmpUri == nullptr) {
+        LOG_ERROR("tmpUri is nullptr");
+        return false;
+    }
+
+    uri = std::move(tmpUri);
+    return true;
+}
+
 ErrCode DataShareStub::CmdGetFileTypes(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("DataShareStub uri is nullptr");
+    std::shared_ptr<Uri> uri = nullptr;
+    if (!ReadUri(uri, data)) {
         return ERR_INVALID_VALUE;
     }
     std::string mimeTypeFilter = data.ReadString();
     if (mimeTypeFilter.empty()) {
-        LOG_ERROR("DataShareStub mimeTypeFilter is nullptr");
+        LOG_ERROR("mimeTypeFilter is nullptr");
         return ERR_INVALID_VALUE;
     }
     std::vector<std::string> types = GetFileTypes(*uri, mimeTypeFilter);
@@ -89,14 +100,13 @@ ErrCode DataShareStub::CmdGetFileTypes(MessageParcel &data, MessageParcel &reply
 
 ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("DataShareStub uri is nullptr");
+    std::shared_ptr<Uri> uri = nullptr;
+    if (!ReadUri(uri, data)) {
         return ERR_INVALID_VALUE;
     }
     std::string mode = data.ReadString();
     if (mode.empty()) {
-        LOG_ERROR("DataShareStub mode is nullptr");
+        LOG_ERROR("mode is nullptr");
         return ERR_INVALID_VALUE;
     }
     int fd = OpenFile(*uri, mode);
@@ -113,14 +123,13 @@ ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
 
 ErrCode DataShareStub::CmdOpenRawFile(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("DataShareStub uri is nullptr");
+    std::shared_ptr<Uri> uri = nullptr;
+    if (!ReadUri(uri, data)) {
         return ERR_INVALID_VALUE;
     }
     std::string mode = data.ReadString();
     if (mode.empty()) {
-        LOG_ERROR("DataShareStub mode is nullptr");
+        LOG_ERROR("mode is nullptr");
         return ERR_INVALID_VALUE;
     }
     int fd = OpenRawFile(*uri, mode);
@@ -154,9 +163,8 @@ ErrCode DataShareStub::CmdInsert(MessageParcel &data, MessageParcel &reply)
 
 ErrCode DataShareStub::CmdUpdate(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("DataShareStub uri is nullptr");
+    std::shared_ptr<Uri> uri = nullptr;
+    if (!ReadUri(uri, data)) {
         return ERR_INVALID_VALUE;
     }
     DataSharePredicates predicates;
@@ -179,9 +187,8 @@ ErrCode DataShareStub::CmdUpdate(MessageParcel &data, MessageParcel &reply)
 
 ErrCode DataShareStub::CmdDelete(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("DataShareStub uri is nullptr");
+    std::shared_ptr<Uri> uri = nullptr;
+    if (!ReadUri(uri, data)) {
         return ERR_INVALID_VALUE;
     }
     DataSharePredicates predicates;
@@ -199,9 +206,8 @@ ErrCode DataShareStub::CmdDelete(MessageParcel &data, MessageParcel &reply)
 
 ErrCode DataShareStub::CmdQuery(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("DataShareStub uri is nullptr");
+    std::shared_ptr<Uri> uri = nullptr;
+    if (!ReadUri(uri, data)) {
         return ERR_INVALID_VALUE;
     }
     DataSharePredicates predicates;
@@ -224,15 +230,13 @@ ErrCode DataShareStub::CmdQuery(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("!resultSet->Marshalling(reply)");
         return ERR_INVALID_VALUE;
     }
-    LOG_INFO("DataShareStub::CmdQueryInner end");
     return NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdGetType(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("DataShareStub uri is nullptr");
+    std::shared_ptr<Uri> uri = nullptr;
+    if (!ReadUri(uri, data)) {
         return ERR_INVALID_VALUE;
     }
     std::string type = GetType(*uri);
@@ -245,9 +249,8 @@ ErrCode DataShareStub::CmdGetType(MessageParcel &data, MessageParcel &reply)
 
 ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("DataShareStub uri is nullptr");
+    std::shared_ptr<Uri> uri = nullptr;
+    if (!ReadUri(uri, data)) {
         return ERR_INVALID_VALUE;
     }
 
@@ -278,14 +281,13 @@ ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
 
 ErrCode DataShareStub::CmdRegisterObserver(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("DataShareStub uri is nullptr");
+    std::shared_ptr<Uri> uri = nullptr;
+    if (!ReadUri(uri, data)) {
         return ERR_INVALID_VALUE;
     }
     auto obServer = iface_cast<AAFwk::IDataAbilityObserver>(data.ReadRemoteObject());
     if (obServer == nullptr) {
-        LOG_ERROR("DataShareStub obServer is nullptr");
+        LOG_ERROR("obServer is nullptr");
         return ERR_INVALID_VALUE;
     }
 
@@ -299,14 +301,13 @@ ErrCode DataShareStub::CmdRegisterObserver(MessageParcel &data, MessageParcel &r
 
 ErrCode DataShareStub::CmdUnregisterObserver(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("DataShareStub uri is nullptr");
+    std::shared_ptr<Uri> uri = nullptr;
+    if (!ReadUri(uri, data)) {
         return ERR_INVALID_VALUE;
     }
     auto obServer = iface_cast<AAFwk::IDataAbilityObserver>(data.ReadRemoteObject());
     if (obServer == nullptr) {
-        LOG_ERROR("DataShareStub obServer is nullptr");
+        LOG_ERROR("obServer is nullptr");
         return ERR_INVALID_VALUE;
     }
 
@@ -320,9 +321,8 @@ ErrCode DataShareStub::CmdUnregisterObserver(MessageParcel &data, MessageParcel 
 
 ErrCode DataShareStub::CmdNotifyChange(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("DataShareStub uri is nullptr");
+    std::shared_ptr<Uri> uri = nullptr;
+    if (!ReadUri(uri, data)) {
         return ERR_INVALID_VALUE;
     }
 
@@ -336,9 +336,8 @@ ErrCode DataShareStub::CmdNotifyChange(MessageParcel &data, MessageParcel &reply
 
 ErrCode DataShareStub::CmdNormalizeUri(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("DataShareStub uri is nullptr");
+    std::shared_ptr<Uri> uri = nullptr;
+    if (!ReadUri(uri, data)) {
         return ERR_INVALID_VALUE;
     }
 
@@ -353,9 +352,8 @@ ErrCode DataShareStub::CmdNormalizeUri(MessageParcel &data, MessageParcel &reply
 
 ErrCode DataShareStub::CmdDenormalizeUri(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("DataShareStub uri is nullptr");
+    std::shared_ptr<Uri> uri = nullptr;
+    if (!ReadUri(uri, data)) {
         return ERR_INVALID_VALUE;
     }
 
@@ -370,18 +368,17 @@ ErrCode DataShareStub::CmdDenormalizeUri(MessageParcel &data, MessageParcel &rep
 
 ErrCode DataShareStub::CmdExecuteBatch(MessageParcel &data, MessageParcel &reply)
 {
-    LOG_INFO("DataShareStub::CmdExecuteBatchInner start");
     int count = 0;
     if (!data.ReadInt32(count)) {
-        LOG_ERROR("DataShareStub::CmdExecuteBatchInner fail to ReadInt32 count");
+        LOG_ERROR("fail to ReadInt32 count");
         return ERR_INVALID_VALUE;
     }
-    LOG_INFO("DataShareStub::CmdExecuteBatchInner count:%{public}d", count);
+    LOG_INFO("count:%{public}d", count);
     std::vector<std::shared_ptr<DataShareOperation>> operations;
     for (int i = 0; i < count; i++) {
         DataShareOperation *operation = data.ReadParcelable<DataShareOperation>();
         if (operation == nullptr) {
-            LOG_ERROR("DataShareStub::CmdExecuteBatchInner operation is nullptr, index = %{public}d", i);
+            LOG_ERROR("operation is nullptr, index = %{public}d", i);
             return ERR_INVALID_VALUE;
         }
         std::shared_ptr<DataShareOperation> dataShareOperation(operation);
@@ -391,22 +388,20 @@ ErrCode DataShareStub::CmdExecuteBatch(MessageParcel &data, MessageParcel &reply
     std::vector<std::shared_ptr<DataShareResult>> results = ExecuteBatch(operations);
     int total = (int)(results.size());
     if (!reply.WriteInt32(total)) {
-        LOG_ERROR("DataShareStub::CmdExecuteBatchInner fail to WriteInt32 ret");
+        LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
     }
-    LOG_INFO("DataShareStub::CmdExecuteBatchInner total:%{public}d", total);
+    LOG_INFO("total:%{public}d", total);
     for (int i = 0; i < total; i++) {
         if (results[i] == nullptr) {
-            LOG_ERROR("DataShareStub::CmdExecuteBatchInner results[i] is nullptr, index = %{public}d", i);
+            LOG_ERROR("results[i] is nullptr, index = %{public}d", i);
             return ERR_INVALID_VALUE;
         }
         if (!reply.WriteParcelable(results[i].get())) {
-            LOG_ERROR(
-                "DataShareStub::CmdExecuteBatchInner fail to WriteParcelable operation, index = %{public}d", i);
+            LOG_ERROR("fail to WriteParcelable operation, index = %{public}d", i);
             return ERR_INVALID_VALUE;
         }
     }
-    LOG_INFO("DataShareStub::CmdExecuteBatchInner end");
     return NO_ERROR;
 }
 } // namespace DataShare

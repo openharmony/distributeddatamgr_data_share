@@ -38,7 +38,7 @@ ISharedResultSetStub::ISharedResultSetStub(std::shared_ptr<DataShareResultSet> r
       thread_(&ISharedResultSetStub::Run, this)
 {
     thread_.detach();
-    LOG_ERROR("ISharedResultSetStub start thread(%{public}" PRIx64 ")", uint64_t(thread_.native_handle()));
+    LOG_ERROR("start thread(%{public}" PRIx64 ")", uint64_t(thread_.native_handle()));
 }
 ISharedResultSetStub::~ISharedResultSetStub()
 {
@@ -46,7 +46,7 @@ ISharedResultSetStub::~ISharedResultSetStub()
     isRunning_ = false;
     // do not delete this code, this code is waiting the thread exit.
     isRunning_ = Submit([this]() -> bool { return isRunning_;}).get();
-    LOG_ERROR("~ISharedResultSetStub thread(%{public}" PRIx64 ")", uint64_t(handle));
+    LOG_ERROR("thread(%{public}" PRIx64 ")", uint64_t(handle));
 }
 
 int ISharedResultSetStub::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data,
@@ -58,12 +58,12 @@ int ISharedResultSetStub::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &da
     }
 
     if (code >= FUNC_BUTT) {
-        LOG_ERROR("OnRemoteRequest method code(%{public}d) out of range", code);
+        LOG_ERROR("method code(%{public}d) out of range", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
     Handler handler = handlers[code];
     if (handler == nullptr) {
-        LOG_ERROR("OnRemoteRequest method code(%{public}d) is not support", code);
+        LOG_ERROR("method code(%{public}d) is not support", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
 
@@ -81,7 +81,7 @@ int ISharedResultSetStub::HandleGetRowCountRequest(MessageParcel &data, MessageP
     if (errCode == E_OK) {
         reply.WriteInt32(count);
     }
-    LOG_DEBUG("HandleGetRowCountRequest call %{public}d", errCode);
+    LOG_DEBUG("errCode %{public}d", errCode);
     return NO_ERROR;
 }
 
@@ -93,7 +93,7 @@ int ISharedResultSetStub::HandleGetAllColumnNamesRequest(MessageParcel &data, Me
     if (errCode == E_OK) {
         reply.WriteStringVector(names);
     }
-    LOG_DEBUG("HandleGetAllColumnNamesRequest call %{public}d", errCode);
+    LOG_DEBUG("errCode %{public}d", errCode);
     return NO_ERROR;
 }
 
@@ -114,7 +114,7 @@ int ISharedResultSetStub::HandleOnGoRequest(MessageParcel &data, MessageParcel &
         errCode = resultSet_->OnGo(oldRow, newRow);
     }
     reply.WriteInt32(errCode);
-    LOG_DEBUG("HandleOnGoRequest call %{public}d", errCode);
+    LOG_DEBUG("errCode %{public}d", errCode);
     return NO_ERROR;
 }
 
@@ -122,7 +122,7 @@ int ISharedResultSetStub::HandleCloseRequest(MessageParcel &data, MessageParcel 
 {
     int errCode = resultSet_->Close();
     reply.WriteInt32(errCode);
-    LOG_DEBUG("HandleCloseRequest call %{public}d", errCode);
+    LOG_DEBUG("errCode %{public}d", errCode);
     return NO_ERROR;
 }
 
@@ -137,6 +137,6 @@ void ISharedResultSetStub::Run()
         }
         isRunning = runnable();
     }
-    LOG_ERROR("ISharedResultSetStub thread(%{public}" PRIx64 ") is exited", uint64_t(handle));
+    LOG_ERROR("thread(%{public}" PRIx64 ") is exited", uint64_t(handle));
 }
 } // namespace OHOS::DataShare

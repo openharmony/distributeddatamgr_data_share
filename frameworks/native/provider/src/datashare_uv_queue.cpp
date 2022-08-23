@@ -30,7 +30,7 @@ DataShareUvQueue::DataShareUvQueue(napi_env env)
 
 void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     uv_work_t* work = new (std::nothrow) uv_work_t;
     if (work == nullptr) {
         return;
@@ -40,7 +40,7 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
         loop_, work, [](uv_work_t* work) {},
         [](uv_work_t* work, int uvstatus) {
             if (work == nullptr || work->data == nullptr) {
-                LOG_ERROR("%{public}s invalid work or work->data.", __func__);
+                LOG_ERROR("invalid work or work->data.");
                 return;
             }
             auto *entry = static_cast<UvEntry*>(work->data);
@@ -56,7 +56,7 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
             }
         });
     if (status != napi_ok) {
-        LOG_ERROR("%{public}s queue work failed", __func__);
+        LOG_ERROR("queue work failed");
         DataShareUvQueue::Purge(work);
         return;
     }
@@ -70,7 +70,7 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
         }
         CheckFuncAndExec(uvEntry->retFunc);
         if (!uvEntry->done && !uv_cancel((uv_req_t*)&work)) {
-            LOG_ERROR("%{public}s uv_cancel failed.", __func__);
+            LOG_ERROR("uv_cancel failed.");
             uvEntry->purge = true;
             noNeedPurge = true;
         }
@@ -79,14 +79,13 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
     if (!noNeedPurge) {
         DataShareUvQueue::Purge(work);
     }
-    LOG_INFO("end.");
 }
 
 void DataShareUvQueue::Purge(uv_work_t* work)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     if (work == nullptr || work->data == nullptr) {
-        LOG_ERROR("%{public}s invalid work or work->data.", __func__);
+        LOG_ERROR("invalid work or work->data.");
         return;
     }
 
@@ -98,7 +97,6 @@ void DataShareUvQueue::Purge(uv_work_t* work)
 
     delete work;
     work = nullptr;
-    LOG_INFO("end.");
 }
 
 void DataShareUvQueue::CheckFuncAndExec(NapiBoolFunc retFunc)

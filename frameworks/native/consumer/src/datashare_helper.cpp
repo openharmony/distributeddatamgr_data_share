@@ -34,12 +34,11 @@ std::mutex DataShareHelper::deathlock_;
 DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token,
     const Uri &uri, const sptr<IDataShare> &dataShareProxy, sptr<DataShareConnection> dataShareConnection)
 {
-    LOG_INFO("DataShareHelper::DataShareHelper start");
+    LOG_DEBUG("Start");
     token_ = token;
     uri_ = uri;
     dataShareProxy_ = dataShareProxy;
     dataShareConnection_ = dataShareConnection;
-    LOG_INFO("DataShareHelper::DataShareHelper end");
 }
 
 DataShareHelper::~DataShareHelper()
@@ -52,7 +51,7 @@ DataShareHelper::~DataShareHelper()
 
 void DataShareHelper::AddDataShareDeathRecipient(const sptr<IRemoteObject> &token)
 {
-    LOG_INFO("DataShareHelper::AddDataShareDeathRecipient start.");
+    LOG_DEBUG("Start");
     if (token == nullptr) {
         LOG_INFO("token is nullptr");
         return;
@@ -63,17 +62,14 @@ void DataShareHelper::AddDataShareDeathRecipient(const sptr<IRemoteObject> &toke
         return;
     }
 
-    LOG_INFO("token AddDeathRecipient.");
     callerDeathRecipient_ =
         new DataShareDeathRecipient(std::bind(&DataShareHelper::OnSchedulerDied, this, std::placeholders::_1));
     token->AddDeathRecipient(callerDeathRecipient_);
-
-    LOG_INFO("DataShareHelper::AddDataShareDeathRecipient end.");
 }
 
 void DataShareHelper::OnSchedulerDied(const wptr<IRemoteObject> &remote)
 {
-    LOG_INFO("start.");
+    LOG_DEBUG("Start");
     std::lock_guard<std::mutex> lock_l(deathlock_);
     if (callerDeathRecipient_ != nullptr) {
         if (dataShareProxy_ != nullptr) {
@@ -83,7 +79,6 @@ void DataShareHelper::OnSchedulerDied(const wptr<IRemoteObject> &remote)
     }
     dataShareProxy_ = nullptr;
     dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
-    LOG_INFO("DataShareHelper::OnSchedulerDied end.");
 }
 
 /**
@@ -99,7 +94,7 @@ void DataShareHelper::OnSchedulerDied(const wptr<IRemoteObject> &remote)
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
     const std::shared_ptr<Context> &context, const std::string &strUri)
 {
-    LOG_INFO("DataShareHelper::Creator with context and uri called start.");
+    LOG_DEBUG("Creator with context and uri called start");
     if (context == nullptr) {
         LOG_ERROR("DataShareHelper::Creator failed, context == nullptr");
         return nullptr;
@@ -121,7 +116,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
     const std::shared_ptr<OHOS::AbilityRuntime::Context> &context, const std::string &strUri)
 {
-    LOG_INFO("DataShareHelper::Creator with runtime context and uri called start.");
+    LOG_DEBUG("Creator with runtime context and uri called start");
     if (context == nullptr) {
         LOG_ERROR("DataShareHelper::Creator failed, context == nullptr");
         return nullptr;
@@ -142,45 +137,41 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
  */
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObject> &token, const std::string &strUri)
 {
-    LOG_INFO("DataShareHelper::Creator with runtime token and uri called start.");
+    LOG_DEBUG("Creator with runtime token and uri called start");
     if (token == nullptr) {
-        LOG_ERROR("DataShareHelper::Creator failed, token == nullptr");
+        LOG_ERROR("token == nullptr");
         return nullptr;
     }
 
     Uri uri(strUri);
     if (uri.GetScheme() != SCHEME_DATASHARE) {
-        LOG_ERROR("DataShareHelper::Creator failed, the Scheme is not datashare, Scheme: %{public}s",
-            uri.GetScheme().c_str());
+        LOG_ERROR("the Scheme is not datashare, Scheme: %{public}s", uri.GetScheme().c_str());
         return nullptr;
     }
 
-    LOG_INFO("DataShareHelper::Creator before ConnectDataShareExtAbility.");
     sptr<DataShareConnection> dataShareConnection = new (std::nothrow) DataShareConnection(uri);
     if (!dataShareConnection->IsExtAbilityConnected()) {
         dataShareConnection->ConnectDataShareExtAbility(uri, token);
     }
     sptr<IDataShare> dataShareProxy = dataShareConnection->GetDataShareProxy();
     if (dataShareProxy == nullptr) {
-        LOG_ERROR("DataShareHelper::Creator get invalid dataShareProxy");
+        LOG_ERROR("Invalid dataShareProxy");
         if (dataShareConnection->IsExtAbilityConnected()) {
             dataShareConnection->DisconnectDataShareExtAbility();
         }
         return nullptr;
     }
-    LOG_INFO("DataShareHelper::Creator after ConnectDataShareExtAbility.");
 
     DataShareHelper *ptrDataShareHelper =
         new (std::nothrow) DataShareHelper(token, uri, dataShareProxy, dataShareConnection);
     if (ptrDataShareHelper == nullptr) {
-        LOG_ERROR("DataShareHelper::Creator failed, create DataShareHelper failed");
+        LOG_ERROR("create DataShareHelper failed");
         if (dataShareConnection->IsExtAbilityConnected()) {
             dataShareConnection->DisconnectDataShareExtAbility();
         }
         return nullptr;
     }
 
-    LOG_INFO("DataShareHelper::Creator out.");
     return std::shared_ptr<DataShareHelper>(ptrDataShareHelper);
 }
 
@@ -192,16 +183,13 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
  */
 bool DataShareHelper::Release()
 {
-    LOG_INFO("DataShareHelper::Release start.");
-    LOG_INFO("DataShareHelper::Release before DisconnectDataShareExtAbility.");
+    LOG_DEBUG("Start");
     if (dataShareConnection_->IsExtAbilityConnected()) {
         dataShareConnection_->DisconnectDataShareExtAbility();
     }
-    LOG_INFO("DataShareHelper::Release after DisconnectDataShareExtAbility.");
     dataShareProxy_ = nullptr;
     dataShareConnection_ = nullptr;
     uri_ = Uri("");
-    LOG_INFO("DataShareHelper::Release end.");
     return true;
 }
 
@@ -215,10 +203,9 @@ bool DataShareHelper::Release()
  */
 std::vector<std::string> DataShareHelper::GetFileTypes(Uri &uri, const std::string &mimeTypeFilter)
 {
-    LOG_INFO("DataShareHelper::GetFileTypes start.");
+    LOG_DEBUG("Start");
     std::vector<std::string> matchedMIMEs;
     if (!CheckUriParam(uri)) {
-        LOG_ERROR("%{public}s called. CheckUriParam uri failed", __func__);
         return matchedMIMEs;
     }
 
@@ -229,15 +216,11 @@ std::vector<std::string> DataShareHelper::GetFileTypes(Uri &uri, const std::stri
     if (dataShareProxy_) {
         AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     } else {
-        LOG_ERROR("%{public}s failed with invalid dataShareProxy_", __func__);
+        LOG_ERROR("invalid dataShareProxy_");
         return matchedMIMEs;
     }
 
-    LOG_INFO("DataShareHelper::GetFileTypes before dataShareProxy_->GetFileTypes.");
     matchedMIMEs = dataShareProxy_->GetFileTypes(uri, mimeTypeFilter);
-    LOG_INFO("DataShareHelper::GetFileTypes after dataShareProxy_->GetFileTypes.");
-
-    LOG_INFO("DataShareHelper::GetFileTypes end.");
     return matchedMIMEs;
 }
 
@@ -254,10 +237,9 @@ std::vector<std::string> DataShareHelper::GetFileTypes(Uri &uri, const std::stri
  */
 int DataShareHelper::OpenFile(Uri &uri, const std::string &mode)
 {
-    LOG_INFO("DataShareHelper::OpenFile start.");
+    LOG_DEBUG("Start");
     int fd = INVALID_VALUE;
     if (!CheckUriParam(uri)) {
-        LOG_ERROR("%{public}s called. CheckUriParam uri failed", __func__);
         return fd;
     }
 
@@ -268,15 +250,11 @@ int DataShareHelper::OpenFile(Uri &uri, const std::string &mode)
     if (dataShareProxy_) {
         AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     } else {
-        LOG_ERROR("%{public}s failed with invalid dataShareProxy_", __func__);
+        LOG_ERROR("invalid dataShareProxy_");
         return fd;
     }
 
-    LOG_INFO("DataShareHelper::OpenFile before dataShareProxy_->OpenFile.");
     fd = dataShareProxy_->OpenFile(uri, mode);
-    LOG_INFO("DataShareHelper::OpenFile after dataShareProxy_->OpenFile.");
-
-    LOG_INFO("DataShareHelper::OpenFile end.");
     return fd;
 }
 
@@ -294,10 +272,9 @@ int DataShareHelper::OpenFile(Uri &uri, const std::string &mode)
  */
 int DataShareHelper::OpenRawFile(Uri &uri, const std::string &mode)
 {
-    LOG_INFO("DataShareHelper::OpenRawFile start.");
+    LOG_DEBUG("Start");
     int fd = INVALID_VALUE;
     if (!CheckUriParam(uri)) {
-        LOG_ERROR("%{public}s called. CheckUriParam uri failed", __func__);
         return fd;
     }
 
@@ -308,15 +285,11 @@ int DataShareHelper::OpenRawFile(Uri &uri, const std::string &mode)
     if (dataShareProxy_) {
         AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     } else {
-        LOG_ERROR("%{public}s failed with invalid dataShareProxy_", __func__);
+        LOG_ERROR("invalid dataShareProxy_");
         return fd;
     }
 
-    LOG_INFO("DataShareHelper::OpenRawFile before dataShareProxy_->OpenRawFile.");
     fd = dataShareProxy_->OpenRawFile(uri, mode);
-    LOG_INFO("DataShareHelper::OpenRawFile after dataShareProxy_->OpenRawFile.");
-
-    LOG_INFO("DataShareHelper::OpenRawFile end.");
     return fd;
 }
 
@@ -330,10 +303,9 @@ int DataShareHelper::OpenRawFile(Uri &uri, const std::string &mode)
  */
 int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
 {
-    LOG_INFO("DataShareHelper::Insert start.");
+    LOG_DEBUG("Start");
     int index = INVALID_VALUE;
     if (!CheckUriParam(uri)) {
-        LOG_ERROR("%{public}s called. CheckUriParam uri failed", __func__);
         return index;
     }
 
@@ -344,15 +316,11 @@ int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
     if (dataShareProxy_) {
         AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     } else {
-        LOG_ERROR("%{public}s failed with invalid dataShareProxy_", __func__);
+        LOG_ERROR("invalid dataShareProxy_");
         return index;
     }
 
-    LOG_INFO("DataShareHelper::Insert before dataShareProxy_->Insert.");
     index = dataShareProxy_->Insert(uri, value);
-    LOG_INFO("DataShareHelper::Insert after dataShareProxy_->Insert.");
-
-    LOG_INFO("DataShareHelper::Insert end.");
     return index;
 }
 
@@ -368,10 +336,9 @@ int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
 int DataShareHelper::Update(
     Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
 {
-    LOG_INFO("DataShareHelper::Update start.");
+    LOG_DEBUG("Start");
     int index = INVALID_VALUE;
     if (!CheckUriParam(uri)) {
-        LOG_ERROR("%{public}s called. CheckUriParam uri failed", __func__);
         return index;
     }
 
@@ -382,15 +349,11 @@ int DataShareHelper::Update(
     if (dataShareProxy_) {
         AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     } else {
-        LOG_ERROR("%{public}s failed with invalid dataShareProxy_", __func__);
+        LOG_ERROR("invalid dataShareProxy_");
         return index;
     }
 
-    LOG_INFO("DataShareHelper::Update before dataShareProxy_->Update.");
     index = dataShareProxy_->Update(uri, predicates, value);
-    LOG_INFO("DataShareHelper::Update after dataShareProxy_->Update.");
-
-    LOG_INFO("DataShareHelper::Update end.");
     return index;
 }
 
@@ -404,10 +367,9 @@ int DataShareHelper::Update(
  */
 int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
 {
-    LOG_INFO("DataShareHelper::Delete start.");
+    LOG_DEBUG("Start");
     int index = INVALID_VALUE;
     if (!CheckUriParam(uri)) {
-        LOG_ERROR("%{public}s called. CheckUriParam uri failed", __func__);
         return index;
     }
 
@@ -418,15 +380,11 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
     if (dataShareProxy_) {
         AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     } else {
-        LOG_ERROR("%{public}s failed with invalid dataShareProxy_", __func__);
+        LOG_ERROR("invalid dataShareProxy_");
         return index;
     }
 
-    LOG_INFO("DataShareHelper::Delete before dataShareProxy_->Delete.");
     index = dataShareProxy_->Delete(uri, predicates);
-    LOG_INFO("DataShareHelper::Delete after dataShareProxy_->Delete.");
-
-    LOG_INFO("DataShareHelper::Delete end.");
     return index;
 }
 
@@ -442,11 +400,10 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
 std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
     Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns)
 {
-    LOG_INFO("DataShareHelper::Query start.");
+    LOG_DEBUG("Start");
     std::shared_ptr<DataShareResultSet> resultset = nullptr;
 
     if (!CheckUriParam(uri)) {
-        LOG_ERROR("%{public}s called. CheckUriParam uri failed", __func__);
         return resultset;
     }
 
@@ -457,15 +414,11 @@ std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
     if (dataShareProxy_) {
         AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     } else {
-        LOG_ERROR("%{public}s failed with invalid dataShareProxy_", __func__);
+        LOG_ERROR("invalid dataShareProxy_");
         return resultset;
     }
 
-    LOG_INFO("DataShareHelper::Query before dataShareProxy_->Query.");
     resultset = dataShareProxy_->Query(uri, predicates, columns);
-    LOG_INFO("DataShareHelper::Query after dataShareProxy_->Query.");
-
-    LOG_INFO("DataShareHelper::Query end.");
     return resultset;
 }
 
@@ -479,10 +432,9 @@ std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
  */
 std::string DataShareHelper::GetType(Uri &uri)
 {
-    LOG_INFO("DataShareHelper::GetType start.");
+    LOG_DEBUG("Start");
     std::string type;
     if (!CheckUriParam(uri)) {
-        LOG_ERROR("%{public}s called. CheckUriParam uri failed", __func__);
         return type;
     }
 
@@ -493,15 +445,11 @@ std::string DataShareHelper::GetType(Uri &uri)
     if (dataShareProxy_) {
         AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     } else {
-        LOG_ERROR("%{public}s failed with invalid dataShareProxy_", __func__);
+        LOG_ERROR("invalid dataShareProxy_");
         return type;
     }
 
-    LOG_INFO("DataShareHelper::GetType before dataShareProxy_->GetType.");
     type = dataShareProxy_->GetType(uri);
-    LOG_INFO("DataShareHelper::GetType after dataShareProxy_->GetType.");
-
-    LOG_INFO("DataShareHelper::GetType end.");
     return type;
 }
 
@@ -515,10 +463,9 @@ std::string DataShareHelper::GetType(Uri &uri)
  */
 int DataShareHelper::BatchInsert(Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
-    LOG_INFO("DataShareHelper::BatchInsert start.");
+    LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
     if (!CheckUriParam(uri)) {
-        LOG_ERROR("%{public}s called. CheckUriParam uri failed", __func__);
         return ret;
     }
 
@@ -529,30 +476,26 @@ int DataShareHelper::BatchInsert(Uri &uri, const std::vector<DataShareValuesBuck
     if (dataShareProxy_) {
         AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     } else {
-        LOG_ERROR("%{public}s failed with invalid dataShareProxy_", __func__);
+        LOG_ERROR("invalid dataShareProxy_");
         return ret;
     }
 
-    LOG_INFO("DataShareHelper::BatchInsert before dataShareProxy_->BatchInsert.");
     ret = dataShareProxy_->BatchInsert(uri, values);
-    LOG_INFO("DataShareHelper::BatchInsert after dataShareProxy_->BatchInsert.");
-
-    LOG_INFO("DataShareHelper::BatchInsert end.");
     return ret;
 }
 
 bool DataShareHelper::CheckUriParam(const Uri &uri)
 {
-    LOG_INFO("DataShareHelper::CheckUriParam start.");
+    LOG_DEBUG("Start");
     Uri checkUri(uri.ToString());
     if (!CheckOhosUri(checkUri)) {
-        LOG_ERROR("DataShareHelper::CheckUriParam failed. CheckOhosUri uri failed");
+        LOG_ERROR("CheckOhosUri uri failed");
         return false;
     }
 
     if (uri_.ToString().empty()) {
         if (!CheckOhosUri(uri_)) {
-            LOG_ERROR("DataShareHelper::CheckUriParam failed. CheckOhosUri uri_ failed");
+            LOG_ERROR("CheckOhosUri uri_ failed");
             return false;
         }
 
@@ -563,35 +506,33 @@ bool DataShareHelper::CheckUriParam(const Uri &uri)
         uri_.GetPathSegments(segments);
 
         if (checkSegments[0] != segments[0]) {
-            LOG_ERROR("DataShareHelper::CheckUriParam failed. the datashare in uri doesn't equal the one in uri_.");
+            LOG_ERROR("The datashare in uri doesn't equal the one in uri_.");
             return false;
         }
     }
-    LOG_INFO("DataShareHelper::CheckUriParam end.");
     return true;
 }
 
 bool DataShareHelper::CheckOhosUri(const Uri &uri)
 {
-    LOG_INFO("DataShareHelper::CheckOhosUri start.");
+    LOG_DEBUG("Start");
     Uri checkUri(uri.ToString());
     if (checkUri.GetScheme() != SCHEME_DATASHARE) {
-        LOG_ERROR("DataShareHelper::CheckOhosUri failed. uri is not a datashare one.");
+        LOG_ERROR("uri is not a datashare one.");
         return false;
     }
 
     std::vector<std::string> segments;
     checkUri.GetPathSegments(segments);
     if (segments.empty()) {
-        LOG_ERROR("DataShareHelper::CheckOhosUri failed. There is no segments in the uri.");
+        LOG_ERROR("There is no segments in the uri.");
         return false;
     }
 
     if (checkUri.GetPath() == "") {
-        LOG_ERROR("DataShareHelper::CheckOhosUri failed. The path in the uri is empty.");
+        LOG_ERROR("The path in the uri is empty.");
         return false;
     }
-    LOG_INFO("DataShareHelper::CheckOhosUri end.");
     return true;
 }
 
@@ -603,14 +544,13 @@ bool DataShareHelper::CheckOhosUri(const Uri &uri)
  */
 void DataShareHelper::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    LOG_INFO("DataShareHelper::RegisterObserver start.");
+    LOG_DEBUG("Start");
     if (!CheckUriParam(uri)) {
-        LOG_ERROR("%{public}s called. CheckUriParam uri failed", __func__);
         return;
     }
 
     if (dataObserver == nullptr) {
-        LOG_ERROR("%{public}s called. dataObserver is nullptr", __func__);
+        LOG_ERROR("dataObserver is nullptr");
         return;
     }
 
@@ -628,8 +568,7 @@ void DataShareHelper::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAb
         } else {
             auto path = uriMap_.find(dataObserver);
             if (path->second != tmpUri.GetPath()) {
-                LOG_ERROR("DataShareHelper::RegisterObserver failed input uri's path is not equal the one the "
-                         "observer used");
+                LOG_ERROR("input uri's path is not equal the one the observer used");
                 return;
             }
             dataShareProxy_ = datashare->second;
@@ -639,13 +578,12 @@ void DataShareHelper::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAb
     }
 
     if (dataShareProxy_ == nullptr) {
-        LOG_ERROR("DataShareHelper::RegisterObserver failed dataShareProxy_ == nullptr");
+        LOG_ERROR("dataShareProxy_ is nullptr");
         registerMap_.erase(dataObserver);
         uriMap_.erase(dataObserver);
         return;
     }
     dataShareProxy_->RegisterObserver(uri, dataObserver);
-    LOG_INFO("DataShareHelper::RegisterObserver end.");
 }
 
 /**
@@ -656,14 +594,13 @@ void DataShareHelper::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAb
  */
 void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    LOG_INFO("DataShareHelper::UnregisterObserver start.");
+    LOG_DEBUG("Start");
     if (!CheckUriParam(uri)) {
-        LOG_ERROR("%{public}s called. CheckUriParam uri failed", __func__);
         return;
     }
 
     if (dataObserver == nullptr) {
-        LOG_ERROR("%{public}s called. dataObserver is nullptr", __func__);
+        LOG_ERROR("dataObserver is nullptr");
         return;
     }
 
@@ -676,8 +613,7 @@ void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IData
         }
         auto path = uriMap_.find(dataObserver);
         if (path->second != tmpUri.GetPath()) {
-            LOG_ERROR("DataShareHelper::UnregisterObserver failed input uri's path is not equal the one the "
-                     "observer used");
+            LOG_ERROR("input uri's path is not equal the one the observer used");
             return;
         }
         dataShareProxy_ = datashare->second;
@@ -686,22 +622,19 @@ void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IData
     }
 
     if (dataShareProxy_ == nullptr) {
-        LOG_ERROR("DataShareHelper::UnregisterObserver failed dataShareProxy_ == nullptr");
+        LOG_ERROR("dataShareProxy_ is nullptr");
         return;
     }
 
     dataShareProxy_->UnregisterObserver(uri, dataObserver);
     if (uri_.ToString().empty()) {
-        LOG_INFO("DataShareHelper::UnregisterObserver before DisconnectDataShareExtAbility.");
         if (dataShareConnection_->IsExtAbilityConnected()) {
             dataShareConnection_->DisconnectDataShareExtAbility();
         }
-        LOG_INFO("DataShareHelper::UnregisterObserver after DisconnectDataShareExtAbility.");
         dataShareProxy_ = nullptr;
     }
     registerMap_.erase(dataObserver);
     uriMap_.erase(dataObserver);
-    LOG_INFO("DataShareHelper::UnregisterObserver end.");
 }
 
 /**
@@ -711,9 +644,8 @@ void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IData
  */
 void DataShareHelper::NotifyChange(const Uri &uri)
 {
-    LOG_INFO("DataShareHelper::NotifyChange start.");
+    LOG_DEBUG("Start");
     if (!CheckUriParam(uri)) {
-        LOG_ERROR("%{public}s called. CheckUriParam uri failed", __func__);
         return;
     }
 
@@ -724,15 +656,11 @@ void DataShareHelper::NotifyChange(const Uri &uri)
     if (dataShareProxy_) {
         AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     } else {
-        LOG_ERROR("%{public}s failed with invalid dataShareProxy_", __func__);
+        LOG_ERROR("invalid dataShareProxy_");
         return;
     }
 
-    LOG_INFO("DataShareHelper::NotifyChange before dataShareProxy_->NotifyChange.");
     dataShareProxy_->NotifyChange(uri);
-    LOG_INFO("DataShareHelper::NotifyChange after dataShareProxy_->NotifyChange.");
-
-    LOG_INFO("DataShareHelper::NotifyChange end.");
 }
 
 /**
@@ -749,10 +677,9 @@ void DataShareHelper::NotifyChange(const Uri &uri)
  */
 Uri DataShareHelper::NormalizeUri(Uri &uri)
 {
-    LOG_INFO("DataShareHelper::NormalizeUri start.");
+    LOG_DEBUG("Start");
     Uri urivalue("");
     if (!CheckUriParam(uri)) {
-        LOG_ERROR("%{public}s called. CheckUriParam uri failed", __func__);
         return urivalue;
     }
 
@@ -763,15 +690,11 @@ Uri DataShareHelper::NormalizeUri(Uri &uri)
     if (dataShareProxy_) {
         AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     } else {
-        LOG_ERROR("%{public}s failed with invalid dataShareProxy_", __func__);
+        LOG_ERROR("invalid dataShareProxy_");
         return urivalue;
     }
 
-    LOG_INFO("DataShareHelper::NormalizeUri before dataShareProxy_->NormalizeUri.");
     urivalue = dataShareProxy_->NormalizeUri(uri);
-    LOG_INFO("DataShareHelper::NormalizeUri after dataShareProxy_->NormalizeUri.");
-
-    LOG_INFO("DataShareHelper::NormalizeUri end.");
     return urivalue;
 }
 
@@ -787,10 +710,9 @@ Uri DataShareHelper::NormalizeUri(Uri &uri)
  */
 Uri DataShareHelper::DenormalizeUri(Uri &uri)
 {
-    LOG_INFO("DataShareHelper::DenormalizeUri start.");
+    LOG_DEBUG("Start");
     Uri urivalue("");
     if (!CheckUriParam(uri)) {
-        LOG_ERROR("%{public}s called. CheckUriParam uri failed", __func__);
         return urivalue;
     }
 
@@ -801,25 +723,20 @@ Uri DataShareHelper::DenormalizeUri(Uri &uri)
     if (dataShareProxy_) {
         AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     } else {
-        LOG_ERROR("%{public}s failed with invalid dataShareProxy_", __func__);
+        LOG_ERROR("invalid dataShareProxy_");
         return urivalue;
     }
 
-    LOG_INFO("DataShareHelper::DenormalizeUri before dataShareProxy_->DenormalizeUri.");
     urivalue = dataShareProxy_->DenormalizeUri(uri);
-    LOG_INFO("DataShareHelper::DenormalizeUri after dataShareProxy_->DenormalizeUri.");
-
-    LOG_INFO("DataShareHelper::DenormalizeUri end.");
     return urivalue;
 }
 
 void DataShareDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    LOG_INFO("recv DataShareDeathRecipient death notice");
+    LOG_DEBUG("Start");
     if (handler_) {
         handler_(remote);
     }
-    LOG_INFO("DataShareHelper::OnRemoteDied end.");
 }
 
 DataShareDeathRecipient::DataShareDeathRecipient(RemoteDiedHandler handler) : handler_(handler)

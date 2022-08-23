@@ -82,7 +82,7 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
         LOG_ERROR("Failed to get jsObj_");
         return;
     }
-    LOG_INFO("JsDataShareExtAbility::Init ConvertNativeValueTo.");
+    LOG_INFO("ConvertNativeValueTo.");
     NativeObject* obj = ConvertNativeValueTo<NativeObject>(jsObj_->Get());
     if (obj == nullptr) {
         LOG_ERROR("Failed to get JsDataShareExtAbility object");
@@ -94,14 +94,14 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
         LOG_ERROR("Failed to get context");
         return;
     }
-    LOG_INFO("JsDataShareExtAbility::Init CreateJsDataShareExtAbilityContext.");
+    LOG_INFO("CreateJsDataShareExtAbilityContext.");
     NativeValue* contextObj = CreateJsDataShareExtAbilityContext(engine, context);
     auto contextRef = jsRuntime_.LoadSystemModule("application.DataShareExtensionAbilityContext",
         &contextObj, ARGC_ONE);
     contextObj = contextRef->Get();
-    LOG_INFO("JsDataShareExtAbility::Init Bind.");
+    LOG_INFO("Bind.");
     context->Bind(jsRuntime_, contextRef.release());
-    LOG_INFO("JsDataShareExtAbility::SetProperty.");
+    LOG_INFO("SetProperty.");
     obj->SetProperty("context", contextObj);
 
     auto nativeObj = ConvertNativeValueTo<NativeObject>(contextObj);
@@ -117,13 +117,11 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
             LOG_INFO("Finalizer for weak_ptr datashare extension ability context is called");
             delete static_cast<std::weak_ptr<AbilityRuntime::Context>*>(data);
         }, nullptr);
-
-    LOG_INFO("JsDataShareExtAbility::Init end.");
 }
 
 void JsDataShareExtAbility::OnStart(const AAFwk::Want &want)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     Extension::OnStart(want);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -131,21 +129,19 @@ void JsDataShareExtAbility::OnStart(const AAFwk::Want &want)
     NativeValue* nativeWant = reinterpret_cast<NativeValue*>(napiWant);
     NativeValue* argv[] = {nativeWant};
     CallObjectMethod("onCreate", argv, ARGC_ONE);
-    LOG_INFO("end.");
 }
 
 sptr<IRemoteObject> JsDataShareExtAbility::OnConnect(const AAFwk::Want &want)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     Extension::OnConnect(want);
     sptr<DataShareStubImpl> remoteObject = new (std::nothrow) DataShareStubImpl(
         std::static_pointer_cast<JsDataShareExtAbility>(shared_from_this()),
         reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine()));
     if (remoteObject == nullptr) {
-        LOG_ERROR("%{public}s No memory allocated for DataShareStubImpl", __func__);
+        LOG_ERROR("No memory allocated for DataShareStubImpl");
         return nullptr;
     }
-    LOG_INFO("end.");
     return remoteObject->AsObject();
 }
 
@@ -189,11 +185,11 @@ NativeValue* JsDataShareExtAbility::AsyncCallback(NativeEngine* engine, NativeCa
 {
     LOG_INFO("engine == nullptr : %{public}d, info == nullptr : %{public}d.", engine == nullptr, info == nullptr);
     if (engine == nullptr || info == nullptr) {
-        LOG_ERROR("%{public}s invalid param.", __func__);
+        LOG_ERROR("invalid param.");
         return nullptr;
     }
     if (info->argc < ARGC_TWO || info->argv[0] == nullptr || info->argv[1] == nullptr) {
-        LOG_ERROR("%{public}s invalid args.", __func__);
+        LOG_ERROR("invalid args.");
         return engine->CreateUndefined();
     }
 
@@ -201,11 +197,11 @@ NativeValue* JsDataShareExtAbility::AsyncCallback(NativeEngine* engine, NativeCa
     if ((info->argv[0])->TypeOf() == NATIVE_NUMBER) {
         value = OHOS::AppExecFwk::UnwrapInt32FromJS(reinterpret_cast<napi_env>(engine),
             reinterpret_cast<napi_value>(info->argv[0]));
-        LOG_INFO("%{public}s value_number : %{public}d.", __func__, value);
+        LOG_INFO("value_number : %{public}d.", value);
     }
 
     if (info->functionInfo == nullptr || info->functionInfo->data == nullptr) {
-        LOG_ERROR("%{public}s invalid object.", __func__);
+        LOG_ERROR("invalid object.");
         return engine->CreateUndefined();
     }
 
@@ -216,7 +212,6 @@ NativeValue* JsDataShareExtAbility::AsyncCallback(NativeEngine* engine, NativeCa
         instance->CheckAndSetAsyncResult(engine);
     }
 
-    LOG_INFO("%{public}s end.", __func__);
     return engine->CreateUndefined();
 }
 
@@ -265,7 +260,6 @@ NativeValue* JsDataShareExtAbility::CallObjectMethod(const char* name, NativeVal
     }
 
     SetBlockWaiting(false);
-    LOG_INFO("%{public}s(%{public}s) end", __func__, name);
     return handleScope.Escape(nativeEngine.CallFunction(value, method, args, count));
 }
 
@@ -292,7 +286,7 @@ void JsDataShareExtAbility::GetSrcPath(std::string &srcPath)
 
 std::vector<std::string> JsDataShareExtAbility::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     auto ret = DataShareExtAbility::GetFileTypes(uri, mimeTypeFilter);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -315,13 +309,12 @@ std::vector<std::string> JsDataShareExtAbility::GetFileTypes(const Uri &uri, con
     NativeValue* argv[] = {nativeUri, nativeMimeTypeFilter};
     CallObjectMethod("getFileTypes", argv, ARGC_TWO);
 
-    LOG_INFO("end.");
     return ret;
 }
 
 int JsDataShareExtAbility::OpenFile(const Uri &uri, const std::string &mode)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     auto ret = DataShareExtAbility::OpenFile(uri, mode);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -344,13 +337,12 @@ int JsDataShareExtAbility::OpenFile(const Uri &uri, const std::string &mode)
     NativeValue* argv[] = {nativeUri, nativeMode};
     CallObjectMethod("openFile", argv, ARGC_TWO);
 
-    LOG_INFO("end.");
     return ret;
 }
 
 int JsDataShareExtAbility::OpenRawFile(const Uri &uri, const std::string &mode)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     auto ret = DataShareExtAbility::OpenRawFile(uri, mode);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -373,16 +365,15 @@ int JsDataShareExtAbility::OpenRawFile(const Uri &uri, const std::string &mode)
     NativeValue* argv[] = {nativeUri, nativeMode};
     CallObjectMethod("openRawFile", argv, ARGC_TWO, false);
 
-    LOG_INFO("end.");
     return ret;
 }
 
 int JsDataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
     if (!CheckCallingPermission(abilityInfo_->writePermission)) {
-        LOG_ERROR("%{public}s Check calling permission failed.", __func__);
+        LOG_ERROR("Check calling permission failed.");
         return ret;
     }
 
@@ -397,7 +388,7 @@ int JsDataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &v
     }
     napi_value napiValue = DataShareValueBucketNewInstance(env, const_cast<DataShareValuesBucket&>(value));
     if (napiValue == nullptr) {
-        LOG_ERROR("%{public}s failed to make new instance of rdbValueBucket.", __func__);
+        LOG_ERROR("failed to make new instance of rdbValueBucket.");
         return ret;
     }
 
@@ -406,17 +397,16 @@ int JsDataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &v
     NativeValue* argv[] = {nativeUri, nativeValue};
     CallObjectMethod("insert", argv, ARGC_TWO);
 
-    LOG_INFO("end.");
     return ret;
 }
 
 int JsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &predicates,
     const DataShareValuesBucket &value)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
     if (!CheckCallingPermission(abilityInfo_->writePermission)) {
-        LOG_ERROR("%{public}s Check calling permission failed.", __func__);
+        LOG_ERROR("Check calling permission failed.");
         return ret;
     }
 
@@ -433,13 +423,13 @@ int JsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pre
 
     napi_value napiPredicates = MakePredicates(env, predicates);
     if (napiPredicates == nullptr) {
-        LOG_DEBUG("%{public}s failed to make new instance of dataSharePredicates.", __func__);
+        LOG_DEBUG("failed to make new instance of dataSharePredicates.");
         return ret;
     }
 
     napi_value napiValue = DataShareValueBucketNewInstance(env, const_cast<DataShareValuesBucket&>(value));
     if (napiValue == nullptr) {
-        LOG_ERROR("%{public}s failed to make new instance of rdbValueBucket.", __func__);
+        LOG_ERROR("failed to make new instance of rdbValueBucket.");
         return ret;
     }
 
@@ -449,16 +439,15 @@ int JsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pre
     NativeValue* argv[] = {nativeUri, nativePredicates, nativeValue};
     CallObjectMethod("update", argv, ARGC_THREE);
 
-    LOG_INFO("end.");
     return ret;
 }
 
 int JsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
     if (!CheckCallingPermission(abilityInfo_->writePermission)) {
-        LOG_ERROR("%{public}s Check calling permission failed.", __func__);
+        LOG_ERROR("Check calling permission failed.");
         return ret;
     }
 
@@ -474,7 +463,7 @@ int JsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &pre
 
     napi_value napiPredicates = MakePredicates(env, predicates);
     if (napiPredicates == nullptr) {
-        LOG_DEBUG("%{public}s failed to make new instance of dataSharePredicates.", __func__);
+        LOG_DEBUG("failed to make new instance of dataSharePredicates.");
         return ret;
     }
 
@@ -483,17 +472,16 @@ int JsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &pre
     NativeValue* argv[] = {nativeUri, nativePredicates};
     CallObjectMethod("delete", argv, ARGC_TWO);
 
-    LOG_INFO("end.");
     return ret;
 }
 
 std::shared_ptr<DataShareResultSet> JsDataShareExtAbility::Query(const Uri &uri,
     const DataSharePredicates &predicates, std::vector<std::string> &columns)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     std::shared_ptr<DataShareResultSet> ret;
     if (!CheckCallingPermission(abilityInfo_->readPermission)) {
-        LOG_ERROR("%{public}s Check calling permission failed.", __func__);
+        LOG_ERROR("Check calling permission failed.");
         return ret;
     }
 
@@ -510,7 +498,7 @@ std::shared_ptr<DataShareResultSet> JsDataShareExtAbility::Query(const Uri &uri,
 
     napi_value napiPredicates = MakePredicates(env, predicates);
     if (napiPredicates == nullptr) {
-        LOG_DEBUG("%{public}s failed to make new instance of dataSharePredicates.", __func__);
+        LOG_DEBUG("failed to make new instance of dataSharePredicates.");
         return ret;
     }
 
@@ -526,13 +514,12 @@ std::shared_ptr<DataShareResultSet> JsDataShareExtAbility::Query(const Uri &uri,
     NativeValue* argv[] = {nativeUri, nativePredicates, nativeColumns};
     CallObjectMethod("query", argv, ARGC_THREE);
 
-    LOG_INFO("end.");
     return std::make_shared<DataShareResultSet>();
 }
 
 std::string JsDataShareExtAbility::GetType(const Uri &uri)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     auto ret = DataShareExtAbility::GetType(uri);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -547,16 +534,15 @@ std::string JsDataShareExtAbility::GetType(const Uri &uri)
     NativeValue* argv[] = {nativeUri};
     CallObjectMethod("getType", argv, ARGC_ONE);
 
-    LOG_INFO("end.");
     return ret;
 }
 
 int JsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
     if (!CheckCallingPermission(abilityInfo_->writePermission)) {
-        LOG_ERROR("%{public}s Check calling permission failed.", __func__);
+        LOG_ERROR("Check calling permission failed.");
         return ret;
     }
 
@@ -586,7 +572,7 @@ int JsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataSha
     for (const auto &value : values) {
         napi_value result = DataShareValueBucketNewInstance(env, const_cast<DataShareValuesBucket&>(value));
         if (result == nullptr) {
-            LOG_ERROR("%{public}s failed to make new instance of rdbValueBucket.", __func__);
+            LOG_ERROR("failed to make new instance of rdbValueBucket.");
             return ret;
         }
         napi_set_element(env, napiValues, index++, result);
@@ -597,70 +583,66 @@ int JsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataSha
     NativeValue* argv[] = {nativeUri, nativeValues};
     CallObjectMethod("batchInsert", argv, ARGC_TWO);
 
-    LOG_INFO("end.");
     return ret;
 }
 
 bool JsDataShareExtAbility::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     DataShareExtAbility::RegisterObserver(uri, dataObserver);
     auto obsMgrClient = DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
-        LOG_ERROR("%{public}s obsMgrClient is nullptr", __func__);
+        LOG_ERROR("obsMgrClient is nullptr");
         return false;
     }
 
     ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
     if (ret != ERR_OK) {
-        LOG_ERROR("%{public}s obsMgrClient->RegisterObserver error return %{public}d", __func__, ret);
+        LOG_ERROR("obsMgrClient->RegisterObserver error return %{public}d", ret);
         return false;
     }
-    LOG_INFO("end.");
     return true;
 }
 
 bool JsDataShareExtAbility::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     DataShareExtAbility::UnregisterObserver(uri, dataObserver);
     auto obsMgrClient = DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
-        LOG_ERROR("%{public}s obsMgrClient is nullptr", __func__);
+        LOG_ERROR("obsMgrClient is nullptr");
         return false;
     }
 
     ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver);
     if (ret != ERR_OK) {
-        LOG_ERROR("%{public}s obsMgrClient->UnregisterObserver error return %{public}d", __func__, ret);
+        LOG_ERROR("obsMgrClient->UnregisterObserver error return %{public}d", ret);
         return false;
     }
-    LOG_INFO("end.");
     return true;
 }
 
 bool JsDataShareExtAbility::NotifyChange(const Uri &uri)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     DataShareExtAbility::NotifyChange(uri);
     auto obsMgrClient = DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
-        LOG_ERROR("%{public}s obsMgrClient is nullptr", __func__);
+        LOG_ERROR("obsMgrClient is nullptr");
         return false;
     }
 
     ErrCode ret = obsMgrClient->NotifyChange(uri);
     if (ret != ERR_OK) {
-        LOG_ERROR("%{public}s obsMgrClient->NotifyChange error return %{public}d", __func__, ret);
+        LOG_ERROR("obsMgrClient->NotifyChange error return %{public}d", ret);
         return false;
     }
-    LOG_INFO("end.");
     return true;
 }
 
 Uri JsDataShareExtAbility::NormalizeUri(const Uri &uri)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     auto ret = DataShareExtAbility::NormalizeUri(uri);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -675,13 +657,12 @@ Uri JsDataShareExtAbility::NormalizeUri(const Uri &uri)
     NativeValue* argv[] = {nativeUri};
     CallObjectMethod("normalizeUri", argv, ARGC_ONE);
 
-    LOG_INFO("end.");
     return ret;
 }
 
 Uri JsDataShareExtAbility::DenormalizeUri(const Uri &uri)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     auto ret = DataShareExtAbility::DenormalizeUri(uri);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -696,44 +677,40 @@ Uri JsDataShareExtAbility::DenormalizeUri(const Uri &uri)
     NativeValue* argv[] = {nativeUri};
     CallObjectMethod("denormalizeUri", argv, ARGC_ONE);
 
-    LOG_INFO("end.");
     return ret;
 }
 
 std::vector<std::shared_ptr<DataShareResult>> JsDataShareExtAbility::ExecuteBatch(
     const std::vector<std::shared_ptr<DataShareOperation>> &operations)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     auto ret = DataShareExtAbility::ExecuteBatch(operations);
-    LOG_INFO("end.");
     return ret;
 }
 
 bool JsDataShareExtAbility::CheckCallingPermission(const std::string &permission)
 {
-    LOG_INFO("begin, permission:%{public}s", permission.c_str());
+    LOG_DEBUG("Start");
     if (!permission.empty() && AccessTokenKit::VerifyAccessToken(IPCSkeleton::GetCallingTokenID(), permission)
         != AppExecFwk::Constants::PERMISSION_GRANTED) {
-        LOG_ERROR("%{public}s permission not granted.", __func__);
+        LOG_ERROR("permission not granted.");
         return false;
     }
-    LOG_INFO("end.");
     return true;
 }
 
 napi_value JsDataShareExtAbility::MakePredicates(napi_env env, const DataSharePredicates &predicates)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     std::shared_ptr<DataSharePredicates> predicatesPtr = std::make_shared<DataSharePredicates>(predicates);
     if (predicatesPtr == nullptr) {
-        LOG_ERROR("%{public}s No memory allocated for predicates", __func__);
+        LOG_ERROR("No memory allocated for predicates");
         return nullptr;
     }
     napi_value napiPredicates = DataSharePredicatesProxy::NewInstance(env, predicatesPtr);
     if (napiPredicates == nullptr) {
-        LOG_ERROR("%{public}s failed to make new instance of DataSharePredicates.", __func__);
+        LOG_ERROR("failed to make new instance of DataSharePredicates.");
     }
-    LOG_INFO("end.");
     return napiPredicates;
 }
 

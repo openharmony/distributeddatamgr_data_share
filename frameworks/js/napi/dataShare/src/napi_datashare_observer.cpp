@@ -30,9 +30,9 @@ NAPIDataShareObserver::~NAPIDataShareObserver() {}
 
 void NAPIDataShareObserver::OnChange()
 {
-    LOG_DEBUG("OnChange called");
+    LOG_DEBUG("Start");
     if (ref_ == nullptr) {
-        LOG_ERROR("ref_ == nullptr");
+        LOG_ERROR("ref_ is nullptr");
         return;
     }
     ObserverWorker *observerWorker = new (std::nothrow)ObserverWorker(this);

@@ -30,7 +30,7 @@ namespace OHOS {
 namespace DataShare {
 std::vector<std::string> DataShareProxy::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     std::vector<std::string> types;
 
     MessageParcel data;
@@ -38,7 +38,7 @@ std::vector<std::string> DataShareProxy::GetFileTypes(const Uri &uri, const std:
     MessageOption option;
 
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return types;
     }
 
@@ -54,24 +54,23 @@ std::vector<std::string> DataShareProxy::GetFileTypes(const Uri &uri, const std:
 
     int32_t err = Remote()->SendRequest(CMD_GET_FILE_TYPES, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("GetFileTypes fail to SendRequest. err: %d", err);
+        LOG_ERROR("GetFileTypes fail to SendRequest. err: %{public}d", err);
     }
 
     if (!reply.ReadStringVector(&types)) {
         LOG_ERROR("fail to ReadStringVector types");
     }
 
-    LOG_INFO("end successfully.");
     return types;
 }
 
 int DataShareProxy::OpenFile(const Uri &uri, const std::string &mode)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     int fd = -1;
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return fd;
     }
 
@@ -89,7 +88,7 @@ int DataShareProxy::OpenFile(const Uri &uri, const std::string &mode)
     MessageOption option;
     int32_t err = Remote()->SendRequest(CMD_OPEN_FILE, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("OpenFile fail to SendRequest. err: %d", err);
+        LOG_ERROR("OpenFile fail to SendRequest. err: %{public}d", err);
         return fd;
     }
 
@@ -99,17 +98,16 @@ int DataShareProxy::OpenFile(const Uri &uri, const std::string &mode)
         return fd;
     }
 
-    LOG_INFO("end successfully.");
     return fd;
 }
 
 int DataShareProxy::OpenRawFile(const Uri &uri, const std::string &mode)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     int fd = -1;
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return fd;
     }
 
@@ -127,7 +125,7 @@ int DataShareProxy::OpenRawFile(const Uri &uri, const std::string &mode)
     MessageOption option;
     int32_t err = Remote()->SendRequest(CMD_OPEN_RAW_FILE, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("OpenRawFile fail to SendRequest. err: %d", err);
+        LOG_ERROR("OpenRawFile fail to SendRequest. err: %{public}d", err);
         return fd;
     }
 
@@ -136,17 +134,16 @@ int DataShareProxy::OpenRawFile(const Uri &uri, const std::string &mode)
         return fd;
     }
 
-    LOG_INFO("end successfully.");
     return fd;
 }
 
 int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     int index = -1;
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return index;
     }
 
@@ -164,7 +161,7 @@ int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
     MessageOption option;
     int32_t err = Remote()->SendRequest(CMD_INSERT, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Insert fail to SendRequest. err: %d", err);
+        LOG_ERROR("Insert fail to SendRequest. err: %{public}d", err);
         return index;
     }
 
@@ -173,18 +170,17 @@ int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
         return index;
     }
 
-    LOG_INFO("end successfully.");
     return index;
 }
 
 int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates,
     const DataShareValuesBucket &value)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     int index = -1;
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return index;
     }
 
@@ -207,7 +203,7 @@ int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates
     MessageOption option;
     int32_t err = Remote()->SendRequest(CMD_UPDATE, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Update fail to SendRequest. err: %d", err);
+        LOG_ERROR("Update fail to SendRequest. err: %{public}d", err);
         return index;
     }
 
@@ -216,17 +212,16 @@ int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates
         return index;
     }
 
-    LOG_INFO("end successfully.");
     return index;
 }
 
 int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
-    LOG_INFO("begin.");
+    LOG_DEBUG("Start");
     int index = -1;
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return index;
     }
 
@@ -244,7 +239,7 @@ int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates
     MessageOption option;
     int32_t err = Remote()->SendRequest(CMD_DELETE, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Delete fail to SendRequest. err: %d", err);
+        LOG_ERROR("Delete fail to SendRequest. err: %{public}d", err);
         return index;
     }
 
@@ -253,7 +248,6 @@ int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates
         return index;
     }
 
-    LOG_INFO("end successfully.");
     return index;
 }
 
@@ -263,7 +257,7 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri,
     LOG_INFO("begin.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return nullptr;
     }
 
@@ -286,7 +280,7 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri,
     MessageOption option;
     int32_t err = Remote()->SendRequest(CMD_QUERY, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Query fail to SendRequest. err: %d", err);
+        LOG_ERROR("Query fail to SendRequest. err: %{public}d", err);
         return nullptr;
     }
     LOG_INFO("end successfully.");
@@ -299,7 +293,7 @@ std::string DataShareProxy::GetType(const Uri &uri)
     std::string type;
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return type;
     }
     if (!data.WriteParcelable(&uri)) {
@@ -311,7 +305,7 @@ std::string DataShareProxy::GetType(const Uri &uri)
     MessageOption option;
     int32_t err = Remote()->SendRequest(CMD_GET_TYPE, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("GetFileTypes fail to SendRequest. err: %d", err);
+        LOG_ERROR("GetFileTypes fail to SendRequest. err: %{public}d", err);
         return type;
     }
 
@@ -331,7 +325,7 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
     int ret = -1;
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return ret;
     }
 
@@ -357,7 +351,7 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
     MessageOption option;
     int32_t err = Remote()->SendRequest(CMD_BATCH_INSERT, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("GetFileTypes fail to SendRequest. err: %d", err);
+        LOG_ERROR("GetFileTypes fail to SendRequest. err: %{public}d", err);
         return ret;
     }
 
@@ -375,17 +369,17 @@ bool DataShareProxy::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbi
     LOG_INFO("begin.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return false;
     }
 
     if (!data.WriteParcelable(&uri)) {
-        LOG_ERROR("%{public}s failed to WriteParcelable uri ", __func__);
+        LOG_ERROR("failed to WriteParcelable uri ");
         return false;
     }
 
     if (!data.WriteRemoteObject(dataObserver->AsObject())) {
-        LOG_ERROR("%{public}s failed to WriteParcelable dataObserver ", __func__);
+        LOG_ERROR("failed to WriteParcelable dataObserver ");
         return false;
     }
 
@@ -407,17 +401,17 @@ bool DataShareProxy::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataA
     LOG_INFO("begin.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return false;
     }
 
     if (!data.WriteParcelable(&uri)) {
-        LOG_ERROR("%{public}s failed to WriteParcelable uri ", __func__);
+        LOG_ERROR("failed to WriteParcelable uri ");
         return false;
     }
 
     if (!data.WriteRemoteObject(dataObserver->AsObject())) {
-        LOG_ERROR("%{public}s failed to WriteParcelable dataObserver ", __func__);
+        LOG_ERROR("failed to WriteParcelable dataObserver ");
         return false;
     }
 
@@ -439,12 +433,12 @@ bool DataShareProxy::NotifyChange(const Uri &uri)
     LOG_INFO("begin.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return false;
     }
 
     if (!data.WriteParcelable(&uri)) {
-        LOG_ERROR("%{public}s failed to WriteParcelable uri ", __func__);
+        LOG_ERROR("failed to WriteParcelable uri ");
         return false;
     }
 
@@ -467,7 +461,7 @@ Uri DataShareProxy::NormalizeUri(const Uri &uri)
     Uri urivalue("");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return urivalue;
     }
 
@@ -480,7 +474,7 @@ Uri DataShareProxy::NormalizeUri(const Uri &uri)
     MessageOption option;
     int32_t err = Remote()->SendRequest(CMD_NORMALIZE_URI, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("NormalizeUri fail to SendRequest. err: %d", err);
+        LOG_ERROR("NormalizeUri fail to SendRequest. err: %{public}d", err);
         return urivalue;
     }
 
@@ -499,7 +493,7 @@ Uri DataShareProxy::DenormalizeUri(const Uri &uri)
     Uri urivalue("");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return urivalue;
     }
 
@@ -512,7 +506,7 @@ Uri DataShareProxy::DenormalizeUri(const Uri &uri)
     MessageOption option;
     int32_t err = Remote()->SendRequest(CMD_DENORMALIZE_URI, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("DenormalizeUri fail to SendRequest. err: %d", err);
+        LOG_ERROR("DenormalizeUri fail to SendRequest. err: %{public}d", err);
         return urivalue;
     }
 
@@ -534,7 +528,7 @@ std::vector<std::shared_ptr<DataShareResult>> DataShareProxy::ExecuteBatch(
     results.clear();
 
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("%{public}s WriteInterfaceToken failed", __func__);
+        LOG_ERROR("WriteInterfaceToken failed");
         return results;
     }
 

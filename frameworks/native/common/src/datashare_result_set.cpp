@@ -104,7 +104,7 @@ int DataShareResultSet::GetDataType(int columnIndex, DataType &dataType)
     AppDataFwk::SharedBlock::CellUnit *cellUnit =
         sharedBlock_->GetCellUnit((uint32_t)rowPos_ - startRowPos_, (uint32_t)columnIndex);
     if (!cellUnit) {
-        LOG_ERROR("DataShareResultSet::GetDataType cellUnit is null!");
+        LOG_ERROR("cellUnit is null!");
         return E_ERROR;
     }
     dataType = (DataType)cellUnit->type;
@@ -159,7 +159,7 @@ int DataShareResultSet::GetBlob(int columnIndex, std::vector<uint8_t> &value)
 
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
-        LOG_ERROR("DataShareResultSet::GetBlob cellUnit is null!");
+        LOG_ERROR("cellUnit is null!");
         return E_ERROR;
     }
 
@@ -177,16 +177,16 @@ int DataShareResultSet::GetBlob(int columnIndex, std::vector<uint8_t> &value)
         }
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_INTEGER) {
-        LOG_ERROR("DataShareResultSet::GetDouble AppDataFwk::SharedBlock::CELL_UNIT_TYPE_INTEGER!");
+        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_INTEGER!");
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
-        LOG_ERROR("DataShareResultSet::GetDouble AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL!");
+        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL!");
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_FLOAT) {
-        LOG_ERROR("DataShareResultSet::GetDouble AppDataFwk::SharedBlock::CELL_UNIT_TYPE_FLOAT!");
+        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_FLOAT!");
         return E_OK;
     } else {
-        LOG_ERROR("DataShareResultSet::GetDouble AppDataFwk::SharedBlock::nothing !");
+        LOG_ERROR("AppDataFwk::SharedBlock::nothing !");
         return E_INVALID_OBJECT_TYPE;
     }
 }
@@ -199,7 +199,7 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
     }
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
-        LOG_ERROR("DataShareResultSet::GetString cellUnit is null!");
+        LOG_ERROR("cellUnit is null!");
         return E_ERROR;
     }
     int type = cellUnit->type;
@@ -223,13 +223,13 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
             value = os.str();
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
-        LOG_ERROR("DataShareResultSet::AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL!");
+        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL!");
         return E_ERROR;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB) {
-        LOG_ERROR("DataShareResultSet::AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB!");
+        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB!");
         return E_ERROR;
     } else {
-        LOG_ERROR("DataShareResultSet::GetString is failed!");
+        LOG_ERROR("GetString is failed!");
         return E_ERROR;
     }
 }
@@ -238,7 +238,7 @@ int DataShareResultSet::GetInt(int columnIndex, int &value)
 {
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
-        LOG_ERROR("DataShareResultSet::GetInt cellUnit is null!");
+        LOG_ERROR("cellUnit is null!");
         return E_ERROR;
     }
     value = (int)cellUnit->cell.longValue;
@@ -253,7 +253,7 @@ int DataShareResultSet::GetLong(int columnIndex, int64_t &value)
     }
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
-        LOG_ERROR("DataShareResultSet::GetLong cellUnit is null!");
+        LOG_ERROR("cellUnit is null!");
         return E_ERROR;
     }
 
@@ -269,18 +269,18 @@ int DataShareResultSet::GetLong(int columnIndex, int64_t &value)
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_FLOAT) {
         value = (int64_t)cellUnit->cell.doubleValue;
-        LOG_ERROR("DataShareResultSet::GetLong AppDataFwk::SharedBlock::CELL_UNIT_TYPE_FLOAT !");
+        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_FLOAT !");
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
-        LOG_ERROR("DataShareResultSet::GetLong AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL !");
+        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL !");
         value = 0L;
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB) {
-        LOG_ERROR("DataShareResultSet::GetLong AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB !");
+        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB !");
         value = 0L;
         return E_OK;
     } else {
-        LOG_ERROR("DataShareResultSet::GetLong Nothing !");
+        LOG_ERROR("Nothing !");
         return E_INVALID_OBJECT_TYPE;
     }
 }
@@ -293,7 +293,7 @@ int DataShareResultSet::GetDouble(int columnIndex, double &value)
     }
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
-        LOG_ERROR("DataShareResultSet::GetDouble cellUnit is null!");
+        LOG_ERROR("cellUnit is null!");
         return E_ERROR;
     }
     int type = cellUnit->type;
@@ -309,15 +309,15 @@ int DataShareResultSet::GetDouble(int columnIndex, double &value)
         value = cellUnit->cell.longValue;
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
-        LOG_ERROR("DataShareResultSet::GetDouble AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL!");
+        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL!");
         value = 0.0;
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB) {
-        LOG_ERROR("DataShareResultSet::GetDouble AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB!");
+        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB!");
         value = 0.0;
         return E_OK;
     } else {
-        LOG_ERROR("DataShareResultSet::GetDouble AppDataFwk::SharedBlock::nothing !");
+        LOG_ERROR("AppDataFwk::SharedBlock::nothing !");
         value = 0.0;
         return E_INVALID_OBJECT_TYPE;
     }
@@ -331,7 +331,7 @@ int DataShareResultSet::IsColumnNull(int columnIndex, bool &isNull)
     }
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
-        LOG_ERROR("DataShareResultSet::IsColumnNull cellUnit is null!");
+        LOG_ERROR("cellUnit is null!");
         return E_ERROR;
     }
     if (cellUnit->type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
@@ -395,7 +395,7 @@ void DataShareResultSet::Finalize()
 int DataShareResultSet::CheckState(int columnIndex)
 {
     if (sharedBlock_ == nullptr) {
-        LOG_ERROR("DataShareResultSet::CheckState sharedBlock is null!");
+        LOG_ERROR("sharedBlock is null!");
         return E_ERROR;
     }
     int cnt = 0;
@@ -414,10 +414,9 @@ int DataShareResultSet::CheckState(int columnIndex)
 bool DataShareResultSet::Marshalling(MessageParcel &parcel)
 {
     if (sharedBlock_ == nullptr) {
-        LOG_ERROR("DataShareResultSet::Marshalling sharedBlock is null.");
+        LOG_ERROR("sharedBlock is null.");
         return false;
     }
-    LOG_DEBUG("DataShareResultSet::Marshalling sharedBlock.");
     return sharedBlock_->WriteMessageParcel(parcel);
 }
 
@@ -428,7 +427,7 @@ bool DataShareResultSet::Unmarshalling(MessageParcel &parcel)
     }
     int result = AppDataFwk::SharedBlock::ReadMessageParcel(parcel, sharedBlock_);
     if (result < 0) {
-        LOG_ERROR("DataShareResultSet: create from parcel error is %{public}d.", result);
+        LOG_ERROR("create from parcel error is %{public}d.", result);
     }
     return true;
 }
