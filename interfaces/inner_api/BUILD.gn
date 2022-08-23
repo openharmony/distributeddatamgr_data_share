@@ -150,6 +150,7 @@ ohos_shared_library("datashare_ext_ability_module") {
     "relational_store:native_appdatafwk",
   ]
 
+  relative_install_dir = "extensionability/"
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
 }
