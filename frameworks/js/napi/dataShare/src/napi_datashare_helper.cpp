@@ -229,7 +229,8 @@ napi_value NapiDataShareHelper::Napi_OpenFile(napi_env env, napi_callback_info i
             context->resultNumber = context->proxy->datashareHelper_->OpenFile(uri, context->mode);
             context->status = napi_ok;
         } else {
-            LOG_ERROR("dataShareHelper_ is nullptr or context->uri is empty");
+            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
+                context->proxy->datashareHelper_ == nullptr, context->uri.empty());
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -261,7 +262,8 @@ napi_value NapiDataShareHelper::Napi_Insert(napi_env env, napi_callback_info inf
             context->resultNumber = context->proxy->datashareHelper_->Insert(uri, context->valueBucket);
             context->status = napi_ok;
         } else {
-            LOG_ERROR("dataShareHelper_ is nullptr or context->uri is empty");
+            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
+                context->proxy->datashareHelper_ == nullptr, context->uri.empty());
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -292,7 +294,8 @@ napi_value NapiDataShareHelper::Napi_Delete(napi_env env, napi_callback_info inf
             context->resultNumber = context->proxy->datashareHelper_->Delete(uri, context->predicates);
             context->status = napi_ok;
         } else {
-            LOG_ERROR("dataShareHelper_ is nullptr or context->uri is empty");
+            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
+                context->proxy->datashareHelper_ == nullptr, context->uri.empty());
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -325,7 +328,8 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
             context->resultObject = context->proxy->datashareHelper_->Query(uri, context->predicates, context->columns);
             context->status = napi_ok;
         } else {
-            LOG_ERROR("dataShareHelper_ is nullptr or context->uri is empty");
+            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
+                context->proxy->datashareHelper_ == nullptr, context->uri.empty());
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -360,7 +364,8 @@ napi_value NapiDataShareHelper::Napi_Update(napi_env env, napi_callback_info inf
                 context->proxy->datashareHelper_->Update(uri, context->predicates, context->valueBucket);
             context->status = napi_ok;
         } else {
-            LOG_ERROR("dataShareHelper_ is nullptr or context->uri is empty");
+            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
+                context->proxy->datashareHelper_ == nullptr, context->uri.empty());
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -391,7 +396,8 @@ napi_value NapiDataShareHelper::Napi_BatchInsert(napi_env env, napi_callback_inf
             context->resultNumber = context->proxy->datashareHelper_->BatchInsert(uri, context->values);
             context->status = napi_ok;
         } else {
-            LOG_ERROR("dataShareHelper_ is nullptr or context->uri is empty");
+            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
+                context->proxy->datashareHelper_ == nullptr, context->uri.empty());
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -420,7 +426,8 @@ napi_value NapiDataShareHelper::Napi_GetType(napi_env env, napi_callback_info in
             context->resultString = context->proxy->datashareHelper_->GetType(uri);
             context->status = napi_ok;
         } else {
-            LOG_ERROR("dataShareHelper_ is nullptr or context->uri is empty");
+            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
+                context->proxy->datashareHelper_ == nullptr, context->uri.empty());
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -457,7 +464,8 @@ napi_value NapiDataShareHelper::Napi_GetFileTypes(napi_env env, napi_callback_in
             context->resultStrArr = context->proxy->datashareHelper_->GetFileTypes(uri, context->mimeTypeFilter);
             context->status = napi_ok;
         } else {
-            LOG_ERROR("dataShareHelper_ is nullptr or context->uri is empty");
+            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
+                context->proxy->datashareHelper_ == nullptr, context->uri.empty());
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -487,7 +495,8 @@ napi_value NapiDataShareHelper::Napi_NormalizeUri(napi_env env, napi_callback_in
             context->resultString = uriValue.ToString();
             context->status = napi_ok;
         } else {
-            LOG_ERROR("dataShareHelper_ is nullptr or context->uri is empty");
+            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
+                context->proxy->datashareHelper_ == nullptr, context->uri.empty());
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -517,7 +526,8 @@ napi_value NapiDataShareHelper::Napi_DenormalizeUri(napi_env env, napi_callback_
             context->resultString = uriValue.ToString();
             context->status = napi_ok;
         } else {
-            LOG_ERROR("dataShareHelper_ is nullptr or context->uri is empty");
+            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
+                context->proxy->datashareHelper_ == nullptr, context->uri.empty());
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -546,7 +556,8 @@ napi_value NapiDataShareHelper::Napi_NotifyChange(napi_env env, napi_callback_in
             context->proxy->datashareHelper_->NotifyChange(uri);
             context->status = napi_ok;
         } else {
-            LOG_ERROR("dataShareHelper_ is nullptr or context->uri is empty");
+            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
+                context->proxy->datashareHelper_ == nullptr, context->uri.empty());
         }
     };
     context->SetAction(std::move(input), std::move(output));

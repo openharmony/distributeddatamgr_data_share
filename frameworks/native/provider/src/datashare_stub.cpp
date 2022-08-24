@@ -69,13 +69,11 @@ int DataShareStub::OnRemoteRequest(uint32_t code, MessageParcel& data, MessagePa
 
 bool ReadUri(std::shared_ptr<Uri> &uri, MessageParcel &data)
 {
-    std::shared_ptr<Uri> tmpUri(data.ReadParcelable<Uri>());
-    if (tmpUri == nullptr) {
-        LOG_ERROR("tmpUri is nullptr");
+    uri = std::make_shared<Uri>(data.ReadParcelable<Uri>());
+    if (uri == nullptr) {
+        LOG_ERROR("uri is nullptr");
         return false;
     }
-
-    uri = std::move(tmpUri);
     return true;
 }
 
