@@ -40,7 +40,7 @@ std::shared_ptr<DataShareResultSet> ISharedResultSetProxy::CreateProxy(MessagePa
 
 int ISharedResultSetProxy::GetAllColumnNames(std::vector<std::string> &columnNames)
 {
-    LOG_DEBUG("GetAllColumnNames Begin");
+    LOG_DEBUG("Start");
     if (!columnNames_.empty()) {
         columnNames = columnNames_;
         return E_OK;
@@ -51,12 +51,12 @@ int ISharedResultSetProxy::GetAllColumnNames(std::vector<std::string> &columnNam
     MessageOption msgOption;
     int errCode = Remote()->SendRequest(FUNC_GET_ALL_COLUMN_NAMES, request, reply, msgOption);
     if (errCode != 0) {
-        LOG_ERROR("GetAllColumnNames IPC Error %{public}x", errCode);
+        LOG_ERROR("IPC Error %{public}x", errCode);
         return -errCode;
     }
     errCode = reply.ReadInt32();
     if (errCode != E_OK) {
-        LOG_ERROR("GetAllColumnNames Reply Error %{public}d", errCode);
+        LOG_ERROR("Reply Error %{public}d", errCode);
         return errCode;
     }
     if (!reply.ReadStringVector(&columnNames)) {
@@ -68,7 +68,7 @@ int ISharedResultSetProxy::GetAllColumnNames(std::vector<std::string> &columnNam
 
 int ISharedResultSetProxy::GetRowCount(int &count)
 {
-    LOG_DEBUG("GetRowCount Begin");
+    LOG_DEBUG("Start");
     if (rowCount_ >= 0) {
         count = rowCount_;
         return E_OK;
@@ -79,23 +79,23 @@ int ISharedResultSetProxy::GetRowCount(int &count)
     MessageOption msgOption;
     int errCode = Remote()->SendRequest(FUNC_GET_ROW_COUNT, request, reply, msgOption);
     if (errCode != 0) {
-        LOG_ERROR("GetRowCount IPC Error %{public}x", errCode);
+        LOG_ERROR("IPC Error %{public}x", errCode);
         return -errCode;
     }
     errCode = reply.ReadInt32();
     if (errCode != E_OK) {
-        LOG_ERROR("GetRowCount Reply Error %{public}d", errCode);
+        LOG_ERROR("Reply Error %{public}d", errCode);
         return errCode;
     }
     count = reply.ReadInt32();
-    LOG_DEBUG("GetRowCount count %{public}d", count);
+    LOG_DEBUG("count %{public}d", count);
     rowCount_ = count;
     return E_OK;
 }
 
 bool ISharedResultSetProxy::OnGo(int oldRowIndex, int newRowIndex)
 {
-    LOG_DEBUG("OnGo Begin");
+    LOG_DEBUG("Start");
     MessageParcel request;
     request.WriteInterfaceToken(GetDescriptor());
     request.WriteInt32(oldRowIndex);
@@ -104,7 +104,7 @@ bool ISharedResultSetProxy::OnGo(int oldRowIndex, int newRowIndex)
     MessageOption msgOption;
     int errCode = Remote()->SendRequest(FUNC_ON_GO, request, reply, msgOption);
     if (errCode != 0) {
-        LOG_ERROR("OnGo IPC Error %{public}x", errCode);
+        LOG_ERROR("IPC Error %{public}x", errCode);
         return -errCode;
     }
     return reply.ReadBool();
@@ -112,7 +112,7 @@ bool ISharedResultSetProxy::OnGo(int oldRowIndex, int newRowIndex)
 
 int ISharedResultSetProxy::Close()
 {
-    LOG_DEBUG("Close Begin");
+    LOG_DEBUG("Start");
     DataShareResultSet::Close();
     MessageParcel request;
     request.WriteInterfaceToken(GetDescriptor());
@@ -120,7 +120,7 @@ int ISharedResultSetProxy::Close()
     MessageOption msgOption;
     int errCode = Remote()->SendRequest(FUNC_CLOSE, request, reply, msgOption);
     if (errCode != 0) {
-        LOG_ERROR("Close IPC Error %{public}x", errCode);
+        LOG_ERROR("IPC Error %{public}x", errCode);
         return -errCode;
     }
     return reply.ReadInt32();

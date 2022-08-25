@@ -70,27 +70,24 @@ void SetValuesBucketObject(
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, value, &valueType);
     if (valueType == napi_string) {
+        LOG_DEBUG("ValueObject is string");
         std::string valueString = DataShareJSUtils::UnwrapStringFromJS(env, value);
-        LOG_INFO("ValueObject type:%{public}d, key:%{public}s, value:%{public}s",
-            valueType, keyStr.c_str(), valueString.c_str());
         valuesBucket.Put(keyStr, valueString);
     } else if (valueType == napi_number) {
+        LOG_DEBUG("ValueObject is number");
         double valueNumber = 0;
         napi_get_value_double(env, value, &valueNumber);
         valuesBucket.Put(keyStr, valueNumber);
-        LOG_INFO(
-            "ValueObject type:%{public}d, key:%{public}s, value:%{public}lf", valueType, keyStr.c_str(), valueNumber);
     } else if (valueType == napi_boolean) {
+        LOG_DEBUG("ValueObject is boolean");
         bool valueBool = false;
         napi_get_value_bool(env, value, &valueBool);
-        LOG_INFO(
-            "ValueObject type:%{public}d, key:%{public}s, value:%{public}d", valueType, keyStr.c_str(), valueBool);
         valuesBucket.Put(keyStr, valueBool);
     } else if (valueType == napi_null) {
+        LOG_DEBUG("ValueObject is null");
         valuesBucket.Put(keyStr);
-        LOG_INFO("ValueObject type:%{public}d, key:%{public}s, value:null", valueType, keyStr.c_str());
     } else if (valueType == napi_object) {
-        LOG_INFO("ValueObject type:%{public}d, key:%{public}s, value:Uint8Array", valueType, keyStr.c_str());
+        LOG_DEBUG("ValueObject is Uint8Array");
         valuesBucket.Put(keyStr, DataShareJSUtils::Convert2U8Vector(env, value));
     } else {
         LOG_ERROR("valuesBucket error");
@@ -107,7 +104,7 @@ void AnalysisValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &e
         LOG_ERROR("ValuesBucket errr");
         return;
     }
-    LOG_INFO("ValuesBucket num : %{public}u", arrLen);
+    LOG_DEBUG("ValuesBucket num : %{public}u", arrLen);
     for (size_t i = 0; i < arrLen; ++i) {
         napi_value key = 0;
         status = napi_get_element(env, keys, i, &key);

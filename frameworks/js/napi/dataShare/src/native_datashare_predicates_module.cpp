@@ -27,9 +27,8 @@ EXTERN_C_START
  */
 static napi_value Init(napi_env env, napi_value exports)
 {
-    LOG_INFO("DataSharePredicatesProxy module Init in");
+    LOG_DEBUG("Init DataSharePredicates");
     DataSharePredicatesProxy::Init(env, exports);
-    LOG_INFO("DataSharePredicatesProxy module Init out");
     return exports;
 }
 EXTERN_C_END

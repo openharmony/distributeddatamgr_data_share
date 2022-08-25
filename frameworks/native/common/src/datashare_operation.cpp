@@ -138,119 +138,108 @@ DataShareOperation &DataShareOperation::operator=(const DataShareOperation &othe
 
 std::shared_ptr<DataShareOperationBuilder> DataShareOperation::NewInsertBuilder(const std::shared_ptr<Uri> &uri)
 {
-    LOG_DEBUG("DataShareOperation::NewInsertBuilder start");
+    LOG_DEBUG("Start");
     if (uri == nullptr) {
-        LOG_ERROR("DataShareOperation::NewInsertBuilder uri is nullptr");
+        LOG_ERROR("uri is nullptr");
         return nullptr;
     }
     std::shared_ptr<DataShareOperationBuilder> builder =
         std::make_shared<DataShareOperationBuilder>(TYPE_INSERT, uri);
-    LOG_DEBUG("DataShareOperation::NewInsertBuilder end");
     return builder;
 }
 
 std::shared_ptr<DataShareOperationBuilder> DataShareOperation::NewUpdateBuilder(const std::shared_ptr<Uri> &uri)
 {
-    LOG_DEBUG("DataShareOperation::NewUpdateBuilder start");
+    LOG_DEBUG("Start");
     if (uri == nullptr) {
-        LOG_ERROR("DataShareOperation::NewUpdateBuilder uri is nullptr");
+        LOG_ERROR("uri is nullptr");
         return nullptr;
     }
     std::shared_ptr<DataShareOperationBuilder> builder =
         std::make_shared<DataShareOperationBuilder>(TYPE_UPDATE, uri);
-    LOG_DEBUG("DataShareOperation::NewUpdateBuilder end");
     return builder;
 }
 
 std::shared_ptr<DataShareOperationBuilder> DataShareOperation::NewDeleteBuilder(const std::shared_ptr<Uri> &uri)
 {
-    LOG_DEBUG("DataShareOperation::NewDeleteBuilder start");
+    LOG_DEBUG("Start");
     if (uri == nullptr) {
-        LOG_ERROR("DataShareOperation::NewDeleteBuilder uri is nullptr");
+        LOG_ERROR("uri is nullptr");
         return nullptr;
     }
     std::shared_ptr<DataShareOperationBuilder> builder =
         std::make_shared<DataShareOperationBuilder>(TYPE_DELETE, uri);
-    LOG_DEBUG("DataShareOperation::NewDeleteBuilder end");
     return builder;
 }
 
 std::shared_ptr<DataShareOperationBuilder> DataShareOperation::NewAssertBuilder(const std::shared_ptr<Uri> &uri)
 {
-    LOG_DEBUG("DataShareOperation::NewAssertBuilder start");
+    LOG_DEBUG("Start");
     if (uri == nullptr) {
-        LOG_ERROR("DataShareOperation::NewAssertBuilder uri is nullptr");
+        LOG_ERROR("uri is nullptr");
         return nullptr;
     }
     std::shared_ptr<DataShareOperationBuilder> builder =
         std::make_shared<DataShareOperationBuilder>(TYPE_ASSERT, uri);
-    LOG_DEBUG("DataShareOperation::NewAssertBuilder end");
     return builder;
 }
 
 int DataShareOperation::GetType() const
 {
-    LOG_DEBUG("DataShareOperation::GetType");
     return type_;
 }
 
 std::shared_ptr<Uri> DataShareOperation::GetUri() const
 {
-    LOG_DEBUG("DataShareOperation::GetUri");
     return uri_;
 }
 
 std::shared_ptr<DataShareValuesBucket> DataShareOperation::GetValuesBucket() const
 {
-    LOG_DEBUG("DataShareOperation::GetValuesBucket");
     return valuesBucket_;
 }
 
 int DataShareOperation::GetExpectedCount() const
 {
-    LOG_DEBUG("DataShareOperation::GetExpectedCount");
     return expectedCount_;
 }
 
 std::shared_ptr<DataSharePredicates> DataShareOperation::GetDataSharePredicates() const
 {
-    LOG_DEBUG("DataShareOperation::GetDataSharePredicates");
     return dataSharePredicates_;
 }
 
 std::shared_ptr<DataShareValuesBucket> DataShareOperation::GetValuesBucketReferences() const
 {
-    LOG_DEBUG("DataShareOperation::GetValuesBucketReferences");
     return valuesBucketReferences_;
 }
 std::map<int, int> DataShareOperation::GetDataSharePredicatesBackReferences() const
 {
-    LOG_DEBUG("DataShareOperation::GetDataSharePredicatesBackReferences");
     return dataSharePredicatesBackReferences_;
 }
 bool DataShareOperation::IsInsertOperation() const
 {
-    LOG_DEBUG("DataShareOperation::IsInsertOperation：%d", type_ == TYPE_INSERT);
+    LOG_DEBUG("type_ == TYPE_INSERT : %{public}d", type_ == TYPE_INSERT);
     return type_ == TYPE_INSERT;
 }
 bool DataShareOperation::IsUpdateOperation() const
 {
-    LOG_DEBUG("DataShareOperation::IsUpdateOperation：%d", type_ == TYPE_UPDATE);
+    LOG_DEBUG("type_ == TYPE_INSERT : %{public}d", type_ == TYPE_UPDATE);
     return type_ == TYPE_UPDATE;
 }
 bool DataShareOperation::IsDeleteOperation() const
 {
-    LOG_DEBUG("DataShareOperation::IsDeleteOperation：%d", type_ == TYPE_DELETE);
+    LOG_DEBUG("type_ == TYPE_INSERT : %{public}d", type_ == TYPE_DELETE);
     return type_ == TYPE_DELETE;
 }
 bool DataShareOperation::IsAssertOperation() const
 {
-    LOG_DEBUG("DataShareOperation::IsAssertOperation：%d", type_ == TYPE_ASSERT);
+    LOG_DEBUG("type_ == TYPE_INSERT : %{public}d", type_ == TYPE_ASSERT);
     return type_ == TYPE_ASSERT;
 }
 bool DataShareOperation::IsInterruptionAllowed() const
 {
-    LOG_DEBUG("DataShareOperation::IsInterruptionAllowed：%d", interrupted_);
+    LOG_DEBUG("interrupted_ : %{public}d", interrupted_);
     return interrupted_;
 }
 bool DataShareOperation::Marshalling(Parcel &out) const
@@ -275,18 +264,19 @@ bool DataShareOperation::Marshalling(Parcel &out) const
         return false;
     }
 
+    LOG_DEBUG("End successfully");
     return true;
 }
 DataShareOperation *DataShareOperation::Unmarshalling(Parcel &in)
 {
-    LOG_DEBUG("DataShareOperation::Unmarshalling start");
+    LOG_DEBUG("Start");
     DataShareOperation *dataShareOperation = new (std::nothrow) DataShareOperation();
     if (dataShareOperation != nullptr && !dataShareOperation->ReadFromParcel(in)) {
-        LOG_ERROR("DataShareOperation::Unmarshalling dataShareOperation error");
+        LOG_ERROR("Read dataShareOperation error");
         delete dataShareOperation;
         dataShareOperation = nullptr;
     }
-    LOG_DEBUG("DataShareOperation::Unmarshalling end");
+    LOG_DEBUG("End");
     return dataShareOperation;
 }
 bool DataShareOperation::ReadFromParcel(Parcel &in)
@@ -309,9 +299,8 @@ bool DataShareOperation::ReadFromParcel(Parcel &in)
 }
 std::shared_ptr<DataShareOperation> DataShareOperation::CreateFromParcel(Parcel &in)
 {
-    LOG_DEBUG("DataShareOperation::CreateFromParcel start");
+    LOG_DEBUG("Start");
     std::shared_ptr<DataShareOperation> operation = std::make_shared<DataShareOperation>(in);
-    LOG_DEBUG("DataShareOperation::CreateFromParcel end");
     return operation;
 }
 void DataShareOperation::PutMap(Parcel &in)

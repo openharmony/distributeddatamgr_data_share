@@ -85,7 +85,7 @@ int DataShareAbsResultSet::GoTo(int offset)
 {
     int ret = GoToRow(rowPos_ + offset);
     if (ret != E_OK) {
-        LOG_ERROR("DataShareAbsResultSet::GoTo return ret is wrong!");
+        LOG_ERROR("return ret is wrong!");
     }
     return ret;
 }
@@ -94,7 +94,7 @@ int DataShareAbsResultSet::GoToFirstRow()
 {
     int ret = GoToRow(0);
     if (ret != E_OK) {
-        LOG_ERROR("DataShareAbsResultSet::GoToFirstRow return ret is wrong!");
+        LOG_ERROR("return ret is wrong!");
     }
     return ret;
 }
@@ -104,13 +104,13 @@ int DataShareAbsResultSet::GoToLastRow()
     int rowCnt = 0;
     int ret = GetRowCount(rowCnt);
     if (ret != E_OK) {
-        LOG_ERROR("DataShareAbsResultSet::GoToLastRow  return GetRowCount::ret is wrong!");
+        LOG_ERROR("return GetRowCount ret is wrong!");
         return ret;
     }
 
     ret = GoToRow(rowCnt - 1);
     if (ret != E_OK) {
-        LOG_ERROR("DataShareAbsResultSet::GoToLastRow  return GoToRow::ret is wrong!");
+        LOG_ERROR("return GoToRow ret is wrong!");
     }
     return ret;
 }
@@ -119,7 +119,7 @@ int DataShareAbsResultSet::GoToNextRow()
 {
     int ret = GoToRow(rowPos_ + 1);
     if (ret != E_OK) {
-        LOG_ERROR("DataShareAbsResultSet::GoToNextRow  return GoToRow::ret is wrong!");
+        LOG_ERROR("return GoToRow ret is wrong!");
     }
     return ret;
 }
@@ -128,7 +128,7 @@ int DataShareAbsResultSet::GoToPreviousRow()
 {
     int ret = GoToRow(rowPos_ - 1);
     if (ret != E_OK) {
-        LOG_ERROR("DataShareAbsResultSet::GoToPreviousRow  return GoToRow::ret is wrong!");
+        LOG_ERROR("return GoToRow ret is wrong!");
     }
     return ret;
 }
@@ -144,7 +144,7 @@ int DataShareAbsResultSet::IsAtLastRow(bool &result)
     int rowCnt = 0;
     int ret = GetRowCount(rowCnt);
     if (ret != E_OK) {
-        LOG_ERROR("DataShareAbsResultSet::IsAtLastRow  return GetRowCount::ret is wrong!");
+        LOG_ERROR("return GetRowCount ret is wrong!");
         return ret;
     }
     result = (rowPos_ == (rowCnt - 1));
@@ -162,7 +162,7 @@ int DataShareAbsResultSet::IsEnded(bool &result)
     int rowCnt = 0;
     int ret =  GetRowCount(rowCnt);
     if (ret != E_OK) {
-        LOG_ERROR("DataShareAbsResultSet::IsEnded  return GetRowCount::ret is wrong!");
+        LOG_ERROR("return GetRowCount ret is wrong!");
         return ret;
     }
     result = (rowCnt == 0) ? true : (rowPos_ == rowCnt);
@@ -174,7 +174,7 @@ int DataShareAbsResultSet::GetColumnCount(int &count)
     std::vector<std::string> columnNames;
     int ret = GetAllColumnNames(columnNames);
     if (ret != E_OK) {
-        LOG_ERROR("DataShareAbsResultSet::GetColumnCount  return GetAllColumnNames::ret is wrong!");
+        LOG_ERROR("return GetAllColumnNames ret is wrong!");
         return ret;
     }
     count = static_cast<int>(columnNames.size());
@@ -192,7 +192,7 @@ int DataShareAbsResultSet::GetColumnIndex(const std::string &columnName, int &co
     std::vector<std::string> columnNames;
     int ret = GetAllColumnNames(columnNames);
     if (ret != E_OK) {
-        LOG_ERROR("DataShareAbsResultSet::GetColumnIndex  return GetAllColumnNames::ret is wrong!");
+        LOG_ERROR("return GetAllColumnNames ret is wrong!");
         return ret;
     }
 
@@ -214,7 +214,7 @@ int DataShareAbsResultSet::GetColumnName(int columnIndex, std::string &columnNam
     int rowCnt = 0;
     int ret = GetColumnCount(rowCnt);
     if (ret != E_OK) {
-        LOG_ERROR("DataShareAbsResultSet::GetColumnName  return GetColumnCount::ret is wrong!");
+        LOG_ERROR("return GetColumnCount ret is wrong!");
         return ret;
     }
     if (columnIndex >= rowCnt || columnIndex < 0) {

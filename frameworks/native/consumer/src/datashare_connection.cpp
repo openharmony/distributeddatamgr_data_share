@@ -38,20 +38,19 @@ std::mutex DataShareConnection::mutex_;
 void DataShareConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    LOG_INFO("called begin");
+    LOG_DEBUG("Start");
     if (remoteObject == nullptr) {
-        LOG_ERROR("DataShareConnection::OnAbilityConnectDone failed, remote is nullptr");
+        LOG_ERROR("remote is nullptr");
         return;
     }
     dataShareProxy_ = iface_cast<DataShareProxy>(remoteObject);
     std::unique_lock<std::mutex> lock(condition_.mutex);
     condition_.condition.notify_all();
     if (dataShareProxy_ == nullptr) {
-        LOG_ERROR("DataShareConnection::OnAbilityConnectDone failed, dataShareProxy_ is nullptr");
+        LOG_ERROR("dataShareProxy_ is nullptr");
         return;
     }
     isConnected_.store(true);
-    LOG_INFO("called end");
 }
 
 /**
@@ -65,12 +64,11 @@ void DataShareConnection::OnAbilityConnectDone(
  */
 void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    LOG_INFO("called begin");
+    LOG_DEBUG("Start");
     std::unique_lock<std::mutex> lock(condition_.mutex);
     dataShareProxy_ = nullptr;
     condition_.condition.notify_all();
     isConnected_.store(false);
-    LOG_INFO("called end");
 }
 
 /**
@@ -78,7 +76,7 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
  */
 void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token)
 {
-    LOG_INFO("called begin");
+    LOG_DEBUG("Start");
     std::unique_lock<std::mutex> lock(condition_.mutex);
     AAFwk::Want want;
     if (uri_.ToString().empty()) {
@@ -99,7 +97,7 @@ void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
  */
 void DataShareConnection::DisconnectDataShareExtAbility()
 {
-    LOG_INFO("called begin");
+    LOG_DEBUG("Start");
     std::unique_lock<std::mutex> lock(condition_.mutex);
     isConnected_.store(false);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(this);

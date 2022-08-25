@@ -84,7 +84,7 @@ DataShareResult *DataShareResult::CreateFromParcel(Parcel &parcel)
 {
     DataShareResult *dataShareResult = new (std::nothrow) DataShareResult(parcel);
     if (dataShareResult == nullptr) {
-        LOG_ERROR("DataShareResult::CreateFromParcel dataShareResult is nullptr");
+        LOG_ERROR("dataShareResult is nullptr");
     }
     return dataShareResult;
 }
