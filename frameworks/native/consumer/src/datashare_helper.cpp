@@ -212,7 +212,7 @@ std::vector<std::string> DataShareHelper::GetFileTypes(Uri &uri, const std::stri
     if (!dataShareConnection_->IsExtAbilityConnected()) {
         dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
         if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
+            LOG_ERROR("reconnect get dataShareProxy failed");
             dataShareConnection_->DisconnectDataShareExtAbility();
             return matchedMIMEs;
         }
@@ -247,7 +247,7 @@ int DataShareHelper::OpenFile(Uri &uri, const std::string &mode)
     if (!dataShareConnection_->IsExtAbilityConnected()) {
         dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
         if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
+            LOG_ERROR("reconnect get dataShareProxy failed");
             dataShareConnection_->DisconnectDataShareExtAbility();
             return fd;
         }
@@ -283,7 +283,7 @@ int DataShareHelper::OpenRawFile(Uri &uri, const std::string &mode)
     if (!dataShareConnection_->IsExtAbilityConnected()) {
         dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
         if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
+            LOG_ERROR("reconnect get dataShareProxy failed");
             dataShareConnection_->DisconnectDataShareExtAbility();
             return fd;
         }
@@ -315,7 +315,7 @@ int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
     if (!dataShareConnection_->IsExtAbilityConnected()) {
         dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
         if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
+            LOG_ERROR("reconnect get dataShareProxy failed");
             dataShareConnection_->DisconnectDataShareExtAbility();
             return index;
         }
@@ -349,7 +349,7 @@ int DataShareHelper::Update(
     if (!dataShareConnection_->IsExtAbilityConnected()) {
         dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
         if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
+            LOG_ERROR("reconnect get dataShareProxy failed");
             dataShareConnection_->DisconnectDataShareExtAbility();
             return index;
         }
@@ -381,7 +381,7 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
     if (!dataShareConnection_->IsExtAbilityConnected()) {
         dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
         if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
+            LOG_ERROR("reconnect get dataShareProxy failed");
             dataShareConnection_->DisconnectDataShareExtAbility();
             return index;
         }
@@ -416,7 +416,7 @@ std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
     if (!dataShareConnection_->IsExtAbilityConnected()) {
         dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
         if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
+            LOG_ERROR("reconnect get dataShareProxy failed");
             dataShareConnection_->DisconnectDataShareExtAbility();
             return resultset;
         }
@@ -448,7 +448,7 @@ std::string DataShareHelper::GetType(Uri &uri)
     if (!dataShareConnection_->IsExtAbilityConnected()) {
         dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
         if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
+            LOG_ERROR("reconnect get dataShareProxy failed");
             dataShareConnection_->DisconnectDataShareExtAbility();
             return type;
         }
@@ -480,7 +480,7 @@ int DataShareHelper::BatchInsert(Uri &uri, const std::vector<DataShareValuesBuck
     if (!dataShareConnection_->IsExtAbilityConnected()) {
         dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
         if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
+            LOG_ERROR("reconnect get dataShareProxy failed");
             dataShareConnection_->DisconnectDataShareExtAbility();
             return ret;
         }
@@ -661,7 +661,7 @@ void DataShareHelper::NotifyChange(const Uri &uri)
     if (!dataShareConnection_->IsExtAbilityConnected()) {
         dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
         if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
+            LOG_ERROR("reconnect get dataShareProxy failed");
             dataShareConnection_->DisconnectDataShareExtAbility();
             return;
         }
@@ -695,7 +695,7 @@ Uri DataShareHelper::NormalizeUri(Uri &uri)
     if (!dataShareConnection_->IsExtAbilityConnected()) {
         dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
         if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
+            LOG_ERROR("reconnect get dataShareProxy failed");
             dataShareConnection_->DisconnectDataShareExtAbility();
             return urivalue;
         }
@@ -729,7 +729,7 @@ Uri DataShareHelper::DenormalizeUri(Uri &uri)
     if (!dataShareConnection_->IsExtAbilityConnected()) {
         dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
         if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
+            LOG_ERROR("reconnect get dataShareProxy failed");
             dataShareConnection_->DisconnectDataShareExtAbility();
             return urivalue;
         }
