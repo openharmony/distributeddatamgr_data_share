@@ -355,7 +355,7 @@ int DataShareHelper::Update(
         }
     }
 
-	dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
+    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
     AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     index = dataShareProxy_->Update(uri, predicates, value);
     
@@ -387,7 +387,7 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
         }
     }
 
-	dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
+    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
     AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     index = dataShareProxy_->Delete(uri, predicates);
 
@@ -422,7 +422,7 @@ std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
         }
     }
 
-	dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
+    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
     AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     resultset = dataShareProxy_->Query(uri, predicates, columns);
 
@@ -454,7 +454,7 @@ std::string DataShareHelper::GetType(Uri &uri)
         }
     }
 
-	dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
+    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
     AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     type = dataShareProxy_->GetType(uri);
 
@@ -486,7 +486,7 @@ int DataShareHelper::BatchInsert(Uri &uri, const std::vector<DataShareValuesBuck
         }
     }
 
-	dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
+    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
     AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     ret = dataShareProxy_->BatchInsert(uri, values);
 
@@ -667,7 +667,7 @@ void DataShareHelper::NotifyChange(const Uri &uri)
         }
     }
 
-	dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
+    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
     AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     dataShareProxy_->NotifyChange(uri);
 }
@@ -701,7 +701,7 @@ Uri DataShareHelper::NormalizeUri(Uri &uri)
         }
     }
 
-	dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
+    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
     AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     urivalue = dataShareProxy_->NormalizeUri(uri);
 
@@ -735,7 +735,7 @@ Uri DataShareHelper::DenormalizeUri(Uri &uri)
         }
     }
 
-	dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
+    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
     AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     urivalue = dataShareProxy_->DenormalizeUri(uri);
     
