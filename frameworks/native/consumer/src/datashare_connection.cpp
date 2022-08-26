@@ -72,22 +72,6 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
 }
 
 /**
- * @brief disconnect remote ability of DataShareExtAbility.
- */
-void DataShareConnection::DisconnectDataShareExtAbility()
-{
-    LOG_DEBUG("Start");
-    std::unique_lock<std::mutex> lock(condition_.mutex);
-    isConnected_.store(false);
-    ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(this);
-    if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
-        [this] { return dataShareProxy_ == nullptr; })) {
-        LOG_INFO("disconnect ability ended successfully");
-    }
-    LOG_INFO("called end, ret=%{public}d", ret);
-}
-
-/**
  * @brief connect remote ability of DataShareExtAbility.
  */
 void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token)
@@ -102,8 +86,24 @@ void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
     }
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, this, token);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
-                                      [this] { return dataShareProxy_ != nullptr; })) {
+        [this] { return dataShareProxy_ != nullptr; })) {
         LOG_INFO("connect ability ended successfully");
+    }
+    LOG_INFO("called end, ret=%{public}d", ret);
+}
+
+/**
+ * @brief disconnect remote ability of DataShareExtAbility.
+ */
+void DataShareConnection::DisconnectDataShareExtAbility()
+{
+    LOG_DEBUG("Start");
+    std::unique_lock<std::mutex> lock(condition_.mutex);
+    isConnected_.store(false);
+    ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(this);
+    if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
+        [this] { return dataShareProxy_ == nullptr; })) {
+        LOG_INFO("disconnect ability ended successfully");
     }
     LOG_INFO("called end, ret=%{public}d", ret);
 }
