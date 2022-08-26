@@ -72,27 +72,6 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
 }
 
 /**
- * @brief connect remote ability of DataShareExtAbility.
- */
-void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token)
-{
-    LOG_DEBUG("Start");
-    std::unique_lock<std::mutex> lock(condition_.mutex);
-    AAFwk::Want want;
-    if (uri_.ToString().empty()) {
-        want.SetUri(uri);
-    } else {
-        want.SetUri(uri_);
-    }
-    ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, this, token);
-    if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
-        [this] { return dataShareProxy_ != nullptr; })) {
-        LOG_INFO("connect ability ended successfully");
-    }
-    LOG_INFO("called end, ret=%{public}d", ret);
-}
-
-/**
  * @brief disconnect remote ability of DataShareExtAbility.
  */
 void DataShareConnection::DisconnectDataShareExtAbility()
@@ -109,12 +88,48 @@ void DataShareConnection::DisconnectDataShareExtAbility()
 }
 
 /**
+ * @brief connect remote ability of DataShareExtAbility.
+ */
+void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token)
+{
+    LOG_DEBUG("Start");
+    std::unique_lock<std::mutex> lock(condition_.mutex);
+    AAFwk::Want want;
+    if (uri_.ToString().empty()) {
+        want.SetUri(uri);
+    } else {
+        want.SetUri(uri_);
+    }
+    ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, this, token);
+    if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
+                                      [this] { return dataShareProxy_ != nullptr; })) {
+        LOG_INFO("connect ability ended successfully");
+    }
+    LOG_INFO("called end, ret=%{public}d", ret);
+}
+
+/**
  * @brief check whether connected to remote extension ability.
  *
  * @return bool true if connected, otherwise false.
  */
 bool DataShareConnection::IsExtAbilityConnected()
 {
+    return isConnected_.load();
+}
+
+/**
+ * @brief check whether connected to remote extension ability.
+ *
+ * @return bool true if connected, otherwise false.
+ */
+bool DataShareConnection::TryReconnect(const Uri &uri, const sptr<IRemoteObject> &token)
+{
+    ConnectDataShareExtAbility(uri, token);
+    if (!IsExtAbilityConnected()) {
+        LOG_ERROR("Reconnect failed");
+        DisconnectDataShareExtAbility();
+    }
     return isConnected_.load();
 }
 

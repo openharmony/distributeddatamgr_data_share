@@ -210,18 +210,12 @@ std::vector<std::string> DataShareHelper::GetFileTypes(Uri &uri, const std::stri
     }
 
     if (!dataShareConnection_->IsExtAbilityConnected()) {
-        dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
-        if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
-            dataShareConnection_->DisconnectDataShareExtAbility();
+        if (!TryReconnect(uri_, token_)) {
             return matchedMIMEs;
         }
     }
 
-    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     matchedMIMEs = dataShareProxy_->GetFileTypes(uri, mimeTypeFilter);
-
     return matchedMIMEs;
 }
 
@@ -245,18 +239,12 @@ int DataShareHelper::OpenFile(Uri &uri, const std::string &mode)
     }
 
     if (!dataShareConnection_->IsExtAbilityConnected()) {
-        dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
-        if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
-            dataShareConnection_->DisconnectDataShareExtAbility();
+        if (!TryReconnect(uri_, token_)) {
             return fd;
         }
     }
 
-    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     fd = dataShareProxy_->OpenFile(uri, mode);
-
     return fd;
 }
 
@@ -281,18 +269,12 @@ int DataShareHelper::OpenRawFile(Uri &uri, const std::string &mode)
     }
 
     if (!dataShareConnection_->IsExtAbilityConnected()) {
-        dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
-        if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
-            dataShareConnection_->DisconnectDataShareExtAbility();
+        if (!TryReconnect(uri_, token_)) {
             return fd;
         }
     }
 
-    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     fd = dataShareProxy_->OpenRawFile(uri, mode);
-
     return fd;
 }
 
@@ -313,18 +295,12 @@ int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
     }
 
     if (!dataShareConnection_->IsExtAbilityConnected()) {
-        dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
-        if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
-            dataShareConnection_->DisconnectDataShareExtAbility();
+        if (!TryReconnect(uri_, token_)) {
             return index;
         }
     }
 
-    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     index = dataShareProxy_->Insert(uri, value);
-
     return index;
 }
 
@@ -347,18 +323,12 @@ int DataShareHelper::Update(
     }
 
     if (!dataShareConnection_->IsExtAbilityConnected()) {
-        dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
-        if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
-            dataShareConnection_->DisconnectDataShareExtAbility();
+        if (!TryReconnect(uri_, token_)) {
             return index;
         }
     }
 
-    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     index = dataShareProxy_->Update(uri, predicates, value);
-    
     return index;
 }
 
@@ -379,18 +349,12 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
     }
 
     if (!dataShareConnection_->IsExtAbilityConnected()) {
-        dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
-        if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
-            dataShareConnection_->DisconnectDataShareExtAbility();
+        if (!TryReconnect(uri_, token_)) {
             return index;
         }
     }
 
-    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     index = dataShareProxy_->Delete(uri, predicates);
-
     return index;
 }
 
@@ -414,18 +378,12 @@ std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
     }
 
     if (!dataShareConnection_->IsExtAbilityConnected()) {
-        dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
-        if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
-            dataShareConnection_->DisconnectDataShareExtAbility();
+        if (!TryReconnect(uri_, token_)) {
             return resultset;
         }
     }
 
-    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     resultset = dataShareProxy_->Query(uri, predicates, columns);
-
     return resultset;
 }
 
@@ -446,18 +404,12 @@ std::string DataShareHelper::GetType(Uri &uri)
     }
 
     if (!dataShareConnection_->IsExtAbilityConnected()) {
-        dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
-        if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
-            dataShareConnection_->DisconnectDataShareExtAbility();
+        if (!TryReconnect(uri_, token_)) {
             return type;
         }
     }
 
-    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     type = dataShareProxy_->GetType(uri);
-
     return type;
 }
 
@@ -478,18 +430,12 @@ int DataShareHelper::BatchInsert(Uri &uri, const std::vector<DataShareValuesBuck
     }
 
     if (!dataShareConnection_->IsExtAbilityConnected()) {
-        dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
-        if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
-            dataShareConnection_->DisconnectDataShareExtAbility();
+        if (!TryReconnect(uri_, token_)) {
             return ret;
         }
     }
 
-    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     ret = dataShareProxy_->BatchInsert(uri, values);
-
     return ret;
 }
 
@@ -659,16 +605,11 @@ void DataShareHelper::NotifyChange(const Uri &uri)
     }
 
     if (!dataShareConnection_->IsExtAbilityConnected()) {
-        dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
-        if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
-            dataShareConnection_->DisconnectDataShareExtAbility();
+        if (!TryReconnect(uri_, token_)) {
             return;
         }
     }
 
-    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     dataShareProxy_->NotifyChange(uri);
 }
 
@@ -693,18 +634,12 @@ Uri DataShareHelper::NormalizeUri(Uri &uri)
     }
 
     if (!dataShareConnection_->IsExtAbilityConnected()) {
-        dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
-        if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
-            dataShareConnection_->DisconnectDataShareExtAbility();
+        if (!TryReconnect(uri_, token_)) {
             return urivalue;
         }
     }
 
-    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     urivalue = dataShareProxy_->NormalizeUri(uri);
-
     return urivalue;
 }
 
@@ -727,19 +662,24 @@ Uri DataShareHelper::DenormalizeUri(Uri &uri)
     }
 
     if (!dataShareConnection_->IsExtAbilityConnected()) {
-        dataShareConnection_->ConnectDataShareExtAbility(uri_, token_);
-        if (!dataShareConnection_->IsExtAbilityConnected()) {
-            LOG_ERROR("reconnect get dataShareProxy failed");     
-            dataShareConnection_->DisconnectDataShareExtAbility();
+        if (!TryReconnect(uri_, token_)) {
             return urivalue;
         }
     }
 
+    urivalue = dataShareProxy_->DenormalizeUri(uri);
+    return urivalue;
+}
+
+bool DataShareHelper::TryReconnect(const Uri &uri, const sptr <IRemoteObject> &token)
+{
+    if (!dataShareConnection_->TryReconnect(uri, token)) {
+        return false;
+    }
+
     dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
     AddDataShareDeathRecipient(dataShareProxy_->AsObject());
-    urivalue = dataShareProxy_->DenormalizeUri(uri);
-    
-    return urivalue;
+    return true;
 }
 
 void DataShareDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
