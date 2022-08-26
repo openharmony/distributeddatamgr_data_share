@@ -209,10 +209,8 @@ std::vector<std::string> DataShareHelper::GetFileTypes(Uri &uri, const std::stri
         return matchedMIMEs;
     }
 
-    if (!dataShareConnection_->IsExtAbilityConnected()) {
-        if (!TryReconnect(uri_, token_)) {
-            return matchedMIMEs;
-        }
+    if (!TryReconnect(uri_, token_)) {
+        return matchedMIMEs;
     }
 
     matchedMIMEs = dataShareProxy_->GetFileTypes(uri, mimeTypeFilter);
@@ -238,10 +236,8 @@ int DataShareHelper::OpenFile(Uri &uri, const std::string &mode)
         return fd;
     }
 
-    if (!dataShareConnection_->IsExtAbilityConnected()) {
-        if (!TryReconnect(uri_, token_)) {
-            return fd;
-        }
+    if (!TryReconnect(uri_, token_)) {
+        return fd;
     }
 
     fd = dataShareProxy_->OpenFile(uri, mode);
@@ -268,10 +264,8 @@ int DataShareHelper::OpenRawFile(Uri &uri, const std::string &mode)
         return fd;
     }
 
-    if (!dataShareConnection_->IsExtAbilityConnected()) {
-        if (!TryReconnect(uri_, token_)) {
-            return fd;
-        }
+    if (!TryReconnect(uri_, token_)) {
+        return fd;
     }
 
     fd = dataShareProxy_->OpenRawFile(uri, mode);
@@ -294,10 +288,8 @@ int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
         return index;
     }
 
-    if (!dataShareConnection_->IsExtAbilityConnected()) {
-        if (!TryReconnect(uri_, token_)) {
-            return index;
-        }
+    if (!TryReconnect(uri_, token_)) {
+        return index;
     }
 
     index = dataShareProxy_->Insert(uri, value);
@@ -322,10 +314,8 @@ int DataShareHelper::Update(
         return index;
     }
 
-    if (!dataShareConnection_->IsExtAbilityConnected()) {
-        if (!TryReconnect(uri_, token_)) {
-            return index;
-        }
+    if (!TryReconnect(uri_, token_)) {
+        return index;
     }
 
     index = dataShareProxy_->Update(uri, predicates, value);
@@ -348,10 +338,8 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
         return index;
     }
 
-    if (!dataShareConnection_->IsExtAbilityConnected()) {
-        if (!TryReconnect(uri_, token_)) {
-            return index;
-        }
+    if (!TryReconnect(uri_, token_)) {
+        return index;
     }
 
     index = dataShareProxy_->Delete(uri, predicates);
@@ -377,10 +365,8 @@ std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
         return resultset;
     }
 
-    if (!dataShareConnection_->IsExtAbilityConnected()) {
-        if (!TryReconnect(uri_, token_)) {
-            return resultset;
-        }
+    if (!TryReconnect(uri_, token_)) {
+        return resultset;
     }
 
     resultset = dataShareProxy_->Query(uri, predicates, columns);
@@ -403,10 +389,8 @@ std::string DataShareHelper::GetType(Uri &uri)
         return type;
     }
 
-    if (!dataShareConnection_->IsExtAbilityConnected()) {
-        if (!TryReconnect(uri_, token_)) {
-            return type;
-        }
+    if (!TryReconnect(uri_, token_)) {
+        return type;
     }
 
     type = dataShareProxy_->GetType(uri);
@@ -429,10 +413,8 @@ int DataShareHelper::BatchInsert(Uri &uri, const std::vector<DataShareValuesBuck
         return ret;
     }
 
-    if (!dataShareConnection_->IsExtAbilityConnected()) {
-        if (!TryReconnect(uri_, token_)) {
-            return ret;
-        }
+    if (!TryReconnect(uri_, token_)) {
+        return ret;
     }
 
     ret = dataShareProxy_->BatchInsert(uri, values);
@@ -604,10 +586,8 @@ void DataShareHelper::NotifyChange(const Uri &uri)
         return;
     }
 
-    if (!dataShareConnection_->IsExtAbilityConnected()) {
-        if (!TryReconnect(uri_, token_)) {
-            return;
-        }
+    if (!TryReconnect(uri_, token_)) {
+        return;
     }
 
     dataShareProxy_->NotifyChange(uri);
@@ -633,10 +613,8 @@ Uri DataShareHelper::NormalizeUri(Uri &uri)
         return urivalue;
     }
 
-    if (!dataShareConnection_->IsExtAbilityConnected()) {
-        if (!TryReconnect(uri_, token_)) {
-            return urivalue;
-        }
+    if (!TryReconnect(uri_, token_)) {
+        return urivalue;
     }
 
     urivalue = dataShareProxy_->NormalizeUri(uri);
@@ -661,10 +639,8 @@ Uri DataShareHelper::DenormalizeUri(Uri &uri)
         return urivalue;
     }
 
-    if (!dataShareConnection_->IsExtAbilityConnected()) {
-        if (!TryReconnect(uri_, token_)) {
-            return urivalue;
-        }
+    if (!TryReconnect(uri_, token_)) {
+        return urivalue;
     }
 
     urivalue = dataShareProxy_->DenormalizeUri(uri);
@@ -673,6 +649,10 @@ Uri DataShareHelper::DenormalizeUri(Uri &uri)
 
 bool DataShareHelper::TryReconnect(const Uri &uri, const sptr <IRemoteObject> &token)
 {
+    if (dataShareConnection_->IsExtAbilityConnected()) {
+        return true;
+    }
+
     if (!dataShareConnection_->TryReconnect(uri, token)) {
         return false;
     }
