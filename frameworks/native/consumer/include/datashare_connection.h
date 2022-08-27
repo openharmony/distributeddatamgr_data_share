@@ -72,7 +72,6 @@ public:
      */
     bool IsExtAbilityConnected();
 
-
     /**
      * @brief try to reconnect remote extension ability.
      *
