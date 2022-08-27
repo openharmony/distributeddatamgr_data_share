@@ -118,6 +118,21 @@ bool DataShareConnection::IsExtAbilityConnected()
     return isConnected_.load();
 }
 
+/**
+ * @brief check whether connected to remote extension ability.
+ *
+ * @return bool true if connected, otherwise false.
+ */
+bool DataShareConnection::TryReconnect(const Uri &uri, const sptr<IRemoteObject> &token)
+{
+    ConnectDataShareExtAbility(uri, token);
+    if (!IsExtAbilityConnected()) {
+        LOG_ERROR("Reconnect failed");
+        DisconnectDataShareExtAbility();
+    }
+    return isConnected_.load();
+}
+
 sptr<IDataShare> DataShareConnection::GetDataShareProxy()
 {
     return dataShareProxy_;

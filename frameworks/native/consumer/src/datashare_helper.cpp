@@ -209,14 +209,7 @@ std::vector<std::string> DataShareHelper::GetFileTypes(Uri &uri, const std::stri
         return matchedMIMEs;
     }
 
-    if (dataShareProxy_ == nullptr) {
-        dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    }
-
-    if (dataShareProxy_) {
-        AddDataShareDeathRecipient(dataShareProxy_->AsObject());
-    } else {
-        LOG_ERROR("invalid dataShareProxy_");
+    if (!TryReconnect(uri_, token_)) {
         return matchedMIMEs;
     }
 
@@ -243,14 +236,7 @@ int DataShareHelper::OpenFile(Uri &uri, const std::string &mode)
         return fd;
     }
 
-    if (dataShareProxy_ == nullptr) {
-        dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    }
-
-    if (dataShareProxy_) {
-        AddDataShareDeathRecipient(dataShareProxy_->AsObject());
-    } else {
-        LOG_ERROR("invalid dataShareProxy_");
+    if (!TryReconnect(uri_, token_)) {
         return fd;
     }
 
@@ -278,14 +264,7 @@ int DataShareHelper::OpenRawFile(Uri &uri, const std::string &mode)
         return fd;
     }
 
-    if (dataShareProxy_ == nullptr) {
-        dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    }
-
-    if (dataShareProxy_) {
-        AddDataShareDeathRecipient(dataShareProxy_->AsObject());
-    } else {
-        LOG_ERROR("invalid dataShareProxy_");
+    if (!TryReconnect(uri_, token_)) {
         return fd;
     }
 
@@ -309,14 +288,7 @@ int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
         return index;
     }
 
-    if (dataShareProxy_ == nullptr) {
-        dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    }
-
-    if (dataShareProxy_) {
-        AddDataShareDeathRecipient(dataShareProxy_->AsObject());
-    } else {
-        LOG_ERROR("invalid dataShareProxy_");
+    if (!TryReconnect(uri_, token_)) {
         return index;
     }
 
@@ -342,14 +314,7 @@ int DataShareHelper::Update(
         return index;
     }
 
-    if (dataShareProxy_ == nullptr) {
-        dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    }
-
-    if (dataShareProxy_) {
-        AddDataShareDeathRecipient(dataShareProxy_->AsObject());
-    } else {
-        LOG_ERROR("invalid dataShareProxy_");
+    if (!TryReconnect(uri_, token_)) {
         return index;
     }
 
@@ -373,14 +338,7 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
         return index;
     }
 
-    if (dataShareProxy_ == nullptr) {
-        dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    }
-
-    if (dataShareProxy_) {
-        AddDataShareDeathRecipient(dataShareProxy_->AsObject());
-    } else {
-        LOG_ERROR("invalid dataShareProxy_");
+    if (!TryReconnect(uri_, token_)) {
         return index;
     }
 
@@ -407,14 +365,7 @@ std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
         return resultset;
     }
 
-    if (dataShareProxy_ == nullptr) {
-        dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    }
-
-    if (dataShareProxy_) {
-        AddDataShareDeathRecipient(dataShareProxy_->AsObject());
-    } else {
-        LOG_ERROR("invalid dataShareProxy_");
+    if (!TryReconnect(uri_, token_)) {
         return resultset;
     }
 
@@ -438,14 +389,7 @@ std::string DataShareHelper::GetType(Uri &uri)
         return type;
     }
 
-    if (dataShareProxy_ == nullptr) {
-        dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    }
-
-    if (dataShareProxy_) {
-        AddDataShareDeathRecipient(dataShareProxy_->AsObject());
-    } else {
-        LOG_ERROR("invalid dataShareProxy_");
+    if (!TryReconnect(uri_, token_)) {
         return type;
     }
 
@@ -469,14 +413,7 @@ int DataShareHelper::BatchInsert(Uri &uri, const std::vector<DataShareValuesBuck
         return ret;
     }
 
-    if (dataShareProxy_ == nullptr) {
-        dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    }
-
-    if (dataShareProxy_) {
-        AddDataShareDeathRecipient(dataShareProxy_->AsObject());
-    } else {
-        LOG_ERROR("invalid dataShareProxy_");
+    if (!TryReconnect(uri_, token_)) {
         return ret;
     }
 
@@ -649,14 +586,7 @@ void DataShareHelper::NotifyChange(const Uri &uri)
         return;
     }
 
-    if (dataShareProxy_ == nullptr) {
-        dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    }
-
-    if (dataShareProxy_) {
-        AddDataShareDeathRecipient(dataShareProxy_->AsObject());
-    } else {
-        LOG_ERROR("invalid dataShareProxy_");
+    if (!TryReconnect(uri_, token_)) {
         return;
     }
 
@@ -683,14 +613,7 @@ Uri DataShareHelper::NormalizeUri(Uri &uri)
         return urivalue;
     }
 
-    if (dataShareProxy_ == nullptr) {
-        dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    }
-
-    if (dataShareProxy_) {
-        AddDataShareDeathRecipient(dataShareProxy_->AsObject());
-    } else {
-        LOG_ERROR("invalid dataShareProxy_");
+    if (!TryReconnect(uri_, token_)) {
         return urivalue;
     }
 
@@ -716,19 +639,27 @@ Uri DataShareHelper::DenormalizeUri(Uri &uri)
         return urivalue;
     }
 
-    if (dataShareProxy_ == nullptr) {
-        dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
-    }
-
-    if (dataShareProxy_) {
-        AddDataShareDeathRecipient(dataShareProxy_->AsObject());
-    } else {
-        LOG_ERROR("invalid dataShareProxy_");
+    if (!TryReconnect(uri_, token_)) {
         return urivalue;
     }
 
     urivalue = dataShareProxy_->DenormalizeUri(uri);
     return urivalue;
+}
+
+bool DataShareHelper::TryReconnect(const Uri &uri, const sptr <IRemoteObject> &token)
+{
+    if (dataShareConnection_->IsExtAbilityConnected()) {
+        return true;
+    }
+
+    if (!dataShareConnection_->TryReconnect(uri, token)) {
+        return false;
+    }
+
+    dataShareProxy_ = dataShareConnection_->GetDataShareProxy();
+    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
+    return true;
 }
 
 void DataShareDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
