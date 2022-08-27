@@ -241,6 +241,7 @@ private:
     void OnSchedulerDied(const wptr<IRemoteObject> &remote);
     bool CheckUriParam(const Uri &uri);
     bool CheckOhosUri(const Uri &uri);
+    bool TryReconnect(const Uri &uri, const sptr<IRemoteObject> &token);
 
     sptr<IRemoteObject> token_ = {};
     Uri uri_ = Uri("");

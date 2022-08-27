@@ -72,6 +72,14 @@ public:
      */
     bool IsExtAbilityConnected();
 
+
+    /**
+     * @brief try to reconnect remote extension ability.
+     *
+     * @return bool true if connected, otherwise false.
+     */
+    bool TryReconnect(const Uri &uri, const sptr<IRemoteObject> &token);
+
     /**
      * @brief get the proxy of datashare extension ability.
      *
