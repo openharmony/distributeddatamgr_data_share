@@ -19,11 +19,10 @@
 #include <variant>
 #include <string>
 #include <vector>
-
 namespace OHOS {
 namespace DataShare {
 constexpr int INVALID_TYPE = -1;
-constexpr int NO_ERROR = 0;
+constexpr int DATA_SHARE_NO_ERROR = 0;
 enum DataShareValueObjectType : int32_t {
     TYPE_NULL = 0,
     TYPE_INT,

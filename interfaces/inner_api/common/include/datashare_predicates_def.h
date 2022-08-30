@@ -35,7 +35,7 @@ typedef enum {
     OR,
     IS_NULL,
     IS_NOT_NULL,
-    IN,
+    SQL_IN,
     NOT_IN,
     LIKE,
     UNLIKE,

@@ -93,7 +93,7 @@ ErrCode DataShareStub::CmdGetFileTypes(MessageParcel &data, MessageParcel &reply
         LOG_ERROR("fail to WriteStringVector types");
         return ERR_INVALID_VALUE;
     }
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
@@ -116,7 +116,7 @@ ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to WriteFileDescriptor fd");
         return ERR_INVALID_VALUE;
     }
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdOpenRawFile(MessageParcel &data, MessageParcel &reply)
@@ -135,7 +135,7 @@ ErrCode DataShareStub::CmdOpenRawFile(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to WriteInt32 fd");
         return ERR_INVALID_VALUE;
     }
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdInsert(MessageParcel &data, MessageParcel &reply)
@@ -156,7 +156,7 @@ ErrCode DataShareStub::CmdInsert(MessageParcel &data, MessageParcel &reply)
         return ERR_INVALID_VALUE;
     }
     LOG_INFO("DataShareStub::CmdInsertInner end");
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdUpdate(MessageParcel &data, MessageParcel &reply)
@@ -180,7 +180,7 @@ ErrCode DataShareStub::CmdUpdate(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to WriteInt32 index");
         return ERR_INVALID_VALUE;
     }
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdDelete(MessageParcel &data, MessageParcel &reply)
@@ -199,7 +199,7 @@ ErrCode DataShareStub::CmdDelete(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to WriteInt32 index");
         return ERR_INVALID_VALUE;
     }
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdQuery(MessageParcel &data, MessageParcel &reply)
@@ -228,7 +228,7 @@ ErrCode DataShareStub::CmdQuery(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("!resultSet->Marshalling(reply)");
         return ERR_INVALID_VALUE;
     }
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdGetType(MessageParcel &data, MessageParcel &reply)
@@ -242,7 +242,7 @@ ErrCode DataShareStub::CmdGetType(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to WriteString type");
         return ERR_INVALID_VALUE;
     }
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
@@ -273,7 +273,7 @@ ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
     }
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 
 
@@ -294,7 +294,7 @@ ErrCode DataShareStub::CmdRegisterObserver(MessageParcel &data, MessageParcel &r
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
     }
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdUnregisterObserver(MessageParcel &data, MessageParcel &reply)
@@ -314,7 +314,7 @@ ErrCode DataShareStub::CmdUnregisterObserver(MessageParcel &data, MessageParcel 
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
     }
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdNotifyChange(MessageParcel &data, MessageParcel &reply)
@@ -329,7 +329,7 @@ ErrCode DataShareStub::CmdNotifyChange(MessageParcel &data, MessageParcel &reply
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
     }
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdNormalizeUri(MessageParcel &data, MessageParcel &reply)
@@ -345,7 +345,7 @@ ErrCode DataShareStub::CmdNormalizeUri(MessageParcel &data, MessageParcel &reply
         LOG_ERROR("fail to WriteParcelable type");
         return ERR_INVALID_VALUE;
     }
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdDenormalizeUri(MessageParcel &data, MessageParcel &reply)
@@ -361,7 +361,7 @@ ErrCode DataShareStub::CmdDenormalizeUri(MessageParcel &data, MessageParcel &rep
         LOG_ERROR("fail to WriteParcelable type");
         return ERR_INVALID_VALUE;
     }
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdExecuteBatch(MessageParcel &data, MessageParcel &reply)
@@ -400,7 +400,7 @@ ErrCode DataShareStub::CmdExecuteBatch(MessageParcel &data, MessageParcel &reply
             return ERR_INVALID_VALUE;
         }
     }
-    return NO_ERROR;
+    return DATA_SHARE_NO_ERROR;
 }
 } // namespace DataShare
 } // namespace OHOS
