@@ -17,6 +17,7 @@
 #include <vector>
 #include "datashare_errno.h"
 #include "datashare_log.h"
+#include "dds_trace.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -92,6 +93,7 @@ int DataShareAbsResultSet::GoTo(int offset)
 
 int DataShareAbsResultSet::GoToFirstRow()
 {
+    DistributedDataDfx::DdsTracetrace(std::string(LOG_TAG"::") + std::string(__FUNCTION__));
     int ret = GoToRow(0);
     if (ret != E_OK) {
         LOG_ERROR("return ret is wrong!");

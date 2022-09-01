@@ -17,6 +17,7 @@
 #include "datashare_errno.h"
 #include "iremote_proxy.h"
 #include "datashare_log.h"
+#include "dds_trace.h"
 namespace OHOS::DataShare {
 std::function<std::shared_ptr<DataShareResultSet>(
     MessageParcel &parcel)> ISharedResultSet::consumerCreator_ = ISharedResultSetProxy::CreateProxy;
@@ -69,6 +70,7 @@ int ISharedResultSetProxy::GetAllColumnNames(std::vector<std::string> &columnNam
 int ISharedResultSetProxy::GetRowCount(int &count)
 {
     LOG_DEBUG("Start");
+    DistributedDataDfx::DdsTracetrace(std::string(LOG_TAG"::") + std::string(__FUNCTION__));
     if (rowCount_ >= 0) {
         count = rowCount_;
         return E_OK;
