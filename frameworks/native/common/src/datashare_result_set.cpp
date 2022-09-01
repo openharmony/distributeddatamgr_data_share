@@ -153,7 +153,7 @@ int DataShareResultSet::GoToRow(int position)
 
 int DataShareResultSet::GetBlob(int columnIndex, std::vector<uint8_t> &value)
 {
-    DistributedDataDfx::DdsTracetrace(std::string(LOG_TAG"::") + std::string(__FUNCTION__));
+    DistributedDataDfx::DdsTrace trace(std::string(LOG_TAG"::") + std::string(__FUNCTION__));
     int errorCode = CheckState(columnIndex);
     if (errorCode != E_OK) {
         return errorCode;
@@ -346,7 +346,7 @@ int DataShareResultSet::IsColumnNull(int columnIndex, bool &isNull)
 
 int DataShareResultSet::Close()
 {
-    DistributedDataDfx::DdsTracetrace(std::string(LOG_TAG"::") + std::string(__FUNCTION__));
+    DistributedDataDfx::DdsTrace trace(std::string(LOG_TAG"::") + std::string(__FUNCTION__));
     DataShareAbsResultSet::Close();
     ClosedBlock();
     return E_OK;

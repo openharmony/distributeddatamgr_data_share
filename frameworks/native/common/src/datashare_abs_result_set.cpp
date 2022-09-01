@@ -93,7 +93,7 @@ int DataShareAbsResultSet::GoTo(int offset)
 
 int DataShareAbsResultSet::GoToFirstRow()
 {
-    DistributedDataDfx::DdsTracetrace(std::string(LOG_TAG"::") + std::string(__FUNCTION__));
+    DistributedDataDfx::DdsTrace trace(std::string(LOG_TAG"::") + std::string(__FUNCTION__));
     int ret = GoToRow(0);
     if (ret != E_OK) {
         LOG_ERROR("return ret is wrong!");

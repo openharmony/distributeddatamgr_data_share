@@ -70,7 +70,7 @@ int ISharedResultSetProxy::GetAllColumnNames(std::vector<std::string> &columnNam
 int ISharedResultSetProxy::GetRowCount(int &count)
 {
     LOG_DEBUG("Start");
-    DistributedDataDfx::DdsTracetrace(std::string(LOG_TAG"::") + std::string(__FUNCTION__));
+    DistributedDataDfx::DdsTrace trace(std::string(LOG_TAG"::") + std::string(__FUNCTION__));
     if (rowCount_ >= 0) {
         count = rowCount_;
         return E_OK;
