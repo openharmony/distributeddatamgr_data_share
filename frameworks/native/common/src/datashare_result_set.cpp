@@ -48,10 +48,6 @@ DataShareResultSet::DataShareResultSet(std::shared_ptr<ResultSetBridge> &bridge)
     if (sharedBlock_ == nullptr) {
         return;
     }
-    std::vector<std::string> columnNames;
-    GetAllColumnNames(columnNames);
-    sharedBlock_->Clear();
-    sharedBlock_->SetColumnNum(columnNames.size());
 }
 
 DataShareResultSet::~DataShareResultSet()
@@ -79,10 +75,14 @@ int DataShareResultSet::GetRowCount(int &count)
 
 bool DataShareResultSet::OnGo(int startRowIndex, int targetRowIndex)
 {
-    if (bridge_ == nullptr || blockWriter_ == nullptr) {
-        LOG_ERROR("bridge_ or blockWriter_ is null!");
+    if (bridge_ == nullptr || blockWriter_ == nullptr || sharedBlock_ == nullptr) {
+        LOG_ERROR("bridge_ or blockWriter_ or sharedBlock_ is null!");
         return E_ERROR;
     }
+    std::vector<std::string> columnNames;
+    GetAllColumnNames(columnNames);
+    sharedBlock_->Clear();
+    sharedBlock_->SetColumnNum(columnNames.size());
     return bridge_->OnGo(startRowIndex, targetRowIndex, *blockWriter_);
 }
 
