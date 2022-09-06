@@ -43,14 +43,11 @@ void DataShareConnection::OnAbilityConnectDone(
         LOG_ERROR("remote is nullptr");
         return;
     }
-    dataShareProxy_ = iface_cast<DataShareProxy>(remoteObject);
     std::unique_lock<std::mutex> lock(condition_.mutex);
-    condition_.condition.notify_all();
-    if (dataShareProxy_ == nullptr) {
-        LOG_ERROR("dataShareProxy_ is nullptr");
-        return;
-    }
+    dataShareProxy_ = iface_cast<DataShareProxy>(remoteObject);
     isConnected_.store(true);
+    condition_.condition.notify_all();
+    LOG_DEBUG("End");
 }
 
 /**
@@ -125,12 +122,13 @@ bool DataShareConnection::IsExtAbilityConnected()
  */
 bool DataShareConnection::TryReconnect(const Uri &uri, const sptr<IRemoteObject> &token)
 {
+    LOG_INFO("Reconnect begin");
     ConnectDataShareExtAbility(uri, token);
-    if (!IsExtAbilityConnected()) {
+    if (dataShareProxy_ == nullptr) {
         LOG_ERROR("Reconnect failed");
         DisconnectDataShareExtAbility();
     }
-    return isConnected_.load();
+    return dataShareProxy_ != nullptr;
 }
 
 sptr<IDataShare> DataShareConnection::GetDataShareProxy()
