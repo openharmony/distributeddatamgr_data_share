@@ -18,6 +18,7 @@
 
 #include <memory>
 #include <condition_variable>
+#include <mutex>
 
 #include "ability_connect_callback_stub.h"
 #include "event_handler.h"
@@ -27,9 +28,50 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
+constexpr uint32_t WAIT_TIME = 1;
+
+template <typename T>
+class ConditionLock {
+public:
+    explicit ConditionLock(uint32_t wait_time) : waitTime_(wait_time) {}
+    ~ConditionLock() {}
+
+public:
+    void Notify(T &data)
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        data_ = data;
+        isSet_ = true;
+        cv_.notify_one();
+    }
+
+    T Wait()
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        cv_.wait_for(lock, std::chrono::seconds(waitTime_), [this]() { return isSet_; });
+        T data = data_;
+        cv_.notify_one();
+        return data;
+    }
+
+    void Clear()
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        isSet_ = false;
+        cv_.notify_one();
+    }
+
+private:
+    const uint32_t waitTime_;
+    bool isSet_ = false;
+    T data_;
+    std::mutex mutex_;
+    std::condition_variable cv_;
+};
+
 class DataShareConnection : public AAFwk::AbilityConnectionStub {
 public:
-    DataShareConnection(const Uri &uri) : uri_(uri) {}
+    DataShareConnection(const Uri &uri) : uri_(uri), conditionLock_(WAIT_TIME) {}
     virtual ~DataShareConnection() = default;
 
     /**
@@ -88,15 +130,16 @@ public:
 
     struct ConnectCondition {
         std::condition_variable condition;
-        std::mutex mutex;
+        std::recursive_mutex mutex;
     };
 private:
     static sptr<DataShareConnection> instance_;
-    static std::mutex mutex_;
+    std::recursive_mutex mutex_;
     std::atomic<bool> isConnected_ = {false};
     sptr<IDataShare> dataShareProxy_;
     ConnectCondition condition_;
     Uri uri_;
+    ConditionLock<sptr<IRemoteObject>> conditionLock_;
 };
 }  // namespace DataShare
 }  // namespace OHOS
