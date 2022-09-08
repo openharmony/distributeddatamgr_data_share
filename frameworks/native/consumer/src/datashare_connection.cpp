@@ -22,7 +22,6 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-constexpr int WAIT_TIME = 1;
 sptr<DataShareConnection> DataShareConnection::instance_ = nullptr;
 
 /**

@@ -130,7 +130,7 @@ public:
 
     struct ConnectCondition {
         std::condition_variable condition;
-        std::recursive_mutex mutex
+        std::recursive_mutex mutex;
     };
 private:
     static sptr<DataShareConnection> instance_;
