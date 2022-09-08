@@ -82,6 +82,8 @@ void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
     if (dataShareProxy_ != nullptr) {
         isConnected_.store(true);
         LOG_INFO("connect ability ended successfully");
+    } else {
+        LOG_ERROR("connect ability ended failed");
     }
     conditionLock_.Clear();
     LOG_INFO("called end, ret=%{public}d", ret);
@@ -100,6 +102,8 @@ void DataShareConnection::DisconnectDataShareExtAbility()
         dataShareProxy_ = nullptr;
         isConnected_.store(false);
         LOG_INFO("disconnect ability ended successfully");
+    } else {
+        LOG_ERROR("disconnect ability ended failed");
     }
     conditionLock_.Clear();
     LOG_INFO("called end, ret=%{public}d", ret);
