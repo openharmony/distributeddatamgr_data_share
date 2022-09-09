@@ -24,7 +24,6 @@ namespace DataShare {
 using namespace AppExecFwk;
 constexpr int WAIT_TIME = 1;
 sptr<DataShareConnection> DataShareConnection::instance_ = nullptr;
-std::mutex DataShareConnection::mutex_;
 
 /**
  * @brief This method is called back to receive the connection result after an ability calls the
