@@ -92,7 +92,7 @@ public:
     };
 private:
     static sptr<DataShareConnection> instance_;
-    static std::mutex mutex_;
+    std::mutex mutex_;
     std::atomic<bool> isConnected_ = {false};
     sptr<IDataShare> dataShareProxy_;
     ConnectCondition condition_;
