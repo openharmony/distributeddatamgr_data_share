@@ -22,7 +22,6 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-constexpr int WAIT_TIME = 1;
 sptr<DataShareConnection> DataShareConnection::instance_ = nullptr;
 
 /**
@@ -42,10 +41,8 @@ void DataShareConnection::OnAbilityConnectDone(
         LOG_ERROR("remote is nullptr");
         return;
     }
-    std::unique_lock<std::mutex> lock(condition_.mutex);
-    dataShareProxy_ = iface_cast<DataShareProxy>(remoteObject);
-    isConnected_.store(true);
-    condition_.condition.notify_all();
+    sptr<IRemoteObject> temp = remoteObject;
+    conditionLock_.Notify(temp);
     LOG_DEBUG("End");
 }
 
@@ -61,10 +58,9 @@ void DataShareConnection::OnAbilityConnectDone(
 void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
     LOG_DEBUG("Start");
-    std::unique_lock<std::mutex> lock(condition_.mutex);
-    dataShareProxy_ = nullptr;
-    condition_.condition.notify_all();
-    isConnected_.store(false);
+    sptr<IRemoteObject> temp = nullptr;
+    conditionLock_.Notify(temp);
+    LOG_DEBUG("End");
 }
 
 /**
@@ -73,7 +69,7 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
 void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token)
 {
     LOG_DEBUG("Start");
-    std::unique_lock<std::mutex> lock(condition_.mutex);
+    std::lock_guard<std::recursive_mutex> lock(condition_.mutex);
     AAFwk::Want want;
     if (uri_.ToString().empty()) {
         want.SetUri(uri);
@@ -81,10 +77,15 @@ void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
         want.SetUri(uri_);
     }
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, this, token);
-    if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
-        [this] { return dataShareProxy_ != nullptr; })) {
+    sptr<IRemoteObject> remoteObject = conditionLock_.Wait();
+    dataShareProxy_ = iface_cast<DataShareProxy>(remoteObject);
+    if (dataShareProxy_ != nullptr) {
+        isConnected_.store(true);
         LOG_INFO("connect ability ended successfully");
+    } else {
+        LOG_ERROR("connect ability ended failed");
     }
+    conditionLock_.Clear();
     LOG_INFO("called end, ret=%{public}d", ret);
 }
 
@@ -94,13 +95,17 @@ void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
 void DataShareConnection::DisconnectDataShareExtAbility()
 {
     LOG_DEBUG("Start");
-    std::unique_lock<std::mutex> lock(condition_.mutex);
-    isConnected_.store(false);
+    std::lock_guard<std::recursive_mutex> lock(condition_.mutex);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(this);
-    if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
-        [this] { return dataShareProxy_ == nullptr; })) {
+    sptr<IRemoteObject> remoteObject = conditionLock_.Wait();
+    if (remoteObject == nullptr) {
+        dataShareProxy_ = nullptr;
+        isConnected_.store(false);
         LOG_INFO("disconnect ability ended successfully");
+    } else {
+        LOG_ERROR("disconnect ability ended failed");
     }
+    conditionLock_.Clear();
     LOG_INFO("called end, ret=%{public}d", ret);
 }
 
@@ -121,6 +126,11 @@ bool DataShareConnection::IsExtAbilityConnected()
  */
 bool DataShareConnection::TryReconnect(const Uri &uri, const sptr<IRemoteObject> &token)
 {
+    std::lock_guard<std::recursive_mutex> lock(condition_.mutex);
+    if (dataShareProxy_ != nullptr) {
+        return true;
+    }
+
     LOG_INFO("Reconnect begin");
     ConnectDataShareExtAbility(uri, token);
     if (dataShareProxy_ == nullptr) {
