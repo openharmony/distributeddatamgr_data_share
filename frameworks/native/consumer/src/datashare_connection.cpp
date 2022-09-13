@@ -74,7 +74,7 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
 void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token)
 {
     LOG_DEBUG("Start");
-    std::lock_guard<std::mutex> lock(condition_.mutex);
+    std::unique_lock<std::mutex> lock(condition_.mutex);
     AAFwk::Want want;
     if (uri_.ToString().empty()) {
         want.SetUri(uri);
@@ -95,7 +95,7 @@ void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
 void DataShareConnection::DisconnectDataShareExtAbility()
 {
     LOG_DEBUG("Start");
-    std::lock_guard<std::mutex> lock(condition_.mutex);
+    std::unique_lock<std::mutex> lock(condition_.mutex);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(this);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ == nullptr; })) {
