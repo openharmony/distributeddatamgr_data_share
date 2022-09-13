@@ -96,6 +96,7 @@ void DataShareConnection::DisconnectDataShareExtAbility()
 {
     LOG_DEBUG("Start");
     std::unique_lock<std::mutex> lock(condition_.mutex);
+    isConnected_.store(false);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(this);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ == nullptr; })) {
