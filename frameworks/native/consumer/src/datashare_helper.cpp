@@ -649,6 +649,10 @@ Uri DataShareHelper::DenormalizeUri(Uri &uri)
 
 bool DataShareHelper::TryReconnect(const Uri &uri, const sptr <IRemoteObject> &token)
 {
+    if (dataShareConnection_->IsExtAbilityConnected()) {
+        return true;
+    }
+
     if (!dataShareConnection_->TryReconnect(uri, token)) {
         return false;
     }
