@@ -27,7 +27,6 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-
 class DataShareConnection : public AAFwk::AbilityConnectionStub {
 public:
     DataShareConnection(const Uri &uri) : uri_(uri) {}
