@@ -662,6 +662,7 @@ bool DataShareHelper::TryReconnect(const Uri &uri, const sptr <IRemoteObject> &t
         LOG_ERROR("Invalid dataShareProxy");
         return false;
     }
+
     AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     return true;
 }
