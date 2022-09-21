@@ -455,7 +455,7 @@ bool ITypesUtil::Marshalling(const std::vector<T> &params, Parcel &parcel)
         LOG_ERROR("predicate write params size failed");
         return false;
     }
-    for (auto i = 0; i < params.size(); i++) {
+    for (size_t i = 0; i < params.size(); i++) {
         if (!Marshalling(params[i], parcel)) {
             LOG_ERROR("predicate write params failed");
             return false;
@@ -477,7 +477,7 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, std::vector<T> &params)
         return false;
     }
     params.resize(static_cast<int32_t>(size));
-    for (auto i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         T param;
         if (!Unmarshalling(parcel, param)) {
             LOG_ERROR("Unmarshalling param failed");
