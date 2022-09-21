@@ -42,7 +42,6 @@ ohos_shared_library("datashare_common") {
     "${datashare_common_native_path}/src/datashare_block_writer_impl.cpp",
     "${datashare_common_native_path}/src/datashare_operation.cpp",
     "${datashare_common_native_path}/src/datashare_operation_builder.cpp",
-    "${datashare_common_native_path}/src/datashare_predicates.cpp",
     "${datashare_common_native_path}/src/datashare_result.cpp",
     "${datashare_common_native_path}/src/datashare_result_set.cpp",
     "${datashare_common_native_path}/src/ishared_result_set.cpp",
