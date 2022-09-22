@@ -27,6 +27,8 @@ config("ability_config") {
     "${ability_runtime_napi_path}/inner/napi_common",
     "${relational_store_innerapi_path}/rdb/include",
     "//foundation/distributeddatamgr/kv_store/frameworks/innerkitsimpl/rdb/include",
+    "//foundation/distributeddatamgr/relational_store/interfaces/inner_api/appdatafwk/include",
+    "//foundation/communication/ipc/ipc/native/src/napi/include",
   ]
 
   cflags = []
@@ -73,8 +75,6 @@ ohos_shared_library("datashare_consumer") {
     "ability_runtime:ability_manager",
     "c_utils:utils",
     "ipc:ipc_core",
-    "ipc_js:rpc",
-    "relational_store:native_appdatafwk",
   ]
 
   public_deps = [
@@ -109,14 +109,12 @@ ohos_shared_library("datashare_provider") {
   ]
 
   external_deps = [
-    "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_context_native",
     "ability_runtime:runtime",
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "ipc:ipc_core",
-    "ipc_js:rpc",
     "relational_store:native_appdatafwk",
   ]
 
@@ -142,13 +140,7 @@ ohos_shared_library("datashare_ext_ability_module") {
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
   ]
 
-  external_deps = [
-    "ability_base:want",
-    "ability_runtime:runtime",
-    "c_utils:utils",
-    "hiviewdfx_hilog_native:libhilog",
-    "relational_store:native_appdatafwk",
-  ]
+  external_deps = [ "ability_runtime:runtime" ]
 
   relative_install_dir = "extensionability/"
   subsystem_name = "distributeddatamgr"
