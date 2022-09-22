@@ -50,23 +50,21 @@ ohos_shared_library("datashare_common") {
     "${datashare_common_native_path}/src/itypes_util.cpp",
   ]
 
-  public_deps = [
-    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter/dfx:distributeddata_dfx_static",
-  ]
+  public_deps = []
 
   configs = [ ":ability_config" ]
 
   external_deps = [
     "ability_base:zuri",
     "c_utils:utils",
-    "ipc:ipc_core",
-    "kv_store:distributeddata_inner",
-    "napi:ace_napi",
-    "relational_store:native_appdatafwk",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
     "hitrace_native:libhitrace",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
+    "napi:ace_napi",
+    "relational_store:native_appdatafwk",
   ]
 
   subsystem_name = "distributeddatamgr"
