@@ -52,12 +52,9 @@ ohos_shared_library("datashare_common") {
 
   public_deps = [
     "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter/dfx:distributeddata_dfx_static",
-    "//foundation/distributeddatamgr/kv_store/interfaces/innerkits/distributeddata:distributeddata_inner",
   ]
 
   configs = [ ":ability_config" ]
-
-  ldflags = [ "-Wl,--exclude-libs=libdistributeddata_dfx_static.a" ]
 
   external_deps = [
     "ability_base:zuri",
@@ -65,6 +62,7 @@ ohos_shared_library("datashare_common") {
     "hitrace_native:libhitrace",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
     "napi:ace_napi",
     "relational_store:native_appdatafwk",
   ]
