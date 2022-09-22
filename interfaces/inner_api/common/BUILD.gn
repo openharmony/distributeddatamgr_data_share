@@ -59,12 +59,14 @@ ohos_shared_library("datashare_common") {
   external_deps = [
     "ability_base:zuri",
     "c_utils:utils",
-    "hitrace_native:libhitrace",
-    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "kv_store:distributeddata_inner",
     "napi:ace_napi",
     "relational_store:native_appdatafwk",
+    "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
+    "hitrace_native:libhitrace",
+    "hiviewdfx_hilog_native:libhilog",
   ]
 
   subsystem_name = "distributeddatamgr"
