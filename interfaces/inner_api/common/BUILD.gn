@@ -62,7 +62,6 @@ ohos_shared_library("datashare_common") {
     "hitrace_native:libhitrace",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "kv_store:distributeddata_inner",
     "napi:ace_napi",
     "relational_store:native_appdatafwk",
   ]
