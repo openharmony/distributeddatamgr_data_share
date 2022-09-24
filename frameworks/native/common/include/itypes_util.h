@@ -24,6 +24,9 @@
 namespace OHOS::DataShare {
 class ITypesUtil final {
 public:
+    static bool Marshal(Parcel &data);
+    static bool Unmarshal(Parcel &data);
+
     static bool Marshalling(const DataSharePredicates &predicates, Parcel &parcel);
     static bool Unmarshalling(Parcel &parcel, DataSharePredicates &predicates);
 
@@ -42,10 +45,35 @@ public:
     static bool Marshalling(const DataShareValueObject &valueObject, Parcel &parcel);
     static bool Unmarshalling(Parcel &parcel, DataShareValueObject &valueObject);
 
+    static bool Marshalling(const std::string &input, Parcel &data);
+    static bool Unmarshalling(Parcel &data, std::string &output);
+
     template <typename T>
     static bool Marshalling(const std::vector<T> &params, Parcel &parcel);
     template <typename T>
     static bool Unmarshalling(Parcel &parcel, std::vector<T> &params);
+
+    template<typename T, typename... Types>
+    static bool Marshal(Parcel &parcel, const T &first, const Types &...others);
+    template<typename T, typename... Types>
+    static bool Unmarshal(Parcel &parcel, T &first, Types &...others);
 };
+template<typename T, typename... Types>
+bool ITypesUtil::Marshal(Parcel &parcel, const T &first, const Types &...others)
+{
+    if (!Marshalling(first, parcel)) {
+        return false;
+    }
+    return Marshal(parcel, others...);
+}
+
+template<typename T, typename... Types>
+bool ITypesUtil::Unmarshal(Parcel &parcel, T &first, Types &...others)
+{
+    if (!Unmarshalling(parcel, first)) {
+        return false;
+    }
+    return Unmarshal(parcel, others...);
+}
 } // namespace OHOS::DataShare
 #endif

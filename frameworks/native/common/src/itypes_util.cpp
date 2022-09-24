@@ -487,4 +487,23 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, std::vector<T> &params)
     }
     return true;
 }
+bool ITypesUtil::Marshalling(const std::string &input, Parcel &data)
+{
+    return data.WriteString(input);
+}
+
+bool ITypesUtil::Unmarshalling(Parcel &data, std::string &output)
+{
+    return data.ReadString(output);
+}
+
+bool ITypesUtil::Marshal(Parcel &data)
+{
+    return true;
+}
+
+bool ITypesUtil::Unmarshal(Parcel &data)
+{
+    return true;
+}
 } // namespace OHOS::DistributedKv
