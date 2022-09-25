@@ -17,9 +17,9 @@
 #define DATASHARE_I_SHARED_RESULT_SET_PROXY_H
 #include <memory>
 
-#include "../../../../interfaces/inner_api/common/include/ishared_result_set.h"
-#include "datashare_errno.h"
+#include "ishared_result_set.h"
 #include "iremote_proxy.h"
+#include "datashare_errno.h"
 
 namespace OHOS::DataShare {
 class ISharedResultSetProxy : public IRemoteProxy<ISharedResultSet> {

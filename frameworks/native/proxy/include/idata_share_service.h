@@ -16,12 +16,12 @@
 #ifndef DISTRIBUTEDDATAFWK_IDATA_SHARE_SERVICE_H
 #define DISTRIBUTEDDATAFWK_IDATA_SHARE_SERVICE_H
 
-#include "iremote_broker.h"
 #include <string>
 
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
 #include "datashare_values_bucket.h"
+#include "iremote_broker.h"
 
 namespace OHOS::DataShare {
 class IDataShareService : public IRemoteBroker {

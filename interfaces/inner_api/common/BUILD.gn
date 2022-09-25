@@ -48,6 +48,7 @@ ohos_shared_library("datashare_common") {
     "${datashare_common_native_path}/src/ishared_result_set_proxy.cpp",
     "${datashare_common_native_path}/src/ishared_result_set_stub.cpp",
     "${datashare_common_native_path}/src/itypes_util.cpp",
+    "${datashare_common_native_path}/src/shared_block.cpp",
   ]
 
   public_deps = []

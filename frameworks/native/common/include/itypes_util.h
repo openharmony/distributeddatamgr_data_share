@@ -75,5 +75,40 @@ bool ITypesUtil::Unmarshal(Parcel &parcel, T &first, Types &...others)
     }
     return Unmarshal(parcel, others...);
 }
+
+template <typename T>
+bool ITypesUtil::Marshalling(const std::vector<T> &params, Parcel &parcel)
+{
+    if (!parcel.WriteInt32(params.size())) {
+        return false;
+    }
+    for (auto i = 0; i < params.size(); i++) {
+        if (!Marshalling(params[i], parcel)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <typename T>
+bool ITypesUtil::Unmarshalling(Parcel &parcel, std::vector<T> &params)
+{
+    size_t size = static_cast<size_t>(parcel.ReadInt32());
+    if (static_cast<int32_t>(size) < 0) {
+        return false;
+    }
+    if ((size > parcel.GetReadableBytes()) || (params.max_size() < size)) {
+        return false;
+    }
+    params.resize(static_cast<int32_t>(size));
+    for (auto i = 0; i < size; i++) {
+        T param;
+        if (!Unmarshalling(parcel, param)) {
+            return false;
+        }
+        params[static_cast<int32_t>(i)] = param;
+    }
+    return true;
+}
 } // namespace OHOS::DataShare
 #endif

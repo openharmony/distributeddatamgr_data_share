@@ -19,9 +19,10 @@
 #include <future>
 #include <memory>
 
-#include "../../../../interfaces/inner_api/common/include/ishared_result_set.h"
-#include "iremote_stub.h"
 #include "safe_block_queue.h"
+#include "ishared_result_set.h"
+#include "iremote_stub.h"
+
 namespace OHOS::DataShare {
 class ISharedResultSetStub : public IRemoteStub<ISharedResultSet> {
 public:

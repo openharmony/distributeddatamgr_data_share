@@ -239,8 +239,7 @@ public:
      *
      * @return Returns the created DataShareService instance with a specified Uri.
      */
-    static std::shared_ptr<IDataShareService> CheckMode(const sptr<IRemoteObject> &token, const Uri &uri);
-    
+    static std::shared_ptr<IDataShareService> GetDataShareService(const sptr<IRemoteObject> &token, const Uri &uri);
 
 private:
     DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri, const sptr<IDataShare> &dataShareProxy,

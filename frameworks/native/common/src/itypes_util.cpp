@@ -448,45 +448,6 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataShareValueObject &valueObject
     return true;
 }
 
-template <typename T>
-bool ITypesUtil::Marshalling(const std::vector<T> &params, Parcel &parcel)
-{
-    if (!parcel.WriteInt32(params.size())) {
-        LOG_ERROR("predicate write params size failed");
-        return false;
-    }
-    for (auto i = 0; i < params.size(); i++) {
-        if (!Marshalling(params[i], parcel)) {
-            LOG_ERROR("predicate write params failed");
-            return false;
-        }
-    }
-    return true;
-}
-
-template <typename T>
-bool ITypesUtil::Unmarshalling(Parcel &parcel, std::vector<T> &params)
-{
-    size_t size = static_cast<size_t>(parcel.ReadInt32());
-    if (static_cast<int32_t>(size) < 0) {
-        LOG_ERROR("predicate read params size failed");
-        return false;
-    }
-    if ((size > parcel.GetReadableBytes()) || (params.max_size() < size)) {
-        LOG_ERROR("Read params failed, size : %{public}zu", size);
-        return false;
-    }
-    params.resize(static_cast<int32_t>(size));
-    for (auto i = 0; i < size; i++) {
-        T param;
-        if (!Unmarshalling(parcel, param)) {
-            LOG_ERROR("Unmarshalling param failed");
-            return false;
-        }
-        params[static_cast<int32_t>(i)] = param;
-    }
-    return true;
-}
 bool ITypesUtil::Marshalling(const std::string &input, Parcel &data)
 {
     return data.WriteString(input);

@@ -22,9 +22,9 @@
 #include <vector>
 
 namespace OHOS::DataShare {
-enum RdbStatus {
-    DATA_SHARE_OK,
-    DATA_SHARE_ERROR,
+enum class DataShareStatus {
+    DATA_SHARE_ERROR = -1,
+    DATA_SHARE_OK = 0,
 };
 
 } // namespace OHOS::DataShare
