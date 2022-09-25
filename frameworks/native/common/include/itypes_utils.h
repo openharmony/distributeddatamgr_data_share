@@ -22,7 +22,7 @@
 
 
 namespace OHOS::DataShare {
-class ITypesUtil final {
+class ITypesUtils final {
 public:
     static bool Marshal(Parcel &data);
     static bool Unmarshal(Parcel &data);
@@ -59,7 +59,7 @@ public:
     static bool Unmarshal(Parcel &parcel, T &first, Types &...others);
 };
 template<typename T, typename... Types>
-bool ITypesUtil::Marshal(Parcel &parcel, const T &first, const Types &...others)
+bool ITypesUtils::Marshal(Parcel &parcel, const T &first, const Types &...others)
 {
     if (!Marshalling(first, parcel)) {
         return false;
@@ -68,7 +68,7 @@ bool ITypesUtil::Marshal(Parcel &parcel, const T &first, const Types &...others)
 }
 
 template<typename T, typename... Types>
-bool ITypesUtil::Unmarshal(Parcel &parcel, T &first, Types &...others)
+bool ITypesUtils::Unmarshal(Parcel &parcel, T &first, Types &...others)
 {
     if (!Unmarshalling(parcel, first)) {
         return false;
@@ -77,7 +77,7 @@ bool ITypesUtil::Unmarshal(Parcel &parcel, T &first, Types &...others)
 }
 
 template <typename T>
-bool ITypesUtil::Marshalling(const std::vector<T> &params, Parcel &parcel)
+bool ITypesUtils::Marshalling(const std::vector<T> &params, Parcel &parcel)
 {
     if (!parcel.WriteInt32(params.size())) {
         return false;
@@ -91,7 +91,7 @@ bool ITypesUtil::Marshalling(const std::vector<T> &params, Parcel &parcel)
 }
 
 template <typename T>
-bool ITypesUtil::Unmarshalling(Parcel &parcel, std::vector<T> &params)
+bool ITypesUtils::Unmarshalling(Parcel &parcel, std::vector<T> &params)
 {
     size_t size = static_cast<size_t>(parcel.ReadInt32());
     if (static_cast<int32_t>(size) < 0) {

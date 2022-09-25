@@ -18,8 +18,8 @@
 #include "data_share_service_proxy.h"
 
 #include "datashare_log.h"
-#include "itypes_utils.h"
 #include "ishared_result_set.h"
+#include "itypes_utils.h"
 
 namespace OHOS::DataShare {
 DataShareServiceProxy::DataShareServiceProxy(const sptr<IRemoteObject> &object)
@@ -36,7 +36,7 @@ int32_t DataShareServiceProxy::Insert(const std::string &uri, const DataShareVal
         LOG_ERROR("Write descriptor failed!");
         return DATA_SHARE_ERROR;
     }
-    if (!ITypesUtil::Marshal(data, uri, valuesBucket)) {
+    if (!ITypesUtils::Marshal(data, uri, valuesBucket)) {
         LOG_ERROR("Write to message parcel failed!");
         return DATA_SHARE_ERROR;
     }
@@ -59,7 +59,7 @@ int32_t DataShareServiceProxy::Update(
         LOG_ERROR("Write descriptor failed!");
         return DATA_SHARE_ERROR;
     }
-    if (!ITypesUtil::Marshal(data, uri, predicate, valuesBucket)) {
+    if (!ITypesUtils::Marshal(data, uri, predicate, valuesBucket)) {
         LOG_ERROR("Write to message parcel failed!");
         return DATA_SHARE_ERROR;
     }
@@ -81,7 +81,7 @@ int32_t DataShareServiceProxy::Delete(const std::string &uri, const DataSharePre
         LOG_ERROR("Write descriptor failed!");
         return DATA_SHARE_ERROR;
     }
-    if (!ITypesUtil::Marshal(data, uri, predicate)) {
+    if (!ITypesUtils::Marshal(data, uri, predicate)) {
         LOG_ERROR("Write to message parcel failed!");
         return DATA_SHARE_ERROR;
     }
@@ -105,7 +105,7 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
         return nullptr;
     }
 
-    if (!ITypesUtil::Marshal(data, uri, predicates, columns)) {
+    if (!ITypesUtils::Marshal(data, uri, predicates, columns)) {
         LOG_ERROR("Write to message parcel failed!");
         return nullptr;
     }
