@@ -18,7 +18,7 @@
 #include "data_share_service_proxy.h"
 
 #include "datashare_log.h"
-#include "itypes_util.h"
+#include "itypes_utils.h"
 #include "ishared_result_set.h"
 
 namespace OHOS::DataShare {

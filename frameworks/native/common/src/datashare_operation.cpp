@@ -15,7 +15,7 @@
 
 #include "datashare_operation.h"
 #include "datashare_log.h"
-#include "itypes_util.h"
+#include "itypes_utils.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -360,7 +360,7 @@ bool DataShareOperation::Marshalling(Parcel &out, const std::shared_ptr<DataShar
             return false;
         }
 
-        if (!ITypesUtil::Marshalling(*valuesBucket, out)) {
+        if (!ITypesUtils::Marshalling(*valuesBucket, out)) {
             LOG_ERROR("Write valuesBucket error");
             return false;
         }
@@ -382,7 +382,7 @@ bool DataShareOperation::ReadFromParcel(Parcel &in, std::shared_ptr<DataShareVal
     }
     if (isEmpty == VALUE_OBJECT) {
         DataShareValuesBucket vb;
-        if (!ITypesUtil::Unmarshalling(in, vb)) {
+        if (!ITypesUtils::Unmarshalling(in, vb)) {
             return false;
         }
         valuesBucket.reset(&vb);
@@ -399,7 +399,7 @@ bool DataShareOperation::Marshalling(Parcel &out, const std::shared_ptr<DataShar
             LOG_ERROR("Write VALUE_OBJECT error");
             return false;
         }
-        if (!ITypesUtil::Marshalling(*dataSharePredicates, out)) {
+        if (!ITypesUtils::Marshalling(*dataSharePredicates, out)) {
             LOG_ERROR("Write dataSharePredicates error");
             return false;
         }
@@ -421,7 +421,7 @@ bool DataShareOperation::ReadFromParcel(Parcel &in, std::shared_ptr<DataSharePre
     }
     if (isEmpty == VALUE_OBJECT) {
         DataSharePredicates tmpPredicates;
-        if (!ITypesUtil::Unmarshalling(in, tmpPredicates)) {
+        if (!ITypesUtils::Unmarshalling(in, tmpPredicates)) {
             return false;
         }
         dataSharePredicates.reset(&tmpPredicates);
