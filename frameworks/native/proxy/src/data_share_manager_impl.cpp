@@ -29,7 +29,7 @@
 #include "system_ability_definition.h"
 
 namespace OHOS::DataShare {
-sptr<DistributedKv::IKvStoreDataService> DataShareManagerImpl::GetDistributedDataManager()
+std::shared_ptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
 {
     int retry = 0;
     while (++retry <= GET_SA_RETRY_TIMES) {
@@ -45,14 +45,14 @@ sptr<DistributedKv::IKvStoreDataService> DataShareManagerImpl::GetDistributedDat
             continue;
         }
         LOG_INFO("get distributed data manager success");
-        return iface_cast<DistributedKv::IKvStoreDataService>(remoteObject);
+        return std::make_shared<DataShareKvServiceProxy>(remoteObject);
     }
 
     LOG_ERROR("get distributed data manager failed");
     return nullptr;
 }
 
-sptr<IDataShareService> DataShareManagerImpl::GetDataShareServiceProxy()
+sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
 {
     if (dataMgrService_ == nullptr) {
         dataMgrService_ = GetDistributedDataManager();
@@ -61,13 +61,12 @@ sptr<IDataShareService> DataShareManagerImpl::GetDataShareServiceProxy()
         LOG_ERROR("Get distributed data manager failed!");
         return nullptr;
     }
-
     auto remote = dataMgrService_->GetDataShareService();
     if (remote == nullptr) {
         LOG_ERROR("Get DataShare service failed!");
         return nullptr;
     }
-    return iface_cast<IDataShareService>(remote);
+    return iface_cast<DataShareServiceProxy>(remote);
 }
 
 std::shared_ptr<IDataShareService> DataShareManagerImpl::GetDataShareService()
@@ -81,8 +80,7 @@ std::shared_ptr<IDataShareService> DataShareManagerImpl::GetDataShareService()
         return nullptr;
     }
 
-    sptr<IDataShareService> serviceBase = service;
-    dataShareService_ = std::shared_ptr<IDataShareService>(
+    dataShareService_ = std::shared_ptr<DataShareServiceProxy>(
         service.GetRefPtr(), [holder = service](const auto *) {});
     return dataShareService_;
 }
@@ -111,4 +109,35 @@ void DataShareManagerImpl::ResetServiceHandle()
     dataMgrService_ = nullptr;
     dataShareService_ = nullptr;
 }
+
+DataShareKvServiceProxy::DataShareKvServiceProxy(const sptr<IRemoteObject> &impl)
+    : IRemoteProxy<DataShare::IKvStoreDataService>(impl)
+{
+    LOG_DEBUG("Init data service proxy.");
+}
+
+sptr<IRemoteObject> DataShareKvServiceProxy::GetDataShareService()
+{
+    LOG_INFO("GetDataShareService enter.");
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DataShareKvServiceProxy::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed");
+        return nullptr;
+    }
+
+    MessageParcel reply;
+    MessageOption mo { MessageOption::TF_SYNC };
+    int32_t error = Remote()->SendRequest(GET_DATA_SHARE_SERVICE, data, reply, mo);
+    if (error != 0) {
+        LOG_ERROR("SendRequest returned %{public}d", error);
+        return nullptr;
+    }
+    auto remoteObject = reply.ReadRemoteObject();
+    if (remoteObject == nullptr) {
+        LOG_ERROR("Remote object is nullptr!");
+        return nullptr;
+    }
+    return remoteObject;
+}
+
 } // namespace OHOS::DataShare

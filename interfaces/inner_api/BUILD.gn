@@ -77,8 +77,6 @@ ohos_shared_library("datashare_consumer") {
     "c_utils:utils",
     "ipc:ipc_core",
     "ipc_js:rpc",
-    "kv_store:distributeddata_inner",
-    "relational_store:native_appdatafwk",
     "samgr:samgr_proxy",
   ]
 

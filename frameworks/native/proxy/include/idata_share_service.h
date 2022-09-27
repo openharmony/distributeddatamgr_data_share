@@ -35,8 +35,8 @@ public:
     };
 
     enum {
-        DATA_SHARE_OK,
-        DATA_SHARE_ERROR,
+        DATA_SHARE_ERROR = -1,
+        DATA_SHARE_OK = 0,
     };
     virtual int32_t Insert(const std::string &uri, const DataShareValuesBucket &valuesBucket) = 0;
     virtual int32_t Update(
@@ -46,5 +46,20 @@ public:
         const std::string &uri, const DataSharePredicates &predicates, const std::vector<std::string> &columns) = 0;
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DataShare.IDataShareService");
 };
+
+class IKvStoreDataService : public IRemoteBroker {
+public:
+    enum { GET_DATA_SHARE_SERVICE = 14 };
+
+    enum {
+        DATA_SHARE_ERROR = -1,
+        DATA_SHARE_OK = 0,
+    };
+
+    virtual sptr<IRemoteObject> GetDataShareService() = 0;
+
+    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DistributedKv.IKvStoreDataService");
+};
+
 } // namespace OHOS::DataShare
 #endif

@@ -20,40 +20,44 @@
 #include <memory>
 #include <mutex>
 
-#include "ikvstore_data_service.h"
 #include "data_share_manager.h"
 #include "data_share_types.h"
 #include "idata_share_service.h"
+#include "data_share_service_proxy.h"
 #include "iremote_object.h"
 #include "refbase.h"
 
-namespace OHOS::DistributedKv {
-class KvStoreDataServiceProxy;
-}
-
 namespace OHOS::DataShare {
-class DataShareService;
-class DataShareServiceProxy;
+class DataShareKvServiceProxy;
 class DataShareManagerImpl {
 public:
     static DataShareManagerImpl &GetInstance();
     std::shared_ptr<IDataShareService> GetDataShareService();
 
-
 private:
     DataShareManagerImpl();
     ~DataShareManagerImpl();
-    sptr<IDataShareService> GetDataShareServiceProxy();
+    sptr<DataShareServiceProxy> GetDataShareServiceProxy();
     void ResetServiceHandle();
-    static sptr<DistributedKv::IKvStoreDataService> GetDistributedDataManager();
+    static std::shared_ptr<DataShareKvServiceProxy> GetDistributedDataManager();
 
     std::mutex mutex_;
-    sptr<DistributedKv::IKvStoreDataService> dataMgrService_;
-    std::shared_ptr<IDataShareService> dataShareService_;
+    std::shared_ptr<DataShareKvServiceProxy> dataMgrService_;
+    std::shared_ptr<DataShareServiceProxy> dataShareService_;
     std::string bundleName_;
     static constexpr int GET_SA_RETRY_TIMES = 3;
     static constexpr int RETRY_INTERVAL = 1;
     static constexpr int WAIT_TIME = 2;
+};
+
+class DataShareKvServiceProxy : public IRemoteProxy<DataShare::IKvStoreDataService> {
+public:
+    explicit DataShareKvServiceProxy(const sptr<IRemoteObject> &impl);
+    ~DataShareKvServiceProxy() = default;
+    virtual sptr<IRemoteObject> GetDataShareService();
+
+private:
+    static inline BrokerDelegator<DataShareKvServiceProxy> delegator_;
 };
 } // namespace OHOS::DataShare
 #endif
