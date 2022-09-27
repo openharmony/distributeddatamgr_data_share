@@ -26,8 +26,6 @@ config("ability_config") {
     "${datashare_native_provider_path}/include",
     "${datashare_native_proxy_path}/include",
     "${ability_runtime_napi_path}/inner/napi_common",
-    "${relational_store_innerapi_path}/rdb/include",
-    "//foundation/distributeddatamgr/kv_store/frameworks/innerkitsimpl/rdb/include",
     "//foundation/distributeddatamgr/relational_store/interfaces/inner_api/appdatafwk/include",
     "//foundation/communication/ipc/ipc/native/src/napi/include",
   ]
@@ -80,6 +78,7 @@ ohos_shared_library("datashare_consumer") {
     "ability_runtime:ability_manager",
     "c_utils:utils",
     "ipc:ipc_core",
+    "samgr:samgr_proxy",
   ]
 
   public_deps = [
