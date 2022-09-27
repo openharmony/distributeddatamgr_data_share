@@ -28,7 +28,6 @@ class NapiDataShareHelper {
 public:
     static napi_value Napi_CreateDataShareHelper(napi_env env, napi_callback_info info);
 
-    static napi_value Napi_OpenFile(napi_env env, napi_callback_info info);
     static napi_value Napi_On(napi_env env, napi_callback_info info);
     static napi_value Napi_Off(napi_env env, napi_callback_info info);
     static napi_value Napi_Insert(napi_env env, napi_callback_info info);
@@ -36,8 +35,6 @@ public:
     static napi_value Napi_Query(napi_env env, napi_callback_info info);
     static napi_value Napi_Update(napi_env env, napi_callback_info info);
     static napi_value Napi_BatchInsert(napi_env env, napi_callback_info info);
-    static napi_value Napi_GetType(napi_env env, napi_callback_info info);
-    static napi_value Napi_GetFileTypes(napi_env env, napi_callback_info info);
     static napi_value Napi_NormalizeUri(napi_env env, napi_callback_info info);
     static napi_value Napi_DenormalizeUri(napi_env env, napi_callback_info info);
     static napi_value Napi_NotifyChange(napi_env env, napi_callback_info info);
@@ -70,15 +67,12 @@ private:
         int resultNumber = 0;
         std::shared_ptr<DataShareResultSet> resultObject = nullptr;
         std::string resultString = "";
-        std::vector<std::string> resultStrArr;
 
         std::string uri;
-        std::string mode;
         DataShareValuesBucket valueBucket;
         DataSharePredicates predicates;
         std::vector<std::string> columns;
         std::vector<DataShareValuesBucket> values;
-        std::string mimeTypeFilter;
 
         ContextInfo() : Context(nullptr, nullptr) {};
         ContextInfo(InputAction input, OutputAction output) : Context(std::move(input), std::move(output)) {};
