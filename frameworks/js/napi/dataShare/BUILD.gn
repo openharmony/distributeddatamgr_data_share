@@ -36,8 +36,6 @@ ohos_shared_library("datashare") {
   ]
 
   external_deps = [
-    "ability_base:base",
-    "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:abilitykit_native",
     "ability_runtime:napi_base_context",
