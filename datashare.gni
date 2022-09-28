@@ -36,3 +36,5 @@ datashare_native_provider_path =
 
 datashare_native_consumer_path =
     "${datashare_base_path}/frameworks/native/consumer"
+
+datashare_native_proxy_path = "${datashare_base_path}/frameworks/native/proxy"

@@ -24,7 +24,7 @@
 #include "ipc_types.h"
 #include "ishared_result_set.h"
 #include "pac_map.h"
-#include "itypes_util.h"
+#include "itypes_utils.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -152,7 +152,7 @@ int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
         return index;
     }
 
-    if (!ITypesUtil::Marshalling(value, data)) {
+    if (!ITypesUtils::Marshalling(value, data)) {
         LOG_ERROR("fail to WriteParcelable value");
         return index;
     }
@@ -189,12 +189,12 @@ int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates
         return index;
     }
 
-    if (!ITypesUtil::Marshalling(predicates, data)) {
+    if (!ITypesUtils::Marshalling(predicates, data)) {
         LOG_ERROR("fail to Marshalling predicates");
         return index;
     }
 
-    if (!ITypesUtil::Marshalling(value, data)) {
+    if (!ITypesUtils::Marshalling(value, data)) {
         LOG_ERROR("fail to Marshalling value");
         return index;
     }
@@ -230,7 +230,7 @@ int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates
         return index;
     }
 
-    if (!ITypesUtil::Marshalling(predicates, data)) {
+    if (!ITypesUtils::Marshalling(predicates, data)) {
         LOG_ERROR("fail to Marshalling predicates");
         return index;
     }
@@ -266,7 +266,7 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri,
         return nullptr;
     }
 
-    if (!ITypesUtil::Marshalling(predicates, data)) {
+    if (!ITypesUtils::Marshalling(predicates, data)) {
         LOG_ERROR("fail to Marshalling predicates");
         return nullptr;
     }
@@ -341,7 +341,7 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
     }
 
     for (int i = 0; i < count; i++) {
-        if (!ITypesUtil::Marshalling(values[i], data)) {
+        if (!ITypesUtils::Marshalling(values[i], data)) {
             LOG_ERROR("fail to WriteParcelable ret, index = %{public}d", i);
             return ret;
         }

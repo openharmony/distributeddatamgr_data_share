@@ -22,12 +22,12 @@
 #include <vector>
 
 #include "datashare_abs_result_set.h"
+#include "datashare_block_writer_impl.h"
+#include "datashare_shared_result_set.h"
 #include "message_parcel.h"
 #include "parcel.h"
-#include "shared_block.h"
-#include "datashare_shared_result_set.h"
 #include "result_set_bridge.h"
-#include "datashare_block_writer_impl.h"
+#include "shared_block.h"
 
 namespace OHOS {
 namespace DataShare {

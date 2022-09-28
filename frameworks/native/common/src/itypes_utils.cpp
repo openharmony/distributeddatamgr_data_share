@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
-#include "itypes_util.h"
+#include "itypes_utils.h"
+
 #include "datashare_log.h"
 
 namespace OHOS::DataShare {
 constexpr size_t MAX_PARAM_COUNT = 3;
-bool ITypesUtil::Marshalling(const DataSharePredicates &predicates, Parcel &parcel)
+bool ITypesUtils::Marshalling(const DataSharePredicates &predicates, Parcel &parcel)
 {
     LOG_DEBUG("Marshalling DataSharePredicates Start");
     const std::list<OperationItem> &operations = predicates.GetOperationList();
@@ -51,7 +52,7 @@ bool ITypesUtil::Marshalling(const DataSharePredicates &predicates, Parcel &parc
     return true;
 }
 
-bool ITypesUtil::Unmarshalling(Parcel &parcel, DataSharePredicates &predicates)
+bool ITypesUtils::Unmarshalling(Parcel &parcel, DataSharePredicates &predicates)
 {
     LOG_DEBUG("Unmarshalling DataSharePredicates Start");
     std::list<OperationItem> operations {};
@@ -102,7 +103,7 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataSharePredicates &predicates)
     return true;
 }
 
-bool ITypesUtil::Marshalling(const DataShareValuesBucket &valuesBucket, Parcel &parcel)
+bool ITypesUtils::Marshalling(const DataShareValuesBucket &valuesBucket, Parcel &parcel)
 {
     if (!parcel.WriteInt32(valuesBucket.valuesMap.size())) {
         LOG_ERROR("valuesBucket write size failed");
@@ -121,7 +122,7 @@ bool ITypesUtil::Marshalling(const DataShareValuesBucket &valuesBucket, Parcel &
     return true;
 }
 
-bool ITypesUtil::Unmarshalling(Parcel &parcel, DataShareValuesBucket &valuesBucket)
+bool ITypesUtils::Unmarshalling(Parcel &parcel, DataShareValuesBucket &valuesBucket)
 {
     int len = parcel.ReadInt32();
     if (len < 0) {
@@ -146,7 +147,7 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataShareValuesBucket &valuesBuck
     return true;
 }
 
-bool ITypesUtil::Marshalling(const OperationItem &operationItem, Parcel &parcel)
+bool ITypesUtils::Marshalling(const OperationItem &operationItem, Parcel &parcel)
 {
     if (!parcel.WriteInt64(static_cast<int64_t>(operationItem.operation))) {
         LOG_ERROR("predicate write operation failed");
@@ -167,7 +168,7 @@ bool ITypesUtil::Marshalling(const OperationItem &operationItem, Parcel &parcel)
     return true;
 }
 
-bool ITypesUtil::Unmarshalling(Parcel &parcel, OperationItem &operationItem)
+bool ITypesUtils::Unmarshalling(Parcel &parcel, OperationItem &operationItem)
 {
     operationItem.operation = static_cast<OperationType>(parcel.ReadInt64());
     if (operationItem.operation < OperationType::INVALID_OPERATION) {
@@ -185,7 +186,7 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, OperationItem &operationItem)
     return true;
 }
 
-bool ITypesUtil::Marshalling(const DataSharePredicatesObject &predicatesObject, Parcel &parcel)
+bool ITypesUtils::Marshalling(const DataSharePredicatesObject &predicatesObject, Parcel &parcel)
 {
     if (!parcel.WriteInt16((int16_t)predicatesObject.GetType())) {
         LOG_ERROR("predicatesObject write type failed");
@@ -233,7 +234,7 @@ bool ITypesUtil::Marshalling(const DataSharePredicatesObject &predicatesObject, 
     return true;
 }
 
-bool ITypesUtil::Unmarshalling(Parcel &parcel, DataSharePredicatesObject &predicatesObject)
+bool ITypesUtils::Unmarshalling(Parcel &parcel, DataSharePredicatesObject &predicatesObject)
 {
     int16_t type = parcel.ReadInt16();
     if (type < (int16_t)DataSharePredicatesObjectType::TYPE_NULL) {
@@ -268,7 +269,7 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataSharePredicatesObject &predic
     return true;
 }
 
-bool ITypesUtil::Marshalling(const DataSharePredicatesObjects &predicatesObject, Parcel &parcel)
+bool ITypesUtils::Marshalling(const DataSharePredicatesObjects &predicatesObject, Parcel &parcel)
 {
     if (!parcel.WriteInt16((int16_t)predicatesObject.GetType())) {
         LOG_ERROR("predicatesObject write type failed");
@@ -309,7 +310,7 @@ bool ITypesUtil::Marshalling(const DataSharePredicatesObjects &predicatesObject,
     return true;
 }
 
-bool ITypesUtil::Unmarshalling(Parcel &parcel, DataSharePredicatesObjects &predicatesObject)
+bool ITypesUtils::Unmarshalling(Parcel &parcel, DataSharePredicatesObjects &predicatesObject)
 {
     int16_t type = parcel.ReadInt16();
     if (type < (int16_t)DataSharePredicatesObjectsType::TYPE_NULL) {
@@ -360,7 +361,7 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataSharePredicatesObjects &predi
     return true;
 }
 
-bool ITypesUtil::Marshalling(const DataShareValueObject &valueObject, Parcel &parcel)
+bool ITypesUtils::Marshalling(const DataShareValueObject &valueObject, Parcel &parcel)
 {
     if (!parcel.WriteInt16((int16_t)valueObject.type)) {
         LOG_ERROR("valueObject write type failed");
@@ -408,7 +409,7 @@ bool ITypesUtil::Marshalling(const DataShareValueObject &valueObject, Parcel &pa
     return true;
 }
 
-bool ITypesUtil::Unmarshalling(Parcel &parcel, DataShareValueObject &valueObject)
+bool ITypesUtils::Unmarshalling(Parcel &parcel, DataShareValueObject &valueObject)
 {
     int16_t type = parcel.ReadInt16();
     if (type < (int16_t)DataShareValueObjectType::TYPE_NULL) {
@@ -448,43 +449,23 @@ bool ITypesUtil::Unmarshalling(Parcel &parcel, DataShareValueObject &valueObject
     return true;
 }
 
-template <typename T>
-bool ITypesUtil::Marshalling(const std::vector<T> &params, Parcel &parcel)
+bool ITypesUtils::Marshalling(const std::string &input, Parcel &data)
 {
-    if (!parcel.WriteInt32(params.size())) {
-        LOG_ERROR("predicate write params size failed");
-        return false;
-    }
-    for (auto i = 0; i < params.size(); i++) {
-        if (!Marshalling(params[i], parcel)) {
-            LOG_ERROR("predicate write params failed");
-            return false;
-        }
-    }
+    return data.WriteString(input);
+}
+
+bool ITypesUtils::Unmarshalling(Parcel &data, std::string &output)
+{
+    return data.ReadString(output);
+}
+
+bool ITypesUtils::Marshal(Parcel &data)
+{
     return true;
 }
 
-template <typename T>
-bool ITypesUtil::Unmarshalling(Parcel &parcel, std::vector<T> &params)
+bool ITypesUtils::Unmarshal(Parcel &data)
 {
-    size_t size = static_cast<size_t>(parcel.ReadInt32());
-    if (static_cast<int32_t>(size) < 0) {
-        LOG_ERROR("predicate read params size failed");
-        return false;
-    }
-    if ((size > parcel.GetReadableBytes()) || (params.max_size() < size)) {
-        LOG_ERROR("Read params failed, size : %{public}zu", size);
-        return false;
-    }
-    params.resize(static_cast<int32_t>(size));
-    for (auto i = 0; i < size; i++) {
-        T param;
-        if (!Unmarshalling(parcel, param)) {
-            LOG_ERROR("Unmarshalling param failed");
-            return false;
-        }
-        params[static_cast<int32_t>(i)] = param;
-    }
     return true;
 }
 } // namespace OHOS::DistributedKv

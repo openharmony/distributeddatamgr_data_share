@@ -22,8 +22,11 @@
 
 
 namespace OHOS::DataShare {
-class ITypesUtil final {
+class ITypesUtils final {
 public:
+    static bool Marshal(Parcel &data);
+    static bool Unmarshal(Parcel &data);
+
     static bool Marshalling(const DataSharePredicates &predicates, Parcel &parcel);
     static bool Unmarshalling(Parcel &parcel, DataSharePredicates &predicates);
 
@@ -42,10 +45,70 @@ public:
     static bool Marshalling(const DataShareValueObject &valueObject, Parcel &parcel);
     static bool Unmarshalling(Parcel &parcel, DataShareValueObject &valueObject);
 
+    static bool Marshalling(const std::string &input, Parcel &data);
+    static bool Unmarshalling(Parcel &data, std::string &output);
+
     template <typename T>
     static bool Marshalling(const std::vector<T> &params, Parcel &parcel);
     template <typename T>
     static bool Unmarshalling(Parcel &parcel, std::vector<T> &params);
+
+    template<typename T, typename... Types>
+    static bool Marshal(Parcel &parcel, const T &first, const Types &...others);
+    template<typename T, typename... Types>
+    static bool Unmarshal(Parcel &parcel, T &first, Types &...others);
 };
+template<typename T, typename... Types>
+bool ITypesUtils::Marshal(Parcel &parcel, const T &first, const Types &...others)
+{
+    if (!Marshalling(first, parcel)) {
+        return false;
+    }
+    return Marshal(parcel, others...);
+}
+
+template<typename T, typename... Types>
+bool ITypesUtils::Unmarshal(Parcel &parcel, T &first, Types &...others)
+{
+    if (!Unmarshalling(parcel, first)) {
+        return false;
+    }
+    return Unmarshal(parcel, others...);
+}
+
+template <typename T>
+bool ITypesUtils::Marshalling(const std::vector<T> &params, Parcel &parcel)
+{
+    if (!parcel.WriteInt32(params.size())) {
+        return false;
+    }
+    for (auto i = 0; i < params.size(); i++) {
+        if (!Marshalling(params[i], parcel)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <typename T>
+bool ITypesUtils::Unmarshalling(Parcel &parcel, std::vector<T> &params)
+{
+    size_t size = static_cast<size_t>(parcel.ReadInt32());
+    if (static_cast<int32_t>(size) < 0) {
+        return false;
+    }
+    if ((size > parcel.GetReadableBytes()) || (params.max_size() < size)) {
+        return false;
+    }
+    params.resize(static_cast<int32_t>(size));
+    for (auto i = 0; i < size; i++) {
+        T param;
+        if (!Unmarshalling(parcel, param)) {
+            return false;
+        }
+        params[static_cast<int32_t>(i)] = param;
+    }
+    return true;
+}
 } // namespace OHOS::DataShare
 #endif

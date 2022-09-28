@@ -27,6 +27,7 @@
 #include "idatashare.h"
 #include "uri.h"
 #include "datashare_operation.h"
+#include "idata_share_service.h"
 
 using Uri = OHOS::Uri;
 
@@ -233,19 +234,27 @@ public:
      * in the current environment.
      */
     Uri DenormalizeUri(Uri &uri);
+    /**
+     * @brief checks mode to create a spercific DataShareHelper instance with the given Uri.
+     *
+     * @return Returns the created DataShareService instance with a specified Uri.
+     */
+    static std::shared_ptr<IDataShareService> GetDataShareService(const sptr<IRemoteObject> &token, const Uri &uri);
 
 private:
     DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri, const sptr<IDataShare> &dataShareProxy,
         const sptr<DataShareConnection> dataShareConnection);
+    DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri, const std::shared_ptr<IDataShareService>& dataShareService);
     void AddDataShareDeathRecipient(const sptr<IRemoteObject> &token);
     void OnSchedulerDied(const wptr<IRemoteObject> &remote);
     bool CheckUriParam(const Uri &uri);
     bool CheckOhosUri(const Uri &uri);
     bool TryReconnect(const Uri &uri, const sptr<IRemoteObject> &token);
-
+    bool isDataShareService_ = false;
     sptr<IRemoteObject> token_ = {};
     Uri uri_ = Uri("");
     sptr<IDataShare> dataShareProxy_ = nullptr;
+    std::shared_ptr<IDataShareService> dataShareService_ = nullptr;
     static std::mutex oplock_;
     static std::mutex deathlock_;
     sptr<IRemoteObject::DeathRecipient> callerDeathRecipient_ = nullptr;

@@ -19,7 +19,7 @@
 #include "datashare_log.h"
 #include "ipc_types.h"
 #include "ishared_result_set.h"
-#include "itypes_util.h"
+#include "itypes_utils.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -146,7 +146,7 @@ ErrCode DataShareStub::CmdInsert(MessageParcel &data, MessageParcel &reply)
         return ERR_INVALID_VALUE;
     }
     DataShareValuesBucket value;
-    if (!ITypesUtil::Unmarshalling(data, value)) {
+    if (!ITypesUtils::Unmarshalling(data, value)) {
         LOG_ERROR("Unmarshalling value is nullptr");
         return ERR_INVALID_VALUE;
     }
@@ -166,12 +166,12 @@ ErrCode DataShareStub::CmdUpdate(MessageParcel &data, MessageParcel &reply)
         return ERR_INVALID_VALUE;
     }
     DataSharePredicates predicates;
-    if (!ITypesUtil::Unmarshalling(data, predicates)) {
+    if (!ITypesUtils::Unmarshalling(data, predicates)) {
         LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
     DataShareValuesBucket value;
-    if (!ITypesUtil::Unmarshalling(data, value)) {
+    if (!ITypesUtils::Unmarshalling(data, value)) {
         LOG_ERROR("Unmarshalling value is nullptr");
         return ERR_INVALID_VALUE;
     }
@@ -190,7 +190,7 @@ ErrCode DataShareStub::CmdDelete(MessageParcel &data, MessageParcel &reply)
         return ERR_INVALID_VALUE;
     }
     DataSharePredicates predicates;
-    if (!ITypesUtil::Unmarshalling(data, predicates)) {
+    if (!ITypesUtils::Unmarshalling(data, predicates)) {
         LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
@@ -209,7 +209,7 @@ ErrCode DataShareStub::CmdQuery(MessageParcel &data, MessageParcel &reply)
         return ERR_INVALID_VALUE;
     }
     DataSharePredicates predicates;
-    if (!ITypesUtil::Unmarshalling(data, predicates)) {
+    if (!ITypesUtils::Unmarshalling(data, predicates)) {
         LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
@@ -261,7 +261,7 @@ ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
     std::vector<DataShareValuesBucket> values;
     for (int i = 0; i < count; i++) {
         DataShareValuesBucket value;
-        if (!ITypesUtil::Unmarshalling(data, value)) {
+        if (!ITypesUtils::Unmarshalling(data, value)) {
             LOG_ERROR("Unmarshalling value is nullptr");
             return ERR_INVALID_VALUE;
         }
