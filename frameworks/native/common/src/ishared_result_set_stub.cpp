@@ -26,7 +26,7 @@ constexpr ISharedResultSetStub::Handler ISharedResultSetStub::handlers[ISharedRe
 sptr<ISharedResultSet> ISharedResultSetStub::CreateStub(std::shared_ptr<DataShareResultSet> result,
     OHOS::MessageParcel &parcel)
 {
-    sptr<ISharedResultSet> stub = new ISharedResultSetStub(result);
+    sptr<ISharedResultSet> stub = new (std::nothrow) ISharedResultSetStub(result);
     parcel.WriteRemoteObject(stub->AsObject().GetRefPtr());
     result->Marshalling(parcel);
     return stub;
