@@ -49,14 +49,14 @@ public:
 
 class IKvStoreDataService : public IRemoteBroker {
 public:
-    enum { GET_DATA_SHARE_SERVICE = 14 };
+    enum { GET_FEATURE_INTERFACE = 0 };
 
     enum {
         DATA_SHARE_ERROR = -1,
         DATA_SHARE_OK = 0,
     };
 
-    virtual sptr<IRemoteObject> GetDataShareService() = 0;
+    virtual sptr<IRemoteObject> GetFeatureInterface(const std::string &name) = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DistributedKv.IKvStoreDataService");
 };

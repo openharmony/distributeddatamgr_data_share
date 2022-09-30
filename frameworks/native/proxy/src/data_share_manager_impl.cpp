@@ -61,7 +61,7 @@ sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
         LOG_ERROR("Get distributed data manager failed!");
         return nullptr;
     }
-    auto remote = dataMgrService_->GetDataShareService();
+    auto remote = dataMgrService_->GetFeatureInterface("data_share");
     if (remote == nullptr) {
         LOG_ERROR("Get DataShare service failed!");
         return nullptr;
@@ -116,7 +116,7 @@ DataShareKvServiceProxy::DataShareKvServiceProxy(const sptr<IRemoteObject> &impl
     LOG_DEBUG("Init data service proxy.");
 }
 
-sptr<IRemoteObject> DataShareKvServiceProxy::GetDataShareService()
+sptr<IRemoteObject> DataShareKvServiceProxy::GetFeatureInterface(const std::string &name)
 {
     LOG_INFO("GetDataShareService enter.");
     MessageParcel data;
@@ -124,10 +124,14 @@ sptr<IRemoteObject> DataShareKvServiceProxy::GetDataShareService()
         LOG_ERROR("Write descriptor failed");
         return nullptr;
     }
+    if (!data.WriteString(name)) {
+        LOG_ERROR("Write name failed");
+        return nullptr;
+    }
 
     MessageParcel reply;
     MessageOption mo { MessageOption::TF_SYNC };
-    int32_t error = Remote()->SendRequest(GET_DATA_SHARE_SERVICE, data, reply, mo);
+    int32_t error = Remote()->SendRequest(GET_FEATURE_INTERFACE, data, reply, mo);
     if (error != 0) {
         LOG_ERROR("SendRequest returned %{public}d", error);
         return nullptr;

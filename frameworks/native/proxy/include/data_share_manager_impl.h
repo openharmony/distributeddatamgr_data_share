@@ -54,7 +54,7 @@ class DataShareKvServiceProxy : public IRemoteProxy<DataShare::IKvStoreDataServi
 public:
     explicit DataShareKvServiceProxy(const sptr<IRemoteObject> &impl);
     ~DataShareKvServiceProxy() = default;
-    virtual sptr<IRemoteObject> GetDataShareService();
+    sptr<IRemoteObject> GetFeatureInterface(const std::string &name) override;
 
 private:
     static inline BrokerDelegator<DataShareKvServiceProxy> delegator_;
