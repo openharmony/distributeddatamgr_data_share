@@ -79,7 +79,7 @@ std::vector<DataShareValuesBucket> GetValuesBucketArray(napi_env env, napi_value
     return result;
 }
 
-GetUri(napi_env env, napi_value jsValue, std::string &uri)
+void GetUri(napi_env env, napi_value jsValue, std::string &uri)
 {
     LOG_DEBUG("Start");
     napi_valuetype valuetype = napi_undefined;
