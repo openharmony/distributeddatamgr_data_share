@@ -32,7 +32,7 @@ constexpr int MAX_ARGC = 6;
 
 std::list<std::shared_ptr<DataShareHelper>> g_dataShareHelperListV9;
 
-DataSharePredicates UnwrapDataSharePredicates(napi_env env, napi_value value)
+static DataSharePredicates UnwrapDataSharePredicates(napi_env env, napi_value value)
 {
     auto predicates = DataSharePredicatesProxy::GetNativePredicates(env, value);
     if (predicates == nullptr) {
@@ -42,7 +42,7 @@ DataSharePredicates UnwrapDataSharePredicates(napi_env env, napi_value value)
     return DataSharePredicates(predicates->GetOperationList());
 }
 
-bool UnwrapValuesBucketArrayFromJS(napi_env env, napi_value param, std::vector<DataShareValuesBucket> &value)
+static bool UnwrapValuesBucketArrayFromJS(napi_env env, napi_value param, std::vector<DataShareValuesBucket> &value)
 {
     LOG_DEBUG("Start");
     uint32_t arraySize = 0;
@@ -71,7 +71,7 @@ bool UnwrapValuesBucketArrayFromJS(napi_env env, napi_value param, std::vector<D
     return true;
 }
 
-std::vector<DataShareValuesBucket> GetValuesBucketArray(napi_env env, napi_value param, bool &status)
+static std::vector<DataShareValuesBucket> GetValuesBucketArray(napi_env env, napi_value param, bool &status)
 {
     LOG_DEBUG("Start");
     std::vector<DataShareValuesBucket> result;
@@ -79,7 +79,7 @@ std::vector<DataShareValuesBucket> GetValuesBucketArray(napi_env env, napi_value
     return result;
 }
 
-bool GetUri(napi_env env, napi_value jsValue, std::string &uri)
+static bool GetUri(napi_env env, napi_value jsValue, std::string &uri)
 {
     LOG_DEBUG("Start");
     napi_valuetype valuetype = napi_undefined;
