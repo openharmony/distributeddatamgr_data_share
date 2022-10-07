@@ -192,7 +192,7 @@ napi_value NapiDataShareHelperV9::Initialize(napi_env env, napi_callback_info in
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, nullptr));
     if (argc <= 1) {
         DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK, "Parameters error, need at least 2 parameters!");
-        return napi_invalid_arg;
+        return nullptr;
     }
 
     auto *proxy = new NapiDataShareHelperV9();
@@ -533,7 +533,7 @@ napi_value NapiDataShareHelperV9::Napi_On(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, nullptr));
     NAPI_ASSERT(env, argc == ARGS_THREE, "wrong count of args");
 
-    NapiDataShareHelper *proxy = nullptr;
+    NapiDataShareHelperV9 *proxy = nullptr;
     NAPI_CALL_BASE(env, napi_unwrap(env, self, reinterpret_cast<void **>(&proxy)), nullptr);
     NAPI_ASSERT_BASE(env, proxy != nullptr, "there is no NapiDataShareHelper instance", nullptr);
     NAPI_ASSERT_BASE(env, proxy->datashareHelper_ != nullptr, "there is no DataShareHelper instance", nullptr);
@@ -579,7 +579,7 @@ napi_value NapiDataShareHelperV9::Napi_Off(napi_env env, napi_callback_info info
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, nullptr));
     NAPI_ASSERT(env, argc == ARGS_TWO || argc == ARGS_THREE, "wrong count of args");
 
-    NapiDataShareHelper *proxy = nullptr;
+    NapiDataShareHelperV9 *proxy = nullptr;
     NAPI_CALL_BASE(env, napi_unwrap(env, self, reinterpret_cast<void **>(&proxy)), nullptr);
     NAPI_ASSERT_BASE(env, proxy != nullptr, "there is no NapiDataShareHelper instance", nullptr);
     NAPI_ASSERT_BASE(env, proxy->datashareHelper_ != nullptr, "there is no DataShareHelper instance", nullptr);
