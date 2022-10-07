@@ -15,7 +15,6 @@
 
 #include "napi_datashare_values_bucket.h"
 
-#include "napi_datashare_helperV9.h"
 #include "datashare_log.h"
 #include "datashare_js_utils.h"
 #include "datashare_value_object.h"
@@ -92,7 +91,7 @@ bool SetValuesBucketObject(
         valuesBucket.Put(keyStr, DataShareJSUtils::Convert2U8Vector(env, value));
     } else {
         LOG_ERROR("valuesBucket error");
-        NapiDataShareHelperV9::ThrowError(env, EXCEPTION_PARAMETER_CHECK,
+        DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK,
             "Parameters error. The type of 'ValueObject' must in [string, number, boolean, null, object]");
         return false;
     }

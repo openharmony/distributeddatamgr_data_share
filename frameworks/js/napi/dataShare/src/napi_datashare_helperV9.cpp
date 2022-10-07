@@ -85,17 +85,11 @@ bool GetUri(napi_env env, napi_value jsValue, std::string &uri)
     napi_valuetype valuetype = napi_undefined;
     napi_typeof(env, jsValue, &valuetype);
     if (valuetype != napi_string) {
-        NapiDataShareHelperV9::ThrowError(env, EXCEPTION_PARAMETER_CHECK, "Parameters error. The type of 'uri' must be 'string'");
+        DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK, "Parameters error. The type of 'uri' must be 'string'");
         return false;
     }
     uri = DataShareJSUtils::Convert2String(env, jsValue);
     return true;
-}
-
-void NapiDataShareHelperV9::ThrowError(napi_env env, const ExceptionErrorCode &code,const std::string &msg)
-{
-    std::string errorCode = std::to_string(code);
-    napi_throw_error(env, errorCode.c_str(), msg.c_str());
 }
 
 napi_value NapiDataShareHelperV9::Napi_CreateDataShareHelper(napi_env env, napi_callback_info info)
@@ -104,7 +98,7 @@ napi_value NapiDataShareHelperV9::Napi_CreateDataShareHelper(napi_env env, napi_
     auto ctxInfo = std::make_shared<CreateContextInfo>();
     auto input = [ctxInfo](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
-            ThrowError(env, EXCEPTION_PARAMETER_CHECK, "Parameters error, should 2 or 3 parameters!");
+            DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK, "Parameters error, should 2 or 3 parameters!");
             return napi_invalid_arg;
         }
         bool isStageMode = false;
@@ -116,7 +110,7 @@ napi_value NapiDataShareHelperV9::Napi_CreateDataShareHelper(napi_env env, napi_
                 return napi_invalid_arg;
             }
             if (ability == nullptr) {
-                ThrowError(env, EXCEPTION_PARAMETER_CHECK, "Parameters error, failed to get native ability.");
+                DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK, "Parameters error, failed to get native ability.");
                 return napi_invalid_arg;
             }
             ctxInfo->contextF = ability->GetContext();
@@ -126,7 +120,7 @@ napi_value NapiDataShareHelperV9::Napi_CreateDataShareHelper(napi_env env, napi_
                 return napi_invalid_arg;
             }
             if (ctxInfo->contextS == nullptr) {
-                ThrowError(env, EXCEPTION_PARAMETER_CHECK, "Parameters error, failed to get native context.");
+                DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK, "Parameters error, failed to get native context.");
                 return napi_invalid_arg;
             }
         }
@@ -134,7 +128,7 @@ napi_value NapiDataShareHelperV9::Napi_CreateDataShareHelper(napi_env env, napi_
         napi_value helperProxy = nullptr;
         status = napi_new_instance(env, GetConstructor(env), argc, argv, &helperProxy);
         if ((helperProxy == nullptr) || (status != napi_ok)) {
-            ThrowError(env, EXCEPTION_HELPER_UNINITIALIZED, MESSAGE_HELPER_UNINITIALIZED);
+            DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_HELPER_UNINITIALIZED, DataShareJSUtils::MESSAGE_HELPER_UNINITIALIZED);
             return napi_generic_failure;
         }
         napi_create_reference(env, helperProxy, 1, &(ctxInfo->ref));
@@ -197,7 +191,7 @@ napi_value NapiDataShareHelperV9::Initialize(napi_env env, napi_callback_info in
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, nullptr));
     if (argc <= 1) {
-        ThrowError(env, EXCEPTION_PARAMETER_CHECK, "Parameters error, need at least 2 parameters!");
+        DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK, "Parameters error, need at least 2 parameters!");
         return napi_invalid_arg;
     }
 
@@ -229,7 +223,7 @@ napi_value NapiDataShareHelperV9::Napi_Insert(napi_env env, napi_callback_info i
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
-            ThrowError(env, EXCEPTION_PARAMETER_CHECK, "Parameters error, should 2 or 3 parameters!");
+            DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK, "Parameters error, should 2 or 3 parameters!");
             return napi_invalid_arg;
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
@@ -271,7 +265,7 @@ napi_value NapiDataShareHelperV9::Napi_Delete(napi_env env, napi_callback_info i
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
-            ThrowError(env, EXCEPTION_PARAMETER_CHECK, "Parameters error, should 2 or 3 parameters!");
+            DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK, "Parameters error, should 2 or 3 parameters!");
             return napi_invalid_arg;
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
@@ -311,7 +305,7 @@ napi_value NapiDataShareHelperV9::Napi_Query(napi_env env, napi_callback_info in
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 3 && argc != 4) {
-            ThrowError(env, EXCEPTION_PARAMETER_CHECK, "Parameters error, should 3 or 4 parameters!");
+            DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK, "Parameters error, should 3 or 4 parameters!");
             return napi_invalid_arg;
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
@@ -353,7 +347,7 @@ napi_value NapiDataShareHelperV9::Napi_Update(napi_env env, napi_callback_info i
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 3 && argc != 4) {
-            ThrowError(env, EXCEPTION_PARAMETER_CHECK, "Parameters error, should 3 or 4 parameters!");
+            DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK, "Parameters error, should 3 or 4 parameters!");
             return napi_invalid_arg;
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
@@ -399,7 +393,7 @@ napi_value NapiDataShareHelperV9::Napi_BatchInsert(napi_env env, napi_callback_i
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
-            ThrowError(env, EXCEPTION_PARAMETER_CHECK, "Parameters error, should 2 or 3 parameters!");
+            DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK, "Parameters error, should 2 or 3 parameters!");
             return napi_invalid_arg;
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
