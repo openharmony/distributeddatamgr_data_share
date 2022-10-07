@@ -18,6 +18,7 @@
 
 #include "datashare_log.h"
 #include "napi_datashare_helper.h"
+#include "napi_datashare_helperV9.h"
 
 namespace OHOS {
 namespace DataShare {
