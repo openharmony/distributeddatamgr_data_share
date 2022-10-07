@@ -30,7 +30,7 @@ namespace OHOS {
 namespace DataShare {
 constexpr int MAX_ARGC = 6;
 
-std::list<std::shared_ptr<DataShareHelper>> g_dataShareHelperList;
+std::list<std::shared_ptr<DataShareHelper>> g_dataShareHelperListV9;
 
 DataSharePredicates UnwrapDataSharePredicates(napi_env env, napi_value value)
 {
@@ -139,7 +139,7 @@ napi_value NapiDataShareHelperV9::Napi_CreateDataShareHelper(napi_env env, napi_
         if (ctxInfo->dataShareHelper == nullptr) {
             return napi_object_expected;
         }
-        g_dataShareHelperList.emplace_back(ctxInfo->dataShareHelper);
+        g_dataShareHelperListV9.emplace_back(ctxInfo->dataShareHelper);
         napi_status status = napi_get_reference_value(env, ctxInfo->ref, result);
         NapiDataShareHelperV9 *proxy = nullptr;
         status = napi_unwrap(env, *result, reinterpret_cast<void **>(&proxy));
@@ -179,7 +179,7 @@ napi_value NapiDataShareHelperV9::GetConstructor(napi_env env)
     };
     NAPI_CALL(env, napi_define_class(env, "DataShareHelperV9", NAPI_AUTO_LENGTH, Initialize, nullptr,
         sizeof(clzDes) / sizeof(napi_property_descriptor), clzDes, &cons));
-    g_dataShareHelperList.clear();
+    g_dataShareHelperListV9.clear();
     return cons;
 }
 
