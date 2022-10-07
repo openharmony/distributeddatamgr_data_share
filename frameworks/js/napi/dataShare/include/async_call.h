@@ -24,6 +24,15 @@
 
 namespace OHOS::DataShare {
 class AsyncCall final {
+static constexpr const char *MESSAGE_HELPER_UNINITIALIZED = "The DataShareHelper is not initialized successfully.";
+static constexpr const char *MESSAGE_INNER_ERROR = "Inner error";
+
+enum ExceptionErrorCode {
+    EXCEPTION_INNER = 15700000,
+    EXCEPTION_HELPER_UNINITIALIZED = 15700010,
+    EXCEPTION_PARAMETER_CHECK = 401,
+};
+
 public:
     class Context {
     public:

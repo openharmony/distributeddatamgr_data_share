@@ -33,7 +33,10 @@ AsyncCall::AsyncCall(napi_env env, napi_callback_info info, std::shared_ptr<Cont
         napi_create_reference(env, argv[argc - 1], 1, &context_->callback);
         argc = argc - 1;
     }
-    NAPI_CALL_RETURN_VOID(env, (*context)(env, argc, argv, self));
+    napi_status status = (*context)(env, argc, argv, self);
+    if (status != napi_ok) {
+        return;
+    }
     context_->ctx = std::move(context);
     napi_create_reference(env, self, 1, &context_->self);
 }
@@ -97,6 +100,22 @@ void AsyncCall::OnExecute(napi_env env, void *data)
     context->ctx->Exec();
 }
 
+void SetBusinessError(napi_env env, napi_value *businessError, napi_status runStatus)
+{
+    napi_create_object(env, businessError);
+    napi_value errorCode = nullptr;
+    napi_value errorMessage = nullptr;
+    if (runStatus == napi_object_expected) {
+        napi_create_int32(env, EXCEPTION_HELPER_UNINITIALIZED, &errorCode);
+        napi_create_string_utf8(env, MESSAGE_HELPER_UNINITIALIZED, NAPI_AUTO_LENGTH, &errorMessage);
+    } else {
+        napi_create_int32(env, EXCEPTION_INNER, &errorCode);
+        napi_create_string_utf8(env, MESSAGE_INNER_ERROR, NAPI_AUTO_LENGTH, &errorMessage);
+    }
+    napi_set_named_property(env, *businessError, "code", errorCode);
+    napi_set_named_property(env, *businessError, "message", errorMessage);
+}
+
 void AsyncCall::OnComplete(napi_env env, napi_status status, void *data)
 {
     LOG_DEBUG("run the js callback function");
@@ -112,9 +131,13 @@ void AsyncCall::OnComplete(napi_env env, napi_status status, void *data)
             napi_get_undefined(env, &result[ARG_DATA]);
         }
     } else {
-        napi_value message = nullptr;
-        napi_create_string_utf8(env, "async call failed", NAPI_AUTO_LENGTH, &message);
-        napi_create_error(env, nullptr, message, &result[ARG_ERROR]);
+        // napi_value message = nullptr;
+        // napi_create_string_utf8(env, "async call failed", NAPI_AUTO_LENGTH, &message);
+        // napi_create_error(env, nullptr, message, &result[ARG_ERROR]);
+        // napi_get_undefined(env, &result[ARG_DATA]);
+        napi_value businessError = nullptr;
+        SetBusinessError(env, &businessError, runStatus);
+        result[ARG_ERROR] = businessError;
         napi_get_undefined(env, &result[ARG_DATA]);
     }
     if (context->defer != nullptr) {
@@ -133,6 +156,7 @@ void AsyncCall::OnComplete(napi_env env, napi_status status, void *data)
     }
     DeleteContext(env, context);
 }
+
 void AsyncCall::DeleteContext(napi_env env, AsyncContext *context)
 {
     if (env != nullptr) {

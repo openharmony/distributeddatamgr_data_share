@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace DataShare {
+constexpr int DEFAULT_NUMBER = -1;
 DataShareStub::DataShareStub()
 {
     stubFuncMap_[CMD_GET_FILE_TYPES] = &DataShareStub::CmdGetFileTypes;
@@ -151,6 +152,10 @@ ErrCode DataShareStub::CmdInsert(MessageParcel &data, MessageParcel &reply)
         return ERR_INVALID_VALUE;
     }
     int index = Insert(*uri, value);
+    if (index == DEFAULT_NUMBER) {
+        LOG_ERROR("Insert inner error");
+        return ERR_INVALID_VALUE;
+    }
     if (!reply.WriteInt32(index)) {
         LOG_ERROR("fail to WriteInt32 index");
         return ERR_INVALID_VALUE;
@@ -176,6 +181,10 @@ ErrCode DataShareStub::CmdUpdate(MessageParcel &data, MessageParcel &reply)
         return ERR_INVALID_VALUE;
     }
     int index = Update(*uri, predicates, value);
+    if (index == DEFAULT_NUMBER) {
+        LOG_ERROR("Update inner error");
+        return ERR_INVALID_VALUE;
+    }
     if (!reply.WriteInt32(index)) {
         LOG_ERROR("fail to WriteInt32 index");
         return ERR_INVALID_VALUE;
@@ -195,6 +204,10 @@ ErrCode DataShareStub::CmdDelete(MessageParcel &data, MessageParcel &reply)
         return ERR_INVALID_VALUE;
     }
     int index = Delete(*uri, predicates);
+    if (index == DEFAULT_NUMBER) {
+        LOG_ERROR("Delete inner error");
+        return ERR_INVALID_VALUE;
+    }
     if (!reply.WriteInt32(index)) {
         LOG_ERROR("fail to WriteInt32 index");
         return ERR_INVALID_VALUE;
@@ -269,6 +282,10 @@ ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
     }
 
     int ret = BatchInsert(*uri, values);
+    if (ret == DEFAULT_NUMBER) {
+        LOG_ERROR("BatchInsert inner error");
+        return ERR_INVALID_VALUE;
+    }
     if (!reply.WriteInt32(ret)) {
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
