@@ -141,7 +141,7 @@ napi_value NapiDataShareHelperV9::Napi_CreateDataShareHelper(napi_env env, napi_
         }
         g_dataShareHelperList.emplace_back(ctxInfo->dataShareHelper);
         napi_status status = napi_get_reference_value(env, ctxInfo->ref, result);
-        NapiDataShareHelper *proxy = nullptr;
+        NapiDataShareHelperV9 *proxy = nullptr;
         status = napi_unwrap(env, *result, reinterpret_cast<void **>(&proxy));
         if (proxy == nullptr) {
             LOG_ERROR("proxy is nullptr");
