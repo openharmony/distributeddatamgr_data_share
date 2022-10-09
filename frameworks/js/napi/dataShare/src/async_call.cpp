@@ -131,10 +131,6 @@ void AsyncCall::OnComplete(napi_env env, napi_status status, void *data)
             napi_get_undefined(env, &result[ARG_DATA]);
         }
     } else {
-        // napi_value message = nullptr;
-        // napi_create_string_utf8(env, "async call failed", NAPI_AUTO_LENGTH, &message);
-        // napi_create_error(env, nullptr, message, &result[ARG_ERROR]);
-        // napi_get_undefined(env, &result[ARG_DATA]);
         napi_value businessError = nullptr;
         SetBusinessError(env, &businessError, runStatus);
         result[ARG_ERROR] = businessError;
