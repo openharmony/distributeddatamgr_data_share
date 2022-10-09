@@ -24,7 +24,6 @@ ohos_shared_library("datashare") {
   sources = [
     "${datashare_napi_path}/dataShare/src/async_call.cpp",
     "${datashare_napi_path}/dataShare/src/napi_datashare_helper.cpp",
-    "${datashare_napi_path}/dataShare/src/napi_datashare_helperV9.cpp",
     "${datashare_napi_path}/dataShare/src/napi_datashare_observer.cpp",
     "${datashare_napi_path}/dataShare/src/native_datashare_module.cpp",
   ]

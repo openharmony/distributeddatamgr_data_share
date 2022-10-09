@@ -30,7 +30,7 @@ namespace DataShare {
 class DataShareJSUtils final {
 public:
     static constexpr const char *MESSAGE_HELPER_UNINITIALIZED = "The DataShareHelper is not initialized successfully.";
-    static constexpr const char *MESSAGE_INNER_ERROR = "Inner error";
+    static constexpr const char *MESSAGE_INNER_ERROR = "System error";
 
     enum ExceptionErrorCode {
         EXCEPTION_INNER = 15700000,
