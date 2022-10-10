@@ -18,6 +18,7 @@
 #include "datashare_result_set.h"
 #include "data_share_manager.h"
 #include "data_ability_observer_interface.h"
+#include "dataobs_mgr_client.h"
 #include "datashare_log.h"
 #include "idatashare.h"
 
@@ -543,7 +544,7 @@ void DataShareHelper::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAb
     }
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
-        auto obsMgrClient = DataObsMgrClient::GetInstance();
+        auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
         if (obsMgrClient == nullptr) {
             LOG_ERROR("get DataObsMgrClient failed");
             return;
@@ -599,13 +600,15 @@ void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IData
     if (!CheckUriParam(uri)) {
         return;
     }
+
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         return;
     }
+
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
-        auto obsMgrClient = DataObsMgrClient::GetInstance();
+        auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
         if (obsMgrClient == nullptr) {
             LOG_ERROR("get DataObsMgrClient failed");
             return;
@@ -616,7 +619,7 @@ void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IData
             return;
         }
     }
-  
+
     Uri tmpUri(uri.ToString());
     std::lock_guard<std::mutex> lock_l(oplock_);
     if (uri_.ToString().empty()) {
