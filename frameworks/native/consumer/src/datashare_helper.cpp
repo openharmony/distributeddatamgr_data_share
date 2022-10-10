@@ -552,8 +552,8 @@ void DataShareHelper::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAb
         ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
         if (ret != ERR_OK) {
             LOG_ERROR("RegisterObserver failed");
-            return;
         }
+        return;
     }
 
     Uri tmpUri(uri.ToString());
@@ -600,12 +600,10 @@ void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IData
     if (!CheckUriParam(uri)) {
         return;
     }
-
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         return;
     }
-
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
         auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
@@ -616,8 +614,8 @@ void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IData
         ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver);
         if (ret != ERR_OK) {
             LOG_ERROR("UnregisterObserver failed");
-            return;
         }
+        return;
     }
 
     Uri tmpUri(uri.ToString());
