@@ -15,17 +15,33 @@
 
 #include "datashare_stub_impl.h"
 
+#include "accesstoken_kit.h"
 #include "datashare_log.h"
+#include "ipc_skeleton.h"
 
 namespace OHOS {
 namespace DataShare {
+using OHOS::Security::AccessToken::AccessTokenKit;
+
 constexpr int DEFAULT_NUMBER = -1;
+constexpr int PERMISSION_ERROR_NUMBER = -2;
 std::shared_ptr<JsDataShareExtAbility> DataShareStubImpl::GetOwner()
 {
     if (extension_ == nullptr) {
         LOG_ERROR("extension_ is nullptr.");
     }
     return extension_;
+}
+
+bool DataShareStubImpl::CheckCallingPermission(const std::string &permission)
+{
+    LOG_DEBUG("Start");
+    if (!permission.empty() && AccessTokenKit::VerifyAccessToken(IPCSkeleton::GetCallingTokenID(), permission)
+        != AppExecFwk::Constants::PERMISSION_GRANTED) {
+        LOG_ERROR("permission not granted.");
+        return false;
+    }
+    return true;
 }
 
 std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
@@ -92,12 +108,19 @@ int DataShareStubImpl::OpenRawFile(const Uri &uri, const std::string &mode)
 int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
     LOG_DEBUG("Start");
+    auto client = sptr<DataShareStubImpl>(this);
+    auto extension = client->GetOwner();
+    if (extension == nullptr) {
+        return DEFAULT_NUMBER;
+    }
+
+    if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
+        LOG_ERROR("Check calling permission failed.");
+        return PERMISSION_ERROR_NUMBER;
+    }
+
     int ret = 0;
-    std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
-        auto extension = client->GetOwner();
-        if (extension == nullptr) {
-            return;
-        }
+    std::function<void()> syncTaskFunc = [=, &ret, &extension]() {
         ret = extension->Insert(uri, value);
     };
     std::function<bool()> getRetFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() -> bool {
@@ -116,12 +139,19 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
     const DataShareValuesBucket &value)
 {
     LOG_DEBUG("Start");
+    auto client = sptr<DataShareStubImpl>(this);
+    auto extension = client->GetOwner();
+    if (extension == nullptr) {
+        return DEFAULT_NUMBER;
+    }
+
+    if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
+        LOG_ERROR("Check calling permission failed.");
+        return PERMISSION_ERROR_NUMBER;
+    }
+
     int ret = 0;
-    std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
-        auto extension = client->GetOwner();
-        if (extension == nullptr) {
-            return;
-        }
+    std::function<void()> syncTaskFunc = [=, &ret, &extension]() {
         ret = extension->Update(uri, predicates, value);
     };
     std::function<bool()> getRetFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() -> bool {
@@ -139,12 +169,19 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
 int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
     LOG_DEBUG("Start");
+    auto client = sptr<DataShareStubImpl>(this);
+    auto extension = client->GetOwner();
+    if (extension == nullptr) {
+        return DEFAULT_NUMBER;
+    }
+
+    if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
+        LOG_ERROR("Check calling permission failed.");
+        return PERMISSION_ERROR_NUMBER;
+    }
+
     int ret = 0;
-    std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
-        auto extension = client->GetOwner();
-        if (extension == nullptr) {
-            return;
-        }
+    std::function<void()> syncTaskFunc = [=, &ret, &extension]() {
         ret = extension->Delete(uri, predicates);
     };
     std::function<bool()> getRetFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() -> bool {
@@ -164,11 +201,18 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
 {
     LOG_DEBUG("Start");
     std::shared_ptr<DataShareResultSet> resultSet = nullptr;
-    std::function<void()> syncTaskFunc = [=, &columns, &resultSet, client = sptr<DataShareStubImpl>(this)]() {
-        auto extension = client->GetOwner();
-        if (extension == nullptr) {
-            return;
-        }
+    auto client = sptr<DataShareStubImpl>(this);
+    auto extension = client->GetOwner();
+    if (extension == nullptr) {
+        return resultSet;
+    }
+
+    if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {
+        LOG_ERROR("Check calling permission failed.");
+        return resultSet;
+    }
+
+    std::function<void()> syncTaskFunc = [=, &columns, &resultSet, &extension]() {
         resultSet = extension->Query(uri, predicates, columns);
     };
     std::function<bool()> getRetFunc = [=, &resultSet, client = sptr<DataShareStubImpl>(this)]() -> bool {
@@ -209,8 +253,19 @@ std::string DataShareStubImpl::GetType(const Uri &uri)
 int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
     LOG_DEBUG("Start");
+    auto client = sptr<DataShareStubImpl>(this);
+    auto extension = client->GetOwner();
+    if (extension == nullptr) {
+        return DEFAULT_NUMBER;
+    }
+
+    if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
+        LOG_ERROR("Check calling permission failed.");
+        return PERMISSION_ERROR_NUMBER;
+    }
+
     int ret = 0;
-    std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
+    std::function<void()> syncTaskFunc = [=, &ret, &extension]() {
         auto extension = client->GetOwner();
         if (extension == nullptr) {
             return;

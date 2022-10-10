@@ -69,6 +69,7 @@ public:
 
 private:
     std::shared_ptr<JsDataShareExtAbility> GetOwner();
+    bool CheckCallingPermission(const std::string &permission);
 
 private:
     std::shared_ptr<JsDataShareExtAbility> extension_;

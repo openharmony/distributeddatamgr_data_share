@@ -28,6 +28,8 @@
 
 namespace OHOS {
 namespace DataShare {
+constexpr int32_t PERMISSION_ERR = 1;
+constexpr int PERMISSION_ERR_CODE = -2;
 std::vector<std::string> DataShareProxy::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
 {
     LOG_DEBUG("Start");
@@ -162,7 +164,7 @@ int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
     int32_t err = Remote()->SendRequest(CMD_INSERT, data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("Insert fail to SendRequest. err: %{public}d", err);
-        return index;
+        return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : index;
     }
 
     if (!reply.ReadInt32(index)) {
@@ -204,7 +206,7 @@ int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates
     int32_t err = Remote()->SendRequest(CMD_UPDATE, data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("Update fail to SendRequest. err: %{public}d", err);
-        return index;
+        return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : index;
     }
 
     if (!reply.ReadInt32(index)) {
@@ -240,7 +242,7 @@ int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates
     int32_t err = Remote()->SendRequest(CMD_DELETE, data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("Delete fail to SendRequest. err: %{public}d", err);
-        return index;
+        return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : index;
     }
 
     if (!reply.ReadInt32(index)) {
@@ -352,7 +354,7 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
     int32_t err = Remote()->SendRequest(CMD_BATCH_INSERT, data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("GetFileTypes fail to SendRequest. err: %{public}d", err);
-        return ret;
+        return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : index;
     }
 
     if (!reply.ReadInt32(ret)) {

@@ -24,6 +24,7 @@
 namespace OHOS {
 namespace DataShare {
 constexpr int DEFAULT_NUMBER = -1;
+constexpr int PERMISSION_ERROR_NUMBER = -2;
 DataShareStub::DataShareStub()
 {
     stubFuncMap_[CMD_GET_FILE_TYPES] = &DataShareStub::CmdGetFileTypes;
@@ -155,6 +156,9 @@ ErrCode DataShareStub::CmdInsert(MessageParcel &data, MessageParcel &reply)
     if (index == DEFAULT_NUMBER) {
         LOG_ERROR("Insert inner error");
         return ERR_INVALID_VALUE;
+    } else if (index == PERMISSION_ERROR_NUMBER) {
+        LOG_ERROR("Insert permission error");
+        return ERR_PERMISSION_DENIED;
     }
     if (!reply.WriteInt32(index)) {
         LOG_ERROR("fail to WriteInt32 index");
@@ -182,8 +186,11 @@ ErrCode DataShareStub::CmdUpdate(MessageParcel &data, MessageParcel &reply)
     }
     int index = Update(*uri, predicates, value);
     if (index == DEFAULT_NUMBER) {
-        LOG_ERROR("Update inner error");
+        LOG_ERROR("Insert inner error");
         return ERR_INVALID_VALUE;
+    } else if (index == PERMISSION_ERROR_NUMBER) {
+        LOG_ERROR("Insert permission error");
+        return ERR_PERMISSION_DENIED;
     }
     if (!reply.WriteInt32(index)) {
         LOG_ERROR("fail to WriteInt32 index");
@@ -205,8 +212,11 @@ ErrCode DataShareStub::CmdDelete(MessageParcel &data, MessageParcel &reply)
     }
     int index = Delete(*uri, predicates);
     if (index == DEFAULT_NUMBER) {
-        LOG_ERROR("Delete inner error");
+        LOG_ERROR("Insert inner error");
         return ERR_INVALID_VALUE;
+    } else if (index == PERMISSION_ERROR_NUMBER) {
+        LOG_ERROR("Insert permission error");
+        return ERR_PERMISSION_DENIED;
     }
     if (!reply.WriteInt32(index)) {
         LOG_ERROR("fail to WriteInt32 index");
@@ -283,8 +293,11 @@ ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
 
     int ret = BatchInsert(*uri, values);
     if (ret == DEFAULT_NUMBER) {
-        LOG_ERROR("BatchInsert inner error");
+        LOG_ERROR("Insert inner error");
         return ERR_INVALID_VALUE;
+    } else if (ret == PERMISSION_ERROR_NUMBER) {
+        LOG_ERROR("Insert permission error");
+        return ERR_PERMISSION_DENIED;
     }
     if (!reply.WriteInt32(ret)) {
         LOG_ERROR("fail to WriteInt32 ret");

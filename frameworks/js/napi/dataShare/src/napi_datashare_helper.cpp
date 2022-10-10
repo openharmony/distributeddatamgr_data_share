@@ -29,6 +29,7 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 namespace DataShare {
 constexpr int MAX_ARGC = 6;
+static constexpr int INNER_ERR = -1;
 
 std::list<std::shared_ptr<DataShareHelper>> g_dataShareHelperList;
 
@@ -239,7 +240,7 @@ napi_value NapiDataShareHelper::Napi_Insert(napi_env env, napi_callback_info inf
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
         if (context->resultNumber < 0) {
-            return napi_generic_failure;
+            return context->resultNumber == INNER_ERR ? napi_generic_failure : napi_cancelled;
         }
         napi_create_int32(env, context->resultNumber, result);
         return napi_ok;
@@ -279,7 +280,7 @@ napi_value NapiDataShareHelper::Napi_Delete(napi_env env, napi_callback_info inf
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
         if (context->resultNumber < 0) {
-            return napi_generic_failure;
+            return context->resultNumber == INNER_ERR ? napi_generic_failure : napi_cancelled;
         }
         napi_create_int32(env, context->resultNumber, result);
         return napi_ok;
@@ -366,7 +367,7 @@ napi_value NapiDataShareHelper::Napi_Update(napi_env env, napi_callback_info inf
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
         if (context->resultNumber < 0) {
-            return napi_generic_failure;
+            return context->resultNumber == INNER_ERR ? napi_generic_failure : napi_cancelled;
         }
         napi_create_int32(env, context->resultNumber, result);
         return napi_ok;
@@ -411,7 +412,7 @@ napi_value NapiDataShareHelper::Napi_BatchInsert(napi_env env, napi_callback_inf
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
         if (context->resultNumber < 0) {
-            return napi_generic_failure;
+            return context->resultNumber == INNER_ERR ? napi_generic_failure : napi_cancelled;
         }
         napi_create_int32(env, context->resultNumber, result);
         return napi_ok;
