@@ -543,6 +543,20 @@ void DataShareHelper::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAb
         return;
     }
 
+    if (isDataShareService_) {
+        LOG_DEBUG("DataShareService mode.");
+        auto obsMgrClient = DataObsMgrClient::GetInstance();
+        if (obsMgrClient == nullptr) {
+            LOG_ERROR("get DataObsMgrClient failed");
+            return;
+        }
+        ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
+        if (ret != ERR_OK) {
+            LOG_ERROR("RegisterObserver failed");
+            return;
+        }
+    }
+
     Uri tmpUri(uri.ToString());
     std::lock_guard<std::mutex> lock_l(oplock_);
     if (uri_.ToString().empty()) {
@@ -591,6 +605,20 @@ void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IData
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         return;
+    }
+
+    if (isDataShareService_) {
+        LOG_DEBUG("DataShareService mode.");
+        auto obsMgrClient = DataObsMgrClient::GetInstance();
+        if (obsMgrClient == nullptr) {
+            LOG_ERROR("get DataObsMgrClient failed");
+            return;
+        }
+        ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver);
+        if (ret != ERR_OK) {
+            LOG_ERROR("UnregisterObserver failed");
+            return;
+        }
     }
 
     Uri tmpUri(uri.ToString());
