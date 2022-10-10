@@ -354,7 +354,7 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
     int32_t err = Remote()->SendRequest(CMD_BATCH_INSERT, data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("GetFileTypes fail to SendRequest. err: %{public}d", err);
-        return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : index;
+        return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : ret;
     }
 
     if (!reply.ReadInt32(ret)) {
