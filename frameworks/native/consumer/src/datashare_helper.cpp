@@ -537,12 +537,10 @@ void DataShareHelper::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAb
     if (!CheckUriParam(uri)) {
         return;
     }
-
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         return;
     }
-
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
         auto obsMgrClient = DataObsMgrClient::GetInstance();
@@ -601,12 +599,10 @@ void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IData
     if (!CheckUriParam(uri)) {
         return;
     }
-
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         return;
     }
-
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
         auto obsMgrClient = DataObsMgrClient::GetInstance();
@@ -620,7 +616,7 @@ void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IData
             return;
         }
     }
-
+  
     Uri tmpUri(uri.ToString());
     std::lock_guard<std::mutex> lock_l(oplock_);
     if (uri_.ToString().empty()) {
