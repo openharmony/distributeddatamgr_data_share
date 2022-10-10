@@ -25,8 +25,6 @@
 #include "uri.h"
 #include "iremote_broker.h"
 #include "iremote_proxy.h"
-
-
 namespace OHOS::DataShare {
 class DataShareManager {
 public:

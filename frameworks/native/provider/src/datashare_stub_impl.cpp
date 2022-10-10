@@ -108,6 +108,9 @@ int DataShareStubImpl::OpenRawFile(const Uri &uri, const std::string &mode)
 int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
     LOG_DEBUG("Start");
+    CallingInfo info;
+    GetCallingInfo(info);
+
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
     if (extension == nullptr) {
@@ -121,6 +124,7 @@ int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value
 
     int ret = 0;
     std::function<void()> syncTaskFunc = [=, &ret, &extension]() {
+        extension->SetCallingInfo(info);
         ret = extension->Insert(uri, value);
     };
     std::function<bool()> getRetFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() -> bool {
@@ -139,6 +143,9 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
     const DataShareValuesBucket &value)
 {
     LOG_DEBUG("Start");
+    CallingInfo info;
+    GetCallingInfo(info);
+
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
     if (extension == nullptr) {
@@ -152,6 +159,7 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
 
     int ret = 0;
     std::function<void()> syncTaskFunc = [=, &ret, &extension]() {
+        extension->SetCallingInfo(info);
         ret = extension->Update(uri, predicates, value);
     };
     std::function<bool()> getRetFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() -> bool {
@@ -169,6 +177,9 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
 int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
     LOG_DEBUG("Start");
+    CallingInfo info;
+    GetCallingInfo(info);
+
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
     if (extension == nullptr) {
@@ -182,6 +193,7 @@ int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predica
 
     int ret = 0;
     std::function<void()> syncTaskFunc = [=, &ret, &extension]() {
+        extension->SetCallingInfo(info);
         ret = extension->Delete(uri, predicates);
     };
     std::function<bool()> getRetFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() -> bool {
@@ -200,6 +212,8 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
     const DataSharePredicates &predicates, std::vector<std::string> &columns)
 {
     LOG_DEBUG("Start");
+    CallingInfo info;
+    GetCallingInfo(info);
     std::shared_ptr<DataShareResultSet> resultSet = nullptr;
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
@@ -220,6 +234,7 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
         if (extension == nullptr) {
             return false;
         }
+        extension->SetCallingInfo(info);
         extension->GetResult(resultSet);
         return (resultSet != nullptr);
     };
@@ -385,6 +400,13 @@ std::vector<std::shared_ptr<DataShareResult>> DataShareStubImpl::ExecuteBatch(
     };
     uvQueue_->SyncCall(syncTaskFunc);
     return results;
+}
+
+void DataShareStubImpl::GetCallingInfo(CallingInfo& callingInfo)
+{
+    callingInfo.callingTokenId = GetCallingTokenID();
+    callingInfo.callingPid = GetCallingPid();
+    callingInfo.callingUid = GetCallingUid();
 }
 } // namespace DataShare
 } // namespace OHOS

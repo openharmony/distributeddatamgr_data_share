@@ -20,6 +20,7 @@
 #include "datashare_stub.h"
 #include "datashare_uv_queue.h"
 #include "js_datashare_ext_ability.h"
+#include "napi_remote_object.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -70,6 +71,7 @@ public:
 private:
     std::shared_ptr<JsDataShareExtAbility> GetOwner();
     bool CheckCallingPermission(const std::string &permission);
+    void GetCallingInfo(CallingInfo& callingInfo);
 
 private:
     std::shared_ptr<JsDataShareExtAbility> extension_;

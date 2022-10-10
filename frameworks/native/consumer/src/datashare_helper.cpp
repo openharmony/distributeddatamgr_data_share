@@ -42,28 +42,13 @@ DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token,
     dataShareConnection_ = dataShareConnection;
 }
 
-DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri, const std::shared_ptr<IDataShareService> &dataShareService)
+DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri)
 {
     LOG_INFO("DataShareHelper::DataShareHelper start");
     token_ = token;
     uri_ = uri;
-    dataShareService_ = dataShareService;
-    isDataShareService_ = true;
+    isDataShareService_ = (uri_.GetQuery().find("Proxy=true") != std::string::npos);
     LOG_INFO("DataShareHelper::DataShareHelper end");
-}
-
-std::shared_ptr<IDataShareService> DataShareHelper::GetDataShareService(const sptr<IRemoteObject> &token, const Uri &uri)
-{
-    auto temp = uri;
-    if (temp.GetQuery().find("Proxy=true") != std::string::npos) {
-        auto dataShareService = DataShareManager::GetDataShareService();
-        if (!dataShareService) {
-            LOG_ERROR("get invalid dataShareServiceProxy");
-            return nullptr;
-        }
-        return dataShareService;
-    }
-    return nullptr;
 }
 
 DataShareHelper::~DataShareHelper()
@@ -173,10 +158,9 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
         LOG_ERROR("the Scheme is not datashare, Scheme: %{public}s", uri.GetScheme().c_str());
         return nullptr;
     }
-    auto dataShareService = GetDataShareService(token, uri);
-    if (dataShareService) {
+    if ((uri.GetQuery().find("Proxy=true") != std::string::npos) && DataShareManager::GetDataShareService() != nullptr) {
         LOG_DEBUG("Creator with dataShareService successfully.");
-        DataShareHelper *dataShareHelper = new (std::nothrow) DataShareHelper(token, uri, dataShareService);
+        DataShareHelper *dataShareHelper = new (std::nothrow) DataShareHelper(token, uri);
         if (dataShareHelper) {
             return std::shared_ptr<DataShareHelper>(dataShareHelper);
         }
@@ -319,14 +303,12 @@ int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
     int index = INVALID_VALUE;
 	if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
-        if (dataShareService_ == nullptr) {
-            dataShareService_ = DataShareManager::GetDataShareService();
-        }
-        if (!dataShareService_) {
+        auto service = DataShareManager::GetDataShareService();
+        if (!service) {
             LOG_DEBUG("DataShareService mode, but fail to get dataShareService.");
             return index;
         }  
-        return dataShareService_->Insert(uri.ToString(), value);
+        return service->Insert(uri.ToString(), value);
     }
     if (!CheckUriParam(uri)) {
         return index;
@@ -356,14 +338,12 @@ int DataShareHelper::Update(
     int index = INVALID_VALUE;
 	if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
-        if (dataShareService_ == nullptr) {
-            dataShareService_ = DataShareManager::GetDataShareService();
-        }
-        if (!dataShareService_) {
+        auto service = DataShareManager::GetDataShareService();
+        if (!service) {
             LOG_DEBUG("DataShareService mode, but fail to get dataShareService.");
             return index;
-        }  
-        return dataShareService_->Update(uri.ToString(), predicates, value);
+        }
+        return service->Update(uri.ToString(), predicates, value);
     }
     if (!CheckUriParam(uri)) {
         return index;
@@ -391,14 +371,12 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
     int index = INVALID_VALUE;
 	if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
-        if (dataShareService_ == nullptr) {
-            dataShareService_ = DataShareManager::GetDataShareService();
-        }
-        if (!dataShareService_) {
+        auto service = DataShareManager::GetDataShareService();
+        if (!service) {
             LOG_DEBUG("DataShareService mode, but fail to get dataShareService.");
             return index;
-        }  
-        return dataShareService_->Delete(uri.ToString(), predicates);
+        }
+        return service->Delete(uri.ToString(), predicates);
     }
     if (!CheckUriParam(uri)) {
         return index;
@@ -428,14 +406,12 @@ std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
     std::shared_ptr<DataShareResultSet> resultset = nullptr;
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
-        if (dataShareService_ == nullptr) {
-            dataShareService_ = DataShareManager::GetDataShareService();
-        }
-        if (!dataShareService_) {
+        auto service = DataShareManager::GetDataShareService();
+        if (!service) {
             LOG_DEBUG("DataShareService mode, but fail to get dataShareService.");
             return nullptr;
         }
-        return dataShareService_->Query(uri.ToString(), predicates, columns);
+        return service->Query(uri.ToString(), predicates, columns);
     }    
     if (!CheckUriParam(uri)) {
         return resultset;
