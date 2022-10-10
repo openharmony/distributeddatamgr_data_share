@@ -186,10 +186,10 @@ ErrCode DataShareStub::CmdUpdate(MessageParcel &data, MessageParcel &reply)
     }
     int index = Update(*uri, predicates, value);
     if (index == DEFAULT_NUMBER) {
-        LOG_ERROR("Insert inner error");
+        LOG_ERROR("Update inner error");
         return ERR_INVALID_VALUE;
     } else if (index == PERMISSION_ERROR_NUMBER) {
-        LOG_ERROR("Insert permission error");
+        LOG_ERROR("Update permission error");
         return ERR_PERMISSION_DENIED;
     }
     if (!reply.WriteInt32(index)) {
@@ -212,10 +212,10 @@ ErrCode DataShareStub::CmdDelete(MessageParcel &data, MessageParcel &reply)
     }
     int index = Delete(*uri, predicates);
     if (index == DEFAULT_NUMBER) {
-        LOG_ERROR("Insert inner error");
+        LOG_ERROR("Delete inner error");
         return ERR_INVALID_VALUE;
     } else if (index == PERMISSION_ERROR_NUMBER) {
-        LOG_ERROR("Insert permission error");
+        LOG_ERROR("Delete permission error");
         return ERR_PERMISSION_DENIED;
     }
     if (!reply.WriteInt32(index)) {
@@ -293,10 +293,10 @@ ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
 
     int ret = BatchInsert(*uri, values);
     if (ret == DEFAULT_NUMBER) {
-        LOG_ERROR("Insert inner error");
+        LOG_ERROR("BatchInsert inner error");
         return ERR_INVALID_VALUE;
     } else if (ret == PERMISSION_ERROR_NUMBER) {
-        LOG_ERROR("Insert permission error");
+        LOG_ERROR("BatchInsert permission error");
         return ERR_PERMISSION_DENIED;
     }
     if (!reply.WriteInt32(ret)) {
