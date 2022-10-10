@@ -103,17 +103,14 @@ void AsyncCall::OnExecute(napi_env env, void *data)
 void SetBusinessError(napi_env env, napi_value *businessError, napi_status runStatus)
 {
     napi_create_object(env, businessError);
-    napi_value errorCode = nullptr;
-    napi_value errorMessage = nullptr;
     if (runStatus == napi_object_expected) {
+        napi_value errorCode = nullptr;
+        napi_value errorMessage = nullptr;
         napi_create_int32(env, DataShareJSUtils::EXCEPTION_HELPER_UNINITIALIZED, &errorCode);
         napi_create_string_utf8(env, DataShareJSUtils::MESSAGE_HELPER_UNINITIALIZED, NAPI_AUTO_LENGTH, &errorMessage);
-    } else {
-        napi_create_int32(env, DataShareJSUtils::EXCEPTION_INNER, &errorCode);
-        napi_create_string_utf8(env, DataShareJSUtils::MESSAGE_INNER_ERROR, NAPI_AUTO_LENGTH, &errorMessage);
+        napi_set_named_property(env, *businessError, "code", errorCode);
+        napi_set_named_property(env, *businessError, "message", errorMessage);
     }
-    napi_set_named_property(env, *businessError, "code", errorCode);
-    napi_set_named_property(env, *businessError, "message", errorMessage);
 }
 
 void AsyncCall::OnComplete(napi_env env, napi_status status, void *data)
