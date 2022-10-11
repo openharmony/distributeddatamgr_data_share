@@ -544,7 +544,7 @@ void DataShareHelper::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAb
     }
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
-        if(!RegObserver(uri, dataObserver)) {
+        if (!RegObserver(uri, dataObserver)) {
             LOG_ERROR("RegisterObserver failed");
         }
         return;
@@ -600,7 +600,7 @@ void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IData
     }
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
-        if(!UnregObserver(uri, dataObserver)) {
+        if (!UnregObserver(uri, dataObserver)) {
             LOG_ERROR("UnregisterObserver failed");
         }
         return;
