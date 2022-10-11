@@ -121,7 +121,6 @@ ohos_shared_library("datashare_provider") {
     "c_utils:utils",
     "ipc:ipc_core",
     "ipc_js:rpc",
-    "relational_store:native_appdatafwk",
   ]
 
   public_deps = [

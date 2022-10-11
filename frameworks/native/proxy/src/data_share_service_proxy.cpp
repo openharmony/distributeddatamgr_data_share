@@ -25,12 +25,12 @@ namespace OHOS::DataShare {
 DataShareServiceProxy::DataShareServiceProxy(const sptr<IRemoteObject> &object)
     : IRemoteProxy<IDataShareService>(object)
 {
-    LOG_INFO("construct");
+    LOG_INFO("Construct complete.");
 }
 
 int32_t DataShareServiceProxy::Insert(const std::string &uri, const DataShareValuesBucket &valuesBucket)
 {
-    LOG_INFO("Insert");
+    LOG_DEBUG("Proxy insert start.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed!");
@@ -43,8 +43,9 @@ int32_t DataShareServiceProxy::Insert(const std::string &uri, const DataShareVal
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    if (Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_INSERT, data, reply, option) != 0) {
-        LOG_ERROR("send request failed");
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_INSERT, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("Insert fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
         return DATA_SHARE_ERROR;
     }
     return reply.ReadInt32();
@@ -53,7 +54,7 @@ int32_t DataShareServiceProxy::Insert(const std::string &uri, const DataShareVal
 int32_t DataShareServiceProxy::Update(
     const std::string &uri, const DataSharePredicates &predicate, const DataShareValuesBucket &valuesBucket)
 {
-    LOG_INFO("Update");
+    LOG_DEBUG("Proxy update start.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed!");
@@ -66,8 +67,9 @@ int32_t DataShareServiceProxy::Update(
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    if (Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_UPDATE, data, reply, option) != 0) {
-        LOG_ERROR("send request failed");
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_UPDATE, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("Update fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
         return DATA_SHARE_ERROR;
     }
     return reply.ReadInt32();
@@ -75,7 +77,7 @@ int32_t DataShareServiceProxy::Update(
 
 int32_t DataShareServiceProxy::Delete(const std::string &uri, const DataSharePredicates &predicate)
 {
-    LOG_INFO("Delete");
+    LOG_DEBUG("Proxy delete start.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed!");
@@ -88,8 +90,9 @@ int32_t DataShareServiceProxy::Delete(const std::string &uri, const DataSharePre
 
     MessageParcel reply;
     MessageOption option = { MessageOption::TF_ASYNC };
-    if (Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_DELETE, data, reply, option) != 0) {
-        LOG_ERROR("send request failed");
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_DELETE, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("Delete fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
         return DATA_SHARE_ERROR;
     }
     return reply.ReadInt32();
@@ -98,10 +101,10 @@ int32_t DataShareServiceProxy::Delete(const std::string &uri, const DataSharePre
 std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
     const std::string &uri, const DataSharePredicates &predicates, const std::vector<std::string> &columns)
 {
-    LOG_INFO("Query");
+    LOG_DEBUG("Proxy query start.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
-        LOG_ERROR("WriteInterfaceToken failed");
+        LOG_ERROR("WriteInterfaceToken failed!");
         return nullptr;
     }
 
@@ -114,10 +117,10 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
     MessageOption option;
     int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_QUERY, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Query fail to SendRequest. err: %{public}d", err);
+        LOG_ERROR("Query fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
         return nullptr;
     }
-    LOG_INFO("end successfully.");
+
     return ISharedResultSet::ReadFromParcel(reply);
 }
 } // namespace OHOS::DataShare
