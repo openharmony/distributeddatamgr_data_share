@@ -30,8 +30,8 @@ namespace DataShare {
 class DataShareJSUtils final {
 public:
     static constexpr const char *MESSAGE_HELPER_UNINITIALIZED = "The DataShareHelper is not initialized successfully.";
-    static constexpr const char *MESSAGE_WRITE_PERMISSION_DENIED = "Permission denied. An attempt was made to write,
-        forbidden by permission: writePermission";
+    static constexpr const char *MESSAGE_WRITE_PERMISSION_DENIED = "Permission denied. An attempt was made to write, "
+        "forbidden by permission: writePermission.";
 
     enum ExceptionErrorCode {
         EXCEPTION_HELPER_UNINITIALIZED = 15700010,
