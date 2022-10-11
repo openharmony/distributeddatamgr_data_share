@@ -258,7 +258,7 @@ std::string DataShareJSUtils::UnwrapStringFromJS(napi_env env, napi_value param,
     return value;
 }
 
-void DataShareJSUtils::ThrowError(napi_env env, const ExceptionErrorCode &code,const std::string &msg)
+void DataShareJSUtils::ThrowError(napi_env env, const ExceptionErrorCode &code, const std::string &msg)
 {
     std::string errorCode = std::to_string(code);
     napi_throw_error(env, errorCode.c_str(), msg.c_str());
