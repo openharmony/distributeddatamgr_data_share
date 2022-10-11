@@ -149,7 +149,6 @@ napi_value NapiDataShareHelper::GetConstructor(napi_env env)
 {
     napi_value cons = nullptr;
     napi_property_descriptor clzDes[] = {
-        DECLARE_NAPI_FUNCTION("openFile", Napi_OpenFile),
         DECLARE_NAPI_FUNCTION("on", Napi_On),
         DECLARE_NAPI_FUNCTION("off", Napi_Off),
         DECLARE_NAPI_FUNCTION("insert", Napi_Insert),
@@ -157,8 +156,6 @@ napi_value NapiDataShareHelper::GetConstructor(napi_env env)
         DECLARE_NAPI_FUNCTION("query", Napi_Query),
         DECLARE_NAPI_FUNCTION("update", Napi_Update),
         DECLARE_NAPI_FUNCTION("batchInsert", Napi_BatchInsert),
-        DECLARE_NAPI_FUNCTION("getType", Napi_GetType),
-        DECLARE_NAPI_FUNCTION("getFileTypes", Napi_GetFileTypes),
         DECLARE_NAPI_FUNCTION("normalizeUri", Napi_NormalizeUri),
         DECLARE_NAPI_FUNCTION("denormalizeUri", Napi_DenormalizeUri),
         DECLARE_NAPI_FUNCTION("notifyChange", Napi_NotifyChange),
