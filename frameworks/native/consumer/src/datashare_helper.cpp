@@ -544,13 +544,7 @@ void DataShareHelper::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAb
     }
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
-        auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
-        if (obsMgrClient == nullptr) {
-            LOG_ERROR("get DataObsMgrClient failed");
-            return;
-        }
-        ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
-        if (ret != ERR_OK) {
+        if(!RegObserver(uri, dataObserver)) {
             LOG_ERROR("RegisterObserver failed");
         }
         return;
@@ -606,13 +600,7 @@ void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IData
     }
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
-        auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
-        if (obsMgrClient == nullptr) {
-            LOG_ERROR("get DataObsMgrClient failed");
-            return;
-        }
-        ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver);
-        if (ret != ERR_OK) {
+        if(!UnregObserver(uri, dataObserver)) {
             LOG_ERROR("UnregisterObserver failed");
         }
         return;
@@ -741,6 +729,34 @@ bool DataShareHelper::TryReconnect(const Uri &uri, const sptr <IRemoteObject> &t
     }
 
     AddDataShareDeathRecipient(dataShareProxy_->AsObject());
+    return true;
+}
+
+bool DataShareHelper::RegObserver (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
+        return false;
+    }
+    ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
+    if (ret != ERR_OK) {
+        return false;
+    }
+    return true;
+}
+bool DataShareHelper::UnregObserver (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
+        return false;
+    }
+    ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver);
+    if (ret != ERR_OK) {
+        LOG_ERROR("UnregisterObserver failed");
+        return false;
+    }
     return true;
 }
 

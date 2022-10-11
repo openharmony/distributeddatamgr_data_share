@@ -253,6 +253,8 @@ private:
     std::map<sptr<AAFwk::IDataAbilityObserver>, sptr<IDataShare>> registerMap_;
     std::map<sptr<AAFwk::IDataAbilityObserver>, std::string> uriMap_;
     sptr<DataShareConnection> dataShareConnection_ = nullptr;
+    static bool RegObserver (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    static bool UnregObserver (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
 };
 
 class DataShareDeathRecipient : public IRemoteObject::DeathRecipient {
