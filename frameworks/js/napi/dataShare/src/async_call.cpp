@@ -110,7 +110,8 @@ void SetBusinessError(napi_env env, napi_value *businessError, napi_status runSt
         napi_create_string_utf8(env, DataShareJSUtils::MESSAGE_HELPER_UNINITIALIZED, NAPI_AUTO_LENGTH, &errorMessage);
     } else if (runStatus == napi_cancelled) {
         napi_create_int32(env, DataShareJSUtils::EXCEPTION_PERMISSION_DENIED, &errorCode);
-        napi_create_string_utf8(env, DataShareJSUtils::MESSAGE_WRITE_PERMISSION_DENIED, NAPI_AUTO_LENGTH, &errorMessage);
+        napi_create_string_utf8(env, DataShareJSUtils::MESSAGE_WRITE_PERMISSION_DENIED,
+            NAPI_AUTO_LENGTH, &errorMessage);
     }
 
     if (runStatus != napi_generic_failure) {

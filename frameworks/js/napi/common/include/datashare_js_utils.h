@@ -30,8 +30,9 @@ namespace DataShare {
 class DataShareJSUtils final {
 public:
     static constexpr const char *MESSAGE_HELPER_UNINITIALIZED = "The DataShareHelper is not initialized successfully.";
-    static constexpr const char *MESSAGE_WRITE_PERMISSION_DENIED = "Permission denied. An attempt was made to write, forbidden by permission: writePermission";
-    
+    static constexpr const char *MESSAGE_WRITE_PERMISSION_DENIED = "Permission denied. An attempt was made to write,
+        forbidden by permission: writePermission";
+
     enum ExceptionErrorCode {
         EXCEPTION_HELPER_UNINITIALIZED = 15700010,
         EXCEPTION_PERMISSION_DENIED = 201,
@@ -57,7 +58,7 @@ public:
     static napi_value Convert2JSValue(napi_env env, bool value);
     static napi_value Convert2JSValue(napi_env env, const std::map<std::string, int>& value);
     static std::vector<uint8_t> ConvertU8Vector(napi_env env, napi_value jsValue);
-    static void ThrowError(napi_env env, const ExceptionErrorCode &code,const std::string &msg);
+    static void ThrowError(napi_env env, const ExceptionErrorCode &code, const std::string &msg);
 };
 } // namespace DataShare
 } // namespace OHOS
