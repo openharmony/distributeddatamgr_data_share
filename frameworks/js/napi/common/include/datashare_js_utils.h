@@ -61,7 +61,7 @@ public:
     #define NAPI_ASSERT_ERRCODE(env, assertion, msg, code)                    \
     do {                                                                      \
         if (!(assertion)) {                                                   \
-            napi_throw_error(env, std::to_string(code).c_str(), msg.c_str()); \
+            napi_throw_error((env), std::to_string(code).c_str(), msg.c_str()); \
             return;                                                           \
         }                                                                     \
     } while (0)
