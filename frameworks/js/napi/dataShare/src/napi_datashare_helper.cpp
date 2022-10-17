@@ -100,8 +100,9 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
     LOG_DEBUG("Start");
     auto ctxInfo = std::make_shared<CreateContextInfo>();
     auto context = std::make_shared<ContextInfo>();
-    auto input = [ctxInfo, context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
+    auto input = [&](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
+            LOG_ERROR("Parameters error, should 2 or 3 parameters!");
             context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
             context->errorMsg = "Parameters error, should 2 or 3 parameters!";
             return napi_invalid_arg;
@@ -113,13 +114,13 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             auto ability = OHOS::AbilityRuntime::GetCurrentAbility(env);
             std::string msg = GetUri(env, argv[PARAM0], ctxInfo->strUri);
             if (!msg.empty()) {
-                LOG_DEBUG("getUri failed.");
+                LOG_ERROR("getUri failed.");
                 context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 context->errorMsg = msg;
                 return napi_invalid_arg;
             }
             if (ability == nullptr) {
-                LOG_DEBUG("ability is nullptr.");
+                LOG_ERROR("ability is nullptr.");
                 context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 context->errorMsg = "Parameters error, failed to get native ability, ability can't be nullptr";
                 return napi_invalid_arg;
@@ -129,13 +130,13 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             ctxInfo->contextS = OHOS::AbilityRuntime::GetStageModeContext(env, argv[PARAM0]);
             std::string msg = GetUri(env, argv[PARAM1], ctxInfo->strUri);
             if (!msg.empty()) {
-                LOG_DEBUG("getUri failed.");
+                LOG_ERROR("getUri failed.");
                 context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 context->errorMsg = msg;
                 return napi_invalid_arg;
             }
             if (ctxInfo->contextS == nullptr) {
-                LOG_DEBUG("contextS is nullptr");
+                LOG_ERROR("contextS is nullptr");
                 context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 context->errorMsg = "Parameters error, failed to get native contextS, contextS can't be nullptr";
                 return napi_invalid_arg;
@@ -145,7 +146,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         napi_value helperProxy = nullptr;
         status = napi_new_instance(env, GetConstructor(env), argc, argv, &helperProxy);
         if ((helperProxy == nullptr) || (status != napi_ok)) {
-            LOG_DEBUG("helperProxy == nullptr) || (status != napi_ok)");
+            LOG_ERROR("helperProxy == nullptr) || (status != napi_ok)");
             context->errorCode = DataShareJSUtils::EXCEPTION_HELPER_UNINITIALIZED;
             context->errorMsg = DataShareJSUtils::MESSAGE_HELPER_UNINITIALIZED;
             return napi_generic_failure;
@@ -154,7 +155,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         ctxInfo->env = env;
         return napi_ok;
     };
-    auto output = [ctxInfo, context](napi_env env, napi_value *result) -> napi_status {
+    auto output = [&](napi_env env, napi_value *result) -> napi_status {
         if (ctxInfo->dataShareHelper == nullptr) {
             context->errorCode = DataShareJSUtils::EXCEPTION_HELPER_UNINITIALIZED;
             context->errorMsg = DataShareJSUtils::MESSAGE_HELPER_UNINITIALIZED;

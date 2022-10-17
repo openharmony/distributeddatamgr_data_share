@@ -32,6 +32,7 @@ public:
     static constexpr const char *MESSAGE_HELPER_UNINITIALIZED = "The DataShareHelper is not initialized successfully.";
 
     enum ExceptionErrorCode {
+        OK = 0;
         EXCEPTION_INNER = 15700000,
         EXCEPTION_HELPER_UNINITIALIZED = 15700010,
         EXCEPTION_PARAMETER_CHECK = 401,
