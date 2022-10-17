@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace DataShare {
 napi_value DataShareValueBucketNewInstance(napi_env env, DataShareValuesBucket &valuesBucket);
-bool GetValueBucketObject(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg);
+std::string GetValueBucketObject(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg);
 } // namespace DataShare
 } // namespace OHOS
 #endif // NAPI_DATASHARE_VALUES_BUCKET_H

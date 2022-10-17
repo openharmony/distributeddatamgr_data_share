@@ -34,9 +34,7 @@ AsyncCall::AsyncCall(napi_env env, napi_callback_info info, std::shared_ptr<Cont
         argc = argc - 1;
     }
     napi_status status = (*context)(env, argc, argv, self);
-    if (status != napi_ok) {
-        return;
-    }
+    NAPI_ASSERT_ERRCODE(env, st == napi_ok, context->errorMsg, context->errorCode);
     context_->ctx = std::move(context);
     napi_create_reference(env, self, 1, &context_->self);
 }
@@ -100,23 +98,17 @@ void AsyncCall::OnExecute(napi_env env, void *data)
     context->ctx->Exec();
 }
 
-void SetBusinessError(napi_env env, napi_value *businessError, napi_status runStatus)
+void SetBusinessError(napi_env env, napi_value *businessError, DataShareJSUtils::ExceptionErrorCode errorCode,
+    std::string errorMsg)
 {
     napi_create_object(env, businessError);
-    napi_value errorCode = nullptr;
-    napi_value errorMessage = nullptr;
-    if (runStatus == napi_object_expected) {
-        napi_create_int32(env, DataShareJSUtils::EXCEPTION_HELPER_UNINITIALIZED, &errorCode);
-        napi_create_string_utf8(env, DataShareJSUtils::MESSAGE_HELPER_UNINITIALIZED, NAPI_AUTO_LENGTH, &errorMessage);
-    } else if (runStatus == napi_cancelled) {
-        napi_create_int32(env, DataShareJSUtils::EXCEPTION_PERMISSION_DENIED, &errorCode);
-        napi_create_string_utf8(env, DataShareJSUtils::MESSAGE_WRITE_PERMISSION_DENIED,
-            NAPI_AUTO_LENGTH, &errorMessage);
-    }
-
-    if (runStatus != napi_generic_failure) {
-        napi_set_named_property(env, *businessError, "code", errorCode);
-        napi_set_named_property(env, *businessError, "message", errorMessage);
+    if (errorCode != DataShareJSUtils::EXCEPTION_INNER) {
+        napi_value code = nullptr;
+        napi_value msg = nullptr;
+        napi_create_int32(env, errorCode, &code);
+        napi_create_string_utf8(env, errorMsg.c_str(), NAPI_AUTO_LENGTH, &msg);
+        napi_set_named_property(env, *businessError, "code", code);
+        napi_set_named_property(env, *businessError, "message", msg);
     }
 }
 
@@ -136,7 +128,7 @@ void AsyncCall::OnComplete(napi_env env, napi_status status, void *data)
         }
     } else {
         napi_value businessError = nullptr;
-        SetBusinessError(env, &businessError, runStatus);
+        SetBusinessError(env, &businessError, context->ctx->errorCode, context->ctx->errorMsg);
         result[ARG_ERROR] = businessError;
         napi_get_undefined(env, &result[ARG_DATA]);
     }

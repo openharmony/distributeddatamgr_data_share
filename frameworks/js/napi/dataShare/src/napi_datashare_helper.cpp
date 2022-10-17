@@ -29,7 +29,6 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 namespace DataShare {
 constexpr int MAX_ARGC = 6;
-static constexpr int INNER_ERR = -1;
 
 std::list<std::shared_ptr<DataShareHelper>> g_dataShareHelperList;
 
@@ -43,7 +42,8 @@ static DataSharePredicates UnwrapDataSharePredicates(napi_env env, napi_value va
     return DataSharePredicates(predicates->GetOperationList());
 }
 
-static bool UnwrapValuesBucketArrayFromJS(napi_env env, napi_value param, std::vector<DataShareValuesBucket> &value)
+static std::string UnwrapValuesBucketArrayFromJS(napi_env env, napi_value param,
+    std::vector<DataShareValuesBucket> &value)
 {
     LOG_DEBUG("Start");
     uint32_t arraySize = 0;
@@ -52,7 +52,7 @@ static bool UnwrapValuesBucketArrayFromJS(napi_env env, napi_value param, std::v
 
     if (!IsArrayForNapiValue(env, param, arraySize)) {
         LOG_ERROR("IsArrayForNapiValue is false");
-        return false;
+        return "Parameters error. The type of 'values' must be 'Array'";
     }
 
     value.clear();
@@ -60,48 +60,50 @@ static bool UnwrapValuesBucketArrayFromJS(napi_env env, napi_value param, std::v
         jsValue = nullptr;
         if (napi_get_element(env, param, i, &jsValue) != napi_ok) {
             LOG_ERROR("napi_get_element is false");
-            return false;
+            return "Parameters error. The type of 'values' must be 'Array'";
         }
 
         DataShareValuesBucket valueBucket;
         valueBucket.Clear();
-        GetValueBucketObject(valueBucket, env, jsValue);
+        std::string msg = GetValueBucketObject(valueBucket, env, jsValue);
+        if (!msg.empty()) {
+            return msg;
+        }
 
         value.push_back(valueBucket);
     }
-    return true;
+    return "";
 }
 
-static std::vector<DataShareValuesBucket> GetValuesBucketArray(napi_env env, napi_value param, bool &status)
+static std::vector<DataShareValuesBucket> GetValuesBucketArray(napi_env env, napi_value param, std::string &msg)
 {
     LOG_DEBUG("Start");
     std::vector<DataShareValuesBucket> result;
-    status = UnwrapValuesBucketArrayFromJS(env, param, result);
+    msg = UnwrapValuesBucketArrayFromJS(env, param, result);
     return result;
 }
 
-static bool GetUri(napi_env env, napi_value jsValue, std::string &uri)
+static std::string GetUri(napi_env env, napi_value jsValue, std::string &uri)
 {
     LOG_DEBUG("Start");
     napi_valuetype valuetype = napi_undefined;
     napi_typeof(env, jsValue, &valuetype);
     if (valuetype != napi_string) {
-        DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK,
-            "Parameters error. The type of 'uri' must be 'string'");
-        return false;
+        return "Parameters error. The type of 'uri' must be 'string'";
     }
     uri = DataShareJSUtils::Convert2String(env, jsValue);
-    return true;
+    return "";
 }
 
 napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_callback_info info)
 {
     LOG_DEBUG("Start");
     auto ctxInfo = std::make_shared<CreateContextInfo>();
-    auto input = [ctxInfo](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
+    auto context = std::make_shared<ContextInfo>();
+    auto input = [ctxInfo, context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
-            DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK,
-                "Parameters error, should 2 or 3 parameters!");
+            context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+            context->errorMsg = "Parameters error, should 2 or 3 parameters!";
             return napi_invalid_arg;
         }
         bool isStageMode = false;
@@ -109,23 +111,29 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         if (status != napi_ok || !isStageMode) {
             ctxInfo->isStageMode = false;
             auto ability = OHOS::AbilityRuntime::GetCurrentAbility(env);
-            if (!GetUri(env, argv[PARAM0], ctxInfo->strUri)) {
+            std::string msg = GetUri(env, argv[PARAM0], context->uri);
+            if (!msg.empty()) {
+                context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+                context->errorMsg = msg;
                 return napi_invalid_arg;
             }
             if (ability == nullptr) {
-                DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK,
-                    "Parameters error, failed to get native ability.");
+                context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+                context->errorMsg = "Parameters error, failed to get native ability, ability can't be nullptr";
                 return napi_invalid_arg;
             }
             ctxInfo->contextF = ability->GetContext();
         } else {
             ctxInfo->contextS = OHOS::AbilityRuntime::GetStageModeContext(env, argv[PARAM0]);
-            if (!GetUri(env, argv[PARAM1], ctxInfo->strUri)) {
+            std::string msg = GetUri(env, argv[PARAM1], context->uri);
+            if (!msg.empty()) {
+                context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+                context->errorMsg = msg;
                 return napi_invalid_arg;
             }
             if (ctxInfo->contextS == nullptr) {
-                DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK,
-                    "Parameters error, failed to get native context.");
+                context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+                context->errorMsg = "Parameters error, failed to get native contextS, contextS can't be nullptr";
                 return napi_invalid_arg;
             }
         }
@@ -133,17 +141,19 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         napi_value helperProxy = nullptr;
         status = napi_new_instance(env, GetConstructor(env), argc, argv, &helperProxy);
         if ((helperProxy == nullptr) || (status != napi_ok)) {
-            DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_HELPER_UNINITIALIZED,
-                DataShareJSUtils::MESSAGE_HELPER_UNINITIALIZED);
+            context->errorCode = DataShareJSUtils::EXCEPTION_HELPER_UNINITIALIZED;
+            context->errorMsg = DataShareJSUtils::MESSAGE_HELPER_UNINITIALIZED;
             return napi_generic_failure;
         }
         napi_create_reference(env, helperProxy, 1, &(ctxInfo->ref));
         ctxInfo->env = env;
         return napi_ok;
     };
-    auto output = [ctxInfo](napi_env env, napi_value *result) -> napi_status {
+    auto output = [ctxInfo, context](napi_env env, napi_value *result) -> napi_status {
         if (ctxInfo->dataShareHelper == nullptr) {
-            return napi_object_expected;
+            context->errorCode = DataShareJSUtils::EXCEPTION_HELPER_UNINITIALIZED;
+            context->errorMsg = DataShareJSUtils::MESSAGE_HELPER_UNINITIALIZED;
+            return napi_generic_failure;
         }
         g_dataShareHelperList.emplace_back(ctxInfo->dataShareHelper);
         napi_status status = napi_get_reference_value(env, ctxInfo->ref, result);
@@ -163,8 +173,8 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextF, ctxInfo->strUri);
         }
     };
-    auto context = std::make_shared<AsyncCall::Context>(input, output);
-    AsyncCall asyncCall(env, info, context);
+    context->SetAction(std::move(input), std::move(output));
+    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
     return asyncCall.Call(env, exec);
 }
 
@@ -197,8 +207,7 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, nullptr));
     if (argc <= 1) {
-        DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK,
-            "Parameters error, need at least 2 parameters!");
+        LOG_ERROR("Parameters error, need at least 2 parameters!");
         return nullptr;
     }
 
@@ -230,17 +239,24 @@ napi_value NapiDataShareHelper::Napi_Insert(napi_env env, napi_callback_info inf
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
-            DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK,
-                "Parameters error, should 2 or 3 parameters!");
+            context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+            context->errorMsg = "Parameters error, should 2 or 3 parameters!";
             return napi_invalid_arg;
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        if (!GetUri(env, argv[PARAM0], context->uri)) {
+        std::string msg = GetUri(env, argv[PARAM0], context->uri);
+        if (!msg.empty()) {
+            context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+            context->errorMsg = msg;
             return napi_invalid_arg;
         }
+
         context->valueBucket.Clear();
-        if (!GetValueBucketObject(context->valueBucket, env, argv[PARAM1])) {
+        msg = GetValueBucketObject(context->valueBucket, env, argv[PARAM1]);
+        if (!msg.empty()) {
+            context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+            context->errorMsg = msg;
             return napi_invalid_arg;
         }
 
@@ -248,7 +264,8 @@ napi_value NapiDataShareHelper::Napi_Insert(napi_env env, napi_callback_info inf
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
         if (context->resultNumber < 0) {
-            return context->resultNumber == INNER_ERR ? napi_generic_failure : napi_cancelled;
+            context->errorCode = DataShareJSUtils::EXCEPTION_INNER;
+            return napi_generic_failure;
         }
         napi_create_int32(env, context->resultNumber, result);
         return napi_ok;
@@ -274,13 +291,16 @@ napi_value NapiDataShareHelper::Napi_Delete(napi_env env, napi_callback_info inf
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
-            DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK,
-                "Parameters error, should 2 or 3 parameters!");
+            context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+            context->errorMsg = "Parameters error, should 2 or 3 parameters!";
             return napi_invalid_arg;
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        if (!GetUri(env, argv[PARAM0], context->uri)) {
+        std::string msg = GetUri(env, argv[PARAM0], context->uri);
+        if (!msg.empty()) {
+            context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+            context->errorMsg = msg;
             return napi_invalid_arg;
         }
 
@@ -289,7 +309,8 @@ napi_value NapiDataShareHelper::Napi_Delete(napi_env env, napi_callback_info inf
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
         if (context->resultNumber < 0) {
-            return context->resultNumber == INNER_ERR ? napi_generic_failure : napi_cancelled;
+            context->errorCode = DataShareJSUtils::EXCEPTION_INNER;
+            return napi_generic_failure;
         }
         napi_create_int32(env, context->resultNumber, result);
         return napi_ok;
@@ -315,13 +336,16 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 3 && argc != 4) {
-            DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK,
-                "Parameters error, should 3 or 4 parameters!");
+            context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+            context->errorMsg = "Parameters error, should 3 or 4 parameters!";
             return napi_invalid_arg;
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        if (!GetUri(env, argv[PARAM0], context->uri)) {
+        std::string msg = GetUri(env, argv[PARAM0], context->uri);
+        if (!msg.empty()) {
+            context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+            context->errorMsg = msg;
             return napi_invalid_arg;
         }
 
@@ -332,6 +356,7 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
         if (context->resultObject == nullptr) {
+            context->errorCode = DataShareJSUtils::EXCEPTION_INNER;
             return napi_generic_failure;
         }
         *result = DataShareResultSetProxy::NewInstance(env, context->resultObject);
@@ -358,27 +383,34 @@ napi_value NapiDataShareHelper::Napi_Update(napi_env env, napi_callback_info inf
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 3 && argc != 4) {
-            DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK,
-                "Parameters error, should 3 or 4 parameters!");
+            context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+            context->errorMsg = "Parameters error, should 3 or 4 parameters!";
             return napi_invalid_arg;
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        if (!GetUri(env, argv[PARAM0], context->uri)) {
+        std::string msg = GetUri(env, argv[PARAM0], context->uri);
+        if (!msg.empty()) {
+            context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+            context->errorMsg = msg;
             return napi_invalid_arg;
         }
 
         context->predicates = UnwrapDataSharePredicates(env, argv[PARAM1]);
 
         context->valueBucket.Clear();
-        if (!GetValueBucketObject(context->valueBucket, env, argv[PARAM2])) {
+        msg = GetValueBucketObject(context->valueBucket, env, argv[PARAM2]);
+        if (!msg.empty()) {
+            context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+            context->errorMsg = msg;
             return napi_invalid_arg;
         }
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
         if (context->resultNumber < 0) {
-            return context->resultNumber == INNER_ERR ? napi_generic_failure : napi_cancelled;
+            context->errorCode = DataShareJSUtils::EXCEPTION_INNER;
+            return napi_generic_failure;
         }
         napi_create_int32(env, context->resultNumber, result);
         return napi_ok;
@@ -405,8 +437,8 @@ napi_value NapiDataShareHelper::Napi_BatchInsert(napi_env env, napi_callback_inf
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
-            DataShareJSUtils::ThrowError(env, DataShareJSUtils::EXCEPTION_PARAMETER_CHECK,
-                "Parameters error, should 2 or 3 parameters!");
+            context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+            context->errorMsg = "Parameters error, should 2 or 3 parameters!";
             return napi_invalid_arg;
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
@@ -415,16 +447,19 @@ napi_value NapiDataShareHelper::Napi_BatchInsert(napi_env env, napi_callback_inf
             return napi_invalid_arg;
         }
 
-        bool status;
-        context->values = GetValuesBucketArray(env, argv[PARAM1], status);
-        if (!status) {
+        std::string msg;
+        context->values = GetValuesBucketArray(env, argv[PARAM1], msg);
+        if (!msg.empty()) {
+            context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+            context->errorMsg = msg;
             return napi_invalid_arg;
         }
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
         if (context->resultNumber < 0) {
-            return context->resultNumber == INNER_ERR ? napi_generic_failure : napi_cancelled;
+            context->errorCode = DataShareJSUtils::EXCEPTION_INNER;
+            return napi_generic_failure;
         }
         napi_create_int32(env, context->resultNumber, result);
         return napi_ok;
