@@ -107,6 +107,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             context->errorMsg = "Parameters error, should 2 or 3 parameters!";
             return napi_invalid_arg;
         }
+        LOG_INFO("after check Parameters.");
         bool isStageMode = false;
         napi_status status = AbilityRuntime::IsStageContext(env, argv[PARAM0], isStageMode);
         if (status != napi_ok || !isStageMode) {
@@ -119,38 +120,47 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
                 context->errorMsg = msg;
                 return napi_invalid_arg;
             }
+            LOG_INFO("after geturi.");
             if (ability == nullptr) {
                 LOG_ERROR("ability is nullptr.");
                 context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 context->errorMsg = "Parameters error, failed to get native ability, ability can't be nullptr";
                 return napi_invalid_arg;
             }
+            LOG_INFO("after check ability.");
             ctxInfo->contextF = ability->GetContext();
         } else {
             ctxInfo->contextS = OHOS::AbilityRuntime::GetStageModeContext(env, argv[PARAM0]);
+            LOG_INFO("before geturi.");
             std::string msg = GetUri(env, argv[PARAM1], ctxInfo->strUri);
+            LOG_INFO("after geturi.");
             if (!msg.empty()) {
                 LOG_ERROR("getUri failed.");
                 context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 context->errorMsg = msg;
                 return napi_invalid_arg;
             }
+            LOG_INFO("after geturi check.");
             if (ctxInfo->contextS == nullptr) {
                 LOG_ERROR("contextS is nullptr");
                 context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 context->errorMsg = "Parameters error, failed to get native contextS, contextS can't be nullptr";
                 return napi_invalid_arg;
             }
+            LOG_INFO("after contextS check.");
         }
 
         napi_value helperProxy = nullptr;
+        LOG_INFO("before napi_new_instance");
         status = napi_new_instance(env, GetConstructor(env), argc, argv, &helperProxy);
+        LOG_INFO("after napi_new_instance");
         if ((helperProxy == nullptr) || (status != napi_ok)) {
             LOG_ERROR("helperProxy == nullptr) || (status != napi_ok)");
             context->errorCode = DataShareJSUtils::EXCEPTION_HELPER_UNINITIALIZED;
             context->errorMsg = DataShareJSUtils::MESSAGE_HELPER_UNINITIALIZED;
             return napi_generic_failure;
         }
+        LOG_INFO("(helperProxy == nullptr) || (status != napi_ok)");
         napi_create_reference(env, helperProxy, 1, &(ctxInfo->ref));
         ctxInfo->env = env;
         return napi_ok;
@@ -201,6 +211,7 @@ napi_value NapiDataShareHelper::GetConstructor(napi_env env)
     };
     NAPI_CALL(env, napi_define_class(env, "DataShareHelper", NAPI_AUTO_LENGTH, Initialize, nullptr,
         sizeof(clzDes) / sizeof(napi_property_descriptor), clzDes, &cons));
+    LOG_INFO("after napi_call");
     g_dataShareHelperList.clear();
     return cons;
 }
@@ -216,7 +227,7 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
         LOG_ERROR("Parameters error, need at least 2 parameters!");
         return nullptr;
     }
-
+    LOG_INFO("after check Parameters");
     auto *proxy = new NapiDataShareHelper();
     auto finalize = [](napi_env env, void * data, void * hint) {
         NapiDataShareHelper *proxy = reinterpret_cast<NapiDataShareHelper *>(data);
@@ -232,10 +243,12 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
             delete proxy;
         }
     };
+    LOG_INFO("after finalize");
     if (napi_wrap(env, self, proxy, finalize, nullptr, nullptr) != napi_ok) {
         finalize(env, proxy, nullptr);
         return nullptr;
     }
+    LOG_INFO("after napi_wrap");
     return self;
 }
 
