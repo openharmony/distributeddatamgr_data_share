@@ -154,7 +154,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         ctxInfo->env = env;
         return napi_ok;
     };
-    auto output = [ctxInfo, context](napi_env env, napi_value *result) -> napi_status {
+    auto output = [ctxInfo](napi_env env, napi_value *result) -> napi_status {
         if (ctxInfo->dataShareHelper == nullptr) {
             ctxInfo->errorCode = DataShareJSUtils::EXCEPTION_HELPER_UNINITIALIZED;
             ctxInfo->errorMsg = DataShareJSUtils::MESSAGE_HELPER_UNINITIALIZED;
