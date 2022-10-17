@@ -443,7 +443,10 @@ napi_value NapiDataShareHelper::Napi_BatchInsert(napi_env env, napi_callback_inf
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        if (!GetUri(env, argv[PARAM0], context->uri)) {
+        std::string msg = GetUri(env, argv[PARAM0], context->uri);
+        if (!msg.empty()) {
+            context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
+            context->errorMsg = msg;
             return napi_invalid_arg;
         }
 
