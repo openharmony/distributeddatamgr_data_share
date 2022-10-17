@@ -113,11 +113,13 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             auto ability = OHOS::AbilityRuntime::GetCurrentAbility(env);
             std::string msg = GetUri(env, argv[PARAM0], ctxInfo->strUri);
             if (!msg.empty()) {
+                LOG_DEBUG("getUri failed.");
                 context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 context->errorMsg = msg;
                 return napi_invalid_arg;
             }
             if (ability == nullptr) {
+                LOG_DEBUG("ability is nullptr.");
                 context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 context->errorMsg = "Parameters error, failed to get native ability, ability can't be nullptr";
                 return napi_invalid_arg;
@@ -127,11 +129,13 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             ctxInfo->contextS = OHOS::AbilityRuntime::GetStageModeContext(env, argv[PARAM0]);
             std::string msg = GetUri(env, argv[PARAM1], ctxInfo->strUri);
             if (!msg.empty()) {
+                LOG_DEBUG("getUri failed.");
                 context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 context->errorMsg = msg;
                 return napi_invalid_arg;
             }
             if (ctxInfo->contextS == nullptr) {
+                LOG_DEBUG("contextS is nullptr");
                 context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 context->errorMsg = "Parameters error, failed to get native contextS, contextS can't be nullptr";
                 return napi_invalid_arg;
@@ -141,6 +145,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         napi_value helperProxy = nullptr;
         status = napi_new_instance(env, GetConstructor(env), argc, argv, &helperProxy);
         if ((helperProxy == nullptr) || (status != napi_ok)) {
+            LOG_DEBUG("helperProxy == nullptr) || (status != napi_ok)");
             context->errorCode = DataShareJSUtils::EXCEPTION_HELPER_UNINITIALIZED;
             context->errorMsg = DataShareJSUtils::MESSAGE_HELPER_UNINITIALIZED;
             return napi_generic_failure;
