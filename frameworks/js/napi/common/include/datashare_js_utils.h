@@ -56,7 +56,6 @@ public:
     static napi_value Convert2JSValue(napi_env env, bool value);
     static napi_value Convert2JSValue(napi_env env, const std::map<std::string, int>& value);
     static std::vector<uint8_t> ConvertU8Vector(napi_env env, napi_value jsValue);
-    static void ThrowError(napi_env env, const ExceptionErrorCode &code, const std::string &msg);
 
     #define NAPI_ASSERT_ERRCODE(env, assertion, msg, code)                    \
     do {                                                                      \

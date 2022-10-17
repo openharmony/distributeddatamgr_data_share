@@ -34,7 +34,7 @@ AsyncCall::AsyncCall(napi_env env, napi_callback_info info, std::shared_ptr<Cont
         argc = argc - 1;
     }
     napi_status status = (*context)(env, argc, argv, self);
-    NAPI_ASSERT_ERRCODE(env, st == napi_ok, context->errorMsg, context->errorCode);
+    NAPI_ASSERT_ERRCODE(env, status == napi_ok, context->errorMsg, context->errorCode);
     context_->ctx = std::move(context);
     napi_create_reference(env, self, 1, &context_->self);
 }
