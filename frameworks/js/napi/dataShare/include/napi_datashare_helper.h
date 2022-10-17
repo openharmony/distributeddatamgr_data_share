@@ -45,7 +45,7 @@ private:
     std::shared_ptr<DataShareHelper> datashareHelper_ = nullptr;
     std::map<std::string, sptr<NAPIDataShareObserver>> observerMap_;
 
-    struct CreateContextInfo : public AsyncCall::Context {
+    struct CreateContextInfo {
         napi_env env = nullptr;
         napi_ref ref = nullptr;
         bool isStageMode = true;
@@ -53,8 +53,6 @@ private:
         std::shared_ptr<Context> contextF = nullptr;
         std::shared_ptr<OHOS::AbilityRuntime::Context> contextS = nullptr;
         std::shared_ptr<DataShareHelper> dataShareHelper = nullptr;
-        CreateContextInfo() : Context(nullptr, nullptr) {};
-        CreateContextInfo(InputAction input, OutputAction output) : Context(std::move(input), std::move(output)) {};
         
         ~CreateContextInfo()
         {
