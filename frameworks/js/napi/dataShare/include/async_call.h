@@ -27,7 +27,7 @@ class AsyncCall final {
 public:
     class Context {
     public:
-        DataShareJSUtils::ExceptionErrorCode errorCode;
+        DataShareJSUtils::ExceptionErrorCode errorCode = DataShareJSUtils::OK;
         std::string errorMsg;
         using InputAction = std::function<napi_status(napi_env, size_t, napi_value *, napi_value)>;
         using OutputAction = std::function<napi_status(napi_env, napi_value *)>;
