@@ -31,48 +31,36 @@ enum class DataSharePredicatesObjectsType {
 };
 
 using ObjectsType = DataSharePredicatesObjectsType;
-class DataSharePredicatesObjects {
+class MutliValue {
 public:
-    DataSharePredicatesObjects() : type(ObjectsType::TYPE_NULL) {}
-    ~DataSharePredicatesObjects() = default;
-    DataSharePredicatesObjects(DataSharePredicatesObjects &&val) noexcept : type(val.type), value(std::move(val.value))
+    using Type = std::variant<std::monostate, std::vector<int>, std::vector<int64_t>, std::vector<std::string>, std::vector<double>>;
+    Type value;
+    MutliValue() = default;
+    ~MutliValue() = default;
+    MutliValue(MutliValue::Type val) noexcept : value(std::move(val))
     {
-        val.type = ObjectsType::TYPE_NULL;
     }
-    DataSharePredicatesObjects(const DataSharePredicatesObjects &val) : type(val.type), value(val.value) {}
-    DataSharePredicatesObjects &operator=(DataSharePredicatesObjects &&object) noexcept
+    MutliValue(const MutliValue &val) : value(val.value) {}
+    MutliValue &operator=(MutliValue &&object) noexcept
     {
         if (this == &object) {
             return *this;
         }
-        type = object.type;
         value = std::move(object.value);
-        object.type = ObjectsType::TYPE_NULL;
         return *this;
     }
-    DataSharePredicatesObjects &operator=(const DataSharePredicatesObjects &object)
+    MutliValue &operator=(const MutliValue &object)
     {
         if (this == &object) {
             return *this;
         }
-        type = object.type;
         value = object.value;
         return *this;
     }
-    DataSharePredicatesObjects(const std::vector<int> &val) : type(ObjectsType::TYPE_INT_VECTOR), value(val) {}
-    DataSharePredicatesObjects(const std::vector<int64_t> &val) : type(ObjectsType::TYPE_LONG_VECTOR), value(val) {}
-    DataSharePredicatesObjects(const std::vector<double> &val) : type(ObjectsType::TYPE_DOUBLE_VECTOR), value(val) {}
-    DataSharePredicatesObjects(const std::vector<std::string> &val)
-        : type(ObjectsType::TYPE_STRING_VECTOR), value(val) {}
-
-    DataSharePredicatesObjectsType GetType() const
-    {
-        return type;
-    }
-
-    DataSharePredicatesObjectsType type;
-    std::variant<std::monostate, std::vector<int>, std::vector<int64_t>,
-        std::vector<std::string>, std::vector<double>> value;
+    MutliValue(const std::vector<int> &val) : value(val) {}
+    MutliValue(const std::vector<int64_t> &val) : value(val) {}
+    MutliValue(const std::vector<double> &val) : value(val) {}
+    MutliValue(const std::vector<std::string> &val) : value(val) {}
 
     operator std::vector<int> () const
     {

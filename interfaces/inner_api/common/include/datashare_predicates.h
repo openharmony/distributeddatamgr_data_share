@@ -30,48 +30,48 @@ public:
     DataSharePredicates()
     {
     }
-    explicit DataSharePredicates(const std::list<OperationItem> &operList) : operationList_(operList)
+    explicit DataSharePredicates(std::vector<OperationItem> operList) : operations_(std::move(operList))
     {
     }
     ~DataSharePredicates()
     {
     }
-    DataSharePredicates *EqualTo(const std::string &field, const DataSharePredicatesObject &value)
+    DataSharePredicates *EqualTo(const std::string &field, const SingleValue &value)
     {
         SetOperationList(EQUAL_TO, field, value);
         return this;
     }
-    DataSharePredicates *NotEqualTo(const std::string &field, const DataSharePredicatesObject &value)
+    DataSharePredicates *NotEqualTo(const std::string &field, const SingleValue &value)
     {
         SetOperationList(NOT_EQUAL_TO, field, value);
         return this;
     }
-    DataSharePredicates *GreaterThan(const std::string &field, const DataSharePredicatesObject &value)
+    DataSharePredicates *GreaterThan(const std::string &field, const SingleValue &value)
     {
         SetOperationList(GREATER_THAN, field, value);
         return this;
     }
-    DataSharePredicates *LessThan(const std::string &field, const DataSharePredicatesObject &value)
+    DataSharePredicates *LessThan(const std::string &field, const SingleValue &value)
     {
         SetOperationList(LESS_THAN, field, value);
         return this;
     }
-    DataSharePredicates *GreaterThanOrEqualTo(const std::string &field, const DataSharePredicatesObject &value)
+    DataSharePredicates *GreaterThanOrEqualTo(const std::string &field, const SingleValue &value)
     {
         SetOperationList(GREATER_THAN_OR_EQUAL_TO, field, value);
         return this;
     }
-    DataSharePredicates *LessThanOrEqualTo(const std::string &field, const DataSharePredicatesObject &value)
+    DataSharePredicates *LessThanOrEqualTo(const std::string &field, const SingleValue &value)
     {
         SetOperationList(LESS_THAN_OR_EQUAL_TO, field, value);
         return this;
     }
-    DataSharePredicates *In(const std::string &field, const DataSharePredicatesObjects &values)
+    DataSharePredicates *In(const std::string &field, const MutliValue &values)
     {
         SetOperationList(SQL_IN, field, values);
         return this;
     }
-    DataSharePredicates *NotIn(const std::string &field, const DataSharePredicatesObjects &values)
+    DataSharePredicates *NotIn(const std::string &field, const MutliValue &values)
     {
         SetOperationList(NOT_IN, field, values);
         return this;
@@ -186,9 +186,9 @@ public:
         SetOperationList(IN_KEY, keys);
         return this;
     }
-    const std::list<OperationItem> &GetOperationList() const
+    const std::vector<OperationItem> &GetOperationList() const
     {
-        return operationList_;
+        return operations_;
     }
     std::string GetWhereClause() const
     {
@@ -241,39 +241,39 @@ public:
     }
 
 private:
-    void SetOperationList(OperationType operationType, const DataSharePredicatesObjects &param)
+    void SetOperationList(OperationType operationType, const MutliValue &param)
     {
         OperationItem operationItem {};
         operationItem.operation = operationType;
-        operationItem.multiParams.push_back(param);
-        operationList_.push_back(operationItem);
+        operationItem.multiParams.push_back(param.value);
+        operations_.push_back(operationItem);
         if (settingMode_ != PREDICATES_METHOD) {
             ClearQueryLanguage();
             settingMode_ = PREDICATES_METHOD;
         }
     }
     void SetOperationList(
-        OperationType operationType, const DataSharePredicatesObject &param1, const DataSharePredicatesObjects &param2)
+        OperationType operationType, const SingleValue &param1, const MutliValue &param2)
     {
         OperationItem operationItem {};
         operationItem.operation = operationType;
-        operationItem.singleParams.push_back(param1);
-        operationItem.multiParams.push_back(param2);
-        operationList_.push_back(operationItem);
+        operationItem.singleParams.push_back(param1.value);
+        operationItem.multiParams.push_back(param2.value);
+        operations_.push_back(operationItem);
         if (settingMode_ != PREDICATES_METHOD) {
             ClearQueryLanguage();
             settingMode_ = PREDICATES_METHOD;
         }
     }
-    void SetOperationList(OperationType operationType, const DataSharePredicatesObject &para1 = {},
-        const DataSharePredicatesObject &para2 = {}, const DataSharePredicatesObject &para3 = {})
+    void SetOperationList(OperationType operationType, const SingleValue &para1 = {},
+        const SingleValue &para2 = {}, const SingleValue &para3 = {})
     {
         OperationItem operationItem {};
         operationItem.operation = operationType;
-        operationItem.singleParams.push_back(para1);
-        operationItem.singleParams.push_back(para2);
-        operationItem.singleParams.push_back(para3);
-        operationList_.push_back(operationItem);
+        operationItem.singleParams.push_back(para1.value);
+        operationItem.singleParams.push_back(para2.value);
+        operationItem.singleParams.push_back(para3.value);
+        operations_.push_back(operationItem);
         if (settingMode_ != PREDICATES_METHOD) {
             ClearQueryLanguage();
             settingMode_ = PREDICATES_METHOD;
@@ -285,7 +285,7 @@ private:
         whereArgs_ = {};
         order_ = "";
     }
-    std::list<OperationItem> operationList_;
+    std::vector<OperationItem> operations_;
     std::string whereClause_;
     std::vector<std::string> whereArgs_;
     std::string order_;

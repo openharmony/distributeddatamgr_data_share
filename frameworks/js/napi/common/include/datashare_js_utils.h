@@ -19,6 +19,7 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <variant>
 #include <vector>
 
 #include "napi/native_api.h"
@@ -39,6 +40,7 @@ public:
     static std::string ConvertAny2String(napi_env env, const napi_value jsValue);
     static std::string UnwrapStringFromJS(napi_env env, napi_value param, const std::string &defaultValue = "");
 
+    static napi_value Convert2JSValue(napi_env env, const std::monostate &value = {});
     static napi_value Convert2JSValue(napi_env env, const std::vector<std::string> &value);
     static napi_value Convert2JSValue(napi_env env, const std::string &value);
     static napi_value Convert2JSValue(napi_env env, const std::vector<uint8_t> &value);
@@ -47,8 +49,39 @@ public:
     static napi_value Convert2JSValue(napi_env env, double value);
     static napi_value Convert2JSValue(napi_env env, bool value);
     static napi_value Convert2JSValue(napi_env env, const std::map<std::string, int>& value);
+    template<class... Types>
+    static napi_value Convert2JSValue(napi_env env, const std::variant<Types...>& value);
     static std::vector<uint8_t> ConvertU8Vector(napi_env env, napi_value jsValue);
+
+private:
+    template<typename _VTp>
+    static napi_value ReadVariant(napi_env env, uint32_t step, uint32_t index, const _VTp &output)
+    {
+        (void)step;
+        (void)index;
+        (void)output;
+        return Convert2JSValue(env);
+    }
+
+    template<typename _VTp, typename _First, typename ..._Rest>
+    static napi_value ReadVariant(napi_env env, uint32_t step, uint32_t index, const _VTp &value)
+    {
+        if (step == index) {
+            auto *realValue = std::get_if<_First>(&value);
+            if (realValue == nullptr) {
+                return nullptr;
+            }
+            return Convert2JSValue(env, *realValue);
+        }
+        return ReadVariant<_VTp, _Rest...>(env, step + 1, index, value);
+    }
 };
+
+template<class... Types>
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::variant<Types...> &value)
+{
+    return ReadVariant<decltype(value), Types...>(env, 0, value.index(), value);
+}
 } // namespace DataShare
 } // namespace OHOS
 

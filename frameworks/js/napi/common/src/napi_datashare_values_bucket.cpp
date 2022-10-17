@@ -27,36 +27,14 @@ napi_value DataShareValueBucketNewInstance(napi_env env, DataShareValuesBucket &
 {
     napi_value ret;
     NAPI_CALL(env, napi_create_object(env, &ret));
-    std::map<std::string, DataShareValueObject> valuesMap = valuesBucket.valuesMap;
-    std::map<std::string, DataShareValueObject>::iterator it;
-    for (it = valuesMap.begin(); it != valuesMap.end(); ++it) {
+    const auto &valuesMap = valuesBucket.valuesMap;
+    auto it = valuesMap.begin();
+    for (; it != valuesMap.end(); ++it) {
         std::string key = it->first;
         auto valueObject = it->second;
-        napi_value value = nullptr;
-        switch (valueObject.GetType()) {
-            case DataShareValueObjectType::TYPE_NULL: {
-                    value = nullptr;
-                } break;
-            case DataShareValueObjectType::TYPE_INT: {
-                    int64_t intVal = valueObject;
-                    value = DataShareJSUtils::Convert2JSValue(env, intVal);
-                } break;
-            case DataShareValueObjectType::TYPE_DOUBLE: {
-                    double doubleVal = valueObject;
-                    value = DataShareJSUtils::Convert2JSValue(env, doubleVal);
-                } break;
-            case DataShareValueObjectType::TYPE_BLOB: {
-                    std::vector<uint8_t> blobVal = valueObject;
-                    value = DataShareJSUtils::Convert2JSValue(env, blobVal);
-                } break;
-            case DataShareValueObjectType::TYPE_BOOL: {
-                    bool boolVal  = valueObject;
-                    value = DataShareJSUtils::Convert2JSValue(env, boolVal);
-                } break;
-            default: {
-                    std::string strVal = valueObject;
-                    value = DataShareJSUtils::Convert2JSValue(env, strVal);
-                } break;
+        napi_value value = DataShareJSUtils::Convert2JSValue(env, valueObject);
+        if (value == nullptr) {
+            continue;
         }
         NAPI_CALL(env, napi_set_named_property(env, ret, key.c_str(), value));
     }
