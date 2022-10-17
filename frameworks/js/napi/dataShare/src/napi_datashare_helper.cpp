@@ -111,7 +111,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         if (status != napi_ok || !isStageMode) {
             ctxInfo->isStageMode = false;
             auto ability = OHOS::AbilityRuntime::GetCurrentAbility(env);
-            std::string msg = GetUri(env, argv[PARAM0], context->uri);
+            std::string msg = GetUri(env, argv[PARAM0], ctxInfo->uri);
             if (!msg.empty()) {
                 context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 context->errorMsg = msg;
@@ -125,7 +125,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             ctxInfo->contextF = ability->GetContext();
         } else {
             ctxInfo->contextS = OHOS::AbilityRuntime::GetStageModeContext(env, argv[PARAM0]);
-            std::string msg = GetUri(env, argv[PARAM1], context->uri);
+            std::string msg = GetUri(env, argv[PARAM1], ctxInfo->uri);
             if (!msg.empty()) {
                 context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 context->errorMsg = msg;
@@ -450,7 +450,6 @@ napi_value NapiDataShareHelper::Napi_BatchInsert(napi_env env, napi_callback_inf
             return napi_invalid_arg;
         }
 
-        std::string msg;
         context->values = GetValuesBucketArray(env, argv[PARAM1], msg);
         if (!msg.empty()) {
             context->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
