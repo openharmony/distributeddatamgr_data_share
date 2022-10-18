@@ -194,7 +194,6 @@ napi_value NapiDataShareHelper::GetConstructor(napi_env env)
     };
     NAPI_CALL(env, napi_define_class(env, "DataShareHelper", NAPI_AUTO_LENGTH, Initialize, nullptr,
         sizeof(clzDes) / sizeof(napi_property_descriptor), clzDes, &cons));
-    LOG_INFO("after napi_call");
     g_dataShareHelperList.clear();
     return cons;
 }
@@ -210,7 +209,6 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
         LOG_ERROR("Parameters error, need at least 2 parameters!");
         return nullptr;
     }
-    LOG_INFO("after check Parameters");
     auto *proxy = new NapiDataShareHelper();
     auto finalize = [](napi_env env, void * data, void * hint) {
         NapiDataShareHelper *proxy = reinterpret_cast<NapiDataShareHelper *>(data);
@@ -226,12 +224,10 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
             delete proxy;
         }
     };
-    LOG_INFO("after finalize");
     if (napi_wrap(env, self, proxy, finalize, nullptr, nullptr) != napi_ok) {
         finalize(env, proxy, nullptr);
         return nullptr;
     }
-    LOG_INFO("after napi_wrap");
     return self;
 }
 
