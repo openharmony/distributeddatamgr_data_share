@@ -116,7 +116,7 @@ std::string AnalysisValuesBucket(DataShareValuesBucket &valuesBucket, const napi
 
         std::string msg = SetValuesBucketObject(valuesBucket, env, keyStr, value);
         if (!msg.empty()) {
-           return msg;
+            return msg;
         }
     }
     return "";

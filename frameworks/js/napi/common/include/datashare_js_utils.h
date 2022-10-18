@@ -58,14 +58,13 @@ public:
     static napi_value Convert2JSValue(napi_env env, const std::map<std::string, int>& value);
     static std::vector<uint8_t> ConvertU8Vector(napi_env env, napi_value jsValue);
 
-    #define NAPI_ASSERT_ERRCODE(env, assertion, msg, code)                    \
-    do {                                                                      \
-        if (!(assertion)) {                                                   \
+    #define NAPI_ASSERT_ERRCODE(env, assertion, msg, code)                      \
+    do {                                                                        \
+        if (!(assertion)) {                                                     \
             napi_throw_error((env), std::to_string(code).c_str(), msg.c_str()); \
-            return;                                                           \
-        }                                                                     \
+            return;                                                             \
+        }                                                                       \
     } while (0)
-
 };
 } // namespace DataShare
 } // namespace OHOS
