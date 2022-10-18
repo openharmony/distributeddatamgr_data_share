@@ -99,7 +99,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
 {
     LOG_DEBUG("Start");
     auto ctxInfo = std::make_shared<CreateContextInfo>();
-    auto context = std::make_shared<ContextInfo>();
+    auto context = std::make_shared<AsyncCall::Context>(nullptr, nullptr);
     auto input = [&](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
             LOG_ERROR("Parameters error, should 2 or 3 parameters!");
@@ -190,7 +190,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
