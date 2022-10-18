@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef LDBPROJ_DATASHARE_ERROR_H
-#define LDBPROJ_DATASHARE_ERROR_H
+#ifndef DATASHARE_ERROR_H
+#define DATASHARE_ERROR_H
 
 #include "datashare_js_utils.h"
 
@@ -66,4 +66,4 @@ public:
 } // namespace DataShare
 } // namespace OHOS
 
-#endif // LDBPROJ_DATASHARE_ERROR_H
+#endif // DATASHARE_ERROR_H

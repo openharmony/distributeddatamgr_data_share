@@ -19,7 +19,7 @@ namespace OHOS {
 namespace DataShare {
 std::string ParametersTypeError::GetMessage()
 {
-    return "Parameter error. The type of '" + name +"' must be '" + wantType + "'";
+    return "Parameter error. The type of '" + name + "' must be '" + wantType + "'.";
 }
 
 int ParametersTypeError::GetCode()
@@ -29,7 +29,7 @@ int ParametersTypeError::GetCode()
 
 std::string ParametersNumError::GetMessage()
 {
-    return "Parameter error. Need " + wantNum +" parameters!";
+    return "Parameter error. Need " + wantNum + " parameters!";
 }
 
 int ParametersNumError::GetCode()
