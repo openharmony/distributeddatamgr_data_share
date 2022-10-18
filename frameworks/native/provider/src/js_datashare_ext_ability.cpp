@@ -16,11 +16,9 @@
 #include "js_datashare_ext_ability.h"
 
 #include "ability_info.h"
-#include "accesstoken_kit.h"
 #include "dataobs_mgr_client.h"
 #include "datashare_stub_impl.h"
 #include "datashare_log.h"
-#include "ipc_skeleton.h"
 #include "js_datashare_ext_ability_context.h"
 #include "js_runtime.h"
 #include "js_runtime_utils.h"
@@ -47,7 +45,6 @@ const std::string ASYNC_CALLBACK_NAME = "AsyncCallback";
 bool MakeNapiColumn(napi_env env, napi_value &napiColumns, const std::vector<std::string> &columns);
 
 using namespace OHOS::AppExecFwk;
-using OHOS::Security::AccessToken::AccessTokenKit;
 using DataObsMgrClient = OHOS::AAFwk::DataObsMgrClient;
 
 JsDataShareExtAbility* JsDataShareExtAbility::Create(const std::unique_ptr<Runtime>& runtime)
@@ -372,11 +369,6 @@ int JsDataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &v
 {
     LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
-    if (!CheckCallingPermission(abilityInfo_->writePermission)) {
-        LOG_ERROR("Check calling permission failed.");
-        return ret;
-    }
-
     ret = DataShareExtAbility::Insert(uri, value);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -405,13 +397,7 @@ int JsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pre
 {
     LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
-    if (!CheckCallingPermission(abilityInfo_->writePermission)) {
-        LOG_ERROR("Check calling permission failed.");
-        return ret;
-    }
-
     ret = DataShareExtAbility::Update(uri, predicates, value);
-
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
     napi_value napiUri = nullptr;
@@ -446,11 +432,6 @@ int JsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &pre
 {
     LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
-    if (!CheckCallingPermission(abilityInfo_->writePermission)) {
-        LOG_ERROR("Check calling permission failed.");
-        return ret;
-    }
-
     ret = DataShareExtAbility::Delete(uri, predicates);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -480,11 +461,6 @@ std::shared_ptr<DataShareResultSet> JsDataShareExtAbility::Query(const Uri &uri,
 {
     LOG_DEBUG("Start");
     std::shared_ptr<DataShareResultSet> ret;
-    if (!CheckCallingPermission(abilityInfo_->readPermission)) {
-        LOG_ERROR("Check calling permission failed.");
-        return ret;
-    }
-
     ret = DataShareExtAbility::Query(uri, predicates, columns);
 
     HandleScope handleScope(jsRuntime_);
@@ -541,11 +517,6 @@ int JsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataSha
 {
     LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
-    if (!CheckCallingPermission(abilityInfo_->writePermission)) {
-        LOG_ERROR("Check calling permission failed.");
-        return ret;
-    }
-
     ret = DataShareExtAbility::BatchInsert(uri, values);
 
     HandleScope handleScope(jsRuntime_);
@@ -686,17 +657,6 @@ std::vector<std::shared_ptr<DataShareResult>> JsDataShareExtAbility::ExecuteBatc
     LOG_DEBUG("Start");
     auto ret = DataShareExtAbility::ExecuteBatch(operations);
     return ret;
-}
-
-bool JsDataShareExtAbility::CheckCallingPermission(const std::string &permission)
-{
-    LOG_DEBUG("Start");
-    if (!permission.empty() && AccessTokenKit::VerifyAccessToken(IPCSkeleton::GetCallingTokenID(), permission)
-        != AppExecFwk::Constants::PERMISSION_GRANTED) {
-        LOG_ERROR("permission not granted.");
-        return false;
-    }
-    return true;
 }
 
 napi_value JsDataShareExtAbility::MakePredicates(napi_env env, const DataSharePredicates &predicates)

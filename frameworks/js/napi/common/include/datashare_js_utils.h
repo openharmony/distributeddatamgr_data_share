@@ -29,6 +29,15 @@ namespace OHOS {
 namespace DataShare {
 class DataShareJSUtils final {
 public:
+    static constexpr const char *MESSAGE_HELPER_UNINITIALIZED = "The DataShareHelper is not initialized successfully.";
+
+    enum ExceptionErrorCode {
+        OK = 0,
+        EXCEPTION_INNER = 15700000,
+        EXCEPTION_HELPER_UNINITIALIZED = 15700010,
+        EXCEPTION_PARAMETER_CHECK = 401,
+    };
+
     static constexpr int32_t DEFAULT_BUF_SIZE = 1024;
     static constexpr int32_t ASYNC_RST_SIZE = 2;
     static constexpr int32_t SYNC_RESULT_ELEMNT_NUM = 2;
@@ -48,6 +57,14 @@ public:
     static napi_value Convert2JSValue(napi_env env, bool value);
     static napi_value Convert2JSValue(napi_env env, const std::map<std::string, int>& value);
     static std::vector<uint8_t> ConvertU8Vector(napi_env env, napi_value jsValue);
+
+    #define NAPI_ASSERT_ERRCODE(env, assertion, msg, code)                      \
+    do {                                                                        \
+        if (!(assertion)) {                                                     \
+            napi_throw_error((env), std::to_string(code).c_str(), msg.c_str()); \
+            return;                                                             \
+        }                                                                       \
+    } while (0)
 };
 } // namespace DataShare
 } // namespace OHOS

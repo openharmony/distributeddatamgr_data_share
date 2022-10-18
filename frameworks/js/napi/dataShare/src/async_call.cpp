@@ -33,7 +33,8 @@ AsyncCall::AsyncCall(napi_env env, napi_callback_info info, std::shared_ptr<Cont
         napi_create_reference(env, argv[argc - 1], 1, &context_->callback);
         argc = argc - 1;
     }
-    NAPI_CALL_RETURN_VOID(env, (*context)(env, argc, argv, self));
+    napi_status status = (*context)(env, argc, argv, self);
+    NAPI_ASSERT_ERRCODE(env, status == napi_ok, context->errorMsg, context->errorCode);
     context_->ctx = std::move(context);
     napi_create_reference(env, self, 1, &context_->self);
 }
@@ -97,6 +98,20 @@ void AsyncCall::OnExecute(napi_env env, void *data)
     context->ctx->Exec();
 }
 
+void SetBusinessError(napi_env env, napi_value *businessError, DataShareJSUtils::ExceptionErrorCode errorCode,
+    std::string errorMsg)
+{
+    napi_create_object(env, businessError);
+    if (errorCode != DataShareJSUtils::EXCEPTION_INNER) {
+        napi_value code = nullptr;
+        napi_value msg = nullptr;
+        napi_create_int32(env, errorCode, &code);
+        napi_create_string_utf8(env, errorMsg.c_str(), NAPI_AUTO_LENGTH, &msg);
+        napi_set_named_property(env, *businessError, "code", code);
+        napi_set_named_property(env, *businessError, "message", msg);
+    }
+}
+
 void AsyncCall::OnComplete(napi_env env, napi_status status, void *data)
 {
     LOG_DEBUG("run the js callback function");
@@ -112,9 +127,9 @@ void AsyncCall::OnComplete(napi_env env, napi_status status, void *data)
             napi_get_undefined(env, &result[ARG_DATA]);
         }
     } else {
-        napi_value message = nullptr;
-        napi_create_string_utf8(env, "async call failed", NAPI_AUTO_LENGTH, &message);
-        napi_create_error(env, nullptr, message, &result[ARG_ERROR]);
+        napi_value businessError = nullptr;
+        SetBusinessError(env, &businessError, context->ctx->errorCode, context->ctx->errorMsg);
+        result[ARG_ERROR] = businessError;
         napi_get_undefined(env, &result[ARG_DATA]);
     }
     if (context->defer != nullptr) {
@@ -133,6 +148,7 @@ void AsyncCall::OnComplete(napi_env env, napi_status status, void *data)
     }
     DeleteContext(env, context);
 }
+
 void AsyncCall::DeleteContext(napi_env env, AsyncContext *context)
 {
     if (env != nullptr) {

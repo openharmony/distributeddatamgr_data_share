@@ -303,7 +303,6 @@ private:
     NativeValue* CallObjectMethod(const char *name, NativeValue * const *argv = nullptr, size_t argc = 0,
         bool isAsync = true);
     void GetSrcPath(std::string &srcPath);
-    bool CheckCallingPermission(const std::string &permission);
     napi_value MakePredicates(napi_env env, const DataSharePredicates &predicates);
     static NativeValue* AsyncCallback(NativeEngine* engine, NativeCallbackInfo* info);
     void CheckAndSetAsyncResult(NativeEngine* engine);
