@@ -101,12 +101,10 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
     auto ctxInfo = std::make_shared<CreateContextInfo>();
     auto input = [ctxInfo](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
-            LOG_ERROR("Parameters error, should 2 or 3 parameters!");
             ctxInfo->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
             ctxInfo->errorMsg = "Parameters error, should 2 or 3 parameters!";
             return napi_invalid_arg;
         }
-        LOG_INFO("after check Parameters.");
         bool isStageMode = false;
         napi_status status = AbilityRuntime::IsStageContext(env, argv[PARAM0], isStageMode);
         if (status != napi_ok || !isStageMode) {
@@ -114,80 +112,57 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             auto ability = OHOS::AbilityRuntime::GetCurrentAbility(env);
             std::string msg = GetUri(env, argv[PARAM0], ctxInfo->strUri);
             if (!msg.empty()) {
-                LOG_ERROR("getUri failed.");
                 ctxInfo->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 ctxInfo->errorMsg = msg;
                 return napi_invalid_arg;
             }
-            LOG_INFO("after geturi.");
             if (ability == nullptr) {
-                LOG_ERROR("ability is nullptr.");
                 ctxInfo->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 ctxInfo->errorMsg = "Parameters error, failed to get native ability, ability can't be nullptr";
                 return napi_invalid_arg;
             }
-            LOG_INFO("after check ability.");
             ctxInfo->contextF = ability->GetContext();
         } else {
             ctxInfo->contextS = OHOS::AbilityRuntime::GetStageModeContext(env, argv[PARAM0]);
-            LOG_INFO("before geturi.");
             std::string msg = GetUri(env, argv[PARAM1], ctxInfo->strUri);
-            LOG_INFO("after geturi.");
             if (!msg.empty()) {
-                LOG_ERROR("getUri failed.");
                 ctxInfo->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 ctxInfo->errorMsg = msg;
                 return napi_invalid_arg;
             }
-            LOG_INFO("after geturi check.");
             if (ctxInfo->contextS == nullptr) {
-                LOG_ERROR("contextS is nullptr");
                 ctxInfo->errorCode = DataShareJSUtils::EXCEPTION_PARAMETER_CHECK;
                 ctxInfo->errorMsg = "Parameters error, failed to get native contextS, contextS can't be nullptr";
                 return napi_invalid_arg;
             }
-            LOG_INFO("after contextS check.");
         }
 
         napi_value helperProxy = nullptr;
-        LOG_INFO("before napi_new_instance");
         status = napi_new_instance(env, GetConstructor(env), argc, argv, &helperProxy);
-        LOG_INFO("after napi_new_instance");
         if ((helperProxy == nullptr) || (status != napi_ok)) {
-            LOG_ERROR("helperProxy == nullptr) || (status != napi_ok)");
             ctxInfo->errorCode = DataShareJSUtils::EXCEPTION_HELPER_UNINITIALIZED;
             ctxInfo->errorMsg = DataShareJSUtils::MESSAGE_HELPER_UNINITIALIZED;
             return napi_generic_failure;
         }
-        LOG_INFO("(helperProxy == nullptr) || (status != napi_ok)");
         napi_create_reference(env, helperProxy, 1, &(ctxInfo->ref));
         ctxInfo->env = env;
         return napi_ok;
     };
     auto output = [ctxInfo](napi_env env, napi_value *result) -> napi_status {
-        LOG_INFO("output start.");
         if (ctxInfo->dataShareHelper == nullptr) {
-            LOG_INFO("ctxInfo->dataShareHelper == nullptr.");
             ctxInfo->errorCode = DataShareJSUtils::EXCEPTION_HELPER_UNINITIALIZED;
             ctxInfo->errorMsg = DataShareJSUtils::MESSAGE_HELPER_UNINITIALIZED;
             return napi_generic_failure;
         }
-        LOG_INFO("ctxInfo->dataShareHelper != nullptr.");
         g_dataShareHelperList.emplace_back(ctxInfo->dataShareHelper);
-        LOG_INFO("before napi_get_reference_value");
         napi_status status = napi_get_reference_value(env, ctxInfo->ref, result);
-        LOG_INFO("after napi_get_reference_value");
         NapiDataShareHelper *proxy = nullptr;
-        LOG_INFO("before napi_unwrap");
         status = napi_unwrap(env, *result, reinterpret_cast<void **>(&proxy));
-        LOG_INFO("after napi_unwrap");
         if (proxy == nullptr) {
             LOG_ERROR("proxy is nullptr");
             return status;
         }
-        LOG_INFO("before move");
         proxy->datashareHelper_ = std::move(ctxInfo->dataShareHelper);
-        LOG_INFO("after move");
         return status;
     };
     auto exec = [ctxInfo](AsyncCall::Context *ctx) {
