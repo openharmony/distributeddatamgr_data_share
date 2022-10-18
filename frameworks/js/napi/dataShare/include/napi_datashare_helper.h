@@ -50,7 +50,7 @@ private:
         napi_ref ref = nullptr;
         bool isStageMode = true;
         std::string strUri = "";
-        std::shared_ptr<Context> contextF = nullptr;
+        std::shared_ptr<AppExecFwk::Context> contextF = nullptr;
         std::shared_ptr<OHOS::AbilityRuntime::Context> contextS = nullptr;
         std::shared_ptr<DataShareHelper> dataShareHelper = nullptr;
         CreateContextInfo() : Context(nullptr, nullptr) {};
