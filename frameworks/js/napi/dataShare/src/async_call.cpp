@@ -34,7 +34,7 @@ AsyncCall::AsyncCall(napi_env env, napi_callback_info info, std::shared_ptr<Cont
         argc = argc - 1;
     }
     napi_status status = (*context)(env, argc, argv, self);
-    NAPI_ASSERT_ERRCODE(env, status == napi_ok, context->errorMsg, context->errorCode);
+    NAPI_ASSERT_ERRCODE(env, status == napi_ok, context->error);
     context_->ctx = std::move(context);
     napi_create_reference(env, self, 1, &context_->self);
 }
@@ -98,15 +98,14 @@ void AsyncCall::OnExecute(napi_env env, void *data)
     context->ctx->Exec();
 }
 
-void SetBusinessError(napi_env env, napi_value *businessError, DataShareJSUtils::ExceptionErrorCode errorCode,
-    std::string errorMsg)
+void SetBusinessError(napi_env env, napi_value *businessError, std::shared_ptr<Error> error)
 {
     napi_create_object(env, businessError);
-    if (errorCode != DataShareJSUtils::EXCEPTION_INNER) {
+    if (error->GetCode() != EXCEPTION_INNER) {
         napi_value code = nullptr;
         napi_value msg = nullptr;
-        napi_create_int32(env, errorCode, &code);
-        napi_create_string_utf8(env, errorMsg.c_str(), NAPI_AUTO_LENGTH, &msg);
+        napi_create_int32(env, error->GetCode(), &code);
+        napi_create_string_utf8(env, error->GetMessage().c_str(), NAPI_AUTO_LENGTH, &msg);
         napi_set_named_property(env, *businessError, "code", code);
         napi_set_named_property(env, *businessError, "message", msg);
     }
@@ -128,7 +127,7 @@ void AsyncCall::OnComplete(napi_env env, napi_status status, void *data)
         }
     } else {
         napi_value businessError = nullptr;
-        SetBusinessError(env, &businessError, context->ctx->errorCode, context->ctx->errorMsg);
+        SetBusinessError(env, &businessError, context->ctx->error);
         result[ARG_ERROR] = businessError;
         napi_get_undefined(env, &result[ARG_DATA]);
     }

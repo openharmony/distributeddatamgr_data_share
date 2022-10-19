@@ -18,6 +18,7 @@
 #include <functional>
 #include <memory>
 #include "datashare_js_utils.h"
+#include "datashare_error.h"
 #include "napi/native_common.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
@@ -27,8 +28,7 @@ class AsyncCall final {
 public:
     class Context {
     public:
-        DataShareJSUtils::ExceptionErrorCode errorCode = DataShareJSUtils::OK;
-        std::string errorMsg;
+        std::shared_ptr<Error> error;
         using InputAction = std::function<napi_status(napi_env, size_t, napi_value *, napi_value)>;
         using OutputAction = std::function<napi_status(napi_env, napi_value *)>;
         using ExecAction = std::function<void(Context *)>;
