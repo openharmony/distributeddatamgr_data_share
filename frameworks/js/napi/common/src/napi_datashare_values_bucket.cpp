@@ -42,7 +42,7 @@ napi_value DataShareValueBucketNewInstance(napi_env env, DataShareValuesBucket &
     return ret;
 }
 
-void SetValuesBucketObject(
+bool SetValuesBucketObject(
     DataShareValuesBucket &valuesBucket, const napi_env &env, std::string keyStr, napi_value value)
 {
     napi_valuetype valueType = napi_undefined;
@@ -69,18 +69,20 @@ void SetValuesBucketObject(
         valuesBucket.Put(keyStr, DataShareJSUtils::Convert2U8Vector(env, value));
     } else {
         LOG_ERROR("valuesBucket error");
+        return false;
     }
+    return true;
 }
 
-void AnalysisValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg)
+bool AnalysisValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg)
 {
     napi_value keys = 0;
     napi_get_property_names(env, arg, &keys);
     uint32_t arrLen = 0;
     napi_status status = napi_get_array_length(env, keys, &arrLen);
     if (status != napi_ok) {
-        LOG_ERROR("ValuesBucket errr");
-        return;
+        LOG_ERROR("ValuesBucket err");
+        return false;
     }
     LOG_DEBUG("ValuesBucket num : %{public}u", arrLen);
     for (size_t i = 0; i < arrLen; ++i) {
@@ -90,13 +92,16 @@ void AnalysisValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &e
         napi_value value = 0;
         napi_get_property(env, arg, key, &value);
 
-        SetValuesBucketObject(valuesBucket, env, keyStr, value);
+        if (!SetValuesBucketObject(valuesBucket, env, keyStr, value)) {
+            return false;
+        }
     }
+    return true;
 }
 
-void GetValueBucketObject(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg)
+bool GetValueBucketObject(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg)
 {
-    AnalysisValuesBucket(valuesBucket, env, arg);
+    return AnalysisValuesBucket(valuesBucket, env, arg);
 }
 } // namespace DataShare
 } // namespace OHOS

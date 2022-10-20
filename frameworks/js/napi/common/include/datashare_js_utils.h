@@ -53,6 +53,14 @@ public:
     static napi_value Convert2JSValue(napi_env env, const std::variant<Types...>& value);
     static std::vector<uint8_t> ConvertU8Vector(napi_env env, napi_value jsValue);
 
+    #define NAPI_ASSERT_ERRCODE(env, assertion, error)                                                      \
+    do {                                                                                                    \
+        if (!(assertion)) {                                                                                 \
+            napi_throw_error((env), std::to_string(error->GetCode()).c_str(), error->GetMessage().c_str()); \
+            return;                                                                                         \
+        }                                                                                                   \
+    } while (0)
+
 private:
     template<typename _VTp>
     static napi_value ReadVariant(napi_env env, uint32_t step, uint32_t index, const _VTp &output)
