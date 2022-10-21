@@ -64,7 +64,7 @@ napi_value DataShareValueBucketNewInstance(napi_env env, DataShareValuesBucket &
     return ret;
 }
 
-std::string SetValuesBucketObject(
+bool SetValuesBucketObject(
     DataShareValuesBucket &valuesBucket, const napi_env &env, std::string keyStr, napi_value value)
 {
     napi_valuetype valueType = napi_undefined;
@@ -91,12 +91,12 @@ std::string SetValuesBucketObject(
         valuesBucket.Put(keyStr, DataShareJSUtils::Convert2U8Vector(env, value));
     } else {
         LOG_ERROR("valuesBucket error");
-        return "Parameters error. The type of 'ValueObject' must in [string, number, boolean, null, Uint8Array]";
+        return false;
     }
-    return "";
+    return true;
 }
 
-std::string AnalysisValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg)
+bool AnalysisValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg)
 {
     napi_value keys = 0;
     napi_get_property_names(env, arg, &keys);
@@ -104,7 +104,7 @@ std::string AnalysisValuesBucket(DataShareValuesBucket &valuesBucket, const napi
     napi_status status = napi_get_array_length(env, keys, &arrLen);
     if (status != napi_ok) {
         LOG_ERROR("ValuesBucket err");
-        return "Parameters error. The type of 'DataShareValuesBucket.key' must be 'string'";
+        return false;
     }
     LOG_DEBUG("ValuesBucket num : %{public}u", arrLen);
     for (size_t i = 0; i < arrLen; ++i) {
@@ -114,15 +114,14 @@ std::string AnalysisValuesBucket(DataShareValuesBucket &valuesBucket, const napi
         napi_value value = 0;
         napi_get_property(env, arg, key, &value);
 
-        std::string msg = SetValuesBucketObject(valuesBucket, env, keyStr, value);
-        if (!msg.empty()) {
-            return msg;
+        if (!SetValuesBucketObject(valuesBucket, env, keyStr, value)) {
+            return false;
         }
     }
-    return "";
+    return true;
 }
 
-std::string GetValueBucketObject(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg)
+bool GetValueBucketObject(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg)
 {
     return AnalysisValuesBucket(valuesBucket, env, arg);
 }
