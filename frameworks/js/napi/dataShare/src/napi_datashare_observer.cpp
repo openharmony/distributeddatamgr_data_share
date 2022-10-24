@@ -69,6 +69,7 @@ void NAPIDataShareObserver::OnChange()
             if (callStatus != napi_ok) {
                 LOG_ERROR("napi_call_function failed status : %{public}d", callStatus);
             }
+            delete work;
         });
     if (ret != 0) {
         LOG_ERROR("uv_queue_work failed");
