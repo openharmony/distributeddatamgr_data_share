@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
 sptr<DataShareConnection> DataShareConnection::instance_ = nullptr;
-constexpr int WAIT_TIME = 1;
+constexpr int WAIT_TIME = 3;
 
 /**
  * @brief This method is called back to receive the connection result after an ability calls the

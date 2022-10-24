@@ -300,7 +300,7 @@ int DataShareHelper::OpenRawFile(Uri &uri, const std::string &mode)
  */
 int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
 {
-    LOG_DEBUG("Start");
+    LOG_INFO("Start");
     int index = INVALID_VALUE;
 	if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
@@ -335,7 +335,7 @@ int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
 int DataShareHelper::Update(
     Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
 {
-    LOG_DEBUG("Start");
+    LOG_INFO("Start");
     int index = INVALID_VALUE;
 	if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
@@ -368,7 +368,7 @@ int DataShareHelper::Update(
  */
 int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
 {
-    LOG_DEBUG("Start");
+    LOG_INFO("Start");
     int index = INVALID_VALUE;
 	if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
@@ -403,7 +403,7 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
 std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
     Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns)
 {
-    LOG_DEBUG("Start");
+    LOG_INFO("Start");
     std::shared_ptr<DataShareResultSet> resultset = nullptr;
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
@@ -460,7 +460,7 @@ std::string DataShareHelper::GetType(Uri &uri)
  */
 int DataShareHelper::BatchInsert(Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
-    LOG_DEBUG("Start");
+    LOG_INFO("Start");
     int ret = INVALID_VALUE;
     if (!CheckUriParam(uri)) {
         return ret;
@@ -715,6 +715,7 @@ Uri DataShareHelper::DenormalizeUri(Uri &uri)
 bool DataShareHelper::TryReconnect(const Uri &uri, const sptr <IRemoteObject> &token)
 {
     if (dataShareConnection_->IsExtAbilityConnected()) {
+        LOG_INFO("dataShareConnection_->IsExtAbilityConnected()");
         return true;
     }
 
@@ -729,6 +730,7 @@ bool DataShareHelper::TryReconnect(const Uri &uri, const sptr <IRemoteObject> &t
     }
 
     AddDataShareDeathRecipient(dataShareProxy_->AsObject());
+    LOG_INFO("After reconnect, dataShareProxy is connected");
     return true;
 }
 
