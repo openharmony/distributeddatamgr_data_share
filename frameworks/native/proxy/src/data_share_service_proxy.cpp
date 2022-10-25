@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-//#define LOG_TAG "DataShareServiceProxy"
-
 #include "data_share_service_proxy.h"
 
 #include "datashare_log.h"
