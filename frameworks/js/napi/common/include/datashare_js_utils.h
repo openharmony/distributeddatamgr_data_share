@@ -26,6 +26,14 @@
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
 
+#define NAPI_ASSERT_ERRCODE(env, assertion, error)                                                          \
+do {                                                                                                        \
+    if (!(assertion)) {                                                                                     \
+        napi_throw_error((env), std::to_string((error)->GetCode()).c_str(), (error)->GetMessage().c_str()); \
+        return;                                                                                             \
+    }                                                                                                       \
+} while (0)
+
 namespace OHOS {
 namespace DataShare {
 class DataShareJSUtils final {
@@ -52,14 +60,6 @@ public:
     template<class... Types>
     static napi_value Convert2JSValue(napi_env env, const std::variant<Types...>& value);
     static std::vector<uint8_t> ConvertU8Vector(napi_env env, napi_value jsValue);
-
-    #define NAPI_ASSERT_ERRCODE(env, assertion, error)                                                      \
-    do {                                                                                                    \
-        if (!(assertion)) {                                                                                 \
-            napi_throw_error((env), std::to_string(error->GetCode()).c_str(), error->GetMessage().c_str()); \
-            return;                                                                                         \
-        }                                                                                                   \
-    } while (0)
 
 private:
     template<typename _VTp>
