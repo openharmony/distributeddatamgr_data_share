@@ -31,6 +31,10 @@ sptr<ISharedResultSet> ISharedResultSetStub::CreateStub(std::shared_ptr<DataShar
         LOG_ERROR("stub is nullptr");
         return stub;
     }
+    if (result == nullptr) {
+        LOG_ERROR("result is nullptr");
+        return result;
+    }
     parcel.WriteRemoteObject(stub->AsObject().GetRefPtr());
     result->Marshalling(parcel);
     return stub;
