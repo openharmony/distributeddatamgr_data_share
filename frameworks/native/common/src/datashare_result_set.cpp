@@ -15,13 +15,15 @@
 #include "datashare_result_set.h"
 
 #include <securec.h>
+
 #include <sstream>
+
+#include "adaptor.h"
+#include "datashare_errno.h"
 #include "datashare_log.h"
 #include "parcel.h"
-#include "datashare_errno.h"
 #include "shared_block.h"
 #include "string_ex.h"
-#include "dds_trace.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -153,7 +155,7 @@ int DataShareResultSet::GoToRow(int position)
 
 int DataShareResultSet::GetBlob(int columnIndex, std::vector<uint8_t> &value)
 {
-    DistributedDataDfx::DdsTrace trace(std::string(LOG_TAG"::") + std::string(__FUNCTION__));
+    DISTRIBUTED_DATA_HITRACE(std::string(__FUNCTION__));
     int errorCode = CheckState(columnIndex);
     if (errorCode != E_OK) {
         return errorCode;
@@ -346,7 +348,7 @@ int DataShareResultSet::IsColumnNull(int columnIndex, bool &isNull)
 
 int DataShareResultSet::Close()
 {
-    DistributedDataDfx::DdsTrace trace(std::string(LOG_TAG"::") + std::string(__FUNCTION__));
+    DISTRIBUTED_DATA_HITRACE(std::string(__FUNCTION__));
     DataShareAbsResultSet::Close();
     ClosedBlock();
     return E_OK;
