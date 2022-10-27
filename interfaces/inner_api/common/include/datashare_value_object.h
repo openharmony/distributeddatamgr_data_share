@@ -34,28 +34,27 @@ enum DataShareValueObjectType : int32_t {
 
 class DataShareValueObject {
 public:
-    DataShareValueObject() : type(TYPE_NULL) {};
+    using Type = std::variant<std::monostate, int64_t, double, std::string, bool, std::vector<uint8_t>>;
+    Type value;
+
+    DataShareValueObject() = default;
     ~DataShareValueObject() = default;
-    DataShareValueObject(DataShareValueObject &&object) noexcept : type(object.type), value(std::move(object.value))
-    {
-        object.type = DataShareValueObjectType::TYPE_NULL;
-    };
-    DataShareValueObject(const DataShareValueObject &object) : type(object.type), value(object.value) {};
-    DataShareValueObject(int val) : type(TYPE_INT), value(static_cast<int64_t>(val)) {};
-    DataShareValueObject(int64_t val) : type(TYPE_INT), value(val) {};
-    DataShareValueObject(double val) : type(TYPE_DOUBLE), value(val) {};
-    DataShareValueObject(bool val) : type(TYPE_BOOL), value(val) {};
-    DataShareValueObject(std::string val) : type(TYPE_STRING), value(std::move(val)) {};
+    DataShareValueObject(const Type &object) noexcept : value(object) { };
+    DataShareValueObject(DataShareValueObject &&object) noexcept : value(std::move(object.value)) { };
+    DataShareValueObject(const DataShareValueObject &object) : value(object.value) {};
+    DataShareValueObject(int val) : value(static_cast<int64_t>(val)) {};
+    DataShareValueObject(int64_t val) : value(val) {};
+    DataShareValueObject(double val) : value(val) {};
+    DataShareValueObject(bool val) : value(val) {};
+    DataShareValueObject(std::string val) : value(std::move(val)) {};
     DataShareValueObject(const char *val) : DataShareValueObject(std::string(val)) {};
-    DataShareValueObject(std::vector<uint8_t> blob) : type(TYPE_BLOB), value(std::move(blob)) {};
+    DataShareValueObject(std::vector<uint8_t> blob) : value(std::move(blob)) {};
     DataShareValueObject &operator=(DataShareValueObject &&object) noexcept
     {
         if (this == &object) {
             return *this;
         }
-        type = object.type;
         value = std::move(object.value);
-        object.type = TYPE_NULL;
         return *this;
     };
     DataShareValueObject &operator=(const DataShareValueObject &object)
@@ -63,14 +62,8 @@ public:
         if (this == &object) {
             return *this;
         }
-        type = object.type;
         value = object.value;
         return *this;
-    }
-
-    DataShareValueObjectType GetType() const
-    {
-        return type;
     }
 
     operator int () const
@@ -121,8 +114,6 @@ public:
             return {};
         }
     }
-    DataShareValueObjectType type;
-    std::variant<std::monostate, int, int64_t, double, std::string, bool, std::vector<uint8_t>> value;
 };
 } // namespace DataShare
 } // namespace OHOS

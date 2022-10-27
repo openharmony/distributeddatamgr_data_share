@@ -42,6 +42,7 @@ void NAPIDataShareObserver::OnChange()
     }
     uv_work_t *work = new (std::nothrow)uv_work_t();
     if (work == nullptr) {
+        delete observerWorker;
         LOG_ERROR("Failed to create uv work");
         return;
     }
@@ -52,6 +53,7 @@ void NAPIDataShareObserver::OnChange()
             LOG_DEBUG("uv_queue_work start");
             std::shared_ptr<ObserverWorker> innerWorker(reinterpret_cast<ObserverWorker *>(work->data));
             if (innerWorker->observer_->ref_ == nullptr) {
+                delete work;
                 LOG_ERROR("innerWorker->observer_->ref_ is nullptr");
                 return;
             }
@@ -67,6 +69,7 @@ void NAPIDataShareObserver::OnChange()
             if (callStatus != napi_ok) {
                 LOG_ERROR("napi_call_function failed status : %{public}d", callStatus);
             }
+            delete work;
         });
     if (ret != 0) {
         LOG_ERROR("uv_queue_work failed");

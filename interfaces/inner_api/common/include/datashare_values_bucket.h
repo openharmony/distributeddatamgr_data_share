@@ -26,12 +26,12 @@ namespace DataShare {
 class DataShareValuesBucket {
 public:
     DataShareValuesBucket() = default;
-    explicit DataShareValuesBucket(std::map<std::string, DataShareValueObject> &values) : valuesMap(values){};
+    explicit DataShareValuesBucket(std::map<std::string, DataShareValueObject::Type> values) : valuesMap(std::move(values)){};
     ~DataShareValuesBucket() = default;
 
     void Put(const std::string &columnName, const DataShareValueObject &value = {})
     {
-        valuesMap.insert(std::make_pair(columnName, value));
+        valuesMap.insert(std::make_pair(columnName, value.value));
     }
 
     void Clear()
@@ -55,7 +55,7 @@ public:
         return iter->second;
     }
 
-    std::map<std::string, DataShareValueObject> valuesMap;
+    std::map<std::string, DataShareValueObject::Type> valuesMap;
 };
 } // namespace DataShare
 } // namespace OHOS

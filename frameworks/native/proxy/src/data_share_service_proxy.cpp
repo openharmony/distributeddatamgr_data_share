@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-//#define LOG_TAG "DataShareServiceProxy"
-
 #include "data_share_service_proxy.h"
 
 #include "datashare_log.h"
@@ -120,7 +118,6 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
         LOG_ERROR("Query fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
         return nullptr;
     }
-
     return ISharedResultSet::ReadFromParcel(reply);
 }
 } // namespace OHOS::DataShare
