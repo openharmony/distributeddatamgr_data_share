@@ -82,7 +82,7 @@ bool ITypesUtils::Marshalling(const std::vector<T> &params, Parcel &parcel)
     if (!parcel.WriteInt32(params.size())) {
         return false;
     }
-    for (auto i = 0; i < params.size(); i++) {
+    for (unsigned long i = 0; i < params.size(); i++) {
         if (!Marshalling(params[i], parcel)) {
             return false;
         }
@@ -101,7 +101,7 @@ bool ITypesUtils::Unmarshalling(Parcel &parcel, std::vector<T> &params)
         return false;
     }
     params.resize(static_cast<int32_t>(size));
-    for (auto i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         T param;
         if (!Unmarshalling(parcel, param)) {
             return false;

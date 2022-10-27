@@ -235,7 +235,7 @@ public:
     Uri DenormalizeUri(Uri &uri);
 
 private:
-    DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri, const sptr<IDataShare> &dataShareProxy,
+    DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,
         const sptr<DataShareConnection> dataShareConnection);
     DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri);
     void AddDataShareDeathRecipient(const sptr<IRemoteObject> &token);
@@ -246,7 +246,6 @@ private:
     bool isDataShareService_ = false;
     sptr<IRemoteObject> token_ = {};
     Uri uri_ = Uri("");
-    sptr<IDataShare> dataShareProxy_ = nullptr;
     static std::mutex oplock_;
     static std::mutex deathlock_;
     sptr<IRemoteObject::DeathRecipient> callerDeathRecipient_ = nullptr;
