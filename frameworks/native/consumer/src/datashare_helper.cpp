@@ -722,7 +722,7 @@ bool DataShareHelper::TryReconnect(const Uri &uri, const sptr <IRemoteObject> &t
         return false;
     }
 
-    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
+    AddDataShareDeathRecipient(dataShareConnection_->GetDataShareProxy()->AsObject());
     LOG_INFO("After reconnect, dataShareProxy is connected");
     return true;
 }
