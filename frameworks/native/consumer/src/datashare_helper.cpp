@@ -119,7 +119,8 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
         LOG_ERROR("the Scheme is not datashare, Scheme: %{public}s", uri.GetScheme().c_str());
         return nullptr;
     }
-    if ((uri.GetQuery().find("Proxy=true") != std::string::npos) && DataShareManager::GetDataShareService() != nullptr) {
+    if ((uri.GetQuery().find("Proxy=true") != std::string::npos) &&
+        DataShareManager::GetDataShareService() != nullptr) {
         LOG_DEBUG("Creator with dataShareService successfully.");
         DataShareHelper *dataShareHelper = new (std::nothrow) DataShareHelper(token, uri);
         if (dataShareHelper) {
@@ -273,13 +274,13 @@ int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
 {
     LOG_INFO("Start");
     int index = INVALID_VALUE;
-	if (isDataShareService_) {
+    if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
         auto service = DataShareManager::GetDataShareService();
         if (!service) {
             LOG_DEBUG("DataShareService mode, but fail to get dataShareService.");
             return index;
-        }  
+        }
         return service->Insert(uri.ToString(), value);
     }
 
@@ -314,7 +315,7 @@ int DataShareHelper::Update(
 {
     LOG_INFO("Start");
     int index = INVALID_VALUE;
-	if (isDataShareService_) {
+    if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
         auto service = DataShareManager::GetDataShareService();
         if (!service) {
@@ -353,7 +354,7 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
 {
     LOG_INFO("Start");
     int index = INVALID_VALUE;
-	if (isDataShareService_) {
+    if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
         auto service = DataShareManager::GetDataShareService();
         if (!service) {
