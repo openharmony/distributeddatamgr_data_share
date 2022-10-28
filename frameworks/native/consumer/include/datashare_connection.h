@@ -30,7 +30,7 @@ using namespace AppExecFwk;
 class DataShareConnection : public AAFwk::AbilityConnectionStub {
 public:
     DataShareConnection(const Uri &uri) : uri_(uri) {}
-    virtual ~DataShareConnection() = default;
+    virtual ~DataShareConnection();
 
     /**
      * @brief This method is called back to receive the connection result after an ability calls the
@@ -58,7 +58,7 @@ public:
     /**
      * @brief connect remote ability of DataShareExtAbility.
      */
-    void ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
+    bool ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
 
     /**
      * @brief disconnect remote ability of DataShareExtAbility.
@@ -73,30 +73,41 @@ public:
     bool IsExtAbilityConnected();
 
     /**
-     * @brief try to reconnect remote extension ability.
-     *
-     * @return bool true if connected, otherwise false.
-     */
-    bool TryReconnect(const Uri &uri, const sptr<IRemoteObject> &token);
-
-    /**
      * @brief get the proxy of datashare extension ability.
      *
      * @return the proxy of datashare extension ability.
      */
     sptr<IDataShare> GetDataShareProxy();
 
+    void SetDataShareProxy(sptr<IDataShare>);
+
     struct ConnectCondition {
         std::condition_variable condition;
         std::mutex mutex;
     };
 private:
+    void AddDataShareDeathRecipient(const sptr<IRemoteObject> &token);
+    void OnSchedulerDied(const wptr<IRemoteObject> &remote);
     static sptr<DataShareConnection> instance_;
     std::mutex mutex_;
-    std::atomic<bool> isConnected_ = {false};
     sptr<IDataShare> dataShareProxy_;
     ConnectCondition condition_;
     Uri uri_;
+    sptr<IRemoteObject::DeathRecipient> callerDeathRecipient_ = nullptr;
+};
+
+class DataShareDeathRecipient : public IRemoteObject::DeathRecipient {
+public:
+    using RemoteDiedHandler = std::function<void(const wptr<IRemoteObject> &)>;
+
+    explicit DataShareDeathRecipient(RemoteDiedHandler handler);
+
+    virtual ~DataShareDeathRecipient();
+
+    virtual void OnRemoteDied(const wptr<IRemoteObject> &remote);
+
+private:
+    RemoteDiedHandler handler_;
 };
 }  // namespace DataShare
 }  // namespace OHOS
