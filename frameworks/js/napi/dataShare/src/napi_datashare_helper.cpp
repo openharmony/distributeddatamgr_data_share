@@ -159,7 +159,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
     };
     auto exec = [ctxInfo](AsyncCall::Context *ctx) {
         if (ctxInfo->isStageMode && ctxInfo->contextS != nullptr) {
-            ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextS, ctxInfo->strUri);
+            ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextS->GetToken(), ctxInfo->strUri);
         } else if (!ctxInfo->isStageMode && ctxInfo->contextF != nullptr) {
             ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextF, ctxInfo->strUri);
         }

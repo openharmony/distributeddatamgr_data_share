@@ -119,28 +119,6 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
  * between the ability using the Data template (data share for short) and the associated client process in
  * a DataShareHelper instance.
  *
- * @param context Indicates the Context object on OHOS.
- * @param strUri Indicates the database table or disk file to operate.
- *
- * @return Returns the created DataShareHelper instance.
- */
-std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
-    const std::shared_ptr<OHOS::AbilityRuntime::Context> &context, const std::string &strUri)
-{
-    LOG_DEBUG("Creator with runtime context and uri called start");
-    if (context == nullptr) {
-        LOG_ERROR("DataShareHelper::Creator failed, context == nullptr");
-        return nullptr;
-    }
-    sptr<IRemoteObject> token = context->GetToken();
-    return Creator(token, strUri);
-}
-
-/**
- * @brief You can use this method to specify the Uri of the data to operate and set the binding relationship
- * between the ability using the Data template (data share for short) and the associated client process in
- * a DataShareHelper instance.
- *
  * @param token Indicates the System token.
  * @param strUri Indicates the database table or disk file to operate.
  *
