@@ -162,7 +162,6 @@ bool DataShareHelper::Release()
     LOG_INFO("Release Start");
     if (dataShareConnection_ != nullptr) {
         dataShareConnection_->DisconnectDataShareExtAbility();
-        dataShareConnection_ = nullptr;
     }
     uri_ = Uri("");
     return true;
