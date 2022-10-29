@@ -50,7 +50,7 @@ public:
      * @return Returns the created DataShareHelper instance with a specified Uri.
      */
     static std::shared_ptr<DataShareHelper> Creator(const std::shared_ptr<Context> &context,
-                                          const std::string &strUri);
+        const std::string &strUri);
     /**
      * @brief You can use this method to specify the Uri of the data to operate and set the binding relationship
      * between the ability using the Data template (data share for short) and the associated client process in
