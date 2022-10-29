@@ -175,7 +175,7 @@ DataShareConnection::~DataShareConnection() {
 
 void DataShareDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    LOG_WARN("Start");
+    LOG_WARN("DataShareDeathRecipient::OnRemoteDied Start");
     if (handler_) {
         handler_(remote);
     }
