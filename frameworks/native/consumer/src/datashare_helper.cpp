@@ -152,6 +152,23 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
 }
 
 /**
+ * @brief Releases the client resource of the data share.
+ * You should call this method to releases client resource after the data operations are complete.
+ *
+ * @return Returns true if the resource is successfully released; returns false otherwise.
+ */
+bool DataShareHelper::Release()
+{
+    LOG_INFO("Release Start");
+    if (dataShareConnection_ != nullptr) {
+        dataShareConnection_->DisconnectDataShareExtAbility();
+        dataShareConnection_ = nullptr;
+    }
+    uri_ = Uri("");
+    return true;
+}
+
+/**
  * @brief Obtains the MIME types of files supported.
  *
  * @param uri Indicates the path of the files to obtain.

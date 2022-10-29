@@ -163,7 +163,8 @@ void DataShareConnection::OnSchedulerDied(const wptr<IRemoteObject> &remote)
     SetDataShareProxy(nullptr);
 }
 
-DataShareConnection::~DataShareConnection() {
+DataShareConnection::~DataShareConnection()
+{
     if (callerDeathRecipient_ != nullptr) {
         auto proxy = GetDataShareProxy();
         if (proxy != nullptr) {
