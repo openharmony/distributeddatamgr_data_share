@@ -30,7 +30,6 @@ ohos_shared_library("datashare_common") {
     "${datashare_base_path}/interfaces/inner_api/common/include",
     "${datashare_base_path}/interfaces/inner_api/consumer/include",
     "${datashare_base_path}/interfaces/inner_api/provider/include",
-    "//foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/adapter/include/dfx",
   ]
 
   sources = [
