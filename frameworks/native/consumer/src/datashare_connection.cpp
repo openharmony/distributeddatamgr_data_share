@@ -85,10 +85,6 @@ bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
         want.SetUri(uri_);
     }
     std::unique_lock<std::mutex> lock(condition_.mutex);
-    if (dataShareProxy_ != nullptr) {
-        return true;
-    }
-
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, this, token);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ != nullptr; })) {
@@ -156,7 +152,7 @@ void DataShareConnection::AddDataShareDeathRecipient(const sptr<IRemoteObject> &
 
 void DataShareConnection::OnSchedulerDied(const wptr<IRemoteObject> &remote)
 {
-    LOG_INFO("Start");
+    LOG_INFO("OnSchedulerDied Start");
     if (callerDeathRecipient_ != nullptr) {
         auto proxy = GetDataShareProxy();
         if (proxy != nullptr) {
@@ -179,7 +175,7 @@ DataShareConnection::~DataShareConnection() {
 
 void DataShareDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    LOG_DEBUG("Start");
+    LOG_WARN("Start");
     if (handler_) {
         handler_(remote);
     }

@@ -33,7 +33,7 @@ constexpr int INVALID_VALUE = -1;
 DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,
     sptr<DataShareConnection> dataShareConnection)
 {
-    LOG_DEBUG("Start");
+    LOG_INFO("DataShareHelper::DataShareHelper start");
     token_ = token;
     uri_ = uri;
     dataShareConnection_ = dataShareConnection;
@@ -119,7 +119,8 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
         LOG_ERROR("the Scheme is not datashare, Scheme: %{public}s", uri.GetScheme().c_str());
         return nullptr;
     }
-    if ((uri.GetQuery().find("Proxy=true") != std::string::npos) && DataShareManager::GetDataShareService() != nullptr) {
+    if ((uri.GetQuery().find("Proxy=true") != std::string::npos) &&
+        DataShareManager::GetDataShareService() != nullptr) {
         LOG_DEBUG("Creator with dataShareService successfully.");
         DataShareHelper *dataShareHelper = new (std::nothrow) DataShareHelper(token, uri);
         if (dataShareHelper) {
@@ -148,23 +149,6 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
     }
 
     return std::shared_ptr<DataShareHelper>(ptrDataShareHelper);
-}
-
-/**
- * @brief Releases the client resource of the data share.
- * You should call this method to releases client resource after the data operations are complete.
- *
- * @return Returns true if the resource is successfully released; returns false otherwise.
- */
-bool DataShareHelper::Release()
-{
-    LOG_DEBUG("Start");
-    if (dataShareConnection_ != nullptr) {
-        dataShareConnection_->DisconnectDataShareExtAbility();
-        dataShareConnection_ = nullptr;
-    }
-    uri_ = Uri("");
-    return true;
 }
 
 /**
@@ -273,13 +257,13 @@ int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
 {
     LOG_INFO("Start");
     int index = INVALID_VALUE;
-	if (isDataShareService_) {
+    if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
         auto service = DataShareManager::GetDataShareService();
         if (!service) {
             LOG_DEBUG("DataShareService mode, but fail to get dataShareService.");
             return index;
-        }  
+        }
         return service->Insert(uri.ToString(), value);
     }
 
@@ -314,7 +298,7 @@ int DataShareHelper::Update(
 {
     LOG_INFO("Start");
     int index = INVALID_VALUE;
-	if (isDataShareService_) {
+    if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
         auto service = DataShareManager::GetDataShareService();
         if (!service) {
@@ -336,7 +320,7 @@ int DataShareHelper::Update(
 
     auto proxy = dataShareConnection_->GetDataShareProxy();
     if (proxy != nullptr) {
-        index = proxy->Update(uri, predicates, value);;
+        index = proxy->Update(uri, predicates, value);
     }
     return index;
 }
@@ -353,7 +337,7 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
 {
     LOG_INFO("Start");
     int index = INVALID_VALUE;
-	if (isDataShareService_) {
+    if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
         auto service = DataShareManager::GetDataShareService();
         if (!service) {
