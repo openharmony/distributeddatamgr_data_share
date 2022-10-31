@@ -108,7 +108,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
  */
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObject> &token, const std::string &strUri)
 {
-    LOG_INFO("Creator with runtime token and uri called start");
+    LOG_DEBUG("Creator with runtime token and uri called start");
     if (token == nullptr) {
         LOG_ERROR("token == nullptr");
         return nullptr;
@@ -271,7 +271,7 @@ int DataShareHelper::OpenRawFile(Uri &uri, const std::string &mode)
  */
 int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
 {
-    LOG_INFO("Start");
+    LOG_DEBUG("Start");
     int index = INVALID_VALUE;
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
@@ -309,10 +309,9 @@ int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
  *
  * @return Returns the number of data records updated.
  */
-int DataShareHelper::Update(
-    Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
+int DataShareHelper::Update(Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
 {
-    LOG_INFO("Start");
+    LOG_DEBUG("Start");
     int index = INVALID_VALUE;
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
@@ -351,7 +350,7 @@ int DataShareHelper::Update(
  */
 int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
 {
-    LOG_INFO("Start");
+    LOG_DEBUG("Start");
     int index = INVALID_VALUE;
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
@@ -392,7 +391,7 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
 std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
     Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns)
 {
-    LOG_INFO("Start");
+    LOG_DEBUG("Start");
     std::shared_ptr<DataShareResultSet> resultset = nullptr;
     if (isDataShareService_) {
         LOG_DEBUG("DataShareService mode.");
@@ -461,7 +460,7 @@ std::string DataShareHelper::GetType(Uri &uri)
  */
 int DataShareHelper::BatchInsert(Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
-    LOG_INFO("Start");
+    LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
     if (dataShareConnection_ == nullptr) {
         LOG_ERROR("dataShareConnection_ is nullptr");
