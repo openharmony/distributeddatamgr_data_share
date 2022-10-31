@@ -59,11 +59,15 @@ typedef enum {
     LAST_TYPE
 } OperationType;
 
-typedef struct {
-    OperationType operation;
-    std::vector<DataSharePredicatesObject> singleParams;
-    std::vector<DataSharePredicatesObjects> multiParams;
-} OperationItem;
+struct OperationItem {
+    int32_t operation;
+    std::vector<SingleValue::Type> singleParams;
+    std::vector<MutliValue::Type> multiParams;
+    inline SingleValue GetSingle(int32_t index) const
+    {
+        return singleParams[index];
+    }
+};
 
 typedef enum {
     INVALID_MODE,

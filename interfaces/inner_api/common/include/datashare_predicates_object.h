@@ -32,49 +32,44 @@ enum class DataSharePredicatesObjectType {
 };
 
 using ObjectType = DataSharePredicatesObjectType;
-class DataSharePredicatesObject {
+
+class SingleValue {
 public:
-    DataSharePredicatesObject() : type(ObjectType::TYPE_NULL) {}
-    ~DataSharePredicatesObject() = default;
-    DataSharePredicatesObject(DataSharePredicatesObject &&val) noexcept : type(val.type), value(std::move(val.value))
+    using Type = std::variant<std::monostate, int, int64_t, double, std::string, bool>;
+    Type value;
+    SingleValue() = default;
+    ~SingleValue() = default;
+    SingleValue(Type val) noexcept : value(std::move(val))
     {
-        val.type = ObjectType::TYPE_NULL;
     }
-    DataSharePredicatesObject(const DataSharePredicatesObject &val) : type(val.type), value(val.value) {}
-    DataSharePredicatesObject &operator=(DataSharePredicatesObject &&object) noexcept
+    SingleValue(SingleValue &&val) noexcept :value(std::move(val.value))
+    {
+    }
+    SingleValue(const SingleValue &val) : value(val.value) {}
+    SingleValue &operator=(SingleValue &&object) noexcept
     {
         if (this == &object) {
             return *this;
         }
-        type = object.type;
         value = std::move(object.value);
-        object.type = ObjectType::TYPE_NULL;
         return *this;
     }
-    DataSharePredicatesObject &operator=(const DataSharePredicatesObject &object)
+
+    SingleValue &operator=(const SingleValue &object)
     {
         if (this == &object) {
             return *this;
         }
-        type = object.type;
         value = object.value;
         return *this;
     }
-    DataSharePredicatesObject(int val) : type(ObjectType::TYPE_INT), value(val) {}
-    DataSharePredicatesObject(int64_t val) : type(ObjectType::TYPE_LONG), value(val) {}
-    DataSharePredicatesObject(double val) : type(ObjectType::TYPE_DOUBLE), value(val) {}
-    DataSharePredicatesObject(bool val) : type(ObjectType::TYPE_BOOL), value(val) {}
-    DataSharePredicatesObject(const char *val) : type(ObjectType::TYPE_STRING), value(std::string(val)) {}
-    DataSharePredicatesObject(std::string val) : type(ObjectType::TYPE_STRING), value(std::move(val)) {}
 
-    DataSharePredicatesObjectType GetType() const
-    {
-        return type;
-    }
-
-    DataSharePredicatesObjectType type;
-    std::variant<std::monostate, int, int64_t, double, std::string, bool> value;
-
+    SingleValue(int val) : value(val) {}
+    SingleValue(int64_t val) : value(val) {}
+    SingleValue(double val) : value(val) {}
+    SingleValue(bool val) : value(val) {}
+    SingleValue(const char *val) : value(std::string(val)) {}
+    SingleValue(std::string val) : value(std::move(val)) {}
     operator int () const
     {
         if (std::get_if<int>(&value) != nullptr) {

@@ -121,6 +121,11 @@ std::string DataShareJSUtils::ConvertAny2String(napi_env env, napi_value jsValue
     return "invalid type";
 }
 
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::monostate &value)
+{
+    return nullptr;
+}
+
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<std::string> &value)
 {
     napi_value jsValue;
