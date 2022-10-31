@@ -79,7 +79,7 @@ public:
      */
     sptr<IDataShare> GetDataShareProxy();
 
-    void SetDataShareProxy(sptr<IDataShare>);
+    void SetDataShareProxy(sptr<IDataShare> proxy);
 
     struct ConnectCondition {
         std::condition_variable condition;
