@@ -33,7 +33,7 @@ constexpr int INVALID_VALUE = -1;
 DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,
     sptr<DataShareConnection> dataShareConnection)
 {
-    LOG_DEBUG("Start");
+    LOG_INFO("DataShareHelper::DataShareHelper start");
     token_ = token;
     uri_ = uri;
     dataShareConnection_ = dataShareConnection;
@@ -108,7 +108,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
  */
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObject> &token, const std::string &strUri)
 {
-    LOG_DEBUG("Creator with runtime token and uri called start");
+    LOG_INFO("Creator with runtime token and uri called start");
     if (token == nullptr) {
         LOG_ERROR("token == nullptr");
         return nullptr;
@@ -158,10 +158,9 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
  */
 bool DataShareHelper::Release()
 {
-    LOG_DEBUG("Start");
+    LOG_INFO("Release Start");
     if (dataShareConnection_ != nullptr) {
         dataShareConnection_->DisconnectDataShareExtAbility();
-        dataShareConnection_ = nullptr;
     }
     uri_ = Uri("");
     return true;
@@ -279,7 +278,7 @@ int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
         if (!service) {
             LOG_DEBUG("DataShareService mode, but fail to get dataShareService.");
             return index;
-        }  
+        }
         return service->Insert(uri.ToString(), value);
     }
 

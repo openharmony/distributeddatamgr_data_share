@@ -156,7 +156,7 @@ void DataShareConnection::AddDataShareDeathRecipient(const sptr<IRemoteObject> &
 
 void DataShareConnection::OnSchedulerDied(const wptr<IRemoteObject> &remote)
 {
-    LOG_INFO("Start");
+    LOG_INFO("OnSchedulerDied Start");
     if (callerDeathRecipient_ != nullptr) {
         auto proxy = GetDataShareProxy();
         if (proxy != nullptr) {
@@ -179,7 +179,7 @@ DataShareConnection::~DataShareConnection() {
 
 void DataShareDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
 {
-    LOG_DEBUG("Start");
+    LOG_WARN("DataShareDeathRecipient::OnRemoteDied Start");
     if (handler_) {
         handler_(remote);
     }
