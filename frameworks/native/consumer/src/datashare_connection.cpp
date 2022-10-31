@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
 sptr<DataShareConnection> DataShareConnection::instance_ = nullptr;
-constexpr int WAIT_TIME = 1;
+constexpr int WAIT_TIME = 3;
 
 /**
  * @brief This method is called back to receive the connection result after an ability calls the
@@ -43,8 +43,8 @@ void DataShareConnection::OnAbilityConnectDone(
         return;
     }
     std::unique_lock<std::mutex> lock(condition_.mutex);
-    dataShareProxy_ = iface_cast<DataShareProxy>(remoteObject);
-    isConnected_.store(true);
+    SetDataShareProxy(iface_cast<DataShareProxy>(remoteObject));
+    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     condition_.condition.notify_all();
     LOG_DEBUG("End");
 }
@@ -62,8 +62,7 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
 {
     LOG_DEBUG("Start");
     std::unique_lock<std::mutex> lock(condition_.mutex);
-    dataShareProxy_ = nullptr;
-    isConnected_.store(false);
+    SetDataShareProxy(nullptr);
     condition_.condition.notify_all();
     LOG_DEBUG("End");
 }
@@ -71,22 +70,28 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
 /**
  * @brief connect remote ability of DataShareExtAbility.
  */
-void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token)
+bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token)
 {
+    if (dataShareProxy_ != nullptr) {
+        LOG_DEBUG("dataShareProxy has connected");
+        return true;
+    }
+
     LOG_DEBUG("Start");
-    std::unique_lock<std::mutex> lock(condition_.mutex);
     AAFwk::Want want;
     if (uri_.ToString().empty()) {
         want.SetUri(uri);
     } else {
         want.SetUri(uri_);
     }
+    std::unique_lock<std::mutex> lock(condition_.mutex);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, this, token);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ != nullptr; })) {
         LOG_INFO("connect ability ended successfully");
     }
     LOG_INFO("called end, ret=%{public}d", ret);
+    return dataShareProxy_ != nullptr;
 }
 
 /**
@@ -94,14 +99,18 @@ void DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
  */
 void DataShareConnection::DisconnectDataShareExtAbility()
 {
+    if (dataShareProxy_ == nullptr) {
+        LOG_DEBUG("dataShareProxy has disConnected");
+        return;
+    }
     LOG_DEBUG("Start");
     std::unique_lock<std::mutex> lock(condition_.mutex);
-    isConnected_.store(false);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(this);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ == nullptr; })) {
         LOG_INFO("disconnect ability ended successfully");
     }
+    SetDataShareProxy(nullptr);
     LOG_INFO("called end, ret=%{public}d", ret);
 }
 
@@ -112,22 +121,6 @@ void DataShareConnection::DisconnectDataShareExtAbility()
  */
 bool DataShareConnection::IsExtAbilityConnected()
 {
-    return isConnected_.load();
-}
-
-/**
- * @brief check whether connected to remote extension ability.
- *
- * @return bool true if connected, otherwise false.
- */
-bool DataShareConnection::TryReconnect(const Uri &uri, const sptr<IRemoteObject> &token)
-{
-    LOG_INFO("Reconnect begin");
-    ConnectDataShareExtAbility(uri, token);
-    if (dataShareProxy_ == nullptr) {
-        LOG_ERROR("Reconnect failed");
-        DisconnectDataShareExtAbility();
-    }
     return dataShareProxy_ != nullptr;
 }
 
@@ -135,5 +128,64 @@ sptr<IDataShare> DataShareConnection::GetDataShareProxy()
 {
     return dataShareProxy_;
 }
+
+void DataShareConnection::SetDataShareProxy(sptr<IDataShare> proxy)
+{
+    dataShareProxy_ = proxy;
+}
+
+void DataShareConnection::AddDataShareDeathRecipient(const sptr<IRemoteObject> &token)
+{
+    LOG_DEBUG("Start");
+    if (token == nullptr) {
+        LOG_INFO("token is nullptr");
+        return;
+    }
+    if (callerDeathRecipient_ != nullptr) {
+        LOG_INFO("exist callerDeathRecipient_.");
+        return;
+    }
+    callerDeathRecipient_ =
+        new DataShareDeathRecipient(std::bind(&DataShareConnection::OnSchedulerDied, this, std::placeholders::_1));
+    token->AddDeathRecipient(callerDeathRecipient_);
+}
+
+void DataShareConnection::OnSchedulerDied(const wptr<IRemoteObject> &remote)
+{
+    LOG_INFO("OnSchedulerDied Start");
+    if (callerDeathRecipient_ != nullptr) {
+        auto proxy = GetDataShareProxy();
+        if (proxy != nullptr) {
+            proxy->AsObject()->RemoveDeathRecipient(callerDeathRecipient_);
+        }
+        callerDeathRecipient_ = nullptr;
+    }
+    SetDataShareProxy(nullptr);
+}
+
+DataShareConnection::~DataShareConnection()
+{
+    if (callerDeathRecipient_ != nullptr) {
+        auto proxy = GetDataShareProxy();
+        if (proxy != nullptr) {
+            proxy->AsObject()->RemoveDeathRecipient(callerDeathRecipient_);
+        }
+        callerDeathRecipient_ = nullptr;
+    }
+}
+
+void DataShareDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
+{
+    LOG_WARN("DataShareDeathRecipient::OnRemoteDied Start");
+    if (handler_) {
+        handler_(remote);
+    }
+}
+
+DataShareDeathRecipient::DataShareDeathRecipient(RemoteDiedHandler handler) : handler_(handler)
+{}
+
+DataShareDeathRecipient::~DataShareDeathRecipient()
+{}
 }  // namespace DataShare
 }  // namespace OHOS
