@@ -336,7 +336,7 @@ int DataShareHelper::Update(
 
     auto proxy = dataShareConnection_->GetDataShareProxy();
     if (proxy != nullptr) {
-        index = proxy->Update(uri, predicates, value);;
+        index = proxy->Update(uri, predicates, value);
     }
     return index;
 }
