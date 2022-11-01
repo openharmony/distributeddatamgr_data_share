@@ -104,6 +104,8 @@ AppDataFwk::SharedBlock *DataShareResultSet::GetBlock() const
 
 int DataShareResultSet::GetDataType(int columnIndex, DataType &dataType)
 {
+    int rowCount = 0;
+    GetRowCount(rowCount);
     AppDataFwk::SharedBlock::CellUnit *cellUnit =
         sharedBlock_->GetCellUnit((uint32_t)rowPos_ - startRowPos_, (uint32_t)columnIndex);
     if (!cellUnit) {

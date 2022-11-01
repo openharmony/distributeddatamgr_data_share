@@ -23,7 +23,6 @@
 
 #include "context.h"
 #include "datashare_connection.h"
-#include "foundation/ability/ability_runtime/interfaces/kits/native/appkit/ability_runtime/context/context.h"
 #include "idatashare.h"
 #include "uri.h"
 #include "datashare_operation.h"
@@ -52,18 +51,6 @@ public:
      */
     static std::shared_ptr<DataShareHelper> Creator(const std::shared_ptr<Context> &context,
         const std::string &strUri);
-
-    /**
-     * @brief Creates a DataShareHelper instance with the Uri specified based on the given Context.
-     *
-     * @param context Indicates the Context object on OHOS.
-     * @param StrUri Indicates the database table or disk file to operate.
-     *
-     * @return Returns the created DataShareHelper instance with a specified Uri.
-     */
-    static std::shared_ptr<DataShareHelper> Creator(const std::shared_ptr<OHOS::AbilityRuntime::Context> &context,
-        const std::string &strUri);
-
     /**
      * @brief You can use this method to specify the Uri of the data to operate and set the binding relationship
      * between the ability using the Data template (data share for short) and the associated client process in
