@@ -44,7 +44,6 @@ void DataShareConnection::OnAbilityConnectDone(
     }
     std::unique_lock<std::mutex> lock(condition_.mutex);
     SetDataShareProxy(iface_cast<DataShareProxy>(remoteObject));
-    AddDataShareDeathRecipient(dataShareProxy_->AsObject());
     condition_.condition.notify_all();
     LOG_DEBUG("End");
 }
@@ -133,59 +132,5 @@ void DataShareConnection::SetDataShareProxy(sptr<IDataShare> proxy)
 {
     dataShareProxy_ = proxy;
 }
-
-void DataShareConnection::AddDataShareDeathRecipient(const sptr<IRemoteObject> &token)
-{
-    LOG_DEBUG("Start");
-    if (token == nullptr) {
-        LOG_INFO("token is nullptr");
-        return;
-    }
-    if (callerDeathRecipient_ != nullptr) {
-        LOG_INFO("exist callerDeathRecipient_.");
-        return;
-    }
-    callerDeathRecipient_ =
-        new DataShareDeathRecipient(std::bind(&DataShareConnection::OnSchedulerDied, this, std::placeholders::_1));
-    token->AddDeathRecipient(callerDeathRecipient_);
-}
-
-void DataShareConnection::OnSchedulerDied(const wptr<IRemoteObject> &remote)
-{
-    LOG_INFO("OnSchedulerDied Start");
-    if (callerDeathRecipient_ != nullptr) {
-        auto proxy = GetDataShareProxy();
-        if (proxy != nullptr) {
-            proxy->AsObject()->RemoveDeathRecipient(callerDeathRecipient_);
-        }
-        callerDeathRecipient_ = nullptr;
-    }
-    SetDataShareProxy(nullptr);
-}
-
-DataShareConnection::~DataShareConnection()
-{
-    if (callerDeathRecipient_ != nullptr) {
-        auto proxy = GetDataShareProxy();
-        if (proxy != nullptr) {
-            proxy->AsObject()->RemoveDeathRecipient(callerDeathRecipient_);
-        }
-        callerDeathRecipient_ = nullptr;
-    }
-}
-
-void DataShareDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &remote)
-{
-    LOG_WARN("DataShareDeathRecipient::OnRemoteDied Start");
-    if (handler_) {
-        handler_(remote);
-    }
-}
-
-DataShareDeathRecipient::DataShareDeathRecipient(RemoteDiedHandler handler) : handler_(handler)
-{}
-
-DataShareDeathRecipient::~DataShareDeathRecipient()
-{}
 }  // namespace DataShare
 }  // namespace OHOS

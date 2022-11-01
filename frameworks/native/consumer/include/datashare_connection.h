@@ -30,7 +30,7 @@ using namespace AppExecFwk;
 class DataShareConnection : public AAFwk::AbilityConnectionStub {
 public:
     DataShareConnection(const Uri &uri) : uri_(uri) {}
-    virtual ~DataShareConnection();
+    virtual ~DataShareConnection() = default;
 
     /**
      * @brief This method is called back to receive the connection result after an ability calls the
@@ -93,21 +93,6 @@ private:
     sptr<IDataShare> dataShareProxy_;
     ConnectCondition condition_;
     Uri uri_;
-    sptr<IRemoteObject::DeathRecipient> callerDeathRecipient_ = nullptr;
-};
-
-class DataShareDeathRecipient : public IRemoteObject::DeathRecipient {
-public:
-    using RemoteDiedHandler = std::function<void(const wptr<IRemoteObject> &)>;
-
-    explicit DataShareDeathRecipient(RemoteDiedHandler handler);
-
-    virtual ~DataShareDeathRecipient();
-
-    virtual void OnRemoteDied(const wptr<IRemoteObject> &remote);
-
-private:
-    RemoteDiedHandler handler_;
 };
 }  // namespace DataShare
 }  // namespace OHOS
