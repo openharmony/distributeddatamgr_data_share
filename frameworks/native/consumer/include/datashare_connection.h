@@ -58,7 +58,7 @@ public:
     /**
      * @brief connect remote ability of DataShareExtAbility.
      */
-    void ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
+    bool ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
 
     /**
      * @brief disconnect remote ability of DataShareExtAbility.
@@ -73,18 +73,13 @@ public:
     bool IsExtAbilityConnected();
 
     /**
-     * @brief try to reconnect remote extension ability.
-     *
-     * @return bool true if connected, otherwise false.
-     */
-    bool TryReconnect(const Uri &uri, const sptr<IRemoteObject> &token);
-
-    /**
      * @brief get the proxy of datashare extension ability.
      *
      * @return the proxy of datashare extension ability.
      */
     sptr<IDataShare> GetDataShareProxy();
+
+    void SetDataShareProxy(sptr<IDataShare> proxy);
 
     struct ConnectCondition {
         std::condition_variable condition;
@@ -93,7 +88,6 @@ public:
 private:
     static sptr<DataShareConnection> instance_;
     std::mutex mutex_;
-    std::atomic<bool> isConnected_ = {false};
     sptr<IDataShare> dataShareProxy_;
     ConnectCondition condition_;
     Uri uri_;

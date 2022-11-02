@@ -235,37 +235,13 @@ public:
     Uri DenormalizeUri(Uri &uri);
 
 private:
-    DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri, const sptr<IDataShare> &dataShareProxy,
+    DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,
         const sptr<DataShareConnection> dataShareConnection);
-    void AddDataShareDeathRecipient(const sptr<IRemoteObject> &token);
-    void OnSchedulerDied(const wptr<IRemoteObject> &remote);
-    bool CheckUriParam(const Uri &uri);
-    bool CheckOhosUri(const Uri &uri);
-    bool TryReconnect(const Uri &uri, const sptr<IRemoteObject> &token);
-
+    DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri);
+    bool isDataShareService_ = false;
     sptr<IRemoteObject> token_ = {};
     Uri uri_ = Uri("");
-    sptr<IDataShare> dataShareProxy_ = nullptr;
-    static std::mutex oplock_;
-    static std::mutex deathlock_;
-    sptr<IRemoteObject::DeathRecipient> callerDeathRecipient_ = nullptr;
-    std::map<sptr<AAFwk::IDataAbilityObserver>, sptr<IDataShare>> registerMap_;
-    std::map<sptr<AAFwk::IDataAbilityObserver>, std::string> uriMap_;
     sptr<DataShareConnection> dataShareConnection_ = nullptr;
-};
-
-class DataShareDeathRecipient : public IRemoteObject::DeathRecipient {
-public:
-    using RemoteDiedHandler = std::function<void(const wptr<IRemoteObject> &)>;
-
-    explicit DataShareDeathRecipient(RemoteDiedHandler handler);
-
-    virtual ~DataShareDeathRecipient();
-
-    virtual void OnRemoteDied(const wptr<IRemoteObject> &remote);
-
-private:
-    RemoteDiedHandler handler_;
 };
 }  // namespace DataShare
 }  // namespace OHOS
