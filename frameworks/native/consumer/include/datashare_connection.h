@@ -86,8 +86,6 @@ public:
         std::mutex mutex;
     };
 private:
-    void AddDataShareDeathRecipient(const sptr<IRemoteObject> &token);
-    void OnSchedulerDied(const wptr<IRemoteObject> &remote);
     static sptr<DataShareConnection> instance_;
     std::mutex mutex_;
     sptr<IDataShare> dataShareProxy_;
