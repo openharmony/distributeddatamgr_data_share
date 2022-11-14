@@ -138,5 +138,10 @@ void DataShareConnection::SetDataShareProxy(sptr<IDataShare> proxy)
 {
     dataShareProxy_ = proxy;
 }
+
+DataShareConnection::~DataShareConnection() {
+    uri_ = Uri("");;
+    DisconnectDataShareExtAbility();
+}
 }  // namespace DataShare
 }  // namespace OHOS
