@@ -118,7 +118,6 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
         LOG_ERROR("Query fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
         return nullptr;
     }
-
     return ISharedResultSet::ReadFromParcel(reply);
 }
 } // namespace OHOS::DataShare

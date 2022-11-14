@@ -59,11 +59,18 @@ void DataShareConnection::OnAbilityConnectDone(
  */
 void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    LOG_DEBUG("Start");
-    std::unique_lock<std::mutex> lock(condition_.mutex);
-    SetDataShareProxy(nullptr);
-    condition_.condition.notify_all();
-    LOG_DEBUG("End");
+    auto proxy = dataShareProxy_;
+    {
+        LOG_DEBUG("Start");
+        std::unique_lock<std::mutex> lock(condition_.mutex);
+        SetDataShareProxy(nullptr);
+        condition_.condition.notify_all();
+        LOG_DEBUG("End");
+    }
+    if (proxy != nullptr && !uri_.ToString().empty()) {
+        LOG_INFO("uri : %{public}s disconnect,start reconnect", uri_.ToString().c_str());
+        ConnectDataShareExtAbility(uri_, proxy->AsObject());
+    }
 }
 
 /**
@@ -109,7 +116,6 @@ void DataShareConnection::DisconnectDataShareExtAbility()
         [this] { return dataShareProxy_ == nullptr; })) {
         LOG_INFO("disconnect ability ended successfully");
     }
-    SetDataShareProxy(nullptr);
     LOG_INFO("called end, ret=%{public}d", ret);
 }
 
