@@ -68,7 +68,7 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
         LOG_DEBUG("End");
     }
     if (proxy != nullptr && !uri_.ToString().empty()) {
-        LOG_INFO("uri : %{public}s disconnect,start reconnect", uri_);
+        LOG_INFO("uri : %{public}s disconnect,start reconnect", uri_.ToString().c_str());
         ConnectDataShareExtAbility(uri_, proxy->AsObject());
     }
 }
