@@ -40,7 +40,7 @@ int32_t DataShareServiceProxy::Insert(const std::string &uri, const DataShareVal
     }
 
     MessageParcel reply;
-    MessageOption option = { MessageOption::TF_ASYNC };
+    MessageOption option;
     int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_INSERT, data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("Insert fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
@@ -64,7 +64,7 @@ int32_t DataShareServiceProxy::Update(
     }
 
     MessageParcel reply;
-    MessageOption option = { MessageOption::TF_ASYNC };
+    MessageOption option;
     int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_UPDATE, data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("Update fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
@@ -87,7 +87,7 @@ int32_t DataShareServiceProxy::Delete(const std::string &uri, const DataSharePre
     }
 
     MessageParcel reply;
-    MessageOption option = { MessageOption::TF_ASYNC };
+    MessageOption option;
     int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_DELETE, data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("Delete fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
