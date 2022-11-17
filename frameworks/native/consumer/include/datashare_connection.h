@@ -30,7 +30,7 @@ using namespace AppExecFwk;
 class DataShareConnection : public AAFwk::AbilityConnectionStub {
 public:
     DataShareConnection(const Uri &uri) : uri_(uri) {}
-    virtual ~DataShareConnection() = default;
+    virtual ~DataShareConnection();
 
     /**
      * @brief This method is called back to receive the connection result after an ability calls the
@@ -61,31 +61,21 @@ public:
     bool ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
 
     /**
-     * @brief disconnect remote ability of DataShareExtAbility.
-     */
-    void DisconnectDataShareExtAbility();
-
-    /**
-     * @brief check whether connected to remote extension ability.
-     *
-     * @return bool true if connected, otherwise false.
-     */
-    bool IsExtAbilityConnected();
-
-    /**
      * @brief get the proxy of datashare extension ability.
      *
      * @return the proxy of datashare extension ability.
      */
     sptr<IDataShare> GetDataShareProxy();
 
-    void SetDataShareProxy(sptr<IDataShare> proxy);
-
     struct ConnectCondition {
         std::condition_variable condition;
         std::mutex mutex;
     };
 private:
+    void DisconnectDataShareExtAbility();
+    void SetDataShareProxy(sptr<IDataShare> proxy);
+    bool IsExtAbilityConnected();
+
     static sptr<DataShareConnection> instance_;
     std::mutex mutex_;
     sptr<IDataShare> dataShareProxy_;
