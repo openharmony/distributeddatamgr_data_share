@@ -1,0 +1,76 @@
+# Copyright (C) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//foundation/multimedia/media_library/media_library.gni")
+
+group("unittest") {
+  testonly = true
+
+  deps = [ ":NativeDataShareTest" ]
+}
+
+ohos_unittest("NativeDataShareTest") {
+  module_out_path = "data_share/native_datashare"
+
+  include_dirs = [
+    "./unittest/mediadatashare_test/include",
+    "//base/security/access_token/frameworks/common/include",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+    "$MEDIA_LIB_BASE_DIR/interfaces/innerkits/native/include",
+    "//foundation/aafwk/standard/interfaces/innerkits/uri/include",
+    "${ABILITY_RUNTIME_INNER_API_PATH}/ability_manager/include",
+    "${ABILITY_RUNTIME_INNER_API_PATH}/app_manager/include/appmgr",
+    "${ABILITY_RUNTIME_PATH}/interfaces/kits/native/ability/native",
+    "$MEDIA_LIB_INNERKITS_DIR/media_library_helper/include",
+    "//commonlibrary/c_utils/base/include",
+    "//utils/system/safwk/native/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "${MEDIA_LIB_SERVICES_DIR}/media_library/include",
+    "${MEDIA_LIB_BASE_DIR}/frameworks/innerkitsimpl/medialibrary_data_extension/include",
+    "${MEDIA_LIB_BASE_DIR}/interfaces/inner_api/media_library_helper/include",
+    "${MEDIA_LIB_COMMON_UTILS_DIR}/include",
+    "//third_party/json/include",
+  ]
+
+  sources = [
+    "./unittest/mediadatashare_test/src/get_self_permissions.cpp",
+    "./unittest/mediadatashare_test/src/mediadatashare_unit_test.cpp",
+  ]
+
+  deps = [
+    "${ABILITY_RUNTIME_INNER_API_PATH}/ability_manager:ability_manager",
+    "${ABILITY_RUNTIME_PATH}/frameworks/native/ability/native:abilitykit_native",
+    "//foundation/filemanagement/user_file_service/frameworks/innerkits/file_access:file_access_extension_ability_kit",
+    "//foundation/multimedia/media_library/frameworks/innerkitsimpl/media_library_helper:media_library_packages",
+    "//foundation/multimedia/media_library/frameworks/innerkitsimpl/media_library_manager:media_library_manager",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "data_share:datashare_common",
+    "data_share:datashare_consumer",
+    "hilog_native:libhilog",
+    "hitrace_native:hitrace_meter",
+    "ipc:ipc_core",
+    "relational_store:native_appdatafwk",
+    "relational_store:native_rdb",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+}
