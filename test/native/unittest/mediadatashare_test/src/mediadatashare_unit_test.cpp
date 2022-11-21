@@ -76,23 +76,29 @@ void MediaDataShareUnitTest::SetUpTestCase(void)
 
     Uri uri(MEDIALIBRARY_DATA_URI);
     DataShare::DataShareValuesBucket valuesBucket;
-    valuesBucket.Put(MEDIA_DATA_DB_LONGITUDE, 20.07);
+    double valueD1 = 20.07;
+    valuesBucket.Put(MEDIA_DATA_DB_LONGITUDE, valueD1);
     valuesBucket.Put(MEDIA_DATA_DB_TITLE, "dataShareTest003");
-    valuesBucket.Put(MEDIA_DATA_DB_PARENT_ID, 1001);
+    int value1 = 1001;
+    valuesBucket.Put(MEDIA_DATA_DB_PARENT_ID, value1);
     retVal = g_mediaDataShareHelper->Insert(uri, valuesBucket);
     EXPECT_EQ((retVal > 0), true);
 
     valuesBucket.Clear();
-    valuesBucket.Put(MEDIA_DATA_DB_LONGITUDE, 20.08);
+    double valueD2 = 20.08;
+    valuesBucket.Put(MEDIA_DATA_DB_LONGITUDE, valueD2);
     valuesBucket.Put(MEDIA_DATA_DB_TITLE, "dataShareTest004");
-    valuesBucket.Put(MEDIA_DATA_DB_PARENT_ID, 1000);
+    int value2 = 1000;
+    valuesBucket.Put(MEDIA_DATA_DB_PARENT_ID, value2);
     retVal = g_mediaDataShareHelper->Insert(uri, valuesBucket);
     EXPECT_EQ((retVal > 0), true);
 
     valuesBucket.Clear();
-    valuesBucket.Put(MEDIA_DATA_DB_LONGITUDE, 20.09);
+    double valueD3 = 20.09;
+    valuesBucket.Put(MEDIA_DATA_DB_LONGITUDE, valueD3);
     valuesBucket.Put(MEDIA_DATA_DB_TITLE, "dataShareTest005");
-    valuesBucket.Put(MEDIA_DATA_DB_PARENT_ID, 999);
+    int value3 = 999;
+    valuesBucket.Put(MEDIA_DATA_DB_PARENT_ID, value3);
     retVal = g_mediaDataShareHelper->Insert(uri, valuesBucket);
     EXPECT_EQ((retVal > 0), true);
     LOG_INFO("SetUpTestCase end");
@@ -189,6 +195,9 @@ void MediaDataShareUnitTest::TearDownTestCase(void)
     int retVal = helper->Delete(deleteAssetUri, predicates);
     LOG_INFO("TearDownTestCase Delete retVal: %{public}d", retVal);
     EXPECT_EQ((retVal >= 0), true);
+
+    bool result = helper->Release();
+    EXPECT_EQ(result, true);
     LOG_INFO("TearDownTestCase end");
 }
 
@@ -654,15 +663,6 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_GetType_Test_001, TestSize.Level
     std::string result = helper->GetType(uri);
     EXPECT_NE(result.c_str(), "");
     LOG_INFO("MediaDataShare_GetType_Test_001 End");
-}
-
-HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Release_Test_001, TestSize.Level0)
-{
-    LOG_INFO("MediaDataShare_Release_Test_001::Start");
-    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
-    bool result = helper->Release();
-    EXPECT_EQ(result, true);
-    LOG_INFO("MediaDataShare_Release_Test_001 End");
 }
 } // namespace Media
 } // namespace OHOS
