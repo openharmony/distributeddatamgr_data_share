@@ -100,6 +100,7 @@ void MediaDataShareUnitTest::SetUpTestCase(void)
     valuesBucket.Put(MEDIA_DATA_DB_PARENT_ID, value3);
     retVal = g_mediaDataShareHelper->Insert(uri, valuesBucket);
     EXPECT_EQ((retVal > 0), true);
+    
     LOG_INFO("SetUpTestCase end");
 }
 
@@ -898,6 +899,34 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUD_Test_001, TestSize.Level0)
     retVal = helper->Delete(uri, deletePredicates);
     EXPECT_EQ((retVal >= 0), true);
     LOG_INFO("MediaDataShare_CRUD_Test_001, End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotImplPredicates_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_NotImplPredicates_Test_001::Start");
+    DataShare::DataSharePredicates predicates;
+    vector<string> inColumn;
+    inColumn.push_back("dataShare_Test_001");
+    inColumn.push_back("dataShare_Test_002");
+    predicates.In(MEDIA_DATA_DB_TITLE, inColumn);
+    
+    vector<string> notInColumn;
+    notInColumn.push_back("dataShare_Test_003");
+    notInColumn.push_back("dataShare_Test_004");
+    predicates.NotIn(MEDIA_DATA_DB_TITLE, notInColumn);
+    predicates.Unlike(MEDIA_DATA_DB_TITLE, "%Test003");
+
+    vector<string> preV;
+    preV.push_back(MEDIA_DATA_DB_TITLE);
+    predicates.GroupBy(preV);
+    predicates.Distinct();
+    predicates.IndexedBy(MEDIA_DATA_DB_TITLE);
+    predicates.KeyPrefix("%Test");
+    predicates.InKeys(preV);
+
+    std::list<DataShare::OperationItem> operationItems = predicates.GetOperationList();
+    EXPECT_EQ(operationItems.size(), 8);
+    LOG_INFO("MediaDataShare_NotImplPredicates_Test_001, End");
 }
 } // namespace Media
 } // namespace OHOS
