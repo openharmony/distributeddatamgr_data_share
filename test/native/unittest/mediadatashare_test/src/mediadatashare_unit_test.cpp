@@ -763,5 +763,169 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_PredicatesObject_Test_001, TestS
 
     LOG_INFO("MediaDataShare_PredicatesObject_Test_001 End");
 }
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_ResultSet_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(MEDIA_DATA_DB_TITLE, "dataShareTest003");
+    vector<string> columns;
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    auto resultSet = helper->Query(uri, predicates, columns);
+    int columnIndex = 0;
+    double result;
+    bool isNull;
+    if (resultSet != nullptr) {
+        resultSet->GoToFirstRow();
+        resultSet->GetColumnIndex(MEDIA_DATA_DB_LONGITUDE, columnIndex);
+        int err = resultSet->IsColumnNull(columnIndex, isNull);
+        EXPECT_EQ(err, 0);
+        EXPECT_EQ(isNull, false);
+
+        DataShare::DataType type;
+        err = resultSet->GetDataType(columnIndex, type);
+        EXPECT_EQ(err, 0);
+        EXPECT_EQ(type, DataShare::DataType::TYPE_FLOAT);
+
+        err = resultSet->GetDouble(columnIndex, result);
+        EXPECT_EQ(err, 0);
+    }
+    double valueD1 = 20.07;
+    EXPECT_EQ(result, valueD1);
+    LOG_INFO("MediaDataShare_ResultSet_Test_001, End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_002, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_ResultSet_Test_002::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(MEDIA_DATA_DB_TITLE, "dataShareTest003");
+    vector<string> columns;
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    auto resultSet = helper->Query(uri, predicates, columns);
+    int columnIndex = 0;
+    vector<uint8_t> blob;
+    vector<string> columnNames;
+    if (resultSet != nullptr) {
+        resultSet->GoToFirstRow();
+        resultSet->GetColumnIndex(MEDIA_DATA_DB_TITLE, columnIndex);
+        int err = resultSet->GetBlob(columnIndex, blob);
+        EXPECT_EQ(err, 0);
+        EXPECT_NE(blob.size(), 0);
+
+        err = resultSet->GetAllColumnNames(columnNames);
+        EXPECT_EQ(err, 0);
+        EXPECT_NE(columnNames.size(), 0);
+    }
+    LOG_INFO("MediaDataShare_ResultSet_Test_002, End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_003, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_ResultSet_Test_003::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(MEDIA_DATA_DB_TITLE, "dataShareTest003");
+    vector<string> columns;
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    auto resultSet = helper->Query(uri, predicates, columns);
+    AppDataFwk::SharedBlock *block = nullptr;
+    if (resultSet != nullptr) {
+        bool hasBlock = resultSet->HasBlock();
+        EXPECT_EQ(hasBlock, true);
+        block = resultSet->GetBlock();
+        EXPECT_NE(block, nullptr);
+
+        resultSet->SetBlock(block);
+        EXPECT_EQ(block, resultSet->GetBlock());
+        resultSet->FillBlock(0, block);
+        EXPECT_EQ(block, resultSet->GetBlock());
+    }
+    LOG_INFO("MediaDataShare_ResultSet_Test_003, End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_004, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_ResultSet_Test_004::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    DataShare::DataSharePredicates predicates;
+    predicates.Contains(MEDIA_DATA_DB_TITLE, "dataShareTest");
+    vector<string> columns;
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    auto resultSet = helper->Query(uri, predicates, columns);
+    if (resultSet != nullptr) {
+        resultSet->GoToFirstRow();
+        bool ok = resultSet->OnGo(0, 1);
+        EXPECT_EQ(ok, true);
+    }
+    LOG_INFO("MediaDataShare_ResultSet_Test_004, End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUD_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_CRUD_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put(MEDIA_DATA_DB_TITLE, "Datashare_CRUD_Test001");
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
+
+    DataShare::DataSharePredicates predicates;
+    string selections = MEDIA_DATA_DB_TITLE + " = 'Datashare_CRUD_Test001'";
+    predicates.SetWhereClause(selections);
+
+    valuesBucket.Clear();
+    valuesBucket.Put(MEDIA_DATA_DB_TITLE, "Datashare_CRUD_Test002");
+    retVal = helper->Update(uri, predicates, valuesBucket);
+    EXPECT_EQ((retVal >= 0), true);
+
+    predicates.EqualTo(MEDIA_DATA_DB_TITLE, "Datashare_CRUD_Test002");
+    vector<string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    int result = 0;
+    if (resultSet != nullptr) {
+        resultSet->GetRowCount(result);
+    }
+    EXPECT_EQ(result, 1);
+
+    DataShare::DataSharePredicates deletePredicates;
+    selections = MEDIA_DATA_DB_TITLE + " = 'Datashare_CRUD_Test002'";
+    deletePredicates.SetWhereClause(selections);
+    retVal = helper->Delete(uri, deletePredicates);
+    EXPECT_EQ((retVal >= 0), true);
+    LOG_INFO("MediaDataShare_CRUD_Test_001, End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotImplPredicates_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_NotImplPredicates_Test_001::Start");
+    DataShare::DataSharePredicates predicates;
+    vector<string> inColumn;
+    inColumn.push_back("dataShare_Test_001");
+    inColumn.push_back("dataShare_Test_002");
+    predicates.In(MEDIA_DATA_DB_TITLE, inColumn);
+    
+    vector<string> notInColumn;
+    notInColumn.push_back("dataShare_Test_003");
+    notInColumn.push_back("dataShare_Test_004");
+    predicates.NotIn(MEDIA_DATA_DB_TITLE, notInColumn);
+    predicates.Unlike(MEDIA_DATA_DB_TITLE, "%Test003");
+
+    vector<string> preV;
+    preV.push_back(MEDIA_DATA_DB_TITLE);
+    predicates.GroupBy(preV);
+    predicates.Distinct();
+    predicates.IndexedBy(MEDIA_DATA_DB_TITLE);
+    predicates.KeyPrefix("%Test");
+    predicates.InKeys(preV);
+
+    std::list<DataShare::OperationItem> operationItems = predicates.GetOperationList();
+    EXPECT_EQ(operationItems.size(), 8);
+    LOG_INFO("MediaDataShare_NotImplPredicates_Test_001, End");
+}
 } // namespace Media
 } // namespace OHOS
