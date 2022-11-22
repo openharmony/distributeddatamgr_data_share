@@ -100,7 +100,6 @@ void MediaDataShareUnitTest::SetUpTestCase(void)
     valuesBucket.Put(MEDIA_DATA_DB_PARENT_ID, value3);
     retVal = g_mediaDataShareHelper->Insert(uri, valuesBucket);
     EXPECT_EQ((retVal > 0), true);
-    
     LOG_INFO("SetUpTestCase end");
 }
 
