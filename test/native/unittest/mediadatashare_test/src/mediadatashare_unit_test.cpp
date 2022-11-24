@@ -927,5 +927,29 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotImplPredicates_Test_001, Test
     EXPECT_EQ(operationItems.size(), 8);
     LOG_INFO("MediaDataShare_NotImplPredicates_Test_001, End");
 }
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Observer_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_Observer_001 start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    sptr<IDataShareObserverTest> dataObserver;
+    helper->RegisterObserver(uri, dataObserver);
+    
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put(MEDIA_DATA_DB_TITLE, "Datashare_Observer_Test001");
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
+    helper->NotifyChange(uri);
+
+    DataShare::DataSharePredicates deletePredicates;
+    string selections = MEDIA_DATA_DB_TITLE + " = 'Datashare_Observer_Test001'";
+    deletePredicates.SetWhereClause(selections);
+    retVal = helper->Delete(uri, deletePredicates);
+    EXPECT_EQ((retVal >= 0), true);
+    helper->NotifyChange(uri);
+    helper->UnregisterObserver(uri, dataObserver);
+    LOG_INFO("MediaDataShare_Observer_001 end");
+}
 } // namespace Media
 } // namespace OHOS
