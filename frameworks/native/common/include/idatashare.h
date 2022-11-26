@@ -22,10 +22,8 @@
 #include "uri.h"
 
 #include "datashare_values_bucket.h"
-#include "datashare_result.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
-#include "datashare_operation.h"
 
 namespace OHOS {
 namespace AAFwk {
@@ -51,7 +49,6 @@ public:
         CMD_NOTIFY_CHANGE = 12,
         CMD_NORMALIZE_URI = 13,
         CMD_DENORMALIZE_URI = 14,
-        CMD_EXECUTE_BATCH = 15,
     };
 
     /**
