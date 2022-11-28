@@ -32,24 +32,6 @@ DataShareBlockWriterImpl::~DataShareBlockWriterImpl()
 {
 }
 
-int DataShareBlockWriterImpl::Clear()
-{
-    if (shareBlock_ == nullptr) {
-        LOG_ERROR("shareBlock_ is nullptr");
-        return E_ERROR;
-    }
-    return ConvertErrorCode(shareBlock_->Clear());
-}
-
-int DataShareBlockWriterImpl::SetColumnNum(uint32_t numColumns)
-{
-    if (shareBlock_ == nullptr) {
-        LOG_ERROR("shareBlock_ is nullptr");
-        return E_ERROR;
-    }
-    return ConvertErrorCode(shareBlock_->SetColumnNum(numColumns));
-}
-
 int DataShareBlockWriterImpl::AllocRow()
 {
     if (shareBlock_ == nullptr) {
@@ -57,15 +39,6 @@ int DataShareBlockWriterImpl::AllocRow()
         return E_ERROR;
     }
     return ConvertErrorCode(shareBlock_->AllocRow());
-}
-
-int DataShareBlockWriterImpl::FreeLastRow()
-{
-    if (shareBlock_ == nullptr) {
-        LOG_ERROR("shareBlock_ is nullptr");
-        return E_ERROR;
-    }
-    return ConvertErrorCode(shareBlock_->FreeLastRow());
 }
 
 int DataShareBlockWriterImpl::Write(uint32_t column)
@@ -116,77 +89,6 @@ int DataShareBlockWriterImpl::Write(uint32_t column, const char *value, size_t s
         return E_ERROR;
     }
     return ConvertErrorCode(shareBlock_->PutString(currentRowIndex, column, value, sizeIncludingNull));
-}
-
-const void *DataShareBlockWriterImpl::GetHeader()
-{
-    if (shareBlock_ == nullptr) {
-        LOG_ERROR("shareBlock_ is nullptr");
-        return nullptr;
-    }
-    return shareBlock_->GetHeader();
-}
-
-size_t DataShareBlockWriterImpl::GetUsedBytes()
-{
-    if (shareBlock_ == nullptr) {
-        LOG_ERROR("shareBlock_ is nullptr");
-        return E_ERROR;
-    }
-    return shareBlock_->GetUsedBytes();
-}
-
-std::string DataShareBlockWriterImpl::Name()
-{
-    if (shareBlock_ == nullptr) {
-        LOG_ERROR("shareBlock_ is nullptr");
-    }
-    return shareBlock_->Name();
-}
-
-size_t DataShareBlockWriterImpl::Size()
-{
-    if (shareBlock_ == nullptr) {
-        LOG_ERROR("shareBlock_ is nullptr");
-        return E_ERROR;
-    }
-    return shareBlock_->Size();
-}
-
-uint32_t DataShareBlockWriterImpl::GetRowNum()
-{
-    if (shareBlock_ == nullptr) {
-        LOG_ERROR("shareBlock_ is nullptr");
-        return E_ERROR;
-    }
-    return shareBlock_->GetRowNum();
-}
-
-uint32_t DataShareBlockWriterImpl::GetColumnNum()
-{
-    if (shareBlock_ == nullptr) {
-        LOG_ERROR("shareBlock_ is nullptr");
-        return E_ERROR;
-    }
-    return shareBlock_->GetColumnNum();
-}
-
-size_t DataShareBlockWriterImpl::SetRawData(const void *rawData, size_t size)
-{
-    if (shareBlock_ == nullptr) {
-        LOG_ERROR("shareBlock_ is nullptr");
-        return E_ERROR;
-    }
-    return shareBlock_->SetRawData(rawData, size);
-}
-
-int DataShareBlockWriterImpl::GetFd()
-{
-    if (shareBlock_ == nullptr) {
-        LOG_ERROR("shareBlock_ is nullptr");
-        return E_ERROR;
-    }
-    return shareBlock_->GetFd();
 }
 
 AppDataFwk::SharedBlock *DataShareBlockWriterImpl::GetBlock() const

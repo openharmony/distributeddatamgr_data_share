@@ -44,24 +44,9 @@ public:
     virtual ~DataShareBlockWriterImpl();
 
     /**
-     * Clear current shared block.
-     */
-    int Clear();
-
-    /**
-     * Set a shared block column.
-     */
-    int SetColumnNum(uint32_t numColumns);
-
-    /**
      * Allocate a row unit and its directory.
      */
     int AllocRow() override;
-
-    /**
-     * Release the value of the last row.
-     */
-    int FreeLastRow();
 
     /**
      * Write Null data to the shared block.
@@ -87,46 +72,6 @@ public:
      * Write string data to the shared block.
      */
     virtual int Write(uint32_t column, const char *value, size_t sizeIncludingNull) override;
-
-    /**
-     * The mHeader of the current result set.
-     */
-    const void *GetHeader();
-
-    /**
-     * Size of the used byte in the block.
-     */
-    size_t GetUsedBytes();
-
-    /**
-     * The name of the current result set.
-     */
-    std::string Name();
-
-    /**
-     * The size of the current result set.
-     */
-    size_t Size();
-
-    /**
-     * The row number of the current result set.
-     */
-    uint32_t GetRowNum();
-
-    /**
-     * The column number of the current result set.
-     */
-    uint32_t GetColumnNum();
-
-    /**
-     * Write raw data in block.
-     */
-    size_t SetRawData(const void *rawData, size_t size);
-
-    /**
-     * The fd of shared memory
-     */
-    int GetFd();
 
     /**
      * Get Block
