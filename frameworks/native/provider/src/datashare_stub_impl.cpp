@@ -386,22 +386,6 @@ Uri DataShareStubImpl::DenormalizeUri(const Uri &uri)
     return urivalue;
 }
 
-std::vector<std::shared_ptr<DataShareResult>> DataShareStubImpl::ExecuteBatch(
-    const std::vector<std::shared_ptr<DataShareOperation>> &operations)
-{
-    LOG_DEBUG("Start");
-    std::vector<std::shared_ptr<DataShareResult>> results;
-    std::function<void()> syncTaskFunc = [=, &results, client = sptr<DataShareStubImpl>(this)]() {
-        auto extension = client->GetOwner();
-        if (extension == nullptr) {
-            return;
-        }
-        results = extension->ExecuteBatch(operations);
-    };
-    uvQueue_->SyncCall(syncTaskFunc);
-    return results;
-}
-
 void DataShareStubImpl::GetCallingInfo(CallingInfo& callingInfo)
 {
     callingInfo.callingTokenId = GetCallingTokenID();

@@ -41,7 +41,6 @@ DataShareStub::DataShareStub()
     stubFuncMap_[CMD_NOTIFY_CHANGE] = &DataShareStub::CmdNotifyChange;
     stubFuncMap_[CMD_NORMALIZE_URI] = &DataShareStub::CmdNormalizeUri;
     stubFuncMap_[CMD_DENORMALIZE_URI] = &DataShareStub::CmdDenormalizeUri;
-    stubFuncMap_[CMD_EXECUTE_BATCH] = &DataShareStub::CmdExecuteBatch;
 }
 
 DataShareStub::~DataShareStub()
@@ -390,45 +389,6 @@ ErrCode DataShareStub::CmdDenormalizeUri(MessageParcel &data, MessageParcel &rep
     if (!reply.WriteParcelable(&ret)) {
         LOG_ERROR("fail to WriteParcelable type");
         return ERR_INVALID_VALUE;
-    }
-    return DATA_SHARE_NO_ERROR;
-}
-
-ErrCode DataShareStub::CmdExecuteBatch(MessageParcel &data, MessageParcel &reply)
-{
-    int count = 0;
-    if (!data.ReadInt32(count)) {
-        LOG_ERROR("fail to ReadInt32 count");
-        return ERR_INVALID_VALUE;
-    }
-    LOG_INFO("count:%{public}d", count);
-    std::vector<std::shared_ptr<DataShareOperation>> operations;
-    for (int i = 0; i < count; i++) {
-        DataShareOperation *operation = data.ReadParcelable<DataShareOperation>();
-        if (operation == nullptr) {
-            LOG_ERROR("operation is nullptr, index = %{public}d", i);
-            return ERR_INVALID_VALUE;
-        }
-        std::shared_ptr<DataShareOperation> dataShareOperation(operation);
-        operations.push_back(dataShareOperation);
-    }
-
-    std::vector<std::shared_ptr<DataShareResult>> results = ExecuteBatch(operations);
-    int total = (int)(results.size());
-    if (!reply.WriteInt32(total)) {
-        LOG_ERROR("fail to WriteInt32 ret");
-        return ERR_INVALID_VALUE;
-    }
-    LOG_INFO("total:%{public}d", total);
-    for (int i = 0; i < total; i++) {
-        if (results[i] == nullptr) {
-            LOG_ERROR("results[i] is nullptr, index = %{public}d", i);
-            return ERR_INVALID_VALUE;
-        }
-        if (!reply.WriteParcelable(results[i].get())) {
-            LOG_ERROR("fail to WriteParcelable operation, index = %{public}d", i);
-            return ERR_INVALID_VALUE;
-        }
     }
     return DATA_SHARE_NO_ERROR;
 }

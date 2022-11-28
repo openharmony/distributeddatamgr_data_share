@@ -58,9 +58,6 @@ public:
 
     virtual Uri DenormalizeUri(const Uri &uri) override;
 
-    virtual std::vector<std::shared_ptr<DataShareResult>> ExecuteBatch(
-        const std::vector<std::shared_ptr<DataShareOperation>> &operations) override;
-
 private:
     static inline BrokerDelegator<DataShareProxy> delegator_;
 };
