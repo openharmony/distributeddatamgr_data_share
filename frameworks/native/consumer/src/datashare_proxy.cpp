@@ -19,7 +19,6 @@
 
 #include "datashare_result_set.h"
 #include "data_ability_observer_interface.h"
-#include "datashare_operation.h"
 #include "datashare_log.h"
 #include "ipc_types.h"
 #include "ishared_result_set.h"
@@ -519,59 +518,6 @@ Uri DataShareProxy::DenormalizeUri(const Uri &uri)
     }
     LOG_INFO("end successfully.");
     return *info;
-}
-
-std::vector<std::shared_ptr<DataShareResult>> DataShareProxy::ExecuteBatch(
-    const std::vector<std::shared_ptr<DataShareOperation>> &operations)
-{
-    LOG_INFO("begin.");
-    MessageParcel data;
-    std::vector<std::shared_ptr<DataShareResult>> results;
-    results.clear();
-
-    if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
-        LOG_ERROR("WriteInterfaceToken failed");
-        return results;
-    }
-
-    int count = (int)operations.size();
-    if (!data.WriteInt32(count)) {
-        LOG_ERROR("fail to WriteInt32 ret");
-        return results;
-    }
-
-    for (int i = 0; i < count; i++) {
-        if (!data.WriteParcelable(operations[i].get())) {
-            LOG_ERROR("fail to WriteParcelable ret, index = %{public}d", i);
-            return results;
-        }
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int32_t err = Remote()->SendRequest(CMD_EXECUTE_BATCH, data, reply, option);
-    if (err != DATA_SHARE_NO_ERROR) {
-        LOG_ERROR("fail to SendRequest. err: %{public}d", err);
-        return results;
-    }
-
-    int total = 0;
-    if (!reply.ReadInt32(total)) {
-        LOG_ERROR("fail to ReadInt32 count %{public}d", total);
-        return results;
-    }
-
-    for (int i = 0; i < total; i++) {
-        DataShareResult *result = reply.ReadParcelable<DataShareResult>();
-        if (result == nullptr) {
-            LOG_ERROR("result is nullptr, index = %{public}d", i);
-            return results;
-        }
-        std::shared_ptr<DataShareResult> dataShareResult(result);
-        results.push_back(dataShareResult);
-    }
-    LOG_INFO("end successfully.");
-    return results;
 }
 } // namespace DataShare
 } // namespace OHOS

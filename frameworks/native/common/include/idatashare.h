@@ -22,10 +22,8 @@
 #include "uri.h"
 
 #include "datashare_values_bucket.h"
-#include "datashare_result.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
-#include "datashare_operation.h"
 
 namespace OHOS {
 namespace AAFwk {
@@ -51,7 +49,6 @@ public:
         CMD_NOTIFY_CHANGE = 12,
         CMD_NORMALIZE_URI = 13,
         CMD_DENORMALIZE_URI = 14,
-        CMD_EXECUTE_BATCH = 15,
     };
 
     /**
@@ -206,15 +203,6 @@ public:
      * be found in the current environment.
      */
     virtual Uri DenormalizeUri(const Uri &uri) = 0;
-
-    /**
-     * @brief Performs batch operations on the database.
-     *
-     * @param operations Indicates a list of database operations on the database.
-     * @return Returns the result of each operation, in array.
-     */
-    virtual std::vector<std::shared_ptr<DataShareResult>> ExecuteBatch(
-        const std::vector<std::shared_ptr<DataShareOperation>> &operations) = 0;
 };
 } // namespace DataShare
 } // namespace OHOS
