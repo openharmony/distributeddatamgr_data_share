@@ -109,9 +109,14 @@ int ISharedResultSetStub::HandleOnGoRequest(MessageParcel &data, MessageParcel &
 {
     int oldRow = data.ReadInt32();
     int newRow = data.ReadInt32();
-    int errCode = resultSet_->OnGo(oldRow, newRow);
-    reply.WriteInt32(errCode);
-    LOG_DEBUG("HandleOnGoRequest call %{public}d", errCode);
+    int cachedIndex = 0;
+    bool ret = resultSet_->OnGo(oldRow, newRow, &cachedIndex);
+    if (!ret) {
+        reply.WriteInt32(-1);
+    } else {
+        reply.WriteInt32(cachedIndex);
+    }
+    LOG_DEBUG("HandleOnGoRequest call %{public}d", cachedIndex);
     return NO_ERROR;
 }
 

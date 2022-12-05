@@ -97,7 +97,7 @@ int ISharedResultSetProxy::GetRowCount(int &count)
     return E_OK;
 }
 
-bool ISharedResultSetProxy::OnGo(int oldRowIndex, int newRowIndex)
+bool ISharedResultSetProxy::OnGo(int oldRowIndex, int newRowIndex, int *cachedIndex)
 {
     LOG_DEBUG("Start");
     MessageParcel request;
@@ -111,7 +111,14 @@ bool ISharedResultSetProxy::OnGo(int oldRowIndex, int newRowIndex)
         LOG_ERROR("IPC Error %{public}x", errCode);
         return -errCode;
     }
-    return reply.ReadBool();
+    int ret = reply.ReadInt32();
+    if (cachedIndex != nullptr) {
+        *cachedIndex = ret;
+    }
+    if (ret < 0) {
+        return false;
+    }
+    return true;
 }
 
 int ISharedResultSetProxy::Close()
