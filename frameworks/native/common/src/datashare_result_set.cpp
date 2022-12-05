@@ -32,7 +32,7 @@ namespace {
     static const int INITIAL_POS = -1;
     static const size_t DEFAULT_SHARE_BLOCK_SIZE = 2 * 1024 * 1024;
     // Equivalent to filling in setp + 1 rows each time
-    static const int STEP_LEN = 2;
+    static const int STEP_LEN = 20;
 } // namespace
 int DataShareResultSet::blockId_ = 0;
 DataShareResultSet::DataShareResultSet()
