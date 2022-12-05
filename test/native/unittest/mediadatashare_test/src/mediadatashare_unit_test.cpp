@@ -664,5 +664,39 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_GetType_Test_001, TestSize.Level
     EXPECT_NE(result.c_str(), "");
     LOG_INFO("MediaDataShare_GetType_Test_001 End");
 }
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_005, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_ResultSet_Test_005::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    DataShare::DataSharePredicates predicates;
+    predicates.Contains(MEDIA_DATA_DB_TITLE, "dataShareTest");
+    std::vector<string> columns;
+    DataShare::DataShareResultSet resultSet;
+    std::vector<string> names;
+    int err = resultSet.GetAllColumnNames(names);
+    EXPECT_NE(err, 0);
+    int count;
+    err = resultSet.GetRowCount(count);
+    EXPECT_NE(err, 0);
+    err = resultSet.GoToRow(1);
+    EXPECT_NE(err, 0);
+    std::vector<uint8_t> blob;
+    err = resultSet.GetBlob(0, blob);
+    EXPECT_NE(err, 0);
+    int64_t longValue;
+    err = resultSet.GetLong(0, longValue);
+    EXPECT_NE(err, 0);
+    double doubleValue;
+    err = resultSet.GetDouble(0, doubleValue);
+    EXPECT_NE(err, 0);
+
+    bool isNull;
+    err = resultSet.IsColumnNull(0, isNull);
+    EXPECT_NE(err, 0);
+    bool flag = resultSet.OnGo(0, 1);
+    EXPECT_EQ(flag, true);
+    LOG_INFO("MediaDataShare_ResultSet_Test_005, End");
+}
 } // namespace Media
 } // namespace OHOS

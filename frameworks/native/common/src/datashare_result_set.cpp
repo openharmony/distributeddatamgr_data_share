@@ -384,13 +384,6 @@ void DataShareResultSet::ClosedBlock()
     sharedBlock_ = nullptr;
 }
 
-void DataShareResultSet::ClearBlock()
-{
-    if (sharedBlock_ != nullptr) {
-        sharedBlock_->Clear();
-    }
-}
-
 void DataShareResultSet::Finalize()
 {
     Close();
