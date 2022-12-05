@@ -864,6 +864,20 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_004, TestSize.Lev
     LOG_INFO("MediaDataShare_ResultSet_Test_004, End");
 }
 
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_005, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_ResultSet_Test_005::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    DataShare::DataSharePredicates predicates;
+    predicates.Contains(MEDIA_DATA_DB_TITLE, "dataShareTest");
+    vector<string> columns;
+    DataShare::DataShareResultSet resultSet;
+    vector<string> vector;
+    int err = resultSet.GetAllColumnNames(vector);
+    EXPECT_NE(err, 0);
+    LOG_INFO("MediaDataShare_ResultSet_Test_005, End");
+}
+
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUD_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_CRUD_Test_001::Start");
