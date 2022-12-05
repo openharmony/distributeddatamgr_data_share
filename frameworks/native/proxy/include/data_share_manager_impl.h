@@ -34,6 +34,22 @@ public:
     static DataShareManagerImpl &GetInstance();
     std::shared_ptr<IDataShareService> GetDataShareService();
 
+    void OnRemoteDied();
+
+    class ServiceDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit ServiceDeathRecipient(DataShareManagerImpl *owner) : owner_(owner) {}
+        void OnRemoteDied(const wptr<IRemoteObject> &object) override
+        {
+            if (owner_ != nullptr) {
+                owner_->OnRemoteDied();
+            }
+        }
+
+    private:
+        DataShareManagerImpl *owner_;
+    };
+
 private:
     DataShareManagerImpl();
     ~DataShareManagerImpl();
