@@ -47,7 +47,7 @@ public:
     int GetAllColumnNames(std::vector<std::string> &columnNames) override;
     int GetRowCount(int &count) override;
     AppDataFwk::SharedBlock *GetBlock() const override;
-    bool OnGo(int startRowIndex, int targetRowIndex, int *cachedIndex) override;
+    bool OnGo(int startRowIndex, int targetRowIndex, int *cachedIndex = nullptr) override;
     void FillBlock(int startRowIndex, AppDataFwk::SharedBlock *block) override;
     virtual void SetBlock(AppDataFwk::SharedBlock *block);
     int Close() override;

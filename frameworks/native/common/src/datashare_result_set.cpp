@@ -386,8 +386,10 @@ bool DataShareResultSet::HasBlock() const
  */
 void DataShareResultSet::ClosedBlock()
 {
-    delete sharedBlock_;
-    sharedBlock_ = nullptr;
+    if (sharedBlock_ != nullptr) {
+        delete sharedBlock_;
+        sharedBlock_ = nullptr;
+    }
 }
 
 void DataShareResultSet::ClearBlock()
