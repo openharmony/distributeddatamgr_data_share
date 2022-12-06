@@ -15,15 +15,14 @@
 
 #include "data_share_manager_impl.h"
 
-#include "data_share_manager.h"
-
 #include <thread>
 
+#include "data_share_manager.h"
 #include "data_share_service_proxy.h"
-#include "ipc_skeleton.h"
-#include "idata_share_service.h"
-#include "iservice_registry.h"
 #include "datashare_log.h"
+#include "idata_share_service.h"
+#include "ipc_skeleton.h"
+#include "iservice_registry.h"
 #include "system_ability_definition.h"
 
 namespace OHOS::DataShare {
@@ -111,7 +110,6 @@ DataShareManagerImpl::~DataShareManagerImpl()
     LOG_INFO("destroy");
 }
 
-
 void DataShareManagerImpl::ResetServiceHandle()
 {
     LOG_INFO("enter");
@@ -122,18 +120,7 @@ void DataShareManagerImpl::ResetServiceHandle()
 void DataShareManagerImpl::OnRemoteDied()
 {
     LOG_INFO("datashare service has dead");
-    auto proxy = std::static_pointer_cast<DataShareServiceProxy>(dataShareService_);
     ResetServiceHandle();
-
-    std::this_thread::sleep_for(std::chrono::seconds(WAIT_TIME));
-    auto service = GetDataShareService();
-    if (service == nullptr) {
-        return;
-    }
-    proxy = std::static_pointer_cast<DataShareServiceProxy>(service);
-    if (proxy == nullptr) {
-        return;
-    }
 }
 
 DataShareKvServiceProxy::DataShareKvServiceProxy(const sptr<IRemoteObject> &impl)
