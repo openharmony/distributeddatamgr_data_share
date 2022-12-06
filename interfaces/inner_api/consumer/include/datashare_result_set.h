@@ -55,7 +55,6 @@ public:
 
 protected:
     int CheckState(int columnIndex);
-    void ClearBlock();
     void ClosedBlock();
     virtual void Finalize();
 
