@@ -31,8 +31,6 @@ namespace {
     // The default position of the cursor
     static const int INITIAL_POS = -1;
     static const size_t DEFAULT_SHARE_BLOCK_SIZE = 2 * 1024 * 1024;
-    // Equivalent to filling in setp + 1 rows each time
-    static const int STEP_LEN = 2;
 } // namespace
 int DataShareResultSet::blockId_ = 0;
 DataShareResultSet::DataShareResultSet()
@@ -76,17 +74,24 @@ int DataShareResultSet::GetRowCount(int &count)
     return bridge_->GetRowCount(count);
 }
 
-bool DataShareResultSet::OnGo(int startRowIndex, int targetRowIndex)
+bool DataShareResultSet::OnGo(int startRowIndex, int targetRowIndex, int *cachedIndex)
 {
     if (bridge_ == nullptr || blockWriter_ == nullptr || sharedBlock_ == nullptr) {
         LOG_ERROR("bridge_ or blockWriter_ or sharedBlock_ is null!");
-        return E_ERROR;
+        return false;
     }
     std::vector<std::string> columnNames;
     GetAllColumnNames(columnNames);
     sharedBlock_->Clear();
     sharedBlock_->SetColumnNum(columnNames.size());
-    return bridge_->OnGo(startRowIndex, targetRowIndex, *blockWriter_);
+    int result = bridge_->OnGo(startRowIndex, targetRowIndex, *blockWriter_);
+    if (cachedIndex != nullptr) {
+        *cachedIndex = result;
+    }
+    if (result < 0) {
+        return false;
+    }
+    return true;
 }
 
 void DataShareResultSet::FillBlock(int startRowIndex, AppDataFwk::SharedBlock *block)
@@ -137,10 +142,11 @@ int DataShareResultSet::GoToRow(int position)
     }
     bool result = true;
     if (position > endRowPos_ || position < startRowPos_) {
-        result = OnGo(position, std::min(position + STEP_LEN, rowCnt - 1));
+        int endPos = -1;
+        result = OnGo(position, rowCnt - 1, &endPos);
         if (result) {
             startRowPos_ = position;
-            endRowPos_ = position + static_cast<int>(sharedBlock_->GetRowNum()) -1;
+            endRowPos_ = endPos;
         }
     }
 
@@ -229,7 +235,6 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
             value = os.str();
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
-        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL!");
         return E_ERROR;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB) {
         LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB!");
@@ -380,8 +385,10 @@ bool DataShareResultSet::HasBlock() const
  */
 void DataShareResultSet::ClosedBlock()
 {
-    delete sharedBlock_;
-    sharedBlock_ = nullptr;
+    if (sharedBlock_ != nullptr) {
+        delete sharedBlock_;
+        sharedBlock_ = nullptr;
+    }
 }
 
 void DataShareResultSet::Finalize()
