@@ -21,9 +21,9 @@
 #include <mutex>
 
 #include "data_share_manager.h"
+#include "data_share_service_proxy.h"
 #include "data_share_types.h"
 #include "idata_share_service.h"
-#include "data_share_service_proxy.h"
 #include "iremote_object.h"
 #include "refbase.h"
 
@@ -32,13 +32,34 @@ class DataShareKvServiceProxy;
 class DataShareManagerImpl {
 public:
     static DataShareManagerImpl &GetInstance();
+
     std::shared_ptr<IDataShareService> GetDataShareService();
+
+    void OnRemoteDied();
+
+    class ServiceDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit ServiceDeathRecipient(DataShareManagerImpl *owner) : owner_(owner) {}
+        void OnRemoteDied(const wptr<IRemoteObject> &object) override
+        {
+            if (owner_ != nullptr) {
+                owner_->OnRemoteDied();
+            }
+        }
+
+    private:
+        DataShareManagerImpl *owner_;
+    };
 
 private:
     DataShareManagerImpl();
+
     ~DataShareManagerImpl();
+
     sptr<DataShareServiceProxy> GetDataShareServiceProxy();
+
     void ResetServiceHandle();
+
     static std::shared_ptr<DataShareKvServiceProxy> GetDistributedDataManager();
 
     std::mutex mutex_;
