@@ -43,7 +43,6 @@ std::shared_ptr<DataShareResultSet> ISharedResultSetProxy::CreateProxy(MessagePa
 
 int ISharedResultSetProxy::GetAllColumnNames(std::vector<std::string> &columnNames)
 {
-    LOG_DEBUG("Start");
     if (!columnNames_.empty()) {
         columnNames = columnNames_;
         return E_OK;
@@ -71,7 +70,6 @@ int ISharedResultSetProxy::GetAllColumnNames(std::vector<std::string> &columnNam
 
 int ISharedResultSetProxy::GetRowCount(int &count)
 {
-    LOG_DEBUG("Start");
     DISTRIBUTED_DATA_HITRACE(std::string(__FUNCTION__));
     if (rowCount_ >= 0) {
         count = rowCount_;
@@ -99,7 +97,6 @@ int ISharedResultSetProxy::GetRowCount(int &count)
 
 bool ISharedResultSetProxy::OnGo(int oldRowIndex, int newRowIndex, int *cachedIndex)
 {
-    LOG_DEBUG("Start");
     MessageParcel request;
     request.WriteInterfaceToken(GetDescriptor());
     request.WriteInt32(oldRowIndex);
@@ -123,7 +120,6 @@ bool ISharedResultSetProxy::OnGo(int oldRowIndex, int newRowIndex, int *cachedIn
 
 int ISharedResultSetProxy::Close()
 {
-    LOG_DEBUG("Start");
     DataShareResultSet::Close();
     MessageParcel request;
     request.WriteInterfaceToken(GetDescriptor());

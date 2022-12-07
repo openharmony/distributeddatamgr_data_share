@@ -29,7 +29,7 @@ public:
     virtual ~ISharedResultSetProxy() = default;
     int GetAllColumnNames(std::vector<std::string> &columnNames) override;
     int GetRowCount(int &count) override;
-    bool OnGo(int startRowIndex, int targetRowIndex, int *cachedIndex) override;
+    bool OnGo(int startRowIndex, int targetRowIndex, int *cachedIndex = nullptr) override;
     int Close() override;
 private:
     static BrokerDelegator<ISharedResultSetProxy> delegator_;
