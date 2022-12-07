@@ -15,15 +15,14 @@
 
 #include "data_share_manager_impl.h"
 
-#include "data_share_manager.h"
-
 #include <thread>
 
+#include "data_share_manager.h"
 #include "data_share_service_proxy.h"
-#include "ipc_skeleton.h"
-#include "idata_share_service.h"
-#include "iservice_registry.h"
 #include "datashare_log.h"
+#include "idata_share_service.h"
+#include "ipc_skeleton.h"
+#include "iservice_registry.h"
 #include "system_ability_definition.h"
 
 namespace OHOS::DataShare {
@@ -48,6 +47,17 @@ std::shared_ptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDat
 
     LOG_ERROR("get distributed data manager failed");
     return nullptr;
+}
+
+static void LinkToDeath(const sptr<IRemoteObject> &remote)
+{
+    auto &manager = DataShareManagerImpl::GetInstance();
+    sptr<DataShareManagerImpl::ServiceDeathRecipient> deathRecipient = new (std::nothrow)
+        DataShareManagerImpl::ServiceDeathRecipient(&manager);
+    if (!remote->AddDeathRecipient(deathRecipient)) {
+        LOG_ERROR("add death recipient failed");
+    }
+    LOG_ERROR("link to death success");
 }
 
 sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
@@ -77,9 +87,10 @@ std::shared_ptr<IDataShareService> DataShareManagerImpl::GetDataShareService()
     if (service == nullptr) {
         return nullptr;
     }
-
-    dataShareService_ = std::shared_ptr<DataShareServiceProxy>(
-        service.GetRefPtr(), [holder = service](const auto *) {});
+    sptr<IDataShareService> serviceBase = service;
+    LinkToDeath(serviceBase->AsObject().GetRefPtr());
+    dataShareService_ =
+        std::shared_ptr<DataShareServiceProxy>(service.GetRefPtr(), [holder = service](const auto *) {});
     return dataShareService_;
 }
 
@@ -99,13 +110,17 @@ DataShareManagerImpl::~DataShareManagerImpl()
     LOG_INFO("destroy");
 }
 
-
 void DataShareManagerImpl::ResetServiceHandle()
 {
     LOG_INFO("enter");
     std::lock_guard<std::mutex> lock(mutex_);
     dataMgrService_ = nullptr;
     dataShareService_ = nullptr;
+}
+void DataShareManagerImpl::OnRemoteDied()
+{
+    LOG_INFO("datashare service has dead");
+    ResetServiceHandle();
 }
 
 DataShareKvServiceProxy::DataShareKvServiceProxy(const sptr<IRemoteObject> &impl)
