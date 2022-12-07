@@ -132,7 +132,7 @@ napi_value DataSharePredicatesProxy::NewInstance(napi_env env, std::shared_ptr<D
 }
 
 std::shared_ptr<DataShareAbsPredicates> DataSharePredicatesProxy::GetNativePredicates(
-    const napi_env &env, const napi_value &arg)
+    const napi_env env, const napi_value arg)
 {
     LOG_DEBUG("Start");
     if (arg == nullptr) {

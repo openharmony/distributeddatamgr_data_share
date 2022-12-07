@@ -18,7 +18,7 @@
 #include <functional>
 #include <memory>
 #include "datashare_js_utils.h"
-#include "datashare_error.h"
+#include "datashare_error_impl.h"
 #include "napi/native_common.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"

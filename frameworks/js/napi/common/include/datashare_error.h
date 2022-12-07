@@ -20,48 +20,14 @@
 
 namespace OHOS {
 namespace DataShare {
-static const int EXCEPTION_PARAMETER_CHECK = 401;
-static const int EXCEPTION_INNER = 15700000;
-static const int EXCEPTION_HELPER_UNINITIALIZED = 15700010;
-
 class Error {
 public:
+    static const int EXCEPTION_PARAMETER_CHECK = 401;
+    static const int EXCEPTION_INNER = 15700000;
+    static const int EXCEPTION_HELPER_UNINITIALIZED = 15700010;
     virtual ~Error() {};
     virtual std::string GetMessage() = 0;
     virtual int GetCode() = 0;
-};
-
-class ParametersTypeError : public Error {
-public:
-    ParametersTypeError(const std::string &name, const std::string &wantType) : name(name), wantType(wantType) {};
-    std::string GetMessage() override;
-    int GetCode() override;
-private:
-    std::string name;
-    std::string wantType;
-};
-
-class ParametersNumError : public Error {
-public:
-    ParametersNumError(const std::string &wantNum) : wantNum(wantNum) {};
-    std::string GetMessage() override;
-    int GetCode() override;
-private:
-    std::string wantNum;
-};
-
-class DataShareHelperInitError : public Error {
-public:
-    DataShareHelperInitError() = default;
-    std::string GetMessage() override;
-    int GetCode() override;
-};
-
-class InnerError : public Error {
-public:
-    InnerError() = default;
-    std::string GetMessage() override;
-    int GetCode() override;
 };
 } // namespace DataShare
 } // namespace OHOS

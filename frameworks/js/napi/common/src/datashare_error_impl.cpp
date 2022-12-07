@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "datashare_error.h"
+#include "datashare_error_impl.h"
 
 namespace OHOS {
 namespace DataShare {

@@ -378,7 +378,7 @@ int JsDataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &v
         LOG_ERROR("napi_create_string_utf8 status : %{public}d", status);
         return ret;
     }
-    napi_value napiValue = DataShareValueBucketNewInstance(env, const_cast<DataShareValuesBucket&>(value));
+    napi_value napiValue = NewInstance(env, const_cast<DataShareValuesBucket&>(value));
     if (napiValue == nullptr) {
         LOG_ERROR("failed to make new instance of rdbValueBucket.");
         return ret;
@@ -413,7 +413,7 @@ int JsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pre
         return ret;
     }
 
-    napi_value napiValue = DataShareValueBucketNewInstance(env, const_cast<DataShareValuesBucket&>(value));
+    napi_value napiValue = NewInstance(env, const_cast<DataShareValuesBucket&>(value));
     if (napiValue == nullptr) {
         LOG_ERROR("failed to make new instance of rdbValueBucket.");
         return ret;
@@ -541,7 +541,7 @@ int JsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataSha
     }
     int32_t index = 0;
     for (const auto &value : values) {
-        napi_value result = DataShareValueBucketNewInstance(env, const_cast<DataShareValuesBucket&>(value));
+        napi_value result = NewInstance(env, const_cast<DataShareValuesBucket&>(value));
         if (result == nullptr) {
             LOG_ERROR("failed to make new instance of rdbValueBucket.");
             return ret;

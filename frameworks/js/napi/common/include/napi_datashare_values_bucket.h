@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace DataShare {
-napi_value DataShareValueBucketNewInstance(napi_env env, DataShareValuesBucket &valuesBucket);
+napi_value NewInstance(napi_env env, DataShareValuesBucket &valuesBucket);
 bool GetValueBucketObject(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg);
 } // namespace DataShare
 } // namespace OHOS

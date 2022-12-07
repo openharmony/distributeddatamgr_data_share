@@ -61,8 +61,6 @@ private:
 
     std::shared_ptr<DataShareResultSet> resultSet_;
 };
-napi_value GetNapiResultSetObject(napi_env env, DataShareResultSet *resultSet);
-DataShareResultSet *GetResultSetProxyObject(const napi_env &env, const napi_value &arg);
 } // namespace DataShare
 } // namespace OHOS
 #endif // DATASHARE_RESULT_SET_PROXY
