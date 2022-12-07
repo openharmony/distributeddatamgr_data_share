@@ -36,7 +36,7 @@ public:
     /**
      * Called when the position of the result set changes
      */
-    virtual bool OnGo(int oldRowIndex, int newRowIndex) = 0;
+    virtual bool OnGo(int oldRowIndex, int newRowIndex, int *cachedIndex) = 0;
 };
 } // namespace DataShare
 } // namespace OHOS

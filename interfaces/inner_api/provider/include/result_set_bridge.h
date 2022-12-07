@@ -78,7 +78,7 @@ public:
     /**
      * Called when the position of the result set changes
      */
-    virtual bool OnGo(int32_t startRowIndex, int32_t targetRowIndex, Writer &writer) = 0;
+    virtual int OnGo(int32_t startRowIndex, int32_t targetRowIndex, Writer &writer) = 0;
 };
 } // namespace DataShare
 } // namespace OHOS
