@@ -32,6 +32,7 @@ using namespace testing::ext;
 namespace OHOS {
 namespace Media {
 constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
+std::string MEDIALIBRARY_DATA_URI_ERROR = "test:///media";
 std::shared_ptr<DataShare::DataShareHelper> g_mediaDataShareHelper;
 
 std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t systemAbilityId)
@@ -65,7 +66,7 @@ void MediaDataShareUnitTest::SetUpTestCase(void)
     LOG_INFO("SetUpTestCase invoked");
     g_mediaDataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
     ASSERT_TRUE(g_mediaDataShareHelper != nullptr);
-    
+
     Uri deleteAssetUri(MEDIALIBRARY_DATA_URI);
     DataShare::DataSharePredicates predicates;
     string selections = MEDIA_DATA_DB_ID + " <> 0 ";
@@ -561,7 +562,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ValuesBucket_Test_001, TestSize.
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ValueObject_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ValueObject_Test_001::Start");
-    
+
     int base = 100;
     DataShare::DataShareValueObject object(base);
     int value = object;
@@ -618,21 +619,6 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_OpenRawFile_Test_001, TestSize.L
     int result = helper->OpenRawFile(uri, mode);
     EXPECT_EQ(result, 0);
     LOG_INFO("MediaDataShare_OpenRawFile_Test_001 End");
-}
-
-HWTEST_F(MediaDataShareUnitTest, MediaDataShare_batchInsert_Test_001, TestSize.Level0)
-{
-    LOG_INFO("MediaDataShare_batchInsert_Test_001::Start");
-    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
-    Uri uri(MEDIALIBRARY_DATA_URI);
-    DataShare::DataShareValuesBucket valuesBucket;
-    valuesBucket.Put("name", "ZhangSan");
-    valuesBucket.Put("age", 20);
-    std::vector<DataShare::DataShareValuesBucket> values;
-    values.push_back(valuesBucket);
-    int result = helper->BatchInsert(uri, values);
-    EXPECT_NE(result, 0);
-    LOG_INFO("MediaDataShare_batchInsert_Test_001 End");
 }
 
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NormalizeUri_Test_001, TestSize.Level0)
@@ -697,6 +683,99 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_005, TestSize.Lev
     bool flag = resultSet.OnGo(0, 1);
     EXPECT_EQ(flag, true);
     LOG_INFO("MediaDataShare_ResultSet_Test_005, End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, Creator_ContextNull_Test_001, TestSize.Level0)
+{
+    LOG_INFO("Creator_ContextNull_Test_001::Start");
+    std::shared_ptr<Context> remoteObjCon = nullptr;
+    auto remoteNull = DataShare::DataShareHelper::Creator(remoteObjCon, MEDIALIBRARY_DATA_URI);
+    EXPECT_EQ(remoteNull, nullptr);
+    LOG_INFO("Creator_ContextNull_Test_001 End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, Creator_IRemoteObjectNull_Test_001, TestSize.Level0)
+{
+    LOG_INFO("Creator_IRemoteObjectNull_Test_001::Start");
+    sptr<IRemoteObject> remoteObjNull = nullptr;
+    auto remoteNull = DataShare::DataShareHelper::Creator(remoteObjNull, MEDIALIBRARY_DATA_URI);
+    EXPECT_EQ(remoteNull, nullptr);
+    LOG_INFO("Creator_IRemoteObjectNull_Test_001 End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, Creator_UriError_Test_001, TestSize.Level0)
+{
+    LOG_INFO("Creator_UriError_Test_001::Start");
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    EXPECT_NE(saManager, nullptr);
+    auto remoteObj = saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID);
+    EXPECT_NE(remoteObj, nullptr);
+    auto uriError = DataShare::DataShareHelper::Creator(remoteObj, MEDIALIBRARY_DATA_URI_ERROR);
+    EXPECT_EQ(uriError, nullptr);
+    LOG_INFO("Creator_UriError_Test_001 End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, GetFileTypes_ConnectionNull_Test_001, TestSize.Level0)
+{
+    LOG_INFO("GetFileTypes_ConnectionNull_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    auto ret = helper->Release();
+    EXPECT_TRUE(ret);
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    std::string mimeTypeFilter("mimeTypeFiltertest");
+    std::vector<std::string> result = helper->GetFileTypes(uri, mimeTypeFilter);
+    EXPECT_EQ(result.size(), 0);
+    LOG_INFO("GetFileTypes_ConnectionNull_Test_001 End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, OpenRawFile_ConnectionNull_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_OpenRawFile_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    auto ret = helper->Release();
+    EXPECT_TRUE(ret);
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    std::string mode("modetest");
+    int result = helper->OpenRawFile(uri, mode);
+    EXPECT_EQ(result, -1);
+    LOG_INFO("MediaDataShare_OpenRawFile_Test_001 End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, OpenFile_ConnectionNull_Test_001, TestSize.Level0)
+{
+    LOG_INFO("OpenFile_ConnectionNull_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    auto ret = helper->Release();
+    EXPECT_TRUE(ret);
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    std::string mode("modetest");
+    int result = helper->OpenFile(uri, mode);
+    EXPECT_EQ(result, -1);
+    LOG_INFO("OpenFile_ConnectionNull_Test_001 End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, Insert_ConnectionNull_Test_001, TestSize.Level0)
+{
+    LOG_INFO("Insert_ConnectionNull_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    auto ret = helper->Release();
+    EXPECT_TRUE(ret);
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+
+    valuesBucket.Clear();
+    double valueD4 = 20.10;
+    valuesBucket.Put(MEDIA_DATA_DB_LONGITUDE, valueD4);
+    valuesBucket.Put(MEDIA_DATA_DB_TITLE, "dataShareTest006");
+    int value4 = 998;
+    valuesBucket.Put(MEDIA_DATA_DB_PARENT_ID, value4);
+    auto resultInsert= helper->Insert(uri, valuesBucket);
+    EXPECT_EQ(resultInsert, -1);
+
+    auto resultGetType = helper->GetType(uri);
+    EXPECT_EQ(resultGetType.size(), 0);
+    valuesBucket.Clear();
+    LOG_INFO("Insert_ConnectionNull_Test_001 End");
 }
 } // namespace Media
 } // namespace OHOS
