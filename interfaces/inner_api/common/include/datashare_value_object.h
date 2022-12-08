@@ -26,6 +26,7 @@ constexpr int DATA_SHARE_NO_ERROR = 0;
 enum DataShareValueObjectType : int32_t {
     TYPE_NULL = 0,
     TYPE_INT,
+    TYPE_INT64,
     TYPE_DOUBLE,
     TYPE_STRING,
     TYPE_BOOL,
@@ -42,7 +43,7 @@ public:
     };
     DataShareValueObject(const DataShareValueObject &object) : type(object.type), value(object.value) {};
     DataShareValueObject(int val) : type(TYPE_INT), value(static_cast<int64_t>(val)) {};
-    DataShareValueObject(int64_t val) : type(TYPE_INT), value(val) {};
+    DataShareValueObject(int64_t val) : type(TYPE_INT64), value(val) {};
     DataShareValueObject(double val) : type(TYPE_DOUBLE), value(val) {};
     DataShareValueObject(bool val) : type(TYPE_BOOL), value(val) {};
     DataShareValueObject(std::string val) : type(TYPE_STRING), value(std::move(val)) {};
