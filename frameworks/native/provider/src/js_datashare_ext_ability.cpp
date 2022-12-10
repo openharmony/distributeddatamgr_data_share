@@ -222,7 +222,7 @@ NativeValue* JsDataShareExtAbility::CallObjectMethod(const char* name, NativeVal
         return nullptr;
     }
 
-    HandleScope handleScope(jsRuntime_);
+    HandleEscape handleEscape(jsRuntime_);
     auto& nativeEngine = jsRuntime_.GetNativeEngine();
 
     NativeValue* value = jsObj_->Get();
@@ -257,7 +257,7 @@ NativeValue* JsDataShareExtAbility::CallObjectMethod(const char* name, NativeVal
     }
 
     SetBlockWaiting(false);
-    return handleScope.Escape(nativeEngine.CallFunction(value, method, args, count));
+    return handleEscape.Escape(nativeEngine.CallFunction(value, method, args, count));
 }
 
 void JsDataShareExtAbility::GetSrcPath(std::string &srcPath)
