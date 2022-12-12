@@ -36,7 +36,7 @@ public:
     static napi_value GetConstructor(napi_env env);
 
 private:
-    static std::shared_ptr<DataShareResultSet> &GetInnerResultSet(napi_env env, napi_callback_info info);
+    static std::shared_ptr<DataShareResultSet> GetInnerResultSet(napi_env env, napi_callback_info info);
     static napi_value Initialize(napi_env env, napi_callback_info info);
 
     static napi_value GoToFirstRow(napi_env env, napi_callback_info info);

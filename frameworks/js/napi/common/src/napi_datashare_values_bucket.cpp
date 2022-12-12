@@ -42,39 +42,7 @@ napi_value NewInstance(napi_env env, DataShareValuesBucket &valuesBucket)
     return ret;
 }
 
-bool SetValuesBucketObject(
-    DataShareValuesBucket &valuesBucket, const napi_env &env, std::string keyStr, napi_value value)
-{
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, value, &valueType);
-    if (valueType == napi_string) {
-        LOG_DEBUG("ValueObject is string");
-        std::string valueString = DataShareJSUtils::UnwrapStringFromJS(env, value);
-        valuesBucket.Put(keyStr, valueString);
-    } else if (valueType == napi_number) {
-        LOG_DEBUG("ValueObject is number");
-        double valueNumber = 0;
-        napi_get_value_double(env, value, &valueNumber);
-        valuesBucket.Put(keyStr, valueNumber);
-    } else if (valueType == napi_boolean) {
-        LOG_DEBUG("ValueObject is boolean");
-        bool valueBool = false;
-        napi_get_value_bool(env, value, &valueBool);
-        valuesBucket.Put(keyStr, valueBool);
-    } else if (valueType == napi_null) {
-        LOG_DEBUG("ValueObject is null");
-        valuesBucket.Put(keyStr);
-    } else if (valueType == napi_object) {
-        LOG_DEBUG("ValueObject is Uint8Array");
-        valuesBucket.Put(keyStr, DataShareJSUtils::Convert2U8Vector(env, value));
-    } else {
-        LOG_ERROR("valuesBucket error");
-        return false;
-    }
-    return true;
-}
-
-bool AnalysisValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg)
+bool UnWarpValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg)
 {
     napi_value keys = 0;
     napi_get_property_names(env, arg, &keys);
@@ -88,20 +56,27 @@ bool AnalysisValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &e
     for (size_t i = 0; i < arrLen; ++i) {
         napi_value key = 0;
         status = napi_get_element(env, keys, i, &key);
+        if (status != napi_ok) {
+            LOG_ERROR("ValuesBucket err");
+            return false;
+        }
         std::string keyStr = DataShareJSUtils::UnwrapStringFromJS(env, key);
         napi_value value = 0;
         napi_get_property(env, arg, key, &value);
 
-        if (!SetValuesBucketObject(valuesBucket, env, keyStr, value)) {
+        bool flag;
+        DataShareValueObject valueObject = DataShareJSUtils::Convert2ValueObject(env, value, flag);
+        if (!flag) {
             return false;
         }
+        valuesBucket.Put(keyStr, valueObject);
     }
     return true;
 }
 
 bool GetValueBucketObject(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg)
 {
-    return AnalysisValuesBucket(valuesBucket, env, arg);
+    return UnWarpValuesBucket(valuesBucket, env, arg);
 }
 } // namespace DataShare
 } // namespace OHOS
