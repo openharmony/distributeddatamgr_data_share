@@ -115,7 +115,7 @@ bool ITypesUtils::Marshalling(const DataSharePredicates &predicates, Parcel &par
 {
     LOG_DEBUG("Marshalling DataSharePredicates Start");
     const auto &operations = predicates.GetOperationList();
-    int64_t mode = static_cast<int64_t>(predicates.GetSettingMode());
+    int64_t mode = predicates.GetSettingMode();
     return ITypesUtils::Marshal(parcel, operations, predicates.GetWhereClause(), predicates.GetWhereArgs(),
         predicates.GetOrder(), mode);
 }

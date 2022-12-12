@@ -309,12 +309,12 @@ private:
     /**
      * Convert utf8 string to utf16.
      */
-    static std::u16string ToUtf16(std::string str);
+    static std::u16string ToUtf16(const std::string& str);
 
     /**
      * Convert utf16 string to utf8.
      */
-    static std::string ToUtf8(std::u16string str16);
+    static std::string ToUtf8(const std::u16string& str16);
 };
 } // namespace AppDataFwk
 } // namespace OHOS
