@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace DataShare {
-napi_value DataShareValueBucketNewInstance(napi_env env, DataShareValuesBucket &valuesBucket)
+napi_value NewInstance(napi_env env, DataShareValuesBucket &valuesBucket)
 {
     napi_value ret;
     NAPI_CALL(env, napi_create_object(env, &ret));

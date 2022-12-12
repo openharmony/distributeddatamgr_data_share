@@ -478,17 +478,5 @@ napi_value DataShareResultSetProxy::IsClosed(napi_env env, napi_callback_info in
     napi_get_boolean(env, result, &output);
     return output;
 }
-
-napi_value GetNapiResultSetObject(napi_env env, DataShareResultSet *resultSet)
-{
-    return DataShareResultSetProxy::NewInstance(env, std::shared_ptr<DataShareResultSet>(resultSet));
-}
-
-DataShareResultSet *GetResultSetProxyObject(const napi_env &env, const napi_value &arg)
-{
-    // the resultSet maybe release.
-    auto resultSet = DataShareResultSetProxy::GetNativeObject(env, arg);
-    return resultSet.get();
-}
 } // namespace DataShare
 } // namespace OHOS

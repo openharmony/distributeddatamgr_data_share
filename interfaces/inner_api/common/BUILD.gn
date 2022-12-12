@@ -33,7 +33,7 @@ ohos_shared_library("datashare_common") {
   ]
 
   sources = [
-    "${datashare_common_napi_path}/src/datashare_error.cpp",
+    "${datashare_common_napi_path}/src/datashare_error_impl.cpp",
     "${datashare_common_napi_path}/src/datashare_js_utils.cpp",
     "${datashare_common_napi_path}/src/datashare_predicates_proxy.cpp",
     "${datashare_common_napi_path}/src/datashare_result_set_proxy.cpp",

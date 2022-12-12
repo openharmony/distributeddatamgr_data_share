@@ -29,7 +29,7 @@ public:
     static void Init(napi_env env, napi_value exports);
     static napi_value NewInstance(napi_env env, std::shared_ptr<DataShareAbsPredicates> value);
     static std::shared_ptr<DataShareAbsPredicates> GetNativePredicates(
-        const napi_env &env, const napi_value &arg);
+        const napi_env env, const napi_value arg);
     static void Destructor(napi_env env, void *nativeObject, void *finalize_hint);
 
     DataSharePredicatesProxy();
@@ -72,8 +72,8 @@ private:
     static napi_value PrefixKey(napi_env env, napi_callback_info info);
     static napi_value InKeys(napi_env env, napi_callback_info info);
 
-    napi_env env_;
-    napi_ref wrapper_;
+    napi_env env_ = nullptr;
+    napi_ref wrapper_ = nullptr;
 };
 } // namespace DataShare
 } // namespace OHOS
