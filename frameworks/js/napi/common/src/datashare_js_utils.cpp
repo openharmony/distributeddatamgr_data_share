@@ -22,11 +22,10 @@ namespace OHOS {
 namespace DataShare {
 std::string DataShareJSUtils::Convert2String(napi_env env, napi_value jsStr, const size_t max)
 {
-    size_t str_buffer_size = 0;
-    napi_get_value_string_utf8(env, jsStr, nullptr, 0, &str_buffer_size);
-    char *buf = new char[str_buffer_size + BUF_CACHE_MARGIN + 1];
+    NAPI_ASSERT_BASE(env, max > 0, "failed on max > 0", std::string());
+    char *buf = new char[max + 1];
     size_t len = 0;
-    napi_get_value_string_utf8(env, jsStr, buf, str_buffer_size, &len);
+    napi_get_value_string_utf8(env, jsStr, buf, max, &len);
     buf[len] = 0;
     std::string value(buf);
     delete[] buf;
