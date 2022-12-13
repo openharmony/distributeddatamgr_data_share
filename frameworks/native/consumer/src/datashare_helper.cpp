@@ -240,15 +240,6 @@ int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
 {
     LOG_DEBUG("Start");
     int index = INVALID_VALUE;
-//    if (isDataShareService_) {
-//        LOG_DEBUG("DataShareService mode.");
-//        auto service = DataShareManager::GetDataShareService();
-//        if (!service) {
-//            LOG_DEBUG("DataShareService mode, but fail to get dataShareService.");
-//            return index;
-//        }
-//        return service->Insert(uri.ToString(), value);
-//    }
     auto connection = connection_;
     if (connection == nullptr) {
         LOG_ERROR("dataShareConnection_ is nullptr");
@@ -280,16 +271,6 @@ int DataShareHelper::Update(Uri &uri, const DataSharePredicates &predicates, con
 {
     LOG_DEBUG("Start");
     int index = INVALID_VALUE;
-//    if (isDataShareService_) {
-//        LOG_DEBUG("DataShareService mode.");
-//        auto service = DataShareManager::GetDataShareService();
-//        if (!service) {
-//            LOG_DEBUG("DataShareService mode, but fail to get dataShareService.");
-//            return index;
-//        }
-//        return service->Update(uri.ToString(), predicates, value);
-//    }
-
     auto connection = connection_;
     if (connection == nullptr) {
         LOG_ERROR("dataShareConnection_ is nullptr");
@@ -320,16 +301,6 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
 {
     LOG_DEBUG("Start");
     int index = INVALID_VALUE;
-//    if (isDataShareService_) {
-//        LOG_DEBUG("DataShareService mode.");
-//        auto service = DataShareManager::GetDataShareService();
-//        if (!service) {
-//            LOG_DEBUG("DataShareService mode, but fail to get dataShareService.");
-//            return index;
-//        }
-//        return service->Delete(uri.ToString(), predicates);
-//    }
-
     auto connection = connection_;
     if (connection == nullptr) {
         LOG_ERROR("dataShareConnection_ is nullptr");
