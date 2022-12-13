@@ -41,7 +41,7 @@ napi_value NewInstance(napi_env env, DataShareValuesBucket &valuesBucket)
     return ret;
 }
 
-bool UnWarpValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg)
+bool UnWrapValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg)
 {
     napi_value keys = 0;
     napi_get_property_names(env, arg, &keys);
@@ -63,9 +63,9 @@ bool UnWarpValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &env
         napi_value value = 0;
         napi_get_property(env, arg, key, &value);
 
-        bool flag;
-        DataShareValueObject valueObject = DataShareJSUtils::Convert2ValueObject(env, value, flag);
-        if (!flag) {
+        bool ret;
+        DataShareValueObject valueObject = DataShareJSUtils::Convert2ValueObject(env, value, ret);
+        if (!ret) {
             return false;
         }
         valuesBucket.Put(keyStr, valueObject);
@@ -75,7 +75,7 @@ bool UnWarpValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &env
 
 bool GetValueBucketObject(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg)
 {
-    return UnWarpValuesBucket(valuesBucket, env, arg);
+    return UnWrapValuesBucket(valuesBucket, env, arg);
 }
 } // namespace DataShare
 } // namespace OHOS
