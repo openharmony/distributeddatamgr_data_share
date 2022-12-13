@@ -688,7 +688,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_005, TestSize.Lev
 HWTEST_F(MediaDataShareUnitTest, Creator_ContextNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("Creator_ContextNull_Test_001::Start");
-    std::shared_ptr<Context> remoteObjCon = nullptr;
+    std::shared_ptr<AppExecFwk::Context> remoteObjCon = nullptr;
     auto remoteNull = DataShare::DataShareHelper::Creator(remoteObjCon, MEDIALIBRARY_DATA_URI);
     EXPECT_EQ(remoteNull, nullptr);
     LOG_INFO("Creator_ContextNull_Test_001 End");
