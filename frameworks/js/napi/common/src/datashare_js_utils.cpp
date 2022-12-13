@@ -24,7 +24,10 @@ std::string DataShareJSUtils::Convert2String(napi_env env, napi_value jsStr, con
 {
     size_t str_buffer_size = max;
     napi_get_value_string_utf8(env, jsStr, nullptr, 0, &str_buffer_size);
-    char *buf = new char[str_buffer_size + 1];
+    char *buf = new (std::nothrow) char[str_buffer_size + 1];
+    if (buf == nullptr) {
+        return "";
+    }
     size_t len = 0;
     napi_get_value_string_utf8(env, jsStr, buf, str_buffer_size + 1, &len);
     buf[len] = 0;
