@@ -31,9 +31,9 @@ namespace AAFwk {
 }
 
 namespace DataShare {
-class DataShareBaseProxy {
+class BaseProxy {
 public:
-    virtual ~DataShareBaseProxy() = default;
+    virtual ~BaseProxy() = default;
 
     /**
     * @brief Opens a file in a specified remote path.

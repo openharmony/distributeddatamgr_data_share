@@ -31,12 +31,12 @@ namespace OHOS::DataShare {
 class DataShareKvServiceProxy;
 class DataShareManagerImpl : public BaseConnection {
 public:
-    std::shared_ptr<DataShareBaseProxy> GetDataShareService();
+    std::shared_ptr<BaseProxy> GetDataShareService();
 
     DataShareManagerImpl();
     virtual ~DataShareManagerImpl();
     void OnRemoteDied();
-    std::shared_ptr<DataShareBaseProxy> GetDataShareProxy() override;
+    std::shared_ptr<BaseProxy> GetDataShareProxy() override;
     bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> &token) override;
     bool IsConnected() override;
 

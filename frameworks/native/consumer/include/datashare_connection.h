@@ -72,7 +72,7 @@ public:
         std::mutex mutex;
     };
 
-    std::shared_ptr<DataShareBaseProxy> GetDataShareProxy() override;
+    std::shared_ptr<BaseProxy> GetDataShareProxy() override;
     bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> &token)  override ;
     bool IsConnected() override ;
 

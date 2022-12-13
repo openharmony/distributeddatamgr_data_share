@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace DataShare {
-class DataShareProxy : public IRemoteProxy<IDataShare>, public DataShareBaseProxy {
+class DataShareProxy : public IRemoteProxy<IDataShare>, public BaseProxy {
 public:
     explicit DataShareProxy(const sptr<IRemoteObject>& remote) : IRemoteProxy<IDataShare>(remote) {}
 

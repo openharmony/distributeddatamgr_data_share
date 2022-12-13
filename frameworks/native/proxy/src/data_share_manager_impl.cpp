@@ -75,7 +75,7 @@ sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
     return iface_cast<DataShareServiceProxy>(remote);
 }
 
-std::shared_ptr<DataShareBaseProxy> DataShareManagerImpl::GetDataShareService()
+std::shared_ptr<BaseProxy> DataShareManagerImpl::GetDataShareService()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (dataShareService_ != nullptr) {
@@ -124,7 +124,7 @@ bool DataShareManagerImpl::IsConnected() {
     return dataShareService_ != nullptr;
 }
 
-std::shared_ptr<DataShareBaseProxy> DataShareManagerImpl::GetDataShareProxy(){
+std::shared_ptr<BaseProxy> DataShareManagerImpl::GetDataShareProxy(){
     return dataShareService_;
 }
 

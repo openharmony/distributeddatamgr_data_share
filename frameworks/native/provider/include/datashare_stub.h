@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace DataShare {
-class DataShareStub : public IRemoteStub<IDataShare>, public DataShareBaseProxy {
+class DataShareStub : public IRemoteStub<IDataShare>, public BaseProxy {
 public:
     DataShareStub();
     ~DataShareStub();

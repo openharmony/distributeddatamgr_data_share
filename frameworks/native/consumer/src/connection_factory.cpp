@@ -25,13 +25,7 @@ std::shared_ptr<BaseConnection> ConnectionFactory::GetConnection(Uri &uri,  cons
         return service_;
     }
 
-    sptr<DataShareConnection> connection = new (std::nothrow) DataShareConnection(uri, token);
-    if (connection == nullptr){
-        LOG_ERROR("Factory Create DataShareConnection failed.");
-        return nullptr;
-    }
-    return  std::shared_ptr<DataShareConnection>(
-        connection.GetRefPtr(), [holder = connection](const auto *) {});
+    return std::make_shared<DataShareConnection>(uri, token);
 }
 
 ConnectionFactory& ConnectionFactory::GetInstance()

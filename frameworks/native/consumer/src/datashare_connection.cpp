@@ -65,7 +65,7 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
         condition_.condition.notify_all();
         LOG_DEBUG("End");
     }
-    if (uri_.ToString().empty()) {
+    if (!uri_.ToString().empty()) {
         LOG_INFO("uri : %{public}s disconnect,start reconnect", uri_.ToString().c_str());
         ConnectDataShareExtAbility(uri_, token_);
     }
@@ -131,6 +131,7 @@ void DataShareConnection::SetDataShareProxy(sptr<DataShareProxy> proxy)
 {
     if (proxy == nullptr){
         dataShareProxy_ = nullptr;
+        return;
     }
 
     dataShareProxy_ =
@@ -142,9 +143,8 @@ DataShareConnection::~DataShareConnection()
     uri_ = Uri("");
     DisconnectDataShareExtAbility();
 }
-std::shared_ptr<DataShareBaseProxy> DataShareConnection::GetDataShareProxy()
+std::shared_ptr<BaseProxy> DataShareConnection::GetDataShareProxy()
 {
-    std::unique_lock<std::mutex> lock(condition_.mutex);
     return dataShareProxy_;
 }
 

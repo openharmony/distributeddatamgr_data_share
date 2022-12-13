@@ -26,7 +26,7 @@
 #include "uri.h"
 
 namespace OHOS::DataShare {
-class DataShareServiceProxy : public IRemoteProxy<IDataShareService>, public DataShareBaseProxy {
+class DataShareServiceProxy : public IRemoteProxy<IDataShareService>, public BaseProxy {
 public:
     explicit DataShareServiceProxy(const sptr<IRemoteObject> &object);
     virtual int Insert(const Uri &uri, const DataShareValuesBucket &valuesBucket) override;
