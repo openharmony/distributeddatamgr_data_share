@@ -18,14 +18,13 @@
 
 #include <string>
 
-#include "datashare_predicates.h"
-#include "datashare_result_set.h"
-#include "datashare_values_bucket.h"
+#include "data_share_base_proxy.h"
 #include "iremote_broker.h"
 
 namespace OHOS::DataShare {
 class IDataShareService : public IRemoteBroker {
 public:
+    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DataShare.IDataShareService");
     enum {
         DATA_SHARE_SERVICE_CMD_INSERT,
         DATA_SHARE_SERVICE_CMD_DELETE,
@@ -38,13 +37,6 @@ public:
         DATA_SHARE_ERROR = -1,
         DATA_SHARE_OK = 0,
     };
-    virtual int32_t Insert(const std::string &uri, const DataShareValuesBucket &valuesBucket) = 0;
-    virtual int32_t Update(
-        const std::string &uri, const DataSharePredicates &predicate, const DataShareValuesBucket &valuesBucket) = 0;
-    virtual int32_t Delete(const std::string &uri, const DataSharePredicates &predicate) = 0;
-    virtual std::shared_ptr<DataShareResultSet> Query(
-        const std::string &uri, const DataSharePredicates &predicates, const std::vector<std::string> &columns) = 0;
-    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DataShare.IDataShareService");
 };
 
 class IKvStoreDataService : public IRemoteBroker {

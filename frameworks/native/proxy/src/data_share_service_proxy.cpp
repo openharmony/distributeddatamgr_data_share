@@ -26,15 +26,16 @@ DataShareServiceProxy::DataShareServiceProxy(const sptr<IRemoteObject> &object)
     LOG_INFO("Construct complete.");
 }
 
-int32_t DataShareServiceProxy::Insert(const std::string &uri, const DataShareValuesBucket &valuesBucket)
+int DataShareServiceProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
+    std::string uriStr = uri.ToString();
     LOG_DEBUG("Proxy insert start.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed!");
         return DATA_SHARE_ERROR;
     }
-    if (!ITypesUtils::Marshal(data, uri, valuesBucket)) {
+    if (!ITypesUtils::Marshal(data, uriStr, value)) {
         LOG_ERROR("Write to message parcel failed!");
         return DATA_SHARE_ERROR;
     }
@@ -43,22 +44,23 @@ int32_t DataShareServiceProxy::Insert(const std::string &uri, const DataShareVal
     MessageOption option;
     int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_INSERT, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Insert fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
+        LOG_ERROR("Insert fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
         return DATA_SHARE_ERROR;
     }
     return reply.ReadInt32();
 }
 
 int32_t DataShareServiceProxy::Update(
-    const std::string &uri, const DataSharePredicates &predicate, const DataShareValuesBucket &valuesBucket)
+        const Uri &uri, const DataSharePredicates &predicate, const DataShareValuesBucket &valuesBucket)
 {
+    std::string uriStr = uri.ToString();
     LOG_DEBUG("Proxy update start.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed!");
         return DATA_SHARE_ERROR;
     }
-    if (!ITypesUtils::Marshal(data, uri, predicate, valuesBucket)) {
+    if (!ITypesUtils::Marshal(data, uriStr, predicate, valuesBucket)) {
         LOG_ERROR("Write to message parcel failed!");
         return DATA_SHARE_ERROR;
     }
@@ -67,21 +69,22 @@ int32_t DataShareServiceProxy::Update(
     MessageOption option;
     int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_UPDATE, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Update fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
+        LOG_ERROR("Update fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
         return DATA_SHARE_ERROR;
     }
     return reply.ReadInt32();
 }
 
-int32_t DataShareServiceProxy::Delete(const std::string &uri, const DataSharePredicates &predicate)
+    int DataShareServiceProxy::Delete(const Uri &uri, const DataSharePredicates &predicate)
 {
+    std::string uriStr = uri.ToString();
     LOG_DEBUG("Proxy delete start.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed!");
         return DATA_SHARE_ERROR;
     }
-    if (!ITypesUtils::Marshal(data, uri, predicate)) {
+    if (!ITypesUtils::Marshal(data, uriStr, predicate)) {
         LOG_ERROR("Write to message parcel failed!");
         return DATA_SHARE_ERROR;
     }
@@ -90,15 +93,16 @@ int32_t DataShareServiceProxy::Delete(const std::string &uri, const DataSharePre
     MessageOption option;
     int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_DELETE, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Delete fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
+        LOG_ERROR("Delete fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
         return DATA_SHARE_ERROR;
     }
     return reply.ReadInt32();
 }
 
 std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
-    const std::string &uri, const DataSharePredicates &predicates, const std::vector<std::string> &columns)
+    const Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns)
 {
+    std::string uriStr = uri.ToString();
     LOG_DEBUG("Proxy query start.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
@@ -106,7 +110,7 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
         return nullptr;
     }
 
-    if (!ITypesUtils::Marshal(data, uri, predicates, columns)) {
+    if (!ITypesUtils::Marshal(data, uriStr, predicates, columns)) {
         LOG_ERROR("Write to message parcel failed!");
         return nullptr;
     }
@@ -115,9 +119,57 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
     MessageOption option;
     int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_QUERY, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Query fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
+        LOG_ERROR("Query fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
         return nullptr;
     }
     return ISharedResultSet::ReadFromParcel(reply);
+}
+
+
+int DataShareServiceProxy::OpenFile(const Uri &uri, const std::string &mode) {
+    return 0;
+}
+
+std::vector<std::string> DataShareServiceProxy::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter) {
+    return std::vector<std::string>();
+}
+
+int DataShareServiceProxy::OpenRawFile(const Uri &uri, const std::string &mode) {
+    return 0;
+}
+
+std::string DataShareServiceProxy::GetType(const Uri &uri) {
+    return std::string();
+}
+
+int DataShareServiceProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values) {
+    return 0;
+}
+
+bool
+DataShareServiceProxy::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) {
+    return false;
+}
+
+bool
+DataShareServiceProxy::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) {
+    return false;
+}
+
+bool DataShareServiceProxy::NotifyChange(const Uri &uri) {
+    return false;
+}
+
+Uri DataShareServiceProxy::NormalizeUri(const Uri &uri) {
+    return Uri("");
+}
+
+std::vector<std::shared_ptr<DataShareResult>>
+DataShareServiceProxy::ExecuteBatch(const std::vector<std::shared_ptr<DataShareOperation>> &operations) {
+    return std::vector<std::shared_ptr<DataShareResult>>();
+}
+
+Uri DataShareServiceProxy::DenormalizeUri(const Uri &uri) {
+    return Uri("");
 }
 } // namespace OHOS::DataShare

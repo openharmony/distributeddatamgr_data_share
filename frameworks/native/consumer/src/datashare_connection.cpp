@@ -22,7 +22,6 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-sptr<DataShareConnection> DataShareConnection::instance_ = nullptr;
 constexpr int WAIT_TIME = 3;
 
 /**
@@ -59,7 +58,6 @@ void DataShareConnection::OnAbilityConnectDone(
  */
 void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    auto proxy = dataShareProxy_;
     {
         LOG_DEBUG("Start");
         std::unique_lock<std::mutex> lock(condition_.mutex);
@@ -67,9 +65,9 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
         condition_.condition.notify_all();
         LOG_DEBUG("End");
     }
-    if (proxy != nullptr && !uri_.ToString().empty()) {
+    if (uri_.ToString().empty()) {
         LOG_INFO("uri : %{public}s disconnect,start reconnect", uri_.ToString().c_str());
-        ConnectDataShareExtAbility(uri_, proxy->AsObject());
+        ConnectDataShareExtAbility(uri_, token_);
     }
 }
 
@@ -129,20 +127,35 @@ bool DataShareConnection::IsExtAbilityConnected()
     return dataShareProxy_ != nullptr;
 }
 
-sptr<IDataShare> DataShareConnection::GetDataShareProxy()
+void DataShareConnection::SetDataShareProxy(sptr<DataShareProxy> proxy)
 {
-    return dataShareProxy_;
-}
+    if (proxy == nullptr){
+        dataShareProxy_ = nullptr;
+    }
 
-void DataShareConnection::SetDataShareProxy(sptr<IDataShare> proxy)
-{
-    dataShareProxy_ = proxy;
+    dataShareProxy_ =
+        std::shared_ptr<DataShareProxy>(proxy.GetRefPtr(), [holder = proxy](const auto *) {});
 }
 
 DataShareConnection::~DataShareConnection()
 {
     uri_ = Uri("");
     DisconnectDataShareExtAbility();
+}
+std::shared_ptr<DataShareBaseProxy> DataShareConnection::GetDataShareProxy()
+{
+    std::unique_lock<std::mutex> lock(condition_.mutex);
+    return dataShareProxy_;
+}
+
+bool DataShareConnection::ConnectDataShare(const Uri & uri, const sptr<IRemoteObject> & token)
+{
+    return ConnectDataShareExtAbility(uri, token);
+}
+
+bool DataShareConnection::IsConnected()
+{
+    return dataShareProxy_ != nullptr;
 }
 }  // namespace DataShare
 }  // namespace OHOS

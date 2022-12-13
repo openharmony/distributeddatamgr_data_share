@@ -26,16 +26,41 @@
 #include "uri.h"
 
 namespace OHOS::DataShare {
-class DataShareServiceProxy : public IRemoteProxy<IDataShareService> {
+class DataShareServiceProxy : public IRemoteProxy<IDataShareService>, public DataShareBaseProxy {
 public:
     explicit DataShareServiceProxy(const sptr<IRemoteObject> &object);
+    virtual int Insert(const Uri &uri, const DataShareValuesBucket &valuesBucket) override;
 
-    int32_t Insert(const std::string &uri, const DataShareValuesBucket &valuesBucket) override;
-    int32_t Update(const std::string &uri, const DataSharePredicates &predicate,
-        const DataShareValuesBucket &valuesBucket) override;
-    int32_t Delete(const std::string &uri, const DataSharePredicates &predicate) override;
-    std::shared_ptr<DataShareResultSet> Query(const std::string &uri, const DataSharePredicates &predicates,
-        const std::vector<std::string> &columns) override;
+    virtual  int Update(const Uri &uri, const DataSharePredicates &predicate,
+                        const DataShareValuesBucket &valuesBucket) override;
+
+    virtual  int Delete(const Uri &uri, const DataSharePredicates &predicate) override;
+
+    virtual std::shared_ptr<DataShareResultSet> Query(
+        const Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns) override;
+
+    virtual std::vector<std::string> GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter) override;
+
+    virtual int OpenFile(const Uri &uri, const std::string &mode) override;
+
+    virtual int OpenRawFile(const Uri &uri, const std::string &mode) override;
+
+    virtual std::string GetType(const Uri &uri) override;
+
+    virtual int BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values) override;
+
+    virtual bool RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
+
+    virtual bool UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
+
+    virtual bool NotifyChange(const Uri &uri) override;
+
+    virtual Uri NormalizeUri(const Uri &uri) override;
+
+    virtual Uri DenormalizeUri(const Uri &uri) override;
+
+    virtual std::vector<std::shared_ptr<DataShareResult>> ExecuteBatch(
+        const std::vector<std::shared_ptr<DataShareOperation>> &operations) override;
 
 private:
     static inline BrokerDelegator<DataShareServiceProxy> delegator_;
