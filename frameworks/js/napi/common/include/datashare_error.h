@@ -26,8 +26,8 @@ public:
     static const int EXCEPTION_INNER = 15700000;
     static const int EXCEPTION_HELPER_UNINITIALIZED = 15700010;
     virtual ~Error() {};
-    virtual std::string GetMessage() = 0;
-    virtual int GetCode() = 0;
+    virtual std::string GetMessage() const = 0;
+    virtual int GetCode() const = 0;
 };
 } // namespace DataShare
 } // namespace OHOS

@@ -28,8 +28,7 @@ napi_value NewInstance(napi_env env, DataShareValuesBucket &valuesBucket)
     napi_value ret;
     NAPI_CALL(env, napi_create_object(env, &ret));
     const auto &valuesMap = valuesBucket.valuesMap;
-    auto it = valuesMap.begin();
-    for (; it != valuesMap.end(); ++it) {
+    for (auto it = valuesMap.begin(); it != valuesMap.end(); ++it) {
         std::string key = it->first;
         auto valueObject = it->second;
         napi_value value = DataShareJSUtils::Convert2JSValue(env, valueObject);

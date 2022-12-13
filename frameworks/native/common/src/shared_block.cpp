@@ -194,7 +194,6 @@ int SharedBlock::AllocRow()
         return SHARED_BLOCK_INVALID_OPERATION;
     }
 
-    /* Fill in the row offset */
     uint32_t *rowOffset = AllocRowOffset();
     if (rowOffset == nullptr) {
         return SHARED_BLOCK_NO_MEMORY;

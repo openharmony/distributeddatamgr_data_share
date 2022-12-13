@@ -23,8 +23,8 @@ namespace DataShare {
 class ParametersTypeError : public Error {
 public:
     ParametersTypeError(const std::string &name, const std::string &wantType) : name(name), wantType(wantType) {};
-    std::string GetMessage() override;
-    int GetCode() override;
+    std::string GetMessage() const override;
+    int GetCode() const override;
 private:
     std::string name;
     std::string wantType;
@@ -33,8 +33,8 @@ private:
 class ParametersNumError : public Error {
 public:
     ParametersNumError(const std::string &wantNum) : wantNum(wantNum) {};
-    std::string GetMessage() override;
-    int GetCode() override;
+    std::string GetMessage() const override;
+    int GetCode() const override;
 private:
     std::string wantNum;
 };
@@ -42,15 +42,15 @@ private:
 class DataShareHelperInitError : public Error {
 public:
     DataShareHelperInitError() = default;
-    std::string GetMessage() override;
-    int GetCode() override;
+    std::string GetMessage() const override;
+    int GetCode() const override;
 };
 
 class InnerError : public Error {
 public:
     InnerError() = default;
-    std::string GetMessage() override;
-    int GetCode() override;
+    std::string GetMessage() const override;
+    int GetCode() const override;
 };
 } // namespace DataShare
 } // namespace OHOS
