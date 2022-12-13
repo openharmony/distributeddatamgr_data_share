@@ -210,7 +210,7 @@ bool ITypesUtils::Unmarshalling(Parcel &parcel, std::list<T> &params)
     if ((size > parcel.GetReadableBytes()) || (params.max_size() < size)) {
         return false;
     }
-    for (auto i = 0; i < size; i++) {
+    for (size_t i = 0; i < size; i++) {
         T param;
         if (!Unmarshalling(parcel, param)) {
             return false;
