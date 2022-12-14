@@ -44,6 +44,7 @@ bool ITypesUtils::Marshalling(const char *input, Parcel &data)
 
 bool ITypesUtils::Marshalling(const std::string &input, Parcel &data)
 {
+    LOG_INFO("Marshalling string");
     return data.WriteString(input);
 }
 
@@ -115,7 +116,7 @@ bool ITypesUtils::Marshalling(const DataSharePredicates &predicates, Parcel &par
 {
     LOG_DEBUG("Marshalling DataSharePredicates Start");
     const auto &operations = predicates.GetOperationList();
-    int64_t mode = static_cast<int64_t>(predicates.GetSettingMode());
+    int16_t mode = predicates.GetSettingMode();
     return ITypesUtils::Marshal(parcel, operations, predicates.GetWhereClause(), predicates.GetWhereArgs(),
         predicates.GetOrder(), mode);
 }
@@ -127,7 +128,7 @@ bool ITypesUtils::Unmarshalling(Parcel &parcel, DataSharePredicates &predicates)
     std::string whereClause = "";
     std::vector<std::string> whereArgs;
     std::string order = "";
-    int64_t mode = INVALID_MODE;
+    int16_t mode = INVALID_MODE;
     if (!ITypesUtils::Unmarshal(parcel, operations, whereClause, whereArgs, order, mode)) {
         LOG_ERROR("read predicate failed");
         return false;
@@ -138,6 +139,7 @@ bool ITypesUtils::Unmarshalling(Parcel &parcel, DataSharePredicates &predicates)
     tmpPredicates.SetOrder(order);
     tmpPredicates.SetSettingMode(static_cast<SettingMode>(mode));
     predicates = tmpPredicates;
+    LOG_INFO("Unmarshalling DataSharePredicates end");
     return true;
 }
 

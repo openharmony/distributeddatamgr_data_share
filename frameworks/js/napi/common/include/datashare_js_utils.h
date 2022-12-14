@@ -22,6 +22,7 @@
 #include <variant>
 #include <vector>
 
+#include "datashare_value_object.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
@@ -47,6 +48,7 @@ public:
     static std::vector<uint8_t> Convert2U8Vector(napi_env env, napi_value jsValue);
     static std::string ConvertAny2String(napi_env env, const napi_value jsValue);
     static std::string UnwrapStringFromJS(napi_env env, napi_value param, const std::string &defaultValue = "");
+    static DataShareValueObject Convert2ValueObject(napi_env env, napi_value value, bool &status);
 
     static napi_value Convert2JSValue(napi_env env, const std::monostate &value = {});
     static napi_value Convert2JSValue(napi_env env, const std::vector<std::string> &value);
