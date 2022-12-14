@@ -17,42 +17,42 @@
 
 namespace OHOS {
 namespace DataShare {
-std::string ParametersTypeError::GetMessage() const
+std::string ParametersTypeError::GetMessage()
 {
     return "Parameter error. The type of '" + name + "' must be '" + wantType + "'.";
 }
 
-int ParametersTypeError::GetCode() const
+int ParametersTypeError::GetCode()
 {
     return EXCEPTION_PARAMETER_CHECK;
 }
 
-std::string ParametersNumError::GetMessage() const
+std::string ParametersNumError::GetMessage()
 {
     return "Parameter error. Need " + wantNum + " parameters!";
 }
 
-int ParametersNumError::GetCode() const
+int ParametersNumError::GetCode()
 {
     return EXCEPTION_PARAMETER_CHECK;
 }
 
-std::string DataShareHelperInitError::GetMessage() const
+std::string DataShareHelperInitError::GetMessage()
 {
     return "The DataShareHelper is not initialized successfully.";
 }
 
-int DataShareHelperInitError::GetCode() const
+int DataShareHelperInitError::GetCode()
 {
     return EXCEPTION_HELPER_UNINITIALIZED;
 }
 
-std::string InnerError::GetMessage() const
+std::string InnerError::GetMessage()
 {
     return "";
 }
 
-int InnerError::GetCode() const
+int InnerError::GetCode()
 {
     return EXCEPTION_INNER;
 }

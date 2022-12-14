@@ -26,14 +26,14 @@ constexpr ISharedResultSetStub::Handler ISharedResultSetStub::handlers[ISharedRe
 sptr<ISharedResultSet> ISharedResultSetStub::CreateStub(std::shared_ptr<DataShareResultSet> result,
     OHOS::MessageParcel &parcel)
 {
-    if (result == nullptr) {
-        LOG_ERROR("result is nullptr");
-        return nullptr;
-    }
     sptr<ISharedResultSet> stub = new (std::nothrow) ISharedResultSetStub(result);
     if (stub == nullptr) {
         LOG_ERROR("stub is nullptr");
         return stub;
+    }
+    if (result == nullptr) {
+        LOG_ERROR("result is nullptr");
+        return nullptr;
     }
     parcel.WriteRemoteObject(stub->AsObject().GetRefPtr());
     result->Marshalling(parcel);

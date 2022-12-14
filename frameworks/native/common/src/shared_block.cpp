@@ -41,12 +41,12 @@ SharedBlock::~SharedBlock()
     }
 }
 
-std::u16string SharedBlock::ToUtf16(const std::string& str)
+std::u16string SharedBlock::ToUtf16(std::string str)
 {
     return OHOS::Str8ToStr16(str);
 }
 
-std::string SharedBlock::ToUtf8(const std::u16string& str16)
+std::string SharedBlock::ToUtf8(std::u16string str16)
 {
     return OHOS::Str16ToStr8(str16);
 }
@@ -71,9 +71,8 @@ int SharedBlock::CreateSharedBlock(const std::string &name, size_t size, sptr<As
         return SHARED_BLOCK_BAD_VALUE;
     }
 
-    if (!outSharedBlock->Init()) {
+    if (outSharedBlock->Init() == false) {
         delete outSharedBlock;
-        outSharedBlock = nullptr;
         LOG_ERROR("CreateSharedBlock: mHeader is null.");
         return SHARED_BLOCK_ASHMEM_ERROR;
     }
@@ -131,9 +130,8 @@ int SharedBlock::ReadMessageParcel(MessageParcel &parcel, SharedBlock *&block)
         LOG_ERROR("ReadMessageParcel new SharedBlock error.");
         return SHARED_BLOCK_BAD_VALUE;
     }
-    if (!block->Init()) {
+    if (block->Init() == false) {
         delete block;
-        block = nullptr;
         LOG_ERROR("ReadMessageParcel: mHeader is null.");
         return SHARED_BLOCK_ASHMEM_ERROR;
     }
@@ -194,6 +192,7 @@ int SharedBlock::AllocRow()
         return SHARED_BLOCK_INVALID_OPERATION;
     }
 
+    /* Fill in the row offset */
     uint32_t *rowOffset = AllocRowOffset();
     if (rowOffset == nullptr) {
         return SHARED_BLOCK_NO_MEMORY;
