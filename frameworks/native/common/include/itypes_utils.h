@@ -19,6 +19,7 @@
 #include "datashare_predicates.h"
 #include "datashare_values_bucket.h"
 #include "parcel.h"
+#include "datashare_log.h"
 namespace OHOS::DataShare {
 class ITypesUtils final {
 public:
