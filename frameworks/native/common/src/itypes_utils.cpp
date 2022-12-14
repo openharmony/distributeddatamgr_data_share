@@ -50,16 +50,19 @@ bool ITypesUtils::Marshalling(const std::string &input, Parcel &data)
 
 bool ITypesUtils::Unmarshalling(Parcel &data, std::string &output)
 {
+    LOG_INFO("UnMarshalling string");
     return data.ReadString(output);
 }
 
 bool ITypesUtils::Marshalling(int16_t input, Parcel &data)
 {
+    LOG_INFO("Marshalling int16_t");
     return data.WriteInt16(input);
 }
 
 bool ITypesUtils::Unmarshalling(Parcel &data, int16_t &output)
 {
+    LOG_INFO("UnMarshalling int16_t");
     return data.ReadInt16(output);
 }
 
@@ -129,10 +132,12 @@ bool ITypesUtils::Unmarshalling(Parcel &parcel, DataSharePredicates &predicates)
     std::vector<std::string> whereArgs;
     std::string order = "";
     int16_t mode = INVALID_MODE;
+    LOG_DEBUG("before unmarshal");
     if (!ITypesUtils::Unmarshal(parcel, operations, whereClause, whereArgs, order, mode)) {
         LOG_ERROR("read predicate failed");
         return false;
     }
+    LOG_DEBUG("after unmarshal");
     DataSharePredicates tmpPredicates(std::move(operations));
     tmpPredicates.SetWhereClause(whereClause);
     tmpPredicates.SetWhereArgs(whereArgs);
