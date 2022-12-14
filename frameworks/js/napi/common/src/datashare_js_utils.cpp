@@ -22,14 +22,10 @@ namespace OHOS {
 namespace DataShare {
 std::string DataShareJSUtils::Convert2String(napi_env env, napi_value jsStr, const size_t max)
 {
-    size_t str_buffer_size = max;
-    napi_get_value_string_utf8(env, jsStr, nullptr, 0, &str_buffer_size);
-    char *buf = new (std::nothrow) char[str_buffer_size + 1];
-    if (buf == nullptr) {
-        return "";
-    }
+    NAPI_ASSERT_BASE(env, max > 0, "failed on max > 0", std::string());
+    char *buf = new char[max + 1];
     size_t len = 0;
-    napi_get_value_string_utf8(env, jsStr, buf, str_buffer_size + 1, &len);
+    napi_get_value_string_utf8(env, jsStr, buf, max, &len);
     buf[len] = 0;
     std::string value(buf);
     delete[] buf;
@@ -47,9 +43,7 @@ std::vector<std::string> DataShareJSUtils::Convert2StrVector(napi_env env, napi_
     std::vector<std::string> result;
     for (size_t i = 0; i < arrLen; ++i) {
         napi_value element;
-        if (napi_get_element(env, value, i, &element) != napi_ok) {
-            return {};
-        }
+        napi_get_element(env, value, i, &element);
         result.push_back(ConvertAny2String(env, element));
     }
     return result;
@@ -79,7 +73,6 @@ std::vector<uint8_t> DataShareJSUtils::ConvertU8Vector(napi_env env, napi_value 
 {
     bool isTypedArray = false;
     if (napi_is_typedarray(env, jsValue, &isTypedArray) != napi_ok || !isTypedArray) {
-        LOG_ERROR("ConvertU8Vector error");
         return {};
     }
 
@@ -162,9 +155,6 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<uin
     napi_value jsValue;
     void *native = nullptr;
     napi_value buffer = nullptr;
-    if (value.empty()) {
-        return nullptr;
-    }
     napi_status status = napi_create_arraybuffer(env, value.size(), &native, &buffer);
     if (status != napi_ok) {
         return nullptr;
@@ -271,40 +261,6 @@ std::string DataShareJSUtils::UnwrapStringFromJS(napi_env env, napi_value param,
         buf = nullptr;
     }
     return value;
-}
-
-
-DataShareValueObject DataShareJSUtils::Convert2ValueObject(napi_env env, napi_value value, bool &status)
-{
-    napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, value, &valueType);
-    status = true;
-    if (valueType == napi_string) {
-        LOG_DEBUG("ValueObject is string");
-        std::string valueString = DataShareJSUtils::UnwrapStringFromJS(env, value);
-        return valueString;
-    } else if (valueType == napi_number) {
-        LOG_DEBUG("ValueObject is number");
-        double valueNumber = 0;
-        napi_get_value_double(env, value, &valueNumber);
-        return valueNumber;
-    } else if (valueType == napi_boolean) {
-        LOG_DEBUG("ValueObject is boolean");
-        bool valueBool = false;
-        napi_get_value_bool(env, value, &valueBool);
-        return valueBool;
-    } else if (valueType == napi_null) {
-        LOG_DEBUG("ValueObject is null");
-        return {};
-    } else if (valueType == napi_object) {
-        LOG_DEBUG("ValueObject is Uint8Array");
-        std::vector<uint8_t> valueBlob = DataShareJSUtils::Convert2U8Vector(env, value);
-        return valueBlob;
-    } else {
-        LOG_ERROR("valuesBucket error");
-        status = false;
-        return {};
-    }
 }
 } // namespace DataShare
 } // namespace OHOS
