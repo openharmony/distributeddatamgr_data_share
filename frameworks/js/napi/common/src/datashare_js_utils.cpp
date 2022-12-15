@@ -38,6 +38,7 @@ std::string DataShareJSUtils::Convert2String(napi_env env, napi_value jsStr, con
 
 std::vector<std::string> DataShareJSUtils::Convert2StrVector(napi_env env, napi_value value, const size_t strMax)
 {
+    LOG_DEBUG("Convert2StrVector");
     NAPI_ASSERT_BASE(env, strMax > 0, "failed on strMax > 0",  std::vector<std::string>());
     uint32_t arrLen = 0;
     napi_get_array_length(env, value, &arrLen);
@@ -47,9 +48,10 @@ std::vector<std::string> DataShareJSUtils::Convert2StrVector(napi_env env, napi_
     std::vector<std::string> result;
     for (size_t i = 0; i < arrLen; ++i) {
         napi_value element;
-        if (napi_get_element(env, value, i, &element) != napi_ok) {
-            return {};
-        }
+        napi_get_element(env, value, i, &element);
+        // if (napi_get_element(env, value, i, &element) != napi_ok) {
+        //     return {};
+        // }
         result.push_back(ConvertAny2String(env, element));
     }
     return result;
