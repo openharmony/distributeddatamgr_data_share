@@ -19,7 +19,7 @@
 #include "datashare_predicates.h"
 #include "datashare_values_bucket.h"
 #include "parcel.h"
-#include "datashare_log.h"
+
 namespace OHOS::DataShare {
 class ITypesUtils final {
 public:
@@ -169,27 +169,21 @@ bool ITypesUtils::Marshalling(const std::vector<T> &params, Parcel &parcel)
 template<typename T>
 bool ITypesUtils::Unmarshalling(Parcel &parcel, std::vector<T> &params)
 {
-    LOG_INFO("Unmarshalling vector<T> start");
     size_t size = static_cast<size_t>(parcel.ReadInt32());
     if (static_cast<int32_t>(size) < 0) {
-        LOG_INFO("Unmarshalling vector<T> error");
         return false;
     }
     if ((size > parcel.GetReadableBytes()) || (params.max_size() < size)) {
-        LOG_INFO("Unmarshalling vector<T> error");
         return false;
     }
     params.resize(static_cast<int32_t>(size));
     for (size_t i = 0; i < size; i++) {
         T param;
         if (!Unmarshalling(parcel, param)) {
-            LOG_INFO("for Unmarshalling vector<T> error, %{public}d", i);
             return false;
         }
-        LOG_INFO("for Unmarshalling vector<T> , %{public}d", i);
         params[static_cast<int32_t>(i)] = param;
     }
-    LOG_INFO("Unmarshalling vector<T> end");
     return true;
 }
 

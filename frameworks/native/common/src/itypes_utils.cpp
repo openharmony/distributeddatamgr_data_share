@@ -44,25 +44,21 @@ bool ITypesUtils::Marshalling(const char *input, Parcel &data)
 
 bool ITypesUtils::Marshalling(const std::string &input, Parcel &data)
 {
-    LOG_INFO("Marshalling string");
     return data.WriteString(input);
 }
 
 bool ITypesUtils::Unmarshalling(Parcel &data, std::string &output)
 {
-    LOG_INFO("UnMarshalling string");
     return data.ReadString(output);
 }
 
 bool ITypesUtils::Marshalling(int16_t input, Parcel &data)
 {
-    LOG_INFO("Marshalling int16_t");
     return data.WriteInt16(input);
 }
 
 bool ITypesUtils::Unmarshalling(Parcel &data, int16_t &output)
 {
-    LOG_INFO("UnMarshalling int16_t");
     return data.ReadInt16(output);
 }
 
@@ -119,7 +115,7 @@ bool ITypesUtils::Marshalling(const DataSharePredicates &predicates, Parcel &par
 {
     LOG_DEBUG("Marshalling DataSharePredicates Start");
     const auto &operations = predicates.GetOperationList();
-    int64_t mode = static_cast<int64_t>(predicates.GetSettingMode());
+    int16_t mode = predicates.GetSettingMode();
     return ITypesUtils::Marshal(parcel, operations, predicates.GetWhereClause(), predicates.GetWhereArgs(),
         predicates.GetOrder(), mode);
 }
@@ -131,20 +127,17 @@ bool ITypesUtils::Unmarshalling(Parcel &parcel, DataSharePredicates &predicates)
     std::string whereClause = "";
     std::vector<std::string> whereArgs;
     std::string order = "";
-    int64_t mode = INVALID_MODE;
-    LOG_DEBUG("before unmarshal");
+    int16_t mode = INVALID_MODE;
     if (!ITypesUtils::Unmarshal(parcel, operations, whereClause, whereArgs, order, mode)) {
         LOG_ERROR("read predicate failed");
         return false;
     }
-    LOG_DEBUG("after unmarshal");
     DataSharePredicates tmpPredicates(std::move(operations));
     tmpPredicates.SetWhereClause(whereClause);
     tmpPredicates.SetWhereArgs(whereArgs);
     tmpPredicates.SetOrder(order);
-    tmpPredicates.SetSettingMode(static_cast<SettingMode>(mode));
+    tmpPredicates.SetSettingMode(mode);
     predicates = tmpPredicates;
-    LOG_INFO("Unmarshalling DataSharePredicates end");
     return true;
 }
 

@@ -105,9 +105,6 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
         LOG_ERROR("WriteInterfaceToken failed!");
         return nullptr;
     }
-    for (int i = 0; i < columns.size(); i++) {
-		LOG_INFO("columns: %{public}s", columns[i].c_str());
-	}
 
     if (!ITypesUtils::Marshal(data, uri, predicates, columns)) {
         LOG_ERROR("Write to message parcel failed!");

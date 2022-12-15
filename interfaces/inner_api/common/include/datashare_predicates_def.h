@@ -69,7 +69,7 @@ struct OperationItem {
     }
 };
 
-typedef enum {
+typedef enum : int16_t {
     INVALID_MODE,
     QUERY_LANGUAGE,
     PREDICATES_METHOD

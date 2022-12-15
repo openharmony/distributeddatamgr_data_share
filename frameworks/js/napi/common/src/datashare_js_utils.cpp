@@ -38,7 +38,6 @@ std::string DataShareJSUtils::Convert2String(napi_env env, napi_value jsStr, con
 
 std::vector<std::string> DataShareJSUtils::Convert2StrVector(napi_env env, napi_value value, const size_t strMax)
 {
-    LOG_DEBUG("Convert2StrVector");
     NAPI_ASSERT_BASE(env, strMax > 0, "failed on strMax > 0",  std::vector<std::string>());
     uint32_t arrLen = 0;
     napi_get_array_length(env, value, &arrLen);
@@ -48,10 +47,9 @@ std::vector<std::string> DataShareJSUtils::Convert2StrVector(napi_env env, napi_
     std::vector<std::string> result;
     for (size_t i = 0; i < arrLen; ++i) {
         napi_value element;
-        napi_get_element(env, value, i, &element);
-        // if (napi_get_element(env, value, i, &element) != napi_ok) {
-        //     return {};
-        // }
+        if (napi_get_element(env, value, i, &element) != napi_ok) {
+            return {};
+        }
         result.push_back(ConvertAny2String(env, element));
     }
     return result;
@@ -81,7 +79,6 @@ std::vector<uint8_t> DataShareJSUtils::ConvertU8Vector(napi_env env, napi_value 
 {
     bool isTypedArray = false;
     if (napi_is_typedarray(env, jsValue, &isTypedArray) != napi_ok || !isTypedArray) {
-        LOG_ERROR("ConvertU8Vector error");
         return {};
     }
 
@@ -91,7 +88,6 @@ std::vector<uint8_t> DataShareJSUtils::ConvertU8Vector(napi_env env, napi_value 
     size_t offset = 0;
     NAPI_CALL_BASE(env, napi_get_typedarray_info(env, jsValue, &type, &length, nullptr, &buffer, &offset), {});
     if (type != napi_uint8_array) {
-        LOG_ERROR("ConvertU8Vector error");
         return {};
     }
     uint8_t *data = nullptr;
@@ -101,7 +97,6 @@ std::vector<uint8_t> DataShareJSUtils::ConvertU8Vector(napi_env env, napi_value 
     std::vector<uint8_t> result(sizeof(uint8_t) + length);
     int retCode = memcpy_s(result.data(), result.size(), &data[offset], length);
     if (retCode != 0) {
-        LOG_ERROR("ConvertU8Vector error");
         return {};
     }
     return result;

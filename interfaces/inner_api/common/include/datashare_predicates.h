@@ -231,11 +231,11 @@ public:
         }
         return E_ERROR;
     }
-    SettingMode GetSettingMode() const
+    int16_t GetSettingMode() const
     {
         return settingMode_;
     }
-    void SetSettingMode(const SettingMode &settingMode)
+    void SetSettingMode(int16_t settingMode)
     {
         settingMode_ = settingMode;
     }
@@ -289,7 +289,7 @@ private:
     std::string whereClause_;
     std::vector<std::string> whereArgs_;
     std::string order_;
-    SettingMode settingMode_ = {};
+    int16_t settingMode_ = {};
 };
 } // namespace DataShare
 } // namespace OHOS
