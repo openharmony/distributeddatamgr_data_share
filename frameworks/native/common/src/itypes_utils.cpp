@@ -119,7 +119,7 @@ bool ITypesUtils::Marshalling(const DataSharePredicates &predicates, Parcel &par
 {
     LOG_DEBUG("Marshalling DataSharePredicates Start");
     const auto &operations = predicates.GetOperationList();
-    int16_t mode = predicates.GetSettingMode();
+    int64_t mode = static_cast<int64_t>(predicates.GetSettingMode());
     return ITypesUtils::Marshal(parcel, operations, predicates.GetWhereClause(), predicates.GetWhereArgs(),
         predicates.GetOrder(), mode);
 }
@@ -131,7 +131,7 @@ bool ITypesUtils::Unmarshalling(Parcel &parcel, DataSharePredicates &predicates)
     std::string whereClause = "";
     std::vector<std::string> whereArgs;
     std::string order = "";
-    int16_t mode = INVALID_MODE;
+    int64_t mode = INVALID_MODE;
     LOG_DEBUG("before unmarshal");
     if (!ITypesUtils::Unmarshal(parcel, operations, whereClause, whereArgs, order, mode)) {
         LOG_ERROR("read predicate failed");
