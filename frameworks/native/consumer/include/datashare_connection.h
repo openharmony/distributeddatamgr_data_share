@@ -59,7 +59,7 @@ public:
     /**
      * @brief connect remote ability of DataShareExtAbility.
      */
-    bool ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
+    bool ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> token);
 
     /**
      * @brief get the proxy of datashare extension ability.
@@ -73,7 +73,7 @@ public:
     };
 
     std::shared_ptr<BaseProxy> GetDataShareProxy() override;
-    bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> &token)  override ;
+    bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> token)  override ;
     bool IsConnected() override ;
 
 private:

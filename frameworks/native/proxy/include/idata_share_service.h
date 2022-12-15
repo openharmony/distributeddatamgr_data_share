@@ -18,7 +18,7 @@
 
 #include <string>
 
-#include "data_share_base_proxy.h"
+#include "base_proxy.h"
 #include "iremote_broker.h"
 
 namespace OHOS::DataShare {

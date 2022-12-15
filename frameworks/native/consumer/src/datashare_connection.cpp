@@ -74,7 +74,7 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
 /**
  * @brief connect remote ability of DataShareExtAbility.
  */
-bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token)
+bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> token)
 {
     if (dataShareProxy_ != nullptr) {
         LOG_DEBUG("dataShareProxy has connected");
@@ -148,7 +148,7 @@ std::shared_ptr<BaseProxy> DataShareConnection::GetDataShareProxy()
     return dataShareProxy_;
 }
 
-bool DataShareConnection::ConnectDataShare(const Uri & uri, const sptr<IRemoteObject> & token)
+bool DataShareConnection::ConnectDataShare(const Uri & uri, const sptr<IRemoteObject> token)
 {
     return ConnectDataShareExtAbility(uri, token);
 }

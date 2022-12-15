@@ -48,7 +48,7 @@ std::shared_ptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDat
     return nullptr;
 }
 
-void DataShareManagerImpl::LinkToDeath(const sptr<IRemoteObject> &remote)
+void DataShareManagerImpl::LinkToDeath(const sptr<IRemoteObject> remote)
 {
     sptr<DataShareManagerImpl::ServiceDeathRecipient> deathRecipient = new (std::nothrow)
         DataShareManagerImpl::ServiceDeathRecipient(this);
@@ -102,7 +102,7 @@ DataShareManagerImpl::~DataShareManagerImpl()
     LOG_INFO("destroy");
 }
 
-bool DataShareManagerImpl::ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> &token) {
+bool DataShareManagerImpl::ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> token) {
     if (dataShareService_ != nullptr) {
         LOG_DEBUG("dataShareProxy has connected");
         return true;

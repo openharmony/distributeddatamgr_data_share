@@ -21,7 +21,7 @@
 #include <iremote_broker.h>
 
 #include "uri.h"
-#include "data_share_base_proxy.h"
+#include "base_proxy.h"
 
 namespace OHOS {
 

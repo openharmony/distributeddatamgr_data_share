@@ -19,14 +19,13 @@
 #include <string>
 #include <memory>
 #include "base_connection.h"
-#include "data_share_manager_impl.h"
 
 namespace OHOS::DataShare {
 
 class ConnectionFactory {
 public:
     ~ConnectionFactory() = default;
-    std::shared_ptr<BaseConnection> GetConnection(Uri &uri, const sptr<IRemoteObject> &token);
+    std::shared_ptr<BaseConnection> GetConnection(Uri &uri, const sptr<IRemoteObject> token);
     static ConnectionFactory& GetInstance();
 
 private:

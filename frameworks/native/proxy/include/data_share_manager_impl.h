@@ -37,7 +37,7 @@ public:
     virtual ~DataShareManagerImpl();
     void OnRemoteDied();
     std::shared_ptr<BaseProxy> GetDataShareProxy() override;
-    bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> &token) override;
+    bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> token) override;
     bool IsConnected() override;
 
     class ServiceDeathRecipient : public IRemoteObject::DeathRecipient {
@@ -55,7 +55,7 @@ public:
     };
 
 private:
-    void LinkToDeath(const sptr<IRemoteObject> &remote);
+    void LinkToDeath(const sptr<IRemoteObject> remote);
 
     sptr<DataShareServiceProxy> GetDataShareServiceProxy();
 
