@@ -16,20 +16,21 @@
 #ifndef DATASHARE_CONNECTION_H
 #define DATASHARE_CONNECTION_H
 
-#include <memory>
 #include <condition_variable>
+#include <memory>
 
 #include "ability_connect_callback_stub.h"
+#include "base_connection.h"
+#include "datashare_proxy.h"
 #include "event_handler.h"
-#include "idatashare.h"
 #include "want.h"
 
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-class DataShareConnection : public AAFwk::AbilityConnectionStub {
+class DataShareConnection : public AAFwk::AbilityConnectionStub, public BaseConnection {
 public:
-    DataShareConnection(const Uri &uri) : uri_(uri) {}
+    DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token) : uri_(uri), token_(token) {}
     virtual ~DataShareConnection();
 
     /**
@@ -58,29 +59,33 @@ public:
     /**
      * @brief connect remote ability of DataShareExtAbility.
      */
-    bool ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
+    bool ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> token);
 
     /**
      * @brief get the proxy of datashare extension ability.
      *
      * @return the proxy of datashare extension ability.
      */
-    sptr<IDataShare> GetDataShareProxy();
 
     struct ConnectCondition {
         std::condition_variable condition;
         std::mutex mutex;
     };
+
+    std::shared_ptr<BaseProxy> GetDataShareProxy() override;
+    bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> token)  override ;
+    bool IsConnected() override ;
+
 private:
     void DisconnectDataShareExtAbility();
-    void SetDataShareProxy(sptr<IDataShare> proxy);
+    void SetDataShareProxy(sptr<DataShareProxy> proxy);
     bool IsExtAbilityConnected();
 
-    static sptr<DataShareConnection> instance_;
     std::mutex mutex_;
-    sptr<IDataShare> dataShareProxy_;
+    std::shared_ptr<DataShareProxy> dataShareProxy_;
     ConnectCondition condition_;
     Uri uri_;
+    sptr<IRemoteObject> token_ = {};
 };
 }  // namespace DataShare
 }  // namespace OHOS

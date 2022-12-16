@@ -16,16 +16,15 @@
 #ifndef DATASHARE_HELPER_H
 #define DATASHARE_HELPER_H
 
-#include <mutex>
+
 #include <map>
 #include <memory>
+#include <mutex>
 #include <string>
 
+#include "base_connection.h"
 #include "context.h"
-#include "datashare_connection.h"
-#include "idatashare.h"
 #include "uri.h"
-#include "datashare_operation.h"
 
 using Uri = OHOS::Uri;
 
@@ -49,7 +48,7 @@ public:
      *
      * @return Returns the created DataShareHelper instance with a specified Uri.
      */
-    static std::shared_ptr<DataShareHelper> Creator(const std::shared_ptr<Context> &context,
+    static std::shared_ptr<DataShareHelper> Creator(const std::shared_ptr<AppExecFwk::Context> &context,
         const std::string &strUri);
     /**
      * @brief You can use this method to specify the Uri of the data to operate and set the binding relationship
@@ -223,12 +222,12 @@ public:
 
 private:
     DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,
-        const sptr<DataShareConnection> dataShareConnection);
+         std::shared_ptr<BaseConnection> dataShareConnection);
     DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri);
     bool isDataShareService_ = false;
     sptr<IRemoteObject> token_ = {};
     Uri uri_ = Uri("");
-    sptr<DataShareConnection> dataShareConnection_ = nullptr;
+    std::shared_ptr<BaseConnection> connection_ = nullptr;
     static bool RegObserver (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     static bool UnregObserver (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
 };

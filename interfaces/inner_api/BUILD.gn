@@ -53,10 +53,10 @@ ohos_shared_library("datashare_consumer") {
   include_dirs = []
 
   sources = [
+    "${datashare_native_consumer_path}/src/connection_factory.cpp",
     "${datashare_native_consumer_path}/src/datashare_connection.cpp",
     "${datashare_native_consumer_path}/src/datashare_helper.cpp",
     "${datashare_native_consumer_path}/src/datashare_proxy.cpp",
-    "${datashare_native_proxy_path}/src/data_share_manager.cpp",
     "${datashare_native_proxy_path}/src/data_share_manager_impl.cpp",
     "${datashare_native_proxy_path}/src/data_share_service_proxy.cpp",
   ]

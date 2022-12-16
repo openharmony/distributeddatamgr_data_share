@@ -20,22 +20,25 @@
 #include <memory>
 #include <mutex>
 
-#include "data_share_manager.h"
 #include "data_share_service_proxy.h"
 #include "data_share_types.h"
 #include "idata_share_service.h"
 #include "iremote_object.h"
 #include "refbase.h"
+#include "base_connection.h"
 
 namespace OHOS::DataShare {
 class DataShareKvServiceProxy;
-class DataShareManagerImpl {
+class DataShareManagerImpl : public BaseConnection {
 public:
-    static DataShareManagerImpl &GetInstance();
+    std::shared_ptr<BaseProxy> GetDataShareService();
 
-    std::shared_ptr<IDataShareService> GetDataShareService();
-
+    DataShareManagerImpl();
+    virtual ~DataShareManagerImpl();
     void OnRemoteDied();
+    std::shared_ptr<BaseProxy> GetDataShareProxy() override;
+    bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> token) override;
+    bool IsConnected() override;
 
     class ServiceDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
@@ -52,9 +55,7 @@ public:
     };
 
 private:
-    DataShareManagerImpl();
-
-    ~DataShareManagerImpl();
+    void LinkToDeath(const sptr<IRemoteObject> remote);
 
     sptr<DataShareServiceProxy> GetDataShareServiceProxy();
 

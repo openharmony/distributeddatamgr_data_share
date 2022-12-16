@@ -13,23 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef DATASHARESERVICE_DATA_SHARE_MANAGER_H
-#define DATASHARESERVICE_DATA_SHARE_MANAGER_H
+#ifndef DATA_SHARE_CONNECTION_FACTORY_H
+#define DATA_SHARE_CONNECTION_FACTORY_H
 
-#include <functional>
-#include <memory>
 #include <string>
+#include <memory>
+#include "base_connection.h"
 
-#include "idata_share_service.h"
-#include "data_share_types.h"
-#include "uri.h"
-#include "iremote_broker.h"
-#include "iremote_proxy.h"
 namespace OHOS::DataShare {
-class DataShareManager {
-public:
-    static std::shared_ptr<IDataShareService> GetDataShareService();
-};
 
-} // namespace OHOS::DataShare
-#endif
+class ConnectionFactory {
+public:
+    ~ConnectionFactory() = default;
+    std::shared_ptr<BaseConnection> GetConnection(Uri &uri, const sptr<IRemoteObject> token);
+    static ConnectionFactory& GetInstance();
+
+private:
+    ConnectionFactory();
+
+    std::shared_ptr<BaseConnection> service_;
+
+};
+}
+
+#endif //DATA_SHARE_CONNECTION_FACTORY_H

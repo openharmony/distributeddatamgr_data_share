@@ -17,7 +17,6 @@
 
 #include <thread>
 
-#include "data_share_manager.h"
 #include "data_share_service_proxy.h"
 #include "datashare_log.h"
 #include "idata_share_service.h"
@@ -49,11 +48,10 @@ std::shared_ptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDat
     return nullptr;
 }
 
-static void LinkToDeath(const sptr<IRemoteObject> &remote)
+void DataShareManagerImpl::LinkToDeath(const sptr<IRemoteObject> remote)
 {
-    auto &manager = DataShareManagerImpl::GetInstance();
     sptr<DataShareManagerImpl::ServiceDeathRecipient> deathRecipient = new (std::nothrow)
-        DataShareManagerImpl::ServiceDeathRecipient(&manager);
+        DataShareManagerImpl::ServiceDeathRecipient(this);
     if (!remote->AddDeathRecipient(deathRecipient)) {
         LOG_ERROR("add death recipient failed");
     }
@@ -77,7 +75,7 @@ sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
     return iface_cast<DataShareServiceProxy>(remote);
 }
 
-std::shared_ptr<IDataShareService> DataShareManagerImpl::GetDataShareService()
+std::shared_ptr<BaseProxy> DataShareManagerImpl::GetDataShareService()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (dataShareService_ != nullptr) {
@@ -94,13 +92,7 @@ std::shared_ptr<IDataShareService> DataShareManagerImpl::GetDataShareService()
     return dataShareService_;
 }
 
-DataShareManagerImpl& DataShareManagerImpl::GetInstance()
-{
-    static DataShareManagerImpl manager;
-    return manager;
-}
-
-DataShareManagerImpl::DataShareManagerImpl()
+DataShareManagerImpl::DataShareManagerImpl() : BaseConnection(ConnectionType::SILENCE)
 {
     LOG_INFO("construct");
 }
@@ -108,6 +100,32 @@ DataShareManagerImpl::DataShareManagerImpl()
 DataShareManagerImpl::~DataShareManagerImpl()
 {
     LOG_INFO("destroy");
+}
+
+bool DataShareManagerImpl::ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> token) {
+    if (dataShareService_ != nullptr) {
+        LOG_DEBUG("dataShareProxy has connected");
+        return true;
+    }
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto service = GetDataShareServiceProxy();
+    if (service == nullptr) {
+        return false;
+    }
+    sptr<IDataShareService> serviceBase = service;
+    LinkToDeath(serviceBase->AsObject().GetRefPtr());
+    dataShareService_ = std::shared_ptr<DataShareServiceProxy>(
+            service.GetRefPtr(), [holder = service](const auto *) {});
+    return true;
+}
+
+bool DataShareManagerImpl::IsConnected() {
+    return dataShareService_ != nullptr;
+}
+
+std::shared_ptr<BaseProxy> DataShareManagerImpl::GetDataShareProxy(){
+    return dataShareService_;
 }
 
 void DataShareManagerImpl::ResetServiceHandle()
@@ -119,7 +137,7 @@ void DataShareManagerImpl::ResetServiceHandle()
 }
 void DataShareManagerImpl::OnRemoteDied()
 {
-    LOG_INFO("datashare service has dead");
+    LOG_INFO("#######datashare service has dead");
     ResetServiceHandle();
 }
 
