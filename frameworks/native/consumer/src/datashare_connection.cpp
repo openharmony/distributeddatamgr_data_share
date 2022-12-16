@@ -92,6 +92,10 @@ bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
     }
     std::unique_lock<std::mutex> lock(condition_.mutex);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, this, token);
+    if (ret != ERR_OK) {
+        LOG_ERROR("connect ability failed, ret = %{public}d", ret);
+        return false;
+    }
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ != nullptr; })) {
         LOG_INFO("connect ability ended successfully");
@@ -112,6 +116,10 @@ void DataShareConnection::DisconnectDataShareExtAbility()
     LOG_DEBUG("Start");
     std::unique_lock<std::mutex> lock(condition_.mutex);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(this);
+    if (ret != ERR_OK) {
+        LOG_ERROR("disconnect ability failed, ret = %{public}d", ret);
+        return;
+    }
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ == nullptr; })) {
         LOG_INFO("disconnect ability ended successfully");
