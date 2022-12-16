@@ -235,6 +235,7 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
             value = os.str();
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
+        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL!");
         return E_ERROR;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB) {
         LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB!");

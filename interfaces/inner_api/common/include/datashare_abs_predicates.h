@@ -69,7 +69,7 @@ public:
     virtual int SetWhereArgs(const std::vector<std::string> &whereArgs) = 0;
     virtual std::string GetOrder() const = 0;
     virtual int SetOrder(const std::string &order) = 0;
-    virtual SettingMode GetSettingMode() const = 0;
+    virtual int16_t GetSettingMode() const = 0;
 };
 } // namespace DataShare
 } // namespace OHOS
