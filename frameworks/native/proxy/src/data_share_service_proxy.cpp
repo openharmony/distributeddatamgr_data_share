@@ -19,7 +19,8 @@
 #include "ishared_result_set.h"
 #include "itypes_utils.h"
 
-namespace OHOS::DataShare {
+namespace OHOS {
+namespace DataShare {
 DataShareServiceProxy::DataShareServiceProxy(const sptr<IRemoteObject> &object)
     : IRemoteProxy<IDataShareService>(object)
 {
@@ -50,8 +51,8 @@ int DataShareServiceProxy::Insert(const Uri &uri, const DataShareValuesBucket &v
     return reply.ReadInt32();
 }
 
-int32_t DataShareServiceProxy::Update(
-        const Uri &uri, const DataSharePredicates &predicate, const DataShareValuesBucket &valuesBucket)
+int32_t DataShareServiceProxy::Update(const Uri &uri,
+    const DataSharePredicates &predicate, const DataShareValuesBucket &valuesBucket)
 {
     std::string uriStr = uri.ToString();
     LOG_DEBUG("Proxy update start.");
@@ -126,50 +127,60 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
 }
 
 
-int DataShareServiceProxy::OpenFile(const Uri &uri, const std::string &mode) {
+int DataShareServiceProxy::OpenFile(const Uri &uri, const std::string &mode)
+{
     return 0;
 }
 
-std::vector<std::string> DataShareServiceProxy::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter) {
+std::vector<std::string> DataShareServiceProxy::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
+{
     return std::vector<std::string>();
 }
 
-int DataShareServiceProxy::OpenRawFile(const Uri &uri, const std::string &mode) {
+int DataShareServiceProxy::OpenRawFile(const Uri &uri, const std::string &mode)
+{
     return 0;
 }
 
-std::string DataShareServiceProxy::GetType(const Uri &uri) {
+std::string DataShareServiceProxy::GetType(const Uri &uri)
+{
     return std::string();
 }
 
-int DataShareServiceProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values) {
+int DataShareServiceProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values)
+{
     return 0;
 }
 
-bool
-DataShareServiceProxy::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) {
+bool DataShareServiceProxy::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
     return false;
 }
 
-bool
-DataShareServiceProxy::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) {
+bool DataShareServiceProxy::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
     return false;
 }
 
-bool DataShareServiceProxy::NotifyChange(const Uri &uri) {
+bool DataShareServiceProxy::NotifyChange(const Uri &uri)
+{
     return false;
 }
 
-Uri DataShareServiceProxy::NormalizeUri(const Uri &uri) {
+Uri DataShareServiceProxy::NormalizeUri(const Uri &uri)
+{
     return Uri("");
 }
 
-std::vector<std::shared_ptr<DataShareResult>>
-DataShareServiceProxy::ExecuteBatch(const std::vector<std::shared_ptr<DataShareOperation>> &operations) {
+std::vector<std::shared_ptr<DataShareResult>> DataShareServiceProxy::ExecuteBatch(
+    const std::vector<std::shared_ptr<DataShareOperation>> &operations)
+{
     return std::vector<std::shared_ptr<DataShareResult>>();
 }
 
-Uri DataShareServiceProxy::DenormalizeUri(const Uri &uri) {
+Uri DataShareServiceProxy::DenormalizeUri(const Uri &uri)
+{
     return Uri("");
 }
-} // namespace OHOS::DataShare
+}
+}

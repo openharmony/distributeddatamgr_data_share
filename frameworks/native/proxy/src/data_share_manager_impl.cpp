@@ -24,7 +24,8 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 
-namespace OHOS::DataShare {
+namespace OHOS {
+namespace DataShare {
 std::shared_ptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
 {
     int retry = 0;
@@ -102,7 +103,8 @@ DataShareManagerImpl::~DataShareManagerImpl()
     LOG_INFO("destroy");
 }
 
-bool DataShareManagerImpl::ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> token) {
+bool DataShareManagerImpl::ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> token)
+{
     if (dataShareService_ != nullptr) {
         LOG_DEBUG("dataShareProxy has connected");
         return true;
@@ -120,11 +122,13 @@ bool DataShareManagerImpl::ConnectDataShare(const Uri &uri, const sptr<IRemoteOb
     return true;
 }
 
-bool DataShareManagerImpl::IsConnected() {
+bool DataShareManagerImpl::IsConnected()
+{
     return dataShareService_ != nullptr;
 }
 
-std::shared_ptr<BaseProxy> DataShareManagerImpl::GetDataShareProxy(){
+std::shared_ptr<BaseProxy> DataShareManagerImpl::GetDataShareProxy()
+{
     return dataShareService_;
 }
 
@@ -135,6 +139,7 @@ void DataShareManagerImpl::ResetServiceHandle()
     dataMgrService_ = nullptr;
     dataShareService_ = nullptr;
 }
+
 void DataShareManagerImpl::OnRemoteDied()
 {
     LOG_INFO("#######datashare service has dead");
@@ -174,5 +179,5 @@ sptr<IRemoteObject> DataShareKvServiceProxy::GetFeatureInterface(const std::stri
     }
     return remoteObject;
 }
-
-} // namespace OHOS::DataShare
+}
+}
