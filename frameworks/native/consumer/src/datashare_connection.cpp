@@ -129,7 +129,7 @@ bool DataShareConnection::IsExtAbilityConnected()
 
 void DataShareConnection::SetDataShareProxy(sptr<DataShareProxy> proxy)
 {
-    if (proxy == nullptr){
+    if (proxy == nullptr) {
         dataShareProxy_ = nullptr;
         return;
     }

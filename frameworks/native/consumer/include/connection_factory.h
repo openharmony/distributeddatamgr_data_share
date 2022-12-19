@@ -30,10 +30,8 @@ public:
 
 private:
     ConnectionFactory();
-
     std::shared_ptr<BaseConnection> service_;
-
 };
 }
 
-#endif //DATA_SHARE_CONNECTION_FACTORY_H
+#endif // DATA_SHARE_CONNECTION_FACTORY_H

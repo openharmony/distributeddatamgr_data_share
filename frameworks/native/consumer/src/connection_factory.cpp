@@ -12,22 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
+#include "connection_factory.h"
 
 #include <memory>
 
-#include "connection_factory.h"
 #include "datashare_connection.h"
 #include "datashare_log.h"
 #include "data_share_manager_impl.h"
 
-namespace OHOS::DataShare{
-std::shared_ptr<BaseConnection> ConnectionFactory::GetConnection(Uri &uri,  const sptr<IRemoteObject> token) {
+namespace OHOS {
+namespace DataShare {
+std::shared_ptr<BaseConnection> ConnectionFactory::GetConnection(Uri &uri,  const sptr<IRemoteObject> token)
+{
     if (uri.GetQuery().find("Proxy=true") != std::string::npos && service_->ConnectDataShare(uri, token)) {
         return service_;
     }
 
     sptr<DataShareConnection> connection = new (std::nothrow) DataShareConnection(uri, token);
-    if (connection == nullptr){
+    if (connection == nullptr) {
         LOG_ERROR("Factory Create DataShareConnection failed.");
         return nullptr;
     }
@@ -41,8 +44,9 @@ ConnectionFactory& ConnectionFactory::GetInstance()
     return manager;
 }
 
-ConnectionFactory::ConnectionFactory(){
+ConnectionFactory::ConnectionFactory()
+{
     service_ = std::make_shared<DataShareManagerImpl>();
 }
-
+}
 }

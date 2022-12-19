@@ -25,7 +25,7 @@
 
 #ifndef DATA_SHARE_BASE_PROXY_H
 #define DATA_SHARE_BASE_PROXY_H
-namespace OHOS{
+namespace OHOS {
 namespace AAFwk {
     class IDataAbilityObserver;
 }
@@ -199,4 +199,4 @@ virtual std::vector<std::string> GetFileTypes(const Uri &uri, const std::string 
 };
 }
 }
-#endif //DATA_SHARE_BASE_PROXY_H
+#endif // DATA_SHARE_BASE_PROXY_H
