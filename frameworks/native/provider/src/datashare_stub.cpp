@@ -41,7 +41,6 @@ DataShareStub::DataShareStub()
     stubFuncMap_[CMD_NOTIFY_CHANGE] = &DataShareStub::CmdNotifyChange;
     stubFuncMap_[CMD_NORMALIZE_URI] = &DataShareStub::CmdNormalizeUri;
     stubFuncMap_[CMD_DENORMALIZE_URI] = &DataShareStub::CmdDenormalizeUri;
-    stubFuncMap_[CMD_EXECUTE_BATCH] = &DataShareStub::CmdExecuteBatch;
 }
 
 DataShareStub::~DataShareStub()
