@@ -28,7 +28,7 @@ using namespace OHOS::AppExecFwk;
 
 namespace OHOS {
 namespace DataShare {
-constexpr int MAX_ARGC = 6;
+static constexpr int MAX_ARGC = 6;
 
 static DataSharePredicates UnwrapDataSharePredicates(napi_env env, napi_value value)
 {
@@ -62,12 +62,11 @@ static bool UnwrapValuesBucketArrayFromJS(napi_env env, napi_value param,
         }
 
         DataShareValuesBucket valueBucket;
-        valueBucket.Clear();
         if (!GetValueBucketObject(valueBucket, env, jsValue)) {
             return false;
         }
 
-        value.push_back(valueBucket);
+        value.push_back(std::move(valueBucket));
     }
     return true;
 }
@@ -102,11 +101,11 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             return napi_invalid_arg;
         }
         bool isStageMode = false;
-        napi_status status = AbilityRuntime::IsStageContext(env, argv[PARAM0], isStageMode);
+        napi_status status = AbilityRuntime::IsStageContext(env, argv[0], isStageMode);
         if (status != napi_ok || !isStageMode) {
             ctxInfo->isStageMode = false;
             auto ability = OHOS::AbilityRuntime::GetCurrentAbility(env);
-            if (!GetUri(env, argv[PARAM0], ctxInfo->strUri)) {
+            if (!GetUri(env, argv[0], ctxInfo->strUri)) {
                 ctxInfo->error = std::make_shared<ParametersTypeError>("uri", "string");
                 return napi_invalid_arg;
             }
@@ -117,8 +116,8 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             }
             ctxInfo->contextF = ability->GetContext();
         } else {
-            ctxInfo->contextS = OHOS::AbilityRuntime::GetStageModeContext(env, argv[PARAM0]);
-            if (!GetUri(env, argv[PARAM1], ctxInfo->strUri)) {
+            ctxInfo->contextS = OHOS::AbilityRuntime::GetStageModeContext(env, argv[0]);
+            if (!GetUri(env, argv[1], ctxInfo->strUri)) {
                 ctxInfo->error = std::make_shared<ParametersTypeError>("uri", "string");
                 return napi_invalid_arg;
             }
@@ -227,12 +226,12 @@ napi_value NapiDataShareHelper::Napi_OpenFile(napi_env env, napi_callback_info i
         NAPI_ASSERT_BASE(env, argc == 2 || argc == 3, " should 2 or 3 parameters!", napi_invalid_arg);
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        GetUri(env, argv[PARAM0], context->uri);
+        GetUri(env, argv[0], context->uri);
 
         napi_valuetype valuetype = napi_undefined;
-        napi_typeof(env, argv[PARAM1], &valuetype);
+        napi_typeof(env, argv[1], &valuetype);
         if (valuetype == napi_string) {
-            context->mode = DataShareJSUtils::Convert2String(env, argv[PARAM1]);
+            context->mode = DataShareJSUtils::Convert2String(env, argv[1]);
         } else {
             LOG_ERROR("wrong type, should be napi_string");
         }
@@ -268,13 +267,13 @@ napi_value NapiDataShareHelper::Napi_Insert(napi_env env, napi_callback_info inf
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        if (!GetUri(env, argv[PARAM0], context->uri)) {
+        if (!GetUri(env, argv[0], context->uri)) {
             context->error = std::make_shared<ParametersTypeError>("uri", "string");
             return napi_invalid_arg;
         }
 
         context->valueBucket.Clear();
-        if (!GetValueBucketObject(context->valueBucket, env, argv[PARAM1])) {
+        if (!GetValueBucketObject(context->valueBucket, env, argv[1])) {
             context->error = std::make_shared<ParametersTypeError>("valueBucket",
                 "[string|number|boolean|null|Uint8Array]");
             return napi_invalid_arg;
@@ -316,12 +315,12 @@ napi_value NapiDataShareHelper::Napi_Delete(napi_env env, napi_callback_info inf
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        if (!GetUri(env, argv[PARAM0], context->uri)) {
+        if (!GetUri(env, argv[0], context->uri)) {
             context->error = std::make_shared<ParametersTypeError>("uri", "string");
             return napi_invalid_arg;
         }
 
-        context->predicates = UnwrapDataSharePredicates(env, argv[PARAM1]);
+        context->predicates = UnwrapDataSharePredicates(env, argv[1]);
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
@@ -358,14 +357,14 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        if (!GetUri(env, argv[PARAM0], context->uri)) {
+        if (!GetUri(env, argv[0], context->uri)) {
             context->error = std::make_shared<ParametersTypeError>("uri", "string");
             return napi_invalid_arg;
         }
 
-        context->predicates = UnwrapDataSharePredicates(env, argv[PARAM1]);
+        context->predicates = UnwrapDataSharePredicates(env, argv[1]);
 
-        context->columns = DataShareJSUtils::Convert2StrVector(env, argv[PARAM2], DataShareJSUtils::DEFAULT_BUF_SIZE);
+        context->columns = DataShareJSUtils::Convert2StrVector(env, argv[2], DataShareJSUtils::DEFAULT_BUF_SIZE);
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
@@ -402,15 +401,15 @@ napi_value NapiDataShareHelper::Napi_Update(napi_env env, napi_callback_info inf
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        if (!GetUri(env, argv[PARAM0], context->uri)) {
+        if (!GetUri(env, argv[0], context->uri)) {
             context->error = std::make_shared<ParametersTypeError>("uri", "string");
             return napi_invalid_arg;
         }
 
-        context->predicates = UnwrapDataSharePredicates(env, argv[PARAM1]);
+        context->predicates = UnwrapDataSharePredicates(env, argv[1]);
 
         context->valueBucket.Clear();
-        if (!GetValueBucketObject(context->valueBucket, env, argv[PARAM2])) {
+        if (!GetValueBucketObject(context->valueBucket, env, argv[2])) {
             context->error = std::make_shared<ParametersTypeError>("valueBucket",
                 "[string|number|boolean|null|Uint8Array]");
             return napi_invalid_arg;
@@ -452,12 +451,12 @@ napi_value NapiDataShareHelper::Napi_BatchInsert(napi_env env, napi_callback_inf
         }
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        if (!GetUri(env, argv[PARAM0], context->uri)) {
+        if (!GetUri(env, argv[0], context->uri)) {
             context->error = std::make_shared<ParametersTypeError>("uri", "string");
             return napi_invalid_arg;
         }
         bool status = false;
-        context->values = GetValuesBucketArray(env, argv[PARAM1], status);
+        context->values = GetValuesBucketArray(env, argv[1], status);
         if (!status) {
             context->error = std::make_shared<ParametersTypeError>("valueBucket",
                 "[string|number|boolean|null|Uint8Array]");
@@ -496,7 +495,7 @@ napi_value NapiDataShareHelper::Napi_GetType(napi_env env, napi_callback_info in
         NAPI_ASSERT_BASE(env, argc == 1 || argc == 2, " should 1 or 2 parameters!", napi_invalid_arg);
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        GetUri(env, argv[PARAM0], context->uri);
+        GetUri(env, argv[0], context->uri);
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
@@ -526,12 +525,12 @@ napi_value NapiDataShareHelper::Napi_GetFileTypes(napi_env env, napi_callback_in
         NAPI_ASSERT_BASE(env, argc == 2 || argc == 3, " should 2 or 3 parameters!", napi_invalid_arg);
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        GetUri(env, argv[PARAM0], context->uri);
+        GetUri(env, argv[0], context->uri);
 
         napi_valuetype valuetype = napi_undefined;
-        napi_typeof(env, argv[PARAM1], &valuetype);
+        napi_typeof(env, argv[1], &valuetype);
         if (valuetype == napi_string) {
-            context->mimeTypeFilter = DataShareJSUtils::Convert2String(env, argv[PARAM1]);
+            context->mimeTypeFilter = DataShareJSUtils::Convert2String(env, argv[1]);
         } else {
             LOG_ERROR("wrong type, should be napi_string");
         }
@@ -564,7 +563,7 @@ napi_value NapiDataShareHelper::Napi_NormalizeUri(napi_env env, napi_callback_in
         NAPI_ASSERT_BASE(env, argc == 1 || argc == 2, " should 1 or 2 parameters!", napi_invalid_arg);
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        GetUri(env, argv[PARAM0], context->uri);
+        GetUri(env, argv[0], context->uri);
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
@@ -595,7 +594,7 @@ napi_value NapiDataShareHelper::Napi_DenormalizeUri(napi_env env, napi_callback_
         NAPI_ASSERT_BASE(env, argc == 1 || argc == 2, " should 1 or 2 parameters!", napi_invalid_arg);
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        GetUri(env, argv[PARAM0], context->uri);
+        GetUri(env, argv[0], context->uri);
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
@@ -626,7 +625,7 @@ napi_value NapiDataShareHelper::Napi_NotifyChange(napi_env env, napi_callback_in
         NAPI_ASSERT_BASE(env, argc == 1 || argc == 2, " should 1 or 2 parameters!", napi_invalid_arg);
         LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
-        GetUri(env, argv[PARAM0], context->uri);
+        GetUri(env, argv[0], context->uri);
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
@@ -663,24 +662,24 @@ napi_value NapiDataShareHelper::Napi_On(napi_env env, napi_callback_info info)
     NAPI_ASSERT_BASE(env, proxy->datashareHelper_ != nullptr, "there is no DataShareHelper instance", nullptr);
 
     napi_valuetype valueType;
-    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valueType));
+    NAPI_CALL(env, napi_typeof(env, argv[0], &valueType));
     if (valueType != napi_string) {
         LOG_ERROR("type is not string");
         return nullptr;
     }
-    std::string type = DataShareJSUtils::Convert2String(env, argv[PARAM0]);
+    std::string type = DataShareJSUtils::Convert2String(env, argv[0]);
     if (type != "dataChange") {
         LOG_ERROR("wrong register type : %{public}s", type.c_str());
         return nullptr;
     }
 
-    NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valueType));
+    NAPI_CALL(env, napi_typeof(env, argv[1], &valueType));
     NAPI_ASSERT_BASE(env, valueType == napi_string, "uri is not string", nullptr);
-    std::string uri = DataShareJSUtils::Convert2String(env, argv[PARAM1]);
+    std::string uri = DataShareJSUtils::Convert2String(env, argv[1]);
 
-    NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
+    NAPI_CALL(env, napi_typeof(env, argv[2], &valueType));
     NAPI_ASSERT_BASE(env, valueType == napi_function, "callback is not a function", nullptr);
-    sptr<NAPIDataShareObserver> observer(new (std::nothrow) NAPIDataShareObserver(env, argv[PARAM2]));
+    sptr<NAPIDataShareObserver> observer(new (std::nothrow) NAPIDataShareObserver(env, argv[2]));
 
     auto obs = proxy->observerMap_.find(uri);
     if (obs != proxy->observerMap_.end()) {
@@ -709,23 +708,23 @@ napi_value NapiDataShareHelper::Napi_Off(napi_env env, napi_callback_info info)
     NAPI_ASSERT_BASE(env, proxy->datashareHelper_ != nullptr, "there is no DataShareHelper instance", nullptr);
 
     napi_valuetype valueType;
-    NAPI_CALL(env, napi_typeof(env, argv[PARAM0], &valueType));
+    NAPI_CALL(env, napi_typeof(env, argv[0], &valueType));
     if (valueType != napi_string) {
         LOG_ERROR("type is not string");
         return nullptr;
     }
-    std::string type = DataShareJSUtils::Convert2String(env, argv[PARAM0]);
+    std::string type = DataShareJSUtils::Convert2String(env, argv[0]);
     if (type != "dataChange") {
         LOG_ERROR("wrong register type : %{public}s", type.c_str());
         return nullptr;
     }
 
-    NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valueType));
+    NAPI_CALL(env, napi_typeof(env, argv[1], &valueType));
     NAPI_ASSERT_BASE(env, valueType == napi_string, "uri is not string", nullptr);
-    std::string uri = DataShareJSUtils::Convert2String(env, argv[PARAM1]);
+    std::string uri = DataShareJSUtils::Convert2String(env, argv[1]);
 
     if (argc == ARGS_THREE) {
-        NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
+        NAPI_CALL(env, napi_typeof(env, argv[2], &valueType));
         NAPI_ASSERT_BASE(env, valueType == napi_function, "callback is not a function", nullptr);
     }
 

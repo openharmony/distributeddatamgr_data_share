@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace DataShare {
-EXTERN_C_START
 /*
  * The module initialization.
  */
@@ -35,7 +34,6 @@ static napi_value Init(napi_env env, napi_value exports)
     LOG_DEBUG("napi_define_properties status : %{public}d", status);
     return exports;
 }
-EXTERN_C_END
 
 /*
  * The module definition.
