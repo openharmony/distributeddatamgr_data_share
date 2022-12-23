@@ -176,15 +176,6 @@ public:
     */
     virtual Uri DenormalizeUri(const Uri &uri) = 0;
 
-    /**
-    * @brief Performs batch operations on the database.
-    *
-    * @param operations Indicates a list of database operations on the database.
-    * @return Returns the result of each operation, in array.
-    */
-    virtual std::vector<std::shared_ptr<DataShareResult>> ExecuteBatch(
-            const std::vector<std::shared_ptr<DataShareOperation>> &operations) = 0;
-
 /**
 * @brief Obtains the MIME types of files supported.
 *

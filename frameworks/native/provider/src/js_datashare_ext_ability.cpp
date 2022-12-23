@@ -651,14 +651,6 @@ Uri JsDataShareExtAbility::DenormalizeUri(const Uri &uri)
     return ret;
 }
 
-std::vector<std::shared_ptr<DataShareResult>> JsDataShareExtAbility::ExecuteBatch(
-    const std::vector<std::shared_ptr<DataShareOperation>> &operations)
-{
-    LOG_DEBUG("Start");
-    auto ret = DataShareExtAbility::ExecuteBatch(operations);
-    return ret;
-}
-
 napi_value JsDataShareExtAbility::MakePredicates(napi_env env, const DataSharePredicates &predicates)
 {
     LOG_DEBUG("Start");
