@@ -136,12 +136,5 @@ Uri DataShareExtAbility::DenormalizeUri(const Uri &uri)
     Uri urivalue("");
     return urivalue;
 }
-
-std::vector<std::shared_ptr<DataShareResult>> DataShareExtAbility::ExecuteBatch(
-    const std::vector<std::shared_ptr<DataShareOperation>> &operations)
-{
-    std::vector<std::shared_ptr<DataShareResult>> results;
-    return results;
-}
 } // namespace DataShare
 } // namespace OHOS
