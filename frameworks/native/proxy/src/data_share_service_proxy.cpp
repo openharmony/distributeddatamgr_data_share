@@ -172,12 +172,6 @@ Uri DataShareServiceProxy::NormalizeUri(const Uri &uri)
     return Uri("");
 }
 
-std::vector<std::shared_ptr<DataShareResult>> DataShareServiceProxy::ExecuteBatch(
-    const std::vector<std::shared_ptr<DataShareOperation>> &operations)
-{
-    return std::vector<std::shared_ptr<DataShareResult>>();
-}
-
 Uri DataShareServiceProxy::DenormalizeUri(const Uri &uri)
 {
     return Uri("");
