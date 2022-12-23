@@ -18,10 +18,8 @@
 #include "uri.h"
 
 #include "datashare_values_bucket.h"
-#include "datashare_result.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
-#include "datashare_operation.h"
 
 #ifndef DATA_SHARE_BASE_PROXY_H
 #define DATA_SHARE_BASE_PROXY_H
