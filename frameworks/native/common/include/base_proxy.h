@@ -18,10 +18,8 @@
 #include "uri.h"
 
 #include "datashare_values_bucket.h"
-#include "datashare_result.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
-#include "datashare_operation.h"
 
 #ifndef DATA_SHARE_BASE_PROXY_H
 #define DATA_SHARE_BASE_PROXY_H
@@ -177,15 +175,6 @@ public:
     * be found in the current environment.
     */
     virtual Uri DenormalizeUri(const Uri &uri) = 0;
-
-    /**
-    * @brief Performs batch operations on the database.
-    *
-    * @param operations Indicates a list of database operations on the database.
-    * @return Returns the result of each operation, in array.
-    */
-    virtual std::vector<std::shared_ptr<DataShareResult>> ExecuteBatch(
-            const std::vector<std::shared_ptr<DataShareOperation>> &operations) = 0;
 
 /**
 * @brief Obtains the MIME types of files supported.

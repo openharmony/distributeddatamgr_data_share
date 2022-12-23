@@ -231,15 +231,6 @@ public:
      */
     Uri DenormalizeUri(const Uri &uri) override;
 
-    /**
-     * @brief Performs batch operations on the database.
-     *
-     * @param operations Indicates a list of database operations on the database.
-     * @return Returns the result of each operation, in array.
-     */
-    std::vector<std::shared_ptr<DataShareResult>> ExecuteBatch(
-        const std::vector<std::shared_ptr<DataShareOperation>> &operations) override;
-
     bool GetBlockWaiting() const
     {
         return isBlockWaiting_;
