@@ -20,10 +20,7 @@
 
 namespace OHOS::DataShare {
 using namespace AbilityRuntime;
-class DataShareExtAbilityModuleLoader : public ExtensionModuleLoader,
-    public Singleton<DataShareExtAbilityModuleLoader> {
-    DECLARE_SINGLETON(DataShareExtAbilityModuleLoader);
-
+class DataShareExtAbilityModuleLoader : public ExtensionModuleLoader {
 public:
     /**
      * @brief Create Extension.
@@ -31,6 +28,7 @@ public:
      * @param runtime The runtime.
      * @return The Extension instance.
      */
+    static DataShareExtAbilityModuleLoader &GetInstance();
     virtual Extension *Create(const std::unique_ptr<Runtime>& runtime) const override;
 
     virtual std::map<std::string, std::string> GetParams() override;

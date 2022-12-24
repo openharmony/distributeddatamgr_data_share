@@ -112,7 +112,7 @@ int DataShareResultSet::GetDataType(int columnIndex, DataType &dataType)
     int rowCount = 0;
     GetRowCount(rowCount);
     AppDataFwk::SharedBlock::CellUnit *cellUnit =
-        sharedBlock_->GetCellUnit((uint32_t)rowPos_ - startRowPos_, (uint32_t)columnIndex);
+        sharedBlock_->GetCellUnit(static_cast<uint32_t>(rowPos_) - startRowPos_, static_cast<uint32_t>(columnIndex));
     if (!cellUnit) {
         LOG_ERROR("cellUnit is null!");
         return E_ERROR;
@@ -231,8 +231,9 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_FLOAT) {
         double tempValue = cellUnit->cell.doubleValue;
         std::ostringstream os;
-        if (os << tempValue)
-            value = os.str();
+        if (os << tempValue) {
+            value = os.str();            
+        }
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
         LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL!");
@@ -318,7 +319,7 @@ int DataShareResultSet::GetDouble(int columnIndex, double &value)
         value = ((sizeIncludingNull > 1) && (tempValue != nullptr)) ? strtod(tempValue, nullptr) : 0.0;
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_INTEGER) {
-        value = cellUnit->cell.longValue;
+        value = static_cast<double>(cellUnit->cell.longValue);
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
         LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL!");

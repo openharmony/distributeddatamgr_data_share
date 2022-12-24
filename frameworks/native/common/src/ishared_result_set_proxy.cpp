@@ -21,8 +21,8 @@
 #include "iremote_proxy.h"
 
 namespace OHOS::DataShare {
-std::function<std::shared_ptr<DataShareResultSet>(
-    MessageParcel &parcel)> ISharedResultSet::consumerCreator_ = ISharedResultSetProxy::CreateProxy;
+std::function<std::shared_ptr<DataShareResultSet>(MessageParcel &parcel)> ISharedResultSet::consumerCreator_ =
+    ISharedResultSetProxy::CreateProxy;
 BrokerDelegator<ISharedResultSetProxy> ISharedResultSetProxy::delegator_;
 ISharedResultSetProxy::ISharedResultSetProxy(const sptr<OHOS::IRemoteObject> &impl)
     : IRemoteProxy<ISharedResultSet>(impl)
@@ -43,6 +43,7 @@ std::shared_ptr<DataShareResultSet> ISharedResultSetProxy::CreateProxy(MessagePa
 
 int ISharedResultSetProxy::GetAllColumnNames(std::vector<std::string> &columnNames)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (!columnNames_.empty()) {
         columnNames = columnNames_;
         return E_OK;
@@ -106,7 +107,7 @@ bool ISharedResultSetProxy::OnGo(int oldRowIndex, int newRowIndex, int *cachedIn
     int errCode = Remote()->SendRequest(FUNC_ON_GO, request, reply, msgOption);
     if (errCode != 0) {
         LOG_ERROR("IPC Error %{public}x", errCode);
-        return -errCode;
+        return false;
     }
     int ret = reply.ReadInt32();
     if (cachedIndex != nullptr) {
