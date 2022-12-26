@@ -35,9 +35,6 @@ namespace OHOS {
 namespace DataShare {
 using namespace AbilityRuntime;
 namespace {
-constexpr size_t ARGC_ONE = 1;
-constexpr size_t ARGC_TWO = 2;
-constexpr size_t ARGC_THREE = 3;
 constexpr int INVALID_VALUE = -1;
 const std::string ASYNC_CALLBACK_NAME = "AsyncCallback";
 }
@@ -94,7 +91,7 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
     LOG_INFO("CreateJsDataShareExtAbilityContext.");
     NativeValue* contextObj = CreateJsDataShareExtAbilityContext(engine, context);
     auto contextRef = jsRuntime_.LoadSystemModule("application.DataShareExtensionAbilityContext",
-        &contextObj, ARGC_ONE);
+        &contextObj, 1);
     contextObj = contextRef->Get();
     LOG_INFO("Bind.");
     context->Bind(jsRuntime_, contextRef.release());
@@ -125,7 +122,7 @@ void JsDataShareExtAbility::OnStart(const AAFwk::Want &want)
     napi_value napiWant = OHOS::AppExecFwk::WrapWant(env, want);
     NativeValue* nativeWant = reinterpret_cast<NativeValue*>(napiWant);
     NativeValue* argv[] = {nativeWant};
-    CallObjectMethod("onCreate", argv, ARGC_ONE);
+    CallObjectMethod("onCreate", argv, sizeof(argv)/sizeof(argv[0]));
 }
 
 sptr<IRemoteObject> JsDataShareExtAbility::OnConnect(const AAFwk::Want &want)
@@ -185,7 +182,7 @@ NativeValue* JsDataShareExtAbility::AsyncCallback(NativeEngine* engine, NativeCa
         LOG_ERROR("invalid param.");
         return nullptr;
     }
-    if (info->argc < ARGC_TWO || info->argv[0] == nullptr || info->argv[1] == nullptr) {
+    if (info->argc < 2 || info->argv[0] == nullptr || info->argv[1] == nullptr) {
         LOG_ERROR("invalid args.");
         return engine->CreateUndefined();
     }
@@ -304,7 +301,7 @@ std::vector<std::string> JsDataShareExtAbility::GetFileTypes(const Uri &uri, con
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* nativeMimeTypeFilter = reinterpret_cast<NativeValue*>(napiMimeTypeFilter);
     NativeValue* argv[] = {nativeUri, nativeMimeTypeFilter};
-    CallObjectMethod("getFileTypes", argv, ARGC_TWO);
+    CallObjectMethod("getFileTypes", argv, 2);
 
     return ret;
 }
@@ -332,7 +329,7 @@ int JsDataShareExtAbility::OpenFile(const Uri &uri, const std::string &mode)
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* nativeMode = reinterpret_cast<NativeValue*>(napiMode);
     NativeValue* argv[] = {nativeUri, nativeMode};
-    CallObjectMethod("openFile", argv, ARGC_TWO);
+    CallObjectMethod("openFile", argv, 2);
 
     return ret;
 }
@@ -360,7 +357,7 @@ int JsDataShareExtAbility::OpenRawFile(const Uri &uri, const std::string &mode)
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* nativeMode = reinterpret_cast<NativeValue*>(napiMode);
     NativeValue* argv[] = {nativeUri, nativeMode};
-    CallObjectMethod("openRawFile", argv, ARGC_TWO, false);
+    CallObjectMethod("openRawFile", argv, 2, false);
 
     return ret;
 }
@@ -387,7 +384,7 @@ int JsDataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &v
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* nativeValue = reinterpret_cast<NativeValue*>(napiValue);
     NativeValue* argv[] = {nativeUri, nativeValue};
-    CallObjectMethod("insert", argv, ARGC_TWO);
+    CallObjectMethod("insert", argv, 2);
 
     return ret;
 }
@@ -423,7 +420,7 @@ int JsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pre
     NativeValue* nativePredicates = reinterpret_cast<NativeValue*>(napiPredicates);
     NativeValue* nativeValue = reinterpret_cast<NativeValue*>(napiValue);
     NativeValue* argv[] = {nativeUri, nativePredicates, nativeValue};
-    CallObjectMethod("update", argv, ARGC_THREE);
+    CallObjectMethod("update", argv, 3);
 
     return ret;
 }
@@ -451,7 +448,7 @@ int JsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &pre
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* nativePredicates = reinterpret_cast<NativeValue*>(napiPredicates);
     NativeValue* argv[] = {nativeUri, nativePredicates};
-    CallObjectMethod("delete", argv, ARGC_TWO);
+    CallObjectMethod("delete", argv, 2);
 
     return ret;
 }
@@ -488,7 +485,7 @@ std::shared_ptr<DataShareResultSet> JsDataShareExtAbility::Query(const Uri &uri,
     NativeValue* nativePredicates = reinterpret_cast<NativeValue*>(napiPredicates);
     NativeValue* nativeColumns = reinterpret_cast<NativeValue*>(napiColumns);
     NativeValue* argv[] = {nativeUri, nativePredicates, nativeColumns};
-    CallObjectMethod("query", argv, ARGC_THREE);
+    CallObjectMethod("query", argv, 3);
 
     return std::make_shared<DataShareResultSet>();
 }
@@ -508,7 +505,7 @@ std::string JsDataShareExtAbility::GetType(const Uri &uri)
     }
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* argv[] = {nativeUri};
-    CallObjectMethod("getType", argv, ARGC_ONE);
+    CallObjectMethod("getType", argv, 1);
 
     return ret;
 }
@@ -552,7 +549,7 @@ int JsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataSha
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* nativeValues = reinterpret_cast<NativeValue*>(napiValues);
     NativeValue* argv[] = {nativeUri, nativeValues};
-    CallObjectMethod("batchInsert", argv, ARGC_TWO);
+    CallObjectMethod("batchInsert", argv, 2);
 
     return ret;
 }
@@ -626,7 +623,7 @@ Uri JsDataShareExtAbility::NormalizeUri(const Uri &uri)
     }
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* argv[] = {nativeUri};
-    CallObjectMethod("normalizeUri", argv, ARGC_ONE);
+    CallObjectMethod("normalizeUri", argv, 1);
 
     return ret;
 }
@@ -646,7 +643,7 @@ Uri JsDataShareExtAbility::DenormalizeUri(const Uri &uri)
     }
     NativeValue* nativeUri = reinterpret_cast<NativeValue*>(napiUri);
     NativeValue* argv[] = {nativeUri};
-    CallObjectMethod("denormalizeUri", argv, ARGC_ONE);
+    CallObjectMethod("denormalizeUri", argv, 1);
 
     return ret;
 }

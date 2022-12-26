@@ -35,7 +35,8 @@ void DataShareExtAbility::SetCreator(const CreatorFunc& creator)
 DataShareExtAbility* DataShareExtAbility::Create(const std::unique_ptr<Runtime>& runtime)
 {
     if (!runtime) {
-        return new DataShareExtAbility();
+        LOG_INFO("runtime is null");
+        return nullptr;
     }
 
     if (creator_) {
@@ -69,35 +70,35 @@ std::vector<std::string> DataShareExtAbility::GetFileTypes(const Uri &uri, const
 
 int DataShareExtAbility::OpenFile(const Uri &uri, const std::string &mode)
 {
-    return 0;
+    return -1;
 }
 
 int DataShareExtAbility::OpenRawFile(const Uri &uri, const std::string &mode)
 {
-    return 0;
+    return -1;
 }
 
 int DataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
-    return 0;
+    return -1;
 }
 
 int DataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &predicates,
     const DataShareValuesBucket &value)
 {
-    return 0;
+    return -1;
 }
 
 int DataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
-    return 0;
+    return -1;
 }
 
 std::shared_ptr<DataShareResultSet> DataShareExtAbility::Query(const Uri &uri,
     const DataSharePredicates &predicates, std::vector<std::string> &columns)
 {
     std::shared_ptr<DataShareResultSet> ret;
-    return ret;
+    return nullptr;
 }
 
 std::string DataShareExtAbility::GetType(const Uri &uri)
@@ -107,7 +108,7 @@ std::string DataShareExtAbility::GetType(const Uri &uri)
 
 int DataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
-    return 0;
+    return -1;
 }
 
 bool DataShareExtAbility::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
@@ -128,13 +129,13 @@ bool DataShareExtAbility::NotifyChange(const Uri &uri)
 Uri DataShareExtAbility::NormalizeUri(const Uri &uri)
 {
     Uri urivalue("");
-    return urivalue;
+    return uri;
 }
 
 Uri DataShareExtAbility::DenormalizeUri(const Uri &uri)
 {
     Uri urivalue("");
-    return urivalue;
+    return uri;
 }
 } // namespace DataShare
 } // namespace OHOS

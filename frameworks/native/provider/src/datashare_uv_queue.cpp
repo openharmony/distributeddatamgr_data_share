@@ -33,6 +33,7 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
     LOG_DEBUG("Start");
     uv_work_t* work = new (std::nothrow) uv_work_t;
     if (work == nullptr) {
+        LOG_ERROR("invalid work.");        
         return;
     }
     work->data = new UvEntry {env_, std::move(func), false, false, {}, {}, std::move(retFunc)};
@@ -64,6 +65,10 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
     bool noNeedPurge = false;
     auto *uvEntry = static_cast<UvEntry*>(work->data);
     {
+        if (uvEntry == nullptr) {
+            LOG_ERROR("invalid uvEntry.");
+            return;
+        }        
         std::unique_lock<std::mutex> lock(uvEntry->mutex);
         if (uvEntry->condition.wait_for(lock, std::chrono::seconds(WAIT_TIME), [uvEntry] { return uvEntry->done; })) {
             LOG_INFO("function ended successfully");

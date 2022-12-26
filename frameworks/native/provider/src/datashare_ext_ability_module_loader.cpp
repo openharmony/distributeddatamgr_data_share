@@ -18,9 +18,12 @@
 
 namespace OHOS::DataShare {
 using namespace AbilityRuntime;
-DataShareExtAbilityModuleLoader::DataShareExtAbilityModuleLoader() = default;
-DataShareExtAbilityModuleLoader::~DataShareExtAbilityModuleLoader() = default;
 
+DataShareExtAbilityModuleLoader& DataShareExtAbilityModuleLoader::GetInstance()
+{
+    static DataShareExtAbilityModuleLoader DataShareExtAbilityModuleLoader;
+    return DataShareExtAbilityModuleLoader;
+}
 Extension *DataShareExtAbilityModuleLoader::Create(const std::unique_ptr<Runtime>& runtime) const
 {
     return DataShareExtAbility::Create(runtime);

@@ -21,7 +21,7 @@
 #include <mutex>
 
 #include "data_share_service_proxy.h"
-#include "data_share_types.h"
+#include "data_share_errno.h"
 #include "idata_share_service.h"
 #include "iremote_object.h"
 #include "refbase.h"
