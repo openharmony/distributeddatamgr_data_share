@@ -238,6 +238,7 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
         extension->GetResult(resultSet);
         return (resultSet != nullptr);
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return resultSet;
 }
