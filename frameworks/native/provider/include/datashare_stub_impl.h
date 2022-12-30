@@ -72,10 +72,9 @@ private:
     std::shared_ptr<JsDataShareExtAbility> GetOwner();
     bool CheckCallingPermission(const std::string &permission);
     void GetCallingInfo(CallingInfo& callingInfo);
-
-private:
     std::shared_ptr<JsDataShareExtAbility> extension_;
     std::shared_ptr<DataShare::DataShareUvQueue> uvQueue_;
+    std::mutex mutex_;
 };
 } // namespace DataShare
 } // namespace OHOS
