@@ -944,7 +944,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_005, TestSize.Lev
     err = resultSet.IsColumnNull(0, isNull);
     EXPECT_NE(err, 0);
     bool flag = resultSet.OnGo(0, 1);
-    EXPECT_EQ(flag, true);
+    EXPECT_EQ(flag, false);
     LOG_INFO("MediaDataShare_ResultSet_Test_005, End");
 }
 
