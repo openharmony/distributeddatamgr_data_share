@@ -80,7 +80,7 @@ private:
     void DisconnectDataShareExtAbility();
     void SetDataShareProxy(sptr<DataShareProxy> proxy);
     bool IsExtAbilityConnected();
-    void ReportEventToSuspendManager(const std::string &uriString);
+    void ReportEventToSuspendManager(const std::string &uriString) const;
 
     std::mutex mutex_;
     std::shared_ptr<DataShareProxy> dataShareProxy_;
