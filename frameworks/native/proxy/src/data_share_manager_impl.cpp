@@ -106,7 +106,6 @@ DataShareManagerImpl::~DataShareManagerImpl()
 bool DataShareManagerImpl::ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> token)
 {
     if (dataShareService_ != nullptr) {
-        LOG_DEBUG("dataShareProxy has connected");
         return true;
     }
 

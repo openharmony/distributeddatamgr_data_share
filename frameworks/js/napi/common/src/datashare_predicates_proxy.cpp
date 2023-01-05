@@ -71,7 +71,6 @@ napi_value DataSharePredicatesProxy::GetConstructor(napi_env env)
 
 void DataSharePredicatesProxy::Init(napi_env env, napi_value exports)
 {
-    LOG_DEBUG("Init DataSharePredicatesProxy start.");
     napi_value cons = GetConstructor(env);
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, exports, "DataSharePredicates", cons));
 }
@@ -95,7 +94,6 @@ napi_value DataSharePredicatesProxy::New(napi_env env, napi_callback_info info)
             LOG_ERROR("napi_wrap error");
             return nullptr;
         }
-        LOG_DEBUG("proxy->wrapper_ is nullptr : %{public}d", proxy->wrapper_ == nullptr);
         return thiz;
     }
 
@@ -139,7 +137,6 @@ napi_value DataSharePredicatesProxy::NewInstance(napi_env env, std::shared_ptr<D
 std::shared_ptr<DataShareAbsPredicates> DataSharePredicatesProxy::GetNativePredicates(
     const napi_env env, const napi_value arg)
 {
-    LOG_DEBUG("Start");
     if (arg == nullptr) {
         LOG_ERROR("arg is null.");
         return nullptr;
@@ -177,7 +174,6 @@ std::shared_ptr<DataShareAbsPredicates> DataSharePredicatesProxy::GetNativePredi
 
 napi_value DataSharePredicatesProxy::EqualTo(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -221,7 +217,6 @@ napi_value DataSharePredicatesProxy::EqualTo(napi_env env, napi_callback_info in
 
 napi_value DataSharePredicatesProxy::NotEqualTo(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -265,7 +260,6 @@ napi_value DataSharePredicatesProxy::NotEqualTo(napi_env env, napi_callback_info
 
 napi_value DataSharePredicatesProxy::BeginWrap(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     napi_get_cb_info(env, info, nullptr, nullptr, &thiz, nullptr);
     auto nativePredicates = GetNativePredicates(env, info);
@@ -279,7 +273,6 @@ napi_value DataSharePredicatesProxy::BeginWrap(napi_env env, napi_callback_info 
 
 napi_value DataSharePredicatesProxy::EndWrap(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     napi_get_cb_info(env, info, nullptr, nullptr, &thiz, nullptr);
     auto nativePredicates = GetNativePredicates(env, info);
@@ -293,7 +286,6 @@ napi_value DataSharePredicatesProxy::EndWrap(napi_env env, napi_callback_info in
 
 napi_value DataSharePredicatesProxy::Or(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     napi_get_cb_info(env, info, nullptr, nullptr, &thiz, nullptr);
     auto nativePredicates = GetNativePredicates(env, info);
@@ -307,7 +299,6 @@ napi_value DataSharePredicatesProxy::Or(napi_env env, napi_callback_info info)
 
 napi_value DataSharePredicatesProxy::And(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     napi_get_cb_info(env, info, nullptr, nullptr, &thiz, nullptr);
     auto nativePredicates = GetNativePredicates(env, info);
@@ -321,7 +312,6 @@ napi_value DataSharePredicatesProxy::And(napi_env env, napi_callback_info info)
 
 napi_value DataSharePredicatesProxy::Contains(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -341,7 +331,6 @@ napi_value DataSharePredicatesProxy::Contains(napi_env env, napi_callback_info i
 
 napi_value DataSharePredicatesProxy::BeginsWith(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -360,7 +349,6 @@ napi_value DataSharePredicatesProxy::BeginsWith(napi_env env, napi_callback_info
 
 napi_value DataSharePredicatesProxy::EndsWith(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -379,7 +367,6 @@ napi_value DataSharePredicatesProxy::EndsWith(napi_env env, napi_callback_info i
 
 napi_value DataSharePredicatesProxy::IsNull(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 1;
     napi_value args[1] = { 0 };
@@ -397,7 +384,6 @@ napi_value DataSharePredicatesProxy::IsNull(napi_env env, napi_callback_info inf
 
 napi_value DataSharePredicatesProxy::IsNotNull(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 1;
     napi_value args[1] = { 0 };
@@ -415,7 +401,6 @@ napi_value DataSharePredicatesProxy::IsNotNull(napi_env env, napi_callback_info 
 
 napi_value DataSharePredicatesProxy::Like(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -434,7 +419,6 @@ napi_value DataSharePredicatesProxy::Like(napi_env env, napi_callback_info info)
 
 napi_value DataSharePredicatesProxy::Unlike(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -453,7 +437,6 @@ napi_value DataSharePredicatesProxy::Unlike(napi_env env, napi_callback_info inf
 
 napi_value DataSharePredicatesProxy::Glob(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -472,7 +455,6 @@ napi_value DataSharePredicatesProxy::Glob(napi_env env, napi_callback_info info)
 
 napi_value DataSharePredicatesProxy::Between(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 3;
     napi_value args[3] = { 0 };
@@ -492,7 +474,6 @@ napi_value DataSharePredicatesProxy::Between(napi_env env, napi_callback_info in
 
 napi_value DataSharePredicatesProxy::NotBetween(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 3;
     napi_value args[3] = { 0 };
@@ -512,7 +493,6 @@ napi_value DataSharePredicatesProxy::NotBetween(napi_env env, napi_callback_info
 
 napi_value DataSharePredicatesProxy::GreaterThan(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -550,7 +530,6 @@ napi_value DataSharePredicatesProxy::GreaterThan(napi_env env, napi_callback_inf
 
 napi_value DataSharePredicatesProxy::LessThan(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -588,7 +567,6 @@ napi_value DataSharePredicatesProxy::LessThan(napi_env env, napi_callback_info i
 
 napi_value DataSharePredicatesProxy::GreaterThanOrEqualTo(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -626,7 +604,6 @@ napi_value DataSharePredicatesProxy::GreaterThanOrEqualTo(napi_env env, napi_cal
 
 napi_value DataSharePredicatesProxy::LessThanOrEqualTo(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -664,7 +641,6 @@ napi_value DataSharePredicatesProxy::LessThanOrEqualTo(napi_env env, napi_callba
 
 napi_value DataSharePredicatesProxy::OrderByAsc(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 1;
     napi_value args[1] = { 0 };
@@ -682,7 +658,6 @@ napi_value DataSharePredicatesProxy::OrderByAsc(napi_env env, napi_callback_info
 
 napi_value DataSharePredicatesProxy::OrderByDesc(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 1;
     napi_value args[1] = { 0 };
@@ -700,7 +675,6 @@ napi_value DataSharePredicatesProxy::OrderByDesc(napi_env env, napi_callback_inf
 
 napi_value DataSharePredicatesProxy::Distinct(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     napi_get_cb_info(env, info, nullptr, nullptr, &thiz, nullptr);
     auto nativePredicates = GetNativePredicates(env, info);
@@ -714,7 +688,6 @@ napi_value DataSharePredicatesProxy::Distinct(napi_env env, napi_callback_info i
 
 napi_value DataSharePredicatesProxy::Limit(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -735,7 +708,6 @@ napi_value DataSharePredicatesProxy::Limit(napi_env env, napi_callback_info info
 
 napi_value DataSharePredicatesProxy::GroupBy(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 1;
     napi_value args[1] = { 0 };
@@ -754,7 +726,6 @@ napi_value DataSharePredicatesProxy::GroupBy(napi_env env, napi_callback_info in
 
 napi_value DataSharePredicatesProxy::IndexedBy(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 1;
     napi_value args[1] = { 0 };
@@ -772,7 +743,6 @@ napi_value DataSharePredicatesProxy::IndexedBy(napi_env env, napi_callback_info 
 
 napi_value DataSharePredicatesProxy::In(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -792,7 +762,6 @@ napi_value DataSharePredicatesProxy::In(napi_env env, napi_callback_info info)
 
 napi_value DataSharePredicatesProxy::NotIn(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 2;
     napi_value args[2] = { 0 };
@@ -812,7 +781,6 @@ napi_value DataSharePredicatesProxy::NotIn(napi_env env, napi_callback_info info
 
 napi_value DataSharePredicatesProxy::PrefixKey(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 1;
     napi_value args[1] = { 0 };
@@ -830,7 +798,6 @@ napi_value DataSharePredicatesProxy::PrefixKey(napi_env env, napi_callback_info 
 
 napi_value DataSharePredicatesProxy::InKeys(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value thiz;
     size_t argc = 1;
     napi_value args[1] = { 0 };
