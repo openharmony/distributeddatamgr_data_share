@@ -358,8 +358,10 @@ int DataShareResultSet::IsColumnNull(int columnIndex, bool &isNull)
 int DataShareResultSet::Close()
 {
     DISTRIBUTED_DATA_HITRACE(std::string(__FUNCTION__));
+    LOG_INFO("DataShareResultSet close");
     DataShareAbsResultSet::Close();
     ClosedBlock();
+    bridge_ = nullptr;
     return E_OK;
 }
 
