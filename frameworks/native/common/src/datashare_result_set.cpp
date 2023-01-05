@@ -187,13 +187,10 @@ int DataShareResultSet::GetBlob(int columnIndex, std::vector<uint8_t> &value)
         }
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_INTEGER) {
-        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_INTEGER!");
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
-        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL!");
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_FLOAT) {
-        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_FLOAT!");
         return E_OK;
     } else {
         LOG_ERROR("AppDataFwk::SharedBlock::nothing !");
@@ -235,7 +232,6 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
             value = os.str();
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB) {
-        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB!");
         return E_ERROR;
     } else {
         LOG_ERROR("GetString is failed!");
@@ -278,14 +274,11 @@ int DataShareResultSet::GetLong(int columnIndex, int64_t &value)
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_FLOAT) {
         value = (int64_t)cellUnit->cell.doubleValue;
-        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_FLOAT !");
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
-        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL !");
         value = 0L;
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB) {
-        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB !");
         value = 0L;
         return E_OK;
     } else {
@@ -318,11 +311,9 @@ int DataShareResultSet::GetDouble(int columnIndex, double &value)
         value = cellUnit->cell.longValue;
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
-        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL!");
         value = 0.0;
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB) {
-        LOG_ERROR("AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB!");
         value = 0.0;
         return E_OK;
     } else {
