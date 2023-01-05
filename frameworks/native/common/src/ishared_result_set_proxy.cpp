@@ -121,6 +121,7 @@ bool ISharedResultSetProxy::OnGo(int oldRowIndex, int newRowIndex, int *cachedIn
 
 int ISharedResultSetProxy::Close()
 {
+    LOG_INFO("ISharedResultSetProxy::Close");
     DataShareResultSet::Close();
     MessageParcel request;
     request.WriteInterfaceToken(GetDescriptor());

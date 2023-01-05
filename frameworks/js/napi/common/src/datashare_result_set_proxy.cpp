@@ -346,8 +346,10 @@ napi_value DataShareResultSetProxy::GetDouble(napi_env env, napi_callback_info i
 napi_value DataShareResultSetProxy::Close(napi_env env, napi_callback_info info)
 {
     int errCode = E_ERROR;
+    LOG_INFO("DataShareResultSetProxy::Close");
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
+        LOG_INFO("innerResultSet != nullptr DataShareResultSetProxy::Close");
         errCode = innerResultSet->Close();
         if (errCode != E_OK) {
             LOG_ERROR("failed code:%{public}d", errCode);
