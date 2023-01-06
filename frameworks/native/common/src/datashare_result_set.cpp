@@ -46,6 +46,7 @@ DataShareResultSet::DataShareResultSet(std::shared_ptr<ResultSetBridge> &bridge)
         return;
     }
     sharedBlock_ = blockWriter_->GetBlock();
+    name_ = bridge_->GetName();
     if (sharedBlock_ == nullptr) {
         return;
     }
@@ -53,7 +54,8 @@ DataShareResultSet::DataShareResultSet(std::shared_ptr<ResultSetBridge> &bridge)
 
 DataShareResultSet::~DataShareResultSet()
 {
-    ClosedBlock();
+    LOG_INFO("~DataShareResultSet()");
+    Close();
 }
 
 int DataShareResultSet::GetAllColumnNames(std::vector<std::string> &columnNames)
@@ -428,6 +430,7 @@ bool DataShareResultSet::Marshalling(MessageParcel &parcel)
         LOG_ERROR("sharedBlock is null.");
         return false;
     }
+    parcel.WriteInt32(bridge_->GetName());
     return sharedBlock_->WriteMessageParcel(parcel);
 }
 
@@ -436,11 +439,17 @@ bool DataShareResultSet::Unmarshalling(MessageParcel &parcel)
     if (sharedBlock_ != nullptr) {
         return false;
     }
+    name_ = parcel.ReadInt32();
     int result = AppDataFwk::SharedBlock::ReadMessageParcel(parcel, sharedBlock_);
     if (result < 0) {
         LOG_ERROR("create from parcel error is %{public}d.", result);
     }
     return true;
+}
+
+int DataShareResultSet::GetName()
+{
+    return name_;
 }
 } // namespace DataShare
 } // namespace OHOS

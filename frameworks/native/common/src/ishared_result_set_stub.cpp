@@ -122,7 +122,8 @@ int ISharedResultSetStub::HandleOnGoRequest(MessageParcel &data, MessageParcel &
 
 int ISharedResultSetStub::HandleCloseRequest(MessageParcel &data, MessageParcel &reply)
 {
-    LOG_INFO("HandleCloseRequest");
+    LOG_INFO("ISharedResultSetStub::HandleCloseRequest");
+    LOG_INFO("ISharedResultSetStub::GetName: %{public}d", resultSet_->GetName());
     int errCode = resultSet_->Close();
     reply.WriteInt32(errCode);
     LOG_DEBUG("errCode %{public}d", errCode);
