@@ -30,10 +30,9 @@ DataShareUvQueue::DataShareUvQueue(napi_env env)
 
 void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
 {
-    LOG_DEBUG("Start");
     uv_work_t* work = new (std::nothrow) uv_work_t;
     if (work == nullptr) {
-        LOG_ERROR("invalid work.");        
+        LOG_ERROR("invalid work.");
         return;
     }
     work->data = new UvEntry {env_, std::move(func), false, false, {}, {}, std::move(retFunc)};
@@ -68,7 +67,7 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
         if (uvEntry == nullptr) {
             LOG_ERROR("invalid uvEntry.");
             return;
-        }        
+        }
         std::unique_lock<std::mutex> lock(uvEntry->mutex);
         if (uvEntry->condition.wait_for(lock, std::chrono::seconds(WAIT_TIME), [uvEntry] { return uvEntry->done; })) {
             LOG_INFO("function ended successfully");
@@ -88,7 +87,6 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
 
 void DataShareUvQueue::Purge(uv_work_t* work)
 {
-    LOG_DEBUG("Start");
     if (work == nullptr || work->data == nullptr) {
         LOG_ERROR("invalid work or work->data.");
         return;
@@ -109,7 +107,6 @@ void DataShareUvQueue::CheckFuncAndExec(NapiBoolFunc retFunc)
     if (retFunc) {
         int tryTimes = TRY_TIMES;
         while (retFunc() != true && tryTimes > 0) {
-            LOG_DEBUG("tryTimes : %{public}d.", tryTimes);
             std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
             tryTimes--;
         }

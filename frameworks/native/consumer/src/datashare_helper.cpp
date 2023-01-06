@@ -65,7 +65,6 @@ DataShareHelper::~DataShareHelper()
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
     const std::shared_ptr<Context> &context, const std::string &strUri)
 {
-    LOG_DEBUG("Creator with context and uri called start");
     if (context == nullptr) {
         LOG_ERROR("DataShareHelper::Creator failed, context == nullptr");
         return nullptr;
@@ -86,7 +85,6 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
  */
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObject> &token, const std::string &strUri)
 {
-    LOG_DEBUG("Creator with runtime token and uri called start");
     if (token == nullptr) {
         LOG_ERROR("token == nullptr");
         return nullptr;
@@ -141,7 +139,6 @@ bool DataShareHelper::Release()
  */
 std::vector<std::string> DataShareHelper::GetFileTypes(Uri &uri, const std::string &mimeTypeFilter)
 {
-    LOG_DEBUG("Start");
     std::vector<std::string> matchedMIMEs;
     auto connection = connection_;
     if (connection == nullptr) {
@@ -174,7 +171,6 @@ std::vector<std::string> DataShareHelper::GetFileTypes(Uri &uri, const std::stri
  */
 int DataShareHelper::OpenFile(Uri &uri, const std::string &mode)
 {
-    LOG_DEBUG("Start");
     int fd = INVALID_VALUE;
     auto connection = connection_;
     if (connection == nullptr) {
@@ -208,7 +204,6 @@ int DataShareHelper::OpenFile(Uri &uri, const std::string &mode)
  */
 int DataShareHelper::OpenRawFile(Uri &uri, const std::string &mode)
 {
-    LOG_DEBUG("Start");
     int fd = INVALID_VALUE;
     auto connection = connection_;
     if (connection == nullptr) {
@@ -238,7 +233,6 @@ int DataShareHelper::OpenRawFile(Uri &uri, const std::string &mode)
  */
 int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
 {
-    LOG_DEBUG("Start");
     int index = INVALID_VALUE;
     auto connection = connection_;
     if (connection == nullptr) {
@@ -269,7 +263,6 @@ int DataShareHelper::Insert(Uri &uri, const DataShareValuesBucket &value)
  */
 int DataShareHelper::Update(Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
 {
-    LOG_DEBUG("Start");
     int index = INVALID_VALUE;
     auto connection = connection_;
     if (connection == nullptr) {
@@ -299,7 +292,6 @@ int DataShareHelper::Update(Uri &uri, const DataSharePredicates &predicates, con
  */
 int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
 {
-    LOG_DEBUG("Start");
     int index = INVALID_VALUE;
     auto connection = connection_;
     if (connection == nullptr) {
@@ -331,7 +323,6 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
 std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
     Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns)
 {
-    LOG_DEBUG("Start");
     std::shared_ptr<DataShareResultSet> resultset = nullptr;
 
     auto connection = connection_;
@@ -362,7 +353,6 @@ std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
  */
 std::string DataShareHelper::GetType(Uri &uri)
 {
-    LOG_DEBUG("Start");
     std::string type;
 
     auto connection = connection_;
@@ -393,7 +383,6 @@ std::string DataShareHelper::GetType(Uri &uri)
  */
 int DataShareHelper::BatchInsert(Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
-    LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
     auto connection = connection_;
     if (connection == nullptr) {
@@ -427,7 +416,6 @@ void DataShareHelper::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAb
         return;
     }
     if (isDataShareService_) {
-        LOG_DEBUG("DataShareService mode.");
         if (!RegObserver(uri, dataObserver)) {
             LOG_ERROR("RegisterObserver failed");
         }
@@ -468,7 +456,6 @@ void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IData
     }
 
     if (isDataShareService_) {
-        LOG_DEBUG("DataShareService mode.");
         if (!UnregObserver(uri, dataObserver)) {
             LOG_ERROR("UnregisterObserver failed");
         }
@@ -495,7 +482,6 @@ void DataShareHelper::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IData
  */
 void DataShareHelper::NotifyChange(const Uri &uri)
 {
-    LOG_DEBUG("Start");
     auto connection = connection_;
     if (connection == nullptr) {
         LOG_ERROR("dataShareConnection_ is nullptr");
@@ -527,7 +513,6 @@ void DataShareHelper::NotifyChange(const Uri &uri)
  */
 Uri DataShareHelper::NormalizeUri(Uri &uri)
 {
-    LOG_DEBUG("Start");
     Uri uriValue("");
     auto connection = connection_;
     if (connection == nullptr) {
@@ -559,7 +544,6 @@ Uri DataShareHelper::NormalizeUri(Uri &uri)
  */
 Uri DataShareHelper::DenormalizeUri(Uri &uri)
 {
-    LOG_DEBUG("Start");
     Uri uriValue("");
     auto connection = connection_;
     if (connection == nullptr) {

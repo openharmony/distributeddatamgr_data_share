@@ -36,7 +36,6 @@ constexpr int WAIT_TIME = 3;
 void DataShareConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    LOG_DEBUG("Start");
     if (remoteObject == nullptr) {
         LOG_ERROR("remote is nullptr");
         return;
@@ -44,7 +43,6 @@ void DataShareConnection::OnAbilityConnectDone(
     std::unique_lock<std::mutex> lock(condition_.mutex);
     SetDataShareProxy(iface_cast<DataShareProxy>(remoteObject));
     condition_.condition.notify_all();
-    LOG_DEBUG("End");
 }
 
 /**
@@ -59,11 +57,9 @@ void DataShareConnection::OnAbilityConnectDone(
 void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
     {
-        LOG_DEBUG("Start");
         std::unique_lock<std::mutex> lock(condition_.mutex);
         SetDataShareProxy(nullptr);
         condition_.condition.notify_all();
-        LOG_DEBUG("End");
     }
     if (!uri_.ToString().empty()) {
         LOG_INFO("uri : %{public}s disconnect,start reconnect", uri_.ToString().c_str());
@@ -77,11 +73,9 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
 bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> token)
 {
     if (dataShareProxy_ != nullptr) {
-        LOG_DEBUG("dataShareProxy has connected");
         return true;
     }
 
-    LOG_DEBUG("Start");
     AAFwk::Want want;
     if (uri_.ToString().empty()) {
         want.SetUri(uri);
@@ -108,10 +102,8 @@ bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
 void DataShareConnection::DisconnectDataShareExtAbility()
 {
     if (dataShareProxy_ == nullptr) {
-        LOG_DEBUG("dataShareProxy has disConnected");
         return;
     }
-    LOG_DEBUG("Start");
     std::unique_lock<std::mutex> lock(condition_.mutex);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(this);
     if (ret != ERR_OK) {

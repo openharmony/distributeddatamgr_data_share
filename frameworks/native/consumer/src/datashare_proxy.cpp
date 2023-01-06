@@ -31,7 +31,6 @@ constexpr int32_t PERMISSION_ERR = 1;
 constexpr int PERMISSION_ERR_CODE = -2;
 std::vector<std::string> DataShareProxy::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
 {
-    LOG_DEBUG("Start");
     std::vector<std::string> types;
 
     MessageParcel data;
@@ -67,7 +66,6 @@ std::vector<std::string> DataShareProxy::GetFileTypes(const Uri &uri, const std:
 
 int DataShareProxy::OpenFile(const Uri &uri, const std::string &mode)
 {
-    LOG_DEBUG("Start");
     int fd = -1;
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
@@ -104,7 +102,6 @@ int DataShareProxy::OpenFile(const Uri &uri, const std::string &mode)
 
 int DataShareProxy::OpenRawFile(const Uri &uri, const std::string &mode)
 {
-    LOG_DEBUG("Start");
     int fd = -1;
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
@@ -140,7 +137,6 @@ int DataShareProxy::OpenRawFile(const Uri &uri, const std::string &mode)
 
 int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
-    LOG_DEBUG("Start");
     int index = -1;
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
@@ -177,7 +173,6 @@ int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
 int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates,
     const DataShareValuesBucket &value)
 {
-    LOG_DEBUG("Start");
     int index = -1;
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
@@ -218,7 +213,6 @@ int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates
 
 int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
-    LOG_DEBUG("Start");
     int index = -1;
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {

@@ -115,7 +115,6 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
 
 void JsDataShareExtAbility::OnStart(const AAFwk::Want &want)
 {
-    LOG_DEBUG("Start");
     Extension::OnStart(want);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -127,7 +126,6 @@ void JsDataShareExtAbility::OnStart(const AAFwk::Want &want)
 
 sptr<IRemoteObject> JsDataShareExtAbility::OnConnect(const AAFwk::Want &want)
 {
-    LOG_DEBUG("Start");
     Extension::OnConnect(want);
     sptr<DataShareStubImpl> remoteObject = new (std::nothrow) DataShareStubImpl(
         std::static_pointer_cast<JsDataShareExtAbility>(shared_from_this()),
@@ -143,7 +141,6 @@ void JsDataShareExtAbility::CheckAndSetAsyncResult(NativeEngine* engine)
 {
     auto result = GetAsyncResult();
     auto type = result->TypeOf();
-    LOG_DEBUG("type : %{public}d", type);
     if (type == NATIVE_NUMBER) {
         int32_t value = OHOS::AppExecFwk::UnwrapInt32FromJS(reinterpret_cast<napi_env>(engine),
             reinterpret_cast<napi_value>(result));
@@ -157,7 +154,6 @@ void JsDataShareExtAbility::CheckAndSetAsyncResult(NativeEngine* engine)
         napi_unwrap(reinterpret_cast<napi_env>(engine), reinterpret_cast<napi_value>(result),
             reinterpret_cast<void **>(&proxy));
         if (proxy == nullptr) {
-            LOG_DEBUG("proxy == nullptr. STRARR.");
             std::vector<std::string> value;
             OHOS::AppExecFwk::UnwrapArrayStringFromJS(reinterpret_cast<napi_env>(engine),
                 reinterpret_cast<napi_value>(result), value);
@@ -280,7 +276,6 @@ void JsDataShareExtAbility::GetSrcPath(std::string &srcPath)
 
 std::vector<std::string> JsDataShareExtAbility::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
 {
-    LOG_DEBUG("Start");
     auto ret = DataShareExtAbility::GetFileTypes(uri, mimeTypeFilter);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -308,7 +303,6 @@ std::vector<std::string> JsDataShareExtAbility::GetFileTypes(const Uri &uri, con
 
 int JsDataShareExtAbility::OpenFile(const Uri &uri, const std::string &mode)
 {
-    LOG_DEBUG("Start");
     auto ret = DataShareExtAbility::OpenFile(uri, mode);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -336,7 +330,6 @@ int JsDataShareExtAbility::OpenFile(const Uri &uri, const std::string &mode)
 
 int JsDataShareExtAbility::OpenRawFile(const Uri &uri, const std::string &mode)
 {
-    LOG_DEBUG("Start");
     auto ret = DataShareExtAbility::OpenRawFile(uri, mode);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -364,7 +357,6 @@ int JsDataShareExtAbility::OpenRawFile(const Uri &uri, const std::string &mode)
 
 int JsDataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
-    LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
     ret = DataShareExtAbility::Insert(uri, value);
     HandleScope handleScope(jsRuntime_);
@@ -392,7 +384,6 @@ int JsDataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &v
 int JsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &predicates,
     const DataShareValuesBucket &value)
 {
-    LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
     ret = DataShareExtAbility::Update(uri, predicates, value);
     HandleScope handleScope(jsRuntime_);
@@ -406,7 +397,6 @@ int JsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pre
 
     napi_value napiPredicates = MakePredicates(env, predicates);
     if (napiPredicates == nullptr) {
-        LOG_DEBUG("failed to make new instance of dataSharePredicates.");
         return ret;
     }
 
@@ -427,7 +417,6 @@ int JsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pre
 
 int JsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
-    LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
     ret = DataShareExtAbility::Delete(uri, predicates);
     HandleScope handleScope(jsRuntime_);
@@ -441,7 +430,6 @@ int JsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &pre
 
     napi_value napiPredicates = MakePredicates(env, predicates);
     if (napiPredicates == nullptr) {
-        LOG_DEBUG("failed to make new instance of dataSharePredicates.");
         return ret;
     }
 
@@ -456,7 +444,6 @@ int JsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &pre
 std::shared_ptr<DataShareResultSet> JsDataShareExtAbility::Query(const Uri &uri,
     const DataSharePredicates &predicates, std::vector<std::string> &columns)
 {
-    LOG_DEBUG("Start");
     std::shared_ptr<DataShareResultSet> ret;
     ret = DataShareExtAbility::Query(uri, predicates, columns);
 
@@ -471,7 +458,6 @@ std::shared_ptr<DataShareResultSet> JsDataShareExtAbility::Query(const Uri &uri,
 
     napi_value napiPredicates = MakePredicates(env, predicates);
     if (napiPredicates == nullptr) {
-        LOG_DEBUG("failed to make new instance of dataSharePredicates.");
         return ret;
     }
 
@@ -492,7 +478,6 @@ std::shared_ptr<DataShareResultSet> JsDataShareExtAbility::Query(const Uri &uri,
 
 std::string JsDataShareExtAbility::GetType(const Uri &uri)
 {
-    LOG_DEBUG("Start");
     auto ret = DataShareExtAbility::GetType(uri);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -512,7 +497,6 @@ std::string JsDataShareExtAbility::GetType(const Uri &uri)
 
 int JsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
-    LOG_DEBUG("Start");
     int ret = INVALID_VALUE;
     ret = DataShareExtAbility::BatchInsert(uri, values);
 
@@ -556,7 +540,6 @@ int JsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataSha
 
 bool JsDataShareExtAbility::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    LOG_DEBUG("Start");
     DataShareExtAbility::RegisterObserver(uri, dataObserver);
     auto obsMgrClient = DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
@@ -574,7 +557,6 @@ bool JsDataShareExtAbility::RegisterObserver(const Uri &uri, const sptr<AAFwk::I
 
 bool JsDataShareExtAbility::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    LOG_DEBUG("Start");
     DataShareExtAbility::UnregisterObserver(uri, dataObserver);
     auto obsMgrClient = DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
@@ -592,7 +574,6 @@ bool JsDataShareExtAbility::UnregisterObserver(const Uri &uri, const sptr<AAFwk:
 
 bool JsDataShareExtAbility::NotifyChange(const Uri &uri)
 {
-    LOG_DEBUG("Start");
     DataShareExtAbility::NotifyChange(uri);
     auto obsMgrClient = DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
@@ -610,7 +591,6 @@ bool JsDataShareExtAbility::NotifyChange(const Uri &uri)
 
 Uri JsDataShareExtAbility::NormalizeUri(const Uri &uri)
 {
-    LOG_DEBUG("Start");
     auto ret = DataShareExtAbility::NormalizeUri(uri);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -630,7 +610,6 @@ Uri JsDataShareExtAbility::NormalizeUri(const Uri &uri)
 
 Uri JsDataShareExtAbility::DenormalizeUri(const Uri &uri)
 {
-    LOG_DEBUG("Start");
     auto ret = DataShareExtAbility::DenormalizeUri(uri);
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
@@ -650,7 +629,6 @@ Uri JsDataShareExtAbility::DenormalizeUri(const Uri &uri)
 
 napi_value JsDataShareExtAbility::MakePredicates(napi_env env, const DataSharePredicates &predicates)
 {
-    LOG_DEBUG("Start");
     std::shared_ptr<DataSharePredicates> predicatesPtr = std::make_shared<DataSharePredicates>(predicates);
     if (predicatesPtr == nullptr) {
         LOG_ERROR("No memory allocated for predicates");
