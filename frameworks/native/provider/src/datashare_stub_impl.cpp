@@ -35,7 +35,6 @@ std::shared_ptr<JsDataShareExtAbility> DataShareStubImpl::GetOwner()
 
 bool DataShareStubImpl::CheckCallingPermission(const std::string &permission)
 {
-    LOG_DEBUG("Start");
     if (!permission.empty() && AccessTokenKit::VerifyAccessToken(IPCSkeleton::GetCallingTokenID(), permission)
         != AppExecFwk::Constants::PERMISSION_GRANTED) {
         LOG_ERROR("permission not granted.");
@@ -46,7 +45,6 @@ bool DataShareStubImpl::CheckCallingPermission(const std::string &permission)
 
 std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
 {
-    LOG_DEBUG("Start");
     std::vector<std::string> ret;
     std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
         auto extension = client->GetOwner();
@@ -69,7 +67,6 @@ std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const s
 
 int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
 {
-    LOG_DEBUG("Start");
     int ret = -1;
     std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
         auto extension = client->GetOwner();
@@ -92,7 +89,6 @@ int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
 
 int DataShareStubImpl::OpenRawFile(const Uri &uri, const std::string &mode)
 {
-    LOG_DEBUG("Start");
     int ret = -1;
     std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
         auto extension = client->GetOwner();
@@ -107,7 +103,6 @@ int DataShareStubImpl::OpenRawFile(const Uri &uri, const std::string &mode)
 
 int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
-    LOG_DEBUG("Start");
     CallingInfo info;
     GetCallingInfo(info);
 
@@ -142,7 +137,6 @@ int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value
 int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predicates,
     const DataShareValuesBucket &value)
 {
-    LOG_DEBUG("Start");
     CallingInfo info;
     GetCallingInfo(info);
 
@@ -176,7 +170,6 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
 
 int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
-    LOG_DEBUG("Start");
     CallingInfo info;
     GetCallingInfo(info);
 
@@ -211,7 +204,6 @@ int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predica
 std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
     const DataSharePredicates &predicates, std::vector<std::string> &columns)
 {
-    LOG_DEBUG("Start");
     CallingInfo info;
     GetCallingInfo(info);
     std::shared_ptr<DataShareResultSet> resultSet = nullptr;
@@ -245,7 +237,6 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
 
 std::string DataShareStubImpl::GetType(const Uri &uri)
 {
-    LOG_DEBUG("Start");
     std::string ret = "";
     std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
         auto extension = client->GetOwner();
@@ -268,7 +259,6 @@ std::string DataShareStubImpl::GetType(const Uri &uri)
 
 int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
-    LOG_DEBUG("Start");
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
     if (extension == nullptr) {
@@ -302,7 +292,6 @@ int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareVa
 
 bool DataShareStubImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    LOG_DEBUG("Start");
     auto extension = GetOwner();
     if (extension == nullptr) {
         return false;
@@ -312,7 +301,6 @@ bool DataShareStubImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IData
 
 bool DataShareStubImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    LOG_DEBUG("Start");
     auto extension = GetOwner();
     if (extension == nullptr) {
         return false;
@@ -322,7 +310,6 @@ bool DataShareStubImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDa
 
 bool DataShareStubImpl::NotifyChange(const Uri &uri)
 {
-    LOG_DEBUG("Start");
     bool ret = false;
     std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
         auto extension = client->GetOwner();
@@ -337,7 +324,6 @@ bool DataShareStubImpl::NotifyChange(const Uri &uri)
 
 Uri DataShareStubImpl::NormalizeUri(const Uri &uri)
 {
-    LOG_DEBUG("Start");
     Uri urivalue("");
     std::function<void()> syncTaskFunc = [=, &urivalue, client = sptr<DataShareStubImpl>(this)]() {
         auto extension = client->GetOwner();
@@ -363,7 +349,6 @@ Uri DataShareStubImpl::NormalizeUri(const Uri &uri)
 
 Uri DataShareStubImpl::DenormalizeUri(const Uri &uri)
 {
-    LOG_DEBUG("Start");
     Uri urivalue("");
     std::function<void()> syncTaskFunc = [=, &urivalue, client = sptr<DataShareStubImpl>(this)]() {
         auto extension = client->GetOwner();

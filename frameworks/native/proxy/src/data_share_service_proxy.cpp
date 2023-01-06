@@ -28,7 +28,6 @@ DataShareServiceProxy::DataShareServiceProxy(const sptr<IRemoteObject> &object)
 
 int32_t DataShareServiceProxy::Insert(const std::string &uri, const DataShareValuesBucket &valuesBucket)
 {
-    LOG_DEBUG("Proxy insert start.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed!");
@@ -52,7 +51,6 @@ int32_t DataShareServiceProxy::Insert(const std::string &uri, const DataShareVal
 int32_t DataShareServiceProxy::Update(
     const std::string &uri, const DataSharePredicates &predicate, const DataShareValuesBucket &valuesBucket)
 {
-    LOG_DEBUG("Proxy update start.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed!");
@@ -75,7 +73,6 @@ int32_t DataShareServiceProxy::Update(
 
 int32_t DataShareServiceProxy::Delete(const std::string &uri, const DataSharePredicates &predicate)
 {
-    LOG_DEBUG("Proxy delete start.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed!");
@@ -99,7 +96,6 @@ int32_t DataShareServiceProxy::Delete(const std::string &uri, const DataSharePre
 std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
     const std::string &uri, const DataSharePredicates &predicates, const std::vector<std::string> &columns)
 {
-    LOG_DEBUG("Proxy query start.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed!");

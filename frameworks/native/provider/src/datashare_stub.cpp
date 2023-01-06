@@ -51,7 +51,6 @@ DataShareStub::~DataShareStub()
 int DataShareStub::OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
     MessageOption& option)
 {
-    LOG_INFO("Received stub message: %{public}d", code);
     std::u16string descriptor = DataShareStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
