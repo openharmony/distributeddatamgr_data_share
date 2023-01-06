@@ -89,7 +89,7 @@ int DataShareAbsResultSet::GoTo(int offset)
 {
     int ret = GoToRow(rowPos_ + offset);
     if (ret != E_OK) {
-        LOG_ERROR("return ret is wrong!");
+        LOG_WARN("return GoTo ret is wrong!");
     }
     return ret;
 }
@@ -99,7 +99,7 @@ int DataShareAbsResultSet::GoToFirstRow()
     DISTRIBUTED_DATA_HITRACE(std::string(__FUNCTION__));
     int ret = GoToRow(0);
     if (ret != E_OK) {
-        LOG_ERROR("return ret is wrong!");
+        LOG_WARN("return GoToFirstRow ret is wrong!");
     }
     return ret;
 }
@@ -109,13 +109,13 @@ int DataShareAbsResultSet::GoToLastRow()
     int rowCnt = 0;
     int ret = GetRowCount(rowCnt);
     if (ret != E_OK) {
-        LOG_ERROR("return GetRowCount ret is wrong!");
+        LOG_WARN("return GoToLastRow.GetRowCount ret is wrong!");
         return ret;
     }
 
     ret = GoToRow(rowCnt - 1);
     if (ret != E_OK) {
-        LOG_ERROR("return GoToRow ret is wrong!");
+        LOG_ERROR("return GoToLastRow.GoToRow ret is wrong!");
     }
     return ret;
 }
@@ -124,7 +124,7 @@ int DataShareAbsResultSet::GoToNextRow()
 {
     int ret = GoToRow(rowPos_ + 1);
     if (ret != E_OK) {
-        LOG_ERROR("return GoToRow ret is wrong!");
+        LOG_WARN("return GoToNextRow ret is wrong!");
     }
     return ret;
 }
@@ -133,7 +133,7 @@ int DataShareAbsResultSet::GoToPreviousRow()
 {
     int ret = GoToRow(rowPos_ - 1);
     if (ret != E_OK) {
-        LOG_ERROR("return GoToRow ret is wrong!");
+        LOG_WARN("return GoToPreviousRow ret is wrong!");
     }
     return ret;
 }
