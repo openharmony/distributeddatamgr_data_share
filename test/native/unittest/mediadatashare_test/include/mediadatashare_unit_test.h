@@ -17,6 +17,7 @@
 #define MEDIA_DATASHARE_UNIT_TEST_H
 
 #include <gtest/gtest.h>
+#include "data_ability_observer_interface.h"
 
 namespace OHOS {
 namespace Media {
@@ -33,6 +34,18 @@ public:
 
     /* TearDown:Execute after each test case */
     void TearDown();
+};
+
+class IDataShareObserverTest : public AAFwk::IDataAbilityObserver {
+public:
+    IDataShareObserverTest();
+    ~IDataShareObserverTest()
+    {}
+
+    void OnChange()
+    {
+        GTEST_LOG_(INFO) << "OnChange enter";
+    }
 };
 } // namespace Media
 } // namespace OHOS
