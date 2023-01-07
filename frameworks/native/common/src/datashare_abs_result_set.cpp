@@ -115,7 +115,7 @@ int DataShareAbsResultSet::GoToLastRow()
 
     ret = GoToRow(rowCnt - 1);
     if (ret != E_OK) {
-        LOG_ERROR("return GoToLastRow.GoToRow ret is wrong!");
+        LOG_WARN("return GoToLastRow.GoToRow ret is wrong!");
     }
     return ret;
 }
