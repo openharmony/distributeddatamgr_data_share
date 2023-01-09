@@ -545,7 +545,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_020, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_020::Start");
     DataShare::DataSharePredicates predicates;
     predicates.SetSettingMode(DataShare::SettingMode::PREDICATES_METHOD);
-    DataShare::SettingMode setting = predicates.GetSettingMode();
+    int16_t setting = predicates.GetSettingMode();
     EXPECT_EQ(setting, DataShare::SettingMode::PREDICATES_METHOD);
     LOG_INFO("MediaDataShare_Predicates_Test_020, End");
 }
