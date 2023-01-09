@@ -52,7 +52,6 @@ public:
     virtual void SetBlock(AppDataFwk::SharedBlock *block);
     int Close() override;
     bool HasBlock() const;
-    int GetName();
 
 protected:
     int CheckState(int columnIndex);
@@ -74,7 +73,6 @@ private:
     AppDataFwk::SharedBlock *sharedBlock_  = nullptr;
     std::shared_ptr<DataShareBlockWriterImpl> blockWriter_ = nullptr;
     std::shared_ptr<ResultSetBridge> bridge_ = nullptr;
-    int name_ = 0;
 };
 } // namespace DataShare
 } // namespace OHOS
