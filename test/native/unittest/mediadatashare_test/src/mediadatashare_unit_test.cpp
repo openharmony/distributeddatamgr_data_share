@@ -540,15 +540,15 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_019, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_019, End");
 }
 
-// HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_020, TestSize.Level0)
-// {
-//     LOG_INFO("MediaDataShare_Predicates_Test_020::Start");
-//     DataShare::DataSharePredicates predicates;
-//     predicates.SetSettingMode(DataShare::SettingMode::PREDICATES_METHOD);
-//     DataShare::SettingMode setting = predicates.GetSettingMode();
-//     EXPECT_EQ(setting, DataShare::SettingMode::PREDICATES_METHOD);
-//     LOG_INFO("MediaDataShare_Predicates_Test_020, End");
-// }
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_020, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_Predicates_Test_020::Start");
+    DataShare::DataSharePredicates predicates;
+    predicates.SetSettingMode(DataShare::SettingMode::PREDICATES_METHOD);
+    DataShare::SettingMode setting = predicates.GetSettingMode();
+    EXPECT_EQ(setting, DataShare::SettingMode::PREDICATES_METHOD);
+    LOG_INFO("MediaDataShare_Predicates_Test_020, End");
+}
 
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_021, TestSize.Level0)
 {
