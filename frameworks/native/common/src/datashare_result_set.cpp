@@ -53,7 +53,7 @@ DataShareResultSet::DataShareResultSet(std::shared_ptr<ResultSetBridge> &bridge)
 
 DataShareResultSet::~DataShareResultSet()
 {
-    ClosedBlock();
+    Close();
 }
 
 int DataShareResultSet::GetAllColumnNames(std::vector<std::string> &columnNames)
@@ -350,6 +350,7 @@ int DataShareResultSet::Close()
     DISTRIBUTED_DATA_HITRACE(std::string(__FUNCTION__));
     DataShareAbsResultSet::Close();
     ClosedBlock();
+    bridge_ = nullptr;
     return E_OK;
 }
 
