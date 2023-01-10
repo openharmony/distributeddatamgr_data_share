@@ -52,6 +52,7 @@ public:
     virtual void SetBlock(AppDataFwk::SharedBlock *block);
     int Close() override;
     bool HasBlock() const;
+    void SetUri(const std::string &uri);
 
 protected:
     int CheckState(int columnIndex);
@@ -62,6 +63,8 @@ protected:
     friend class ISharedResultSetProxy;
     bool Unmarshalling(MessageParcel &parcel);
     bool Marshalling(MessageParcel &parcel);
+
+    std::string uri_ = "";
 
 private:
     static int blockId_;

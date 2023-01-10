@@ -19,6 +19,9 @@
 #include "datashare_errno.h"
 #include "datashare_log.h"
 #include "iremote_proxy.h"
+#ifdef EFFICIENCY_MANAGER_ENABLE
+#include "suspend_manager_client.h"
+#endif
 
 namespace OHOS::DataShare {
 std::function<std::shared_ptr<DataShareResultSet>(MessageParcel &parcel)> ISharedResultSet::consumerCreator_ =
@@ -52,6 +55,7 @@ int ISharedResultSetProxy::GetAllColumnNames(std::vector<std::string> &columnNam
     request.WriteInterfaceToken(GetDescriptor());
     MessageParcel reply;
     MessageOption msgOption;
+    ReportEventToSuspendManager(uri_);
     int errCode = Remote()->SendRequest(FUNC_GET_ALL_COLUMN_NAMES, request, reply, msgOption);
     if (errCode != 0) {
         LOG_ERROR("IPC Error %{public}x", errCode);
@@ -80,6 +84,7 @@ int ISharedResultSetProxy::GetRowCount(int &count)
     request.WriteInterfaceToken(GetDescriptor());
     MessageParcel reply;
     MessageOption msgOption;
+    ReportEventToSuspendManager(uri_);
     int errCode = Remote()->SendRequest(FUNC_GET_ROW_COUNT, request, reply, msgOption);
     if (errCode != 0) {
         LOG_ERROR("IPC Error %{public}x", errCode);
@@ -104,6 +109,7 @@ bool ISharedResultSetProxy::OnGo(int oldRowIndex, int newRowIndex, int *cachedIn
     request.WriteInt32(newRowIndex);
     MessageParcel reply;
     MessageOption msgOption;
+    ReportEventToSuspendManager(uri_);
     int errCode = Remote()->SendRequest(FUNC_ON_GO, request, reply, msgOption);
     if (errCode != 0) {
         LOG_ERROR("IPC Error %{public}x", errCode);
@@ -126,11 +132,21 @@ int ISharedResultSetProxy::Close()
     request.WriteInterfaceToken(GetDescriptor());
     MessageParcel reply;
     MessageOption msgOption;
+    ReportEventToSuspendManager(uri_);
     int errCode = Remote()->SendRequest(FUNC_CLOSE, request, reply, msgOption);
     if (errCode != 0) {
         LOG_ERROR("IPC Error %{public}x", errCode);
         return -errCode;
     }
     return reply.ReadInt32();
+}
+
+void ISharedResultSetProxy::ReportEventToSuspendManager(const std::string &uriString) const
+{
+#ifdef EFFICIENCY_MANAGER_ENABLE
+    OHOS::SuspendManager::AppInfo appInfo(-1, -1, uriString, "", "THAW_BY_DATASHARE_EXTENSION_CALLED");
+    appInfo.SetIsExtension(true);
+    OHOS::SuspendManager::SuspendManagerClient::GetInstance().ThawOneAppByAppInfo(appInfo);
+#endif
 }
 } // namespace OHOS::DataShare
