@@ -351,7 +351,7 @@ std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
     }
 
     if (resultset) {
-        resultset->SetUri(uri.ToString());
+        resultset->SetUri(connection->GetUriString());
     }
 
     return resultset;

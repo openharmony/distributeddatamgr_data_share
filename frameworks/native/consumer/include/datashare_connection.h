@@ -62,6 +62,12 @@ public:
     bool ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> token);
 
     /**
+     * @brief Get string of member uri_.
+     * @return string of memner uri_.
+     */
+    std::string GetUriString() const;
+
+    /**
      * @brief get the proxy of datashare extension ability.
      *
      * @return the proxy of datashare extension ability.

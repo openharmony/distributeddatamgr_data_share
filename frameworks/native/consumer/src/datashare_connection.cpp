@@ -170,6 +170,11 @@ bool DataShareConnection::IsConnected()
     return dataShareProxy_ != nullptr;
 }
 
+std::string DataShareConnection::GetUriString() const
+{
+    return uri_.ToString();
+}
+
 void DataShareConnection::ReportEventToSuspendManager(const std::string &uriString) const
 {
 #ifdef EFFICIENCY_MANAGER_ENABLE
