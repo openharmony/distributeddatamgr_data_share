@@ -173,7 +173,7 @@ bool DataShareConnection::IsConnected()
 void DataShareConnection::ReportEventToSuspendManager(const std::string &uriString) const
 {
 #ifdef EFFICIENCY_MANAGER_ENABLE
-    OHOS::SuspendManager::AppInfo appInfo(-1, -1, uriString, "", "THAW_BY_START_NOT_PAGE_ABILITY");
+    OHOS::SuspendManager::AppInfo appInfo(-1, -1, uriString, "", "THAW_BY_DATASHARE_EXTENSION_CALLED");
     appInfo.SetIsExtension(true);
     OHOS::SuspendManager::SuspendManagerClient::GetInstance().ThawOneAppByAppInfo(appInfo);
 #endif

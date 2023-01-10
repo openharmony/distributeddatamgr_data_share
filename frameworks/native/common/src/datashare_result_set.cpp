@@ -232,7 +232,7 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
         double tempValue = cellUnit->cell.doubleValue;
         std::ostringstream os;
         if (os << tempValue) {
-            value = os.str();            
+            value = os.str();
         }
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
@@ -439,6 +439,13 @@ bool DataShareResultSet::Unmarshalling(MessageParcel &parcel)
         LOG_ERROR("create from parcel error is %{public}d.", result);
     }
     return true;
+}
+
+void DataShareResultSet::SetUri(const std::string &uri)
+{
+    if (!uri.empty()) {
+        uri_ = uri;
+    }
 }
 } // namespace DataShare
 } // namespace OHOS
