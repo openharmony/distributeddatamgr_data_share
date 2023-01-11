@@ -886,17 +886,17 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_003, TestSize.Lev
     Uri uri(MEDIALIBRARY_DATA_URI);
     auto resultSet = helper->Query(uri, predicates, columns);
     AppDataFwk::SharedBlock *block = nullptr;
-    if (resultSet != nullptr) {
-        bool hasBlock = resultSet->HasBlock();
-        EXPECT_EQ(hasBlock, true);
-        block = resultSet->GetBlock();
-        EXPECT_NE(block, nullptr);
+    ASSERT_TRUE(resultSet != nullptr);
+    
+    bool hasBlock = resultSet->HasBlock();
+    EXPECT_EQ(hasBlock, true);
+    block = resultSet->GetBlock();
+    EXPECT_NE(block, nullptr);
 
-        resultSet->SetBlock(block);
-        EXPECT_EQ(block, resultSet->GetBlock());
-        resultSet->FillBlock(0, block);
-        EXPECT_EQ(block, resultSet->GetBlock());
-    }
+    resultSet->SetBlock(block);
+    EXPECT_EQ(block, resultSet->GetBlock());
+    resultSet->FillBlock(0, block);
+    EXPECT_EQ(block, resultSet->GetBlock());
     LOG_INFO("MediaDataShare_ResultSet_Test_003, End");
 }
 
@@ -946,6 +946,41 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_005, TestSize.Lev
     bool flag = resultSet.OnGo(0, 1);
     EXPECT_EQ(flag, false);
     LOG_INFO("MediaDataShare_ResultSet_Test_005, End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_006, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_ResultSet_Test_006::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    ASSERT_TRUE(helper != nullptr);
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    int value = 1112;
+    valuesBucket.Put(MEDIA_DATA_DB_PARENT_ID, value);
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
+
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(MEDIA_DATA_DB_PARENT_ID, value);
+    vector<string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    int columnIndex = 0;
+    int result = 0;
+    ASSERT_TRUE(resultSet != nullptr);
+    resultSet->GoToFirstRow();
+    resultSet->GetColumnIndex(MEDIA_DATA_DB_PARENT_ID, columnIndex);
+    DataShare::DataType dt;
+    resultSet->GetDataType(0, dt);
+    EXPECT_EQ(dt, DataShare::DataType::TYPE_INTEGER);
+    resultSet->GetInt(columnIndex, result);
+    EXPECT_EQ(result, value);
+
+    DataShare::DataSharePredicates deletePredicates;
+    std::string selections = MEDIA_DATA_DB_PARENT_ID + " = 1112";
+    deletePredicates.SetWhereClause(selections);
+    retVal = helper->Delete(uri, deletePredicates);
+    EXPECT_EQ((retVal >= 0), true);
+    LOG_INFO("MediaDataShare_ResultSet_Test_006, End");
 }
 
 HWTEST_F(MediaDataShareUnitTest, Creator_ContextNull_Test_001, TestSize.Level0)
