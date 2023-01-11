@@ -948,6 +948,42 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_005, TestSize.Lev
     LOG_INFO("MediaDataShare_ResultSet_Test_005, End");
 }
 
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_006, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_ResultSet_Test_006::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    ASSERT_TRUE(helper != nullptr);
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    int value = 1112;
+    valuesBucket.Put(MEDIA_DATA_DB_PARENT_ID, value);
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
+
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(MEDIA_DATA_DB_PARENT_ID, value);
+    vector<string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    int columnIndex = 0;
+    int result = 0;
+    if (resultSet != nullptr) {
+        resultSet->GoToFirstRow();
+        resultSet->GetColumnIndex(MEDIA_DATA_DB_PARENT_ID, columnIndex);
+        DataType dt;
+        resultSet->columnIndex(0, dt);
+        EXPECT_EQ(dt, DataType::TYPE_INTEGER);
+        resultSet->GetInt(columnIndex, result);
+        EXPECT_EQ(result, value);
+    }
+
+    DataShare::DataSharePredicates deletePredicates;
+    selections = MEDIA_DATA_DB_PARENT_ID + " = 1112";
+    deletePredicates.SetWhereClause(selections);
+    retVal = helper->Delete(uri, deletePredicates);
+    EXPECT_EQ((retVal >= 0), true);
+    LOG_INFO("MediaDataShare_ResultSet_Test_006, End");
+}
+
 HWTEST_F(MediaDataShareUnitTest, Creator_ContextNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("Creator_ContextNull_Test_001::Start");
