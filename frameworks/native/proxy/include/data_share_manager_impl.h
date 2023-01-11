@@ -77,9 +77,6 @@ public:
     explicit DataShareKvServiceProxy(const sptr<IRemoteObject> &impl);
     ~DataShareKvServiceProxy() = default;
     sptr<IRemoteObject> GetFeatureInterface(const std::string &name) override;
-
-private:
-    static inline BrokerDelegator<DataShareKvServiceProxy> delegator_;
 };
 } // namespace OHOS::DataShare
 #endif
