@@ -969,15 +969,15 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_006, TestSize.Lev
     if (resultSet != nullptr) {
         resultSet->GoToFirstRow();
         resultSet->GetColumnIndex(MEDIA_DATA_DB_PARENT_ID, columnIndex);
-        DataType dt;
-        resultSet->columnIndex(0, dt);
-        EXPECT_EQ(dt, DataType::TYPE_INTEGER);
+        DataShare::DataType dt;
+        resultSet->GetDataType(0, dt);
+        EXPECT_EQ(dt, DataShare::DataType::TYPE_INTEGER);
         resultSet->GetInt(columnIndex, result);
         EXPECT_EQ(result, value);
     }
 
     DataShare::DataSharePredicates deletePredicates;
-    selections = MEDIA_DATA_DB_PARENT_ID + " = 1112";
+    std::string selections = MEDIA_DATA_DB_PARENT_ID + " = 1112";
     deletePredicates.SetWhereClause(selections);
     retVal = helper->Delete(uri, deletePredicates);
     EXPECT_EQ((retVal >= 0), true);
