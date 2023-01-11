@@ -44,7 +44,7 @@ void DataShareConnection::OnAbilityConnectDone(
         return;
     }
     std::unique_lock<std::mutex> lock(condition_.mutex);
-    SetDataShareProxy(iface_cast<DataShareProxy>(remoteObject));
+    SetDataShareProxy(new (std::nothrow) DataShareProxy(remoteObject));
     condition_.condition.notify_all();
 }
 
