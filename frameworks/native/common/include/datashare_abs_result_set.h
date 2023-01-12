@@ -16,6 +16,7 @@
 #ifndef DATASHARE_ABS_RESULT_SET_H
 #define DATASHARE_ABS_RESULT_SET_H
 
+#include <map>
 #include <string>
 #include "basic/result_set.h"
 
@@ -56,8 +57,10 @@ protected:
     static const int INIT_POS = -1;
     // Current row position
     int rowPos_;
+    int count_;
     // Indicates whether the result set is closed
     bool isClosed_;
+    std::map<std::string, int> indexCache_;
 };
 } // namespace DataShare
 } // namespace OHOS
