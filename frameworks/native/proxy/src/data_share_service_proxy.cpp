@@ -27,9 +27,9 @@ DataShareServiceProxy::DataShareServiceProxy(const sptr<IRemoteObject> &object)
     LOG_INFO("Construct complete.");
 }
 
-int DataShareServiceProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
+int32_t DataShareServiceProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
-    std::string uriStr = uri.ToString();
+    const std::string &uriStr = uri.ToString();
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed!");
@@ -53,7 +53,7 @@ int DataShareServiceProxy::Insert(const Uri &uri, const DataShareValuesBucket &v
 int32_t DataShareServiceProxy::Update(const Uri &uri,
     const DataSharePredicates &predicate, const DataShareValuesBucket &valuesBucket)
 {
-    std::string uriStr = uri.ToString();
+    const std::string &uriStr = uri.ToString();
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed!");
@@ -74,9 +74,9 @@ int32_t DataShareServiceProxy::Update(const Uri &uri,
     return reply.ReadInt32();
 }
 
-    int DataShareServiceProxy::Delete(const Uri &uri, const DataSharePredicates &predicate)
+int32_t DataShareServiceProxy::Delete(const Uri &uri, const DataSharePredicates &predicate)
 {
-    std::string uriStr = uri.ToString();
+    const std::string &uriStr = uri.ToString();
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed!");
@@ -100,7 +100,7 @@ int32_t DataShareServiceProxy::Update(const Uri &uri,
 std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
     const Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns)
 {
-    std::string uriStr = uri.ToString();
+    const std::string &uriStr = uri.ToString();
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed!");

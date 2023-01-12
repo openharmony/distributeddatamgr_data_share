@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace DataShare {
-DataShareAbsResultSet::DataShareAbsResultSet() : rowPos_(INIT_POS), isClosed_(false)
+DataShareAbsResultSet::DataShareAbsResultSet() : rowPos_(INIT_POS), count_(-1), isClosed_(false)
 {}
 
 DataShareAbsResultSet::~DataShareAbsResultSet() {}
@@ -176,18 +176,25 @@ int DataShareAbsResultSet::IsEnded(bool &result)
 
 int DataShareAbsResultSet::GetColumnCount(int &count)
 {
-    std::vector<std::string> columnNames;
-    int ret = GetAllColumnNames(columnNames);
-    if (ret != E_OK) {
-        LOG_ERROR("return GetAllColumnNames ret is wrong!");
-        return ret;
+    if (count_ == -1) {
+        std::vector<std::string> columnNames;
+        int ret = GetAllColumnNames(columnNames);
+        if (ret != E_OK) {
+            LOG_ERROR("return GetAllColumnNames ret is wrong!");
+            return ret;
+        }
+        count_ = static_cast<int>(columnNames.size());
     }
-    count = static_cast<int>(columnNames.size());
+    count = count_;
     return E_OK;
 }
 
 int DataShareAbsResultSet::GetColumnIndex(const std::string &columnName, int &columnIndex)
 {
+    if (indexCache_.find(columnName) != indexCache_.end()) {
+        columnIndex = indexCache_[columnName];
+        return E_OK;
+    }
     auto periodIndex = columnName.rfind('.');
     std::string columnNameLower = columnName;
     if (periodIndex != std::string::npos) {
@@ -206,6 +213,7 @@ int DataShareAbsResultSet::GetColumnIndex(const std::string &columnName, int &co
         std::string lowerName = name;
         transform(name.begin(), name.end(), lowerName.begin(), ::tolower);
         if (lowerName == columnNameLower) {
+            indexCache_[columnName] = columnIndex;
             return E_OK;
         }
         columnIndex++;
