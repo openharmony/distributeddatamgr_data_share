@@ -215,7 +215,7 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
         return E_ERROR;
-    }  else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_INTEGER) {
+    } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_INTEGER) {
         int64_t tempValue = cellUnit->cell.longValue;
         value = std::to_string(tempValue);
         return E_OK;
