@@ -431,5 +431,12 @@ bool DataShareResultSet::Unmarshalling(MessageParcel &parcel)
     }
     return true;
 }
+
+void DataShareResultSet::SetUri(const std::string &uri)
+{
+    if (!uri.empty()) {
+        uri_ = uri;
+    }
+}
 } // namespace DataShare
 } // namespace OHOS
