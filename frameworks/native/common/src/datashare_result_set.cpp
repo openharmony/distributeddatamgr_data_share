@@ -163,7 +163,6 @@ int DataShareResultSet::GoToRow(int position)
 
 int DataShareResultSet::GetBlob(int columnIndex, std::vector<uint8_t> &value)
 {
-    DISTRIBUTED_DATA_HITRACE(std::string(__FUNCTION__));
     int errorCode = CheckState(columnIndex);
     if (errorCode != E_OK) {
         return errorCode;
@@ -214,13 +213,10 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
     int type = cellUnit->type;
     if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_STRING) {
         size_t sizeIncludingNull;
-        const char *tempValue = sharedBlock_->GetCellUnitValueString(cellUnit, &sizeIncludingNull);
-        if ((sizeIncludingNull <= 1) || (tempValue == nullptr)) {
-            value = "";
-            return E_ERROR;
-        }
-        value = tempValue;
+        value = std::string(sharedBlock_->GetCellUnitValueString(cellUnit, &sizeIncludingNull));
         return E_OK;
+    } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
+        return E_ERROR;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_INTEGER) {
         int64_t tempValue = cellUnit->cell.longValue;
         value = std::to_string(tempValue);
@@ -232,8 +228,6 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
             value = os.str();
         }
         return E_OK;
-    } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
-        return E_ERROR;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB) {
         return E_ERROR;
     } else {
@@ -403,9 +397,7 @@ int DataShareResultSet::CheckState(int columnIndex)
     if (columnIndex >= cnt || columnIndex < 0) {
         return E_INVALID_COLUMN_INDEX;
     }
-    int rowCnt = 0;
-    GetRowCount(rowCnt);
-    if (rowPos_ < 0 || rowPos_ >= rowCnt) {
+    if (rowPos_ == INITIAL_POS) {
         return E_INVALID_STATEMENT;
     }
     return E_OK;
