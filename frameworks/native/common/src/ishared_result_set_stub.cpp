@@ -53,7 +53,7 @@ ISharedResultSetStub::~ISharedResultSetStub()
     auto handle = thread_.native_handle();
     isRunning_ = false;
     // do not delete this code, this code is waiting the thread exit.
-    isRunning_ = Submit([this]() -> bool { return isRunning_;}).get();
+    isRunning_ = Submit([this]() -> bool { resultSet_ = nullptr; return isRunning_;}).get();
     LOG_ERROR("thread(%{public}" PRIx64 ")", uint64_t(handle));
 }
 
