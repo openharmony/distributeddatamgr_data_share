@@ -249,7 +249,6 @@ int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates
 std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri,
     const DataSharePredicates &predicates, std::vector<std::string> &columns)
 {
-    LOG_INFO("begin.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
@@ -278,7 +277,6 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri,
         LOG_ERROR("Query fail to SendRequest. err: %{public}d", err);
         return nullptr;
     }
-    LOG_INFO("end successfully.");
     return ISharedResultSet::ReadFromParcel(reply);
 }
 
