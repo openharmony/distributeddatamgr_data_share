@@ -256,7 +256,7 @@ uint32_t SharedBlock::Alloc(size_t size, bool aligned)
     return offset;
 }
 
-uint32_t *SharedBlock::GetRowOffset(uint32_t row)
+inline uint32_t *SharedBlock::GetRowOffset(uint32_t row)
 {
     uint32_t rowPos = row;
 
@@ -450,19 +450,6 @@ size_t SharedBlock::SetRawData(const void *rawData, size_t size)
         return SHARED_BLOCK_NO_MEMORY;
     }
     return SHARED_BLOCK_OK;
-}
-
-void *SharedBlock::OffsetToPtr(uint32_t offset, uint32_t bufferSize)
-{
-    if (offset >= mSize) {
-        LOG_ERROR("Offset %{public}" PRIu32 " out of bounds, max value %{public}zu", offset, mSize);
-        return nullptr;
-    }
-    if (offset + bufferSize > mSize) {
-        LOG_ERROR("End offset %{public}" PRIu32 " out of bounds, max value %{public}zu", offset + bufferSize, mSize);
-        return nullptr;
-    }
-    return static_cast<uint8_t *>(mData) + offset;
 }
 
 uint32_t SharedBlock::OffsetFromPtr(void *ptr)
