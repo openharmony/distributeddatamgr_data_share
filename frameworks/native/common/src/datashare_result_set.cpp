@@ -201,9 +201,9 @@ int DataShareResultSet::GetBlob(int columnIndex, std::vector<uint8_t> &value)
 
 int DataShareResultSet::GetString(int columnIndex, std::string &value)
 {
-    int errorCode = CheckState(columnIndex);
-    if (errorCode != E_OK) {
-        return errorCode;
+    if (sharedBlock_ == nullptr) {
+        LOG_ERROR("sharedBlock is null!");
+        return E_ERROR;
     }
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
@@ -238,6 +238,10 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
 
 int DataShareResultSet::GetInt(int columnIndex, int &value)
 {
+    if (sharedBlock_ == nullptr) {
+        LOG_ERROR("sharedBlock is null!");
+        return E_ERROR;
+    }
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
         LOG_ERROR("cellUnit is null!");
@@ -249,9 +253,9 @@ int DataShareResultSet::GetInt(int columnIndex, int &value)
 
 int DataShareResultSet::GetLong(int columnIndex, int64_t &value)
 {
-    int errorCode = CheckState(columnIndex);
-    if (errorCode != E_OK) {
-        return errorCode;
+    if (sharedBlock_ == nullptr) {
+        LOG_ERROR("sharedBlock is null!");
+        return E_ERROR;
     }
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
