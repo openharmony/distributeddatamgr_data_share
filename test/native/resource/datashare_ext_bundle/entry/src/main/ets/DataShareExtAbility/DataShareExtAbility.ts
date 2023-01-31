@@ -171,15 +171,6 @@ extends Extension {
             }
         });
 
-        /* await valueBuckets.forEach(vb => {
-             console.info('[ttt] [DataShareTest] <<Provider>> [batchInsert] vb:' + JSON.stringify(vb));
-             rdbStore.insert(TBL_NAME, vb, function (err, ret) {
-                 console.info('[ttt] [DataShareTest] <<Provider>> [batchInsert] callback ret:' + ret);
-                 if (callback != undefined) {
-                     callback(err, resultNum);
-                 }
-             });
-         });*/
         console.info('[ttt] [DataShareTest] <<Provider>> [batchInsert] leave');
     }
 
