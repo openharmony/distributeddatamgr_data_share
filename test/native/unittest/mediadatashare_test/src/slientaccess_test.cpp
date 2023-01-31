@@ -101,11 +101,9 @@ void SlientAccessTest::SetUpTestCase(void)
     auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(
         info.userID, info.bundleName, info.instIndex);
     SetSelfTokenID(testTokenId);
-    LOG_INFO("userID = %{public}d, testTokenId = %{public}d.", info.userID, testTokenId);
 
     g_slientAccessHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI);
     ASSERT_TRUE(g_slientAccessHelper != nullptr);
-    
     LOG_INFO("SetUpTestCase end");
 }
 

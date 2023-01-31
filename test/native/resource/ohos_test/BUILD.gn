@@ -16,4 +16,7 @@ import("//build/ohos.gni")
 ohos_copy("copy_ohos_test") {
   sources = [ "./ohos_test.xml" ]
   outputs = [ "$root_out_dir/tests/unittest/data_share/resource/ohos_test.xml" ]
+
+  subsystem_name = "distributeddatamgr"
+  part_name = "data_share"
 }
