@@ -14,17 +14,14 @@
 1.0 {
   global:
     *DataShareAbsPredicates*;
-    *DataShareHelperInitError*;
     *DataShareJSUtils*;
     *DataSharePredicates*;
     *DataShareResultSet*;
     *DataShareValueObject*;
     *DataShareValuesBucket*;
-    *InnerError*;
+    *Error*;
     *ISharedResultSet*;
     *ITypesUtils*;
-    *ParametersNumError*;
-    *ParametersTypeError*;
   local:
     *;
 };
