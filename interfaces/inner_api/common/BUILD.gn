@@ -51,6 +51,7 @@ ohos_shared_library("datashare_common") {
   public_deps = []
 
   configs = [ ":ability_config" ]
+  version_script = "libdatashare_common.map"
 
   external_deps = [
     "ability_base:zuri",
