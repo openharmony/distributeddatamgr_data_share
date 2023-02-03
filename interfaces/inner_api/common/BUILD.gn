@@ -60,7 +60,7 @@ ohos_shared_library("datashare_common") {
     "hitrace_native:hitrace_meter",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "napi:ace_napi",
     "relational_store:native_appdatafwk",
   ]
