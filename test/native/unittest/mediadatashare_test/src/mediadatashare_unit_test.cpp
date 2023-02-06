@@ -1007,7 +1007,8 @@ HWTEST_F(MediaDataShareUnitTest, Creator_UriError_Test_001, TestSize.Level0)
 HWTEST_F(MediaDataShareUnitTest, GetFileTypes_ConnectionNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("GetFileTypes_ConnectionNull_Test_001::Start");
-    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(helper != nullptr);
     auto ret = helper->Release();
     EXPECT_TRUE(ret);
     Uri uri(MEDIALIBRARY_DATA_URI);
@@ -1020,7 +1021,8 @@ HWTEST_F(MediaDataShareUnitTest, GetFileTypes_ConnectionNull_Test_001, TestSize.
 HWTEST_F(MediaDataShareUnitTest, OpenRawFile_ConnectionNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_OpenRawFile_Test_001::Start");
-    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(helper != nullptr);
     auto ret = helper->Release();
     EXPECT_TRUE(ret);
     Uri uri(MEDIALIBRARY_DATA_URI);
@@ -1033,7 +1035,8 @@ HWTEST_F(MediaDataShareUnitTest, OpenRawFile_ConnectionNull_Test_001, TestSize.L
 HWTEST_F(MediaDataShareUnitTest, OpenFile_ConnectionNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("OpenFile_ConnectionNull_Test_001::Start");
-    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(helper != nullptr);
     auto ret = helper->Release();
     EXPECT_TRUE(ret);
     Uri uri(MEDIALIBRARY_DATA_URI);
@@ -1046,7 +1049,8 @@ HWTEST_F(MediaDataShareUnitTest, OpenFile_ConnectionNull_Test_001, TestSize.Leve
 HWTEST_F(MediaDataShareUnitTest, Insert_ConnectionNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("Insert_ConnectionNull_Test_001::Start");
-    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(helper != nullptr);
     auto ret = helper->Release();
     EXPECT_TRUE(ret);
     Uri uri(MEDIALIBRARY_DATA_URI);
