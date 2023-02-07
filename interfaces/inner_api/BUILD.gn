@@ -82,11 +82,6 @@ ohos_shared_library("datashare_consumer") {
     "samgr:samgr_proxy",
   ]
 
-  if (suspend_manager_enable) {
-    external_deps += [ "efficiency_manager:suspend_manager_client" ]
-    defines += [ "EFFICIENCY_MANAGER_ENABLE" ]
-  }
-
   public_deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/arkui/napi:ace_napi",

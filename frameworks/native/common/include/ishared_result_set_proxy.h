@@ -32,7 +32,6 @@ public:
     bool OnGo(int startRowIndex, int targetRowIndex, int *cachedIndex = nullptr) override;
     int Close() override;
 private:
-    void ReportEventToSuspendManager(const std::string &uriString) const;
     std::mutex mutex_;
     static BrokerDelegator<ISharedResultSetProxy> delegator_;
     std::vector<std::string> columnNames_;

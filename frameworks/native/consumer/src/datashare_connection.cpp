@@ -18,9 +18,6 @@
 #include "ability_manager_client.h"
 #include "datashare_proxy.h"
 #include "datashare_log.h"
-#ifdef EFFICIENCY_MANAGER_ENABLE
-#include "suspend_manager_client.h"
-#endif
 
 namespace OHOS {
 namespace DataShare {
@@ -75,7 +72,6 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
  */
 bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> token)
 {
-    ReportEventToSuspendManager(uri.ToString());
     if (dataShareProxy_ != nullptr) {
         return true;
     }
@@ -160,15 +156,6 @@ bool DataShareConnection::ConnectDataShare(const Uri & uri, const sptr<IRemoteOb
 bool DataShareConnection::IsConnected()
 {
     return dataShareProxy_ != nullptr;
-}
-
-void DataShareConnection::ReportEventToSuspendManager(const std::string &uriString) const
-{
-#ifdef EFFICIENCY_MANAGER_ENABLE
-    OHOS::SuspendManager::AppInfo appInfo(-1, -1, uriString, "", "THAW_BY_DATASHARE_EXTENSION_CALLED");
-    appInfo.SetIsExtension(true);
-    OHOS::SuspendManager::SuspendManagerClient::GetInstance().ThawOneAppByAppInfo(appInfo);
-#endif
 }
 }  // namespace DataShare
 }  // namespace OHOS

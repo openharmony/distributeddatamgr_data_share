@@ -39,10 +39,3 @@ datashare_native_consumer_path =
 
 datashare_native_proxy_path = "${datashare_base_path}/frameworks/native/proxy"
 
-declare_args() {
-  suspend_manager_enable = true
-  if (defined(global_parts_info) &&
-      !defined(global_parts_info.resourceschedule_efficiency_manager)) {
-    suspend_manager_enable = false
-  }
-}

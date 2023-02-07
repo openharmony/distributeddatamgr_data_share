@@ -66,11 +66,6 @@ ohos_shared_library("datashare_common") {
     "relational_store:native_appdatafwk",
   ]
 
-  if (suspend_manager_enable) {
-    external_deps += [ "efficiency_manager:suspend_manager_client" ]
-    defines += [ "EFFICIENCY_MANAGER_ENABLE" ]
-  }
-
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
 }
