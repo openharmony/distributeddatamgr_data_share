@@ -24,7 +24,6 @@ config("ability_config") {
 }
 
 ohos_shared_library("datashare_common") {
-  defines = []
   include_dirs = [
     "${datashare_common_napi_path}/include",
     "${datashare_common_native_path}/include",

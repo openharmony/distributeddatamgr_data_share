@@ -51,7 +51,6 @@ config("ability_public_config") {
 
 ohos_shared_library("datashare_consumer") {
   include_dirs = []
-  defines = []
 
   sources = [
     "${datashare_native_consumer_path}/src/connection_factory.cpp",
