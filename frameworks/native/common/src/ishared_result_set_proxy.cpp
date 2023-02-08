@@ -38,7 +38,7 @@ std::shared_ptr<DataShareResultSet> ISharedResultSetProxy::CreateProxy(MessagePa
     if (remoter == nullptr) {
         return nullptr;
     }
-    sptr<ISharedResultSet> result = iface_cast<ISharedResultSet>(remoter);
+    sptr<ISharedResultSetProxy> result = new (std::nothrow)ISharedResultSetProxy(remoter);
     result->Unmarshalling(parcel);
     return std::shared_ptr<DataShareResultSet>(result.GetRefPtr(),
            [keep = result] (DataShareResultSet *) {});
