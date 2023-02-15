@@ -25,25 +25,51 @@ namespace OHOS {
 namespace DataShare {
 class DataShareValuesBucket {
 public:
+    /**
+     * @brief Constructor.
+     */
     DataShareValuesBucket() = default;
+    /**
+     * @brief Constructor.
+     *
+     * @param string Specifies the parameter of the type.
+     * @param values is the value of the corresponding type.
+     */
     explicit DataShareValuesBucket(std::map<std::string, DataShareValueObject::Type> values) : valuesMap(std::move(values)){};
+    /**
+     * @brief Destructor.
+     */
     ~DataShareValuesBucket() = default;
-
+    /**
+     * @brief Function of Put.
+     *
+     * @param columnName is name of the corresponding column.
+     * @param value Indicates the value of columnName data to put or update.
+     */
     void Put(const std::string &columnName, const DataShareValueObject &value = {})
     {
         valuesMap.insert(std::make_pair(columnName, value.value));
     }
-
+    /**
+     * @brief Function of Clear.
+     */
     void Clear()
     {
         valuesMap.clear();
     }
-
+    /**
+     * @brief Function of IsEmpty.
+     */
     bool IsEmpty() const
     {
         return valuesMap.empty();
     }
-
+    /**
+     * @brief Function of get string type object.
+     *
+     * @param columnName is name of the corresponding column.
+     * @param isValid The obtained value is valid.
+     */
     DataShareValueObject Get(const std::string &columnName, bool &isValid) const
     {
         auto iter = valuesMap.find(columnName);
