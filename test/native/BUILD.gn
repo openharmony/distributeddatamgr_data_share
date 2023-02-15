@@ -73,7 +73,7 @@ ohos_unittest("NativeDataShareTest") {
     "data_share:datashare_consumer",
     "hilog_native:libhilog",
     "hitrace_native:hitrace_meter",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "relational_store:native_appdatafwk",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
@@ -110,7 +110,7 @@ ohos_unittest("SlientAccessTest") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
