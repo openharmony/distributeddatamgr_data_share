@@ -45,7 +45,7 @@ ohos_shared_library("datashare") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_single",
+    "ipc:ipc_core",
     "napi:ace_napi",
     "relational_store:native_appdatafwk",
   ]
@@ -74,7 +74,7 @@ ohos_shared_library("datasharepredicates") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_single",
+    "ipc:ipc_core",
     "napi:ace_napi",
   ]
 
