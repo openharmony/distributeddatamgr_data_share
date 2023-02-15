@@ -87,8 +87,6 @@ ohos_shared_library("datashare_consumer") {
     defines += [ "EFFICIENCY_MANAGER_ENABLE" ]
   }
 
-  innerapi_tags = [ "platformsdk" ]
-
   public_deps = [
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/arkui/napi:ace_napi",
@@ -135,7 +133,6 @@ ohos_shared_library("datashare_provider") {
     "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
     "//foundation/arkui/napi:ace_napi",
   ]
-  innerapi_tags = [ "platformsdk" ]
 
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
@@ -161,7 +158,6 @@ ohos_shared_library("datashare_ext_ability_module") {
     "hiviewdfx_hilog_native:libhilog",
     "relational_store:native_appdatafwk",
   ]
-  innerapi_tags = [ "platformsdk" ]
 
   relative_install_dir = "extensionability/"
   subsystem_name = "distributeddatamgr"
