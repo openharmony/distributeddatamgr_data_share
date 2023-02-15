@@ -23,32 +23,99 @@ namespace OHOS {
 namespace DataShare {
 constexpr int INVALID_TYPE = -1;
 constexpr int DATA_SHARE_NO_ERROR = 0;
+/**
+ * @brief DataShare Predicates Object Type .
+ */
 enum DataShareValueObjectType : int32_t {
+    /** Predicates Object Types is null.*/
     TYPE_NULL = 0,
+    /** Predicates Object Types is int.*/
     TYPE_INT,
+    /** Predicates Object Types is double.*/
     TYPE_DOUBLE,
+    /** Predicates Object Types is string.*/
     TYPE_STRING,
+    /** Predicates Object Types is bool.*/
     TYPE_BOOL,
+    /** Predicates Object Types is blob.*/
     TYPE_BLOB,
 };
 
 class DataShareValueObject {
 public:
+    /**
+     * @brief Use Type replace variant namespace.
+     */
     using Type = std::variant<std::monostate, int64_t, double, std::string, bool, std::vector<uint8_t>>;
     Type value;
 
+    /**
+     * @brief Constructor.
+     */
     DataShareValueObject() = default;
+    /**
+     * @brief Destructor.
+     */
     ~DataShareValueObject() = default;
+    /**
+     * @brief constructor.
+     */
     DataShareValueObject(const Type &object) noexcept : value(object) { };
+    /**
+     * @brief Move Constructor.
+     */
     DataShareValueObject(DataShareValueObject &&object) noexcept : value(std::move(object.value)) { };
+    /**
+     * @brief constructor.
+     */
     DataShareValueObject(const DataShareValueObject &object) : value(object.value) {};
+    /**
+     * @brief constructor.
+     *
+     * @param int Specifies the parameter of the type.
+     */
     DataShareValueObject(int val) : value(static_cast<int64_t>(val)) {};
+    /**
+     * @brief constructor.
+     *
+     * @param int64_t Specifies the parameter of the type.
+     */
     DataShareValueObject(int64_t val) : value(val) {};
+    /**
+     * @brief constructor.
+     *
+     * @param double Specifies the parameter of the type.
+     */
     DataShareValueObject(double val) : value(val) {};
+    /**
+     * @brief constructor.
+     *
+     * @param bool Specifies the parameter of the type.
+     */
     DataShareValueObject(bool val) : value(val) {};
+    /**
+     * @brief constructor.
+     *
+     * @param string Specifies the parameter of the type.
+     */
     DataShareValueObject(std::string val) : value(std::move(val)) {};
+    /**
+     * @brief constructor.
+     *
+     * @param char Specifies the parameter of the type.
+     */
     DataShareValueObject(const char *val) : DataShareValueObject(std::string(val)) {};
+    /**
+     * @brief constructor.
+     *
+     * @param uint8_t Specifies the parameter of the type.
+     */
     DataShareValueObject(std::vector<uint8_t> blob) : value(std::move(blob)) {};
+    /**
+     * @brief constructor.
+     *
+     * @param int Specifies the parameter of the type.
+     */
     DataShareValueObject &operator=(DataShareValueObject &&object) noexcept
     {
         if (this == &object) {

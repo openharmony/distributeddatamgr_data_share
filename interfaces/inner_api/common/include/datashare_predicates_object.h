@@ -22,29 +22,68 @@
 
 namespace OHOS {
 namespace DataShare {
+/**
+ * @brief DataShare Predicates Object Type .
+ */
 enum class DataSharePredicatesObjectType {
+    /** Predicates Object Type is null.*/
     TYPE_NULL = 0x00,
+    /** Predicates Object Type is int.*/
     TYPE_INT,
+    /** Predicates Object Type is double.*/
     TYPE_DOUBLE,
+    /** Predicates Object Type is string.*/
     TYPE_STRING,
+    /** Predicates Object Type is bool.*/
     TYPE_BOOL,
+    /** Predicates Object Type is long.*/
     TYPE_LONG,
 };
 
+/**
+ * @brief Use ObjectType replace DataSharePredicatesObjectType namespace.
+ */
 using ObjectType = DataSharePredicatesObjectType;
 
+/**
+ * The SingleValue class.
+ */
 class SingleValue {
 public:
+
+    /**
+     * @brief Use Type replace variant namespace.
+     */
     using Type = std::variant<std::monostate, int, int64_t, double, std::string, bool>;
     Type value;
+
+    /**
+     * @brief Constructor.
+     */
     SingleValue() = default;
+
+    /**
+     * @brief Destructor.
+     */
     ~SingleValue() = default;
+
+    /**
+     * @brief Constructor.
+     */
     SingleValue(Type val) noexcept : value(std::move(val))
     {
     }
+
+    /**
+     * @brief Move constructor.
+     */
     SingleValue(SingleValue &&val) noexcept :value(std::move(val.value))
     {
     }
+
+    /**
+     * @brief Copy constructor.
+     */
     SingleValue(const SingleValue &val) : value(val.value) {}
     SingleValue &operator=(SingleValue &&object) noexcept
     {
@@ -64,11 +103,46 @@ public:
         return *this;
     }
 
+    /**
+     * @brief constructor.
+     *
+     * @param int Specifies the parameter of the type.
+     */
     SingleValue(int val) : value(val) {}
+
+    /**
+     * @brief constructor.
+     *
+     * @param int64_t Specifies the parameter of the type.
+     */
     SingleValue(int64_t val) : value(val) {}
+
+    /**
+     * @brief constructor.
+     *
+     * @param idoublent Specifies the parameter of the type.
+     */
     SingleValue(double val) : value(val) {}
+
+    /**
+     * @brief constructor.
+     *
+     * @param bool Specifies the parameter of the type.
+     */
     SingleValue(bool val) : value(val) {}
+
+    /**
+     * @brief Copy constructor.
+     *
+     * @param char Specifies the parameter of the type.
+     */
     SingleValue(const char *val) : value(std::string(val)) {}
+
+    /**
+     * @brief Move constructor.
+     *
+     * @param string Specifies the parameter of the type.
+     */
     SingleValue(std::string val) : value(std::move(val)) {}
     operator int () const
     {

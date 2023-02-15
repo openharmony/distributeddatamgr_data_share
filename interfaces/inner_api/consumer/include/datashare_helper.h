@@ -38,6 +38,9 @@ namespace DataShare {
 using string = std::string;
 class DataShareHelper final : public std::enable_shared_from_this<DataShareHelper> {
 public:
+    /**
+     * @brief Destructor.
+     */
     ~DataShareHelper();
 
     /**
@@ -50,6 +53,7 @@ public:
      */
     static std::shared_ptr<DataShareHelper> Creator(const std::shared_ptr<AppExecFwk::Context> &context,
         const std::string &strUri);
+
     /**
      * @brief You can use this method to specify the Uri of the data to operate and set the binding relationship
      * between the ability using the Data template (data share for short) and the associated client process in

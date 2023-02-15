@@ -27,173 +27,394 @@ namespace OHOS {
 namespace DataShare {
 class DataSharePredicates : public DataShareAbsPredicates {
 public:
+
+    /**
+     * @brief Constructor.
+     */
     DataSharePredicates()
     {
     }
+
+    /**
+     * @brief Constructor.
+     *
+     * A parameterized constructor used to create an DataSharePredicates instance.
+     *
+     * @param OperationList Indicates the operation list of the database.
+     */
     explicit DataSharePredicates(std::vector<OperationItem> operList) : operations_(std::move(operList))
     {
     }
+
+    /**
+     * @brief Destructor.
+     */
     ~DataSharePredicates()
     {
     }
+
+    /**
+     * @brief The EqualTo of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *EqualTo(const std::string &field, const SingleValue &value)
     {
         SetOperationList(EQUAL_TO, field, value);
         return this;
     }
+
+    /**
+     * @brief The NotEqualTo of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *NotEqualTo(const std::string &field, const SingleValue &value)
     {
         SetOperationList(NOT_EQUAL_TO, field, value);
         return this;
     }
+
+    /**
+     * @brief The GreaterThan of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *GreaterThan(const std::string &field, const SingleValue &value)
     {
         SetOperationList(GREATER_THAN, field, value);
         return this;
     }
+
+    /**
+     * @brief The LessThan of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *LessThan(const std::string &field, const SingleValue &value)
     {
         SetOperationList(LESS_THAN, field, value);
         return this;
     }
+
+    /**
+     * @brief The GreaterThanOrEqualTo of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *GreaterThanOrEqualTo(const std::string &field, const SingleValue &value)
     {
         SetOperationList(GREATER_THAN_OR_EQUAL_TO, field, value);
         return this;
     }
+
+    /**
+     * @brief The LessThanOrEqualTo of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *LessThanOrEqualTo(const std::string &field, const SingleValue &value)
     {
         SetOperationList(LESS_THAN_OR_EQUAL_TO, field, value);
         return this;
     }
+
+    /**
+     * @brief The LessThanOrEqualTo of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *In(const std::string &field, const MutliValue &values)
     {
         SetOperationList(SQL_IN, field, values);
         return this;
     }
+
+    /**
+     * @brief The NotIn of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *NotIn(const std::string &field, const MutliValue &values)
     {
         SetOperationList(NOT_IN, field, values);
         return this;
     }
+
+    /**
+     * @brief BeginWrap.
+     */
     DataSharePredicates *BeginWrap()
     {
         SetOperationList(BEGIN_WARP);
         return this;
     }
+
+    /**
+     * @brief EndWrap.
+     */
     DataSharePredicates *EndWrap()
     {
         SetOperationList(END_WARP);
         return this;
     }
+
+    /**
+     * @brief Or.
+     */
     DataSharePredicates *Or()
     {
         SetOperationList(OR);
         return this;
     }
+
+    /**
+     * @brief And.
+     */
     DataSharePredicates *And()
     {
         SetOperationList(AND);
         return this;
     }
+
+    /**
+     * @brief The Contains of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *Contains(const std::string &field, const std::string &value)
     {
         SetOperationList(CONTAINS, field, value);
         return this;
     }
+
+    /**
+     * @brief The BeginsWith of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *BeginsWith(const std::string &field, const std::string &value)
     {
         SetOperationList(BEGIN_WITH, field, value);
         return this;
     }
+
+    /**
+     * @brief The EndsWith of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *EndsWith(const std::string &field, const std::string &value)
     {
         SetOperationList(END_WITH, field, value);
         return this;
     }
+
+    /**
+     * @brief The IsNull of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *IsNull(const std::string &field)
     {
         SetOperationList(IS_NULL, field);
         return this;
     }
+
+    /**
+     * @brief The IsNotNull of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *IsNotNull(const std::string &field)
     {
         SetOperationList(IS_NOT_NULL, field);
         return this;
     }
+
+    /**
+     * @brief The Like of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *Like(const std::string &field, const std::string &value)
     {
         SetOperationList(LIKE, field, value);
         return this;
     }
+
+    /**
+     * @brief The Unlike of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *Unlike(const std::string &field, const std::string &value)
     {
         SetOperationList(UNLIKE, field, value);
         return this;
     }
+
+    /**
+     * @brief The Glob of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *Glob(const std::string &field, const std::string &value)
     {
         SetOperationList(GLOB, field, value);
         return this;
     }
+
+    /**
+     * @brief The Between of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *Between(const std::string &field, const std::string &low, const std::string &high)
     {
         SetOperationList(BETWEEN, field, low, high);
         return this;
     }
+
+    /**
+     * @brief The NotBetween of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *NotBetween(const std::string &field, const std::string &low, const std::string &high)
     {
         SetOperationList(NOTBETWEEN, field, low, high);
         return this;
     }
+
+    /**
+     * @brief The OrderByAsc of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *OrderByAsc(const std::string &field)
     {
         SetOperationList(ORDER_BY_ASC, field);
         return this;
     }
+
+    /**
+     * @brief The OrderByDesc of the predicate.
+     *
+     * @param field Indicates the target field.
+     * @param value Indicates the queried value.
+     */
     DataSharePredicates *OrderByDesc(const std::string &field)
     {
         SetOperationList(ORDER_BY_DESC, field);
         return this;
     }
+
+    /**
+     * @brief Distinct predicate condition.
+     */
     DataSharePredicates *Distinct()
     {
         SetOperationList(DISTINCT);
         return this;
     }
+
+    /**
+     * @brief The Limit of the predicate.
+     *
+     * @param number Indicates the target number.
+     * @param offset Indicates the queried value.
+     */
     DataSharePredicates *Limit(const int number, const int offset)
     {
         SetOperationList(LIMIT, number, offset);
         return this;
     }
+
+    /**
+     * @brief The GroupBy of the predicate.
+     *
+     * @param field Indicates the target field.
+     */
     DataSharePredicates *GroupBy(const std::vector<std::string> &fields)
     {
         SetOperationList(GROUP_BY, fields);
         return this;
     }
+
+    /**
+     * @brief The IndexedBy of the predicate.
+     *
+     * @param indexName indicates the query condition.
+     */
     DataSharePredicates *IndexedBy(const std::string &indexName)
     {
         SetOperationList(INDEXED_BY, indexName);
         return this;
     }
+
+    /**
+     * @brief The KeyPrefix of the predicate.
+     *
+     * @param Search by prefix conditions.
+     */
     DataSharePredicates *KeyPrefix(const std::string &prefix)
     {
         SetOperationList(KEY_PREFIX, prefix);
         return this;
     }
+
+    /**
+     * @brief The InKeys of the predicate.
+     *
+     * @param Query based on key conditions.
+     */
     DataSharePredicates *InKeys(const std::vector<std::string> &keys)
     {
         SetOperationList(IN_KEY, keys);
         return this;
     }
+
+    /**
+     * @brief The GetOperationList of the predicate.
+     */
     const std::vector<OperationItem> &GetOperationList() const
     {
         return operations_;
     }
+
+    /**
+     * @brief The GetWhereClause of the predicate.
+     */
     std::string GetWhereClause() const
     {
         return whereClause_;
     }
+
+    /**
+     * @brief The SetWhereClause of the predicate.
+     *
+     * @param Query based on the whereClause.
+     */
     int SetWhereClause(const std::string &whereClause)
     {
         if ((settingMode_ != PREDICATES_METHOD) && (!whereClause.empty())) {
@@ -203,10 +424,20 @@ public:
         }
         return E_ERROR;
     }
+
+    /**
+     * @brief The GetWhereArgs of the predicate.
+     */
     std::vector<std::string> GetWhereArgs() const
     {
         return whereArgs_;
     }
+
+    /**
+     * @brief The SetWhereArgs of the predicate.
+     *
+     * @param Query based on whereArgs conditions.
+     */
     int SetWhereArgs(const std::vector<std::string> &whereArgs)
     {
         if ((settingMode_ != PREDICATES_METHOD) && (!whereArgs.empty())) {
@@ -218,10 +449,20 @@ public:
         }
         return E_ERROR;
     }
+
+    /**
+     * @brief The GetOrder of the predicate.
+     */
     std::string GetOrder() const
     {
         return order_;
     }
+
+    /**
+     * @brief The SetOrder of the predicate.
+     *
+     * @param Query based on order conditions..
+     */
     int SetOrder(const std::string &order)
     {
         if ((settingMode_ != PREDICATES_METHOD) && (!order.empty())) {
@@ -231,10 +472,18 @@ public:
         }
         return E_ERROR;
     }
+
+    /**
+     * @brief The GetSettingMode of the predicate.
+     */
     int16_t GetSettingMode() const
     {
         return settingMode_;
     }
+
+    /**
+     * @brief The SetSettingMode of the predicate.
+     */
     void SetSettingMode(int16_t settingMode)
     {
         settingMode_ = settingMode;
