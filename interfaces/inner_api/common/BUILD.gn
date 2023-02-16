@@ -24,7 +24,6 @@ config("ability_config") {
 }
 
 ohos_shared_library("datashare_common") {
-  defines = []
   include_dirs = [
     "${datashare_common_napi_path}/include",
     "${datashare_common_native_path}/include",
@@ -65,11 +64,6 @@ ohos_shared_library("datashare_common") {
     "napi:ace_napi",
     "relational_store:native_appdatafwk",
   ]
-
-  if (suspend_manager_enable) {
-    external_deps += [ "efficiency_manager:suspend_manager_client" ]
-    defines += [ "EFFICIENCY_MANAGER_ENABLE" ]
-  }
 
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"

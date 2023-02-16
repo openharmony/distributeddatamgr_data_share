@@ -340,11 +340,6 @@ std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
     if (proxy != nullptr) {
         resultset = proxy->Query(uri, predicates, columns);
     }
-
-    if (resultset) {
-        resultset->SetUri(uri_.ToString());
-    }
-
     return resultset;
 }
 
