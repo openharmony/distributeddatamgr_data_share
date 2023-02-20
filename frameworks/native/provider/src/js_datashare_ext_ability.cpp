@@ -187,7 +187,7 @@ NativeValue* JsDataShareExtAbility::AsyncCallback(NativeEngine* engine, NativeCa
     if ((info->argv[0])->TypeOf() == NATIVE_OBJECT) {
         LOG_ERROR("Error in callback");
         if (!UnWrapBusinessError(reinterpret_cast<napi_env>(engine), reinterpret_cast<napi_value>(info->argv[0]),
-                businessError)) {
+            businessError)) {
             LOG_ERROR("UnWrapBusinessError failed");
             return engine->CreateUndefined();
         }
@@ -645,8 +645,7 @@ napi_value JsDataShareExtAbility::MakePredicates(napi_env env, const DataSharePr
     return napiPredicates;
 }
 
-bool JsDataShareExtAbility::UnWrapBusinessError(napi_env env, napi_value info,
-    DatashareBusinessError &businessError)
+bool JsDataShareExtAbility::UnWrapBusinessError(napi_env env, napi_value info, DatashareBusinessError &businessError)
 {
     LOG_DEBUG("UnWrapBusinessError start");
     std::string codeStr;

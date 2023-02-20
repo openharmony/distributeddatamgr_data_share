@@ -23,19 +23,23 @@ public:
     DatashareBusinessError() = default;
     ~DatashareBusinessError() = default;
 
-    std::string GetCode() {
+    std::string GetCode()
+    {
         return code_;
     }
 
-    void SetCode(std::string code) {
+    void SetCode(std::string code)
+    {
         code_ = code;
     }
 
-    std::string GetMessage() {
+    std::string GetMessage()
+    {
         return message_;
     }
     
-    void SetMessage(std::string message) {
+    void SetMessage(std::string message)
+    {
         message_ = message;
     }
 

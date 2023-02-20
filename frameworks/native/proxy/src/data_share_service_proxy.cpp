@@ -97,8 +97,8 @@ int32_t DataShareServiceProxy::Delete(const Uri &uri, const DataSharePredicates 
     return reply.ReadInt32();
 }
 
-std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
-    const Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns, DatashareBusinessError &businessError)
+std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri, const DataSharePredicates &predicates,
+    std::vector<std::string> &columns, DatashareBusinessError &businessError)
 {
     const std::string &uriStr = uri.ToString();
     MessageParcel data;

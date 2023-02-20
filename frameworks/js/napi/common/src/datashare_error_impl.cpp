@@ -62,7 +62,7 @@ int BusinessError::GetCode() const
     return code_;
 }
 
-std::string BusinessError::GetMessage() const 
+std::string BusinessError::GetMessage() const
 {
     return message_;
 }

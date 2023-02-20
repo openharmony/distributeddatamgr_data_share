@@ -309,8 +309,7 @@ private:
     napi_value MakePredicates(napi_env env, const DataSharePredicates &predicates);
     static NativeValue* AsyncCallback(NativeEngine* engine, NativeCallbackInfo* info);
     void CheckAndSetAsyncResult(NativeEngine* engine);
-    static bool UnWrapBusinessError(napi_env env, napi_value info,
-        DatashareBusinessError &businessError);
+    static bool UnWrapBusinessError(napi_env env, napi_value info, DatashareBusinessError &businessError);
 
     JsRuntime& jsRuntime_;
     std::unique_ptr<NativeReference> jsObj_;
