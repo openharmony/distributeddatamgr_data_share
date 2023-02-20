@@ -46,6 +46,7 @@ AsyncCall::~AsyncCall()
     }
 
     DeleteContext(env_, context_);
+    context_ = nullptr;
 }
 
 napi_value AsyncCall::Call(napi_env env, Context::ExecAction exec)
@@ -54,7 +55,6 @@ napi_value AsyncCall::Call(napi_env env, Context::ExecAction exec)
         LOG_DEBUG("context_ or context_->ctx is null");
         return nullptr;
     }
-    LOG_DEBUG("async call exec");
     context_->ctx->exec_ = std::move(exec);
     napi_value promise = nullptr;
     if (context_->callback == nullptr) {
@@ -69,7 +69,6 @@ napi_value AsyncCall::Call(napi_env env, Context::ExecAction exec)
     context_->work = work;
     context_ = nullptr;
     napi_queue_async_work(env, work);
-    LOG_DEBUG("async call exec");
     return promise;
 }
 
@@ -93,7 +92,6 @@ napi_value AsyncCall::SyncCall(napi_env env, AsyncCall::Context::ExecAction exec
 
 void AsyncCall::OnExecute(napi_env env, void *data)
 {
-    LOG_DEBUG("run the async runnable");
     AsyncContext *context = reinterpret_cast<AsyncContext *>(data);
     context->ctx->Exec();
 }
@@ -113,7 +111,6 @@ void SetBusinessError(napi_env env, napi_value *businessError, std::shared_ptr<E
 
 void AsyncCall::OnComplete(napi_env env, napi_status status, void *data)
 {
-    LOG_DEBUG("run the js callback function");
     AsyncContext *context = reinterpret_cast<AsyncContext *>(data);
     napi_value output = nullptr;
     napi_status runStatus = (*context->ctx)(env, &output);
@@ -154,6 +151,12 @@ void AsyncCall::DeleteContext(napi_env env, AsyncContext *context)
         napi_delete_reference(env, context->callback);
         napi_delete_reference(env, context->self);
         napi_delete_async_work(env, context->work);
+    }
+    if (context != nullptr) {
+        context->ctx->exec_ = nullptr;
+        context->ctx->input_ = nullptr;
+        context->ctx->output_ = nullptr;
+        context->ctx = nullptr;
     }
     delete context;
 }
