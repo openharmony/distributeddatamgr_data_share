@@ -20,6 +20,7 @@
 #include "datashare_values_bucket.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
+#include "datashare_business_error.h"
 
 #ifndef DATA_SHARE_BASE_PROXY_H
 #define DATA_SHARE_BASE_PROXY_H
@@ -93,16 +94,17 @@ public:
     virtual int Delete(const Uri &uri, const DataSharePredicates &predicates) = 0;
 
     /**
-    * @brief Deletes one or more data records from the database.
+    * @brief Query records from the database.
     *
     * @param uri Indicates the path of data to query.
     * @param predicates Indicates filter criteria. You should define the processing logic when this parameter is null.
     * @param columns Indicates the columns to query. If this parameter is null, all columns are queried.
+    * @param businessError Indicates the error by query.
     *
     * @return Returns the query result.
     */
-    virtual std::shared_ptr<DataShareResultSet> Query(
-            const Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns) = 0;
+    virtual std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
+        std::vector<std::string> &columns, DatashareBusinessError &businessError) = 0;
 
     /**
     * @brief Obtains the MIME type matching the data specified by the URI of the Data ability. This method should be

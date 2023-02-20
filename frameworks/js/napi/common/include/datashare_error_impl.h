@@ -52,6 +52,16 @@ public:
     std::string GetMessage() const override;
     int GetCode() const override;
 };
+
+class BusinessError : public Error {
+public:
+    BusinessError(int code, const std::string &message) : code_(code), message_(message) {};
+    std::string GetMessage() const override;
+    int GetCode() const override;
+private:
+    int code_;
+    std::string message_;
+};
 } // namespace DataShare
 } // namespace OHOS
 #endif // DATASHARE_ERROR_IMPL_H

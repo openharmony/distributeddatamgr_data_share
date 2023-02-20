@@ -239,12 +239,11 @@ ErrCode DataShareStub::CmdQuery(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to ReadStringVector columns");
         return ERR_INVALID_VALUE;
     }
-    auto resultSet = Query(*uri, predicates, columns);
-    if (resultSet == nullptr) {
-        LOG_ERROR("fail to WriteParcelable resultSet");
-        return ERR_INVALID_VALUE;
-    }
+    DatashareBusinessError businessError;
+    auto resultSet = Query(*uri, predicates, columns, businessError);
     auto result = ISharedResultSet::WriteToParcel(std::move(resultSet), reply);
+    reply.WriteString(businessError.GetCode());
+    reply.WriteString(businessError.GetMessage());
     if (result == nullptr) {
         LOG_ERROR("!resultSet->Marshalling(reply)");
         return ERR_INVALID_VALUE;

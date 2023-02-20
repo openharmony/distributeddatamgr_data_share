@@ -202,7 +202,7 @@ int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predica
 }
 
 std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
-    const DataSharePredicates &predicates, std::vector<std::string> &columns)
+    const DataSharePredicates &predicates, std::vector<std::string> &columns, DatashareBusinessError &businessError)
 {
     CallingInfo info;
     GetCallingInfo(info);
@@ -221,13 +221,14 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
     std::function<void()> syncTaskFunc = [=, &columns, &resultSet, &extension]() {
         resultSet = extension->Query(uri, predicates, columns);
     };
-    std::function<bool()> getRetFunc = [=, &resultSet, client = sptr<DataShareStubImpl>(this)]() -> bool {
+    std::function<bool()> getRetFunc = [=, &resultSet, &businessError, client = sptr<DataShareStubImpl>(this)]() -> bool {
         auto extension = client->GetOwner();
         if (extension == nullptr) {
             return false;
         }
         extension->SetCallingInfo(info);
         extension->GetResult(resultSet);
+        extension->GetBusinessError(businessError);
         return (resultSet != nullptr);
     };
     std::lock_guard<std::mutex> lock(mutex_);

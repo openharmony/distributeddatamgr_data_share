@@ -183,11 +183,14 @@ NativeValue* JsDataShareExtAbility::AsyncCallback(NativeEngine* engine, NativeCa
         return engine->CreateUndefined();
     }
 
-    int32_t value = -1;
-    if ((info->argv[0])->TypeOf() == NATIVE_NUMBER) {
-        value = OHOS::AppExecFwk::UnwrapInt32FromJS(reinterpret_cast<napi_env>(engine),
-            reinterpret_cast<napi_value>(info->argv[0]));
-        LOG_INFO("value_number : %{public}d.", value);
+    DatashareBusinessError businessError;
+    if ((info->argv[0])->TypeOf() == NATIVE_OBJECT) {
+        LOG_ERROR("Error in callback");
+        if (!UnWrapBusinessError(reinterpret_cast<napi_env>(engine), reinterpret_cast<napi_value>(info->argv[0]),
+                businessError)) {
+            LOG_ERROR("UnWrapBusinessError failed");
+            return engine->CreateUndefined();
+        }
     }
 
     if (info->functionInfo == nullptr || info->functionInfo->data == nullptr) {
@@ -198,6 +201,7 @@ NativeValue* JsDataShareExtAbility::AsyncCallback(NativeEngine* engine, NativeCa
     JsDataShareExtAbility* instance = static_cast<JsDataShareExtAbility*>(info->functionInfo->data);
     if (instance != nullptr) {
         instance->SetBlockWaiting(true);
+        instance->SetBusinessError(businessError);
         instance->SetAsyncResult(info->argv[1]);
         instance->CheckAndSetAsyncResult(engine);
     }
@@ -639,6 +643,26 @@ napi_value JsDataShareExtAbility::MakePredicates(napi_env env, const DataSharePr
         LOG_ERROR("failed to make new instance of DataSharePredicates.");
     }
     return napiPredicates;
+}
+
+bool JsDataShareExtAbility::UnWrapBusinessError(napi_env env, napi_value info,
+    DatashareBusinessError &businessError)
+{
+    LOG_DEBUG("UnWrapBusinessError start");
+    std::string codeStr;
+    if (!UnwrapStringByPropertyName(env, info, "code", codeStr)) {
+        LOG_ERROR("failed to UnwrapStringByPropertyName");
+        return false;
+    }
+    businessError.SetCode(codeStr);
+
+    std::string msgStr;
+    if (!UnwrapStringByPropertyName(env, info, "message", msgStr)) {
+        LOG_ERROR("failed to UnwrapStringByPropertyName");
+        return false;
+    }
+    businessError.SetMessage(msgStr);
+    return true;
 }
 
 bool MakeNapiColumn(napi_env env, napi_value &napiColumns, const std::vector<std::string> &columns)

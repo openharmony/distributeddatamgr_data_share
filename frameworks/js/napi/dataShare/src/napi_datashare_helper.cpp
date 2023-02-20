@@ -350,6 +350,8 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
 {
     LOG_DEBUG("Start");
     auto context = std::make_shared<ContextInfo>();
+    int errorCode = 0;
+    std::string errorMessage = "";
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 3 && argc != 4) {
             context->error = std::make_shared<ParametersNumError>("3 or 4");
@@ -367,7 +369,13 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
         context->columns = DataShareJSUtils::Convert2StrVector(env, argv[2], DataShareJSUtils::DEFAULT_BUF_SIZE);
         return napi_ok;
     };
-    auto output = [context](napi_env env, napi_value *result) -> napi_status {
+    auto output = [context, &errorCode, &errorMessage](napi_env env, napi_value *result) -> napi_status {
+        if (errorCode != 0) {
+            LOG_DEBUG("errorCode : %{public}d", errorCode);
+            context->error = std::make_shared<BusinessError>(errorCode, errorMessage);
+            return napi_generic_failure;
+        }
+
         if (context->resultObject == nullptr) {
             context->error = std::make_shared<InnerError>();
             return napi_generic_failure;
@@ -375,10 +383,11 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
         *result = DataShareResultSetProxy::NewInstance(env, context->resultObject);
         return napi_ok;
     };
-    auto exec = [context](AsyncCall::Context *ctx) {
+    auto exec = [context, &errorCode, &errorMessage](AsyncCall::Context *ctx) {
         if (context->proxy->datashareHelper_ != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
-            context->resultObject = context->proxy->datashareHelper_->Query(uri, context->predicates, context->columns);
+            context->resultObject = context->proxy->datashareHelper_->Query(uri,
+                context->predicates, context->columns, &errorCode, &errorMessage);
             context->status = napi_ok;
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",

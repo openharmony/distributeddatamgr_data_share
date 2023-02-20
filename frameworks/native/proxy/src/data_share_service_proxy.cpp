@@ -98,7 +98,7 @@ int32_t DataShareServiceProxy::Delete(const Uri &uri, const DataSharePredicates 
 }
 
 std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
-    const Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns)
+    const Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns, DatashareBusinessError &businessError)
 {
     const std::string &uriStr = uri.ToString();
     MessageParcel data;
@@ -115,11 +115,15 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(
     MessageParcel reply;
     MessageOption option;
     int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_QUERY, data, reply, option);
+    
+    auto result = ISharedResultSet::ReadFromParcel(reply);
+    businessError.SetCode(std::to_string(reply.ReadInt32()));
     if (err != NO_ERROR) {
         LOG_ERROR("Query fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
         return nullptr;
     }
-    return ISharedResultSet::ReadFromParcel(reply);
+    return result;
+    // return ISharedResultSet::ReadFromParcel(reply);
 }
 
 

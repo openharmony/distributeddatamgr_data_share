@@ -20,6 +20,7 @@
 #include <map>
 
 #include "idatashare.h"
+#include "datashare_business_error.h"
 
 namespace OHOS {
 namespace DataShare {

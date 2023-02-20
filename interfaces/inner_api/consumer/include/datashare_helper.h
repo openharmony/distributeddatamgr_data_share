@@ -143,16 +143,19 @@ public:
     int Delete(Uri &uri, const DataSharePredicates &predicates);
 
     /**
-     * @brief Deletes one or more data records from the database.
+     * @brief Query records from the database.
      *
      * @param uri Indicates the path of data to query.
      * @param predicates Indicates filter criteria. You should define the processing logic when this parameter is null.
      * @param columns Indicates the columns to query. If this parameter is null, all columns are queried.
+     * @param errCode The optional error code returned by query, if this parameter is nullptr, not return error code.
+     * @param errMessage The optional error message returned by query, if this parameter is nullptr,
+     * not return error message.
      *
      * @return Returns the query result.
      */
-    std::shared_ptr<DataShareResultSet> Query(
-        Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns);
+    std::shared_ptr<DataShareResultSet> Query(Uri &uri, const DataSharePredicates &predicates,
+        std::vector<std::string> &columns, int *errCode = nullptr, std::string *errMessage = nullptr);
 
     /**
      * @brief Obtains the MIME type matching the data specified by the URI of the Data share. This method should be
