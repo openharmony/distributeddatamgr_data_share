@@ -202,8 +202,8 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
                     proxy->datashareHelper_->UnregisterObserver(Uri(it->first), it->second);
                 }
                 it->second->DeleteReference();
+                it = proxy->observerMap_.erase(it);
             }
-            proxy->observerMap_.clear();
             delete proxy;
         }
     };
