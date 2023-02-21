@@ -59,8 +59,8 @@ public:
     std::string GetMessage() const override;
     int GetCode() const override;
 private:
-    int code_;
-    std::string message_;
+    int code_ = 0;
+    std::string message_ = "";
 };
 } // namespace DataShare
 } // namespace OHOS

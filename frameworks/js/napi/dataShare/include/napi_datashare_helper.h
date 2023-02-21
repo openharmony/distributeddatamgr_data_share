@@ -79,6 +79,8 @@ private:
         std::vector<std::string> columns;
         std::vector<DataShareValuesBucket> values;
         std::string mimeTypeFilter;
+        int errorCode = 0;
+        std::string errorMessage = "";
 
         ContextInfo() : Context(nullptr, nullptr) {};
         ContextInfo(InputAction input, OutputAction output) : Context(std::move(input), std::move(output)) {};
