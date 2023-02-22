@@ -113,7 +113,6 @@ bool ITypesUtils::Unmarshalling(Parcel &data, std::vector<uint8_t> &output)
 
 bool ITypesUtils::Marshalling(const DataSharePredicates &predicates, Parcel &parcel)
 {
-    LOG_DEBUG("Marshalling DataSharePredicates Start");
     const auto &operations = predicates.GetOperationList();
     int16_t mode = predicates.GetSettingMode();
     return ITypesUtils::Marshal(parcel, operations, predicates.GetWhereClause(), predicates.GetWhereArgs(),
@@ -122,7 +121,6 @@ bool ITypesUtils::Marshalling(const DataSharePredicates &predicates, Parcel &par
 
 bool ITypesUtils::Unmarshalling(Parcel &parcel, DataSharePredicates &predicates)
 {
-    LOG_DEBUG("Unmarshalling DataSharePredicates Start");
     std::vector<OperationItem> operations{};
     std::string whereClause = "";
     std::vector<std::string> whereArgs;

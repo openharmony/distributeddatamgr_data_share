@@ -346,12 +346,20 @@ napi_value DataShareResultSetProxy::GetDouble(napi_env env, napi_callback_info i
 napi_value DataShareResultSetProxy::Close(napi_env env, napi_callback_info info)
 {
     int errCode = E_ERROR;
-    std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
+    DataShareResultSetProxy *resultSet = nullptr;
+    napi_value self = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &self, nullptr);
+    napi_unwrap(env, self, reinterpret_cast<void **>(&resultSet));
+    if (resultSet == nullptr) {
+        return DataShareJSUtils::Convert2JSValue(env, (errCode == E_OK));
+    }
+    auto innerResultSet = resultSet->resultSet_;
     if (innerResultSet != nullptr) {
         errCode = innerResultSet->Close();
         if (errCode != E_OK) {
             LOG_ERROR("failed code:%{public}d", errCode);
         }
+        resultSet->resultSet_ = nullptr;
     } else {
         LOG_ERROR("GetInnerResultSet failed.");
     }
