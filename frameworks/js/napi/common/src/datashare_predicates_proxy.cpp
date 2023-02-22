@@ -87,8 +87,7 @@ napi_value DataSharePredicatesProxy::New(napi_env env, napi_callback_info info)
     if (is_constructor) {
         auto *proxy = new DataSharePredicatesProxy();
         proxy->predicates_ = std::make_shared<DataSharePredicates>();
-        proxy->env_ = env;
-        napi_status ret = napi_wrap(env, thiz, proxy, DataSharePredicatesProxy::Destructor, nullptr, &proxy->wrapper_);
+        napi_status ret = napi_wrap(env, thiz, proxy, DataSharePredicatesProxy::Destructor, nullptr, nullptr);
         if (ret != napi_ok) {
             delete proxy;
             LOG_ERROR("napi_wrap error");
@@ -154,11 +153,10 @@ void DataSharePredicatesProxy::Destructor(napi_env env, void *nativeObject, void
 
 DataSharePredicatesProxy::~DataSharePredicatesProxy()
 {
-    napi_delete_reference(env_, wrapper_);
+    predicates_ = nullptr;
 }
 
 DataSharePredicatesProxy::DataSharePredicatesProxy()
-    : env_(nullptr), wrapper_(nullptr)
 {
 }
 

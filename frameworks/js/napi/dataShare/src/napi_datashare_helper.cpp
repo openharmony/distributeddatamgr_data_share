@@ -43,7 +43,6 @@ static DataSharePredicates UnwrapDataSharePredicates(napi_env env, napi_value va
 static bool UnwrapValuesBucketArrayFromJS(napi_env env, napi_value param,
     std::vector<DataShareValuesBucket> &value)
 {
-    LOG_DEBUG("Start");
     uint32_t arraySize = 0;
     napi_value jsValue = nullptr;
     std::string strValue = "";
@@ -73,7 +72,6 @@ static bool UnwrapValuesBucketArrayFromJS(napi_env env, napi_value param,
 
 static std::vector<DataShareValuesBucket> GetValuesBucketArray(napi_env env, napi_value param, bool &status)
 {
-    LOG_DEBUG("Start");
     std::vector<DataShareValuesBucket> result;
     status = UnwrapValuesBucketArrayFromJS(env, param, result);
     return result;
@@ -81,7 +79,6 @@ static std::vector<DataShareValuesBucket> GetValuesBucketArray(napi_env env, nap
 
 static bool GetUri(napi_env env, napi_value jsValue, std::string &uri)
 {
-    LOG_DEBUG("Start");
     napi_valuetype valuetype = napi_undefined;
     napi_typeof(env, jsValue, &valuetype);
     if (valuetype != napi_string) {
@@ -93,7 +90,6 @@ static bool GetUri(napi_env env, napi_value jsValue, std::string &uri)
 
 napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     auto ctxInfo = std::make_shared<CreateContextInfo>();
     auto input = [ctxInfo](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
@@ -161,7 +157,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         }
     };
     ctxInfo->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(ctxInfo));
+    AsyncCall asyncCall(env, info, ctxInfo);
     return asyncCall.Call(env, exec);
 }
 
@@ -206,8 +202,8 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
                     proxy->datashareHelper_->UnregisterObserver(Uri(it->first), it->second);
                 }
                 it->second->DeleteReference();
+                it = proxy->observerMap_.erase(it);
             }
-            proxy->observerMap_.clear();
             delete proxy;
         }
     };
@@ -220,7 +216,6 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
 
 napi_value NapiDataShareHelper::Napi_OpenFile(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         NAPI_ASSERT_BASE(env, argc == 2 || argc == 3, " should 2 or 3 parameters!", napi_invalid_arg);
@@ -252,20 +247,18 @@ napi_value NapiDataShareHelper::Napi_OpenFile(napi_env env, napi_callback_info i
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
 napi_value NapiDataShareHelper::Napi_Insert(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
             context->error = std::make_shared<ParametersNumError>("2 or 3");
             return napi_invalid_arg;
         }
-        LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
         if (!GetUri(env, argv[0], context->uri)) {
             context->error = std::make_shared<ParametersTypeError>("uri", "string");
@@ -300,20 +293,18 @@ napi_value NapiDataShareHelper::Napi_Insert(napi_env env, napi_callback_info inf
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
 napi_value NapiDataShareHelper::Napi_Delete(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
             context->error = std::make_shared<ParametersNumError>("2 or 3");
             return napi_invalid_arg;
         }
-        LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
         if (!GetUri(env, argv[0], context->uri)) {
             context->error = std::make_shared<ParametersTypeError>("uri", "string");
@@ -342,20 +333,18 @@ napi_value NapiDataShareHelper::Napi_Delete(napi_env env, napi_callback_info inf
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
 napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 3 && argc != 4) {
             context->error = std::make_shared<ParametersNumError>("3 or 4");
             return napi_invalid_arg;
         }
-        LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
         if (!GetUri(env, argv[0], context->uri)) {
             context->error = std::make_shared<ParametersTypeError>("uri", "string");
@@ -379,6 +368,7 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
             return napi_generic_failure;
         }
         *result = DataShareResultSetProxy::NewInstance(env, context->resultObject);
+        context->resultObject = nullptr;
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
@@ -393,20 +383,18 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
 napi_value NapiDataShareHelper::Napi_Update(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 3 && argc != 4) {
             context->error = std::make_shared<ParametersNumError>("3 or 4");
             return napi_invalid_arg;
         }
-        LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
         if (!GetUri(env, argv[0], context->uri)) {
             context->error = std::make_shared<ParametersTypeError>("uri", "string");
@@ -443,20 +431,18 @@ napi_value NapiDataShareHelper::Napi_Update(napi_env env, napi_callback_info inf
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
 napi_value NapiDataShareHelper::Napi_BatchInsert(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2 && argc != 3) {
             context->error = std::make_shared<ParametersNumError>("2 or 3");
             return napi_invalid_arg;
         }
-        LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
         if (!GetUri(env, argv[0], context->uri)) {
             context->error = std::make_shared<ParametersTypeError>("uri", "string");
@@ -490,17 +476,15 @@ napi_value NapiDataShareHelper::Napi_BatchInsert(napi_env env, napi_callback_inf
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
 napi_value NapiDataShareHelper::Napi_GetType(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         NAPI_ASSERT_BASE(env, argc == 1 || argc == 2, " should 1 or 2 parameters!", napi_invalid_arg);
-        LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
         GetUri(env, argv[0], context->uri);
         return napi_ok;
@@ -520,17 +504,15 @@ napi_value NapiDataShareHelper::Napi_GetType(napi_env env, napi_callback_info in
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
 napi_value NapiDataShareHelper::Napi_GetFileTypes(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         NAPI_ASSERT_BASE(env, argc == 2 || argc == 3, " should 2 or 3 parameters!", napi_invalid_arg);
-        LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
         GetUri(env, argv[0], context->uri);
 
@@ -558,17 +540,15 @@ napi_value NapiDataShareHelper::Napi_GetFileTypes(napi_env env, napi_callback_in
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
 napi_value NapiDataShareHelper::Napi_NormalizeUri(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         NAPI_ASSERT_BASE(env, argc == 1 || argc == 2, " should 1 or 2 parameters!", napi_invalid_arg);
-        LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
         GetUri(env, argv[0], context->uri);
         return napi_ok;
@@ -589,17 +569,15 @@ napi_value NapiDataShareHelper::Napi_NormalizeUri(napi_env env, napi_callback_in
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
 napi_value NapiDataShareHelper::Napi_DenormalizeUri(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         NAPI_ASSERT_BASE(env, argc == 1 || argc == 2, " should 1 or 2 parameters!", napi_invalid_arg);
-        LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
         GetUri(env, argv[0], context->uri);
         return napi_ok;
@@ -620,17 +598,15 @@ napi_value NapiDataShareHelper::Napi_DenormalizeUri(napi_env env, napi_callback_
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
 napi_value NapiDataShareHelper::Napi_NotifyChange(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         NAPI_ASSERT_BASE(env, argc == 1 || argc == 2, " should 1 or 2 parameters!", napi_invalid_arg);
-        LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
 
         GetUri(env, argv[0], context->uri);
         return napi_ok;
@@ -650,13 +626,12 @@ napi_value NapiDataShareHelper::Napi_NotifyChange(napi_env env, napi_callback_in
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
 napi_value NapiDataShareHelper::Napi_On(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value self = nullptr;
     size_t argc = MAX_ARGC;
     napi_value argv[MAX_ARGC] = {nullptr};
@@ -702,7 +677,6 @@ napi_value NapiDataShareHelper::Napi_On(napi_env env, napi_callback_info info)
 
 napi_value NapiDataShareHelper::Napi_Off(napi_env env, napi_callback_info info)
 {
-    LOG_DEBUG("Start");
     napi_value self = nullptr;
     size_t argc = MAX_ARGC;
     napi_value argv[MAX_ARGC] = {nullptr};

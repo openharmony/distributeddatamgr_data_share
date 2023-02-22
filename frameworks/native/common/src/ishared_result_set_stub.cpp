@@ -46,15 +46,12 @@ ISharedResultSetStub::ISharedResultSetStub(std::shared_ptr<DataShareResultSet> r
       thread_(&ISharedResultSetStub::Run, this)
 {
     thread_.detach();
-    LOG_ERROR("start thread(%{public}" PRIx64 ")", uint64_t(thread_.native_handle()));
 }
 ISharedResultSetStub::~ISharedResultSetStub()
 {
-    auto handle = thread_.native_handle();
     isRunning_ = false;
     // do not delete this code, this code is waiting the thread exit.
     isRunning_ = Submit([this]() -> bool { return isRunning_;}).get();
-    LOG_ERROR("thread(%{public}" PRIx64 ")", uint64_t(handle));
 }
 
 int ISharedResultSetStub::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data,
