@@ -23,12 +23,17 @@ public:
     DatashareBusinessError() = default;
     ~DatashareBusinessError() = default;
 
-    std::string GetCode()
+    int GetCode()
     {
         return code_;
     }
 
     void SetCode(std::string code)
+    {
+        code_ = atoi(code.c_str());
+    }
+
+    void SetCode(int code)
     {
         code_ = code;
     }
@@ -44,7 +49,7 @@ public:
     }
 
 private:
-    std::string code_ = "0";
+    int code_ = 0;
     std::string message_ = "";
 };
 }  // namespace DataShare

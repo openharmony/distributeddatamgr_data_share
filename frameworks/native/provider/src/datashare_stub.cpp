@@ -242,7 +242,7 @@ ErrCode DataShareStub::CmdQuery(MessageParcel &data, MessageParcel &reply)
     DatashareBusinessError businessError;
     auto resultSet = Query(*uri, predicates, columns, businessError);
     auto result = ISharedResultSet::WriteToParcel(std::move(resultSet), reply);
-    reply.WriteString(businessError.GetCode());
+    reply.WriteInt32(businessError.GetCode());
     reply.WriteString(businessError.GetMessage());
     if (result == nullptr) {
         LOG_ERROR("!resultSet->Marshalling(reply)");

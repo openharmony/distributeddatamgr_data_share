@@ -274,7 +274,7 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri,
     MessageOption option;
     int32_t err = Remote()->SendRequest(CMD_QUERY, data, reply, option);
     auto result = ISharedResultSet::ReadFromParcel(reply);
-    businessError.SetCode(reply.ReadString());
+    businessError.SetCode(reply.ReadInt32());
     businessError.SetMessage(reply.ReadString());
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("Query fail to SendRequest. err: %{public}d", err);

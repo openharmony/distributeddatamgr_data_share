@@ -342,7 +342,7 @@ std::shared_ptr<DataShareResultSet> DataShareHelper::Query(Uri &uri, const DataS
     if (proxy != nullptr) {
         resultset = proxy->Query(uri, predicates, columns, businessError);
         if (errCode != nullptr) {
-            *errCode = atoi(businessError.GetCode().c_str());
+            *errCode = businessError.GetCode();
         }
         if (errMessage != nullptr) {
             *errMessage = businessError.GetMessage();

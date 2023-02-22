@@ -293,8 +293,7 @@ public:
 
     void GetBusinessError(DatashareBusinessError &businessError)
     {
-        businessError.SetCode(businessError_.GetCode());
-        businessError.SetMessage(businessError_.GetMessage());
+        businessError = businessError_;
     }
 	
     void SetBusinessError(DatashareBusinessError &businessError)
@@ -310,6 +309,8 @@ private:
     static NativeValue* AsyncCallback(NativeEngine* engine, NativeCallbackInfo* info);
     void CheckAndSetAsyncResult(NativeEngine* engine);
     static bool UnWrapBusinessError(napi_env env, napi_value info, DatashareBusinessError &businessError);
+    static napi_valuetype UnWrapPropertyType(napi_env env, napi_value info,
+        DatashareBusinessError& businessError, const char *key);
 
     JsRuntime& jsRuntime_;
     std::unique_ptr<NativeReference> jsObj_;

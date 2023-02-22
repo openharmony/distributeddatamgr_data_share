@@ -117,7 +117,7 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri,
     int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_QUERY, data, reply, option);
     
     auto result = ISharedResultSet::ReadFromParcel(reply);
-    businessError.SetCode(std::to_string(reply.ReadInt32()));
+    businessError.SetCode(reply.ReadInt32());
     if (err != NO_ERROR) {
         LOG_ERROR("Query fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
         return nullptr;
