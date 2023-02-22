@@ -369,7 +369,7 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
         if (context->errorCode != 0) {
-            LOG_DEBUG("errorCode : %{public}d", context->errorCode);
+            LOG_ERROR("query failed, errorCode is %{public}d", context->errorCode);
             context->error = std::make_shared<BusinessError>(context->errorCode, context->errorMessage);
             return napi_generic_failure;
         }
