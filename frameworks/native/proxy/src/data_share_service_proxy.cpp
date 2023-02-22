@@ -123,7 +123,6 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri,
         return nullptr;
     }
     return result;
-    // return ISharedResultSet::ReadFromParcel(reply);
 }
 
 
