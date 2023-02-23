@@ -107,6 +107,7 @@ ohos_shared_library("datashare_provider") {
 
   deps = [
     "${ability_runtime_inner_api_path}/dataobs_manager:dataobs_manager",
+    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
     "${ability_runtime_path}/frameworks/native/appkit:app_context",
     "${datashare_innerapi_path}/common:datashare_common",
   ]
@@ -115,8 +116,6 @@ ohos_shared_library("datashare_provider") {
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_context_native",
-    "ability_runtime:extensionkit_native",
-    "ability_runtime:napi_common",
     "ability_runtime:runtime",
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
