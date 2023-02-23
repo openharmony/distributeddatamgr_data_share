@@ -15,7 +15,6 @@
 
 #include "datashare_ext_ability.h"
 
-#include "ability_loader.h"
 #include "connection_manager.h"
 #include "datashare_log.h"
 #include "js_datashare_ext_ability.h"
