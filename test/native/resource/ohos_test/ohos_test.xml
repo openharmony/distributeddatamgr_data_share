@@ -22,6 +22,7 @@
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
         </cleaner>
+    </target>
     <target name="JoinTest">
         <preparer>
             <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
