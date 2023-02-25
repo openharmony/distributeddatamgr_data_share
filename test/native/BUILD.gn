@@ -19,9 +19,9 @@ group("unittest") {
   deps = []
 
   deps += [
+    ":JoinTest",
     ":NativeDataShareTest",
     ":SlientAccessTest",
-    ":JoinTest",
     "resource/datashare_ext_bundle:datashare_ext",
     "resource/ohos_test:copy_ohos_test",
   ]
@@ -52,8 +52,8 @@ ohos_unittest("NativeDataShareTest") {
 
   sources = [
     "./unittest/mediadatashare_test/src/get_self_permissions.cpp",
-    "./unittest/mediadatashare_test/src/mediadatashare_unit_test.cpp",
     "./unittest/mediadatashare_test/src/join_test.cpp",
+    "./unittest/mediadatashare_test/src/mediadatashare_unit_test.cpp",
   ]
 
   deps = [
