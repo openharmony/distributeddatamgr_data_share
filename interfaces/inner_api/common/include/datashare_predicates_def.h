@@ -91,7 +91,7 @@ typedef enum {
     NOTBETWEEN,
     /** Indicates the parameters is KEY_PREFIX.*/
     KEY_PREFIX,
-    /** Indicates the parameters is CROSSJOIN.*/    
+    /** Indicates the parameters is CROSSJOIN.*/
     CROSSJOIN,
     /** Indicates the parameters is INNERJOIN.*/
     INNERJOIN,

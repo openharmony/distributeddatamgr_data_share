@@ -37,7 +37,7 @@ std::string TBL_STU_NAME = "name";
 std::string TBL_STU_AGE = "age";
 std::shared_ptr<DataShare::DataShareHelper> g_slientAccessHelper;
 
-class JoinTest: public testing::Test {
+class JoinTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
