@@ -316,9 +316,9 @@ bool DataShareJSUtils::Equals(napi_env env, napi_value value, napi_ref copy)
     napi_value copyValue = nullptr;
     napi_get_reference_value(env, copy, &copyValue);
 
-    bool isEquals = false;
-    napi_strict_equals(env, value, copyValue, &isEquals);
-    return isEquals;
+    bool isEqual = false;
+    napi_strict_equals(env, value, copyValue, &isEqual);
+    return isEqual;
 }
 } // namespace DataShare
 } // namespace OHOS
