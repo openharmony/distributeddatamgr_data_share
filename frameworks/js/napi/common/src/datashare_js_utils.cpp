@@ -306,5 +306,19 @@ DataShareValueObject DataShareJSUtils::Convert2ValueObject(napi_env env, napi_va
         return {};
     }
 }
+
+bool DataShareJSUtils::Equals(napi_env env, napi_value value, napi_ref copy)
+{
+    if (copy == nullptr) {
+        return (value == nullptr);
+    }
+
+    napi_value copyValue = nullptr;
+    napi_get_reference_value(env, copy, &copyValue);
+
+    bool isEquals = false;
+    napi_strict_equals(env, value, copyValue, &isEquals);
+    return isEquals;
+}
 } // namespace DataShare
 } // namespace OHOS

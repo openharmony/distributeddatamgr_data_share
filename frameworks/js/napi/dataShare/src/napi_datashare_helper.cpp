@@ -644,17 +644,8 @@ napi_value NapiDataShareHelper::Napi_On(napi_env env, napi_callback_info info)
 
     NAPI_CALL(env, napi_typeof(env, argv[2], &valueType));
     NAPI_ASSERT_BASE(env, valueType == napi_function, "callback is not a function", nullptr);
-    sptr<NAPIDataShareObserver> observer(new (std::nothrow) NAPIDataShareObserver(env, argv[2]));
-
-    auto obs = proxy->observerMap_.find(uri);
-    if (obs != proxy->observerMap_.end()) {
-        proxy->datashareHelper_->UnregisterObserver(Uri(uri), obs->second);
-        obs->second->DeleteReference();
-        proxy->observerMap_.erase(uri);
-    }
-    proxy->datashareHelper_->RegisterObserver(Uri(uri), observer);
-    proxy->observerMap_.emplace(uri, observer);
-
+    
+    proxy->RegisteredObserver(env, uri, argv[PARAM2]);
     return nullptr;
 }
 
@@ -688,20 +679,71 @@ napi_value NapiDataShareHelper::Napi_Off(napi_env env, napi_callback_info info)
     std::string uri = DataShareJSUtils::Convert2String(env, argv[1]);
 
     if (argc == ARGS_THREE) {
-        NAPI_CALL(env, napi_typeof(env, argv[2], &valueType));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
         NAPI_ASSERT_BASE(env, valueType == napi_function, "callback is not a function", nullptr);
+        proxy->UnRegisteredObserver(env, uri, argv[PARAM2]);
+        return nullptr;
     }
+    proxy->UnRegisteredObserver(env, uri);
+    return nullptr;
+}
 
-    auto obs = proxy->observerMap_.find(uri);
-    if (obs != proxy->observerMap_.end()) {
-        proxy->datashareHelper_->UnregisterObserver(Uri(uri), obs->second);
-        obs->second->DeleteReference();
-        proxy->observerMap_.erase(uri);
+bool NapiDataShareHelper::HasRegisteredObserver(napi_env env, std::list<sptr<NAPIDataShareObserver>> list,
+    napi_value callback)
+{
+    for (auto &it : list) {
+        if (DataShareJSUtils::Equals(env, callback, it->GetCallback())) {
+            LOG_DEBUG("The observer has already subscribed.");
+            return true;
+        }
+    }
+    return false;
+}
+
+void NapiDataShareHelper::RegisteredObserver(napi_env env, const std::string& uri, napi_value callback)
+{
+    std::lock_guard<std::mutex> lck(listMutex_);
+    auto obs = observerMap_.find(uri);
+    if (obs == observerMap_.end()) {
+        LOG_DEBUG("this uri has not been Registered");
+        std::list<sptr<NAPIDataShareObserver>> list;
+        observerMap_.emplace(uri, list);
+    }
+    auto list = observerMap_.find(uri)->second;
+    if (!HasRegisteredObserver(env, list, callback)) {
+        sptr<NAPIDataShareObserver> observer(new (std::nothrow) NAPIDataShareObserver(env, callback));
+        datashareHelper_->RegisterObserver(Uri(uri), observer);
+        list.push_back(observer);
+        observerMap_[uri] = list;
+    } else {
+        LOG_DEBUG("has registered observer");
+    }
+    return;
+}
+
+void NapiDataShareHelper::UnRegisteredObserver(napi_env env, const std::string& uri, napi_value callback)
+{
+    std::lock_guard<std::mutex> lck(listMutex_);
+    auto obs = observerMap_.find(uri);
+    if (obs != observerMap_.end()) {
+        auto list = obs->second;
+        auto it = list.begin();
+        while (it != list.end()) {
+            if (callback != nullptr && !DataShareJSUtils::Equals(env, callback, (*it)->GetCallback())) {
+                ++it;
+                continue;
+            }
+            datashareHelper_->UnregisterObserver(Uri(uri), *it);
+            (*it)->DeleteReference();
+            it = list.erase(it);
+            observerMap_[uri] = list;
+        }
+        if (callback == nullptr || list.empty()) {
+            observerMap_.erase(uri);
+        }
     } else {
         LOG_DEBUG("this uri hasn't been registered");
     }
-
-    return nullptr;
 }
 }  // namespace DataShare
 }  // namespace OHOS
