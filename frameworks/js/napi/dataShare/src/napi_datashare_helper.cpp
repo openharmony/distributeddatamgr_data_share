@@ -195,17 +195,7 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
     auto *proxy = new NapiDataShareHelper();
     auto finalize = [](napi_env env, void * data, void * hint) {
         NapiDataShareHelper *proxy = reinterpret_cast<NapiDataShareHelper *>(data);
-        if (proxy != nullptr) {
-            auto it = proxy->observerMap_.begin();
-            while (it != proxy->observerMap_.end()) {
-                if (proxy->datashareHelper_ != nullptr) {
-                    proxy->datashareHelper_->UnregisterObserver(Uri(it->first), it->second);
-                }
-                it->second->DeleteReference();
-                it = proxy->observerMap_.erase(it);
-            }
-            delete proxy;
-        }
+        delete proxy;
     };
     if (napi_wrap(env, self, proxy, finalize, nullptr, nullptr) != napi_ok) {
         finalize(env, proxy, nullptr);
