@@ -688,7 +688,7 @@ napi_value NapiDataShareHelper::Napi_Off(napi_env env, napi_callback_info info)
     return nullptr;
 }
 
-bool NapiDataShareHelper::HasRegisteredObserver(napi_env env, std::list<sptr<NAPIDataShareObserver>> list,
+bool NapiDataShareHelper::HasRegisteredObserver(napi_env env, std::list<sptr<NAPIDataShareObserver>>& list,
     napi_value callback)
 {
     for (auto &it : list) {
