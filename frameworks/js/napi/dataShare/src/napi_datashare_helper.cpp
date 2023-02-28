@@ -684,7 +684,7 @@ napi_value NapiDataShareHelper::Napi_Off(napi_env env, napi_callback_info info)
         proxy->UnRegisteredObserver(env, uri, argv[PARAM2]);
         return nullptr;
     }
-    proxy->UnRegisteredAllObserverByUri(env, uri);
+    proxy->UnRegisteredAllObserversByUri(env, uri);
     return nullptr;
 }
 
