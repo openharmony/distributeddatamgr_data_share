@@ -44,10 +44,10 @@ private:
     static napi_value GetConstructor(napi_env env);
     static napi_value Initialize(napi_env env, napi_callback_info info);
 
-    bool HasRegisteredObserver(napi_env env, std::list<sptr<NAPIDataShareObserver>>& list, napi_value callback);
-    void RegisteredObserver(napi_env env, const std::string& uri, napi_value callback);
-    void UnRegisteredObserver(napi_env env, const std::string& uri, napi_value callback);
-    void UnRegisteredAllObserversByUri(napi_env env, const std::string& uri);
+    bool HasRegisteredObserver(napi_env env, std::list<sptr<NAPIDataShareObserver>> &list, napi_value callback);
+    void RegisteredObserver(napi_env env, const std::string &uri, napi_value callback);
+    void UnRegisteredObserver(napi_env env, const std::string &uri, napi_value callback);
+    void UnRegisteredObserver(napi_env env, const std::string &uri);
 
     std::shared_ptr<DataShareHelper> datashareHelper_ = nullptr;
     std::map<std::string, std::list<sptr<NAPIDataShareObserver>>> observerMap_;
