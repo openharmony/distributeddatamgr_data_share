@@ -91,6 +91,16 @@ typedef enum {
     NOTBETWEEN,
     /** Indicates the parameters is KEY_PREFIX.*/
     KEY_PREFIX,
+    /** Indicates the parameters is CROSSJOIN.*/
+    CROSSJOIN,
+    /** Indicates the parameters is INNERJOIN.*/
+    INNERJOIN,
+    /** Indicates the parameters is LEFTOUTERJOIN.*/
+    LEFTOUTERJOIN,
+    /** Indicates the parameters is USING.*/
+    USING,
+    /** Indicates the parameters is ON.*/
+    ON,
     /** Indicates the parameters is LAST_TYPE.*/
     LAST_TYPE
 } OperationType;

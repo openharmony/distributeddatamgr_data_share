@@ -22,6 +22,8 @@ let TBL_NAME = "TBL00";
 let DDL_TBL_CREATE = "CREATE TABLE IF NOT EXISTS "
 + TBL_NAME
 + " (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER, phoneNumber DOUBLE, isStudent BOOLEAN, Binary BINARY)";
+let DDL_TABLE_USER_SQL = "CREATE TABLE IF NOT EXISTS user (userId INTEGER PRIMARY KEY AUTOINCREMENT, firstName TEXT, lastName TEXT, age INTEGER , balance DOUBLE  NOT NULL)";
+let DDL_TABLE_BOOK_SQL = "CREATE TABLE IF NOT EXISTS book (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, userId INTEGER, FOREIGN KEY (userId) REFERENCES user (userId) ON UPDATE NO ACTION ON DELETE CASCADE)";
 
 let rdbStore;
 
@@ -34,6 +36,8 @@ extends Extension {
         rdbStore = await rdb.getRdbStore(this.context, { name: DB_NAME, securityLevel: rdb.SecurityLevel.S1 });
         console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility getRdbStore done');
         await rdbStore.executeSql(DDL_TBL_CREATE, []);
+        await rdbStore.executeSql(DDL_TABLE_USER_SQL, []);
+        await rdbStore.executeSql(DDL_TABLE_BOOK_SQL, []);
         console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility executeSql done');
         let err = {"code":0};
         callback(err);
