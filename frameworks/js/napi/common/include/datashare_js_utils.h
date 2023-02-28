@@ -63,6 +63,8 @@ public:
     static napi_value Convert2JSValue(napi_env env, const std::variant<Types...>& value);
     static std::vector<uint8_t> ConvertU8Vector(napi_env env, napi_value jsValue);
 
+    static bool Equals(napi_env env, napi_value value, napi_ref copy);
+
 private:
     template<typename _VTp>
     static napi_value ReadVariant(napi_env env, uint32_t step, uint32_t index, const _VTp &output)

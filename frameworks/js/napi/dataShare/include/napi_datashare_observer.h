@@ -30,6 +30,7 @@ public:
     virtual ~NAPIDataShareObserver();
     void OnChange() override;
     void DeleteReference();
+    napi_ref GetCallback();
 private:
     struct ObserverWorker {
         const NAPIDataShareObserver *observer_ = nullptr;
