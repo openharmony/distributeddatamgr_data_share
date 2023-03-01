@@ -22,6 +22,7 @@ namespace OHOS {
 namespace DataShare {
 class Error {
 public:
+    static const int E_OK = 0;
     static const int EXCEPTION_PARAMETER_CHECK = 401;
     static const int EXCEPTION_INNER = 15700000;
     static const int EXCEPTION_HELPER_UNINITIALIZED = 15700010;
