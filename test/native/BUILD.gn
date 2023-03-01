@@ -58,7 +58,6 @@ ohos_unittest("NativeDataShareTest") {
   deps = [
     "${ABILITY_RUNTIME_INNER_API_PATH}/ability_manager:ability_manager",
     "${ABILITY_RUNTIME_PATH}/frameworks/native/ability/native:abilitykit_native",
-    "//foundation/filemanagement/user_file_service/frameworks/innerkits/file_access:file_access_extension_ability_kit",
     "//foundation/multimedia/media_library/frameworks/innerkitsimpl/media_library_helper:media_library_packages",
     "//foundation/multimedia/media_library/frameworks/innerkitsimpl/media_library_manager:media_library_manager",
   ]
