@@ -122,7 +122,7 @@ extends Extension {
         console.info('[ttt] [DataShareTest] <<Provider>> [delete] leave');
     }
 
-    async query(uri, predicates, columns,  callback) {
+    async query(uri, predicates, columns, callback) {
         console.info('[ttt] [DataShareTest] <<Provider>> [query] enter');
         if (predicates == null || predicates == undefined) {
             console.info('[ttt] [DataShareTest] <<Provider>> [query] invalid predicates');
@@ -132,7 +132,7 @@ extends Extension {
         console.info('[ttt] [DataShareTest] <<Provider>> [query]  predicates = ' + predicates);
         console.info('[ttt] [DataShareTest] <<Provider>> [query]  predicates = ' + JSON.stringify(predicates));
         try {
-            await rdbStore.query(TBL_NAME, predicates, columns, function (err, resultSet) {
+            await rdbStore.query(columns, function (err, resultSet) {
                 console.info('[ttt] [DataShareTest] <<Provider>> [query] ret: ' + resultSet);
                 if (resultSet != undefined) {
                     console.info('[ttt] [DataShareTest] <<Provider>> [query] resultSet.rowCount: ' + resultSet.rowCount);
@@ -142,12 +142,13 @@ extends Extension {
                 }
             });
         } catch (err) {
-            console.error('[ttt] [DataShareTest] <<Provider>> [query] error' + err);
+            console.error(`[ttt] [DataShareTest] <<Provider>> [query] error: code: ${err.code}, message: ${err.message} `);
+            callback(err, undefined);
         }
         console.info('[ttt] [DataShareTest] <<Provider>> [query] leave');
     }
 
-    async getType(uri: string,callback) {
+    async getType(uri: string, callback) {
         console.info('[ttt] [DataShareTest] <<Provider>> [getType] enter');
         let ret = "image";
         console.info('[ttt] [DataShareTest] <<Provider>> [getType] leave, ret:' + ret);

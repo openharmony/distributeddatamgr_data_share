@@ -33,6 +33,7 @@ std::string SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB00/
 std::string TBL_STU_NAME = "name";
 std::string TBL_STU_AGE = "age";
 std::shared_ptr<DataShare::DataShareHelper> g_slientAccessHelper;
+std::shared_ptr<DataShare::DataShareHelper> dataShareHelper;
 
 class SlientAccessTest : public testing::Test {
 public:
@@ -61,7 +62,7 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t system
 void SlientAccessTest::SetUpTestCase(void)
 {
     LOG_INFO("SetUpTestCase invoked");
-    auto dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
+    dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
     ASSERT_TRUE(dataShareHelper != nullptr);
     int sleepTime = 3;
     sleep(sleepTime);
@@ -165,6 +166,32 @@ HWTEST_F(SlientAccessTest, SlientAccess_Query_Test_001, TestSize.Level0)
     LOG_INFO("SlientAccess_Query_Test_001::End");
 }
 
+HWTEST_F(SlientAccessTest, SlientAccess_QUERY_ERRORCODE_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_QUERY_ERRORCODE_Test_001::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_URI);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_NAME, "lisi");
+    vector<string> columns;
+    int err = 0;
+    auto resultSet = helper->Query(uri, predicates, columns, &err);
+    EXPECT_EQ(err, 0);
+    int result = 0;
+    if (resultSet != nullptr) {
+        resultSet->GetRowCount(result);
+    }
+    EXPECT_EQ(result, 1);
+
+    std::string ERR_SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB01/TBL01?Proxy=true";
+    Uri uriErr(ERR_SLIENT_ACCESS_URI);
+    resultSet = helper->Query(uriErr, predicates, columns, &err);
+    int ERR_DB_NOT_EXISTS = 14800045;
+    EXPECT_EQ(err, ERR_DB_NOT_EXISTS);
+    EXPECT_EQ(resultSet, nullptr);
+    LOG_INFO("SlientAccess_QUERY_ERRORCODE_Test_001::End");
+}
+
 HWTEST_F(SlientAccessTest, SlientAccess_Delete_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Delete_Test_001::Start");
@@ -177,6 +204,38 @@ HWTEST_F(SlientAccessTest, SlientAccess_Delete_Test_001, TestSize.Level0)
     int retVal = helper->Delete(uri, deletePredicates);
     EXPECT_EQ((retVal > 0), true);
     LOG_INFO("SlientAccess_Delete_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, QUERY_ERRORCODE_Test_001, TestSize.Level0)
+{
+    LOG_INFO("QUERY_ERRORCODE_Test_001::Start");
+    ASSERT_TRUE(dataShareHelper != nullptr);
+    Uri uri(DATA_SHARE_URI);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "wangwu";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 30;
+    valuesBucket.Put(TBL_STU_AGE, age);
+    int retVal = dataShareHelper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
+
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_NAME, "wangwu");
+    vector<string> columns;
+    int err = 0;
+    std::string msg = "";
+    auto resultSet = dataShareHelper->Query(uri, predicates, columns, &err, &msg);
+    EXPECT_EQ(err, 401);
+    EXPECT_EQ(msg, "Parameter error. The predicates must be an RdbPredicates.");
+    EXPECT_EQ(resultSet, nullptr);
+
+    DataShare::DataSharePredicates deletePredicates;
+    std::string selections = TBL_STU_NAME + " = 'wangwu'";
+    deletePredicates.SetWhereClause(selections);
+    retVal = dataShareHelper->Delete(uri, deletePredicates);
+    EXPECT_EQ((retVal > 0), true);
+    LOG_INFO("QUERY_ERRORCODE_Test_001::End");
 }
 } // namespace DataShare
 } // namespace OHOS
