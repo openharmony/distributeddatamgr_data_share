@@ -720,23 +720,14 @@ void JsDataShareExtAbility::UnWrapBusinessError(napi_env env, napi_value info,
     DatashareBusinessError& businessError)
 {
     std::string code = UnWrapProperty(env, info, "code");
-    if (!code.empty()) {
-        businessError.SetCode(code);
-    }
+    businessError.SetCode(code);
     std::string message = UnWrapProperty(env, info, "message");
-    if (!message.empty()) {
-        businessError.SetMessage(message);
-    }
+    businessError.SetMessage(message);
 }
 
 std::string JsDataShareExtAbility::UnWrapProperty(napi_env env, napi_value info, const std::string &key)
 {
     napi_valuetype type = UnWrapPropertyType(env, info, key);
-    if (type == napi_undefined) {
-        LOG_WARN("ValueType is undefined, property is %{public}s", key.c_str());
-        return "";
-    }
-
     if (type == napi_valuetype::napi_number) {
         int value;
         UnwrapInt32ByPropertyName(env, info, key.c_str(), value);

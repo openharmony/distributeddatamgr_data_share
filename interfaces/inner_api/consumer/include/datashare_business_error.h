@@ -30,7 +30,9 @@ public:
 
     void SetCode(const std::string &code)
     {
-        code_ = atoi(code.c_str());
+        if (!code.empty()) {
+            code_ = atoi(code.c_str());
+        }
     }
 
     void SetCode(int code)
@@ -49,7 +51,7 @@ public:
     }
 
     static constexpr int DB_NOT_EXIST_ERR = 14800045;
-    
+
 private:
     int code_ = 0;
     std::string message_ = "";

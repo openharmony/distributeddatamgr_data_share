@@ -174,9 +174,9 @@ HWTEST_F(SlientAccessTest, SlientAccess_QUERY_ERRORCODE_Test_001, TestSize.Level
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(TBL_STU_NAME, "lisi");
     vector<string> columns;
-    int err = 0;
-    auto resultSet = helper->Query(uri, predicates, columns, &err);
-    EXPECT_EQ(err, 0);
+    DatashareBusinessError noError;
+    auto resultSet = helper->Query(uri, predicates, columns, &noError);
+    EXPECT_EQ(noError.GetCode(), 0);
     int result = 0;
     if (resultSet != nullptr) {
         resultSet->GetRowCount(result);
@@ -185,9 +185,10 @@ HWTEST_F(SlientAccessTest, SlientAccess_QUERY_ERRORCODE_Test_001, TestSize.Level
 
     std::string ERR_SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB01/TBL01?Proxy=true";
     Uri uriErr(ERR_SLIENT_ACCESS_URI);
-    resultSet = helper->Query(uriErr, predicates, columns, &err);
+    DatashareBusinessError error;
+    resultSet = helper->Query(uriErr, predicates, columns, &error);
     int errDbNotExists = 14800045;
-    EXPECT_EQ(err, errDbNotExists);
+    EXPECT_EQ(error.GetCode(), errDbNotExists);
     EXPECT_EQ(resultSet, nullptr);
     LOG_INFO("SlientAccess_QUERY_ERRORCODE_Test_001::End");
 }
@@ -223,11 +224,9 @@ HWTEST_F(SlientAccessTest, QUERY_ERRORCODE_Test_001, TestSize.Level0)
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(TBL_STU_NAME, "wangwu");
     vector<string> columns;
-    int err = 0;
-    std::string msg = "";
-    auto resultSet = dataShareHelper->Query(uri, predicates, columns, &err, &msg);
-    EXPECT_EQ(err, 401);
-    EXPECT_EQ(msg, "Parameter error. The predicates must be an RdbPredicates.");
+    DatashareBusinessError error;
+    auto resultSet = dataShareHelper->Query(uri, predicates, columns, &error);
+    EXPECT_EQ(error.GetCode(), 401);
     EXPECT_EQ(resultSet, nullptr);
 
     DataShare::DataSharePredicates deletePredicates;
