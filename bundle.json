@@ -64,14 +64,20 @@
             "third_party": []
         },
         "build": {
-            "sub_component": [
-                "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_consumer",
-                "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_provider",
-                "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_ext_ability_module",
-                "//foundation/distributeddatamgr/data_share/frameworks/js/napi:datashare_napi_packages",
-                "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common"
-            ],
-            "inner_kits": [
+            "group_type": {
+                "base_group": [
+                ],
+                "fwk_group": [
+                    "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_consumer",
+                    "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_provider",
+                    "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common",
+                    "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_ext_ability_module",
+                    "//foundation/distributeddatamgr/data_share/frameworks/js/napi:datashare_napi_packages"
+                ],
+                "service_group": [
+                ]
+            },
+            "inner_api": [
                 {
                     "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_consumer",
                     "header": {

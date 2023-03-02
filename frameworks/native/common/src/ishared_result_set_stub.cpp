@@ -15,6 +15,7 @@
 
 #include "ishared_result_set_stub.h"
 #include <future>
+#include <sys/prctl.h>
 #include "datashare_log.h"
 #include "datashare_errno.h"
 
@@ -127,6 +128,7 @@ int ISharedResultSetStub::HandleCloseRequest(MessageParcel &data, MessageParcel 
 
 void ISharedResultSetStub::Run()
 {
+    pthread_setname_np(pthread_self(), "Shared_RSetStub");
     auto handle = thread_.native_handle();
     bool isRunning = true;
     while (isRunning) {
