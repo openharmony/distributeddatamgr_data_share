@@ -57,6 +57,12 @@ void NAPIDataShareObserver::OnChange()
                 LOG_ERROR("innerWorker->observer_->ref_ is nullptr");
                 return;
             }
+            napi_handle_scope scope = nullptr;
+            napi_open_handle_scope(innerWorker->observer_->env_, &scope);
+            if (scope == nullptr) {
+                return;
+            }
+
             napi_value callback = nullptr;
             napi_value args[2] = {0};
             napi_value global = nullptr;
@@ -66,6 +72,7 @@ void NAPIDataShareObserver::OnChange()
             napi_get_global(innerWorker->observer_->env_, &global);
             napi_status callStatus =
                 napi_call_function(innerWorker->observer_->env_, global, callback, 2, args, &result);
+            napi_close_handle_scope(innerWorker->observer_->env_, scope);
             if (callStatus != napi_ok) {
                 LOG_ERROR("napi_call_function failed status : %{public}d", callStatus);
             }
