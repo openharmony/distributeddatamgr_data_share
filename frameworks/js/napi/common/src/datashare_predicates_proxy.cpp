@@ -85,7 +85,11 @@ napi_value DataSharePredicatesProxy::New(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &thiz, nullptr));
 
     if (is_constructor) {
-        auto *proxy = new DataSharePredicatesProxy();
+        auto *proxy = new (std::nothrow) DataSharePredicatesProxy();
+        if (proxy == nullptr) {
+            LOG_ERROR("DataSharePredicatesProxy::New new DataSharePredicatesProxy error.");
+            return nullptr;
+        }
         proxy->predicates_ = std::make_shared<DataSharePredicates>();
         napi_status ret = napi_wrap(env, thiz, proxy, DataSharePredicatesProxy::Destructor, nullptr, nullptr);
         if (ret != napi_ok) {

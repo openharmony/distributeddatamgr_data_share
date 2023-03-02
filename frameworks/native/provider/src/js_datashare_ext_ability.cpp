@@ -236,7 +236,11 @@ NativeValue* JsDataShareExtAbility::CallObjectMethod(const char* name, NativeVal
     }
 
     size_t count = argc + 1;
-    NativeValue **args = new NativeValue *[count];
+    NativeValue **args = new (std::nothrow) NativeValue *[count];
+    if (args == nullptr) {
+        LOG_ERROR("JsDataShareExtAbility::CallObjectMethod new NativeValue error.");
+        return nullptr;
+    }
     for (size_t i = 0; i < argc; i++) {
         args[i] = argv[i];
     }
