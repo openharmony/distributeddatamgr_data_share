@@ -23,33 +23,33 @@ struct Index {
 
   build() {
     Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
-      Text('DataShare Extension Ability Test')
+      Text('DataShare Extension Ability ErrorCode Test')
         .fontSize(25)
         .fontWeight(FontWeight.Bold)
 
       Text(`${this.message}`)
-        .fontSize(30)
-        .height('15%')
+        .fontSize(25)
+        .height('20%')
         .width('100%')
         .textAlign(TextAlign.Center)
 
       Row() {
         Button() {
           Text('Connect')
-            .fontSize(25)
+            .fontSize(30)
             .fontWeight(FontWeight.Bold)
         }.type(ButtonType.Capsule)
         .margin({
-          top: 20
+          top: 25
         })
-        .width('45%')
-        .height('8%')
+        .width('50%')
+        .height('10%')
         .backgroundColor('#0ddffb')
         .onClick(async () => {
-          console.info('[ttt] [DataShareTest] <<UI>> Connect onclick enter')
+          console.info('[ttt] [DataShareTest] <<UI>> ErrorCode Connect onclick enter')
           this.message = 'Connect onclick'
           await globalThis.connectDataShareExtAbility()
-          console.info('[ttt] [DataShareTest] <<UI>> Connect onclick leave')
+          console.info('[ttt] [DataShareTest] <<UI>> ErrorCode Connect onclick leave')
         })
       }
     }

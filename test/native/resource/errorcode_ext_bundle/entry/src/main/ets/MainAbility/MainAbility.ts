@@ -22,18 +22,15 @@ let uri = ("datashare://com.acts.datasharetest/entry/DB00/TBL00?Proxy=true");
 
 export default class MainAbility extends Ability {
     onCreate(want, launchParam) {
-        // Ability is creating, initialize resources for this ability
         console.log("[ttt] [DataShareTest] <<Consumer>> MainAbility onCreate")
         globalThis.abilityWant = want;
     }
 
     onDestroy() {
-        // Ability is destroying, release resources for this ability
         console.log("[ttt] [DataShareTest] <<Consumer>> MainAbility onDestroy")
     }
 
     onWindowStageCreate(windowStage) {
-        // Main window is created, set main page for this ability
         globalThis.abilityContext = this.context;
         console.log("[ttt] [DataShareTest] <<Consumer>> MainAbility this.context.databaseDir:" + this.context.databaseDir);
         globalThis.connectDataShareExtAbility = (async () => {
@@ -45,17 +42,14 @@ export default class MainAbility extends Ability {
     }
 
     onWindowStageDestroy() {
-        // Main window is destroyed, release UI related resources
         console.log("[ttt] [DataShareTest] <<Consumer>> MainAbility onWindowStageDestroy")
     }
 
     onForeground() {
-        // Ability has brought to foreground
         console.log("[ttt] [DataShareTest] <<Consumer>> MainAbility onForeground")
     }
 
     onBackground() {
-        // Ability has back to background
         console.log("[ttt] [DataShareTest] <<Consumer>> MainAbility onBackground")
     }
 };

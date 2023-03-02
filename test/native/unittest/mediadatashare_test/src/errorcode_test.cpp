@@ -180,7 +180,6 @@ HWTEST_F(ErrorCodeTest, ErrorCodeTest_QUERY_Test_002, TestSize.Level0)
     DatashareBusinessError error;
     auto resultSet = dataShareHelper->Query(uri, predicates, columns, &error);
     EXPECT_EQ(error.GetCode(), 401);
-    // EXPECT_EQ(msg, "Parameter error. The predicates must be an RdbPredicates.");
     EXPECT_EQ(resultSet, nullptr);
 
     DataShare::DataSharePredicates deletePredicates;
