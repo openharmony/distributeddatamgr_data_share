@@ -395,6 +395,61 @@ public:
     }
 
     /**
+     * @brief The CrossJoin of the predicate.
+     *
+     * @param tableName indicates the query condition.
+     */
+    DataSharePredicates *CrossJoin(const std::string &tableName)
+    {
+        SetOperationList(CROSSJOIN, tableName);
+        return this;
+    }
+
+    /**
+     * @brief The InnerJoin of the predicate.
+     *
+     * @param tableName indicates the query condition.
+     */
+    DataSharePredicates *InnerJoin(const std::string &tableName)
+    {
+        SetOperationList(INNERJOIN, tableName);
+        return this;
+    }
+
+    /**
+     * @brief The LeftOuterJoin of the predicate.
+     *
+     * @param tableName indicates the query condition.
+     */
+    DataSharePredicates *LeftOuterJoin(const std::string &tableName)
+    {
+        SetOperationList(LEFTOUTERJOIN, tableName);
+        return this;
+    }
+
+    /**
+     * @brief The Using of the predicate.
+     *
+     * @param field Indicates the target field.
+     */
+    DataSharePredicates *Using(const std::vector<std::string> &fields)
+    {
+        SetOperationList(USING, fields);
+        return this;
+    }
+
+    /**
+     * @brief The On of the predicate.
+     *
+     * @param field Indicates the target field.
+     */
+    DataSharePredicates *On(const std::vector<std::string> &fields)
+    {
+        SetOperationList(ON, fields);
+        return this;
+    }
+
+    /**
      * @brief The GetOperationList of the predicate.
      */
     const std::vector<OperationItem> &GetOperationList() const

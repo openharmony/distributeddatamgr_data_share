@@ -85,5 +85,10 @@ void NAPIDataShareObserver::DeleteReference()
         ref_ = nullptr;
     }
 }
+
+napi_ref NAPIDataShareObserver::GetCallback()
+{
+    return ref_;
+}
 }  // namespace DataShare
 }  // namespace OHOS

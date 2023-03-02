@@ -258,6 +258,41 @@ public:
     virtual DataShareAbsPredicates *InKeys(const std::vector<std::string> &keys) = 0;
 
     /**
+     * @brief The CrossJoin of the predicate.
+     *
+     * @param tableName indicates the query condition.
+     */
+    virtual DataShareAbsPredicates *CrossJoin(const std::string &tableName) = 0;
+
+    /**
+     * @brief The InnerJoin of the predicate.
+     *
+     * @param tableName indicates the query condition.
+     */
+    virtual DataShareAbsPredicates *InnerJoin(const std::string &tableName) = 0;
+
+    /**
+     * @brief The LeftOuterJoin of the predicate.
+     *
+     * @param tableName indicates the query condition.
+     */
+    virtual DataShareAbsPredicates *LeftOuterJoin(const std::string &tableName) = 0;
+
+    /**
+     * @brief The Using of the predicate.
+     *
+     * @param field Indicates the target field.
+     */
+    virtual DataShareAbsPredicates *Using(const std::vector<std::string> &fields) = 0;
+
+    /**
+     * @brief The On of the predicate.
+     *
+     * @param field Indicates the target field.
+     */
+    virtual DataShareAbsPredicates *On(const std::vector<std::string> &fields) = 0;
+
+    /**
      * @brief The GetOperationList of the predicate.
      */
     virtual const std::vector<OperationItem>& GetOperationList() const = 0;
