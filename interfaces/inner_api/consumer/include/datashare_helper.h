@@ -24,6 +24,7 @@
 
 #include "base_connection.h"
 #include "context.h"
+#include "datashare_business_error.h"
 #include "uri.h"
 
 using Uri = OHOS::Uri;
@@ -155,7 +156,7 @@ public:
      * @return Returns the query result.
      */
     std::shared_ptr<DataShareResultSet> Query(Uri &uri, const DataSharePredicates &predicates,
-        std::vector<std::string> &columns, int *errCode = nullptr, std::string *errMessage = nullptr);
+        std::vector<std::string> &columns, DatashareBusinessError *businessError = nullptr);
 
     /**
      * @brief Obtains the MIME type matching the data specified by the URI of the Data share. This method should be

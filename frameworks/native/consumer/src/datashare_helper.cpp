@@ -20,7 +20,6 @@
 #include "dataobs_mgr_client.h"
 #include "datashare_log.h"
 #include "datashare_result_set.h"
-#include "datashare_business_error.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -322,7 +321,7 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
  * @return Returns the query result.
  */
 std::shared_ptr<DataShareResultSet> DataShareHelper::Query(Uri &uri, const DataSharePredicates &predicates,
-    std::vector<std::string> &columns, int *errCode, std::string *errMessage)
+    std::vector<std::string> &columns, DatashareBusinessError *businessError)
 {
     std::shared_ptr<DataShareResultSet> resultset = nullptr;
 
@@ -338,14 +337,11 @@ std::shared_ptr<DataShareResultSet> DataShareHelper::Query(Uri &uri, const DataS
     }
 
     auto proxy = connection->GetDataShareProxy();
-    DatashareBusinessError businessError;
     if (proxy != nullptr) {
-        resultset = proxy->Query(uri, predicates, columns, businessError);
-        if (errCode != nullptr) {
-            *errCode = businessError.GetCode();
-        }
-        if (errMessage != nullptr) {
-            *errMessage = businessError.GetMessage();
+        DatashareBusinessError error;
+        resultset = proxy->Query(uri, predicates, columns, error);
+        if (businessError != nullptr) {
+            *businessError = error;
         }
     }
     return resultset;

@@ -191,11 +191,8 @@ NativeValue* JsDataShareExtAbility::AsyncCallback(NativeEngine* engine, NativeCa
     DatashareBusinessError businessError;
     if ((info->argv[0])->TypeOf() == NATIVE_OBJECT) {
         LOG_INFO("Error in callback");
-        if (!UnWrapBusinessError(reinterpret_cast<napi_env>(engine), reinterpret_cast<napi_value>(info->argv[0]),
-            businessError)) {
-            LOG_ERROR("UnWrapBusinessError failed");
-            return engine->CreateUndefined();
-        }
+        UnWrapBusinessError(reinterpret_cast<napi_env>(engine), reinterpret_cast<napi_value>(info->argv[0]),
+            businessError);
     }
 
     if (info->functionInfo == nullptr || info->functionInfo->data == nullptr) {
@@ -719,55 +716,56 @@ napi_value JsDataShareExtAbility::MakePredicates(napi_env env, const DataSharePr
     return napiPredicates;
 }
 
-bool JsDataShareExtAbility::UnWrapBusinessError(napi_env env, napi_value info,
+void JsDataShareExtAbility::UnWrapBusinessError(napi_env env, napi_value info,
     DatashareBusinessError& businessError)
 {
-    napi_valuetype type = UnWrapPropertyType(env, info, businessError, "code");
-    if (type == napi_valuetype::napi_number) {
-        int code;
-        if (!UnwrapInt32ByPropertyName(env, info, "code", code)) {
-            LOG_ERROR("failed to unwrap int by property : code");
-            return false;
-        }
+    std::string code = UnWrapProperty(env, info, "code");
+    if (!code.empty()) {
         businessError.SetCode(code);
-    } else if (type == napi_valuetype::napi_string) {
-        std::string code;
-        if (!UnwrapStringByPropertyName(env, info, "code", code)) {
-            LOG_ERROR("failed to unwrap string by property : code");
-            return false;
-        }
-        businessError.SetCode(code);
-    } else if (type == napi_valuetype::napi_undefined) {
-        LOG_WARN("code valueType is undefined");
     }
-
-    type = UnWrapPropertyType(env, info, businessError, "message");
-    if (type == napi_valuetype::napi_string) {
-        std::string message;
-        if (!UnwrapStringByPropertyName(env, info, "message", message)) {
-            LOG_ERROR("failed to unwrap string by property : message");
-            return false;
-        }
+    std::string message = UnWrapProperty(env, info, "message");
+    if (!message.empty()) {
         businessError.SetMessage(message);
     }
-    return true;
+}
+
+std::string JsDataShareExtAbility::UnWrapProperty(napi_env env, napi_value info, const std::string &key)
+{
+    napi_valuetype type = UnWrapPropertyType(env, info, key);
+    if (type == napi_undefined) {
+        LOG_WARN("ValueType is undefined, property is %{public}s", key.c_str());
+        return "";
+    }
+
+    if (type == napi_valuetype::napi_number) {
+        int value;
+        UnwrapInt32ByPropertyName(env, info, key.c_str(), value);
+        return std::to_string(value);
+    } else if (type == napi_valuetype::napi_string) {
+        std::string value;
+        UnwrapStringByPropertyName(env, info, key.c_str(), value);
+        return value;
+    } else {
+        LOG_ERROR("ValueType should be napi_number or napi_string, property is %{public}s", key.c_str());
+        return "";
+    }
 }
 
 napi_valuetype JsDataShareExtAbility::UnWrapPropertyType(napi_env env, napi_value info,
-    DatashareBusinessError& businessError, const char *propertyKey)
+    const std::string &propertyKey)
 {
     napi_value key = nullptr;
-    napi_status status = napi_create_string_utf8(env, propertyKey, NAPI_AUTO_LENGTH, &key);
+    napi_status status = napi_create_string_utf8(env, propertyKey.c_str(), propertyKey.size(), &key);
     if (status != napi_ok) {
         LOG_ERROR("napi_create_string_utf8 failed, status is %{public}d, propertyKey is %{public}s",
-            status, propertyKey);
+            status, propertyKey.c_str());
         return napi_undefined;
     }
 
     bool result = false;
     napi_has_property(env, info, key, &result);
     if (!result) {
-        LOG_WARN("not contains property is %{public}s", propertyKey);
+        LOG_WARN("not contains property is %{public}s", propertyKey.c_str());
         return napi_undefined;
     }
 
@@ -775,7 +773,7 @@ napi_valuetype JsDataShareExtAbility::UnWrapPropertyType(napi_env env, napi_valu
     status = napi_get_property(env, info, key, &value);
     if (status != napi_ok) {
         LOG_ERROR("failed to napi_get_property, status is %{public}d, propertyKey is %{public}s",
-            status, propertyKey);
+            status, propertyKey.c_str());
         return napi_undefined;
     }
 

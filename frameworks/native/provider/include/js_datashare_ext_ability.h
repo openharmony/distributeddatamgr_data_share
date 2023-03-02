@@ -308,9 +308,10 @@ private:
     napi_value MakePredicates(napi_env env, const DataSharePredicates &predicates);
     static NativeValue* AsyncCallback(NativeEngine* engine, NativeCallbackInfo* info);
     void CheckAndSetAsyncResult(NativeEngine* engine);
-    static bool UnWrapBusinessError(napi_env env, napi_value info, DatashareBusinessError &businessError);
+    static void UnWrapBusinessError(napi_env env, napi_value info, DatashareBusinessError& businessError);
     static napi_valuetype UnWrapPropertyType(napi_env env, napi_value info,
-        DatashareBusinessError& businessError, const char *key);
+        const std::string &key);
+    static std::string UnWrapProperty(napi_env env, napi_value info, const std::string &key);
 
     JsRuntime& jsRuntime_;
     std::unique_ptr<NativeReference> jsObj_;

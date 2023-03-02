@@ -28,7 +28,7 @@ public:
         return code_;
     }
 
-    void SetCode(std::string code)
+    void SetCode(const std::string &code)
     {
         code_ = atoi(code.c_str());
     }
@@ -43,11 +43,13 @@ public:
         return message_;
     }
     
-    void SetMessage(std::string message)
+    void SetMessage(const std::string &message)
     {
         message_ = message;
     }
 
+    static constexpr int DB_NOT_EXIST_ERR = 14800045;
+    
 private:
     int code_ = 0;
     std::string message_ = "";
