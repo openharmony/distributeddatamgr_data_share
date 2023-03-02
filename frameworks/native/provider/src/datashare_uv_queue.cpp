@@ -87,8 +87,13 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
 
 void DataShareUvQueue::Purge(uv_work_t* work)
 {
-    if (work == nullptr || work->data == nullptr) {
-        LOG_ERROR("invalid work or work->data.");
+    if (work == nullptr) {
+        LOG_ERROR("invalid work");
+        return;
+    }
+    if(work->data == nullptr) {
+        LOG_ERROR("invalid work->data");
+        delete work;
         return;
     }
 
