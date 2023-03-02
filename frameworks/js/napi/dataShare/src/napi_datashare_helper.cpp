@@ -197,7 +197,10 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
         LOG_ERROR("Parameters error, need at least 2 parameters!");
         return nullptr;
     }
-    auto *proxy = new NapiDataShareHelper();
+    auto *proxy = new (std::nothrow) NapiDataShareHelper();
+    if (proxy == nullptr) {
+        return nullptr;
+    }
     auto finalize = [](napi_env env, void * data, void * hint) {
         NapiDataShareHelper *proxy = reinterpret_cast<NapiDataShareHelper *>(data);
         if (proxy != nullptr) {

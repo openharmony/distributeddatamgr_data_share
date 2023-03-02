@@ -106,7 +106,11 @@ napi_value DataShareResultSetProxy::Initialize(napi_env env, napi_callback_info 
 {
     napi_value self = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, nullptr, nullptr, &self, nullptr));
-    auto *proxy = new DataShareResultSetProxy();
+    auto *proxy = new (std::nothrow) DataShareResultSetProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("DataShareResultSetProxy::Initialize new DataShareResultSetProxy error.");
+        return nullptr;
+    }
     auto finalize = [](napi_env env, void *data, void *hint) {
         DataShareResultSetProxy *proxy = reinterpret_cast<DataShareResultSetProxy *>(data);
         if (proxy != nullptr) {
