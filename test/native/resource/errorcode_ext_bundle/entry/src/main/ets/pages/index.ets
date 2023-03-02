@@ -19,7 +19,7 @@ import dataSharePredicates from '@ohos.data.dataSharePredicates'
 @Entry
 @Component
 struct Index {
-  @State message: string = "Main thread message filed"
+  @State message: string = "Main thread message filed errorcode test"
 
   build() {
     Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
