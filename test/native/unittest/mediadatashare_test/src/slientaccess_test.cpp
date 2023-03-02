@@ -186,8 +186,8 @@ HWTEST_F(SlientAccessTest, SlientAccess_QUERY_ERRORCODE_Test_001, TestSize.Level
     std::string ERR_SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB01/TBL01?Proxy=true";
     Uri uriErr(ERR_SLIENT_ACCESS_URI);
     resultSet = helper->Query(uriErr, predicates, columns, &err);
-    int ERR_DB_NOT_EXISTS = 14800045;
-    EXPECT_EQ(err, ERR_DB_NOT_EXISTS);
+    int errDbNotExists = 14800045;
+    EXPECT_EQ(err, errDbNotExists);
     EXPECT_EQ(resultSet, nullptr);
     LOG_INFO("SlientAccess_QUERY_ERRORCODE_Test_001::End");
 }
