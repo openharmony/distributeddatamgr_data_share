@@ -62,7 +62,6 @@ void NAPIDataShareObserver::OnChange()
             if (scope == nullptr) {
                 return;
             }
-
             napi_value callback = nullptr;
             napi_value args[2] = {0};
             napi_value global = nullptr;
