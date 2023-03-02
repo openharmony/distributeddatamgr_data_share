@@ -136,7 +136,7 @@ extends Extension {
         console.info('[ttt] [DataShareTest] <<Provider>> [query]  predicates = ' + predicates);
         console.info('[ttt] [DataShareTest] <<Provider>> [query]  predicates = ' + JSON.stringify(predicates));
         try {
-            await rdbStore.query(columns, function (err, resultSet) {
+            await rdbStore.query(TBL_NAME, predicates, columns, function (err, resultSet) {
                 console.info('[ttt] [DataShareTest] <<Provider>> [query] ret: ' + resultSet);
                 if (resultSet != undefined) {
                     console.info('[ttt] [DataShareTest] <<Provider>> [query] resultSet.rowCount: ' + resultSet.rowCount);
