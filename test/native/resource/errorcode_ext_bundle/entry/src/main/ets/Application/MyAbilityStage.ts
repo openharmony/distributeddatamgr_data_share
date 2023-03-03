@@ -13,24 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef DATASHARE_ERROR_H
-#define DATASHARE_ERROR_H
+import AbilityStage from "@ohos.app.ability.AbilityStage"
 
-#include "datashare_js_utils.h"
-
-namespace OHOS {
-namespace DataShare {
-class Error {
-public:
-    static const int E_OK = 0;
-    static const int EXCEPTION_PARAMETER_CHECK = 401;
-    static const int EXCEPTION_INNER = 15700000;
-    static const int EXCEPTION_HELPER_UNINITIALIZED = 15700010;
-    virtual ~Error() {};
-    virtual std::string GetMessage() const = 0;
-    virtual int GetCode() const = 0;
-};
-} // namespace DataShare
-} // namespace OHOS
-
-#endif // DATASHARE_ERROR_H
+export default class MyAbilityStage extends AbilityStage {
+    onCreate() {
+        console.log("[Demo] MyAbilityStage onCreate")
+    }
+}

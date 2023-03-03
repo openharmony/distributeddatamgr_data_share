@@ -24,6 +24,7 @@
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
+#include "datashare_business_error.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -290,6 +291,16 @@ public:
         callbackResultObject_ = value;
     }
 
+    void GetBusinessError(DatashareBusinessError &businessError)
+    {
+        businessError = businessError_;
+    }
+	
+    void SetBusinessError(DatashareBusinessError &businessError)
+    {
+        businessError_ = businessError;
+    }
+
 private:
     NativeValue* CallObjectMethod(const char *name, NativeValue * const *argv = nullptr, size_t argc = 0,
         bool isAsync = true);
@@ -297,6 +308,10 @@ private:
     napi_value MakePredicates(napi_env env, const DataSharePredicates &predicates);
     static NativeValue* AsyncCallback(NativeEngine* engine, NativeCallbackInfo* info);
     void CheckAndSetAsyncResult(NativeEngine* engine);
+    static void UnWrapBusinessError(napi_env env, napi_value info, DatashareBusinessError &businessError);
+    static napi_valuetype UnWrapPropertyType(napi_env env, napi_value info,
+        const std::string &key);
+    static std::string UnWrapProperty(napi_env env, napi_value info, const std::string &key);
 
     JsRuntime& jsRuntime_;
     std::unique_ptr<NativeReference> jsObj_;
@@ -306,6 +321,7 @@ private:
     std::string callbackResultString_ = "";
     std::vector<std::string> callbackResultStringArr_ = {};
     std::shared_ptr<DataShareResultSet> callbackResultObject_ = nullptr;
+    DatashareBusinessError businessError_;
 };
 } // namespace DataShare
 } // namespace OHOS

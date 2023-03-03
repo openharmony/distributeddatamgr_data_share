@@ -320,8 +320,8 @@ int DataShareHelper::Delete(Uri &uri, const DataSharePredicates &predicates)
  *
  * @return Returns the query result.
  */
-std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
-    Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns)
+std::shared_ptr<DataShareResultSet> DataShareHelper::Query(Uri &uri, const DataSharePredicates &predicates,
+    std::vector<std::string> &columns, DatashareBusinessError *businessError)
 {
     std::shared_ptr<DataShareResultSet> resultset = nullptr;
 
@@ -338,7 +338,11 @@ std::shared_ptr<DataShareResultSet> DataShareHelper::Query(
 
     auto proxy = connection->GetDataShareProxy();
     if (proxy != nullptr) {
-        resultset = proxy->Query(uri, predicates, columns);
+        DatashareBusinessError error;
+        resultset = proxy->Query(uri, predicates, columns, error);
+        if (businessError != nullptr) {
+            *businessError = error;
+        }
     }
     return resultset;
 }

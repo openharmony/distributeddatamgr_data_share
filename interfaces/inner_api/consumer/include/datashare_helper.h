@@ -24,6 +24,7 @@
 
 #include "base_connection.h"
 #include "context.h"
+#include "datashare_business_error.h"
 #include "uri.h"
 
 using Uri = OHOS::Uri;
@@ -143,16 +144,17 @@ public:
     int Delete(Uri &uri, const DataSharePredicates &predicates);
 
     /**
-     * @brief Deletes one or more data records from the database.
+     * @brief Query records from the database.
      *
      * @param uri Indicates the path of data to query.
      * @param predicates Indicates filter criteria. You should define the processing logic when this parameter is null.
      * @param columns Indicates the columns to query. If this parameter is null, all columns are queried.
+     * @param businessError Indicates the error by query.
      *
      * @return Returns the query result.
      */
-    std::shared_ptr<DataShareResultSet> Query(
-        Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns);
+    std::shared_ptr<DataShareResultSet> Query(Uri &uri, const DataSharePredicates &predicates,
+        std::vector<std::string> &columns, DatashareBusinessError *businessError = nullptr);
 
     /**
      * @brief Obtains the MIME type matching the data specified by the URI of the Data share. This method should be

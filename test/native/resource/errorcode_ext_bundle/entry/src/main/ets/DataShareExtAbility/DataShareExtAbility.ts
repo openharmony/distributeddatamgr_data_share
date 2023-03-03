@@ -22,8 +22,6 @@ let TBL_NAME = "TBL00";
 let DDL_TBL_CREATE = "CREATE TABLE IF NOT EXISTS "
 + TBL_NAME
 + " (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER, phoneNumber DOUBLE, isStudent BOOLEAN, Binary BINARY)";
-let DDL_TABLE_USER_SQL = "CREATE TABLE IF NOT EXISTS user (userId INTEGER PRIMARY KEY AUTOINCREMENT, firstName TEXT, lastName TEXT, age INTEGER , balance DOUBLE  NOT NULL)";
-let DDL_TABLE_BOOK_SQL = "CREATE TABLE IF NOT EXISTS book (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, userId INTEGER, FOREIGN KEY (userId) REFERENCES user (userId) ON UPDATE NO ACTION ON DELETE CASCADE)";
 
 let rdbStore;
 
@@ -36,9 +34,7 @@ extends Extension {
         rdbStore = await rdb.getRdbStore(this.context, { name: DB_NAME, securityLevel: rdb.SecurityLevel.S1 });
         console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility getRdbStore done');
         await rdbStore.executeSql(DDL_TBL_CREATE, []);
-        await rdbStore.executeSql(DDL_TABLE_USER_SQL, []);
-        await rdbStore.executeSql(DDL_TABLE_BOOK_SQL, []);
-        console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility executeSql multiple tables done');
+        console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility executeSql done');
         let err = {"code":0};
         callback(err);
         console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility onCreate end');
@@ -126,17 +122,13 @@ extends Extension {
         console.info('[ttt] [DataShareTest] <<Provider>> [delete] leave');
     }
 
-    async query(uri, predicates, columns, callback) {
-        console.info('[ttt] [DataShareTest] <<Provider>> [query] enter');
+    async query(uri, predicates, columns,  callback) {
         if (predicates == null || predicates == undefined) {
             console.info('[ttt] [DataShareTest] <<Provider>> [query] invalid predicates');
         }
-        console.info('[ttt] [DataShareTest] <<Provider>> [query]  values = ' + columns);
-        console.info('[ttt] [DataShareTest] <<Provider>> [query]  values = ' + JSON.stringify(columns));
-        console.info('[ttt] [DataShareTest] <<Provider>> [query]  predicates = ' + predicates);
-        console.info('[ttt] [DataShareTest] <<Provider>> [query]  predicates = ' + JSON.stringify(predicates));
         try {
-            await rdbStore.query(TBL_NAME, predicates, columns, function (err, resultSet) {
+            console.info('[ttt] [DataShareTest] <<Provider>> [query] for errorcode test, sissing parameter: TBL_NAME ');
+            await rdbStore.query(columns, function (err, resultSet) {
                 console.info('[ttt] [DataShareTest] <<Provider>> [query] ret: ' + resultSet);
                 if (resultSet != undefined) {
                     console.info('[ttt] [DataShareTest] <<Provider>> [query] resultSet.rowCount: ' + resultSet.rowCount);
@@ -152,7 +144,7 @@ extends Extension {
         console.info('[ttt] [DataShareTest] <<Provider>> [query] leave');
     }
 
-    async getType(uri: string, callback) {
+    async getType(uri: string,callback) {
         console.info('[ttt] [DataShareTest] <<Provider>> [getType] enter');
         let ret = "image";
         console.info('[ttt] [DataShareTest] <<Provider>> [getType] leave, ret:' + ret);

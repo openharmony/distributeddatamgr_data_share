@@ -56,5 +56,15 @@ int InnerError::GetCode() const
 {
     return EXCEPTION_INNER;
 }
+
+int BusinessError::GetCode() const
+{
+    return code_;
+}
+
+std::string BusinessError::GetMessage() const
+{
+    return message_;
+}
 } // namespace DataShare
 } // namespace OHOS

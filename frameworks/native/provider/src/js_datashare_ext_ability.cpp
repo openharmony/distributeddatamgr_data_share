@@ -188,6 +188,13 @@ NativeValue* JsDataShareExtAbility::AsyncCallback(NativeEngine* engine, NativeCa
         return engine->CreateUndefined();
     }
 
+    DatashareBusinessError businessError;
+    if ((info->argv[0])->TypeOf() == NATIVE_OBJECT) {
+        LOG_INFO("Error in callback");
+        UnWrapBusinessError(reinterpret_cast<napi_env>(engine), reinterpret_cast<napi_value>(info->argv[0]),
+            businessError);
+    }
+
     if (info->functionInfo == nullptr || info->functionInfo->data == nullptr) {
         LOG_ERROR("invalid object.");
         return engine->CreateUndefined();
@@ -196,6 +203,7 @@ NativeValue* JsDataShareExtAbility::AsyncCallback(NativeEngine* engine, NativeCa
     JsDataShareExtAbility* instance = static_cast<JsDataShareExtAbility*>(info->functionInfo->data);
     if (instance != nullptr) {
         instance->SetBlockWaiting(true);
+        instance->SetBusinessError(businessError);
         instance->SetAsyncResult(info->argv[1]);
         instance->CheckAndSetAsyncResult(engine);
     }
@@ -706,6 +714,63 @@ napi_value JsDataShareExtAbility::MakePredicates(napi_env env, const DataSharePr
         LOG_ERROR("failed to make new instance of DataSharePredicates.");
     }
     return napiPredicates;
+}
+
+void JsDataShareExtAbility::UnWrapBusinessError(napi_env env, napi_value info,
+    DatashareBusinessError& businessError)
+{
+    std::string code = UnWrapProperty(env, info, "code");
+    businessError.SetCode(code);
+    std::string message = UnWrapProperty(env, info, "message");
+    businessError.SetMessage(message);
+}
+
+std::string JsDataShareExtAbility::UnWrapProperty(napi_env env, napi_value info, const std::string &key)
+{
+    napi_valuetype type = UnWrapPropertyType(env, info, key);
+    if (type == napi_valuetype::napi_number) {
+        int value;
+        UnwrapInt32ByPropertyName(env, info, key.c_str(), value);
+        return std::to_string(value);
+    } else if (type == napi_valuetype::napi_string) {
+        std::string value;
+        UnwrapStringByPropertyName(env, info, key.c_str(), value);
+        return value;
+    } else {
+        LOG_ERROR("ValueType should be napi_number or napi_string, property is %{public}s", key.c_str());
+        return "";
+    }
+}
+
+napi_valuetype JsDataShareExtAbility::UnWrapPropertyType(napi_env env, napi_value info,
+    const std::string &propertyKey)
+{
+    napi_value key = nullptr;
+    napi_status status = napi_create_string_utf8(env, propertyKey.c_str(), propertyKey.size(), &key);
+    if (status != napi_ok) {
+        LOG_ERROR("napi_create_string_utf8 failed, status is %{public}d, propertyKey is %{public}s",
+            status, propertyKey.c_str());
+        return napi_undefined;
+    }
+
+    bool result = false;
+    napi_has_property(env, info, key, &result);
+    if (!result) {
+        LOG_WARN("not contains property is %{public}s", propertyKey.c_str());
+        return napi_undefined;
+    }
+
+    napi_value value = nullptr;
+    status = napi_get_property(env, info, key, &value);
+    if (status != napi_ok) {
+        LOG_ERROR("failed to napi_get_property, status is %{public}d, propertyKey is %{public}s",
+            status, propertyKey.c_str());
+        return napi_undefined;
+    }
+
+    napi_valuetype type = napi_undefined;
+    napi_typeof(env, value, &type);
+    return type;
 }
 
 bool MakeNapiColumn(napi_env env, napi_value &napiColumns, const std::vector<std::string> &columns)

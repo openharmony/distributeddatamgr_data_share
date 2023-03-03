@@ -347,6 +347,13 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
+        if (context->businessError.GetCode() != 0) {
+            LOG_DEBUG("query failed, errorCode : %{public}d", context->businessError.GetCode());
+            context->error = std::make_shared<BusinessError>(context->businessError.GetCode(),
+                context->businessError.GetMessage());
+            return napi_generic_failure;
+        }
+
         if (context->resultObject == nullptr) {
             context->error = std::make_shared<InnerError>();
             return napi_generic_failure;
@@ -358,7 +365,8 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
     auto exec = [context](AsyncCall::Context *ctx) {
         if (context->proxy->datashareHelper_ != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
-            context->resultObject = context->proxy->datashareHelper_->Query(uri, context->predicates, context->columns);
+            context->resultObject = context->proxy->datashareHelper_->Query(uri,
+                context->predicates, context->columns, &(context->businessError));
             context->status = napi_ok;
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",

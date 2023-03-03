@@ -48,8 +48,8 @@ public:
 
     int Delete(const Uri &uri, const DataSharePredicates &predicates) override;
 
-    std::shared_ptr<DataShareResultSet> Query(const Uri &uri,
-        const DataSharePredicates &predicates, std::vector<std::string> &columns) override;
+    std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
+        std::vector<std::string> &columns, DatashareBusinessError &businessError) override;
 
     std::string GetType(const Uri &uri) override;
 
