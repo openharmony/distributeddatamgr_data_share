@@ -28,8 +28,8 @@ namespace DataShare {
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
 constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
-std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
-std::string SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB00/TBL00?Proxy=true";
+std::string DATA_SHARE_URI = "datashare:///com.acts.errorcodetest";
+std::string SLIENT_ACCESS_URI = "datashare:///com.acts.errorcodetest/entry/DB00/TBL00?Proxy=true";
 std::string TBL_STU_NAME = "name";
 std::string TBL_STU_AGE = "age";
 std::shared_ptr<DataShare::DataShareHelper> g_slientAccessHelper;
@@ -150,7 +150,7 @@ HWTEST_F(ErrorCodeTest, ErrorCodeTest_QUERY_Test_001, TestSize.Level0)
     }
     EXPECT_EQ(result, 1);
 
-    std::string ERR_SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB01/TBL01?Proxy=true";
+    std::string ERR_SLIENT_ACCESS_URI = "datashare:///com.acts.errorcodetest/entry/DB01/TBL01?Proxy=true";
     Uri uriErr(ERR_SLIENT_ACCESS_URI);
     DatashareBusinessError error;
     resultSet = helper->Query(uriErr, predicates, columns, &error);

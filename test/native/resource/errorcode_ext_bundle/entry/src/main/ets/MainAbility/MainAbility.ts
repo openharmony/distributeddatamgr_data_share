@@ -17,8 +17,8 @@ import Ability from '@ohos.app.ability.UIAbility'
 import dataShare from '@ohos.data.dataShare'
 import dataSharePredicates from '@ohos.data.dataSharePredicates'
 
-let dseUri = ("datashare:///com.acts.datasharetest");
-let uri = ("datashare://com.acts.datasharetest/entry/DB00/TBL00?Proxy=true");
+let dseUri = ("datashare:///com.acts.errorcodetest");
+let uri = ("datashare://com.acts.errorcodetest/entry/DB00/TBL00?Proxy=true");
 
 export default class MainAbility extends Ability {
     onCreate(want, launchParam) {

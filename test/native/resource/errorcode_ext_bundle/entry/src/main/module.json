@@ -42,7 +42,7 @@
         "icon": "$media:icon",
         "description": "$string:description_datashareextability",
         "type": "dataShare",
-        "uri": "datashare://com.acts.datasharetest",
+        "uri": "datashare://com.acts.errorcodetest",
         "visible": true
       }
     ]

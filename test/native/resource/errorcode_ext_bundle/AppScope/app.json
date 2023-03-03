@@ -1,6 +1,6 @@
 {
   "app": {
-    "bundleName": "com.acts.datasharetest",
+    "bundleName": "com.acts.errorcodetest",
     "vendor": "example",
     "versionCode": 1000000,
     "versionName": "1.0.0",
