@@ -33,7 +33,6 @@ std::string SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB00/
 std::string TBL_STU_NAME = "name";
 std::string TBL_STU_AGE = "age";
 std::shared_ptr<DataShare::DataShareHelper> g_slientAccessHelper;
-std::shared_ptr<DataShare::DataShareHelper> dataShareHelper;
 
 class SlientAccessTest : public testing::Test {
 public:
@@ -62,7 +61,7 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t system
 void SlientAccessTest::SetUpTestCase(void)
 {
     LOG_INFO("SetUpTestCase invoked");
-    dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
+    auto dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
     ASSERT_TRUE(dataShareHelper != nullptr);
     int sleepTime = 3;
     sleep(sleepTime);

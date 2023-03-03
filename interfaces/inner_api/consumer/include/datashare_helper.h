@@ -149,9 +149,7 @@ public:
      * @param uri Indicates the path of data to query.
      * @param predicates Indicates filter criteria. You should define the processing logic when this parameter is null.
      * @param columns Indicates the columns to query. If this parameter is null, all columns are queried.
-     * @param errCode The optional error code returned by query, if this parameter is nullptr, not return error code.
-     * @param errMessage The optional error message returned by query, if this parameter is nullptr,
-     * not return error message.
+     * @param businessError Indicates the error by query.
      *
      * @return Returns the query result.
      */
