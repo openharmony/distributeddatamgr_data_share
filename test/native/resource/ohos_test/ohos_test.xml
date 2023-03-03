@@ -34,8 +34,8 @@
     </target>
     <target name="ErrorCodeTest">
         <preparer>
-            <option name="push" value="errorcode_ext_bundle/errorcode_ext.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/errorcode_ext.hap"/>
+            <option name="push" value="errorcode_ext_bundle/errorcode_ext.hap -> /data/test/resource/datashare/errortest" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/errortest/errorcode_ext.hap"/>
         </preparer>
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>

@@ -38,7 +38,7 @@ extends Extension {
         await rdbStore.executeSql(DDL_TBL_CREATE, []);
         await rdbStore.executeSql(DDL_TABLE_USER_SQL, []);
         await rdbStore.executeSql(DDL_TABLE_BOOK_SQL, []);
-        console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility executeSql done');
+        console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility executeSql multiple tables done');
         let err = {"code":0};
         callback(err);
         console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility onCreate end');
