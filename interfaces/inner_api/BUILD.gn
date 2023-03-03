@@ -34,7 +34,7 @@ config("ability_config") {
   }
 }
 
-config("ability_public_config") {
+config("datashare_public_config") {
   visibility = [ ":*" ]
   include_dirs = [
     "common/include",
@@ -45,7 +45,6 @@ config("ability_public_config") {
     "${datashare_native_consumer_path}/include",
     "${datashare_native_provider_path}/include",
     "${datashare_native_proxy_path}/include",
-    "//foundation/window/window_manager/interfaces/innerkits/wm",
   ]
 }
 
@@ -61,12 +60,11 @@ ohos_shared_library("datashare_consumer") {
     "${datashare_native_proxy_path}/src/data_share_service_proxy.cpp",
   ]
   configs = [ ":ability_config" ]
-  public_configs = [ ":ability_public_config" ]
-
+  public_configs = [ ":datashare_public_config" ]
+  version_script = "consumer/libdatashare_consumer.map"
+  innerapi_tags = [ "platformsdk" ]
   deps = [
-    "${ability_runtime_inner_api_path}/dataobs_manager:dataobs_manager",
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-    "${ability_runtime_path}/frameworks/native/appkit:app_context",
     "${datashare_innerapi_path}/common:datashare_common",
   ]
 
@@ -75,15 +73,14 @@ ohos_shared_library("datashare_consumer") {
     "ability_base:zuri",
     "ability_runtime:ability_context_native",
     "ability_runtime:ability_manager",
+    "ability_runtime:app_context",
+    "ability_runtime:dataobs_manager",
     "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "ipc_js:rpc",
+    "napi:ace_napi",
     "samgr:samgr_proxy",
-  ]
-
-  public_deps = [
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//foundation/arkui/napi:ace_napi",
   ]
 
   subsystem_name = "distributeddatamgr"
@@ -103,12 +100,11 @@ ohos_shared_library("datashare_provider") {
     "${datashare_native_provider_path}/src/js_datashare_ext_ability_context.cpp",
   ]
   configs = [ ":ability_config" ]
-  public_configs = [ ":ability_public_config" ]
-
+  public_configs = [ ":datashare_public_config" ]
+  version_script = "provider/libdatashare_provider.map"
+  innerapi_tags = [ "platformsdk" ]
   deps = [
-    "${ability_runtime_inner_api_path}/dataobs_manager:dataobs_manager",
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-    "${ability_runtime_path}/frameworks/native/appkit:app_context",
     "${datashare_innerapi_path}/common:datashare_common",
   ]
 
@@ -116,16 +112,15 @@ ohos_shared_library("datashare_provider") {
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_context_native",
+    "ability_runtime:app_context",
+    "ability_runtime:dataobs_manager",
     "ability_runtime:runtime",
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
+    "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "ipc_js:rpc",
-  ]
-
-  public_deps = [
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog",
-    "//foundation/arkui/napi:ace_napi",
+    "napi:ace_napi",
   ]
 
   subsystem_name = "distributeddatamgr"
@@ -138,7 +133,7 @@ ohos_shared_library("datashare_ext_ability_module") {
   sources = [ "${datashare_native_provider_path}/src/datashare_ext_ability_module_loader.cpp" ]
 
   configs = [ ":ability_config" ]
-  public_configs = [ ":ability_public_config" ]
+  public_configs = [ ":datashare_public_config" ]
 
   deps = [
     ":datashare_provider",
