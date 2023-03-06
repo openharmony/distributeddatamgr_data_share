@@ -39,10 +39,6 @@ DataShareStub::DataShareStub()
     stubFuncMap_[CMD_REGISTER_OBSERVER] = &DataShareStub::CmdRegisterObserver;
     stubFuncMap_[CMD_UNREGISTER_OBSERVER] = &DataShareStub::CmdUnregisterObserver;
     stubFuncMap_[CMD_NOTIFY_CHANGE] = &DataShareStub::CmdNotifyChange;
-    stubFuncMap_[CMD_REGISTER_OBSERVER_EXT] = &DataShareStub::CmdRegisterObserverExt;
-    stubFuncMap_[CMD_UNREGISTER_OBSERVER_EXT] = &DataShareStub::CmdUnregisterObserverExt;
-    stubFuncMap_[CMD_UNREGISTER_OBSERVER_ALL_EXT] = &DataShareStub::CmdUnregisterObserverAllExt;
-    stubFuncMap_[CMD_NOTIFY_CHANGE_EXT] = &DataShareStub::CmdNotifyChangeExt;
     stubFuncMap_[CMD_NORMALIZE_URI] = &DataShareStub::CmdNormalizeUri;
     stubFuncMap_[CMD_DENORMALIZE_URI] = &DataShareStub::CmdDenormalizeUri;
 }
@@ -390,89 +386,6 @@ ErrCode DataShareStub::CmdDenormalizeUri(MessageParcel &data, MessageParcel &rep
     ret = DenormalizeUri(*uri);
     if (!reply.WriteParcelable(&ret)) {
         LOG_ERROR("fail to WriteParcelable type");
-        return ERR_INVALID_VALUE;
-    }
-    return DATA_SHARE_NO_ERROR;
-}
-
-ErrCode DataShareStub::CmdRegisterObserverExt(MessageParcel &data, MessageParcel &reply)
-{
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
-        return ERR_INVALID_VALUE;
-    }
-
-    auto remote = data.ReadRemoteObject();
-    if (remote == nullptr) {
-        LOG_ERROR("remote is nullptr");
-        return ERR_INVALID_VALUE;
-    }
-
-    auto obServer = iface_cast<AAFwk::IDataAbilityObserver>(remote);
-    if (obServer == nullptr) {
-        LOG_ERROR("obServer is nullptr");
-        return ERR_INVALID_VALUE;
-    }
-
-    bool isDescendants = false;
-    if (data.ReadBool(isDescendants)) {
-        LOG_ERROR("read isDescendants error");
-        return ERR_INVALID_VALUE;
-    }
-
-    bool ret = RegisterObserverExt(*uri, obServer, isDescendants);
-    if (!reply.WriteInt32(ret)) {
-        LOG_ERROR("fail to WriteInt32 ret");
-        return ERR_INVALID_VALUE;
-    }
-    return DATA_SHARE_NO_ERROR;
-}
-ErrCode DataShareStub::CmdUnregisterObserverExt(MessageParcel &data, MessageParcel &reply)
-{
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
-        return ERR_INVALID_VALUE;
-    }
-    auto obServer = iface_cast<AAFwk::IDataAbilityObserver>(data.ReadRemoteObject());
-    if (obServer == nullptr) {
-        LOG_ERROR("obServer is nullptr");
-        return ERR_INVALID_VALUE;
-    }
-
-    bool ret = UnregisterObserver(*uri, obServer);
-    if (!reply.WriteInt32(ret)) {
-        LOG_ERROR("fail to WriteInt32 ret");
-        return ERR_INVALID_VALUE;
-    }
-    return DATA_SHARE_NO_ERROR;
-}
-ErrCode DataShareStub::CmdUnregisterObserverAllExt(MessageParcel &data, MessageParcel &reply)
-{
-    auto obServer = iface_cast<AAFwk::IDataAbilityObserver>(data.ReadRemoteObject());
-    if (obServer == nullptr) {
-        LOG_ERROR("obServer is nullptr");
-        return ERR_INVALID_VALUE;
-    }
-
-    bool ret = UnregisterObserverExt(obServer);
-    if (!reply.WriteInt32(ret)) {
-        LOG_ERROR("fail to WriteInt32 ret");
-        return ERR_INVALID_VALUE;
-    }
-    return DATA_SHARE_NO_ERROR;
-}
-
-ErrCode DataShareStub::CmdNotifyChangeExt(MessageParcel &data, MessageParcel &reply)
-{
-    AAFwk::ChangeInfo changeInfo;
-    if (!AAFwk::ChangeInfo::Unmarshalling(changeInfo, data)) {
-        LOG_ERROR("fail to unmarshalling changeInfo");
-        return ERR_INVALID_VALUE;
-    }
-
-    bool ret = NotifyChangeExt(changeInfo);
-    if (!reply.WriteInt32(ret)) {
-        LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
     }
     return DATA_SHARE_NO_ERROR;

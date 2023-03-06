@@ -232,45 +232,6 @@ public:
      */
     Uri DenormalizeUri(const Uri &uri) override;
 
-    /**
-     * Registers an observer to DataObsMgr specified by the given Uri.
-     *
-     * @param uri, Indicates the path of the data to operate.
-     * @param dataObserver, Indicates the IDataAbilityObserver object.
-     * @param isDescendants, Indicates the Whether to note the change of descendants.
-     *
-     * @return Return true if success. otherwise return false.
-     */
-    bool RegisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants) override;
-
-    /**
-     * Deregisters an observer used for DataObsMgr specified by the given Uri.
-     *
-     * @param uri, Indicates the path of the data to operate.
-     * @param dataObserver, Indicates the IDataAbilityObserver object
-     *
-     * @return Return true if success. otherwise return false.
-     */
-    bool UnregisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
-
-    /**
-     * Deregisters dataObserver used for DataObsMgr specified
-     *
-     * @param dataObserver, Indicates the IDataAbilityObserver object.
-     *
-     * @return Return true if success. otherwise return false.
-     */
-    bool UnregisterObserverExt(const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
-
-    /**
-     * Notifies the registered observers of a change to the data resource specified by Uris.
-     *
-     * @param changeInfo Indicates the info of the data to operate.
-     *
-     * @return Return true if success. otherwise return false.
-     */
-    bool NotifyChangeExt(const AAFwk::ChangeInfo &changeInfo) override;
-
     bool GetBlockWaiting() const
     {
         return isBlockWaiting_;

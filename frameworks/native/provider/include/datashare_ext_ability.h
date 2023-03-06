@@ -25,7 +25,6 @@
 namespace OHOS {
 namespace AAFwk {
 class IDataAbilityObserver;
-struct ChangeInfo;
 }
 namespace AbilityRuntime {
 class Runtime;
@@ -189,45 +188,6 @@ public:
      * @return Return true if success. otherwise return false.
      */
     virtual bool NotifyChange(const Uri &uri);
-
-    /**
-     * Registers an observer to DataObsMgr specified by the given Uri.
-     *
-     * @param uri, Indicates the path of the data to operate.
-     * @param dataObserver, Indicates the IDataAbilityObserver object.
-     * @param isDescendants, Indicates the Whether to note the change of descendants.
-     *
-     * @return Return true if success. otherwise return false.
-     */
-    virtual bool RegisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants);
-
-    /**
-     * Deregisters an observer used for DataObsMgr specified by the given Uri.
-     *
-     * @param uri, Indicates the path of the data to operate.
-     * @param dataObserver, Indicates the IDataAbilityObserver object
-     *
-     * @return Return true if success. otherwise return false.
-     */
-    virtual bool UnregisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
-
-    /**
-     * Deregisters dataObserver used for DataObsMgr specified
-     *
-     * @param dataObserver, Indicates the IDataAbilityObserver object.
-     *
-     * @return Return true if success. otherwise return false.
-     */
-    virtual bool UnregisterObserverExt(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
-
-    /**
-     * Notifies the registered observers of a change to the data resource specified by Uris.
-     *
-     * @param changeInfo Indicates the info of the data to operate.
-     *
-     * @return Return true if success. otherwise return false.
-     */
-    virtual bool NotifyChangeExt(const AAFwk::ChangeInfo &changeInfo);
 
     /**
      * @brief Converts the given uri that refer to the Data ability into a normalized URI. A normalized URI can be used

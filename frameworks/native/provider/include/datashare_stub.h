@@ -42,10 +42,6 @@ private:
     ErrCode CmdRegisterObserver(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdUnregisterObserver(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdNotifyChange(MessageParcel &data, MessageParcel &reply);
-    ErrCode CmdRegisterObserverExt(MessageParcel &data, MessageParcel &reply);
-    ErrCode CmdUnregisterObserverExt(MessageParcel &data, MessageParcel &reply);
-    ErrCode CmdUnregisterObserverAllExt(MessageParcel &data, MessageParcel &reply);
-    ErrCode CmdNotifyChangeExt(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdNormalizeUri(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdDenormalizeUri(MessageParcel &data, MessageParcel &reply);
 

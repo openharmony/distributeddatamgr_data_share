@@ -54,15 +54,6 @@ public:
 
     virtual bool NotifyChange(const Uri &uri) override;
 
-    virtual bool RegisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
-        bool isDescendants) override;
-
-    virtual bool UnregisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
-
-    virtual bool UnregisterObserverExt(const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
-
-    virtual bool NotifyChangeExt(const AAFwk::ChangeInfo &changeInfo) override;
-
     virtual Uri NormalizeUri(const Uri &uri) override;
 
     virtual Uri DenormalizeUri(const Uri &uri) override;

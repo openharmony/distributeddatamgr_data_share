@@ -206,7 +206,8 @@ public:
      * @param dataObserver, Indicates the IDataAbilityObserver object.
      * @param isDescendants, Indicates the Whether to note the change of descendants.
      */
-    void RegisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants);
+    void RegisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+        bool isDescendants);
 
     /**
      * Deregisters an observer used for DataObsMgr specified by the given Uri.
@@ -267,9 +268,6 @@ private:
     std::shared_ptr<BaseConnection> connection_ = nullptr;
     static bool RegObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     static bool UnregObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
-    static bool RegObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants);
-    static bool UnregObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
-    static bool UnregObserverExt(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
 };
 }  // namespace DataShare
 }  // namespace OHOS

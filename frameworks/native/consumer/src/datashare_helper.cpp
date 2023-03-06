@@ -510,37 +510,24 @@ void DataShareHelper::NotifyChange(const Uri &uri)
  * @param dataObserver, Indicates the IDataAbilityObserver object.
  * @param isDescendants, Indicates the Whether to note the change of descendants.
  */
-void DataShareHelper::RegisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants)
+void DataShareHelper::RegisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+    bool isDescendants)
 {
     LOG_INFO("Start");
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         return;
     }
-    if (isDataShareService_) {
-        if (!RegObserverExt(uri, dataObserver, isDescendants)) {
-            LOG_ERROR("RegisterObserver failed");
-        }
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
         return;
     }
-
-    auto connection = connection_;
-    if (connection == nullptr) {
-        LOG_ERROR("dataShareConnection_ is nullptr");
-        return;
+    ErrCode ret = obsMgrClient->RegisterObserverExt(uri, dataObserver, isDescendants);
+    if (ret != ERR_OK) {
+        LOG_ERROR("RegisterObserverExt failed");
     }
-
-    if (!connection->ConnectDataShare(uri, token_)) {
-        LOG_ERROR("connect failed");
-        return;
-    }
-
-    auto proxy = connection->GetDataShareProxy();
-    if (proxy == nullptr) {
-        LOG_ERROR("proxy has disconnected");
-        return;
-    }
-    proxy->RegisterObserverExt(uri, dataObserver, isDescendants);
+    return;
 }
 
 /**
@@ -556,25 +543,16 @@ void DataShareHelper::UnregisterObserverExt(const Uri &uri, const sptr<AAFwk::ID
         LOG_ERROR("dataObserver is nullptr");
         return;
     }
-
-    if (isDataShareService_) {
-        if (!UnregObserverExt(uri, dataObserver)) {
-            LOG_ERROR("UnregisterObserver failed");
-        }
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
         return;
     }
-
-    auto connection = connection_;
-    if (connection == nullptr) {
-        LOG_ERROR("dataShareConnection_ is nullptr");
-        return;
+    ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, dataObserver);
+    if (ret != ERR_OK) {
+        LOG_ERROR("UnregisterObserverExt failed");
     }
-    auto proxy = connection->GetDataShareProxy();
-    if (proxy == nullptr) {
-        LOG_ERROR("dataShareConnection_->GetDataShareProxy() is nullptr");
-        return;
-    }
-    proxy->UnregisterObserverExt(uri, dataObserver);
+    return;
 }
 
 /**
@@ -590,24 +568,16 @@ void DataShareHelper::UnregisterObserverExt(const sptr<AAFwk::IDataAbilityObserv
         return;
     }
 
-    if (isDataShareService_) {
-        if (!UnregObserverExt(dataObserver)) {
-            LOG_ERROR("UnregisterObserver failed");
-        }
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
         return;
     }
-
-    auto connection = connection_;
-    if (connection == nullptr) {
-        LOG_ERROR("dataShareConnection_ is nullptr");
-        return;
+    ErrCode ret = obsMgrClient->UnregisterObserverExt(dataObserver);
+    if (ret != ERR_OK) {
+        LOG_ERROR("UnregisterObserverExt failed");
     }
-    auto proxy = connection->GetDataShareProxy();
-    if (proxy == nullptr) {
-        LOG_ERROR("dataShareConnection_->GetDataShareProxy() is nullptr");
-        return;
-    }
-    proxy->UnregisterObserverExt(dataObserver);
+    return;
 }
 
 /**
@@ -617,21 +587,19 @@ void DataShareHelper::UnregisterObserverExt(const sptr<AAFwk::IDataAbilityObserv
  */
 void DataShareHelper::NotifyChangeExt(const AAFwk::ChangeInfo &changeInfo)
 {
-    auto connection = connection_;
-    if (connection == nullptr) {
-        LOG_ERROR("dataShareConnection_ is nullptr");
+    LOG_INFO("Start");
+
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
         return;
     }
 
-    if (!connection->ConnectDataShare(uri_, token_)) {
-        LOG_ERROR("dataShareProxy is nullptr");
-        return;
+    ErrCode ret = obsMgrClient->NotifyChangeExt(changeInfo);
+    if (ret != ERR_OK) {
+        LOG_ERROR("NotifyChangeExt failed");
     }
-
-    auto proxy = connection->GetDataShareProxy();
-    if (proxy != nullptr) {
-        proxy->NotifyChangeExt(changeInfo);
-    }
+    return;
 }
 
 /**
@@ -723,52 +691,6 @@ bool DataShareHelper::UnregObserver(const Uri &uri, const sptr<AAFwk::IDataAbili
     ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver);
     if (ret != ERR_OK) {
         LOG_ERROR("UnregisterObserver failed");
-        return false;
-    }
-    return true;
-}
-
-bool DataShareHelper::RegObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
-    bool isDescendants)
-{
-    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
-    if (obsMgrClient == nullptr) {
-        LOG_ERROR("get DataObsMgrClient failed");
-        return false;
-    }
-    ErrCode ret = obsMgrClient->RegisterObserverExt(uri, dataObserver, isDescendants);
-    if (ret != ERR_OK) {
-        LOG_ERROR("RegisterObserverExt failed");
-        return false;
-    }
-    return true;
-}
-
-bool DataShareHelper::UnregObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
-{
-    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
-    if (obsMgrClient == nullptr) {
-        LOG_ERROR("get DataObsMgrClient failed");
-        return false;
-    }
-    ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, dataObserver);
-    if (ret != ERR_OK) {
-        LOG_ERROR("UnregisterObserverExt failed");
-        return false;
-    }
-    return true;
-}
-
-bool DataShareHelper::UnregObserverExt(const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
-{
-    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
-    if (obsMgrClient == nullptr) {
-        LOG_ERROR("get DataObsMgrClient failed");
-        return false;
-    }
-    ErrCode ret = obsMgrClient->UnregisterObserverExt(dataObserver);
-    if (ret != ERR_OK) {
-        LOG_ERROR("UnregisterObserverExt failed");
         return false;
     }
     return true;
