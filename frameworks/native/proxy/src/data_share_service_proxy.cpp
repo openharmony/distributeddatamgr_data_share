@@ -175,5 +175,25 @@ Uri DataShareServiceProxy::DenormalizeUri(const Uri &uri)
 {
     return Uri("");
 }
+
+bool DataShareServiceProxy::RegisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+    bool isDescendants)
+{
+    return false;
+}
+bool DataShareServiceProxy::UnregisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    return false;
+}
+bool DataShareServiceProxy::UnregisterObserverExt(const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    return false;
+}
+
+bool DataShareServiceProxy::NotifyChangeExt(const AAFwk::ChangeInfo &changeInfo)
+{
+    return false;
+}
+
 }
 }

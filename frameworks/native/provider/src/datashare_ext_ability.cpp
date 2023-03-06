@@ -136,5 +136,26 @@ Uri DataShareExtAbility::DenormalizeUri(const Uri &uri)
     Uri urivalue("");
     return uri;
 }
+
+bool DataShareExtAbility::RegisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+    bool isDescendants)
+{
+    return true;
+}
+
+bool DataShareExtAbility::UnregisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    return true;
+}
+
+bool DataShareExtAbility::UnregisterObserverExt(const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    return true;
+}
+
+bool DataShareExtAbility::NotifyChangeExt(const ChangeInfo &changeInfo)
+{
+    return true;
+}
 } // namespace DataShare
 } // namespace OHOS

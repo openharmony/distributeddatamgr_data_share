@@ -504,6 +504,137 @@ void DataShareHelper::NotifyChange(const Uri &uri)
 }
 
 /**
+ * Registers an observer to DataObsMgr specified by the given Uri.
+ *
+ * @param uri, Indicates the path of the data to operate.
+ * @param dataObserver, Indicates the IDataAbilityObserver object.
+ * @param isDescendants, Indicates the Whether to note the change of descendants.
+ */
+void DataShareHelper::RegisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants)
+{
+    LOG_INFO("Start");
+    if (dataObserver == nullptr) {
+        LOG_ERROR("dataObserver is nullptr");
+        return;
+    }
+    if (isDataShareService_) {
+        if (!RegObserverExt(uri, dataObserver, isDescendants)) {
+            LOG_ERROR("RegisterObserver failed");
+        }
+        return;
+    }
+
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return;
+    }
+
+    if (!connection->ConnectDataShare(uri, token_)) {
+        LOG_ERROR("connect failed");
+        return;
+    }
+
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy has disconnected");
+        return;
+    }
+    proxy->RegisterObserverExt(uri, dataObserver, isDescendants);
+}
+
+/**
+ * Deregisters an observer used for DataObsMgr specified by the given Uri.
+ *
+ * @param uri, Indicates the path of the data to operate.
+ * @param dataObserver, Indicates the IDataAbilityObserver object.
+ */
+void DataShareHelper::UnregisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    LOG_INFO("Start");
+    if (dataObserver == nullptr) {
+        LOG_ERROR("dataObserver is nullptr");
+        return;
+    }
+
+    if (isDataShareService_) {
+        if (!UnregObserverExt(uri, dataObserver)) {
+            LOG_ERROR("UnregisterObserver failed");
+        }
+        return;
+    }
+
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("dataShareConnection_->GetDataShareProxy() is nullptr");
+        return;
+    }
+    proxy->UnregisterObserverExt(uri, dataObserver);
+}
+
+/**
+ * Deregisters dataObserver used for DataObsMgr specified
+ *
+ * @param dataObserver, Indicates the IDataAbilityObserver object.
+ */
+void DataShareHelper::UnregisterObserverExt(const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    LOG_INFO("Start");
+    if (dataObserver == nullptr) {
+        LOG_ERROR("dataObserver is nullptr");
+        return;
+    }
+
+    if (isDataShareService_) {
+        if (!UnregObserverExt(dataObserver)) {
+            LOG_ERROR("UnregisterObserver failed");
+        }
+        return;
+    }
+
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("dataShareConnection_->GetDataShareProxy() is nullptr");
+        return;
+    }
+    proxy->UnregisterObserverExt(dataObserver);
+}
+
+/**
+ * Notifies the registered observers of a change to the data resource specified by Uris.
+ *
+ * @param changeInfo Indicates the info of the data to operate.
+ */
+void DataShareHelper::NotifyChangeExt(const AAFwk::ChangeInfo &changeInfo)
+{
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return;
+    }
+
+    if (!connection->ConnectDataShare(uri_, token_)) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return;
+    }
+
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy != nullptr) {
+        proxy->NotifyChangeExt(changeInfo);
+    }
+}
+
+/**
  * @brief Converts the given uri that refer to the data share into a normalized URI. A normalized URI can be used
  * across devices, persisted, backed up, and restored. It can refer to the same item in the data share even if the
  * context has changed. If you implement URI normalization for a data share, you must also implement
@@ -567,7 +698,7 @@ Uri DataShareHelper::DenormalizeUri(Uri &uri)
     return uriValue;
 }
 
-bool DataShareHelper::RegObserver (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+bool DataShareHelper::RegObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
@@ -576,11 +707,13 @@ bool DataShareHelper::RegObserver (const Uri &uri, const sptr<AAFwk::IDataAbilit
     }
     ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
     if (ret != ERR_OK) {
+        LOG_ERROR("RegisterObserver failed");
         return false;
     }
     return true;
 }
-bool DataShareHelper::UnregObserver (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+
+bool DataShareHelper::UnregObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
@@ -594,5 +727,52 @@ bool DataShareHelper::UnregObserver (const Uri &uri, const sptr<AAFwk::IDataAbil
     }
     return true;
 }
+
+bool DataShareHelper::RegObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+    bool isDescendants)
+{
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
+        return false;
+    }
+    ErrCode ret = obsMgrClient->RegisterObserverExt(uri, dataObserver, isDescendants);
+    if (ret != ERR_OK) {
+        LOG_ERROR("RegisterObserverExt failed");
+        return false;
+    }
+    return true;
+}
+
+bool DataShareHelper::UnregObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
+        return false;
+    }
+    ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, dataObserver);
+    if (ret != ERR_OK) {
+        LOG_ERROR("UnregisterObserverExt failed");
+        return false;
+    }
+    return true;
+}
+
+bool DataShareHelper::UnregObserverExt(const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
+        return false;
+    }
+    ErrCode ret = obsMgrClient->UnregisterObserverExt(dataObserver);
+    if (ret != ERR_OK) {
+        LOG_ERROR("UnregisterObserverExt failed");
+        return false;
+    }
+    return true;
+}
+
 }  // namespace DataShare
 }  // namespace OHOS

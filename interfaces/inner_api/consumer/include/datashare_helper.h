@@ -200,6 +200,37 @@ public:
     void NotifyChange(const Uri &uri);
 
     /**
+     * Registers an observer to DataObsMgr specified by the given Uri.
+     *
+     * @param uri, Indicates the path of the data to operate.
+     * @param dataObserver, Indicates the IDataAbilityObserver object.
+     * @param isDescendants, Indicates the Whether to note the change of descendants.
+     */
+    void RegisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants);
+
+    /**
+     * Deregisters an observer used for DataObsMgr specified by the given Uri.
+     *
+     * @param uri, Indicates the path of the data to operate.
+     * @param dataObserver, Indicates the IDataAbilityObserver object
+     */
+    void UnregisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+
+    /**
+     * Deregisters dataObserver used for DataObsMgr specified
+     *
+     * @param dataObserver, Indicates the IDataAbilityObserver object.
+     */
+    void UnregisterObserverExt(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+
+    /**
+     * Notifies the registered observers of a change to the data resource specified by Uris.
+     *
+     * @param changeInfo Indicates the info of the data to operate.
+     */
+    void NotifyChangeExt(const AAFwk::ChangeInfo &changeInfo);
+
+    /**
      * @brief Converts the given uri that refer to the Data share into a normalized URI. A normalized URI can be used
      * across devices, persisted, backed up, and restored. It can refer to the same item in the Data share even if the
      * context has changed. If you implement URI normalization for a Data share, you must also implement
@@ -234,8 +265,11 @@ private:
     sptr<IRemoteObject> token_ = {};
     Uri uri_ = Uri("");
     std::shared_ptr<BaseConnection> connection_ = nullptr;
-    static bool RegObserver (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
-    static bool UnregObserver (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    static bool RegObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    static bool UnregObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    static bool RegObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants);
+    static bool UnregObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    static bool UnregObserverExt(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
 };
 }  // namespace DataShare
 }  // namespace OHOS

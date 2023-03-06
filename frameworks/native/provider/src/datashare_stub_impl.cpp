@@ -18,6 +18,7 @@
 #include "accesstoken_kit.h"
 #include "datashare_log.h"
 #include "ipc_skeleton.h"
+#include "dataobs_mgr_changeinfo.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -379,6 +380,48 @@ void DataShareStubImpl::GetCallingInfo(CallingInfo& callingInfo)
     callingInfo.callingTokenId = GetCallingTokenID();
     callingInfo.callingPid = GetCallingPid();
     callingInfo.callingUid = GetCallingUid();
+}
+
+bool DataShareStubImpl::RegisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+    bool isDescendants)
+{
+    auto extension = GetOwner();
+    if (extension == nullptr) {
+        return false;
+    }
+    return extension->RegisterObserverExt(uri, dataObserver, isDescendants);
+}
+
+bool DataShareStubImpl::UnregisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    auto extension = GetOwner();
+    if (extension == nullptr) {
+        return false;
+    }
+    return extension->UnregisterObserver(uri, dataObserver);
+}
+
+bool DataShareStubImpl::UnregisterObserverExt(const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    auto extension = GetOwner();
+    if (extension == nullptr) {
+        return false;
+    }
+    return extension->UnregisterObserverExt(dataObserver);
+}
+
+bool DataShareStubImpl::NotifyChangeExt(const AAFwk::ChangeInfo &changeInfo)
+{
+    bool ret = false;
+    std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
+        auto extension = client->GetOwner();
+        if (extension == nullptr) {
+            return;
+        }
+        ret = extension->NotifyChangeExt(changeInfo);
+    };
+    uvQueue_->SyncCall(syncTaskFunc);
+    return ret;
 }
 } // namespace DataShare
 } // namespace OHOS
