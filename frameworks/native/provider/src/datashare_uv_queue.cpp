@@ -98,7 +98,6 @@ void DataShareUvQueue::Purge(uv_work_t* work)
     }
 
     auto *entry = static_cast<UvEntry*>(work->data);
-    std::unique_lock<std::mutex> lock(entry->mutex);
 
     delete entry;
     entry = nullptr;
