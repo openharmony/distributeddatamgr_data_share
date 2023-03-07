@@ -14,7 +14,6 @@
  */
 
 #include "ishared_result_set_stub.h"
-#include <future>
 #include <sys/prctl.h>
 #include "datashare_log.h"
 #include "datashare_errno.h"
@@ -42,17 +41,12 @@ sptr<ISharedResultSet> ISharedResultSetStub::CreateStub(std::shared_ptr<DataShar
 }
 
 ISharedResultSetStub::ISharedResultSetStub(std::shared_ptr<DataShareResultSet> resultSet)
-    : resultSet_(std::move(resultSet)),
-      runnables_(MAX_RUNNABLE),
-      thread_(&ISharedResultSetStub::Run, this)
+    : resultSet_(std::move(resultSet))
 {
-    thread_.detach();
 }
+
 ISharedResultSetStub::~ISharedResultSetStub()
 {
-    isRunning_ = false;
-    // do not delete this code, this code is waiting the thread exit.
-    isRunning_ = Submit([this]() -> bool { return isRunning_;}).get();
 }
 
 int ISharedResultSetStub::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data,
@@ -72,11 +66,7 @@ int ISharedResultSetStub::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &da
         LOG_ERROR("method code(%{public}d) is not support", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-
-    auto future = Submit([this, &data, &reply, handler]() -> int {
-        return (this->*handler)(data, reply);
-    });
-    return future.get();
+    return (this->*handler)(data, reply);
 }
 
 int ISharedResultSetStub::HandleGetRowCountRequest(MessageParcel &data, MessageParcel &reply)
@@ -124,20 +114,5 @@ int ISharedResultSetStub::HandleCloseRequest(MessageParcel &data, MessageParcel 
     reply.WriteInt32(errCode);
     LOG_DEBUG("errCode %{public}d", errCode);
     return NO_ERROR;
-}
-
-void ISharedResultSetStub::Run()
-{
-    pthread_setname_np(pthread_self(), "Shared_RSetStub");
-    auto handle = thread_.native_handle();
-    bool isRunning = true;
-    while (isRunning) {
-        auto runnable = runnables_.Pop();
-        if (runnable == nullptr) {
-            continue;
-        }
-        isRunning = runnable();
-    }
-    LOG_ERROR("thread(%{public}" PRIx64 ") is exited", uint64_t(handle));
 }
 } // namespace OHOS::DataShare
