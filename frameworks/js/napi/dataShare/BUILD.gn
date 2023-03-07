@@ -47,7 +47,6 @@ ohos_shared_library("datashare") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "napi:ace_napi",
-    "relational_store:native_appdatafwk",
   ]
 
   relative_install_dir = "module/data"

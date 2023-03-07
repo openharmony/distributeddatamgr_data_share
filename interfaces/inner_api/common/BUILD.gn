@@ -63,7 +63,6 @@ ohos_shared_library("datashare_common") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "napi:ace_napi",
-    "relational_store:native_appdatafwk",
   ]
 
   subsystem_name = "distributeddatamgr"

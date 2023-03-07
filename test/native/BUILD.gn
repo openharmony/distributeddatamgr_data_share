@@ -76,7 +76,6 @@ ohos_unittest("NativeDataShareTest") {
     "hilog_native:libhilog",
     "hitrace_native:hitrace_meter",
     "ipc:ipc_single",
-    "relational_store:native_appdatafwk",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
