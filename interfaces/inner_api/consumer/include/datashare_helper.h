@@ -39,6 +39,7 @@ namespace DataShare {
 using string = std::string;
 class DataShareObserver {
 public:
+    DataShareObserver() = default;
     virtual ~DataShareObserver() = default;
     enum ChangeType : uint32_t {
         INSERT = 0,

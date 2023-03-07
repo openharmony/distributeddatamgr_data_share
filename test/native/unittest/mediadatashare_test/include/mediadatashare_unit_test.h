@@ -17,6 +17,7 @@
 #define MEDIA_DATASHARE_UNIT_TEST_H
 
 #include <gtest/gtest.h>
+#include <condition_variable>
 #include "data_ability_observer_interface.h"
 #include "datashare_helper.h"
 
@@ -51,15 +52,19 @@ public:
 
 class DataShareObserverTest : public DataShare::DataShareObserver {
 public:
-    DataShareObserverTest();
+    DataShareObserverTest() {}
     ~DataShareObserverTest() {}
 
     void OnChange(const ChangeInfo &changeInfo) override
     {
         changeInfo_ = changeInfo;
+        std::unique_lock<std::mutex> lock(mutex_);
+        condition_.notify_one();
     }
 
     ChangeInfo changeInfo_;
+    std::mutex mutex_;
+    std::condition_variable condition_;
 };
 } // namespace Media
 } // namespace OHOS

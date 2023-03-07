@@ -31,7 +31,7 @@ constexpr int INVALID_VALUE = -1;
 } // namespace
 class ObserverImpl : public AAFwk::DataAbilityObserverStub {
 public:
-    ObserverImpl(const std::shared_ptr<DataShareObserver> dataShareObserver)
+    explicit ObserverImpl(const std::shared_ptr<DataShareObserver> dataShareObserver)
         : dataShareObserver_(dataShareObserver){};
     void OnChange();
     void OnChangeExt(const ChangeInfo &info);
@@ -523,7 +523,8 @@ void DataShareHelper::NotifyChange(const Uri &uri)
  * @param dataObserver, Indicates the DataShareObserver object.
  * @param isDescendants, Indicates the Whether to note the change of descendants.
  */
-void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver, bool isDescendants)
+void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+    bool isDescendants)
 {
     LOG_INFO("Start");
     if (dataObserver == nullptr) {

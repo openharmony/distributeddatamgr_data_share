@@ -1184,18 +1184,32 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_001, TestSize.Level0
     int retVal = helper->Insert(uri, valuesBucket);
     EXPECT_EQ((retVal > 0), true);
     helper->NotifyChangeExt({ DataShareObserver::ChangeType::INSERT, { uri } });
-    EXPECT_EQ(dataObserver->changeInfo_.changeType_, DataShareObserver::ChangeType::INSERT);
-    EXPECT_EQ(dataObserver->changeInfo_.uris_.size(), 1);
-    EXPECT_EQ(dataObserver->changeInfo_.uris_.begin()->ToString(), uri.ToString());
+
+    {
+        unique_lock<mutex> lock(dataObserver->mutex_);
+        if (dataObserver->condition_.wait_for(lock, 2s) == std::cv_status::no_timeout) {
+            EXPECT_EQ(dataObserver->changeInfo_.changeType_, DataShareObserver::ChangeType::INSERT);
+            EXPECT_EQ(dataObserver->changeInfo_.uris_.size(), 1);
+            EXPECT_EQ(dataObserver->changeInfo_.uris_.begin()->ToString(), uri.ToString());
+        } else {
+            EXPECT_TRUE(false);
+        }
+    }
 
     Uri descendantsUri(MEDIALIBRARY_DATA_URI + "/com.ohos.example");
     helper->Insert(descendantsUri, valuesBucket);
     EXPECT_EQ((retVal > 0), true);
     helper->NotifyChangeExt({ DataShareObserver::ChangeType::INSERT, { descendantsUri } });
-    EXPECT_EQ(dataObserver->changeInfo_.changeType_, DataShareObserver::ChangeType::INSERT);
-    EXPECT_EQ(dataObserver->changeInfo_.uris_.size(), 1);
-    EXPECT_EQ(dataObserver->changeInfo_.uris_.begin()->ToString(), descendantsUri.ToString());
-
+    {
+        unique_lock<mutex> lock(dataObserver->mutex_);
+        if (dataObserver->condition_.wait_for(lock, 2s) == std::cv_status::no_timeout) {
+            EXPECT_EQ(dataObserver->changeInfo_.changeType_, DataShareObserver::ChangeType::INSERT);
+            EXPECT_EQ(dataObserver->changeInfo_.uris_.size(), 1);
+            EXPECT_EQ(dataObserver->changeInfo_.uris_.begin()->ToString(), descendantsUri.ToString());
+        } else {
+            EXPECT_TRUE(false);
+        }
+    }
 
     DataShare::DataSharePredicates deletePredicates;
     string selections = MEDIA_DATA_DB_TITLE + " = 'Datashare_Observer_Test001'";
@@ -1203,9 +1217,17 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_001, TestSize.Level0
     retVal = helper->Delete(uri, deletePredicates);
     EXPECT_EQ((retVal >= 0), true);
     helper->NotifyChangeExt({ DataShareObserver::ChangeType::DELETE, { uri } });
-    EXPECT_EQ(dataObserver->changeInfo_.changeType_, DataShareObserver::ChangeType::DELETE);
-    EXPECT_EQ(dataObserver->changeInfo_.uris_.size(), 1);
-    EXPECT_EQ(dataObserver->changeInfo_.uris_.begin()->ToString(), descendantsUri.ToString());
+
+    {
+        unique_lock<mutex> lock(dataObserver->mutex_);
+        if (dataObserver->condition_.wait_for(lock, 2s) == std::cv_status::no_timeout) {
+            EXPECT_EQ(dataObserver->changeInfo_.changeType_, DataShareObserver::ChangeType::DELETE);
+            EXPECT_EQ(dataObserver->changeInfo_.uris_.size(), 1);
+            EXPECT_EQ(dataObserver->changeInfo_.uris_.begin()->ToString(), uri.ToString());
+        } else {
+            EXPECT_TRUE(false);
+        }
+    }
 
     helper->UnregisterObserverExt(uri, dataObserver);
     LOG_INFO("MediaDataShare_ObserverExt_001 end");
