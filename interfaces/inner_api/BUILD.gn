@@ -145,7 +145,6 @@ ohos_shared_library("datashare_ext_ability_module") {
     "ability_runtime:runtime",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
-    "relational_store:native_appdatafwk",
   ]
 
   relative_install_dir = "extensionability/"
