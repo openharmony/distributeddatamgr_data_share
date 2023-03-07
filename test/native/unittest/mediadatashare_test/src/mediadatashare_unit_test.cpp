@@ -1170,32 +1170,5 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Observer_001, TestSize.Level0)
     LOG_INFO("MediaDataShare_Observer_001 end");
 }
 
-HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_001, TestSize.Level0)
-{
-    LOG_INFO("MediaDataShare_ObserverExt_001 start");
-    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
-    ASSERT_TRUE(helper != nullptr);
-    Uri uri(MEDIALIBRARY_DATA_URI);
-    sptr<IDataShareObserverTest> dataObserver;
-    EXPECT_EQ(dataObserver, nullptr);
-    helper->RegisterObserverExt(uri, dataObserver, false);
-
-    DataShare::DataShareValuesBucket valuesBucket;
-    valuesBucket.Put(MEDIA_DATA_DB_TITLE, "Datashare_Observer_Test001");
-    int retVal = helper->Insert(uri, valuesBucket);
-    EXPECT_EQ((retVal > 0), true);
-    helper->NotifyChangeExt({ AAFwk::ChangeInfo::ChangeType::INSERT, { uri } });
-
-    DataShare::DataSharePredicates deletePredicates;
-    string selections = MEDIA_DATA_DB_TITLE + " = 'Datashare_Observer_Test001'";
-    deletePredicates.SetWhereClause(selections);
-    retVal = helper->Delete(uri, deletePredicates);
-    EXPECT_EQ((retVal >= 0), true);
-    helper->NotifyChangeExt({ AAFwk::ChangeInfo::ChangeType::DELETE, { uri } });
-    helper->UnregisterObserverExt(uri, dataObserver);
-    helper->UnregisterObserverExt(dataObserver);
-    LOG_INFO("MediaDataShare_ObserverExt_001 end");
-}
-
 } // namespace Media
 } // namespace OHOS

@@ -773,7 +773,6 @@ napi_valuetype JsDataShareExtAbility::UnWrapPropertyType(napi_env env, napi_valu
     return type;
 }
 
-
 bool MakeNapiColumn(napi_env env, napi_value &napiColumns, const std::vector<std::string> &columns)
 {
     napi_status status = napi_create_array(env, &napiColumns);

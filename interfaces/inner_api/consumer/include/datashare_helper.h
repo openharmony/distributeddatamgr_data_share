@@ -37,6 +37,26 @@ class IDataAbilityObserver;
 
 namespace DataShare {
 using string = std::string;
+class DataShareObserver {
+public:
+    enum ChangeType : uint32_t {
+        INSERT = 0,
+        DELETE,
+        UPDATE,
+        OTHER,
+        INVAILD,
+    };
+
+    struct ChangeInfo {
+        ChangeType changeType_ = INVAILD;
+        std::list<Uri> uris_ = {};
+        const void *data_ = nullptr;
+        uint32_t size_ = 0;
+    };
+
+    virtual void OnChange(const ChangeInfo &changeInfo) = 0;
+};
+
 class DataShareHelper final : public std::enable_shared_from_this<DataShareHelper> {
 public:
     /**
@@ -206,7 +226,7 @@ public:
      * @param dataObserver, Indicates the IDataAbilityObserver object.
      * @param isDescendants, Indicates the Whether to note the change of descendants.
      */
-    void RegisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+    void RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
         bool isDescendants);
 
     /**
@@ -215,21 +235,14 @@ public:
      * @param uri, Indicates the path of the data to operate.
      * @param dataObserver, Indicates the IDataAbilityObserver object
      */
-    void UnregisterObserverExt(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
-
-    /**
-     * Deregisters dataObserver used for DataObsMgr specified
-     *
-     * @param dataObserver, Indicates the IDataAbilityObserver object.
-     */
-    void UnregisterObserverExt(const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    void UnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver);
 
     /**
      * Notifies the registered observers of a change to the data resource specified by Uris.
      *
      * @param changeInfo Indicates the info of the data to operate.
      */
-    void NotifyChangeExt(const AAFwk::ChangeInfo &changeInfo);
+    void NotifyChangeExt(const DataShareObserver::ChangeInfo &changeInfo);
 
     /**
      * @brief Converts the given uri that refer to the Data share into a normalized URI. A normalized URI can be used

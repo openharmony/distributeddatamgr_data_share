@@ -27,7 +27,6 @@
 namespace OHOS {
 namespace AAFwk {
     class IDataAbilityObserver;
-    struct ChangeInfo;
 }
 
 namespace DataShare {
