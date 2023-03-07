@@ -18,6 +18,7 @@
 
 #include <gtest/gtest.h>
 #include "data_ability_observer_interface.h"
+#include "datashare_helper.h"
 
 namespace OHOS {
 namespace Media {
@@ -36,16 +37,29 @@ public:
     void TearDown();
 };
 
-class IDataShareObserverTest : public AAFwk::IDataAbilityObserver {
+class IDataAbilityObserverTest : public AAFwk::IDataAbilityObserver {
 public:
-    IDataShareObserverTest();
-    ~IDataShareObserverTest()
+    IDataAbilityObserverTest();
+    ~IDataAbilityObserverTest()
     {}
 
     void OnChange()
     {
         GTEST_LOG_(INFO) << "OnChange enter";
     }
+};
+
+class DataShareObserverTest : public DataShare::DataShareObserver {
+public:
+    DataShareObserverTest();
+    ~DataShareObserverTest() {}
+
+    void OnChange(const ChangeInfo &changeInfo) override
+    {
+        changeInfo_ = changeInfo;
+    }
+
+    ChangeInfo changeInfo_;
 };
 } // namespace Media
 } // namespace OHOS

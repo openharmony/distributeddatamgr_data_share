@@ -28,15 +28,15 @@ using namespace AppExecFwk;
 namespace {
 const std::string SCHEME_DATASHARE = "datashare";
 constexpr int INVALID_VALUE = -1;
-}  // namespace
+} // namespace
 class ObserverImpl : public AAFwk::DataAbilityObserverStub {
 public:
     ObserverImpl(const std::shared_ptr<DataShareObserver> dataShareObserver)
         : dataShareObserver_(dataShareObserver){};
     void OnChange();
     void OnChangeExt(const ChangeInfo &info);
-    static DataShareObserver::ChangeInfo ConvertInfo(AAFwk::ChangeInfo info);
-    static AAFwk::ChangeInfo ConvertInfo(DataShareObserver::ChangeInfo info);
+    static DataShareObserver::ChangeInfo ConvertInfo(const AAFwk::ChangeInfo &info);
+    static AAFwk::ChangeInfo ConvertInfo(const DataShareObserver::ChangeInfo &info);
 
 private:
     std::shared_ptr<DataShareObserver> dataShareObserver_;
@@ -523,7 +523,7 @@ void DataShareHelper::NotifyChange(const Uri &uri)
  * @param dataObserver, Indicates the DataShareObserver object.
  * @param isDescendants, Indicates the Whether to note the change of descendants.
  */
-void RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver, bool isDescendants)
+void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver, bool isDescendants)
 {
     LOG_INFO("Start");
     if (dataObserver == nullptr) {
@@ -700,7 +700,7 @@ void ObserverImpl::OnChangeExt(const ChangeInfo &info)
     dataShareObserver_->OnChange(ConvertInfo(info));
 }
 
-DataShareObserver::ChangeInfo ObserverImpl::ConvertInfo(AAFwk::ChangeInfo info)
+DataShareObserver::ChangeInfo ObserverImpl::ConvertInfo(const AAFwk::ChangeInfo &info)
 {
     DataShareObserver::ChangeInfo changeInfo;
     switch (info.changeType_) {
@@ -720,13 +720,13 @@ DataShareObserver::ChangeInfo ObserverImpl::ConvertInfo(AAFwk::ChangeInfo info)
             changeInfo.changeType_ = DataShareObserver::INVAILD;
             break;
     }
-    changeInfo.uris_ = info.uris_;
+    changeInfo.uris_ = std::move(info.uris_);
     changeInfo.data_ = info.data_;
     changeInfo.size_ = info.size_;
     return changeInfo;
 }
 
-AAFwk::ChangeInfo ObserverImpl::ConvertInfo(DataShareObserver::ChangeInfo info)
+AAFwk::ChangeInfo ObserverImpl::ConvertInfo(const DataShareObserver::ChangeInfo &info)
 {
     AAFwk::ChangeInfo changeInfo;
     switch (info.changeType_) {
@@ -746,7 +746,7 @@ AAFwk::ChangeInfo ObserverImpl::ConvertInfo(DataShareObserver::ChangeInfo info)
             changeInfo.changeType_ = AAFwk::ChangeInfo::INVAILD;
             break;
     }
-    changeInfo.uris_ = info.uris_;
+    changeInfo.uris_ = std::move(info.uris_);
     changeInfo.data_ = info.data_;
     changeInfo.size_ = info.size_;
     return changeInfo;
