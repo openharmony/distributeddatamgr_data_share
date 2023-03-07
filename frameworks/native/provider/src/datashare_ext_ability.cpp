@@ -95,7 +95,7 @@ int DataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &predi
 }
 
 std::shared_ptr<DataShareResultSet> DataShareExtAbility::Query(const Uri &uri,
-    const DataSharePredicates &predicates, std::vector<std::string> &columns)
+    const DataSharePredicates &predicates, std::vector<std::string> &columns, DatashareBusinessError &businessError)
 {
     return nullptr;
 }
