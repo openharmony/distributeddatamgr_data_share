@@ -17,7 +17,9 @@
 #define MEDIA_DATASHARE_UNIT_TEST_H
 
 #include <gtest/gtest.h>
+#include <condition_variable>
 #include "data_ability_observer_interface.h"
+#include "datashare_helper.h"
 
 namespace OHOS {
 namespace Media {
@@ -36,16 +38,33 @@ public:
     void TearDown();
 };
 
-class IDataShareObserverTest : public AAFwk::IDataAbilityObserver {
+class IDataAbilityObserverTest : public AAFwk::IDataAbilityObserver {
 public:
-    IDataShareObserverTest();
-    ~IDataShareObserverTest()
+    IDataAbilityObserverTest();
+    ~IDataAbilityObserverTest()
     {}
 
     void OnChange()
     {
         GTEST_LOG_(INFO) << "OnChange enter";
     }
+};
+
+class DataShareObserverTest : public DataShare::DataShareObserver {
+public:
+    DataShareObserverTest() {}
+    ~DataShareObserverTest() {}
+
+    void OnChange(const ChangeInfo &changeInfo) override
+    {
+        changeInfo_ = changeInfo;
+        std::unique_lock<std::mutex> lock(mutex_);
+        condition_.notify_one();
+    }
+
+    ChangeInfo changeInfo_;
+    std::mutex mutex_;
+    std::condition_variable condition_;
 };
 } // namespace Media
 } // namespace OHOS

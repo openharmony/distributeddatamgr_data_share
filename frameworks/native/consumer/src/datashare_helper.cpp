@@ -17,6 +17,7 @@
 
 #include "connection_factory.h"
 #include "data_ability_observer_interface.h"
+#include "data_ability_observer_stub.h"
 #include "dataobs_mgr_client.h"
 #include "datashare_log.h"
 #include "datashare_result_set.h"
@@ -27,7 +28,19 @@ using namespace AppExecFwk;
 namespace {
 const std::string SCHEME_DATASHARE = "datashare";
 constexpr int INVALID_VALUE = -1;
-}  // namespace
+} // namespace
+class ObserverImpl : public AAFwk::DataAbilityObserverStub {
+public:
+    explicit ObserverImpl(const std::shared_ptr<DataShareObserver> dataShareObserver)
+        : dataShareObserver_(dataShareObserver){};
+    void OnChange();
+    void OnChangeExt(const ChangeInfo &info);
+    static DataShareObserver::ChangeInfo ConvertInfo(const AAFwk::ChangeInfo &info);
+    static AAFwk::ChangeInfo ConvertInfo(const DataShareObserver::ChangeInfo &info);
+
+private:
+    std::shared_ptr<DataShareObserver> dataShareObserver_;
+};
 
 DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,
     std::shared_ptr<BaseConnection> dataShareConnection)
@@ -504,6 +517,90 @@ void DataShareHelper::NotifyChange(const Uri &uri)
 }
 
 /**
+ * Registers an observer to DataObsMgr specified by the given Uri.
+ *
+ * @param uri, Indicates the path of the data to operate.
+ * @param dataObserver, Indicates the DataShareObserver object.
+ * @param isDescendants, Indicates the Whether to note the change of descendants.
+ */
+void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+    bool isDescendants)
+{
+    LOG_INFO("Start");
+    if (dataObserver == nullptr) {
+        LOG_ERROR("dataObserver is nullptr");
+        return;
+    }
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
+        return;
+    }
+    sptr<ObserverImpl> obs(new (std::nothrow) ObserverImpl(dataObserver));
+    if (obs == nullptr) {
+        LOG_ERROR("new ObserverImpl failed");
+        return;
+    }
+    ErrCode ret = obsMgrClient->RegisterObserverExt(uri, obs, isDescendants);
+    if (ret != ERR_OK) {
+        LOG_ERROR("RegisterObserverExt failed");
+    }
+    return;
+}
+
+/**
+ * Deregisters an observer used for DataObsMgr specified by the given Uri.
+ *
+ * @param uri, Indicates the path of the data to operate.
+ * @param dataObserver, Indicates the DataShareObserver object.
+ */
+void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver)
+{
+    LOG_INFO("Start");
+    if (dataObserver == nullptr) {
+        LOG_ERROR("dataObserver is nullptr");
+        return;
+    }
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
+        return;
+    }
+    sptr<ObserverImpl> obs(new (std::nothrow) ObserverImpl(dataObserver));
+    if (obs == nullptr) {
+        LOG_ERROR("new ObserverImpl failed");
+        return;
+    }
+    ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, obs);
+    if (ret != ERR_OK) {
+        LOG_ERROR("UnregisterObserverExt failed");
+    }
+    return;
+}
+
+/**
+ * Notifies the registered observers of a change to the data resource specified by Uris.
+ *
+ * @param changeInfo Indicates the info of the data to operate.
+ */
+void DataShareHelper::NotifyChangeExt(const DataShareObserver::ChangeInfo &changeInfo)
+{
+    LOG_INFO("Start");
+
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
+        return;
+    }
+
+    ErrCode ret = obsMgrClient->NotifyChangeExt(ObserverImpl::ConvertInfo(changeInfo));
+    if (ret != ERR_OK) {
+        LOG_ERROR("NotifyChangeExt failed");
+    }
+    return;
+}
+
+/**
  * @brief Converts the given uri that refer to the data share into a normalized URI. A normalized URI can be used
  * across devices, persisted, backed up, and restored. It can refer to the same item in the data share even if the
  * context has changed. If you implement URI normalization for a data share, you must also implement
@@ -567,7 +664,7 @@ Uri DataShareHelper::DenormalizeUri(Uri &uri)
     return uriValue;
 }
 
-bool DataShareHelper::RegObserver (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+bool DataShareHelper::RegObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
@@ -576,11 +673,13 @@ bool DataShareHelper::RegObserver (const Uri &uri, const sptr<AAFwk::IDataAbilit
     }
     ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
     if (ret != ERR_OK) {
+        LOG_ERROR("RegisterObserver failed");
         return false;
     }
     return true;
 }
-bool DataShareHelper::UnregObserver (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+
+bool DataShareHelper::UnregObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
@@ -594,5 +693,64 @@ bool DataShareHelper::UnregObserver (const Uri &uri, const sptr<AAFwk::IDataAbil
     }
     return true;
 }
-}  // namespace DataShare
-}  // namespace OHOS
+
+void ObserverImpl::OnChange() {}
+
+void ObserverImpl::OnChangeExt(const ChangeInfo &info)
+{
+    dataShareObserver_->OnChange(ConvertInfo(info));
+}
+
+DataShareObserver::ChangeInfo ObserverImpl::ConvertInfo(const AAFwk::ChangeInfo &info)
+{
+    DataShareObserver::ChangeInfo changeInfo;
+    switch (info.changeType_) {
+        case AAFwk::ChangeInfo::INSERT:
+            changeInfo.changeType_ = DataShareObserver::INSERT;
+            break;
+        case AAFwk::ChangeInfo::DELETE:
+            changeInfo.changeType_ = DataShareObserver::DELETE;
+            break;
+        case AAFwk::ChangeInfo::UPDATE:
+            changeInfo.changeType_ = DataShareObserver::UPDATE;
+            break;
+        case AAFwk::ChangeInfo::OTHER:
+            changeInfo.changeType_ = DataShareObserver::OTHER;
+            break;
+        default:
+            changeInfo.changeType_ = DataShareObserver::INVAILD;
+            break;
+    }
+    changeInfo.uris_ = std::move(info.uris_);
+    changeInfo.data_ = info.data_;
+    changeInfo.size_ = info.size_;
+    return changeInfo;
+}
+
+AAFwk::ChangeInfo ObserverImpl::ConvertInfo(const DataShareObserver::ChangeInfo &info)
+{
+    AAFwk::ChangeInfo changeInfo;
+    switch (info.changeType_) {
+        case DataShareObserver::INSERT:
+            changeInfo.changeType_ = AAFwk::ChangeInfo::INSERT;
+            break;
+        case DataShareObserver::DELETE:
+            changeInfo.changeType_ = AAFwk::ChangeInfo::DELETE;
+            break;
+        case DataShareObserver::UPDATE:
+            changeInfo.changeType_ = AAFwk::ChangeInfo::UPDATE;
+            break;
+        case DataShareObserver::OTHER:
+            changeInfo.changeType_ = AAFwk::ChangeInfo::OTHER;
+            break;
+        default:
+            changeInfo.changeType_ = AAFwk::ChangeInfo::INVAILD;
+            break;
+    }
+    changeInfo.uris_ = std::move(info.uris_);
+    changeInfo.data_ = info.data_;
+    changeInfo.size_ = info.size_;
+    return changeInfo;
+}
+} // namespace DataShare
+} // namespace OHOS
