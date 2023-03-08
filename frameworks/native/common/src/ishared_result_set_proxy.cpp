@@ -15,7 +15,6 @@
 
 #include "ishared_result_set_proxy.h"
 
-#include "adaptor.h"
 #include "datashare_errno.h"
 #include "datashare_log.h"
 #include "iremote_proxy.h"
@@ -74,7 +73,6 @@ int ISharedResultSetProxy::GetAllColumnNames(std::vector<std::string> &columnNam
 
 int ISharedResultSetProxy::GetRowCount(int &count)
 {
-    DISTRIBUTED_DATA_HITRACE(std::string(__FUNCTION__));
     if (rowCount_ >= 0) {
         count = rowCount_;
         return E_OK;
