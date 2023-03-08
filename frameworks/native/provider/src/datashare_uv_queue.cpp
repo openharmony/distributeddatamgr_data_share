@@ -91,7 +91,7 @@ void DataShareUvQueue::Purge(uv_work_t* work)
         LOG_ERROR("invalid work");
         return;
     }
-    if(work->data == nullptr) {
+    if (work->data == nullptr) {
         LOG_ERROR("invalid work->data");
         delete work;
         return;
