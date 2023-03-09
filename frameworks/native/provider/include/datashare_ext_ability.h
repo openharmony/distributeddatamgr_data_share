@@ -18,6 +18,7 @@
 
 #include <memory>
 #include "extension_base.h"
+#include "datashare_business_error.h"
 #include "datashare_values_bucket.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
@@ -138,11 +139,12 @@ public:
      * @param uri Indicates the path of data to query.
      * @param predicates Indicates filter criteria. You should define the processing logic when this parameter is null.
      * @param columns Indicates the columns to query. If this parameter is null, all columns are queried.
+     * @param businessError Indicates the error by query.
      *
      * @return Returns the query result.
      */
-    virtual std::shared_ptr<DataShareResultSet> Query(
-        const Uri &uri, const DataSharePredicates &predicates, std::vector<std::string> &columns);
+    virtual std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
+        std::vector<std::string> &columns, DatashareBusinessError &businessError);
 
     /**
      * @brief Obtains the MIME type matching the data specified by the URI of the Data ability. This method should be

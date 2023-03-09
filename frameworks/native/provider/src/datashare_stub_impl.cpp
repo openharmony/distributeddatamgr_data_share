@@ -218,8 +218,8 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
         return resultSet;
     }
 
-    std::function<void()> syncTaskFunc = [=, &columns, &resultSet, &extension]() {
-        resultSet = extension->Query(uri, predicates, columns);
+    std::function<void()> syncTaskFunc = [=, &columns, &resultSet, &businessError, &extension]() {
+        resultSet = extension->Query(uri, predicates, columns, businessError);
     };
     std::function<bool()> getRetFunc = [=, &resultSet, &businessError,
         client = sptr<DataShareStubImpl>(this)]() -> bool {

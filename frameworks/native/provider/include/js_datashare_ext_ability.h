@@ -158,7 +158,7 @@ public:
      * @return Returns the query result.
      */
     std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
-        std::vector<std::string> &columns) override;
+        std::vector<std::string> &columns, DatashareBusinessError &businessError) override;
 
     /**
      * @brief Obtains the MIME type matching the data specified by the URI of the Data ability. This method should be

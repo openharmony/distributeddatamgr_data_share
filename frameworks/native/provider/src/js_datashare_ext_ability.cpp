@@ -485,10 +485,10 @@ int JsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &pre
 }
 
 std::shared_ptr<DataShareResultSet> JsDataShareExtAbility::Query(const Uri &uri,
-    const DataSharePredicates &predicates, std::vector<std::string> &columns)
+    const DataSharePredicates &predicates, std::vector<std::string> &columns, DatashareBusinessError &businessError)
 {
     std::shared_ptr<DataShareResultSet> ret;
-    ret = DataShareExtAbility::Query(uri, predicates, columns);
+    ret = DataShareExtAbility::Query(uri, predicates, columns, businessError);
 
     HandleScope handleScope(jsRuntime_);
     napi_env env = reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEngine());
