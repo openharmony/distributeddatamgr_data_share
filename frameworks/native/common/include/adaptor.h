@@ -25,7 +25,7 @@
 
 #else
 #include "hitrace.h"
-#define DISTRIBUTED_DATA_HITRACE(trace) HiTrace hitrace(trace)
+#define DISTRIBUTED_DATA_HITRACE(trace) DO_NOTHING
 
 #endif
 
