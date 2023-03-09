@@ -77,7 +77,7 @@ ohos_shared_library("datashare_consumer") {
     "ability_runtime:dataobs_manager",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "ipc_js:rpc",
     "napi:ace_napi",
     "samgr:samgr_proxy",
@@ -118,7 +118,7 @@ ohos_shared_library("datashare_provider") {
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "ipc_js:rpc",
     "napi:ace_napi",
   ]

@@ -146,7 +146,7 @@ ohos_unittest("ErrorCodeTest") {
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "hilog_native:libhilog",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
