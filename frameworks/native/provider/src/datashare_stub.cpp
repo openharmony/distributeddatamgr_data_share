@@ -20,6 +20,7 @@
 #include "ipc_types.h"
 #include "ishared_result_set.h"
 #include "itypes_utils.h"
+#include "unistd.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -114,8 +115,10 @@ ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
     }
     if (!reply.WriteFileDescriptor(fd)) {
         LOG_ERROR("fail to WriteFileDescriptor fd");
+        close(fd);
         return ERR_INVALID_VALUE;
     }
+    close(fd);
     return DATA_SHARE_NO_ERROR;
 }
 
