@@ -54,6 +54,10 @@ static void LinkToDeath(const sptr<IRemoteObject> &remote)
     auto &manager = DataShareManagerImpl::GetInstance();
     sptr<DataShareManagerImpl::ServiceDeathRecipient> deathRecipient = new (std::nothrow)
         DataShareManagerImpl::ServiceDeathRecipient(&manager);
+    if (deathRecipient == nullptr) {
+        LOG_ERROR("DataShareManagerImpl::LinkToDeath new ServiceDeathRecipient error.");
+        return;
+    }
     if (!remote->AddDeathRecipient(deathRecipient)) {
         LOG_ERROR("add death recipient failed");
     }
