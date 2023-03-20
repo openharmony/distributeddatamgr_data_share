@@ -126,7 +126,7 @@ public:
     }
 
     /**
-     * @brief The LessThanOrEqualTo of the predicate.
+     * @brief The In of the predicate.
      *
      * @param field Indicates the target field.
      * @param value Indicates the queried value.
