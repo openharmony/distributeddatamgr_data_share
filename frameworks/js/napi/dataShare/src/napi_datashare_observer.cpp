@@ -19,82 +19,15 @@
 
 namespace OHOS {
 namespace DataShare {
-NAPIDataShareObserver::NAPIDataShareObserver(napi_env env, napi_value callback)
-    : env_(env)
-{
-    napi_create_reference(env, callback, 1, &ref_);
-    napi_get_uv_event_loop(env, &loop_);
-}
 
 NAPIDataShareObserver::~NAPIDataShareObserver() {}
 
 void NAPIDataShareObserver::OnChange()
 {
     LOG_DEBUG("Start");
-    if (ref_ == nullptr) {
-        LOG_ERROR("ref_ is nullptr");
-        return;
+    if (auto sharedObserver = observer_.lock()) {
+        sharedObserver->OnChange();
     }
-    ObserverWorker *observerWorker = new (std::nothrow)ObserverWorker(this);
-    if (observerWorker == nullptr) {
-        LOG_ERROR("Failed to create observerWorker");
-        return;
-    }
-    uv_work_t *work = new (std::nothrow)uv_work_t();
-    if (work == nullptr) {
-        delete observerWorker;
-        LOG_ERROR("Failed to create uv work");
-        return;
-    }
-    work->data = observerWorker;
-    int ret = uv_queue_work(loop_, work,
-        [](uv_work_t *work) {},
-        [](uv_work_t *work, int status) {
-            LOG_DEBUG("uv_queue_work start");
-            std::shared_ptr<ObserverWorker> innerWorker(reinterpret_cast<ObserverWorker *>(work->data));
-            if (innerWorker->observer_->ref_ == nullptr) {
-                delete work;
-                LOG_ERROR("innerWorker->observer_->ref_ is nullptr");
-                return;
-            }
-            napi_handle_scope scope = nullptr;
-            napi_open_handle_scope(innerWorker->observer_->env_, &scope);
-            if (scope == nullptr) {
-                return;
-            }
-            napi_value callback = nullptr;
-            napi_value args[2] = {0};
-            napi_value global = nullptr;
-            napi_value result;
-            napi_get_reference_value(innerWorker->observer_->env_,
-                                     innerWorker->observer_->ref_, &callback);
-            napi_get_global(innerWorker->observer_->env_, &global);
-            napi_status callStatus =
-                napi_call_function(innerWorker->observer_->env_, global, callback, 2, args, &result);
-            napi_close_handle_scope(innerWorker->observer_->env_, scope);
-            if (callStatus != napi_ok) {
-                LOG_ERROR("napi_call_function failed status : %{public}d", callStatus);
-            }
-            delete work;
-        });
-    if (ret != 0) {
-        LOG_ERROR("uv_queue_work failed");
-        delete observerWorker;
-        delete work;
-    }
-}
-
-void NAPIDataShareObserver::DeleteReference()
-{
-    if (ref_ != nullptr) {
-        napi_delete_reference(env_, ref_);
-        ref_ = nullptr;
-    }
-}
-
-napi_ref NAPIDataShareObserver::GetCallback()
-{
-    return ref_;
 }
 }  // namespace DataShare
 }  // namespace OHOS

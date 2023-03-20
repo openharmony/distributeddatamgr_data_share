@@ -21,25 +21,16 @@
 #include "napi/native_common.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "napi_datashare_inner_observer.h"
 
 namespace OHOS {
 namespace DataShare {
 class NAPIDataShareObserver : public AAFwk::DataAbilityObserverStub {
 public:
-    NAPIDataShareObserver(napi_env env, napi_value callback);
+    explicit NAPIDataShareObserver(const std::shared_ptr<NAPIInnerObserver> observer) : observer_(observer){};
     virtual ~NAPIDataShareObserver();
     void OnChange() override;
-    void DeleteReference();
-    napi_ref GetCallback();
-private:
-    struct ObserverWorker {
-        const NAPIDataShareObserver *observer_ = nullptr;
-        ObserverWorker(const NAPIDataShareObserver *observerIn) : observer_(observerIn) {}
-    };
-
-    napi_env env_ = nullptr;
-    napi_ref ref_ = nullptr;
-    uv_loop_s *loop_ = nullptr;
+    std::weak_ptr<NAPIInnerObserver> observer_;
 };
 }  // namespace DataShare
 }  // namespace OHOS
