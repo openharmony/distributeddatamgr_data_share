@@ -16,11 +16,7 @@
 #ifndef NAPI_DATASHARE_OBSERVER_H
 #define NAPI_DATASHARE_OBSERVER_H
 
-#include <uv.h>
 #include "data_ability_observer_stub.h"
-#include "napi/native_common.h"
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
 #include "napi_datashare_inner_observer.h"
 
 namespace OHOS {

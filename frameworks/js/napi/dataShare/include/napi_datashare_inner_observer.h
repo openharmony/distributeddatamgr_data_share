@@ -15,6 +15,13 @@
 
 #ifndef NAPI_DATASHARE_INNER_OBSERVER_H
 #define NAPI_DATASHARE_INNER_OBSERVER_H
+
+#include <uv.h>
+
+#include "napi/native_common.h"
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
+
 namespace OHOS {
 namespace DataShare {
 class NAPIInnerObserver : public std::enable_shared_from_this<NAPIInnerObserver> {
