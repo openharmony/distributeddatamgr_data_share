@@ -50,13 +50,14 @@ void NAPIInnerObserver::OnChange()
         [](uv_work_t *work, int status) {
             LOG_DEBUG("uv_queue_work start");
             std::shared_ptr<ObserverWorker> innerWorker(reinterpret_cast<ObserverWorker *>(work->data));
-            if (innerWorker->observer_->ref_ == nullptr) {
+            auto observer = innerWorker->observer_.lock();
+            if (observer == nullptr || observer->ref_ == nullptr) {
                 delete work;
                 LOG_ERROR("innerWorker->observer_->ref_ is nullptr");
                 return;
             }
             napi_handle_scope scope = nullptr;
-            napi_open_handle_scope(innerWorker->observer_->env_, &scope);
+            napi_open_handle_scope(observer->env_, &scope);
             if (scope == nullptr) {
                 return;
             }
@@ -64,12 +65,10 @@ void NAPIInnerObserver::OnChange()
             napi_value args[2] = {0};
             napi_value global = nullptr;
             napi_value result;
-            napi_get_reference_value(innerWorker->observer_->env_,
-                                     innerWorker->observer_->ref_, &callback);
-            napi_get_global(innerWorker->observer_->env_, &global);
-            napi_status callStatus =
-                napi_call_function(innerWorker->observer_->env_, global, callback, 2, args, &result);
-            napi_close_handle_scope(innerWorker->observer_->env_, scope);
+            napi_get_reference_value(observer->env_, observer->ref_, &callback);
+            napi_get_global(observer->env_, &global);
+            napi_status callStatus = napi_call_function(observer->env_, global, callback, 2, args, &result);
+            napi_close_handle_scope(observer->env_, scope);
             if (callStatus != napi_ok) {
                 LOG_ERROR("napi_call_function failed status : %{public}d", callStatus);
             }

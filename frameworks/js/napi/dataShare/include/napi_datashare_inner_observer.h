@@ -32,7 +32,7 @@ public:
     napi_ref GetCallback();
 private:
     struct ObserverWorker {
-        std::shared_ptr<NAPIInnerObserver> observer_ = nullptr;
+        std::weak_ptr<NAPIInnerObserver> observer_ = nullptr;
         ObserverWorker(std::shared_ptr<NAPIInnerObserver> observerIn)
             : observer_(observerIn) {}
     };

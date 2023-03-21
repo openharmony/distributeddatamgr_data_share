@@ -26,7 +26,7 @@ public:
     explicit NAPIDataShareObserver(const std::shared_ptr<NAPIInnerObserver> observer) : observer_(observer){};
     virtual ~NAPIDataShareObserver();
     void OnChange() override;
-    std::weak_ptr<NAPIInnerObserver> observer_;
+    std::shared_ptr<NAPIInnerObserver> observer_;
 };
 }  // namespace DataShare
 }  // namespace OHOS
