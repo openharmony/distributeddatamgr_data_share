@@ -25,11 +25,12 @@ NAPIDataShareObserver::~NAPIDataShareObserver() {}
 void NAPIDataShareObserver::OnChange()
 {
     LOG_DEBUG("Start");
-    if (auto sharedObserver = observer_.lock()) {
-        sharedObserver->OnChange();
-    } else {
-        LOG_ERROR("!auto sharedObserver = observer_.lock()");
-    }
+    observer_->OnChange();
+    // if (auto sharedObserver = observer_.lock()) {
+    //     sharedObserver->OnChange();
+    // } else {
+    //     LOG_ERROR("!auto sharedObserver = observer_.lock()");
+    // }
 }
 }  // namespace DataShare
 }  // namespace OHOS
