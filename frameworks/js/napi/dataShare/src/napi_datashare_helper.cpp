@@ -380,7 +380,7 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
