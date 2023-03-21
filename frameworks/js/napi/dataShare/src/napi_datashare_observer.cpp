@@ -19,18 +19,12 @@
 
 namespace OHOS {
 namespace DataShare {
-
 NAPIDataShareObserver::~NAPIDataShareObserver() {}
 
 void NAPIDataShareObserver::OnChange()
 {
-    LOG_DEBUG("Start");
+    LOG_DEBUG("NAPIDataShareObserver Start");
     observer_->OnChange();
-    // if (auto sharedObserver = observer_.lock()) {
-    //     sharedObserver->OnChange();
-    // } else {
-    //     LOG_ERROR("!auto sharedObserver = observer_.lock()");
-    // }
 }
 }  // namespace DataShare
 }  // namespace OHOS

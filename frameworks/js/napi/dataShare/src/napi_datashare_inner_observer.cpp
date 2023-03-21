@@ -28,7 +28,7 @@ NAPIInnerObserver::NAPIInnerObserver(napi_env env, napi_value callback)
 
 void NAPIInnerObserver::OnChange()
 {
-    LOG_DEBUG("Start");
+    LOG_DEBUG("NAPIInnerObserver Start");
     if (ref_ == nullptr) {
         LOG_ERROR("ref_ is nullptr");
         return;
@@ -59,6 +59,7 @@ void NAPIInnerObserver::OnChange()
             napi_handle_scope scope = nullptr;
             napi_open_handle_scope(observer->env_, &scope);
             if (scope == nullptr) {
+                delete work;
                 return;
             }
             napi_value callback = nullptr;

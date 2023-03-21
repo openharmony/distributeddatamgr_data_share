@@ -703,10 +703,6 @@ bool NapiDataShareHelper::HasRegisteredObserver(napi_env env, std::list<sptr<NAP
     napi_value callback)
 {
     for (auto &it : list) {
-        // auto innerObserver = it->observer_.lock();
-        // if (innerObserver == nullptr) {
-        //     continue;
-        // }
         if (DataShareJSUtils::Equals(env, callback, it->observer_->GetCallback())) {
             LOG_DEBUG("The observer has already subscribed.");
             return true;
