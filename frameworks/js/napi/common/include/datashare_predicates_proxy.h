@@ -71,9 +71,6 @@ private:
     static napi_value NotIn(napi_env env, napi_callback_info info);
     static napi_value PrefixKey(napi_env env, napi_callback_info info);
     static napi_value InKeys(napi_env env, napi_callback_info info);
-
-    napi_env env_;
-    napi_ref wrapper_;
 };
 } // namespace DataShare
 } // namespace OHOS

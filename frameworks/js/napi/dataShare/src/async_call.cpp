@@ -46,6 +46,7 @@ AsyncCall::~AsyncCall()
     }
 
     DeleteContext(env_, context_);
+    context_ = nullptr;
 }
 
 napi_value AsyncCall::Call(napi_env env, Context::ExecAction exec)
@@ -154,6 +155,12 @@ void AsyncCall::DeleteContext(napi_env env, AsyncContext *context)
         napi_delete_reference(env, context->callback);
         napi_delete_reference(env, context->self);
         napi_delete_async_work(env, context->work);
+    }
+    if (context != nullptr && context->ctx != nullptr) {
+        context->ctx->exec_ = nullptr;
+        context->ctx->input_ = nullptr;
+        context->ctx->output_ = nullptr;
+        context->ctx = nullptr;
     }
     delete context;
 }

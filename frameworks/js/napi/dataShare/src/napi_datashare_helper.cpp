@@ -162,7 +162,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         }
     };
     ctxInfo->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(ctxInfo));
+    AsyncCall asyncCall(env, info, ctxInfo);
     return asyncCall.Call(env, exec);
 }
 
@@ -203,17 +203,7 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
     }
     auto finalize = [](napi_env env, void * data, void * hint) {
         NapiDataShareHelper *proxy = reinterpret_cast<NapiDataShareHelper *>(data);
-        if (proxy != nullptr) {
-            auto it = proxy->observerMap_.begin();
-            while (it != proxy->observerMap_.end()) {
-                if (proxy->datashareHelper_ != nullptr) {
-                    proxy->datashareHelper_->UnregisterObserver(Uri(it->first), it->second);
-                }
-                it->second->DeleteReference();
-            }
-            proxy->observerMap_.clear();
-            delete proxy;
-        }
+        delete proxy;
     };
     if (napi_wrap(env, self, proxy, finalize, nullptr, nullptr) != napi_ok) {
         finalize(env, proxy, nullptr);
@@ -256,7 +246,7 @@ napi_value NapiDataShareHelper::Napi_OpenFile(napi_env env, napi_callback_info i
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
@@ -304,7 +294,7 @@ napi_value NapiDataShareHelper::Napi_Insert(napi_env env, napi_callback_info inf
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
@@ -346,7 +336,7 @@ napi_value NapiDataShareHelper::Napi_Delete(napi_env env, napi_callback_info inf
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
@@ -390,7 +380,7 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context));
     return asyncCall.Call(env, exec);
 }
 
@@ -440,7 +430,7 @@ napi_value NapiDataShareHelper::Napi_Update(napi_env env, napi_callback_info inf
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
@@ -487,7 +477,7 @@ napi_value NapiDataShareHelper::Napi_BatchInsert(napi_env env, napi_callback_inf
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
@@ -517,7 +507,7 @@ napi_value NapiDataShareHelper::Napi_GetType(napi_env env, napi_callback_info in
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
@@ -555,7 +545,7 @@ napi_value NapiDataShareHelper::Napi_GetFileTypes(napi_env env, napi_callback_in
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
@@ -586,7 +576,7 @@ napi_value NapiDataShareHelper::Napi_NormalizeUri(napi_env env, napi_callback_in
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
@@ -617,7 +607,7 @@ napi_value NapiDataShareHelper::Napi_DenormalizeUri(napi_env env, napi_callback_
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
@@ -647,7 +637,7 @@ napi_value NapiDataShareHelper::Napi_NotifyChange(napi_env env, napi_callback_in
         }
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, std::dynamic_pointer_cast<AsyncCall::Context>(context));
+    AsyncCall asyncCall(env, info, context);
     return asyncCall.Call(env, exec);
 }
 
@@ -683,17 +673,8 @@ napi_value NapiDataShareHelper::Napi_On(napi_env env, napi_callback_info info)
 
     NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
     NAPI_ASSERT_BASE(env, valueType == napi_function, "callback is not a function", nullptr);
-    sptr<NAPIDataShareObserver> observer(new (std::nothrow) NAPIDataShareObserver(env, argv[PARAM2]));
 
-    auto obs = proxy->observerMap_.find(uri);
-    if (obs != proxy->observerMap_.end()) {
-        proxy->datashareHelper_->UnregisterObserver(Uri(uri), obs->second);
-        obs->second->DeleteReference();
-        proxy->observerMap_.erase(uri);
-    }
-    proxy->datashareHelper_->RegisterObserver(Uri(uri), observer);
-    proxy->observerMap_.emplace(uri, observer);
-
+    proxy->RegisteredObserver(env, uri, argv[PARAM2]);
     return nullptr;
 }
 
@@ -730,18 +711,86 @@ napi_value NapiDataShareHelper::Napi_Off(napi_env env, napi_callback_info info)
     if (argc == ARGS_THREE) {
         NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
         NAPI_ASSERT_BASE(env, valueType == napi_function, "callback is not a function", nullptr);
+        proxy->UnRegisteredObserver(env, uri, argv[PARAM2]);
+        return nullptr;
     }
-
-    auto obs = proxy->observerMap_.find(uri);
-    if (obs != proxy->observerMap_.end()) {
-        proxy->datashareHelper_->UnregisterObserver(Uri(uri), obs->second);
-        obs->second->DeleteReference();
-        proxy->observerMap_.erase(uri);
-    } else {
-        LOG_DEBUG("this uri hasn't been registered");
-    }
-
+    proxy->UnRegisteredObserver(env, uri);
     return nullptr;
+}
+
+bool NapiDataShareHelper::HasRegisteredObserver(napi_env env, std::list<sptr<NAPIDataShareObserver>> &list,
+    napi_value callback)
+{
+    for (auto &it : list) {
+        if (DataShareJSUtils::Equals(env, callback, it->observer_->GetCallback())) {
+            LOG_DEBUG("The observer has already subscribed.");
+            return true;
+        }
+    }
+    return false;
+}
+
+void NapiDataShareHelper::RegisteredObserver(napi_env env, const std::string &uri, napi_value callback)
+{
+    std::lock_guard<std::mutex> lck(listMutex_);
+    observerMap_.try_emplace(uri);
+
+    auto &list = observerMap_.find(uri)->second;
+    if (HasRegisteredObserver(env, list, callback)) {
+        LOG_DEBUG("has registered observer");
+        return;
+    }
+    auto innerObserver = std::make_shared<NAPIInnerObserver>(env, callback);
+    sptr<NAPIDataShareObserver> observer(new (std::nothrow) NAPIDataShareObserver(innerObserver));
+    if (observer == nullptr) {
+        LOG_ERROR("observer is nullptr");
+        return;
+    }
+    datashareHelper_->RegisterObserver(Uri(uri), observer);
+    list.push_back(observer);
+}
+
+void NapiDataShareHelper::UnRegisteredObserver(napi_env env, const std::string &uri, napi_value callback)
+{
+    std::lock_guard<std::mutex> lck(listMutex_);
+    auto obs = observerMap_.find(uri);
+    if (obs == observerMap_.end()) {
+        LOG_DEBUG("this uri hasn't been registered");
+        return;
+    }
+    auto &list = obs->second;
+    auto it = list.begin();
+    while (it != list.end()) {
+        if (!DataShareJSUtils::Equals(env, callback, (*it)->observer_->GetCallback())) {
+            ++it;
+            continue;
+        }
+        datashareHelper_->UnregisterObserver(Uri(uri), *it);
+        (*it)->observer_->DeleteReference();
+        it = list.erase(it);
+        break;
+    }
+    if (list.empty()) {
+        observerMap_.erase(uri);
+    }
+}
+
+void NapiDataShareHelper::UnRegisteredObserver(napi_env env, const std::string &uri)
+{
+    std::lock_guard<std::mutex> lck(listMutex_);
+    auto obs = observerMap_.find(uri);
+    if (obs == observerMap_.end()) {
+        LOG_DEBUG("this uri hasn't been registered");
+        return;
+    }
+    auto &list = obs->second;
+    auto it = list.begin();
+    while (it != list.end()) {
+        datashareHelper_->UnregisterObserver(Uri(uri), *it);
+        (*it)->observer_->DeleteReference();
+        it = list.erase(it);
+    }
+    observerMap_.erase(uri);
 }
 }  // namespace DataShare
 }  // namespace OHOS
