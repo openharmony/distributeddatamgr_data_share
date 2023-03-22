@@ -56,6 +56,7 @@ public:
     static napi_value Convert2JSValue(napi_env env, bool value);
     static napi_value Convert2JSValue(napi_env env, const std::map<std::string, int>& value);
     static std::vector<uint8_t> ConvertU8Vector(napi_env env, napi_value jsValue);
+    static bool Equals(napi_env env, napi_value value, napi_ref copy);
 };
 } // namespace DataShare
 } // namespace OHOS

@@ -257,5 +257,18 @@ std::string DataShareJSUtils::UnwrapStringFromJS(napi_env env, napi_value param,
     }
     return value;
 }
+bool DataShareJSUtils::Equals(napi_env env, napi_value value, napi_ref copy)
+{
+    if (copy == nullptr) {
+        return (value == nullptr);
+    }
+
+    napi_value copyValue = nullptr;
+    napi_get_reference_value(env, copy, &copyValue);
+
+    bool isEqual = false;
+    napi_strict_equals(env, value, copyValue, &isEqual);
+    return isEqual;
+}
 } // namespace DataShare
 } // namespace OHOS
