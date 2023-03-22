@@ -703,7 +703,7 @@ bool NapiDataShareHelper::HasRegisteredObserver(napi_env env, std::list<sptr<NAP
     napi_value callback)
 {
     for (auto &it : list) {
-        if (DataShareJSUtils::Equals(env, callback, it->GetCallback())) {
+        if (DataShareJSUtils::Equals(env, callback, it->observer_->GetCallback())) {
             LOG_DEBUG("The observer has already subscribed.");
             return true;
         }
@@ -721,7 +721,8 @@ void NapiDataShareHelper::RegisteredObserver(napi_env env, const std::string &ur
         LOG_DEBUG("has registered observer");
         return;
     }
-    sptr<NAPIDataShareObserver> observer(new (std::nothrow) NAPIDataShareObserver(env, callback));
+    auto innerObserver = std::make_shared<NAPIInnerObserver>(env, callback);
+    sptr<NAPIDataShareObserver> observer(new (std::nothrow) NAPIDataShareObserver(innerObserver));
     if (observer == nullptr) {
         LOG_ERROR("observer is nullptr");
         return;
@@ -741,12 +742,12 @@ void NapiDataShareHelper::UnRegisteredObserver(napi_env env, const std::string &
     auto &list = obs->second;
     auto it = list.begin();
     while (it != list.end()) {
-        if (!DataShareJSUtils::Equals(env, callback, (*it)->GetCallback())) {
+        if (!DataShareJSUtils::Equals(env, callback, (*it)->observer_->GetCallback())) {
             ++it;
             continue;
         }
         datashareHelper_->UnregisterObserver(Uri(uri), *it);
-        (*it)->DeleteReference();
+        (*it)->observer_->DeleteReference();
         it = list.erase(it);
         break;
     }
@@ -767,7 +768,7 @@ void NapiDataShareHelper::UnRegisteredObserver(napi_env env, const std::string &
     auto it = list.begin();
     while (it != list.end()) {
         datashareHelper_->UnregisterObserver(Uri(uri), *it);
-        (*it)->DeleteReference();
+        (*it)->observer_->DeleteReference();
         it = list.erase(it);
     }
     observerMap_.erase(uri);
