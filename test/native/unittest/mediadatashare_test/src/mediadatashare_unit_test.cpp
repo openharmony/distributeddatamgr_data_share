@@ -300,7 +300,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_006, TestSize.Le
     vector<string> columns;
     Uri uri(MEDIALIBRARY_DATA_URI);
     auto resultSet = helper->Query(uri, predicates, columns);
-    int result = 0;
+    int result = -1;
     if (resultSet != nullptr) {
         resultSet->GetRowCount(result);
     }
