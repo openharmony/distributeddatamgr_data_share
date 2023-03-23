@@ -17,7 +17,6 @@
 #define DATASHARE_CONNECTION_H
 
 #include <condition_variable>
-#include <future>
 #include <memory>
 
 #include "ability_connect_callback_stub.h"
@@ -69,8 +68,6 @@ private:
         std::condition_variable condition;
         std::mutex mutex;
     };
-
-    bool Run();
     void DisconnectDataShareExtAbility();
     void SetDataShareProxy(sptr<DataShareProxy> proxy);
     bool ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
@@ -79,9 +76,6 @@ private:
     ConnectCondition condition_;
     Uri uri_;
     sptr<IRemoteObject> token_ = {};
-    bool isRunning_ = false;
-    std::future<bool>  result_;
-    ConnectCondition connectSync_;
 };
 }  // namespace DataShare
 }  // namespace OHOS
