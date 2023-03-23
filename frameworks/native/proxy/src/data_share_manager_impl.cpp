@@ -107,7 +107,7 @@ DataShareManagerImpl::~DataShareManagerImpl()
     LOG_INFO("destroy");
 }
 
-bool DataShareManagerImpl::ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> token)
+bool DataShareManagerImpl::ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> &token)
 {
     if (dataShareService_ != nullptr) {
         return true;
@@ -123,11 +123,6 @@ bool DataShareManagerImpl::ConnectDataShare(const Uri &uri, const sptr<IRemoteOb
     dataShareService_ = std::shared_ptr<DataShareServiceProxy>(
             service.GetRefPtr(), [holder = service](const auto *) {});
     return true;
-}
-
-bool DataShareManagerImpl::IsConnected()
-{
-    return dataShareService_ != nullptr;
 }
 
 std::shared_ptr<BaseProxy> DataShareManagerImpl::GetDataShareProxy()

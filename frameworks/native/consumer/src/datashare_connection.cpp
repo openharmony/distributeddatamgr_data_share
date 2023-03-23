@@ -22,8 +22,7 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-constexpr int WAIT_TIME = 3;
-
+constexpr int WAIT_TIME = 1;
 /**
  * @brief This method is called back to receive the connection result after an ability calls the
  * ConnectAbility method to connect it to an extension ability.
@@ -43,6 +42,7 @@ void DataShareConnection::OnAbilityConnectDone(
     std::unique_lock<std::mutex> lock(condition_.mutex);
     SetDataShareProxy(new (std::nothrow) DataShareProxy(remoteObject));
     condition_.condition.notify_all();
+    LOG_INFO("on connect done, uri:%{public}s, ret=%{public}d", uri_.ToString().c_str(), resultCode);
 }
 
 /**
@@ -56,13 +56,13 @@ void DataShareConnection::OnAbilityConnectDone(
  */
 void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
+    LOG_INFO("on disconnect done, uri:%{public}s, ret:%{public}d", uri_.ToString().c_str(), resultCode);
     {
         std::unique_lock<std::mutex> lock(condition_.mutex);
         SetDataShareProxy(nullptr);
         condition_.condition.notify_all();
     }
     if (!uri_.ToString().empty()) {
-        LOG_INFO("uri : %{public}s disconnect,start reconnect", uri_.ToString().c_str());
         ConnectDataShareExtAbility(uri_, token_);
     }
 }
@@ -70,7 +70,7 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
 /**
  * @brief connect remote ability of DataShareExtAbility.
  */
-bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> token)
+bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token)
 {
     if (dataShareProxy_ != nullptr) {
         return true;
@@ -92,7 +92,6 @@ bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
         [this] { return dataShareProxy_ != nullptr; })) {
         LOG_INFO("connect ability ended successfully");
     }
-    LOG_INFO("called end, ret=%{public}d", ret);
     return dataShareProxy_ != nullptr;
 }
 
@@ -112,19 +111,10 @@ void DataShareConnection::DisconnectDataShareExtAbility()
     }
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ == nullptr; })) {
-        LOG_INFO("disconnect ability ended successfully");
+        LOG_INFO("disconnect ability successfully");
+    } else {
+        LOG_INFO("disconnect timeout");
     }
-    LOG_INFO("called end, ret=%{public}d", ret);
-}
-
-/**
- * @brief check whether connected to remote extension ability.
- *
- * @return bool true if connected, otherwise false.
- */
-bool DataShareConnection::IsExtAbilityConnected()
-{
-    return dataShareProxy_ != nullptr;
 }
 
 void DataShareConnection::SetDataShareProxy(sptr<DataShareProxy> proxy)
@@ -148,14 +138,9 @@ std::shared_ptr<BaseProxy> DataShareConnection::GetDataShareProxy()
     return dataShareProxy_;
 }
 
-bool DataShareConnection::ConnectDataShare(const Uri & uri, const sptr<IRemoteObject> token)
+bool DataShareConnection::ConnectDataShare(const Uri & uri, const sptr<IRemoteObject> &token)
 {
     return ConnectDataShareExtAbility(uri, token);
-}
-
-bool DataShareConnection::IsConnected()
-{
-    return dataShareProxy_ != nullptr;
 }
 }  // namespace DataShare
 }  // namespace OHOS

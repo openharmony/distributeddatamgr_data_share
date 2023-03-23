@@ -32,10 +32,9 @@ enum class ConnectionType {
 class BaseConnection {
 public:
     BaseConnection(ConnectionType type = ConnectionType::NORMAL) : type_(type) {};
-    ~BaseConnection()=default;
+    virtual ~BaseConnection() = default;
     virtual std::shared_ptr<BaseProxy> GetDataShareProxy() = 0;
-    virtual bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> token)  = 0;
-    virtual bool IsConnected() = 0;
+    virtual bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> &token) = 0;
     ConnectionType GetType()
     {
         return type_;
@@ -43,7 +42,6 @@ public:
 private:
     ConnectionType type_ = ConnectionType::NORMAL;
 };
-
 }}
 
 #endif // DATA_SHARE_BASE_CONNECTION_H

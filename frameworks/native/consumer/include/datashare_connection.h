@@ -57,30 +57,20 @@ public:
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
 
     /**
-     * @brief connect remote ability of DataShareExtAbility.
-     */
-    bool ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> token);
-
-    /**
      * @brief get the proxy of datashare extension ability.
      *
      * @return the proxy of datashare extension ability.
      */
-
+    std::shared_ptr<BaseProxy> GetDataShareProxy() override;
+    bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> &token)  override ;
+private:
     struct ConnectCondition {
         std::condition_variable condition;
         std::mutex mutex;
     };
-
-    std::shared_ptr<BaseProxy> GetDataShareProxy() override;
-    bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> token)  override ;
-    bool IsConnected() override ;
-
-private:
     void DisconnectDataShareExtAbility();
     void SetDataShareProxy(sptr<DataShareProxy> proxy);
-    bool IsExtAbilityConnected();
-
+    bool ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
     std::mutex mutex_;
     std::shared_ptr<DataShareProxy> dataShareProxy_;
     ConnectCondition condition_;
