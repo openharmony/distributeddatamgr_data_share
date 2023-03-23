@@ -41,7 +41,6 @@ void DataShareConnection::OnAbilityConnectDone(
         return;
     }
     std::unique_lock<std::mutex> lock(condition_.mutex);
-    hasConnected = true;
     SetDataShareProxy(new (std::nothrow) DataShareProxy(remoteObject));
     condition_.condition.notify_all();
     LOG_INFO("on connect done, uri:%{public}s, ret=%{public}d", uri_.ToString().c_str(), resultCode);
@@ -59,8 +58,10 @@ void DataShareConnection::OnAbilityConnectDone(
 void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
     LOG_INFO("on disconnect done, uri:%{public}s, ret:%{public}d", uri_.ToString().c_str(), resultCode);
+    bool hasConnected = false;
     {
         std::unique_lock<std::mutex> lock(condition_.mutex);
+        hasConnected = dataShareProxy_ != nullptr;
         SetDataShareProxy(nullptr);
         condition_.condition.notify_all();
     }
@@ -73,7 +74,6 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
         connectSync_.condition.wait_for(lck, std::chrono::seconds(1),
                                         [this] { return isRunning_; });
     }
-
 }
 
 /**

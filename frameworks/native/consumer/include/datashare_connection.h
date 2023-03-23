@@ -80,7 +80,6 @@ private:
     Uri uri_;
     sptr<IRemoteObject> token_ = {};
     bool isRunning_ = false;
-    bool hasConnected = false;
     std::future<bool>  result_;
     ConnectCondition connectSync_;
 };
