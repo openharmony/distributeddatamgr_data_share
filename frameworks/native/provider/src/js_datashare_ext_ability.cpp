@@ -72,7 +72,7 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
     auto& engine = jsRuntime_.GetNativeEngine();
 
     jsObj_ = jsRuntime_.LoadModule(moduleName, srcPath, abilityInfo_->hapPath,
-        abilityInfo_->compileMode == CompileMode::ES_MODULE);      
+        abilityInfo_->compileMode == CompileMode::ES_MODULE);
     if (jsObj_ == nullptr) {
         LOG_ERROR("Failed to get jsObj_");
         return;
@@ -104,9 +104,7 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
         LOG_ERROR("Failed to get datashare extension ability native object");
         return;
     }
-
     LOG_INFO("Set datashare extension ability context pointer is nullptr: %{public}d", context.get() == nullptr);
-
     nativeObj->SetNativePointer(new std::weak_ptr<AbilityRuntime::Context>(context),
         [](NativeEngine*, void* data, void*) {
             LOG_INFO("Finalizer for weak_ptr datashare extension ability context is called");
