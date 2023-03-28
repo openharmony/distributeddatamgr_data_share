@@ -14,7 +14,7 @@
  */
 
 #include "ishared_result_set_stub.h"
-#include <future>
+#include <sys/prctl.h>
 #include "datashare_log.h"
 #include "datashare_errno.h"
 
@@ -26,14 +26,14 @@ constexpr ISharedResultSetStub::Handler ISharedResultSetStub::handlers[ISharedRe
 sptr<ISharedResultSet> ISharedResultSetStub::CreateStub(std::shared_ptr<DataShareResultSet> result,
     OHOS::MessageParcel &parcel)
 {
+    if (result == nullptr) {
+        LOG_ERROR("result is nullptr");
+        return nullptr;
+    }
     sptr<ISharedResultSet> stub = new (std::nothrow) ISharedResultSetStub(result);
     if (stub == nullptr) {
         LOG_ERROR("stub is nullptr");
         return stub;
-    }
-    if (result == nullptr) {
-        LOG_ERROR("result is nullptr");
-        return nullptr;
     }
     parcel.WriteRemoteObject(stub->AsObject().GetRefPtr());
     result->Marshalling(parcel);
@@ -41,20 +41,12 @@ sptr<ISharedResultSet> ISharedResultSetStub::CreateStub(std::shared_ptr<DataShar
 }
 
 ISharedResultSetStub::ISharedResultSetStub(std::shared_ptr<DataShareResultSet> resultSet)
-    : resultSet_(std::move(resultSet)),
-      runnables_(MAX_RUNNABLE),
-      thread_(&ISharedResultSetStub::Run, this)
+    : resultSet_(std::move(resultSet))
 {
-    thread_.detach();
-    LOG_ERROR("start thread(%{public}" PRIx64 ")", uint64_t(thread_.native_handle()));
 }
+
 ISharedResultSetStub::~ISharedResultSetStub()
 {
-    auto handle = thread_.native_handle();
-    isRunning_ = false;
-    // do not delete this code, this code is waiting the thread exit.
-    isRunning_ = Submit([this]() -> bool { resultSet_ = nullptr; return isRunning_;}).get();
-    LOG_ERROR("thread(%{public}" PRIx64 ")", uint64_t(handle));
 }
 
 int ISharedResultSetStub::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &data,
@@ -74,11 +66,7 @@ int ISharedResultSetStub::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &da
         LOG_ERROR("method code(%{public}d) is not support", code);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-
-    auto future = Submit([this, &data, &reply, handler]() -> int {
-        return (this->*handler)(data, reply);
-    });
-    return future.get();
+    return (this->*handler)(data, reply);
 }
 
 int ISharedResultSetStub::HandleGetRowCountRequest(MessageParcel &data, MessageParcel &reply)
@@ -126,19 +114,5 @@ int ISharedResultSetStub::HandleCloseRequest(MessageParcel &data, MessageParcel 
     reply.WriteInt32(errCode);
     LOG_DEBUG("errCode %{public}d", errCode);
     return NO_ERROR;
-}
-
-void ISharedResultSetStub::Run()
-{
-    auto handle = thread_.native_handle();
-    bool isRunning = true;
-    while (isRunning) {
-        auto runnable = runnables_.Pop();
-        if (runnable == nullptr) {
-            continue;
-        }
-        isRunning = runnable();
-    }
-    LOG_ERROR("thread(%{public}" PRIx64 ") is exited", uint64_t(handle));
 }
 } // namespace OHOS::DataShare
