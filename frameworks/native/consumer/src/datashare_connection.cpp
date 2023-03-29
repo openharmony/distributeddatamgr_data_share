@@ -100,6 +100,7 @@ bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
  */
 void DataShareConnection::DisconnectDataShareExtAbility()
 {
+    uri_ = Uri("");
     if (dataShareProxy_ == nullptr) {
         return;
     }
@@ -130,9 +131,8 @@ void DataShareConnection::SetDataShareProxy(sptr<DataShareProxy> proxy)
 
 DataShareConnection::~DataShareConnection()
 {
-    uri_ = Uri("");
-    DisconnectDataShareExtAbility();
 }
+
 std::shared_ptr<BaseProxy> DataShareConnection::GetDataShareProxy()
 {
     return dataShareProxy_;

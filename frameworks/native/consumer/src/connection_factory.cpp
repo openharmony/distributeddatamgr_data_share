@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "connection_factory.h"
 
 #include <memory>
@@ -34,8 +34,9 @@ std::shared_ptr<BaseConnection> ConnectionFactory::GetConnection(Uri &uri,  cons
         LOG_ERROR("Factory Create DataShareConnection failed.");
         return nullptr;
     }
-    return  std::shared_ptr<DataShareConnection>(
-        connection.GetRefPtr(), [holder = connection](const auto *) {});
+    return std::shared_ptr<DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
+        holder->DisconnectDataShareExtAbility();
+    });
 }
 
 ConnectionFactory& ConnectionFactory::GetInstance()

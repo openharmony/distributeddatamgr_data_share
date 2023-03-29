@@ -57,6 +57,11 @@ public:
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
 
     /**
+     * @brief disconnect remote ability of DataShareExtAbility.
+     */
+    void DisconnectDataShareExtAbility();
+
+    /**
      * @brief get the proxy of datashare extension ability.
      *
      * @return the proxy of datashare extension ability.
@@ -68,7 +73,6 @@ private:
         std::condition_variable condition;
         std::mutex mutex;
     };
-    void DisconnectDataShareExtAbility();
     void SetDataShareProxy(sptr<DataShareProxy> proxy);
     bool ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
     std::mutex mutex_;
