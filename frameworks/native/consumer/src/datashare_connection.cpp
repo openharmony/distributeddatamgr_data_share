@@ -35,6 +35,7 @@ constexpr int WAIT_TIME = 1;
 void DataShareConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
+    LOG_INFO("on connect done, uri:%{public}s, ret=%{public}d", uri_.ToString().c_str(), resultCode);
     if (remoteObject == nullptr) {
         LOG_ERROR("remote is nullptr");
         return;
@@ -42,7 +43,6 @@ void DataShareConnection::OnAbilityConnectDone(
     std::unique_lock<std::mutex> lock(condition_.mutex);
     SetDataShareProxy(new (std::nothrow) DataShareProxy(remoteObject));
     condition_.condition.notify_all();
-    LOG_INFO("on connect done, uri:%{public}s, ret=%{public}d", uri_.ToString().c_str(), resultCode);
 }
 
 /**
@@ -82,12 +82,12 @@ bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
     } else {
         want.SetUri(uri_);
     }
-    std::unique_lock<std::mutex> lock(condition_.mutex);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, this, token);
     if (ret != ERR_OK) {
         LOG_ERROR("connect ability failed, ret = %{public}d", ret);
         return false;
     }
+    std::unique_lock<std::mutex> lock(condition_.mutex);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ != nullptr; })) {
         LOG_INFO("connect ability ended successfully");
@@ -104,12 +104,12 @@ void DataShareConnection::DisconnectDataShareExtAbility()
     if (dataShareProxy_ == nullptr) {
         return;
     }
-    std::unique_lock<std::mutex> lock(condition_.mutex);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(this);
     if (ret != ERR_OK) {
         LOG_ERROR("disconnect ability failed, ret = %{public}d", ret);
         return;
     }
+    std::unique_lock<std::mutex> lock(condition_.mutex);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ == nullptr; })) {
         LOG_INFO("disconnect ability successfully");
