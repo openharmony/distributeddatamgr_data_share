@@ -130,6 +130,7 @@ int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value
         extension->GetResult(ret);
         return (ret != DEFAULT_NUMBER);
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
@@ -164,6 +165,7 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
         extension->GetResult(ret);
         return (ret != DEFAULT_NUMBER);
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
@@ -197,6 +199,7 @@ int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predica
         extension->GetResult(ret);
         return (ret != DEFAULT_NUMBER);
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
@@ -288,6 +291,7 @@ int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareVa
         extension->GetResult(ret);
         return (ret != DEFAULT_NUMBER);
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
