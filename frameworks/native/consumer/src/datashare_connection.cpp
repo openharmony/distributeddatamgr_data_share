@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
 sptr<DataShareConnection> DataShareConnection::instance_ = nullptr;
-constexpr int WAIT_TIME = 3;
+constexpr int WAIT_TIME = 1;
 
 /**
  * @brief This method is called back to receive the connection result after an ability calls the
@@ -37,6 +37,7 @@ constexpr int WAIT_TIME = 3;
 void DataShareConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
+    LOG_INFO("on connect done, uri:%{public}s, ret=%{public}d", uri_.ToString().c_str(), resultCode);
     if (remoteObject == nullptr) {
         LOG_ERROR("remote is nullptr");
         return;
@@ -57,6 +58,7 @@ void DataShareConnection::OnAbilityConnectDone(
  */
 void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
+    LOG_INFO("on disconnect done, uri:%{public}s, ret:%{public}d", uri_.ToString().c_str(), resultCode);
     auto proxy = dataShareProxy_;
     {
         std::unique_lock<std::mutex> lock(condition_.mutex);
@@ -94,7 +96,6 @@ bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
         [this] { return dataShareProxy_ != nullptr; })) {
         LOG_INFO("connect ability ended successfully");
     }
-    LOG_INFO("called end, ret=%{public}d", ret);
     return dataShareProxy_ != nullptr;
 }
 
