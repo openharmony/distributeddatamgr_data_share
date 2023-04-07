@@ -14,53 +14,53 @@
  */
 
 class DataShareExtensionAbility {
-    onCreate(want, callback) {
-        console.log('onCreate, want:' + want.abilityName);
-    }
+  onCreate(want, callback) {
+    console.log('onCreate, want:' + want.abilityName);
+  }
 
-    getFileTypes(uri, mimeTypeFilter, callback) {
-        console.log('getFileTypes, uri:' + uri);
-    }
+  getFileTypes(uri, mimeTypeFilter, callback) {
+    console.log('getFileTypes, uri:' + uri);
+  }
 
-    openFile(uri, mode, callback) {
-        console.log('openFile, uri:' + uri);
-    }
+  openFile(uri, mode, callback) {
+    console.log('openFile, uri:' + uri);
+  }
 
-    openRawFile(uri, mode, callback) {
-        console.log('openRawFile, uri:' + uri);
-    }
+  openRawFile(uri, mode, callback) {
+    console.log('openRawFile, uri:' + uri);
+  }
 
-    insert(uri, value, callback) {
-        console.log('insert, uri:' + uri);
-    }
+  insert(uri, value, callback) {
+    console.log('insert, uri:' + uri);
+  }
 
-    update(uri, predicates, value, callback) {
-        console.log('update, uri:' + uri);
-    }
+  update(uri, predicates, value, callback) {
+    console.log('update, uri:' + uri);
+  }
 
-    delete(uri, predicates, callback) {
-        console.log('delete, uri:' + uri);
-    }
+  delete(uri, predicates, callback) {
+    console.log('delete, uri:' + uri);
+  }
 
-    query(uri, predicates, columns, callback) {
-        console.log('query, uri:' + uri);
-    }
+  query(uri, predicates, columns, callback) {
+    console.log('query, uri:' + uri);
+  }
 
-    getType(uri, callback) {
-        console.log('getType, uri:' + uri);
-    }
+  getType(uri, callback) {
+    console.log('getType, uri:' + uri);
+  }
 
-    batchInsert(uri, values, callback) {
-        console.log('batchInsert, uri:' + uri);
-    }
+  batchInsert(uri, values, callback) {
+    console.log('batchInsert, uri:' + uri);
+  }
 
-    normalizeUri(uri, callback) {
-        console.log('normalizeUri, uri:' + uri);
-    }
+  normalizeUri(uri, callback) {
+    console.log('normalizeUri, uri:' + uri);
+  }
 
-    denormalizeUri(uri, callback) {
-        console.log('denormalizeUri, uri:' + uri);
-    }
+  denormalizeUri(uri, callback) {
+    console.log('denormalizeUri, uri:' + uri);
+  }
 }
 
-export default DataShareExtensionAbility
+export default DataShareExtensionAbility;

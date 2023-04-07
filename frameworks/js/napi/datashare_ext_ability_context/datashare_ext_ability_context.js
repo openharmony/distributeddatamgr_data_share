@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-var ExtensionContext = requireNapi("application.ExtensionContext")
+var ExtensionContext = requireNapi('application.ExtensionContext');
 
 class DataShareExtensionAbilityContext extends ExtensionContext {
-    constructor(obj) {
-        super(obj);
-    }
+  constructor(obj) {
+    super(obj);
+  }
 }
 
-export default DataShareExtensionAbilityContext
+export default DataShareExtensionAbilityContext;
