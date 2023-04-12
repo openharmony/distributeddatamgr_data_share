@@ -31,6 +31,7 @@ public:
     void DeleteReference();
     napi_ref GetCallback();
 private:
+    static void OnComplete(uv_work_t *work, int status);
     struct ObserverWorker {
         std::weak_ptr<NAPIInnerObserver> observer_;
         ObserverWorker(std::shared_ptr<NAPIInnerObserver> observerIn)
