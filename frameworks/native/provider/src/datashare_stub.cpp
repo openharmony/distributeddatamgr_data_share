@@ -285,7 +285,7 @@ ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
     }
 
     std::vector<DataShareValuesBucket> values;
-    params.reverse(static_cast<int32_t>(count));
+    values.reverse(static_cast<int32_t>(count));
     for (int i = 0; i < count; i++) {
         DataShareValuesBucket value;
         if (!ITypesUtils::Unmarshalling(data, value)) {
