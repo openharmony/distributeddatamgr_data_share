@@ -45,7 +45,6 @@ private:
 DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,
     std::shared_ptr<BaseConnection> dataShareConnection)
 {
-    LOG_INFO("DataShareHelper::DataShareHelper start");
     token_ = token;
     uri_ = uri;
     isDataShareService_ = (uri_.GetQuery().find("Proxy=true") != std::string::npos);
@@ -54,11 +53,9 @@ DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token, const Uri &ur
 
 DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri)
 {
-    LOG_INFO("DataShareHelper::DataShareHelper start");
     token_ = token;
     uri_ = uri;
     isDataShareService_ = (uri_.GetQuery().find("Proxy=true") != std::string::npos);
-    LOG_INFO("DataShareHelper::DataShareHelper end");
 }
 
 DataShareHelper::~DataShareHelper()
@@ -136,7 +133,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
  */
 bool DataShareHelper::Release()
 {
-    LOG_INFO("Release Start");
+    LOG_DEBUG("Release Start");
     connection_ = nullptr;
     uri_ = Uri("");
     return true;
