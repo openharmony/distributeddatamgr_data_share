@@ -280,24 +280,19 @@ DataShareValueObject DataShareJSUtils::Convert2ValueObject(napi_env env, napi_va
     napi_typeof(env, value, &valueType);
     status = true;
     if (valueType == napi_string) {
-        LOG_DEBUG("ValueObject is string");
         std::string valueString = DataShareJSUtils::UnwrapStringFromJS(env, value);
         return valueString;
     } else if (valueType == napi_number) {
-        LOG_DEBUG("ValueObject is number");
         double valueNumber = 0;
         napi_get_value_double(env, value, &valueNumber);
         return valueNumber;
     } else if (valueType == napi_boolean) {
-        LOG_DEBUG("ValueObject is boolean");
         bool valueBool = false;
         napi_get_value_bool(env, value, &valueBool);
         return valueBool;
     } else if (valueType == napi_null) {
-        LOG_DEBUG("ValueObject is null");
         return {};
     } else if (valueType == napi_object) {
-        LOG_DEBUG("ValueObject is Uint8Array");
         std::vector<uint8_t> valueBlob = DataShareJSUtils::Convert2U8Vector(env, value);
         return valueBlob;
     } else {
