@@ -51,7 +51,6 @@ bool UnWrapValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &env
         LOG_ERROR("ValuesBucket err");
         return false;
     }
-    LOG_DEBUG("ValuesBucket num : %{public}u", arrLen);
     for (size_t i = 0; i < arrLen; ++i) {
         napi_value key = 0;
         status = napi_get_element(env, keys, i, &key);
