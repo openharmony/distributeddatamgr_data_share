@@ -90,7 +90,7 @@ bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
     std::unique_lock<std::mutex> lock(condition_.mutex);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ != nullptr; })) {
-        LOG_INFO("connect ability ended successfully");
+        LOG_DEBUG("connect ability ended successfully");
     }
     return dataShareProxy_ != nullptr;
 }
@@ -112,7 +112,7 @@ void DataShareConnection::DisconnectDataShareExtAbility()
     std::unique_lock<std::mutex> lock(condition_.mutex);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ == nullptr; })) {
-        LOG_INFO("disconnect ability successfully");
+        LOG_DEBUG("disconnect ability successfully");
     } else {
         LOG_INFO("disconnect timeout");
     }
