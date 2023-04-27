@@ -199,7 +199,7 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
     auto finalize = [](napi_env env, void * data, void * hint) {
         NapiDataShareHelper *proxy = reinterpret_cast<NapiDataShareHelper *>(data);
         delete proxy;
-        LOG_INFO("NapiDataShareHelper has been deleted successfully!");
+        LOG_DEBUG("NapiDataShareHelper has been deleted successfully!");
     };
     if (napi_wrap(env, self, proxy, finalize, nullptr, nullptr) != napi_ok) {
         finalize(env, proxy, nullptr);

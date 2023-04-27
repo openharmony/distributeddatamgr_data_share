@@ -128,7 +128,7 @@ napi_value DataShareResultSetProxy::Initialize(napi_env env, napi_callback_info 
 
 DataShareResultSetProxy::~DataShareResultSetProxy()
 {
-    LOG_INFO("DataShareResultSetProxy destructor!");
+    LOG_DEBUG("DataShareResultSetProxy destructor!");
     if (resultSet_ != nullptr && !resultSet_->IsClosed()) {
         resultSet_->Close();
     }
