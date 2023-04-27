@@ -35,7 +35,7 @@ constexpr int WAIT_TIME = 1;
 void DataShareConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    LOG_DEBUG("on connect done, uri:%{public}s, ret=%{public}d", uri_.ToString().c_str(), resultCode);
+    LOG_INFO("on connect done, uri:%{public}s, ret=%{public}d", uri_.ToString().c_str(), resultCode);
     if (remoteObject == nullptr) {
         LOG_ERROR("remote is nullptr");
         return;
@@ -56,7 +56,7 @@ void DataShareConnection::OnAbilityConnectDone(
  */
 void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    LOG_DEBUG("on disconnect done, uri:%{public}s, ret:%{public}d", uri_.ToString().c_str(), resultCode);
+    LOG_INFO("on disconnect done, uri:%{public}s, ret:%{public}d", uri_.ToString().c_str(), resultCode);
     {
         std::unique_lock<std::mutex> lock(condition_.mutex);
         SetDataShareProxy(nullptr);
