@@ -53,7 +53,7 @@ JsDataShareExtAbility::JsDataShareExtAbility(JsRuntime& jsRuntime) : jsRuntime_(
 
 JsDataShareExtAbility::~JsDataShareExtAbility()
 {
-    LOG_DEBUG("Js datashare extension destructor.")
+    LOG_DEBUG("Js datashare extension destructor.");
     jsRuntime_.FreeNativeReference(std::move(jsObj_));
 }
 
