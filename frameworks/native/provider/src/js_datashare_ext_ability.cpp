@@ -54,7 +54,11 @@ JsDataShareExtAbility* JsDataShareExtAbility::Create(const std::unique_ptr<Runti
 
 JsDataShareExtAbility::JsDataShareExtAbility(JsRuntime& jsRuntime) : jsRuntime_(jsRuntime) {}
 
-JsDataShareExtAbility::~JsDataShareExtAbility() {}
+JsDataShareExtAbility::~JsDataShareExtAbility()
+{
+    LOG_DEBUG("Js datashare extension destructor.");
+    jsRuntime_.FreeNativeReference(std::move(jsObj_));
+}
 
 void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &record,
     const std::shared_ptr<OHOSApplication> &application, std::shared_ptr<AbilityHandler> &handler,
