@@ -35,7 +35,7 @@ using namespace AbilityRuntime;
 class JsDataShareExtAbility : public DataShareExtAbility {
 public:
     explicit JsDataShareExtAbility(JsRuntime& jsRuntime);
-    virtual ~JsDataShareExtAbility() override;
+    ~JsDataShareExtAbility() override;
 
     /**
      * @brief Create JsDataShareExtAbility.
