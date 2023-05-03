@@ -37,10 +37,20 @@ public:
     void OnChangeExt(const ChangeInfo &info);
     static DataShareObserver::ChangeInfo ConvertInfo(const AAFwk::ChangeInfo &info);
     static AAFwk::ChangeInfo ConvertInfo(const DataShareObserver::ChangeInfo &info);
-
+    static sptr<ObserverImpl> AddObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer);
+    static sptr<ObserverImpl> DeleteObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer);
 private:
+    struct ObserverParam {
+        sptr<ObserverImpl>  obs_;
+        std::list<Uri> uris_;
+    };
     std::shared_ptr<DataShareObserver> dataShareObserver_;
+    static std::mutex mutex_;
+    static std::map<DataShareObserver*, ObserverParam>  observers_;
 };
+
+std::mutex ObserverImpl::mutex_;
+std::map<DataShareObserver*, ObserverImpl::ObserverParam>  ObserverImpl::observers_;
 
 DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,
     std::shared_ptr<BaseConnection> dataShareConnection)
@@ -533,7 +543,7 @@ void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataSh
         LOG_ERROR("get DataObsMgrClient failed");
         return;
     }
-    sptr<ObserverImpl> obs(new (std::nothrow) ObserverImpl(dataObserver));
+    sptr<ObserverImpl> obs = ObserverImpl::AddObserver(uri, dataObserver);
     if (obs == nullptr) {
         LOG_ERROR("new ObserverImpl failed");
         return;
@@ -563,7 +573,7 @@ void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<Data
         LOG_ERROR("get DataObsMgrClient failed");
         return;
     }
-    sptr<ObserverImpl> obs(new (std::nothrow) ObserverImpl(dataObserver));
+    sptr<ObserverImpl> obs = ObserverImpl::DeleteObserver(uri, dataObserver);
     if (obs == nullptr) {
         LOG_ERROR("new ObserverImpl failed");
         return;
@@ -715,7 +725,7 @@ DataShareObserver::ChangeInfo ObserverImpl::ConvertInfo(const AAFwk::ChangeInfo 
             changeInfo.changeType_ = DataShareObserver::OTHER;
             break;
         default:
-            changeInfo.changeType_ = DataShareObserver::INVAILD;
+            changeInfo.changeType_ = static_cast<const DataShareObserver::ChangeType>(info.changeType_);
             break;
     }
     changeInfo.uris_ = std::move(info.uris_);
@@ -741,13 +751,48 @@ AAFwk::ChangeInfo ObserverImpl::ConvertInfo(const DataShareObserver::ChangeInfo 
             changeInfo.changeType_ = AAFwk::ChangeInfo::OTHER;
             break;
         default:
-            changeInfo.changeType_ = AAFwk::ChangeInfo::INVAILD;
+            changeInfo.changeType_ = static_cast<const AAFwk::ChangeInfo::ChangeType>(info.changeType_);
             break;
     }
     changeInfo.uris_ = std::move(info.uris_);
-    changeInfo.data_ = info.data_;
+    changeInfo.data_ = const_cast<void*>(info.data_);
     changeInfo.size_ = info.size_;
     return changeInfo;
+}
+
+sptr<ObserverImpl> ObserverImpl::AddObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer)
+{
+    std::lock_guard<std::mutex> lck(mutex_);
+    auto result = observers_.find(observer.get());
+    if (result != observers_.end()) {
+        auto it = std::find(result->second.uris_.begin(), result->second.uris_.end(), uri);
+        if (it == result->second.uris_.end()) {
+            result->second.uris_.push_back(uri);
+        }
+
+        return result->second.obs_;
+    }
+    ObserverParam param;
+    param.obs_ = new (std::nothrow) ObserverImpl(observer);
+    param.uris_.push_back(uri);
+    observers_.emplace(observer.get(), param);
+    return param.obs_;
+}
+sptr<ObserverImpl> ObserverImpl::DeleteObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer)
+{
+    std::lock_guard<std::mutex> lck(mutex_);
+    sptr<ObserverImpl> result = nullptr;
+    auto it = observers_.find(observer.get());
+    if (it != observers_.end()) {
+        result = it->second.obs_;
+        it->second.uris_.remove_if([&uri](const auto &value) {
+            return uri == value;
+        });
+        if (it->second.uris_.empty()) {
+            observers_.erase(observer.get());
+        }
+    }
+    return result;
 }
 } // namespace DataShare
 } // namespace OHOS
