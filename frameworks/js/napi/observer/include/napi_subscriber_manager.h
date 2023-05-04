@@ -28,7 +28,7 @@
 
 namespace OHOS {
 namespace DataShare {
-class NapiRdbSubscriberManager : public CallbacksManager<RdbObserverMapKey, NapiRdbObserver>{
+class NapiRdbSubscriberManager : public CallbacksManager<RdbObserverMapKey, NapiRdbObserver> {
 public:
     using Key = RdbObserverMapKey;
     using Observer = NapiRdbObserver;
@@ -46,7 +46,7 @@ private:
     std::weak_ptr<DataShareHelper> dataShareHelper_;
 };
 
-class NapiPublishedSubscriberManager : public CallbacksManager<PublishedObserverMapKey, NapiPublishedObserver>{
+class NapiPublishedSubscriberManager : public CallbacksManager<PublishedObserverMapKey, NapiPublishedObserver> {
 public:
     using Key = PublishedObserverMapKey;
     using Observer = NapiPublishedObserver;

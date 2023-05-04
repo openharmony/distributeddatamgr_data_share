@@ -65,8 +65,8 @@ private:
 template<class Key, class Observer>
 std::vector<OperationResult> CallbacksManager<Key, Observer>::AddObservers(const std::vector<Key> &keys,
     const std::shared_ptr<Observer> observer,
-    std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &)>
-        processOnFirstAdd)
+    std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
+        std::vector<OperationResult> &)> processOnFirstAdd)
 {
     std::vector<OperationResult> result;
     std::vector<Key> firstRegisterKey;

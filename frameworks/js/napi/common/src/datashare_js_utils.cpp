@@ -392,7 +392,6 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, sptr<Ashmem> &ashmem)
     }
     napiAshmem->SetAshmem(ashmem);
     return jsAshmem;
-
 }
 
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const PublishedDataItem &publishedDataItem)

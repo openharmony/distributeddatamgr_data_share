@@ -20,8 +20,8 @@
 
 namespace OHOS {
 namespace DataShare {
-std::vector<OperationResult> PublishedDataSubscriberManager::AddObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris,
-    int64_t subscriberId, const PublishedDataCallback &callback)
+std::vector<OperationResult> PublishedDataSubscriberManager::AddObservers(std::shared_ptr<BaseProxy> proxy,
+    const std::vector<std::string> &uris, int64_t subscriberId, const PublishedDataCallback &callback)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -59,8 +59,8 @@ std::vector<OperationResult> PublishedDataSubscriberManager::AddObservers(std::s
         });
 }
 
-std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris,
-    int64_t subscriberId)
+std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(std::shared_ptr<BaseProxy> proxy,
+    const std::vector<std::string> &uris, int64_t subscriberId)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -90,8 +90,8 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(std::s
         });
 }
 
-std::vector<OperationResult> PublishedDataSubscriberManager::EnableObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris,
-    int64_t subscriberId)
+std::vector<OperationResult> PublishedDataSubscriberManager::EnableObservers(std::shared_ptr<BaseProxy> proxy,
+    const std::vector<std::string> &uris, int64_t subscriberId)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -125,8 +125,8 @@ std::vector<OperationResult> PublishedDataSubscriberManager::EnableObservers(std
         });
 }
 
-std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris,
-    int64_t subscriberId)
+std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(std::shared_ptr<BaseProxy> proxy,
+    const std::vector<std::string> &uris, int64_t subscriberId)
 {
     std::vector<OperationResult> results;
     if (proxy == nullptr) {
@@ -138,7 +138,8 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(st
         keys.emplace_back(uri, subscriberId);
     });
     return BaseCallbacks::DisableObservers(keys,
-        [&proxy, &subscriberId, this](const std::vector<Key> &lastDisabledKeys, std::vector<OperationResult> &opResult) {
+        [&proxy, &subscriberId, this](const std::vector<Key> &lastDisabledKeys,
+                                      std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDisabledUris;
             std::for_each(lastDisabledKeys.begin(), lastDisabledKeys.end(), [&lastDisabledUris](auto &result) {
                 lastDisabledUris.emplace_back(result);

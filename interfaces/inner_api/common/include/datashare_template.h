@@ -83,8 +83,9 @@ struct PublishedDataItem {
     {
     }
 private:
-    void Close() {
-        if(value_.index() == 0) {
+    void Close()
+    {
+        if (value_.index() == 0) {
             sptr<Ashmem> ashmem = std::get<sptr<Ashmem>>(value_);
 			static const OHOS::HiviewDFX::HiLogLabel DATASHARE_LABEL = { LOG_CORE, 0xD001651, "DataShare" };
             (void)OHOS::HiviewDFX::HiLog::Error(DATASHARE_LABEL,

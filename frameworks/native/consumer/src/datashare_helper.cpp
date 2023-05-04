@@ -72,7 +72,9 @@ DataShareHelper::DataShareHelper(const CreateOptions &options, const Uri &uri,
         std::make_shared<PublishedDataSubscriberManager>();
 }
 
-DataShareHelper::~DataShareHelper() {    LOG_INFO("DataShareHelper::~DataShareHelper with options start %{public}p", this);}
+DataShareHelper::~DataShareHelper()
+{
+}
 
 /**
  * @brief You can use this method to specify the Uri of the data to operate and set the binding relationship
@@ -139,7 +141,6 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
 
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, const CreateOptions &options)
 {
-
     Uri uri(strUri);
     if (!options.isProxy_ && options.token_ == nullptr) {
         LOG_ERROR("token is nullptr");

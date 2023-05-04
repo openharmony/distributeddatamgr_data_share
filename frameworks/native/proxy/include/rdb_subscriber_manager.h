@@ -69,11 +69,14 @@ public:
     using Observer = RdbObserver;
     using BaseCallbacks = CallbacksManager<RdbObserverMapKey, RdbObserver>;
     RdbSubscriberManager();
-    std::vector<OperationResult> AddObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, const TemplateId &templateId,
-        const RdbCallback &callback);
-    std::vector<OperationResult> DelObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, const TemplateId &templateId);
-    std::vector<OperationResult> EnableObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, const TemplateId &templateId);
-    std::vector<OperationResult> DisableObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, const TemplateId &templateId);
+    std::vector<OperationResult> AddObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris,
+        const TemplateId &templateId, const RdbCallback &callback);
+    std::vector<OperationResult> DelObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris,
+        const TemplateId &templateId);
+    std::vector<OperationResult> EnableObservers(std::shared_ptr<BaseProxy> proxy,
+        const std::vector<std::string> &uris, const TemplateId &templateId);
+    std::vector<OperationResult> DisableObservers(std::shared_ptr<BaseProxy> proxy,
+        const std::vector<std::string> &uris, const TemplateId &templateId);
     void DelAllObservers(std::shared_ptr<BaseProxy> proxy);
     void Emit(const RdbChangeNode &changeNode);
 

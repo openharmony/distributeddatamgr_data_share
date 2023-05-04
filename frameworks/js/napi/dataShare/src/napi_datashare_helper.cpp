@@ -655,7 +655,6 @@ napi_value NapiDataShareHelper::Napi_NotifyChange(napi_env env, napi_callback_in
 
 napi_value NapiDataShareHelper::Napi_AddTemplate(napi_env env, napi_callback_info info)
 {
-    LOG_INFO("Napi_AddTemplate start.");
     napi_value self = nullptr;
     size_t argc = MAX_ARGC;
     napi_value argv[MAX_ARGC] = { nullptr };
@@ -682,17 +681,11 @@ napi_value NapiDataShareHelper::Napi_AddTemplate(napi_env env, napi_callback_inf
     int64_t subscriberId = 0;
     napi_status status = napi_get_value_int64(env, argv[1], &subscriberId);
     NAPI_ASSERT_BASE(env, status == napi_ok, "convert subscriberId failed", nullptr);
-    LOG_INFO("subscriberId is %{public}" PRId64 "", subscriberId);
 
-    NAPI_CALL(env, napi_typeof(env, argv[2], &valueType));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_object,
         error = std::make_shared<ParametersTypeError>("template", "Template"), error, nullptr);
-    Template tpl = DataShareJSUtils::Convert2Template(env, argv[2]);
-    LOG_INFO("predicates_ size is %{public}d", tpl.predicates_.size());
-    for(auto &pre : tpl.predicates_) {
-        LOG_INFO("key is : %{public}s, selectSQL is : %{public}s", pre.key_.c_str(), pre.selectSql_.c_str());
-    }
-    LOG_INFO("scheduler_ is %{public}s", tpl.scheduler_.c_str());
+    Template tpl = DataShareJSUtils::Convert2Template(env, argv[PARAM2]);
 
     auto res = proxy->datashareHelper_->AddQueryTemplate(uri, subscriberId, tpl);
     return DataShareJSUtils::Convert2JSValue(env, res);
@@ -747,9 +740,9 @@ napi_value NapiDataShareHelper::Napi_Publish(napi_env env, napi_callback_info in
         NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_string,
             context->error = std::make_shared<ParametersTypeError>("bundleName", "string"), napi_invalid_arg);
         if (argc > 2) {
-            NAPI_CALL_BASE(env, napi_typeof(env, argv[2], &valueType), napi_invalid_arg);
+            NAPI_CALL_BASE(env, napi_typeof(env, argv[PARAM2], &valueType), napi_invalid_arg);
             if (valueType == napi_number) {
-                napi_get_value_int32(env, argv[2], &(context->publishData.version_));
+                napi_get_value_int32(env, argv[PARAM2], &(context->publishData.version_));
             }
         }
         context->publishData = DataShareJSUtils::Convert2PublishedData(env, argv[0]);
@@ -840,7 +833,7 @@ napi_value NapiDataShareHelper::Napi_On(napi_env env, napi_callback_info info)
     NAPI_ASSERT_BASE(env, valueType == napi_string, "uri is not string", nullptr);
     std::string uri = DataShareJSUtils::Convert2String(env, argv[1]);
 
-    NAPI_CALL(env, napi_typeof(env, argv[2], &valueType));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
     NAPI_ASSERT_BASE(env, valueType == napi_function, "callback is not a function", nullptr);
 
     proxy->RegisteredObserver(env, uri, argv[PARAM2]);
@@ -983,12 +976,12 @@ napi_value NapiDataShareHelper::Napi_SubscribeRdbObserver(napi_env env, size_t a
     std::vector<std::string> uris =
         DataShareJSUtils::Convert2StrVector(env, argv[1], DataShareJSUtils::DEFAULT_BUF_SIZE);
 
-    NAPI_CALL(env, napi_typeof(env, argv[2], &valueType));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_object,
         error = std::make_shared<ParametersTypeError>("templateId", "TemplateId"), error, jsResults);
-    TemplateId templateId = DataShareJSUtils::Convert2TemplateId(env, argv[2]);
+    TemplateId templateId = DataShareJSUtils::Convert2TemplateId(env, argv[PARAM2]);
 
-    NAPI_CALL(env, napi_typeof(env, argv[3], &valueType));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
         error = std::make_shared<ParametersTypeError>("callback", "function"), error, jsResults);
 
@@ -996,7 +989,7 @@ napi_value NapiDataShareHelper::Napi_SubscribeRdbObserver(napi_env env, size_t a
         LOG_ERROR("proxy->jsManager_ is nullptr");
         return jsResults;
     }
-    results = proxy->jsRdbObsManager_->AddObservers(env, argv[3], uris, templateId);
+    results = proxy->jsRdbObsManager_->AddObservers(env, argv[PARAM3], uris, templateId);
     return DataShareJSUtils::Convert2JSValue(env, results);
 }
 
@@ -1021,7 +1014,7 @@ napi_value NapiDataShareHelper::Napi_UnSubscribeRdbObserver(napi_env env, size_t
     std::vector<std::string> uris =
         DataShareJSUtils::Convert2StrVector(env, argv[1], DataShareJSUtils::DEFAULT_BUF_SIZE);
 
-    NAPI_CALL(env, napi_typeof(env, argv[2], &valueType));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_object,
         error = std::make_shared<ParametersTypeError>("templateId", "TemplateId"), error, jsResults);
     TemplateId templateId = DataShareJSUtils::Convert2TemplateId(env, argv[2]);
@@ -1032,10 +1025,10 @@ napi_value NapiDataShareHelper::Napi_UnSubscribeRdbObserver(napi_env env, size_t
     }
 
     if (argc == ARGS_FOUR) {
-        NAPI_CALL(env, napi_typeof(env, argv[3], &valueType));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
             error = std::make_shared<ParametersTypeError>("callback", "function"), error, jsResults);
-        results = proxy->jsRdbObsManager_->DelObservers(env, argv[3], uris, templateId);
+        results = proxy->jsRdbObsManager_->DelObservers(env, argv[PARAM3], uris, templateId);
         return DataShareJSUtils::Convert2JSValue(env, results);
     }
     results = proxy->jsRdbObsManager_->DelObservers(env, nullptr, uris, templateId);
@@ -1063,14 +1056,14 @@ napi_value NapiDataShareHelper::Napi_SubscribePublishedObserver(napi_env env, si
     std::vector<std::string> uris =
         DataShareJSUtils::Convert2StrVector(env, argv[1], DataShareJSUtils::DEFAULT_BUF_SIZE);
 
-    NAPI_CALL(env, napi_typeof(env, argv[2], &valueType));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_number,
         error = std::make_shared<ParametersTypeError>("subscriberId", "int64_t"), error, jsResults);
     int64_t subscriberId = 0;
     napi_status status = napi_get_value_int64(env, argv[2], &subscriberId);
     NAPI_ASSERT_BASE(env, status == napi_ok, "convert subscriberId failed", jsResults);
 
-    NAPI_CALL(env, napi_typeof(env, argv[3], &valueType));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
         error = std::make_shared<ParametersTypeError>("callback", "function"), error, jsResults);
 
@@ -1078,7 +1071,7 @@ napi_value NapiDataShareHelper::Napi_SubscribePublishedObserver(napi_env env, si
         LOG_ERROR("proxy->jsPublishedObsManager_ is nullptr");
         return jsResults;
     }
-    results = proxy->jsPublishedObsManager_->AddObservers(env, argv[3], uris, subscriberId);
+    results = proxy->jsPublishedObsManager_->AddObservers(env, argv[PARAM3], uris, subscriberId);
     return DataShareJSUtils::Convert2JSValue(env, results);
 }
 
@@ -1103,7 +1096,7 @@ napi_value NapiDataShareHelper::Napi_UnSubscribePublishedObserver(napi_env env, 
     std::vector<std::string> uris =
         DataShareJSUtils::Convert2StrVector(env, argv[1], DataShareJSUtils::DEFAULT_BUF_SIZE);
 
-    NAPI_CALL(env, napi_typeof(env, argv[2], &valueType));
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_number,
         error = std::make_shared<ParametersTypeError>("subscriberId", "int64_t"), error, jsResults);
     int64_t subscriberId = 0;
@@ -1116,10 +1109,10 @@ napi_value NapiDataShareHelper::Napi_UnSubscribePublishedObserver(napi_env env, 
     }
 
     if (argc == ARGS_FOUR) {
-        NAPI_CALL(env, napi_typeof(env, argv[3], &valueType));
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
             error = std::make_shared<ParametersTypeError>("callback", "function"), error, jsResults);
-        results = proxy->jsPublishedObsManager_->DelObservers(env, argv[3], uris, subscriberId);
+        results = proxy->jsPublishedObsManager_->DelObservers(env, argv[PARAM3], uris, subscriberId);
         return DataShareJSUtils::Convert2JSValue(env, results);
     }
     results = proxy->jsPublishedObsManager_->DelObservers(env, nullptr, uris, subscriberId);

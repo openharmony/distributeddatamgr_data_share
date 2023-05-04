@@ -25,8 +25,8 @@ RdbSubscriberManager::RdbSubscriberManager()
     serviceCallback_ = nullptr;
 }
 
-std::vector<OperationResult> RdbSubscriberManager::AddObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris,
-    const TemplateId &templateId, const RdbCallback &callback)
+std::vector<OperationResult> RdbSubscriberManager::AddObservers(std::shared_ptr<BaseProxy> proxy,
+    const std::vector<std::string> &uris, const TemplateId &templateId, const RdbCallback &callback)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -64,8 +64,8 @@ std::vector<OperationResult> RdbSubscriberManager::AddObservers(std::shared_ptr<
         });
 }
 
-std::vector<OperationResult> RdbSubscriberManager::DelObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris,
-    const TemplateId &templateId)
+std::vector<OperationResult> RdbSubscriberManager::DelObservers(std::shared_ptr<BaseProxy> proxy,
+    const std::vector<std::string> &uris, const TemplateId &templateId)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -95,8 +95,8 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(std::shared_ptr<
         });
 }
 
-std::vector<OperationResult> RdbSubscriberManager::EnableObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris,
-    const TemplateId &templateId)
+std::vector<OperationResult> RdbSubscriberManager::EnableObservers(std::shared_ptr<BaseProxy> proxy,
+    const std::vector<std::string> &uris, const TemplateId &templateId)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -130,8 +130,8 @@ std::vector<OperationResult> RdbSubscriberManager::EnableObservers(std::shared_p
         });
 }
 
-std::vector<OperationResult> RdbSubscriberManager::DisableObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris,
-    const TemplateId &templateId)
+std::vector<OperationResult> RdbSubscriberManager::DisableObservers(std::shared_ptr<BaseProxy> proxy,
+    const std::vector<std::string> &uris, const TemplateId &templateId)
 {
     std::vector<OperationResult> results;
     if (proxy == nullptr) {
@@ -169,10 +169,10 @@ void RdbSubscriberManager::DelAllObservers(std::shared_ptr<BaseProxy> proxy)
             return;
         }
         for (const auto& key : lastDelKeys) {
-           proxy->UnSubscribeRdbData(std::vector<std::string>(1, key.uri_), key.templateId_);
+            proxy->UnSubscribeRdbData(std::vector<std::string>(1, key.uri_), key.templateId_);
         }
         Destroy();
-   });
+    });
 }
 
 void RdbSubscriberManager::Emit(const RdbChangeNode &changeNode)

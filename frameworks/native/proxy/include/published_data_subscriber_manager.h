@@ -71,9 +71,12 @@ public:
     PublishedDataSubscriberManager();
     std::vector<OperationResult> AddObservers(std::shared_ptr<BaseProxy> proxy,
         const std::vector<std::string> &uris, int64_t subscriberId, const PublishedDataCallback &callback);
-    std::vector<OperationResult> DelObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId);
-    std::vector<OperationResult> EnableObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId);
-    std::vector<OperationResult> DisableObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId);
+    std::vector<OperationResult> DelObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris,
+        int64_t subscriberId);
+    std::vector<OperationResult> EnableObservers(std::shared_ptr<BaseProxy> proxy,
+        const std::vector<std::string> &uris, int64_t subscriberId);
+    std::vector<OperationResult> DisableObservers(std::shared_ptr<BaseProxy> proxy,
+        const std::vector<std::string> &uris, int64_t subscriberId);
     void DelAllObservers(std::shared_ptr<BaseProxy> proxy);
     void Emit(PublishedDataChangeNode &changeNode);
 

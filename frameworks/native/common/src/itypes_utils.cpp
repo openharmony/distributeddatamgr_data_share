@@ -195,7 +195,7 @@ bool ITypesUtils::Marshalling(const Data &data, MessageParcel &parcel)
     if (!parcel.WriteInt32(data.datas_.size())) {
         return false;
     }
-    for (const auto & dataItem : data.datas_) {
+    for (const auto &dataItem : data.datas_) {
         if (!ITypesUtils::Marshalling(dataItem, parcel)) {
             return false;
         }
@@ -269,7 +269,7 @@ bool ITypesUtils::Unmarshalling(Parcel &parcel, RdbChangeNode &changeNode)
 bool ITypesUtils::Unmarshalling(MessageParcel &parcel, PublishedDataChangeNode &changeNode)
 {
     auto bundleName = parcel.ReadString();
-    if (!Unmarshalling(parcel, changeNode.datas_ )) {
+    if (!Unmarshalling(parcel, changeNode.datas_)) {
         return false;
     }
     changeNode.ownerBundleName_ = bundleName;

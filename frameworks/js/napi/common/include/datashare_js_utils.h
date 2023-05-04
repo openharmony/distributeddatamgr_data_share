@@ -100,7 +100,8 @@ public:
         std::vector<PublishedDataItem> &publishedDataItems);
     static bool UnwrapTemplatePredicates(napi_env env, napi_value jsPredicates,
         std::vector<PredicateTemplateNode> &predicates);
-    static bool UnwrapStringByPropertyName(napi_env env, napi_value jsObject, const char *propertyName, std::string &value);
+    static bool UnwrapStringByPropertyName(napi_env env, napi_value jsObject, const char *propertyName,
+        std::string &value);
     static bool IsArrayForNapiValue(napi_env env, napi_value param, uint32_t &arraySize);
 private:
     template<typename _VTp>
