@@ -91,6 +91,14 @@ public:
      */
     static std::shared_ptr<DataShareHelper> Creator(const sptr<IRemoteObject> &token, const std::string &strUri);
 
+    /**
+     * @brief Creates a DataShareHelper instance with the Uri and {@link #CreateOptions} .
+     *
+     * @param strUri Indicates the database table or disk file to operate.
+     * @param options Indicates the optional config.
+     *
+     * @return Returns the created DataShareHelper instance with a specified Uri.
+     */
     static std::shared_ptr<DataShareHelper> Creator(const std::string &strUri, const CreateOptions &options);
 
     /**
