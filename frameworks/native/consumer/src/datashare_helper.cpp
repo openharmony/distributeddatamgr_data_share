@@ -27,6 +27,7 @@ namespace DataShare {
 using namespace AppExecFwk;
 namespace {
 const std::string SCHEME_DATASHARE = "datashare";
+const std::string SCHEME_DATASHARE_PROXY = "datashareproxy";
 constexpr int INVALID_VALUE = -1;
 } // namespace
 class ObserverImpl : public AAFwk::DataAbilityObserverStub {
@@ -58,9 +59,20 @@ DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token, const Uri &ur
     isDataShareService_ = (uri_.GetQuery().find("Proxy=true") != std::string::npos);
 }
 
-DataShareHelper::~DataShareHelper()
+DataShareHelper::DataShareHelper(const CreateOptions &options, const Uri &uri,
+    std::shared_ptr<BaseConnection> dataShareConnection)
 {
+    LOG_INFO("DataShareHelper::DataShareHelper with options start %{public}p", this);
+    token_ = options.token_;
+    uri_ = uri;
+    isDataShareService_ = options.isProxy_;
+    connection_ = dataShareConnection;
+    rdbSubscriberManager_ = std::make_shared<RdbSubscriberManager>();
+    publishedDataSubscriberManager_ =
+        std::make_shared<PublishedDataSubscriberManager>();
 }
+
+DataShareHelper::~DataShareHelper() {    LOG_INFO("DataShareHelper::~DataShareHelper with options start %{public}p", this);}
 
 /**
  * @brief You can use this method to specify the Uri of the data to operate and set the binding relationship
@@ -72,8 +84,8 @@ DataShareHelper::~DataShareHelper()
  *
  * @return Returns the created DataShareHelper instance.
  */
-std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
-    const std::shared_ptr<Context> &context, const std::string &strUri)
+std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const std::shared_ptr<Context> &context,
+    const std::string &strUri)
 {
     if (context == nullptr) {
         LOG_ERROR("DataShareHelper::Creator failed, context == nullptr");
@@ -125,6 +137,36 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
     return std::shared_ptr<DataShareHelper>(ptrDataShareHelper);
 }
 
+std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, const CreateOptions &options)
+{
+
+    Uri uri(strUri);
+    if (!options.isProxy_ && options.token_ == nullptr) {
+        LOG_ERROR("token is nullptr");
+        return nullptr;
+    }
+    if (uri.GetScheme() != SCHEME_DATASHARE_PROXY) {
+        LOG_ERROR("the Scheme is not datashareproxy, Scheme: %{public}s", uri.GetScheme().c_str());
+        return nullptr;
+    }
+    std::shared_ptr<BaseConnection> connection = ConnectionFactory::GetInstance().GetConnection(uri, options);
+    if (connection == nullptr) {
+        LOG_ERROR("create dataShareConnection failed");
+        return nullptr;
+    }
+    if (!connection->ConnectDataShare(uri, options.token_)) {
+        LOG_ERROR("connect failed");
+        return nullptr;
+    }
+    DataShareHelper *ptrDataShareHelper = new (std::nothrow) DataShareHelper(options, uri, connection);
+    if (ptrDataShareHelper == nullptr) {
+        LOG_ERROR("create DataShareHelper failed");
+        connection = nullptr;
+        return nullptr;
+    }
+    return std::shared_ptr<DataShareHelper>(ptrDataShareHelper);
+}
+
 /**
  * @brief Releases the client resource of the data share.
  * You should call this method to releases client resource after the data operations are complete.
@@ -133,7 +175,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
  */
 bool DataShareHelper::Release()
 {
-    LOG_DEBUG("Release Start");
+    LOG_INFO("Release Start");
     connection_ = nullptr;
     uri_ = Uri("");
     return true;
@@ -748,6 +790,333 @@ AAFwk::ChangeInfo ObserverImpl::ConvertInfo(const DataShareObserver::ChangeInfo 
     changeInfo.data_ = info.data_;
     changeInfo.size_ = info.size_;
     return changeInfo;
+}
+
+int DataShareHelper::AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl)
+{
+    int errNum = INVALID_VALUE;
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return errNum;
+    }
+    if (!connection->ConnectDataShare(uri_, token_)) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return errNum;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("GetDataShareProxy is nullptr");
+        return errNum;
+    }
+    return proxy->AddQueryTemplate(uri, subscriberId, tpl);
+}
+
+int DataShareHelper::DelQueryTemplate(const std::string &uri, int64_t subscriberId)
+{
+    int errNum = INVALID_VALUE;
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return errNum;
+    }
+    if (!connection->ConnectDataShare(uri_, token_)) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return errNum;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("GetDataShareProxy is nullptr");
+        return errNum;
+    }
+    return proxy->DelQueryTemplate(uri, subscriberId);
+}
+
+std::vector<OperationResult> DataShareHelper::Publish(const Data &data,
+    const std::string &bundleName)
+{
+    std::vector<OperationResult> results;
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return results;
+    }
+    if (!connection->ConnectDataShare(uri_, token_)) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("GetDataShareProxy is nullptr");
+        return results;
+    }
+    return proxy->Publish(data, bundleName);
+}
+
+Data DataShareHelper::GetPublishedData(const std::string &bundleName)
+{
+    Data results;
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return results;
+    }
+    if (!connection->ConnectDataShare(uri_, token_)) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("GetDataShareProxy is nullptr");
+        return results;
+    }
+    return proxy->GetPublishedData(bundleName);
+}
+
+std::vector<OperationResult> DataShareHelper::SubscribeRdbData(const std::vector<std::string> &uris,
+    const TemplateId &templateId, const std::function<void(const RdbChangeNode &changeNode)> &callback)
+{
+    LOG_DEBUG("Start SubscribeRdbData");
+    std::vector<OperationResult> results;
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return results;
+    }
+    if (!connection->ConnectDataShare(uri_, token_)) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto manager = rdbSubscriberManager_;
+    if (manager == nullptr) {
+        LOG_ERROR("rdbSubscriberManager_ is nullptr");
+        return results;
+    }
+    return manager->AddObservers(proxy, uris, templateId, callback);
+}
+
+std::vector<OperationResult> DataShareHelper::UnSubscribeRdbData(const std::vector<std::string> &uris,
+    const TemplateId &templateId)
+{
+    LOG_DEBUG("Start UnSubscribeRdbData");
+    std::vector<OperationResult> results;
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return results;
+    }
+    if (!connection->ConnectDataShare(uri_, token_)) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto manager = rdbSubscriberManager_;
+    if (manager == nullptr) {
+        LOG_ERROR("rdbSubscriberManager_ is nullptr");
+        return results;
+    }
+    return manager->DelObservers(proxy, uris, templateId);
+}
+
+std::vector<OperationResult> DataShareHelper::EnableSubscribeRdbData(const std::vector<std::string> &uris,
+    const TemplateId &templateId)
+{
+    LOG_DEBUG("Start EnableSubscribeRdbData");
+    std::vector<OperationResult> results;
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return results;
+    }
+    if (!connection->ConnectDataShare(uri_, token_)) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto manager = rdbSubscriberManager_;
+    if (manager == nullptr) {
+        LOG_ERROR("rdbSubscriberManager_ is nullptr");
+        return results;
+    }
+    return manager->EnableObservers(proxy, uris, templateId);
+}
+
+std::vector<OperationResult> DataShareHelper::DisableSubscribeRdbData(const std::vector<std::string> &uris,
+    const TemplateId &templateId)
+{
+    LOG_DEBUG("Start DisableSubscribeRdbData");
+    std::vector<OperationResult> results;
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return results;
+    }
+    if (!connection->ConnectDataShare(uri_, token_)) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto manager = rdbSubscriberManager_;
+    if (manager == nullptr) {
+        LOG_ERROR("rdbSubscriberManager_ is nullptr");
+        return results;
+    }
+    return manager->DisableObservers(proxy, uris, templateId);
+}
+
+std::vector<OperationResult> DataShareHelper::SubscribePublishedData(const std::vector<std::string> &uris,
+    int64_t subscriberId, const std::function<void(const PublishedDataChangeNode &changeNode)> &callback)
+{
+    std::vector<OperationResult> results;
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return results;
+    }
+    if (!connection->ConnectDataShare(uri_, token_)) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto manager = publishedDataSubscriberManager_;
+    if (manager == nullptr) {
+        LOG_ERROR("rdbSubscriberManager_ is nullptr");
+        return results;
+    }
+    return manager->AddObservers(proxy, uris, subscriberId, callback);
+}
+
+std::vector<OperationResult> DataShareHelper::UnSubscribePublishedData(const std::vector<std::string> &uris,
+    int64_t subscriberId)
+{
+    LOG_DEBUG("Start UnSubscribePublishedData");
+    std::vector<OperationResult> results;
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return results;
+    }
+    if (!connection->ConnectDataShare(uri_, token_)) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto manager = publishedDataSubscriberManager_;
+    if (manager == nullptr) {
+        LOG_ERROR("rdbSubscriberManager_ is nullptr");
+        return results;
+    }
+    return manager->DelObservers(proxy, uris, subscriberId);
+}
+
+std::vector<OperationResult> DataShareHelper::EnableSubscribePublishedData(const std::vector<std::string> &uris,
+    int64_t subscriberId)
+{
+    LOG_DEBUG("Start UnSubscribePublishedData");
+    std::vector<OperationResult> results;
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return results;
+    }
+    if (!connection->ConnectDataShare(uri_, token_)) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto manager = publishedDataSubscriberManager_;
+    if (manager == nullptr) {
+        LOG_ERROR("rdbSubscriberManager_ is nullptr");
+        return results;
+    }
+    return manager->EnableObservers(proxy, uris, subscriberId);
+}
+
+std::vector<OperationResult> DataShareHelper::DisableSubscribePublishedData(const std::vector<std::string> &uris,
+    int64_t subscriberId)
+{
+    LOG_DEBUG("Start UnSubscribePublishedData");
+    std::vector<OperationResult> results;
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return results;
+    }
+    if (!connection->ConnectDataShare(uri_, token_)) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return results;
+    }
+    auto manager = publishedDataSubscriberManager_;
+    if (manager == nullptr) {
+        LOG_ERROR("rdbSubscriberManager_ is nullptr");
+        return results;
+    }
+    return manager->DisableObservers(proxy, uris, subscriberId);
+}
+
+void DataShareHelper::UnSubscribeAllObservers()
+{
+    LOG_DEBUG("Start UnSubscribeAllObservers");
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("dataShareConnection_ is nullptr");
+        return;
+    }
+    if (!connection->ConnectDataShare(uri_, token_)) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return;
+    }
+    auto proxy = connection->GetDataShareProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("dataShareProxy is nullptr");
+        return;
+    }
+    auto publishedDataSubscriberManager = publishedDataSubscriberManager_;
+    if (publishedDataSubscriberManager == nullptr) {
+        LOG_ERROR("publishedDataSubscriberManager_ is nullptr");
+        return;
+    }
+    publishedDataSubscriberManager->DelAllObservers(proxy);
+    auto rdbSubscriberManager = rdbSubscriberManager_;
+    if (rdbSubscriberManager == nullptr) {
+        LOG_ERROR("rdbSubscriberManager_ is nullptr");
+        return;
+    }
+    rdbSubscriberManager->DelAllObservers(proxy);
 }
 } // namespace DataShare
 } // namespace OHOS

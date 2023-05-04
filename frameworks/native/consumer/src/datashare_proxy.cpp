@@ -17,13 +17,13 @@
 
 #include <string_ex.h>
 
-#include "datashare_result_set.h"
 #include "data_ability_observer_interface.h"
 #include "datashare_log.h"
+#include "datashare_result_set.h"
 #include "ipc_types.h"
 #include "ishared_result_set.h"
-#include "pac_map.h"
 #include "itypes_utils.h"
+#include "pac_map.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -513,6 +513,74 @@ Uri DataShareProxy::DenormalizeUri(const Uri &uri)
     }
     LOG_INFO("end successfully.");
     return *info;
+}
+
+int DataShareProxy::AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl)
+{
+    return -1;
+}
+
+int DataShareProxy::DelQueryTemplate(const std::string &uri, int64_t subscriberId)
+{
+    return -1;
+}
+
+std::vector<OperationResult> DataShareProxy::Publish(const Data &data, const std::string &bundleName)
+{
+    return std::vector<OperationResult>();
+}
+
+Data DataShareProxy::GetPublishedData(const std::string &bundleName)
+{
+    return Data();
+}
+
+std::vector<OperationResult> DataShareProxy::SubscribeRdbData(const std::vector<std::string> &uris,
+    const TemplateId &templateId, const sptr<IDataProxyRdbObserver> &observer)
+{
+    return std::vector<OperationResult>();
+}
+
+std::vector<OperationResult> DataShareProxy::UnSubscribeRdbData(
+    const std::vector<std::string> &uris, const TemplateId &templateId)
+{
+    return {};
+}
+
+std::vector<OperationResult> DataShareProxy::EnableSubscribeRdbData(
+    const std::vector<std::string> &uris, const TemplateId &templateId)
+{
+    return {};
+}
+
+std::vector<OperationResult> DataShareProxy::DisableSubscribeRdbData(
+    const std::vector<std::string> &uris, const TemplateId &templateId)
+{
+    return {};
+}
+
+std::vector<OperationResult> DataShareProxy::SubscribePublishedData(
+    const std::vector<std::string> &uris, int64_t subscriberId, const sptr<IDataProxyPublishedDataObserver> &observer)
+{
+    return {};
+}
+
+std::vector<OperationResult> DataShareProxy::UnSubscribePublishedData(
+    const std::vector<std::string> &uris, int64_t subscriberId)
+{
+    return {};
+}
+
+std::vector<OperationResult> DataShareProxy::EnableSubscribePublishedData(
+    const std::vector<std::string> &uris, int64_t subscriberId)
+{
+    return {};
+}
+
+std::vector<OperationResult> DataShareProxy::DisableSubscribePublishedData(
+    const std::vector<std::string> &uris, int64_t subscriberId)
+{
+    return {};
 }
 } // namespace DataShare
 } // namespace OHOS

@@ -15,12 +15,14 @@
 
 #include <memory>
 #include <string_ex.h>
-#include "uri.h"
 
-#include "datashare_values_bucket.h"
+#include "data_proxy_observer.h"
+#include "datashare_business_error.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
-#include "datashare_business_error.h"
+#include "datashare_template.h"
+#include "datashare_values_bucket.h"
+#include "uri.h"
 
 #ifndef DATA_SHARE_BASE_PROXY_H
 #define DATA_SHARE_BASE_PROXY_H
@@ -178,15 +180,47 @@ public:
     */
     virtual Uri DenormalizeUri(const Uri &uri) = 0;
 
-/**
-* @brief Obtains the MIME types of files supported.
-*
-* @param uri Indicates the path of the files to obtain.
-* @param mimeTypeFilter Indicates the MIME types of the files to obtain. This parameter cannot be null.
-*
-* @return Returns the matched MIME types. If there is no match, null is returned.
-*/
-virtual std::vector<std::string> GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter) = 0;
+    /**
+    * @brief Obtains the MIME types of files supported.
+    *
+    * @param uri Indicates the path of the files to obtain.
+    * @param mimeTypeFilter Indicates the MIME types of the files to obtain. This parameter cannot be null.
+    *
+    * @return Returns the matched MIME types. If there is no match, null is returned.
+    */
+    virtual std::vector<std::string> GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter) = 0;
+
+    virtual int AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl) = 0;
+
+    virtual int DelQueryTemplate(const std::string &uri, int64_t subscriberId) = 0;
+
+    virtual std::vector<OperationResult> Publish(const Data &data, const std::string &bundleName) = 0;
+
+    virtual Data GetPublishedData(const std::string &bundleName) = 0;
+
+    virtual std::vector<OperationResult> SubscribeRdbData(const std::vector<std::string> &uris,
+        const TemplateId &templateId, const sptr<IDataProxyRdbObserver> &observer) = 0;
+
+    virtual std::vector<OperationResult> UnSubscribeRdbData(
+        const std::vector<std::string> &uris, const TemplateId &templateId) = 0;
+
+    virtual std::vector<OperationResult> EnableSubscribeRdbData(const std::vector<std::string> &uris,
+        const TemplateId &templateId) = 0;
+
+    virtual std::vector<OperationResult> DisableSubscribeRdbData(const std::vector<std::string> &uris,
+        const TemplateId &templateId) = 0;
+
+    virtual std::vector<OperationResult> SubscribePublishedData(const std::vector<std::string> &uris,
+        int64_t subscriberId, const sptr<IDataProxyPublishedDataObserver> &observer) = 0;
+
+    virtual std::vector<OperationResult> UnSubscribePublishedData(const std::vector<std::string> &uris,
+        int64_t subscriberId) = 0;
+
+    virtual std::vector<OperationResult> EnableSubscribePublishedData(const std::vector<std::string> &uris,
+        int64_t subscriberId) = 0;
+
+    virtual std::vector<OperationResult> DisableSubscribePublishedData(const std::vector<std::string> &uris,
+        int64_t subscriberId) = 0;
 };
 }
 }

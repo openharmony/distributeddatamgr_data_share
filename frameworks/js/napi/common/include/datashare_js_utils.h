@@ -16,6 +16,7 @@
 #ifndef DATASHARE_JSUTILS_H
 #define DATASHARE_JSUTILS_H
 
+#include <datashare_template.h>
 #include <iostream>
 #include <map>
 #include <string>
@@ -35,6 +36,23 @@ do {                                                                            
     }                                                                                                       \
 } while (0)
 
+#define NAPI_ASSERT_CALL_ERRCODE(env, assertion, call, retVal) \
+    do {                                                       \
+        if (!(assertion)) {                                    \
+            call;                                              \
+            return retVal;                                     \
+        }                                                      \
+    } while (0)
+
+#define NAPI_ASSERT_CALL_ERRCODE_SYNC(env, assertion, call, error, retVal)                                      \
+    do {                                                                                                        \
+        if (!(assertion)) {                                                                                     \
+            call;                                                                                               \
+            napi_throw_error((env), std::to_string((error)->GetCode()).c_str(), (error)->GetMessage().c_str()); \
+            return retVal;                                                                                      \
+        }                                                                                                       \
+    } while (0)
+
 namespace OHOS {
 namespace DataShare {
 class DataShareJSUtils final {
@@ -49,6 +67,10 @@ public:
     static std::string ConvertAny2String(napi_env env, const napi_value jsValue);
     static std::string UnwrapStringFromJS(napi_env env, napi_value param, const std::string &defaultValue = "");
     static DataShareValueObject Convert2ValueObject(napi_env env, napi_value value, bool &status);
+    static Template Convert2Template(napi_env env, napi_value value);
+    static TemplateId Convert2TemplateId(napi_env env, napi_value value);
+    static Data Convert2PublishedData(napi_env env, napi_value value);
+    static sptr<Ashmem> Convert2Ashmem(napi_env env, napi_value value);
 
     static napi_value Convert2JSValue(napi_env env, const std::monostate &value = {});
     static napi_value Convert2JSValue(napi_env env, const std::vector<std::string> &value);
@@ -58,13 +80,28 @@ public:
     static napi_value Convert2JSValue(napi_env env, int64_t value);
     static napi_value Convert2JSValue(napi_env env, double value);
     static napi_value Convert2JSValue(napi_env env, bool value);
-    static napi_value Convert2JSValue(napi_env env, const std::map<std::string, int>& value);
+    static napi_value Convert2JSValue(napi_env env, const std::map<std::string, int> &value);
     template<class... Types>
-    static napi_value Convert2JSValue(napi_env env, const std::variant<Types...>& value);
+    static napi_value Convert2JSValue(napi_env env, const std::variant<Types...> &value);
+    static napi_value Convert2JSValue(napi_env env, const TemplateId &templateId);
+    static napi_value Convert2JSValue(napi_env env, const RdbChangeNode &changeNode);
+    static napi_value Convert2JSValue(napi_env env, sptr<Ashmem> &ashmem);
+    static napi_value Convert2JSValue(napi_env env, const PublishedDataItem &publishedDataItem);
+    static napi_value Convert2JSValue(napi_env env, const std::vector<PublishedDataItem> &publishedDataItems);
+    static napi_value Convert2JSValue(napi_env env, const PublishedDataChangeNode &changeNode);
+    static napi_value Convert2JSValue(napi_env env, const OperationResult &results);
+    static napi_value Convert2JSValue(napi_env env, const std::vector<OperationResult> &results);
     static std::vector<uint8_t> ConvertU8Vector(napi_env env, napi_value jsValue);
 
     static bool Equals(napi_env env, napi_value value, napi_ref copy);
 
+    static bool UnwrapPublishedDataItem(napi_env env, napi_value value, PublishedDataItem &publishedDataItem);
+    static bool UnwrapPublishedDataItemVector(napi_env env, napi_value value,
+        std::vector<PublishedDataItem> &publishedDataItems);
+    static bool UnwrapTemplatePredicates(napi_env env, napi_value jsPredicates,
+        std::vector<PredicateTemplateNode> &predicates);
+    static bool UnwrapStringByPropertyName(napi_env env, napi_value jsObject, const char *propertyName, std::string &value);
+    static bool IsArrayForNapiValue(napi_env env, napi_value param, uint32_t &arraySize);
 private:
     template<typename _VTp>
     static napi_value ReadVariant(napi_env env, uint32_t step, uint32_t index, const _VTp &output)

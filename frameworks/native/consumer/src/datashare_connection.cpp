@@ -16,6 +16,7 @@
 #include "datashare_connection.h"
 
 #include "ability_manager_client.h"
+#include "ability_connect_callback_stub.h"
 #include "datashare_proxy.h"
 #include "datashare_log.h"
 

@@ -17,9 +17,11 @@
 #define NAPI_DATASHARE_HELPER_H
 
 #include <memory>
+
+#include "napi_subscriber_manager.h"
 #include "async_call.h"
-#include "datashare_helper.h"
 #include "data_share_common.h"
+#include "datashare_helper.h"
 #include "napi_datashare_observer.h"
 
 namespace OHOS {
@@ -40,24 +42,36 @@ public:
     static napi_value Napi_NormalizeUri(napi_env env, napi_callback_info info);
     static napi_value Napi_DenormalizeUri(napi_env env, napi_callback_info info);
     static napi_value Napi_NotifyChange(napi_env env, napi_callback_info info);
+    static napi_value Napi_AddTemplate(napi_env env, napi_callback_info info);
+    static napi_value Napi_DelTemplate(napi_env env, napi_callback_info info);
+    static napi_value Napi_Publish(napi_env env, napi_callback_info info);
+    static napi_value Napi_GetPublishedData(napi_env env, napi_callback_info info);
+
 private:
     static napi_value GetConstructor(napi_env env);
     static napi_value Initialize(napi_env env, napi_callback_info info);
+    static napi_value Napi_SubscribeRdbObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
+    static napi_value Napi_UnSubscribeRdbObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
+    static napi_value Napi_SubscribePublishedObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
+    static napi_value Napi_UnSubscribePublishedObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
 
     bool HasRegisteredObserver(napi_env env, std::list<sptr<NAPIDataShareObserver>> &list, napi_value callback);
     void RegisteredObserver(napi_env env, const std::string &uri, napi_value callback);
     void UnRegisteredObserver(napi_env env, const std::string &uri, napi_value callback);
     void UnRegisteredObserver(napi_env env, const std::string &uri);
-
+    static bool GetOptions(napi_env env, napi_value jsValue, CreateOptions &options);
     std::shared_ptr<DataShareHelper> datashareHelper_ = nullptr;
     std::map<std::string, std::list<sptr<NAPIDataShareObserver>>> observerMap_;
-    std::mutex listMutex_ {};
+    std::mutex listMutex_{};
+    std::shared_ptr<NapiRdbSubscriberManager> jsRdbObsManager_ = nullptr;
+    std::shared_ptr<NapiPublishedSubscriberManager> jsPublishedObsManager_ = nullptr;
 
     struct CreateContextInfo : public AsyncCall::Context {
         napi_env env = nullptr;
         napi_ref ref = nullptr;
         bool isStageMode = true;
-        std::string strUri = "";
+        CreateOptions options;
+        std::string strUri;
         std::shared_ptr<AppExecFwk::Context> contextF = nullptr;
         std::shared_ptr<OHOS::AbilityRuntime::Context> contextS = nullptr;
         std::shared_ptr<DataShareHelper> dataShareHelper = nullptr;
@@ -86,6 +100,9 @@ private:
         std::vector<DataShareValuesBucket> values;
         std::string mimeTypeFilter;
         DatashareBusinessError businessError;
+        Data publishData;
+        std::string bundleName;
+        std::vector<OperationResult> results;
 
         ContextInfo() : Context(nullptr, nullptr) {};
         ContextInfo(InputAction input, OutputAction output) : Context(std::move(input), std::move(output)) {};
@@ -107,6 +124,6 @@ private:
         }
     };
 };
-}  // namespace DataShare
-}  // namespace OHOS
+} // namespace DataShare
+} // namespace OHOS
 #endif /* NAPI_DATASHARE_HELPER_H */

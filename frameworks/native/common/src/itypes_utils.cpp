@@ -169,4 +169,115 @@ bool ITypesUtils::Unmarshalling(Parcel &parcel, DataShareValueObject &valueObjec
 {
     return ITypesUtils::Unmarshal(parcel, valueObject.value);
 }
+
+bool ITypesUtils::Marshalling(const PredicateTemplateNode &node, Parcel &parcel)
+{
+    return ITypesUtils::Marshal(parcel, node.key_, node.selectSql_);
+}
+
+bool ITypesUtils::Unmarshalling(Parcel &parcel, PredicateTemplateNode &node)
+{
+    return ITypesUtils::Unmarshal(parcel, node.key_, node.selectSql_);
+}
+
+bool ITypesUtils::Marshalling(const Template &templat, Parcel &parcel)
+{
+    return ITypesUtils::Marshal(parcel, templat.predicates_, templat.scheduler_);
+}
+
+bool ITypesUtils::Unmarshalling(Parcel &parcel, Template &templat)
+{
+    return ITypesUtils::Unmarshal(parcel, templat.predicates_, templat.scheduler_);
+}
+
+bool ITypesUtils::Marshalling(const Data &data, MessageParcel &parcel)
+{
+    if (!parcel.WriteInt32(data.datas_.size())) {
+        return false;
+    }
+    for (const auto & dataItem : data.datas_) {
+        if (!ITypesUtils::Marshalling(dataItem, parcel)) {
+            return false;
+        }
+    }
+    return parcel.WriteInt32(data.version_);
+}
+
+bool ITypesUtils::Marshalling(const PublishedDataItem &dataItem, MessageParcel &parcel)
+{
+    if (!parcel.WriteString(dataItem.key_)) {
+        return false;
+    }
+    if (!parcel.WriteInt64(dataItem.subscriberId_)) {
+        return false;
+    }
+    auto index = static_cast<uint32_t>(dataItem.value_.index());
+    if (!parcel.WriteUint32(index)) {
+        return false;
+    }
+    if (index == 0) {
+        return parcel.WriteAshmem(std::get<sptr<Ashmem>>(dataItem.value_));
+    }
+    return parcel.WriteString(std::get<std::string>(dataItem.value_));
+}
+
+bool ITypesUtils::Unmarshalling(MessageParcel &parcel, PublishedDataItem &dataItem)
+{
+    std::string key = parcel.ReadString();
+    auto subscriberId = parcel.ReadInt64();
+    auto index = parcel.ReadUint32();
+    std::variant<sptr<Ashmem>, std::string> value;
+    if (index == 0) {
+        value = parcel.ReadAshmem();
+    } else {
+        value = parcel.ReadString();
+    }
+    dataItem.key_ = key;
+    dataItem.subscriberId_ = subscriberId;
+    dataItem.value_ = value;
+    return true;
+}
+
+bool ITypesUtils::Unmarshalling(MessageParcel &parcel, std::vector<PublishedDataItem> &publishedDataItems)
+{
+    int32_t len = parcel.ReadInt32();
+    if (len < 0) {
+        return false;
+    }
+    size_t size = static_cast<size_t>(len);
+    size_t readAbleSize = parcel.GetReadableBytes();
+    if ((size > readAbleSize) || (size > publishedDataItems.max_size())) {
+        return false;
+    }
+
+    for (size_t i = 0; i < size; i++) {
+        PublishedDataItem value;
+        if (!ITypesUtils::Unmarshalling(parcel, value)) {
+            return false;
+        }
+        publishedDataItems.emplace_back(std::move(value));
+    }
+    return true;
+}
+
+bool ITypesUtils::Unmarshalling(Parcel &parcel, RdbChangeNode &changeNode)
+{
+    return ITypesUtils::Unmarshal(parcel, changeNode.uri_, changeNode.templateId_.subscriberId_,
+                                  changeNode.templateId_.bundleName_, changeNode.data_);
+}
+
+bool ITypesUtils::Unmarshalling(MessageParcel &parcel, PublishedDataChangeNode &changeNode)
+{
+    auto bundleName = parcel.ReadString();
+    if (!Unmarshalling(parcel, changeNode.datas_ )) {
+        return false;
+    }
+    changeNode.ownerBundleName_ = bundleName;
+    return true;
+}
+
+bool ITypesUtils::Unmarshalling(Parcel &parcel, OperationResult &result)
+{
+    return ITypesUtils::Unmarshal(parcel, result.key_, result.errCode_);
+}
 } // namespace OHOS::DataShare

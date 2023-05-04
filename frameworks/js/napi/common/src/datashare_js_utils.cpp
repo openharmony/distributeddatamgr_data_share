@@ -14,6 +14,9 @@
  */
 
 #include "datashare_js_utils.h"
+
+#include <napi_ashmem.h>
+
 #include "datashare_log.h"
 
 #include "securec.h"
@@ -273,7 +276,6 @@ std::string DataShareJSUtils::UnwrapStringFromJS(napi_env env, napi_value param,
     return value;
 }
 
-
 DataShareValueObject DataShareJSUtils::Convert2ValueObject(napi_env env, napi_value value, bool &status)
 {
     napi_valuetype valueType = napi_undefined;
@@ -314,6 +316,446 @@ bool DataShareJSUtils::Equals(napi_env env, napi_value value, napi_ref copy)
     bool isEqual = false;
     napi_strict_equals(env, value, copyValue, &isEqual);
     return isEqual;
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const TemplateId &templateId)
+{
+    napi_value tplId = nullptr;
+    napi_create_object(env, &tplId);
+    napi_value subscriberId = nullptr;
+    subscriberId = Convert2JSValue(env, templateId.subscriberId_);
+    if (subscriberId == nullptr) {
+        return nullptr;
+    }
+    napi_value bundleName = nullptr;
+    bundleName = Convert2JSValue(env, templateId.bundleName_);
+    if (bundleName == nullptr) {
+        return nullptr;
+    }
+    napi_set_named_property(env, tplId, "subscriberId", subscriberId);
+    napi_set_named_property(env, tplId, "bundleName", bundleName);
+    return tplId;
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const RdbChangeNode &changeNode)
+{
+    napi_value jsRdbChangeNode = nullptr;
+    napi_create_object(env, &jsRdbChangeNode);
+
+    napi_value uri = nullptr;
+    uri = Convert2JSValue(env, changeNode.uri_);
+    if (uri == nullptr) {
+        return nullptr;
+    }
+    napi_value templateId = nullptr;
+    templateId = Convert2JSValue(env, changeNode.templateId_);
+    if (templateId == nullptr) {
+        return nullptr;
+    }
+    napi_value data = nullptr;
+    data = Convert2JSValue(env, changeNode.data_);
+    if (data == nullptr) {
+        return nullptr;
+    }
+    napi_set_named_property(env, jsRdbChangeNode, "uri", uri);
+    napi_set_named_property(env, jsRdbChangeNode, "templateId", templateId);
+    napi_set_named_property(env, jsRdbChangeNode, "data", data);
+    return jsRdbChangeNode;
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, sptr<Ashmem> &ashmem)
+{
+    napi_value global = nullptr;
+    napi_status status = napi_get_global(env, &global);
+    if (status != napi_ok) {
+        LOG_ERROR("get napi global failed");
+        return nullptr;
+    }
+    napi_value constructor = nullptr;
+    status = napi_get_named_property(env, global, "AshmemConstructor_", &constructor);
+    if (status != napi_ok) {
+        LOG_ERROR("get Ashmem constructor failed");
+        return nullptr;
+    }
+    napi_value jsAshmem;
+    status = napi_new_instance(env, constructor, 0, nullptr, &jsAshmem);
+    if (status != napi_ok) {
+        LOG_ERROR("failed to construct js Ashmem");
+        return nullptr;
+    }
+
+    NAPIAshmem *napiAshmem = nullptr;
+    napi_unwrap(env, jsAshmem, (void **)&napiAshmem);
+    if (napiAshmem == nullptr) {
+        LOG_ERROR("napiAshmem is null");
+        return nullptr;
+    }
+    napiAshmem->SetAshmem(ashmem);
+    return jsAshmem;
+
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const PublishedDataItem &publishedDataItem)
+{
+    napi_value jsPublishedDataItem = nullptr;
+    napi_create_object(env, &jsPublishedDataItem);
+
+    napi_value key = nullptr;
+    key = Convert2JSValue(env, publishedDataItem.key_);
+    if (key == nullptr) {
+        return nullptr;
+    }
+
+    napi_value subscriberId = nullptr;
+    subscriberId = Convert2JSValue(env, publishedDataItem.subscriberId_);
+    if (subscriberId == nullptr) {
+        return nullptr;
+    }
+
+    napi_value data = nullptr;
+    if (publishedDataItem.value_.index() == 0) {
+        auto ashmem = std::get<sptr<Ashmem>>(publishedDataItem.value_);
+        data = Convert2JSValue(env, ashmem);
+    } else {
+        auto valueStr = std::get<std::string>(publishedDataItem.value_);
+        data = Convert2JSValue(env, valueStr);
+    }
+    if (data == nullptr) {
+        return nullptr;
+    }
+
+    napi_set_named_property(env, jsPublishedDataItem, "key", key);
+    napi_set_named_property(env, jsPublishedDataItem, "subscriberId", subscriberId);
+    napi_set_named_property(env, jsPublishedDataItem, "data", data);
+    return jsPublishedDataItem;
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<PublishedDataItem> &publishedDataItems)
+{
+    napi_value jsValue;
+    napi_status status = napi_create_array_with_length(env, publishedDataItems.size(), &jsValue);
+    if (status != napi_ok) {
+        return nullptr;
+    }
+
+    for (size_t i = 0; i < publishedDataItems.size(); ++i) {
+        napi_set_element(env, jsValue, i, Convert2JSValue(env, publishedDataItems[i]));
+    }
+    return jsValue;
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const PublishedDataChangeNode &changeNode)
+{
+    napi_value jsPublishedDataChangeNode = nullptr;
+    napi_create_object(env, &jsPublishedDataChangeNode);
+
+    napi_value bundleName = nullptr;
+    bundleName = Convert2JSValue(env, changeNode.ownerBundleName_);
+    if (bundleName == nullptr) {
+        return nullptr;
+    }
+    napi_value data = nullptr;
+    data = Convert2JSValue(env, changeNode.datas_);
+    if (data == nullptr) {
+        return nullptr;
+    }
+    napi_set_named_property(env, jsPublishedDataChangeNode, "bundleName", bundleName);
+    napi_set_named_property(env, jsPublishedDataChangeNode, "data", data);
+    return jsPublishedDataChangeNode;
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const OperationResult &results)
+{
+    napi_value jsOperationResult = nullptr;
+    napi_create_object(env, &jsOperationResult);
+
+    napi_value key = nullptr;
+    key = Convert2JSValue(env, results.key_);
+    if (key == nullptr) {
+        return nullptr;
+    }
+
+    napi_value result = nullptr;
+    result = Convert2JSValue(env, results.errCode_);
+    if (result == nullptr) {
+        return nullptr;
+    }
+    napi_set_named_property(env, jsOperationResult, "key", key);
+    napi_set_named_property(env, jsOperationResult, "result", result);
+    return jsOperationResult;
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<OperationResult> &results)
+{
+    napi_value jsValue;
+    napi_status status = napi_create_array_with_length(env, results.size(), &jsValue);
+    if (status != napi_ok) {
+        return nullptr;
+    }
+
+    for (size_t i = 0; i < results.size(); ++i) {
+        napi_set_element(env, jsValue, i, Convert2JSValue(env, results[i]));
+    }
+    return jsValue;
+}
+
+bool DataShareJSUtils::UnwrapTemplatePredicates(napi_env env, napi_value jsPredicates,
+    std::vector<PredicateTemplateNode> &predicates)
+{
+    napi_value keys = nullptr;
+    napi_get_property_names(env, jsPredicates, &keys);
+    uint32_t arrLen = 0;
+    napi_status status = napi_get_array_length(env, keys, &arrLen);
+    if (status != napi_ok) {
+        LOG_ERROR("UnwrapTemplatePredicates error");
+        return false;
+    }
+    LOG_DEBUG("TemplatePredicates length : %{public}u", arrLen);
+    for (size_t i = 0; i < arrLen; ++i) {
+        napi_value key = nullptr;
+        status = napi_get_element(env, keys, i, &key);
+        if (status != napi_ok) {
+            LOG_ERROR("UnwrapTemplatePredicates err");
+            return false;
+        }
+        napi_value value = nullptr;
+        status = napi_get_property(env, jsPredicates, key, &value);
+        if (status != napi_ok) {
+            LOG_ERROR("UnwrapTemplatePredicates err");
+            return false;
+        }
+        std::string keyStr = UnwrapStringFromJS(env, key);
+        std::string valueStr = UnwrapStringFromJS(env, value);
+        PredicateTemplateNode node(keyStr, valueStr);
+        predicates.emplace_back(node);
+    }
+    return true;
+}
+
+Template DataShareJSUtils::Convert2Template(napi_env env, napi_value value)
+{
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, value, &valueType);
+    if (valueType != napi_object) {
+        LOG_ERROR("Convert2Template error, value is not object");
+        return {};
+    }
+    napi_value jsPredicates;
+    auto status =  napi_get_named_property(env, value, "predicates", &jsPredicates);
+    if (status != napi_ok) {
+        LOG_ERROR("Convert predicates failed");
+        return {};
+    }
+    std::vector<PredicateTemplateNode> predicates;
+    if (!UnwrapTemplatePredicates(env, jsPredicates, predicates)) {
+        LOG_ERROR("UnwrapTemplateNodeVector failed");
+        return {};
+    }
+
+    std::string scheduler;
+    if (!UnwrapStringByPropertyName(env, value, "scheduler", scheduler)) {
+        LOG_ERROR("Convert scheduler failed");
+        return {};
+    }
+    Template tpl(predicates, scheduler);
+    return tpl;
+}
+
+TemplateId DataShareJSUtils::Convert2TemplateId(napi_env env, napi_value value)
+{
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, value, &valueType);
+    if (valueType != napi_object) {
+        LOG_ERROR("Convert2TemplateId error, value is not object");
+        return {};
+    }
+
+    TemplateId templateId;
+    napi_value jsSubscriberId = nullptr;
+    auto status = napi_get_named_property(env, value, "subscriberId", &jsSubscriberId);
+    if (status != napi_ok) {
+        LOG_ERROR("Convert predicates failed");
+        return {};
+    }
+    if (jsSubscriberId == nullptr) {
+        LOG_ERROR("Convert subscriberId failed");
+        return {};
+    }
+    status = napi_get_value_int64(env, jsSubscriberId, &templateId.subscriberId_);
+    if (status != napi_ok) {
+        LOG_ERROR("Convert subscriberId failed");
+        return {};
+    }
+    if (!UnwrapStringByPropertyName(env, value, "bundleNameOfOwner", templateId.bundleName_)) {
+        LOG_ERROR("Convert bundleNameOfOwner failed");
+        return {};
+    }
+    return templateId;
+}
+
+bool DataShareJSUtils::UnwrapPublishedDataItem(napi_env env, napi_value jsObject, PublishedDataItem &publishedDataItem)
+{
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, jsObject, &valueType);
+    if (valueType != napi_object) {
+        LOG_ERROR("UnwrapPublishedDataItem error, value is not object");
+        return false;
+    }
+
+    std::string key;
+    if (!UnwrapStringByPropertyName(env, jsObject, "key", key)) {
+        LOG_ERROR("Convert key failed");
+        return false;
+    }
+
+    std::variant<sptr<Ashmem>, std::string> dataValue;
+    std::string keyStr = "data";
+    napi_value jsDataKey = Convert2JSValue(env, keyStr);
+    napi_value jsDataValue = nullptr;
+    napi_get_property(env, jsObject, jsDataKey, &jsDataValue);
+    napi_typeof(env, jsDataValue, &valueType);
+    if (valueType == napi_object) {
+        sptr<Ashmem> ashmem = Convert2Ashmem(env, jsDataValue);
+        if (ashmem == nullptr) {
+            LOG_ERROR("Convert ashmem failed");
+            return false;
+        }
+        dataValue = ashmem;
+    } else if (valueType == napi_string) {
+        dataValue = Convert2String(env, jsDataValue);
+    } else {
+        LOG_ERROR("Convert dataValue failed, type is %{public}d", valueType);
+        return false;
+    }
+
+    napi_value jsSubscriberId = nullptr;
+    auto status =  napi_get_named_property(env, jsObject, "subscriberId", &jsSubscriberId);
+    if (status != napi_ok) {
+        LOG_ERROR("Convert predicates failed");
+        return {};
+    }
+    if (jsSubscriberId == nullptr) {
+        LOG_ERROR("Convert subscriberId failed");
+        return false;
+    }
+
+    int64_t subscriberId = 0;
+    status = napi_get_value_int64(env, jsSubscriberId, &subscriberId);
+    if (status != napi_ok) {
+        LOG_ERROR("Convert subscriberId failed");
+        return false;
+    }
+
+    publishedDataItem.key_ = key;
+    publishedDataItem.value_ = dataValue;
+    publishedDataItem.subscriberId_ = subscriberId;
+    return true;
+}
+bool DataShareJSUtils::IsArrayForNapiValue(napi_env env, napi_value param, uint32_t &arraySize)
+{
+    bool isArray = false;
+    arraySize = 0;
+
+    if (napi_is_array(env, param, &isArray) != napi_ok || isArray == false) {
+        return false;
+    }
+
+    if (napi_get_array_length(env, param, &arraySize) != napi_ok) {
+        return false;
+    }
+    return true;
+}
+bool DataShareJSUtils::UnwrapPublishedDataItemVector(napi_env env, napi_value value,
+    std::vector<PublishedDataItem> &publishedDataItems)
+{
+    uint32_t arraySize = 0;
+    std::string strValue;
+
+    if (!IsArrayForNapiValue(env, value, arraySize)) {
+        LOG_ERROR("IsArrayForNapiValue is false");
+        return false;
+    }
+
+    for (uint32_t i = 0; i < arraySize; i++) {
+        napi_value jsValue = nullptr;
+        if (napi_get_element(env, value, i, &jsValue) != napi_ok) {
+            LOG_ERROR("napi_get_element is false");
+            return false;
+        }
+
+        PublishedDataItem publishedDataItem;
+        if (!UnwrapPublishedDataItem(env, jsValue, publishedDataItem)) {
+            LOG_ERROR("UnwrapPublishedDataItem failed");
+            return false;
+        }
+        publishedDataItems.emplace_back(publishedDataItem);
+    }
+    return true;
+}
+
+Data DataShareJSUtils::Convert2PublishedData(napi_env env, napi_value value)
+{
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, value, &valueType);
+    if (valueType != napi_object) {
+        LOG_ERROR("Convert2PublishedData error, value is not object");
+        return {};
+    }
+    Data data;
+    if (!UnwrapPublishedDataItemVector(env, value,  data.datas_)) {
+        LOG_ERROR("UnwrapPublishedDataItems failed");
+        return {};
+    }
+    return data;
+}
+
+sptr<Ashmem> DataShareJSUtils::Convert2Ashmem(napi_env env, napi_value value)
+{
+    LOG_INFO("napi_value %{public}p", &value);
+    napi_value global = nullptr;
+    napi_get_global(env, &global);
+    napi_value constructor = nullptr;
+    napi_status status = napi_get_named_property(env, global, "AshmemConstructor_", &constructor);
+    if (status != napi_ok) {
+        LOG_ERROR("get Ashmem constructor failed");
+        return nullptr;
+    }
+    bool isAshmem = false;
+    napi_instanceof(env, value, constructor, &isAshmem);
+    if (!isAshmem) {
+        LOG_ERROR("parameter is not instanceof Ashmem");
+        return nullptr;
+    }
+    NAPIAshmem *napiAshmem = nullptr;
+    napi_unwrap(env, value, (void **)&napiAshmem);
+    if (napiAshmem == nullptr) {
+        LOG_ERROR("napiAshmem is null");
+        return nullptr;
+    }
+    sptr<Ashmem> nativeAshmem = napiAshmem->GetAshmem();
+    return nativeAshmem;
+}
+bool DataShareJSUtils::UnwrapStringByPropertyName(
+    napi_env env, napi_value jsObject, const char *propertyName, std::string &value)
+{
+    napi_value jsResult = nullptr;
+    auto status = napi_get_named_property(env, jsObject, propertyName, &jsResult);
+    if (status != napi_ok) {
+        LOG_ERROR("Convert bundleNameOfOwner failed");
+        return false;
+    }
+    if (jsResult == nullptr) {
+        LOG_ERROR("Convert bundleNameOfOwner failed");
+        return false;
+    }
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, jsResult, &valueType);
+    if (valueType != napi_string) {
+        LOG_ERROR("Convert2PublishedData error, value is not object");
+        return false;
+    }
+    value = DataShareJSUtils::Convert2String(env, jsResult);
+    return true;
 }
 } // namespace DataShare
 } // namespace OHOS

@@ -17,6 +17,7 @@
 #define DATASHARE_COMMON_ITYPES_UTIL_H
 
 #include "datashare_predicates.h"
+#include "datashare_template.h"
 #include "datashare_values_bucket.h"
 #include "parcel.h"
 
@@ -68,6 +69,25 @@ public:
 
     static bool Marshalling(const DataShareValueObject &valueObject, Parcel &parcel);
     static bool Unmarshalling(Parcel &parcel, DataShareValueObject &valueObject);
+
+    static bool Marshalling(const PredicateTemplateNode &node, Parcel &parcel);
+    static bool Unmarshalling(Parcel &parcel, PredicateTemplateNode &node);
+
+    static bool Marshalling(const Template &templat, Parcel &parcel);
+    static bool Unmarshalling(Parcel &parcel, Template &templat);
+
+    static bool Unmarshalling(Parcel &parcel, OperationResult &result);
+
+    static bool Marshalling(const PublishedDataItem &dataItem, MessageParcel &parcel);
+    static bool Unmarshalling(MessageParcel &parcel, PublishedDataItem &dataItem);
+
+    static bool Unmarshalling(MessageParcel &parcel, std::vector<PublishedDataItem> &vector);
+
+    static bool Marshalling(const Data &data, MessageParcel &parcel);
+
+    static bool Unmarshalling(Parcel &parcel, RdbChangeNode &changeNode);
+
+    static bool Unmarshalling(MessageParcel &parcel, PublishedDataChangeNode &changeNode);
 
     template<typename T>
     static bool Marshalling(const std::vector<T> &params, Parcel &parcel);

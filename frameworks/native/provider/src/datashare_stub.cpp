@@ -310,7 +310,6 @@ ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
     return DATA_SHARE_NO_ERROR;
 }
 
-
 ErrCode DataShareStub::CmdRegisterObserver(MessageParcel &data, MessageParcel &reply)
 {
     std::shared_ptr<Uri> uri = nullptr;
@@ -396,6 +395,74 @@ ErrCode DataShareStub::CmdDenormalizeUri(MessageParcel &data, MessageParcel &rep
         return ERR_INVALID_VALUE;
     }
     return DATA_SHARE_NO_ERROR;
+}
+
+int DataShareStub::AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl)
+{
+    return -1;
+}
+
+int DataShareStub::DelQueryTemplate(const std::string &uri, int64_t subscriberId)
+{
+    return -1;
+}
+
+std::vector<OperationResult> DataShareStub::Publish(const Data &data, const std::string &bundleName)
+{
+    return {};
+}
+
+Data DataShareStub::GetPublishedData(const std::string &bundleName)
+{
+    return {};
+}
+
+std::vector<OperationResult> DataShareStub::SubscribeRdbData(const std::vector<std::string> &uris,
+    const TemplateId &templateId, const sptr<IDataProxyRdbObserver> &observer)
+{
+    return {};
+}
+
+std::vector<OperationResult> DataShareStub::UnSubscribeRdbData(
+    const std::vector<std::string> &uris, const TemplateId &templateId)
+{
+    return {};
+}
+
+std::vector<OperationResult> DataShareStub::EnableSubscribeRdbData(
+    const std::vector<std::string> &uris, const TemplateId &templateId)
+{
+    return {};
+}
+
+std::vector<OperationResult> DataShareStub::DisableSubscribeRdbData(
+    const std::vector<std::string> &uris, const TemplateId &templateId)
+{
+    return {};
+}
+
+std::vector<OperationResult> DataShareStub::SubscribePublishedData(const std::vector<std::string> &uris,
+    int64_t subscriberId, const sptr<IDataProxyPublishedDataObserver> &observer)
+{
+    return {};
+}
+
+std::vector<OperationResult> DataShareStub::UnSubscribePublishedData(
+    const std::vector<std::string> &uris, int64_t subscriberId)
+{
+    return {};
+}
+
+std::vector<OperationResult> DataShareStub::EnableSubscribePublishedData(
+    const std::vector<std::string> &uris, int64_t subscriberId)
+{
+    return {};
+}
+
+std::vector<OperationResult> DataShareStub::DisableSubscribePublishedData(
+    const std::vector<std::string> &uris, int64_t subscriberId)
+{
+    return {};
 }
 } // namespace DataShare
 } // namespace OHOS

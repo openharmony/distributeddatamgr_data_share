@@ -125,7 +125,6 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri,
     return result;
 }
 
-
 int DataShareServiceProxy::OpenFile(const Uri &uri, const std::string &mode)
 {
     return 0;
@@ -175,5 +174,314 @@ Uri DataShareServiceProxy::DenormalizeUri(const Uri &uri)
 {
     return Uri("");
 }
+
+int DataShareServiceProxy::AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return DATA_SHARE_ERROR;
+    }
+    if (!ITypesUtils::Marshal(data, uri, subscriberId, tpl)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return DATA_SHARE_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_ADD_TEMPLATE, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("AddTemplate fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
+        return DATA_SHARE_ERROR;
+    }
+    return reply.ReadInt32();
 }
+
+int DataShareServiceProxy::DelQueryTemplate(const std::string &uri, int64_t subscriberId)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return DATA_SHARE_ERROR;
+    }
+    if (!ITypesUtils::Marshal(data, uri, subscriberId)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return DATA_SHARE_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_DEL_TEMPLATE, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("AddTemplate fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
+        return DATA_SHARE_ERROR;
+    }
+    return reply.ReadInt32();
 }
+
+std::vector<OperationResult> DataShareServiceProxy::Publish(const Data &data, const std::string &bundleName)
+{
+    std::vector<OperationResult> results;
+    MessageParcel parcel;
+    if (!parcel.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+    if (!ITypesUtils::Marshalling(data, parcel)) {
+        LOG_ERROR("Write data failed!");
+        return results;
+    }
+    if (!parcel.WriteString(bundleName)) {
+        LOG_ERROR("Write bundleName failed!");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_PUBLISH, parcel, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("Publish fail to SendRequest. err: %{public}d", err);
+        return results;
+    }
+
+    ITypesUtils::Unmarshal(reply, results);
+    return results;
+}
+
+Data DataShareServiceProxy::GetPublishedData(const std::string &bundleName)
+{
+    Data results;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+    if (!ITypesUtils::Marshal(data, bundleName)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_GET_DATA, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("AddTemplate fail to SendRequest, err: %{public}d", err);
+        return results;
+    }
+    ITypesUtils::Unmarshalling(reply,  results.datas_);
+    return results;
+}
+
+std::vector<OperationResult> DataShareServiceProxy::SubscribeRdbData(const std::vector<std::string> &uris,
+    const TemplateId &templateId, const sptr<IDataProxyRdbObserver> &observer)
+{
+    std::vector<OperationResult> results;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+
+    if (!ITypesUtils::Marshal(data, uris, templateId.subscriberId_, templateId.bundleName_)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return results;
+    }
+    if (!data.WriteRemoteObject(observer->AsObject())) {
+        LOG_ERROR("failed to WriteParcelable dataObserver ");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_SUBSCRIBE_RDB, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("SubscribeRdbData fail to SendRequest. err: %{public}d", err);
+        return results;
+    }
+    ITypesUtils::Unmarshal(reply, results);
+    return results;
+}
+
+std::vector<OperationResult> DataShareServiceProxy::UnSubscribeRdbData(
+    const std::vector<std::string> &uris, const TemplateId &templateId)
+{
+    std::vector<OperationResult> results;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+
+    if (!ITypesUtils::Marshal(data, uris, templateId.subscriberId_, templateId.bundleName_)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_UNSUBSCRIBE_RDB, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
+        return results;
+    }
+    ITypesUtils::Unmarshal(reply, results);
+    return results;
+}
+
+std::vector<OperationResult> DataShareServiceProxy::EnableSubscribeRdbData(
+    const std::vector<std::string> &uris, const TemplateId &templateId)
+{
+    std::vector<OperationResult> results;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+
+    if (!ITypesUtils::Marshal(data, uris, templateId.subscriberId_, templateId.bundleName_)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_ENABLE_SUBSCRIBE_RDB, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
+        return results;
+    }
+    ITypesUtils::Unmarshal(reply, results);
+    return results;
+}
+
+std::vector<OperationResult> DataShareServiceProxy::DisableSubscribeRdbData(
+    const std::vector<std::string> &uris, const TemplateId &templateId)
+{
+    std::vector<OperationResult> results;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+
+    if (!ITypesUtils::Marshal(data, uris, templateId.subscriberId_, templateId.bundleName_)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_DISABLE_SUBSCRIBE_RDB, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
+        return results;
+    }
+    ITypesUtils::Unmarshal(reply, results);
+    return results;
+}
+
+std::vector<OperationResult> DataShareServiceProxy::SubscribePublishedData(
+    const std::vector<std::string> &uris, int64_t subscriberId, const sptr<IDataProxyPublishedDataObserver> &observer)
+{
+    std::vector<OperationResult> results;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+    if (!ITypesUtils::Marshal(data, uris, subscriberId)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return results;
+    }
+    if (!data.WriteRemoteObject(observer->AsObject())) {
+        LOG_ERROR("failed to WriteRemoteObject dataObserver ");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_SUBSCRIBE_PUBLISHED, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
+        return results;
+    }
+    ITypesUtils::Unmarshal(reply, results);
+    return results;
+}
+
+std::vector<OperationResult> DataShareServiceProxy::UnSubscribePublishedData(
+    const std::vector<std::string> &uris, int64_t subscriberId)
+{
+    std::vector<OperationResult> results;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+    if (!ITypesUtils::Marshal(data, uris, subscriberId)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_UNSUBSCRIBE_PUBLISHED, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
+        return results;
+    }
+    ITypesUtils::Unmarshal(reply, results);
+    return results;
+}
+
+std::vector<OperationResult> DataShareServiceProxy::EnableSubscribePublishedData(
+    const std::vector<std::string> &uris, int64_t subscriberId)
+{
+    std::vector<OperationResult> results;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+    if (!ITypesUtils::Marshal(data, uris, subscriberId)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_ENABLE_SUBSCRIBE_PUBLISHED, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
+        return results;
+    }
+    ITypesUtils::Unmarshal(reply, results);
+    return results;
+}
+
+std::vector<OperationResult> DataShareServiceProxy::DisableSubscribePublishedData(
+    const std::vector<std::string> &uris, int64_t subscriberId)
+{
+    std::vector<OperationResult> results;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+    if (!ITypesUtils::Marshal(data, uris, subscriberId)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_DISABLE_SUBSCRIBE_PUBLISHED, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
+        return results;
+    }
+    ITypesUtils::Unmarshal(reply, results);
+    return results;
+}
+} // namespace DataShare
+} // namespace OHOS

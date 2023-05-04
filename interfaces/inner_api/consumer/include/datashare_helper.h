@@ -16,15 +16,17 @@
 #ifndef DATASHARE_HELPER_H
 #define DATASHARE_HELPER_H
 
-
 #include <map>
 #include <memory>
 #include <mutex>
+#include <published_data_subscriber_manager.h>
 #include <string>
 
 #include "base_connection.h"
 #include "context.h"
 #include "datashare_business_error.h"
+#include "datashare_template.h"
+#include "rdb_subscriber_manager.h"
 #include "uri.h"
 
 using Uri = OHOS::Uri;
@@ -33,7 +35,7 @@ namespace OHOS {
 namespace AppExecFwk {
 class PacMap;
 class IDataAbilityObserver;
-}
+} // namespace AppExecFwk
 
 namespace DataShare {
 using string = std::string;
@@ -88,6 +90,8 @@ public:
      * @return Returns the created DataShareHelper instance.
      */
     static std::shared_ptr<DataShareHelper> Creator(const sptr<IRemoteObject> &token, const std::string &strUri);
+
+    static std::shared_ptr<DataShareHelper> Creator(const std::string &strUri, const CreateOptions &options);
 
     /**
      * @brief Releases the client resource of the Data share.
@@ -273,17 +277,52 @@ public:
      */
     Uri DenormalizeUri(Uri &uri);
 
+    int AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl);
+
+    int DelQueryTemplate(const std::string &uri, int64_t subscriberId);
+
+    std::vector<OperationResult> Publish(const Data &data, const std::string &bundleName);
+
+    Data GetPublishedData(const std::string &bundleName);
+
+    std::vector<OperationResult> SubscribeRdbData(const std::vector<std::string> &uris, const TemplateId &templateId,
+        const std::function<void(const RdbChangeNode &changeNode)> &callback);
+
+    std::vector<OperationResult> UnSubscribeRdbData(const std::vector<std::string> &uris, const TemplateId &templateId);
+
+    std::vector<OperationResult> EnableSubscribeRdbData(const std::vector<std::string> &uris,
+        const TemplateId &templateId);
+
+    std::vector<OperationResult> DisableSubscribeRdbData(const std::vector<std::string> &uris,
+        const TemplateId &templateId);
+
+    std::vector<OperationResult> SubscribePublishedData(const std::vector<std::string> &uris, int64_t subscriberId,
+        const std::function<void(const PublishedDataChangeNode &changeNode)> &callback);
+
+    std::vector<OperationResult> UnSubscribePublishedData(const std::vector<std::string> &uris, int64_t subscriberId);
+
+    std::vector<OperationResult> EnableSubscribePublishedData(const std::vector<std::string> &uris,
+        int64_t subscriberId);
+
+    std::vector<OperationResult> DisableSubscribePublishedData(const std::vector<std::string> &uris,
+        int64_t subscriberId);
+
+    void UnSubscribeAllObservers();
+
 private:
     DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,
-         std::shared_ptr<BaseConnection> dataShareConnection);
+        std::shared_ptr<BaseConnection> dataShareConnection);
     DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri);
+    DataShareHelper(const CreateOptions &options, const Uri &uri, std::shared_ptr<BaseConnection> dataShareConnection);
     bool isDataShareService_ = false;
     sptr<IRemoteObject> token_ = {};
     Uri uri_ = Uri("");
     std::shared_ptr<BaseConnection> connection_ = nullptr;
     static bool RegObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     static bool UnregObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    std::shared_ptr<RdbSubscriberManager> rdbSubscriberManager_ = nullptr;
+    std::shared_ptr<PublishedDataSubscriberManager> publishedDataSubscriberManager_ = nullptr;
 };
-}  // namespace DataShare
-}  // namespace OHOS
-#endif  // DATASHARE_HELPER_H
+} // namespace DataShare
+} // namespace OHOS
+#endif // DATASHARE_HELPER_H
