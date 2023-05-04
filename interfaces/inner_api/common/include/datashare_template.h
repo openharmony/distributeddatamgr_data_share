@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace DataShare {
+static constexpr int ASHMEM_REF_COUNT = 2;
 struct PredicateTemplateNode {
     PredicateTemplateNode() = default;
     PredicateTemplateNode(const std::string &key, const std::string &selectSql) : key_(key), selectSql_(selectSql) {}
@@ -90,7 +91,7 @@ private:
 			static const OHOS::HiviewDFX::HiLogLabel DATASHARE_LABEL = { LOG_CORE, 0xD001651, "DataShare" };
             (void)OHOS::HiviewDFX::HiLog::Error(DATASHARE_LABEL,
                 "try close %{public}s, %{public}d", key_.c_str(), ashmem->GetSptrRefCount());
-            if (ashmem != nullptr && ashmem->GetSptrRefCount() == 2) {
+            if (ashmem != nullptr && ashmem->GetSptrRefCount() == ASHMEM_REF_COUNT) {
                 (void)OHOS::HiviewDFX::HiLog::Error(DATASHARE_LABEL,
                                                     "close %{public}s, %{public}p", key_.c_str(), ashmem.GetRefPtr());
                 ashmem->UnmapAshmem();

@@ -600,7 +600,6 @@ bool DataShareJSUtils::UnwrapPublishedDataItem(napi_env env, napi_value jsObject
         LOG_ERROR("UnwrapPublishedDataItem error, value is not object");
         return false;
     }
-
     std::string key;
     if (!UnwrapStringByPropertyName(env, jsObject, "key", key)) {
         LOG_ERROR("Convert key failed");
@@ -626,30 +625,24 @@ bool DataShareJSUtils::UnwrapPublishedDataItem(napi_env env, napi_value jsObject
         LOG_ERROR("Convert dataValue failed, type is %{public}d", valueType);
         return false;
     }
-
     napi_value jsSubscriberId = nullptr;
     auto status =  napi_get_named_property(env, jsObject, "subscriberId", &jsSubscriberId);
-    if (status != napi_ok) {
-        LOG_ERROR("Convert predicates failed");
-        return {};
-    }
-    if (jsSubscriberId == nullptr) {
-        LOG_ERROR("Convert subscriberId failed");
+    if (status != napi_ok || jsSubscriberId == nullptr) {
+        LOG_ERROR("get jsSubscriberId failed, status is %{public}d", status);
         return false;
     }
-
     int64_t subscriberId = 0;
     status = napi_get_value_int64(env, jsSubscriberId, &subscriberId);
     if (status != napi_ok) {
-        LOG_ERROR("Convert subscriberId failed");
+        LOG_ERROR("Convert subscriberId failed, status is %{public}d", status);
         return false;
     }
-
     publishedDataItem.key_ = key;
     publishedDataItem.value_ = dataValue;
     publishedDataItem.subscriberId_ = subscriberId;
     return true;
 }
+
 bool DataShareJSUtils::IsArrayForNapiValue(napi_env env, napi_value param, uint32_t &arraySize)
 {
     bool isArray = false;
@@ -664,6 +657,7 @@ bool DataShareJSUtils::IsArrayForNapiValue(napi_env env, napi_value param, uint3
     }
     return true;
 }
+
 bool DataShareJSUtils::UnwrapPublishedDataItemVector(napi_env env, napi_value value,
     std::vector<PublishedDataItem> &publishedDataItems)
 {
@@ -734,6 +728,7 @@ sptr<Ashmem> DataShareJSUtils::Convert2Ashmem(napi_env env, napi_value value)
     sptr<Ashmem> nativeAshmem = napiAshmem->GetAshmem();
     return nativeAshmem;
 }
+
 bool DataShareJSUtils::UnwrapStringByPropertyName(
     napi_env env, napi_value jsObject, const char *propertyName, std::string &value)
 {
