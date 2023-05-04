@@ -277,36 +277,113 @@ public:
      */
     Uri DenormalizeUri(Uri &uri);
 
+    /**
+     * @brief Adds a template of {@link #SubscribeRdbData}.
+     * @param uri, the uri to add.
+     * @param subscriberId, the subscribe id to add.
+     * @param tpl, the template to add.
+     * @return Returns the error code.
+     */
     int AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl);
 
+    /**
+     * @brief Deletes a template of {@link #SubscribeRdbData}
+     * @param uri, the uri to delete.
+     * @param subscriberId, the subscribe id to delete.
+     * @return Returns the error code.
+     */
     int DelQueryTemplate(const std::string &uri, int64_t subscriberId);
 
+    /**
+     * @brief Update a single data into host data area.
+     * @param data, the data to publish.
+     * @param bundleName the bundleName of data to publish.
+     * @return Returns the error code.
+     */
     std::vector<OperationResult> Publish(const Data &data, const std::string &bundleName);
 
+    /**
+     * @brief Get published data by bundleName.
+     * @param bundleName, the bundleName of data.
+     * @return Data {@link #Data}
+     */
     Data GetPublishedData(const std::string &bundleName);
 
+    /**
+     * @brief Registers observers to observe rdb data specified by the given uris and template.
+     * @param uris, the paths of the data to operate.
+     * @param templateId, the template of observers.
+     * @param callback, the callback function of observers.
+     * @return Returns the error code.
+     */
     std::vector<OperationResult> SubscribeRdbData(const std::vector<std::string> &uris, const TemplateId &templateId,
         const std::function<void(const RdbChangeNode &changeNode)> &callback);
 
+    /**
+     * @brief Unregisters observers used for monitoring data specified by the given uris and template.
+     * @param uris, the paths of the data to operate.
+     * @param templateId, the template of observers.
+     * @return Returns the error code.
+     */
     std::vector<OperationResult> UnSubscribeRdbData(const std::vector<std::string> &uris, const TemplateId &templateId);
 
+    /**
+     * @brief Enable observers by the given uris and template.
+     * @param uris, the paths of the data to operate.
+     * @param templateId, the template of observers.
+     * @return Returns the error code.
+     */
     std::vector<OperationResult> EnableSubscribeRdbData(const std::vector<std::string> &uris,
         const TemplateId &templateId);
 
+    /**
+     * @brief Disable observers by the given uris and template.
+     * @param uris, the paths of the data to operate.
+     * @param templateId, the template of observers.
+     * @return Returns the error code.
+     */
     std::vector<OperationResult> DisableSubscribeRdbData(const std::vector<std::string> &uris,
         const TemplateId &templateId);
 
+    /**
+     * @brief Registers observers to observe published data specified by the given uris and subscriberId.
+     * @param uris, the uris of the data to operate.
+     * @param subscriberId, the subscriberId of observers.
+     * @param callback, the callback function of observers.
+     * @return Returns the error code.
+     */
     std::vector<OperationResult> SubscribePublishedData(const std::vector<std::string> &uris, int64_t subscriberId,
         const std::function<void(const PublishedDataChangeNode &changeNode)> &callback);
 
+    /**
+     * @brief Unregisters observers used for monitoring data specified by the given uris and subscriberId.
+     * @param uris, the uris of the data to operate.
+     * @param subscriberId, the subscriberId of observers.
+     * @return Returns the error code.
+     */
     std::vector<OperationResult> UnSubscribePublishedData(const std::vector<std::string> &uris, int64_t subscriberId);
 
+    /**
+     * @brief Enable observers by the given uris and subscriberId.
+     * @param uris, the paths of the data to operate.
+     * @param subscriberId, the subscriberId of observers.
+     * @return Returns the error code.
+     */
     std::vector<OperationResult> EnableSubscribePublishedData(const std::vector<std::string> &uris,
         int64_t subscriberId);
 
+    /**
+     * @brief Disable observers by the given uris and template.
+     * @param uris, the paths of the data to operate.
+     * @param subscriberId, the subscriberId of observers.
+     * @return Returns the error code.
+     */
     std::vector<OperationResult> DisableSubscribePublishedData(const std::vector<std::string> &uris,
         int64_t subscriberId);
 
+    /**
+     * @brief Unregisters all observers.
+     */
     void UnSubscribeAllObservers();
 
 private:
