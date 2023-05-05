@@ -19,6 +19,7 @@
 #include <condition_variable>
 #include <memory>
 
+#include "ability_connect_callback_stub.h"
 #include "base_connection.h"
 #include "datashare_proxy.h"
 #include "event_handler.h"

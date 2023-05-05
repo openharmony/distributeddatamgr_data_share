@@ -71,8 +71,8 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(std::s
         keys.emplace_back(uri, subscriberId);
     });
     return BaseCallbacks::DelObservers(keys, nullptr,
-        [&proxy, &subscriberId, &uris, this](const std::vector<Key> &lastDelKeys, const std::shared_ptr<Observer> &observer,
-            std::vector<OperationResult> &opResult) {
+        [&proxy, &subscriberId, &uris, this](const std::vector<Key> &lastDelKeys,
+            const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
             // delete all obs
             if (uris.empty()) {
                 for (const auto &key : lastDelKeys) {

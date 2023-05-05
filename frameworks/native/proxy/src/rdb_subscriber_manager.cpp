@@ -76,8 +76,8 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(std::shared_ptr<
         keys.emplace_back(uri, templateId);
     });
     return BaseCallbacks::DelObservers(keys, nullptr,
-        [&proxy, &templateId, &uris, this](const std::vector<Key> &lastDelKeys, const std::shared_ptr<Observer> &observer,
-            std::vector<OperationResult> &opResult) {
+        [&proxy, &templateId, &uris, this](const std::vector<Key> &lastDelKeys,
+            const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
             // delete all obs
             if (uris.empty()) {
                 for (const auto& key : lastDelKeys) {
