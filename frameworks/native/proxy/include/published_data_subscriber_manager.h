@@ -77,7 +77,6 @@ public:
         const std::vector<std::string> &uris, int64_t subscriberId);
     std::vector<OperationResult> DisableObservers(std::shared_ptr<BaseProxy> proxy,
         const std::vector<std::string> &uris, int64_t subscriberId);
-    void DelAllObservers(std::shared_ptr<BaseProxy> proxy);
     void Emit(PublishedDataChangeNode &changeNode);
 
 private:

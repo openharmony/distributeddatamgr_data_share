@@ -48,11 +48,9 @@ ohos_shared_library("datashare_common") {
     "${datashare_common_native_path}/src/itypes_utils.cpp",
     "${datashare_common_native_path}/src/shared_block.cpp",
   ]
-  
-  deps = [
-    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-  ]
-  
+
+  deps = [ "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native" ]
+
   public_deps = []
 
   configs = [ ":ability_config" ]
@@ -66,8 +64,8 @@ ohos_shared_library("datashare_common") {
     "hitrace_native:hitrace_meter",
     "hitrace_native:libhitracechain",
     "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_single",
     "ipc:ipc_napi_common",
+    "ipc:ipc_single",
     "napi:ace_napi",
   ]
 

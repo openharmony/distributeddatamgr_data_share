@@ -104,14 +104,19 @@ bool CallbacksManager<Key, Observer>::IsRegistered(const Observer &observer, con
 
 template<class Key, class Observer>
 std::vector<OperationResult> CallbacksManager<Key, Observer>::DelObservers(const std::vector<Key> &keys,
-    const std::shared_ptr<Observer> observer,
-    std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &, std::vector<OperationResult> &)>
-        processOnLastDel)
+    const std::shared_ptr<Observer> observer, std::function<void(const std::vector<Key> &,
+    const std::shared_ptr<Observer> &, std::vector<OperationResult> &)> processOnLastDel)
 {
     std::vector<OperationResult> result;
     std::vector<Key> lastDelKeys;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
+        if (keys.empty() && observer == nullptr) {
+            for (auto &it : callbacks_) {
+                lastDelKeys.emplace_back(it.first);
+            }
+            callbacks_.clear();
+        }
         for (auto &key : keys) {
             auto it = callbacks_.find(key);
             if (it == callbacks_.end()) {
@@ -143,7 +148,6 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::DelObservers(const
             callbacks_.erase(key);
             lastDelKeys.emplace_back(key);
         }
-
         if (lastDelKeys.empty()) {
             return result;
         }

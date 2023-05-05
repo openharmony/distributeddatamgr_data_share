@@ -15,10 +15,8 @@
 
 #include "datashare_js_utils.h"
 
-#include <napi_ashmem.h>
-
 #include "datashare_log.h"
-
+#include "napi_ashmem.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -704,7 +702,6 @@ Data DataShareJSUtils::Convert2PublishedData(napi_env env, napi_value value)
 
 sptr<Ashmem> DataShareJSUtils::Convert2Ashmem(napi_env env, napi_value value)
 {
-    LOG_INFO("napi_value %{public}p", &value);
     napi_value global = nullptr;
     napi_get_global(env, &global);
     napi_value constructor = nullptr;

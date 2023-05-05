@@ -30,13 +30,7 @@ void NapiObserver::CallbackFunc(uv_work_t *work, int status)
 {
     LOG_DEBUG("RdbObsCallbackFunc start");
     std::shared_ptr<ObserverWorker> innerWorker(reinterpret_cast<ObserverWorker *>(work->data));
-    std::shared_ptr<NapiObserver> observer = nullptr;
-    if (innerWorker->type_ == RDB) {
-        observer = innerWorker->rdbObserver_.lock();
-    } else {
-        observer = innerWorker->publisheObserver_.lock();
-    }
-
+    std::shared_ptr<NapiObserver> observer = innerWorker->observer_.lock();
     if (observer == nullptr || observer->ref_ == nullptr) {
         delete work;
         LOG_ERROR("rdbObserver->ref_ is nullptr");
@@ -54,11 +48,7 @@ void NapiObserver::CallbackFunc(uv_work_t *work, int status)
     napi_value result;
     napi_get_reference_value(observer->env_, observer->ref_, &callback);
     napi_get_global(observer->env_, &global);
-    if (innerWorker->type_ == RDB) {
-        param[0] = DataShareJSUtils::Convert2JSValue(observer->env_, innerWorker->rdbChangeNode_);
-    } else {
-        param[0] = DataShareJSUtils::Convert2JSValue(observer->env_, innerWorker->publishedChangeNode_);
-    }
+    param[0] = innerWorker->getParam();
     napi_status callStatus = napi_call_function(observer->env_, global, callback, 1, param, &result);
     napi_close_handle_scope(observer->env_, scope);
     if (callStatus != napi_ok) {
@@ -66,6 +56,7 @@ void NapiObserver::CallbackFunc(uv_work_t *work, int status)
     }
     delete work;
 }
+
 NapiObserver::~NapiObserver()
 {
     if (ref_ != nullptr) {
@@ -73,6 +64,7 @@ NapiObserver::~NapiObserver()
         ref_ = nullptr;
     }
 }
+
 bool NapiObserver::operator==(const NapiObserver &rhs) const
 {
     if (ref_ == nullptr) {
@@ -89,6 +81,7 @@ bool NapiObserver::operator==(const NapiObserver &rhs) const
     napi_strict_equals(env_, value1, value2, &isEqual);
     return isEqual;
 }
+
 bool NapiObserver::operator!=(const NapiObserver &rhs) const
 {
     return !(rhs == *this);
@@ -106,8 +99,9 @@ void NapiRdbObserver::OnChange(const RdbChangeNode &changeNode)
         LOG_ERROR("Failed to create observerWorker");
         return;
     }
-    observerWorker->rdbChangeNode_ = changeNode;
-    observerWorker->type_ = RDB;
+    observerWorker->getParam = [&changeNode, env = env_]() {
+        return DataShareJSUtils::Convert2JSValue(env, changeNode);
+    };
 
     uv_work_t *work = new (std::nothrow) uv_work_t();
     if (work == nullptr) {
@@ -137,8 +131,9 @@ void NapiPublishedObserver::OnChange(const PublishedDataChangeNode &changeNode)
         LOG_ERROR("Failed to create observerWorker");
         return;
     }
-    observerWorker->publishedChangeNode_ = changeNode;
-    observerWorker->type_ = PUBLISHED_DATA;
+    observerWorker->getParam = [&changeNode, env = env_]() {
+        return DataShareJSUtils::Convert2JSValue(env, changeNode);
+    };
 
     uv_work_t *work = new (std::nothrow) uv_work_t();
     if (work == nullptr) {

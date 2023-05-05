@@ -329,11 +329,12 @@ public:
 
     /**
      * @brief Unregisters observers used for monitoring data specified by the given uris and template.
-     * @param uris, the paths of the data to operate.
+     * @param uris, the paths of the data to operate, if uris is empty, Unregisters all observers.
      * @param templateId, the template of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> UnSubscribeRdbData(const std::vector<std::string> &uris, const TemplateId &templateId);
+    std::vector<OperationResult> UnSubscribeRdbData(const std::vector<std::string> &uris = std::vector<std::string>(),
+        const TemplateId &templateId = TemplateId());
 
     /**
      * @brief Enable observers by the given uris and template.
@@ -365,11 +366,12 @@ public:
 
     /**
      * @brief Unregisters observers used for monitoring data specified by the given uris and subscriberId.
-     * @param uris, the uris of the data to operate.
+     * @param uris, the uris of the data to operate, if uris is empty, Unregisters all observers.
      * @param subscriberId, the subscriberId of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> UnSubscribePublishedData(const std::vector<std::string> &uris, int64_t subscriberId);
+    std::vector<OperationResult> UnSubscribePublishedData(
+        const std::vector<std::string> &uris = std::vector<std::string>(), int64_t subscriberId = 0);
 
     /**
      * @brief Enable observers by the given uris and subscriberId.
@@ -388,11 +390,6 @@ public:
      */
     std::vector<OperationResult> DisableSubscribePublishedData(const std::vector<std::string> &uris,
         int64_t subscriberId);
-
-    /**
-     * @brief Unregisters all observers.
-     */
-    void UnSubscribeAllObservers();
 
 private:
     DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,

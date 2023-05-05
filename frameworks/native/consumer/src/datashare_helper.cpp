@@ -62,7 +62,6 @@ DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token, const Uri &ur
 DataShareHelper::DataShareHelper(const CreateOptions &options, const Uri &uri,
     std::shared_ptr<BaseConnection> dataShareConnection)
 {
-    LOG_INFO("DataShareHelper::DataShareHelper with options start %{public}p", this);
     token_ = options.token_;
     uri_ = uri;
     isDataShareService_ = options.isProxy_;
@@ -1087,37 +1086,6 @@ std::vector<OperationResult> DataShareHelper::DisableSubscribePublishedData(cons
         return results;
     }
     return manager->DisableObservers(proxy, uris, subscriberId);
-}
-
-void DataShareHelper::UnSubscribeAllObservers()
-{
-    LOG_DEBUG("Start UnSubscribeAllObservers");
-    auto connection = connection_;
-    if (connection == nullptr) {
-        LOG_ERROR("dataShareConnection_ is nullptr");
-        return;
-    }
-    if (!connection->ConnectDataShare(uri_, token_)) {
-        LOG_ERROR("dataShareProxy is nullptr");
-        return;
-    }
-    auto proxy = connection->GetDataShareProxy();
-    if (proxy == nullptr) {
-        LOG_ERROR("dataShareProxy is nullptr");
-        return;
-    }
-    auto publishedDataSubscriberManager = publishedDataSubscriberManager_;
-    if (publishedDataSubscriberManager == nullptr) {
-        LOG_ERROR("publishedDataSubscriberManager_ is nullptr");
-        return;
-    }
-    publishedDataSubscriberManager->DelAllObservers(proxy);
-    auto rdbSubscriberManager = rdbSubscriberManager_;
-    if (rdbSubscriberManager == nullptr) {
-        LOG_ERROR("rdbSubscriberManager_ is nullptr");
-        return;
-    }
-    rdbSubscriberManager->DelAllObservers(proxy);
 }
 } // namespace DataShare
 } // namespace OHOS

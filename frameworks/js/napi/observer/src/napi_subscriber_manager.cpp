@@ -74,8 +74,14 @@ std::vector<OperationResult> NapiRdbSubscriberManager::DelObservers(
     });
     return BaseCallbacks::DelObservers(keys,
         callback == nullptr ? nullptr : std::make_shared<Observer>(env, callback),
-        [&dataShareHelper, &templateId](const std::vector<Key> &lastDelKeys,
+        [&dataShareHelper, &templateId, &callback, &uris](const std::vector<Key> &lastDelKeys,
             const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
+            // delete all obs
+            if (callback == nullptr && uris.empty()) {
+                dataShareHelper->UnSubscribeRdbData();
+                return;
+            }
+
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
                 lastDelUris.emplace_back(result);
@@ -97,11 +103,6 @@ void NapiRdbSubscriberManager::Emit(const RdbChangeNode &changeNode)
             obs->OnChange(changeNode);
         }
     }
-}
-
-void NapiRdbSubscriberManager::UnSubscribeAllObservers()
-{
-    return BaseCallbacks::DelAllObservers([](const std::vector<Key> &lastDelKeys) {});
 }
 
 std::vector<OperationResult> NapiPublishedSubscriberManager::AddObservers(
@@ -159,8 +160,14 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::DelObservers(
     });
     return BaseCallbacks::DelObservers(keys,
         callback == nullptr ? nullptr : std::make_shared<Observer>(env, callback),
-        [&dataShareHelper, &subscriberId](const std::vector<Key> &lastDelKeys,
+        [&dataShareHelper, &subscriberId, &callback, &uris](const std::vector<Key> &lastDelKeys,
             const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
+            // delete all obs
+            if (callback == nullptr && uris.empty()) {
+                dataShareHelper->UnSubscribePublishedData();
+                return;
+            }
+
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
                 lastDelUris.emplace_back(result);
@@ -190,11 +197,6 @@ void NapiPublishedSubscriberManager::Emit(const PublishedDataChangeNode &changeN
         node.ownerBundleName_ = changeNode.ownerBundleName_;
         callback->OnChange(node);
     }
-}
-
-void NapiPublishedSubscriberManager::UnSubscribeAllObservers()
-{
-    return BaseCallbacks::DelAllObservers([](const std::vector<Key> &lastDelKeys) {});
 }
 } // namespace DataShare
 } // namespace OHOS

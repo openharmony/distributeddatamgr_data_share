@@ -120,7 +120,7 @@ private:
                 "try close %{public}s, %{public}d", key_.c_str(), ashmem->GetSptrRefCount());
             if (ashmem != nullptr && ashmem->GetSptrRefCount() == ASHMEM_REF_COUNT) {
                 (void)OHOS::HiviewDFX::HiLog::Error(DATASHARE_LABEL,
-                                                    "close %{public}s, %{public}p", key_.c_str(), ashmem.GetRefPtr());
+                                                    "close %{public}s", key_.c_str());
                 ashmem->UnmapAshmem();
                 ashmem->CloseAshmem();
             }

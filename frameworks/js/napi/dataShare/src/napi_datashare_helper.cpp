@@ -209,24 +209,13 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
     }
     auto finalize = [](napi_env env, void *data, void *hint) {
         NapiDataShareHelper *proxy = reinterpret_cast<NapiDataShareHelper *>(data);
-        if (proxy->datashareHelper_ == nullptr) {
-            LOG_ERROR("proxy->datashareHelper_ is nullptr");
-            delete proxy;
-            return;
-        }
-        proxy->datashareHelper_->UnSubscribeAllObservers();
-        if (proxy->jsRdbObsManager_ == nullptr) {
+        if (proxy->jsRdbObsManager_ == nullptr || proxy->jsPublishedObsManager_ == nullptr) {
             LOG_ERROR("proxy->jsManager_ is nullptr");
             delete proxy;
             return;
         }
-        proxy->jsRdbObsManager_->UnSubscribeAllObservers();
-        if (proxy->jsPublishedObsManager_ == nullptr) {
-            LOG_ERROR("proxy->jsPublishedObsManager_ is nullptr");
-            delete proxy;
-            return;
-        }
-        proxy->jsPublishedObsManager_->UnSubscribeAllObservers();
+        proxy->jsRdbObsManager_->DelObservers(env, nullptr);
+        proxy->jsPublishedObsManager_->DelObservers(env, nullptr);
         delete proxy;
     };
     if (napi_wrap(env, self, proxy, finalize, nullptr, nullptr) != napi_ok) {

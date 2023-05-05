@@ -77,7 +77,6 @@ public:
         const std::vector<std::string> &uris, const TemplateId &templateId);
     std::vector<OperationResult> DisableObservers(std::shared_ptr<BaseProxy> proxy,
         const std::vector<std::string> &uris, const TemplateId &templateId);
-    void DelAllObservers(std::shared_ptr<BaseProxy> proxy);
     void Emit(const RdbChangeNode &changeNode);
 
 private:

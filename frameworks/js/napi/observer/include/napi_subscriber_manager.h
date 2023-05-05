@@ -37,10 +37,10 @@ public:
         : dataShareHelper_(dataShareHelper){};
     std::vector<OperationResult> AddObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris,
         const TemplateId &templateId);
-    std::vector<OperationResult> DelObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris,
-        const TemplateId &templateId);
+    std::vector<OperationResult> DelObservers(napi_env env, napi_value callback,
+        const std::vector<std::string> &uris = std::vector<std::string>(),
+        const TemplateId &templateId = TemplateId());
     void Emit(const RdbChangeNode &changeNode);
-    void UnSubscribeAllObservers();
 
 private:
     std::weak_ptr<DataShareHelper> dataShareHelper_;
@@ -55,10 +55,9 @@ public:
         : dataShareHelper_(dataShareHelper){};
     std::vector<OperationResult> AddObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris,
         int64_t subscriberId);
-    std::vector<OperationResult> DelObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris,
-        int64_t subscriberId);
+    std::vector<OperationResult> DelObservers(napi_env env, napi_value callback,
+        const std::vector<std::string> &uris = std::vector<std::string>(), int64_t subscriberId = 0);
     void Emit(const PublishedDataChangeNode &changeNode);
-    void UnSubscribeAllObservers();
 
 private:
     std::weak_ptr<DataShareHelper> dataShareHelper_;

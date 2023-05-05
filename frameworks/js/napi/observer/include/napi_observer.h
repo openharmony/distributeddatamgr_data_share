@@ -25,11 +25,6 @@
 
 namespace OHOS {
 namespace DataShare {
-enum ObserverType {
-    RDB = 0,
-    PUBLISHED_DATA
-};
-
 class NapiObserver {
 public:
     NapiObserver(napi_env env, napi_value callback);
@@ -57,13 +52,9 @@ public:
 };
 
 struct ObserverWorker {
-    std::weak_ptr<NapiRdbObserver> rdbObserver_;
-    RdbChangeNode rdbChangeNode_;
-    std::weak_ptr<NapiPublishedObserver> publisheObserver_;
-    PublishedDataChangeNode publishedChangeNode_;
-    ObserverType type_ = RDB;
-    explicit ObserverWorker(std::shared_ptr<NapiRdbObserver> observerIn) : rdbObserver_(observerIn) {}
-    explicit ObserverWorker(std::shared_ptr<NapiPublishedObserver> observerIn) : publisheObserver_(observerIn) {}
+    std::weak_ptr<NapiObserver> observer_;
+    std::function<napi_value()> getParam;
+    explicit ObserverWorker(std::shared_ptr<NapiObserver> observerIn) : observer_(observerIn) {}
 };
 } // namespace DataShare
 } // namespace OHOS
