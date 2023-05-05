@@ -281,8 +281,12 @@ ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to ReadInt32 index");
         return ERR_INVALID_VALUE;
     }
+    if (count > VALUEBUCKET_MAX_COUNT) {
+        return ERR_INVALID_VALUE;
+    }
 
     std::vector<DataShareValuesBucket> values;
+    values.reserve(static_cast<int32_t>(count));
     for (int i = 0; i < count; i++) {
         DataShareValuesBucket value;
         if (!ITypesUtils::Unmarshalling(data, value)) {
