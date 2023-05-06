@@ -70,7 +70,6 @@ ohos_shared_library("datashare_consumer") {
     "ability_base:zuri",
     "ability_runtime:ability_context_native",
     "ability_runtime:ability_manager",
-    "ability_runtime:abilitykit_native",
     "ability_runtime:app_context",
     "ability_runtime:dataobs_manager",
     "c_utils:utils",
