@@ -209,9 +209,9 @@ ohos_unittest("ProxyDatasTest") {
       [ "./unittest/datashareproxy_test/proxydatas_with_permission_test.cpp" ]
 
   deps = [
-    "${ABILITY_RUNTIME_INNER_API_PATH}/ability_manager:ability_manager",
-    "${ABILITY_RUNTIME_PATH}/frameworks/native/ability/native:abilitykit_native",
     "//base/security/access_token/interfaces/innerkits/token_setproc:libtoken_setproc",
+    "//foundation/ability/ability_runtime/frameworks/native/ability/native:abilitykit_native",
+    "//foundation/ability/ability_runtime/interfaces/inner_api/ability_manager:ability_manager",
   ]
 
   external_deps = [
@@ -220,6 +220,7 @@ ohos_unittest("ProxyDatasTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "data_share:datashare_common",
     "data_share:datashare_consumer",
     "hilog_native:libhilog",

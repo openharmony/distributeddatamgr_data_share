@@ -14,32 +14,32 @@
 import("//build/ohos.gni")
 
 ohos_hap("proxydatas_with_permission") {
-    hap_profile = "entry/src/main/module.json"
-    hap_name = "proxydatas_with_permission"
-    subsystem_name = "distributeddatamgr"
-    part_name = "data_share"
-    final_hap_path = "$root_out_dir/tests/unittest/data_share/resource/datashareproxy_bundle/${hap_name}.hap"
-    testonly = true
-    deps = [
-        ":datashare_ext_ets_assets",
-        ":datashare_ext_ets_resources",
-    ]
-    certificate_profile = "signature/openharmony_sx.p7b"
+  hap_profile = "entry/src/main/module.json"
+  hap_name = "proxydatas_with_permission"
+  subsystem_name = "distributeddatamgr"
+  part_name = "data_share"
+  final_hap_path = "$root_out_dir/tests/unittest/data_share/resource/datashareproxy_bundle/${hap_name}.hap"
+  testonly = true
+  deps = [
+    ":datashare_ext_ets_assets",
+    ":datashare_ext_ets_resources",
+  ]
+  certificate_profile = "signature/openharmony_sx.p7b"
 }
 
 ohos_js_assets("datashare_ext_ets_assets") {
-    ets2abc = true
-    source_dir = "entry/src/main/ets"
-    hap_profile = "entry/src/main/module.json"
+  ets2abc = true
+  source_dir = "entry/src/main/ets"
+  hap_profile = "entry/src/main/module.json"
 }
 
 ohos_app_scope("datashare_ext_app_profile") {
-    app_profile = "AppScope/app.json"
-    sources = [ "AppScope/resources" ]
+  app_profile = "AppScope/app.json"
+  sources = [ "AppScope/resources" ]
 }
 
 ohos_resources("datashare_ext_ets_resources") {
-    sources = [ "entry/src/main/resources" ]
-    deps = [ ":datashare_ext_app_profile" ]
-    hap_profile = "entry/src/main/module.json"
+  sources = [ "entry/src/main/resources" ]
+  deps = [ ":datashare_ext_app_profile" ]
+  hap_profile = "entry/src/main/module.json"
 }
