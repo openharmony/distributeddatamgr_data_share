@@ -23,7 +23,7 @@
 #include <string>
 
 #include "base_connection.h"
-#include "context.h"
+#include "app/context.h"
 #include "datashare_business_error.h"
 #include "uri.h"
 

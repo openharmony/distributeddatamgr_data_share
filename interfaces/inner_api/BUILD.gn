@@ -63,10 +63,7 @@ ohos_shared_library("datashare_consumer") {
   public_configs = [ ":datashare_public_config" ]
   version_script = "consumer/libdatashare_consumer.map"
   innerapi_tags = [ "platformsdk" ]
-  deps = [
-    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-    "${datashare_innerapi_path}/common:datashare_common",
-  ]
+  deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
 
   external_deps = [
     "ability_base:want",
@@ -104,15 +101,13 @@ ohos_shared_library("datashare_provider") {
   public_configs = [ ":datashare_public_config" ]
   version_script = "provider/libdatashare_provider.map"
   innerapi_tags = [ "platformsdk" ]
-  deps = [
-    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-    "${datashare_innerapi_path}/common:datashare_common",
-  ]
+  deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
 
   external_deps = [
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_context_native",
+    "ability_runtime:abilitykit_native",
     "ability_runtime:app_context",
     "ability_runtime:dataobs_manager",
     "ability_runtime:runtime",
@@ -137,13 +132,11 @@ ohos_shared_library("datashare_ext_ability_module") {
   configs = [ ":ability_config" ]
   public_configs = [ ":datashare_public_config" ]
 
-  deps = [
-    ":datashare_provider",
-    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-  ]
+  deps = [ ":datashare_provider" ]
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:abilitykit_native",
     "ability_runtime:runtime",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
