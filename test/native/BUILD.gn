@@ -205,7 +205,8 @@ ohos_unittest("ProxyDatasTest") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
   ]
 
-  sources = [ "./unittest/datashareproxy_test/proxydatas_with_permission_test.cpp" ]
+  sources =
+      [ "./unittest/datashareproxy_test/proxydatas_with_permission_test.cpp" ]
 
   deps = [
     "${ABILITY_RUNTIME_INNER_API_PATH}/ability_manager:ability_manager",
