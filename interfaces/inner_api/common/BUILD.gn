@@ -26,10 +26,8 @@ config("ability_config") {
 config("datashare_public_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [
-    "${datashare_base_path}/interfaces/inner_api/common/include",
-    "${datashare_base_path}/interfaces/inner_api/provider/include",
-  ]
+  include_dirs =
+      [ "${datashare_base_path}/interfaces/inner_api/common/include" ]
 }
 
 ohos_shared_library("datashare_common") {
@@ -60,9 +58,7 @@ ohos_shared_library("datashare_common") {
   public_deps = []
 
   configs = [ ":ability_config" ]
-  public_configs = [
-    ":datashare_public_config"
-  ]
+  public_configs = [ ":datashare_public_config" ]
   version_script = "libdatashare_common.map"
   innerapi_tags = [ "platformsdk" ]
 
