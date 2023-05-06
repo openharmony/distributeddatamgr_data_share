@@ -1,0 +1,28 @@
+{
+  "string": [
+    {
+      "name": "entry_desc",
+      "value": "description"
+    },
+    {
+      "name": "MainAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "MainAbility_label",
+      "value": "DataShareTest"
+    },
+    {
+      "name": "description_application",
+      "value": "DataShareTest"
+    },
+    {
+      "name": "app_name",
+      "value": "DataShareTest"
+    },
+    {
+      "name": "description_datashareextability",
+      "value": "description_datashareextability"
+    }
+  ]
+}
