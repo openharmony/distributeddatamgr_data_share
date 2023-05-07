@@ -18,11 +18,11 @@
 #include <string_ex.h>
 
 #include "data_ability_observer_interface.h"
+#include "datashare_itypes_utils.h"
 #include "datashare_log.h"
 #include "datashare_result_set.h"
 #include "ipc_types.h"
 #include "ishared_result_set.h"
-#include "itypes_utils.h"
 #include "pac_map.h"
 
 namespace OHOS {
@@ -143,17 +143,10 @@ int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
         LOG_ERROR("WriteInterfaceToken failed");
         return index;
     }
-
-    if (!data.WriteParcelable(&uri)) {
-        LOG_ERROR("fail to WriteParcelable uri");
+    if (!ITypesUtil::Marshal(data, uri, value)) {
+        LOG_ERROR("fail to Marshal value");
         return index;
     }
-
-    if (!ITypesUtils::Marshalling(value, data)) {
-        LOG_ERROR("fail to WriteParcelable value");
-        return index;
-    }
-
     MessageParcel reply;
     MessageOption option;
     int32_t err = Remote()->SendRequest(CMD_INSERT, data, reply, option);
@@ -161,9 +154,8 @@ int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
         LOG_ERROR("Insert fail to SendRequest. err: %{public}d", err);
         return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : index;
     }
-
-    if (!reply.ReadInt32(index)) {
-        LOG_ERROR("fail to ReadInt32 index");
+    if (!ITypesUtil::Unmarshal(reply, index)) {
+        LOG_ERROR("fail to Unmarshal index");
         return index;
     }
 
@@ -179,22 +171,10 @@ int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates
         LOG_ERROR("WriteInterfaceToken failed");
         return index;
     }
-
-    if (!data.WriteParcelable(&uri)) {
-        LOG_ERROR("fail to WriteParcelable uri");
+    if (!ITypesUtil::Marshal(data, uri, predicates, value)) {
+        LOG_ERROR("fail to Marshal value");
         return index;
     }
-
-    if (!ITypesUtils::Marshalling(predicates, data)) {
-        LOG_ERROR("fail to Marshalling predicates");
-        return index;
-    }
-
-    if (!ITypesUtils::Marshalling(value, data)) {
-        LOG_ERROR("fail to Marshalling value");
-        return index;
-    }
-
     MessageParcel reply;
     MessageOption option;
     int32_t err = Remote()->SendRequest(CMD_UPDATE, data, reply, option);
@@ -202,12 +182,10 @@ int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates
         LOG_ERROR("Update fail to SendRequest. err: %{public}d", err);
         return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : index;
     }
-
-    if (!reply.ReadInt32(index)) {
-        LOG_ERROR("fail to ReadInt32 index");
+    if (!ITypesUtil::Unmarshal(reply, index)) {
+        LOG_ERROR("fail to Unmarshal index");
         return index;
     }
-
     return index;
 }
 
@@ -219,13 +197,7 @@ int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates
         LOG_ERROR("WriteInterfaceToken failed");
         return index;
     }
-
-    if (!data.WriteParcelable(&uri)) {
-        LOG_ERROR("fail to WriteParcelable uri");
-        return index;
-    }
-
-    if (!ITypesUtils::Marshalling(predicates, data)) {
+    if (!ITypesUtil::Marshal(data, uri, predicates)) {
         LOG_ERROR("fail to Marshalling predicates");
         return index;
     }
@@ -237,12 +209,10 @@ int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates
         LOG_ERROR("Delete fail to SendRequest. err: %{public}d", err);
         return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : index;
     }
-
-    if (!reply.ReadInt32(index)) {
-        LOG_ERROR("fail to ReadInt32 index");
+    if (!ITypesUtil::Unmarshal(reply, index)) {
+        LOG_ERROR("fail to Unmarshal index");
         return index;
     }
-
     return index;
 }
 
@@ -254,22 +224,10 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri,
         LOG_ERROR("WriteInterfaceToken failed");
         return nullptr;
     }
-
-    if (!data.WriteParcelable(&uri)) {
-        LOG_ERROR("fail to WriteParcelable uri");
+    if (!ITypesUtil::Marshal(data, uri, predicates, columns)) {
+        LOG_ERROR("fail to Marshalling");
         return nullptr;
     }
-
-    if (!ITypesUtils::Marshalling(predicates, data)) {
-        LOG_ERROR("fail to Marshalling predicates");
-        return nullptr;
-    }
-
-    if (!data.WriteStringVector(columns)) {
-        LOG_ERROR("fail to WriteStringVector columns");
-        return nullptr;
-    }
-
     MessageParcel reply;
     MessageOption option;
     int32_t err = Remote()->SendRequest(CMD_QUERY, data, reply, option);
@@ -292,8 +250,9 @@ std::string DataShareProxy::GetType(const Uri &uri)
         LOG_ERROR("WriteInterfaceToken failed");
         return type;
     }
-    if (!data.WriteParcelable(&uri)) {
-        LOG_ERROR("fail to WriteParcelable uri");
+
+    if (!ITypesUtil::Marshal(data, uri)) {
+        LOG_ERROR("fail to Marshal value");
         return type;
     }
 
@@ -304,8 +263,10 @@ std::string DataShareProxy::GetType(const Uri &uri)
         LOG_ERROR("GetFileTypes fail to SendRequest. err: %{public}d", err);
         return type;
     }
-
-    type = reply.ReadString();
+    if (!ITypesUtil::Unmarshal(reply, type)) {
+        LOG_ERROR("fail to Unmarshal index");
+        return type;
+    }
     if (type.empty()) {
         LOG_ERROR("fail to ReadString type");
         return type;
@@ -324,23 +285,9 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
         LOG_ERROR("WriteInterfaceToken failed");
         return ret;
     }
-
-    if (!data.WriteParcelable(&uri)) {
-        LOG_ERROR("fail to WriteParcelable uri");
+    if (!ITypesUtil::Marshal(data, uri, values)) {
+        LOG_ERROR("fail to Marshalling");
         return ret;
-    }
-
-    int count = (int)values.size();
-    if (!data.WriteInt32(count)) {
-        LOG_ERROR("fail to WriteInt32 ret");
-        return ret;
-    }
-
-    for (int i = 0; i < count; i++) {
-        if (!ITypesUtils::Marshalling(values[i], data)) {
-            LOG_ERROR("fail to WriteParcelable ret, index = %{public}d", i);
-            return ret;
-        }
     }
 
     MessageParcel reply;
@@ -350,12 +297,10 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
         LOG_ERROR("fail to SendRequest. err: %{public}d", err);
         return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : ret;
     }
-
-    if (!reply.ReadInt32(ret)) {
-        LOG_ERROR("fail to ReadInt32 index");
+    if (!ITypesUtil::Unmarshal(reply, ret)) {
+        LOG_ERROR("fail to Unmarshal index");
         return ret;
     }
-
     LOG_INFO("end successfully.");
     return ret;
 }
@@ -369,13 +314,8 @@ bool DataShareProxy::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbi
         return false;
     }
 
-    if (!data.WriteParcelable(&uri)) {
-        LOG_ERROR("failed to WriteParcelable uri ");
-        return false;
-    }
-
-    if (!data.WriteRemoteObject(dataObserver->AsObject())) {
-        LOG_ERROR("failed to WriteParcelable dataObserver ");
+    if (!ITypesUtil::Marshal(data, uri, dataObserver->AsObject())) {
+        LOG_ERROR("fail to Marshalling");
         return false;
     }
 
@@ -400,14 +340,8 @@ bool DataShareProxy::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataA
         LOG_ERROR("WriteInterfaceToken failed");
         return false;
     }
-
-    if (!data.WriteParcelable(&uri)) {
-        LOG_ERROR("failed to WriteParcelable uri ");
-        return false;
-    }
-
-    if (!data.WriteRemoteObject(dataObserver->AsObject())) {
-        LOG_ERROR("failed to WriteParcelable dataObserver ");
+    if (!ITypesUtil::Marshal(data, uri, dataObserver->AsObject())) {
+        LOG_ERROR("fail to Marshalling");
         return false;
     }
 
@@ -432,9 +366,8 @@ bool DataShareProxy::NotifyChange(const Uri &uri)
         LOG_ERROR("WriteInterfaceToken failed");
         return false;
     }
-
-    if (!data.WriteParcelable(&uri)) {
-        LOG_ERROR("failed to WriteParcelable uri ");
+    if (!ITypesUtil::Marshal(data, uri)) {
+        LOG_ERROR("fail to Marshalling");
         return false;
     }
 
@@ -454,16 +387,14 @@ bool DataShareProxy::NotifyChange(const Uri &uri)
 Uri DataShareProxy::NormalizeUri(const Uri &uri)
 {
     LOG_INFO("begin.");
-    Uri urivalue("");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
-        return urivalue;
+        return Uri("");
     }
-
-    if (!data.WriteParcelable(&uri)) {
-        LOG_ERROR("fail to WriteParcelable uri");
-        return urivalue;
+    if (!ITypesUtil::Marshal(data, uri)) {
+        LOG_ERROR("fail to Marshalling");
+        return Uri("");
     }
 
     MessageParcel reply;
@@ -471,31 +402,29 @@ Uri DataShareProxy::NormalizeUri(const Uri &uri)
     int32_t err = Remote()->SendRequest(CMD_NORMALIZE_URI, data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("NormalizeUri fail to SendRequest. err: %{public}d", err);
-        return urivalue;
+        return Uri("");
     }
-
-    std::unique_ptr<Uri> info(reply.ReadParcelable<Uri>());
-    if (!info) {
-        LOG_ERROR("ReadParcelable value is nullptr.");
-        return urivalue;
+    Uri info("");
+    if (!ITypesUtil::Unmarshal(reply, info)) {
+        LOG_ERROR("fail to Unmarshal index");
+        return Uri("");
     }
     LOG_INFO("end successfully.");
-    return *info;
+    return info;
 }
 
 Uri DataShareProxy::DenormalizeUri(const Uri &uri)
 {
     LOG_INFO("begin.");
-    Uri urivalue("");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
-        return urivalue;
+        return Uri("");
     }
 
-    if (!data.WriteParcelable(&uri)) {
-        LOG_ERROR("fail to WriteParcelable uri");
-        return urivalue;
+    if (!ITypesUtil::Marshal(data, uri)) {
+        LOG_ERROR("fail to Marshalling");
+        return Uri("");
     }
 
     MessageParcel reply;
@@ -503,16 +432,16 @@ Uri DataShareProxy::DenormalizeUri(const Uri &uri)
     int32_t err = Remote()->SendRequest(CMD_DENORMALIZE_URI, data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("DenormalizeUri fail to SendRequest. err: %{public}d", err);
-        return urivalue;
+        return Uri("");
     }
 
-    std::unique_ptr<Uri> info(reply.ReadParcelable<Uri>());
-    if (!info) {
-        LOG_ERROR("ReadParcelable value is nullptr.");
-        return urivalue;
+    Uri info("");
+    if (!ITypesUtil::Unmarshal(reply, info)) {
+        LOG_ERROR("fail to Unmarshal index");
+        return Uri("");
     }
     LOG_INFO("end successfully.");
-    return *info;
+    return info;
 }
 
 int DataShareProxy::AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl)

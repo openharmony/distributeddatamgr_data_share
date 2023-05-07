@@ -15,8 +15,7 @@
 
 #include "data_proxy_observer_stub.h"
 
-#include <itypes_utils.h>
-
+#include "datashare_itypes_utils.h"
 #include "datashare_log.h"
 
 namespace OHOS {
@@ -35,7 +34,7 @@ int RdbObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
         return ERR_INVALID_STATE;
     }
     RdbChangeNode changeNode;
-    if (!ITypesUtils::Unmarshal(data, changeNode)) {
+    if (!ITypesUtil::Unmarshal(data, changeNode)) {
         LOG_ERROR("Unmarshalling  is nullptr");
         return ERR_INVALID_VALUE;
     }
@@ -80,7 +79,7 @@ int PublishedDataObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &dat
         return ERR_INVALID_STATE;
     }
     PublishedDataChangeNode changeNode;
-    if (!ITypesUtils::Unmarshalling(data, changeNode)) {
+    if (!ITypesUtil::Unmarshal(data, changeNode)) {
         LOG_ERROR("Unmarshalling  is nullptr");
         return ERR_INVALID_VALUE;
     }

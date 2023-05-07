@@ -16,10 +16,10 @@
 #include "datashare_stub.h"
 
 #include "data_ability_observer_interface.h"
+#include "datashare_itypes_utils.h"
 #include "datashare_log.h"
 #include "ipc_types.h"
 #include "ishared_result_set.h"
-#include "itypes_utils.h"
 #include "unistd.h"
 
 namespace OHOS {
@@ -68,30 +68,21 @@ int DataShareStub::OnRemoteRequest(uint32_t code, MessageParcel& data, MessagePa
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
-bool ReadUri(std::shared_ptr<Uri> &uri, MessageParcel &data)
-{
-    uri = std::shared_ptr<Uri>(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("uri is nullptr");
-        return false;
-    }
-    return true;
-}
-
 ErrCode DataShareStub::CmdGetFileTypes(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
+    Uri uri("");
+    std::string mimeTypeFilter;
+    if (!ITypesUtil::Unmarshal(data, uri, mimeTypeFilter)) {
+        LOG_ERROR("Unmarshalling value is nullptr");
         return ERR_INVALID_VALUE;
     }
-    std::string mimeTypeFilter = data.ReadString();
-    if (mimeTypeFilter.empty()) {
+	if (mimeTypeFilter.empty()) {
         LOG_ERROR("mimeTypeFilter is nullptr");
         return ERR_INVALID_VALUE;
     }
-    std::vector<std::string> types = GetFileTypes(*uri, mimeTypeFilter);
-    if (!reply.WriteStringVector(types)) {
-        LOG_ERROR("fail to WriteStringVector types");
+    std::vector<std::string> types = GetFileTypes(uri, mimeTypeFilter);
+    if (!ITypesUtil::Marshal(reply, types)) {
+        LOG_ERROR("Marshal value is nullptr");
         return ERR_INVALID_VALUE;
     }
     return DATA_SHARE_NO_ERROR;
@@ -99,16 +90,17 @@ ErrCode DataShareStub::CmdGetFileTypes(MessageParcel &data, MessageParcel &reply
 
 ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
+    Uri uri("");
+    std::string mode;
+    if (!ITypesUtil::Unmarshal(data, uri, mode)) {
+        LOG_ERROR("Unmarshalling value is nullptr");
         return ERR_INVALID_VALUE;
     }
-    std::string mode = data.ReadString();
     if (mode.empty()) {
         LOG_ERROR("mode is nullptr");
         return ERR_INVALID_VALUE;
     }
-    int fd = OpenFile(*uri, mode);
+    int fd = OpenFile(uri, mode);
     if (fd < 0) {
         LOG_ERROR("OpenFile fail, fd is %{pubilc}d", fd);
         return ERR_INVALID_VALUE;
@@ -124,36 +116,31 @@ ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
 
 ErrCode DataShareStub::CmdOpenRawFile(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
+    Uri uri("");
+    std::string mode;
+    if (!ITypesUtil::Unmarshal(data, uri, mode)) {
+        LOG_ERROR("Unmarshalling value is nullptr");
         return ERR_INVALID_VALUE;
     }
-    std::string mode = data.ReadString();
-    if (mode.empty()) {
-        LOG_ERROR("mode is nullptr");
+    int fd = OpenRawFile(uri, mode);
+    if (!reply.WriteFileDescriptor(fd)) {
+        LOG_ERROR("fail to WriteFileDescriptor fd");
+        close(fd);
         return ERR_INVALID_VALUE;
     }
-    int fd = OpenRawFile(*uri, mode);
-    if (!reply.WriteInt32(fd)) {
-        LOG_ERROR("fail to WriteInt32 fd");
-        return ERR_INVALID_VALUE;
-    }
+    close(fd);
     return DATA_SHARE_NO_ERROR;
 }
 
 ErrCode DataShareStub::CmdInsert(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri(data.ReadParcelable<Uri>());
-    if (uri == nullptr) {
-        LOG_ERROR("DataShareStub uri is nullptr");
-        return ERR_INVALID_VALUE;
-    }
+    Uri uri("");
     DataShareValuesBucket value;
-    if (!ITypesUtils::Unmarshalling(data, value)) {
+    if (!ITypesUtil::Unmarshal(data, uri, value)) {
         LOG_ERROR("Unmarshalling value is nullptr");
         return ERR_INVALID_VALUE;
     }
-    int index = Insert(*uri, value);
+    int index = Insert(uri, value);
     if (index == DEFAULT_NUMBER) {
         LOG_ERROR("Insert inner error");
         return ERR_INVALID_VALUE;
@@ -171,21 +158,14 @@ ErrCode DataShareStub::CmdInsert(MessageParcel &data, MessageParcel &reply)
 
 ErrCode DataShareStub::CmdUpdate(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
-        return ERR_INVALID_VALUE;
-    }
+    Uri uri("");
     DataSharePredicates predicates;
-    if (!ITypesUtils::Unmarshalling(data, predicates)) {
+    DataShareValuesBucket value;
+    if (!ITypesUtil::Unmarshal(data, uri, predicates, value)) {
         LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
-    DataShareValuesBucket value;
-    if (!ITypesUtils::Unmarshalling(data, value)) {
-        LOG_ERROR("Unmarshalling value is nullptr");
-        return ERR_INVALID_VALUE;
-    }
-    int index = Update(*uri, predicates, value);
+    int index = Update(uri, predicates, value);
     if (index == DEFAULT_NUMBER) {
         LOG_ERROR("Update inner error");
         return ERR_INVALID_VALUE;
@@ -202,16 +182,13 @@ ErrCode DataShareStub::CmdUpdate(MessageParcel &data, MessageParcel &reply)
 
 ErrCode DataShareStub::CmdDelete(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
-        return ERR_INVALID_VALUE;
-    }
+    Uri uri("");
     DataSharePredicates predicates;
-    if (!ITypesUtils::Unmarshalling(data, predicates)) {
+    if (!ITypesUtil::Unmarshal(data, uri, predicates)) {
         LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
-    int index = Delete(*uri, predicates);
+    int index = Delete(uri, predicates);
     if (index == DEFAULT_NUMBER) {
         LOG_ERROR("Delete inner error");
         return ERR_INVALID_VALUE;
@@ -228,22 +205,15 @@ ErrCode DataShareStub::CmdDelete(MessageParcel &data, MessageParcel &reply)
 
 ErrCode DataShareStub::CmdQuery(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
-        return ERR_INVALID_VALUE;
-    }
+    Uri uri("");
     DataSharePredicates predicates;
-    if (!ITypesUtils::Unmarshalling(data, predicates)) {
+    std::vector<std::string> columns;
+    if (!ITypesUtil::Unmarshal(data, uri, predicates, columns)) {
         LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
-    std::vector<std::string> columns;
-    if (!data.ReadStringVector(&columns)) {
-        LOG_ERROR("fail to ReadStringVector columns");
-        return ERR_INVALID_VALUE;
-    }
     DatashareBusinessError businessError;
-    auto resultSet = Query(*uri, predicates, columns, businessError);
+    auto resultSet = Query(uri, predicates, columns, businessError);
     auto result = ISharedResultSet::WriteToParcel(std::move(resultSet), reply);
     reply.WriteInt32(businessError.GetCode());
     reply.WriteString(businessError.GetMessage());
@@ -256,11 +226,12 @@ ErrCode DataShareStub::CmdQuery(MessageParcel &data, MessageParcel &reply)
 
 ErrCode DataShareStub::CmdGetType(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
+    Uri uri("");
+    if (!ITypesUtil::Unmarshal(data, uri)) {
+        LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
-    std::string type = GetType(*uri);
+    std::string type = GetType(uri);
     if (!reply.WriteString(type)) {
         LOG_ERROR("fail to WriteString type");
         return ERR_INVALID_VALUE;
@@ -270,32 +241,14 @@ ErrCode DataShareStub::CmdGetType(MessageParcel &data, MessageParcel &reply)
 
 ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
-        return ERR_INVALID_VALUE;
-    }
-
-    int count = 0;
-    if (!data.ReadInt32(count)) {
-        LOG_ERROR("fail to ReadInt32 index");
-        return ERR_INVALID_VALUE;
-    }
-    if (count > VALUEBUCKET_MAX_COUNT) {
-        return ERR_INVALID_VALUE;
-    }
-
+    Uri uri("");
     std::vector<DataShareValuesBucket> values;
-    values.reserve(static_cast<int32_t>(count));
-    for (int i = 0; i < count; i++) {
-        DataShareValuesBucket value;
-        if (!ITypesUtils::Unmarshalling(data, value)) {
-            LOG_ERROR("Unmarshalling value is nullptr");
-            return ERR_INVALID_VALUE;
-        }
-        values.emplace_back(value);
+    if (!ITypesUtil::Unmarshal(data, uri, values)) {
+        LOG_ERROR("Unmarshalling predicates is nullptr");
+        return ERR_INVALID_VALUE;
     }
 
-    int ret = BatchInsert(*uri, values);
+    int ret = BatchInsert(uri, values);
     if (ret == DEFAULT_NUMBER) {
         LOG_ERROR("BatchInsert inner error");
         return ERR_INVALID_VALUE;
@@ -312,17 +265,19 @@ ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
 
 ErrCode DataShareStub::CmdRegisterObserver(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
+    Uri uri("");
+    sptr<IRemoteObject> observer;
+    if (!ITypesUtil::Unmarshal(data, uri, observer)) {
+        LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
-    auto obServer = iface_cast<AAFwk::IDataAbilityObserver>(data.ReadRemoteObject());
+    auto obServer = iface_cast<AAFwk::IDataAbilityObserver>(observer);
     if (obServer == nullptr) {
         LOG_ERROR("obServer is nullptr");
         return ERR_INVALID_VALUE;
     }
 
-    bool ret = RegisterObserver(*uri, obServer);
+    bool ret = RegisterObserver(uri, obServer);
     if (!reply.WriteInt32(ret)) {
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
@@ -332,17 +287,19 @@ ErrCode DataShareStub::CmdRegisterObserver(MessageParcel &data, MessageParcel &r
 
 ErrCode DataShareStub::CmdUnregisterObserver(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
+    Uri uri("");
+    sptr<IRemoteObject> observer;
+    if (!ITypesUtil::Unmarshal(data, uri, observer)) {
+        LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
-    auto obServer = iface_cast<AAFwk::IDataAbilityObserver>(data.ReadRemoteObject());
+    auto obServer = iface_cast<AAFwk::IDataAbilityObserver>(observer);
     if (obServer == nullptr) {
         LOG_ERROR("obServer is nullptr");
         return ERR_INVALID_VALUE;
     }
 
-    bool ret = UnregisterObserver(*uri, obServer);
+    bool ret = UnregisterObserver(uri, obServer);
     if (!reply.WriteInt32(ret)) {
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
@@ -352,12 +309,13 @@ ErrCode DataShareStub::CmdUnregisterObserver(MessageParcel &data, MessageParcel 
 
 ErrCode DataShareStub::CmdNotifyChange(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
+    Uri uri("");
+    if (!ITypesUtil::Unmarshal(data, uri)) {
+        LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
 
-    bool ret = NotifyChange(*uri);
+    bool ret = NotifyChange(uri);
     if (!reply.WriteInt32(ret)) {
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
@@ -367,15 +325,14 @@ ErrCode DataShareStub::CmdNotifyChange(MessageParcel &data, MessageParcel &reply
 
 ErrCode DataShareStub::CmdNormalizeUri(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
+    Uri uri("");
+    if (!ITypesUtil::Unmarshal(data, uri)) {
+        LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
-
-    Uri ret("");
-    ret = NormalizeUri(*uri);
-    if (!reply.WriteParcelable(&ret)) {
-        LOG_ERROR("fail to WriteParcelable type");
+    auto ret = NormalizeUri(uri);
+    if (!ITypesUtil::Marshal(reply, ret)) {
+        LOG_ERROR("Write to message parcel failed!");
         return ERR_INVALID_VALUE;
     }
     return DATA_SHARE_NO_ERROR;
@@ -383,15 +340,15 @@ ErrCode DataShareStub::CmdNormalizeUri(MessageParcel &data, MessageParcel &reply
 
 ErrCode DataShareStub::CmdDenormalizeUri(MessageParcel &data, MessageParcel &reply)
 {
-    std::shared_ptr<Uri> uri = nullptr;
-    if (!ReadUri(uri, data)) {
+    Uri uri("");
+    if (!ITypesUtil::Unmarshal(data, uri)) {
+        LOG_ERROR("Unmarshalling predicates is nullptr");
         return ERR_INVALID_VALUE;
     }
 
-    Uri ret("");
-    ret = DenormalizeUri(*uri);
-    if (!reply.WriteParcelable(&ret)) {
-        LOG_ERROR("fail to WriteParcelable type");
+    auto ret = DenormalizeUri(uri);
+    if (!ITypesUtil::Marshal(reply, ret)) {
+        LOG_ERROR("Write to message parcel failed!");
         return ERR_INVALID_VALUE;
     }
     return DATA_SHARE_NO_ERROR;

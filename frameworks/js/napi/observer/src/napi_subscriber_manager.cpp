@@ -78,7 +78,7 @@ std::vector<OperationResult> NapiRdbSubscriberManager::DelObservers(
             const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
             // delete all obs
             if (callback == nullptr && uris.empty()) {
-                dataShareHelper->UnSubscribeRdbData();
+                dataShareHelper->UnsubscribeRdbData();
                 return;
             }
 
@@ -89,7 +89,7 @@ std::vector<OperationResult> NapiRdbSubscriberManager::DelObservers(
             if (lastDelUris.empty()) {
                 return;
             }
-            auto unsubResult = dataShareHelper->UnSubscribeRdbData(lastDelUris, templateId);
+            auto unsubResult = dataShareHelper->UnsubscribeRdbData(lastDelUris, templateId);
             opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
         });
 }
@@ -164,7 +164,7 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::DelObservers(
             const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
             // delete all obs
             if (callback == nullptr && uris.empty()) {
-                dataShareHelper->UnSubscribePublishedData();
+                dataShareHelper->UnsubscribePublishedData();
                 return;
             }
 
@@ -175,7 +175,7 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::DelObservers(
             if (lastDelUris.empty()) {
                 return;
             }
-            auto unsubResult = dataShareHelper->UnSubscribePublishedData(lastDelUris, subscriberId);
+            auto unsubResult = dataShareHelper->UnsubscribePublishedData(lastDelUris, subscriberId);
             opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
         });
 }

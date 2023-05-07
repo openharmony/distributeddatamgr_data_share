@@ -119,7 +119,7 @@ void NapiRdbObserver::OnChange(const RdbChangeNode &changeNode)
     }
 }
 
-void NapiPublishedObserver::OnChange(const PublishedDataChangeNode &changeNode)
+void NapiPublishedObserver::OnChange(PublishedDataChangeNode &changeNode)
 {
     LOG_DEBUG("NapiPublishedObserver onchange Start");
     if (ref_ == nullptr) {

@@ -86,9 +86,9 @@ public:
     static napi_value Convert2JSValue(napi_env env, const TemplateId &templateId);
     static napi_value Convert2JSValue(napi_env env, const RdbChangeNode &changeNode);
     static napi_value Convert2JSValue(napi_env env, sptr<Ashmem> &ashmem);
-    static napi_value Convert2JSValue(napi_env env, const PublishedDataItem &publishedDataItem);
-    static napi_value Convert2JSValue(napi_env env, const std::vector<PublishedDataItem> &publishedDataItems);
-    static napi_value Convert2JSValue(napi_env env, const PublishedDataChangeNode &changeNode);
+    static napi_value Convert2JSValue(napi_env env, PublishedDataItem &publishedDataItem);
+    static napi_value Convert2JSValue(napi_env env, std::vector<PublishedDataItem> &publishedDataItems);
+    static napi_value Convert2JSValue(napi_env env, PublishedDataChangeNode &changeNode);
     static napi_value Convert2JSValue(napi_env env, const OperationResult &results);
     static napi_value Convert2JSValue(napi_env env, const std::vector<OperationResult> &results);
     static std::vector<uint8_t> ConvertU8Vector(napi_env env, napi_value jsValue);

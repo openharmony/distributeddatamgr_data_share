@@ -87,6 +87,11 @@ struct CreateOptions {
     bool enabled_ = false;
 };
 
+struct AshmemNode {
+    sptr<Ashmem> ashmem;
+    bool isManaged;
+};
+
 /**
  * Specifies the published item structure.
  */
@@ -95,36 +100,56 @@ struct PublishedDataItem {
     std::string key_;
     /** The subscriber id */
     int64_t subscriberId_;
-    /** * The published data. If the data is large, use Ashmem. */
-    std::variant<sptr<Ashmem>, std::string> value_;
-    PublishedDataItem() {}
-    PublishedDataItem(const PublishedDataItem & item) : PublishedDataItem(item.key_, item.subscriberId_, item.value_)
-    {
-    }
+	/** The published data. If the data is large, use Ashmem. Do not access, only for ipc */
+    std::variant<AshmemNode, std::string> value_;
+    PublishedDataItem(){};
     virtual ~PublishedDataItem()
     {
-        Close();
+        if (value_.index() == 0) {
+            AshmemNode &node = std::get<AshmemNode>(value_);
+            if (node.isManaged && node.ashmem != nullptr) {
+                node.ashmem->UnmapAshmem();
+                node.ashmem->CloseAshmem();
+            }
+        }
     }
-    PublishedDataItem(
-        const std::string &key, int64_t subscriberId, const std::variant<sptr<Ashmem>, std::string> &value)
+    PublishedDataItem(const std::string &key, int64_t subscriberId, const std::string &value)
         : key_(key), subscriberId_(subscriberId), value_(value)
     {
     }
-private:
-    void Close()
+    inline bool IsAshmem() const
     {
-        if (value_.index() == 0) {
-            sptr<Ashmem> ashmem = std::get<sptr<Ashmem>>(value_);
-			static const OHOS::HiviewDFX::HiLogLabel DATASHARE_LABEL = { LOG_CORE, 0xD001651, "DataShare" };
-            (void)OHOS::HiviewDFX::HiLog::Error(DATASHARE_LABEL,
-                "try close %{public}s, %{public}d", key_.c_str(), ashmem->GetSptrRefCount());
-            if (ashmem != nullptr && ashmem->GetSptrRefCount() == ASHMEM_REF_COUNT) {
-                (void)OHOS::HiviewDFX::HiLog::Error(DATASHARE_LABEL,
-                                                    "close %{public}s", key_.c_str());
-                ashmem->UnmapAshmem();
-                ashmem->CloseAshmem();
-            }
+        return value_.index() == 0;
+    }
+    inline bool IsString() const
+    {
+        return value_.index() == 1;
+    }
+    sptr<Ashmem> MoveOutAshmem()
+    {
+        if (IsAshmem()) {
+            AshmemNode &node = std::get<AshmemNode>(value_);
+            node.isManaged = false;
+            return std::move(node.ashmem);
         }
+        return nullptr;
+    }
+    void SetAshmem(sptr<Ashmem> ashmem, bool isManaged = false)
+    {
+        AshmemNode node = { ashmem, isManaged };
+        value_ = node;
+    }
+    bool Get(std::string &value)
+    {
+        if (IsString()) {
+            value = std::get<std::string>(value_);
+            return true;
+        }
+        return false;
+    }
+    void Set(const std::string &value)
+    {
+        value_ = value;
     }
 };
 

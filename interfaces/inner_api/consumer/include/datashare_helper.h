@@ -342,7 +342,7 @@ public:
      * @param templateId, the template of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> EnableSubscribeRdbData(const std::vector<std::string> &uris,
+    std::vector<OperationResult> EnableRdbSubs(const std::vector<std::string> &uris,
         const TemplateId &templateId);
 
     /**
@@ -351,7 +351,7 @@ public:
      * @param templateId, the template of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> DisableSubscribeRdbData(const std::vector<std::string> &uris,
+    std::vector<OperationResult> DisableRdbSubs(const std::vector<std::string> &uris,
         const TemplateId &templateId);
 
     /**

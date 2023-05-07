@@ -48,7 +48,7 @@ public:
 class NapiPublishedObserver final: public NapiObserver, public std::enable_shared_from_this<NapiPublishedObserver> {
 public:
     NapiPublishedObserver(napi_env env, napi_value callback) : NapiObserver(env, callback) {};
-    void OnChange(const PublishedDataChangeNode &changeNode);
+    void OnChange(PublishedDataChangeNode &changeNode);
 };
 
 struct ObserverWorker {

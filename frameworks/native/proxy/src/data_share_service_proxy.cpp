@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,9 +15,9 @@
 
 #include "data_share_service_proxy.h"
 
+#include "datashare_itypes_utils.h"
 #include "datashare_log.h"
 #include "ishared_result_set.h"
-#include "itypes_utils.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -35,7 +35,7 @@ int32_t DataShareServiceProxy::Insert(const Uri &uri, const DataShareValuesBucke
         LOG_ERROR("Write descriptor failed!");
         return DATA_SHARE_ERROR;
     }
-    if (!ITypesUtils::Marshal(data, uriStr, value)) {
+    if (!ITypesUtil::Marshal(data, uriStr, value)) {
         LOG_ERROR("Write to message parcel failed!");
         return DATA_SHARE_ERROR;
     }
@@ -59,7 +59,7 @@ int32_t DataShareServiceProxy::Update(const Uri &uri,
         LOG_ERROR("Write descriptor failed!");
         return DATA_SHARE_ERROR;
     }
-    if (!ITypesUtils::Marshal(data, uriStr, predicate, valuesBucket)) {
+    if (!ITypesUtil::Marshal(data, uriStr, predicate, valuesBucket)) {
         LOG_ERROR("Write to message parcel failed!");
         return DATA_SHARE_ERROR;
     }
@@ -82,7 +82,7 @@ int32_t DataShareServiceProxy::Delete(const Uri &uri, const DataSharePredicates 
         LOG_ERROR("Write descriptor failed!");
         return DATA_SHARE_ERROR;
     }
-    if (!ITypesUtils::Marshal(data, uriStr, predicate)) {
+    if (!ITypesUtil::Marshal(data, uriStr, predicate)) {
         LOG_ERROR("Write to message parcel failed!");
         return DATA_SHARE_ERROR;
     }
@@ -107,7 +107,7 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri,
         return nullptr;
     }
 
-    if (!ITypesUtils::Marshal(data, uriStr, predicates, columns)) {
+    if (!ITypesUtil::Marshal(data, uriStr, predicates, columns)) {
         LOG_ERROR("Write to message parcel failed!");
         return nullptr;
     }
@@ -182,7 +182,7 @@ int DataShareServiceProxy::AddQueryTemplate(const std::string &uri, int64_t subs
         LOG_ERROR("Write descriptor failed!");
         return DATA_SHARE_ERROR;
     }
-    if (!ITypesUtils::Marshal(data, uri, subscriberId, tpl)) {
+    if (!ITypesUtil::Marshal(data, uri, subscriberId, tpl.predicates_, tpl.scheduler_)) {
         LOG_ERROR("Write to message parcel failed!");
         return DATA_SHARE_ERROR;
     }
@@ -204,7 +204,7 @@ int DataShareServiceProxy::DelQueryTemplate(const std::string &uri, int64_t subs
         LOG_ERROR("Write descriptor failed!");
         return DATA_SHARE_ERROR;
     }
-    if (!ITypesUtils::Marshal(data, uri, subscriberId)) {
+    if (!ITypesUtil::Marshal(data, uri, subscriberId)) {
         LOG_ERROR("Write to message parcel failed!");
         return DATA_SHARE_ERROR;
     }
@@ -227,12 +227,8 @@ std::vector<OperationResult> DataShareServiceProxy::Publish(const Data &data, co
         LOG_ERROR("Write descriptor failed!");
         return results;
     }
-    if (!ITypesUtils::Marshalling(data, parcel)) {
-        LOG_ERROR("Write data failed!");
-        return results;
-    }
-    if (!parcel.WriteString(bundleName)) {
-        LOG_ERROR("Write bundleName failed!");
+    if (!ITypesUtil::Marshal(parcel, data, bundleName)) {
+        LOG_ERROR("Marshalfailed!");
         return results;
     }
 
@@ -244,7 +240,7 @@ std::vector<OperationResult> DataShareServiceProxy::Publish(const Data &data, co
         return results;
     }
 
-    ITypesUtils::Unmarshal(reply, results);
+    ITypesUtil::Unmarshal(reply, results);
     return results;
 }
 
@@ -256,7 +252,7 @@ Data DataShareServiceProxy::GetPublishedData(const std::string &bundleName)
         LOG_ERROR("Write descriptor failed!");
         return results;
     }
-    if (!ITypesUtils::Marshal(data, bundleName)) {
+    if (!ITypesUtil::Marshal(data, bundleName)) {
         LOG_ERROR("Write to message parcel failed!");
         return results;
     }
@@ -268,7 +264,7 @@ Data DataShareServiceProxy::GetPublishedData(const std::string &bundleName)
         LOG_ERROR("AddTemplate fail to SendRequest, err: %{public}d", err);
         return results;
     }
-    ITypesUtils::Unmarshalling(reply,  results.datas_);
+    ITypesUtil::Unmarshal(reply, results.datas_);
     return results;
 }
 
@@ -282,7 +278,7 @@ std::vector<OperationResult> DataShareServiceProxy::SubscribeRdbData(const std::
         return results;
     }
 
-    if (!ITypesUtils::Marshal(data, uris, templateId.subscriberId_, templateId.bundleName_)) {
+    if (!ITypesUtil::Marshal(data, uris, templateId.subscriberId_, templateId.bundleName_)) {
         LOG_ERROR("Write to message parcel failed!");
         return results;
     }
@@ -298,7 +294,7 @@ std::vector<OperationResult> DataShareServiceProxy::SubscribeRdbData(const std::
         LOG_ERROR("SubscribeRdbData fail to SendRequest. err: %{public}d", err);
         return results;
     }
-    ITypesUtils::Unmarshal(reply, results);
+    ITypesUtil::Unmarshal(reply, results);
     return results;
 }
 
@@ -312,7 +308,7 @@ std::vector<OperationResult> DataShareServiceProxy::UnSubscribeRdbData(
         return results;
     }
 
-    if (!ITypesUtils::Marshal(data, uris, templateId.subscriberId_, templateId.bundleName_)) {
+    if (!ITypesUtil::Marshal(data, uris, templateId.subscriberId_, templateId.bundleName_)) {
         LOG_ERROR("Write to message parcel failed!");
         return results;
     }
@@ -321,10 +317,10 @@ std::vector<OperationResult> DataShareServiceProxy::UnSubscribeRdbData(
     MessageOption option;
     int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_UNSUBSCRIBE_RDB, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
+        LOG_ERROR("fail to SendRequest. err: %{public}d", err);
         return results;
     }
-    ITypesUtils::Unmarshal(reply, results);
+    ITypesUtil::Unmarshal(reply, results);
     return results;
 }
 
@@ -338,7 +334,7 @@ std::vector<OperationResult> DataShareServiceProxy::EnableSubscribeRdbData(
         return results;
     }
 
-    if (!ITypesUtils::Marshal(data, uris, templateId.subscriberId_, templateId.bundleName_)) {
+    if (!ITypesUtil::Marshal(data, uris, templateId.subscriberId_, templateId.bundleName_)) {
         LOG_ERROR("Write to message parcel failed!");
         return results;
     }
@@ -347,10 +343,10 @@ std::vector<OperationResult> DataShareServiceProxy::EnableSubscribeRdbData(
     MessageOption option;
     int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_ENABLE_SUBSCRIBE_RDB, data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
+        LOG_ERROR("fail to SendRequest. err: %{public}d", err);
         return results;
     }
-    ITypesUtils::Unmarshal(reply, results);
+    ITypesUtil::Unmarshal(reply, results);
     return results;
 }
 
@@ -364,7 +360,7 @@ std::vector<OperationResult> DataShareServiceProxy::DisableSubscribeRdbData(
         return results;
     }
 
-    if (!ITypesUtils::Marshal(data, uris, templateId.subscriberId_, templateId.bundleName_)) {
+    if (!ITypesUtil::Marshal(data, uris, templateId.subscriberId_, templateId.bundleName_)) {
         LOG_ERROR("Write to message parcel failed!");
         return results;
     }
@@ -376,7 +372,7 @@ std::vector<OperationResult> DataShareServiceProxy::DisableSubscribeRdbData(
         LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
         return results;
     }
-    ITypesUtils::Unmarshal(reply, results);
+    ITypesUtil::Unmarshal(reply, results);
     return results;
 }
 
@@ -389,7 +385,7 @@ std::vector<OperationResult> DataShareServiceProxy::SubscribePublishedData(
         LOG_ERROR("Write descriptor failed!");
         return results;
     }
-    if (!ITypesUtils::Marshal(data, uris, subscriberId)) {
+    if (!ITypesUtil::Marshal(data, uris, subscriberId)) {
         LOG_ERROR("Write to message parcel failed!");
         return results;
     }
@@ -405,7 +401,7 @@ std::vector<OperationResult> DataShareServiceProxy::SubscribePublishedData(
         LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
         return results;
     }
-    ITypesUtils::Unmarshal(reply, results);
+    ITypesUtil::Unmarshal(reply, results);
     return results;
 }
 
@@ -418,7 +414,7 @@ std::vector<OperationResult> DataShareServiceProxy::UnSubscribePublishedData(
         LOG_ERROR("Write descriptor failed!");
         return results;
     }
-    if (!ITypesUtils::Marshal(data, uris, subscriberId)) {
+    if (!ITypesUtil::Marshal(data, uris, subscriberId)) {
         LOG_ERROR("Write to message parcel failed!");
         return results;
     }
@@ -430,7 +426,7 @@ std::vector<OperationResult> DataShareServiceProxy::UnSubscribePublishedData(
         LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
         return results;
     }
-    ITypesUtils::Unmarshal(reply, results);
+    ITypesUtil::Unmarshal(reply, results);
     return results;
 }
 
@@ -443,7 +439,7 @@ std::vector<OperationResult> DataShareServiceProxy::EnableSubscribePublishedData
         LOG_ERROR("Write descriptor failed!");
         return results;
     }
-    if (!ITypesUtils::Marshal(data, uris, subscriberId)) {
+    if (!ITypesUtil::Marshal(data, uris, subscriberId)) {
         LOG_ERROR("Write to message parcel failed!");
         return results;
     }
@@ -455,7 +451,7 @@ std::vector<OperationResult> DataShareServiceProxy::EnableSubscribePublishedData
         LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
         return results;
     }
-    ITypesUtils::Unmarshal(reply, results);
+    ITypesUtil::Unmarshal(reply, results);
     return results;
 }
 
@@ -468,7 +464,7 @@ std::vector<OperationResult> DataShareServiceProxy::DisableSubscribePublishedDat
         LOG_ERROR("Write descriptor failed!");
         return results;
     }
-    if (!ITypesUtils::Marshal(data, uris, subscriberId)) {
+    if (!ITypesUtil::Marshal(data, uris, subscriberId)) {
         LOG_ERROR("Write to message parcel failed!");
         return results;
     }
@@ -480,7 +476,7 @@ std::vector<OperationResult> DataShareServiceProxy::DisableSubscribePublishedDat
         LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
         return results;
     }
-    ITypesUtils::Unmarshal(reply, results);
+    ITypesUtil::Unmarshal(reply, results);
     return results;
 }
 } // namespace DataShare

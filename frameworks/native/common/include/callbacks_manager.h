@@ -41,7 +41,6 @@ public:
         std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnLastDel =
             CallbacksManager::DefaultProcess2);
     std::vector<std::shared_ptr<Observer>> GetEnabledObservers(const Key &);
-    void DelAllObservers(std::function<void(const std::vector<Key> &)>);
     int GetEnabledSubscriberSize();
 private:
     static void DefaultProcess2(const std::vector<Key> &, std::vector<OperationResult> &){};
@@ -241,20 +240,6 @@ int CallbacksManager<Key, Observer>::GetEnabledSubscriberSize()
         }
     }
     return count;
-}
-
-template<class Key, class Observer>
-void CallbacksManager<Key, Observer>::DelAllObservers(std::function<void(const std::vector<Key> &)> processOnLastDel)
-{
-    std::vector<Key> lastDelKeys;
-    {
-        std::lock_guard<decltype(mutex_)> lck(mutex_);
-        for (auto &it : callbacks_) {
-            lastDelKeys.emplace_back(it.first);
-        }
-        callbacks_.clear();
-    }
-    processOnLastDel(lastDelKeys);
 }
 } // namespace OHOS::DataShare
 #endif // DATA_SHARE_CALLBACKS_MANAGER_H
