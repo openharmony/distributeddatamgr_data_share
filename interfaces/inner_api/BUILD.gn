@@ -49,7 +49,8 @@ config("datashare_public_config") {
 }
 
 ohos_shared_library("datashare_consumer") {
-  include_dirs = []
+  include_dirs =
+      [ "//foundation/distributeddatamgr/kv_store/frameworks/common" ]
 
   sources = [
     "${datashare_native_consumer_path}/src/connection_factory.cpp",
@@ -92,7 +93,8 @@ ohos_shared_library("datashare_consumer") {
 }
 
 ohos_shared_library("datashare_provider") {
-  include_dirs = []
+  include_dirs =
+      [ "//foundation/distributeddatamgr/kv_store/frameworks/common" ]
 
   sources = [
     "${datashare_native_provider_path}/src/datashare_ext_ability.cpp",

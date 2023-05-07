@@ -76,7 +76,7 @@ ErrCode DataShareStub::CmdGetFileTypes(MessageParcel &data, MessageParcel &reply
         LOG_ERROR("Unmarshalling value is nullptr");
         return ERR_INVALID_VALUE;
     }
-	if (mimeTypeFilter.empty()) {
+    if (mimeTypeFilter.empty()) {
         LOG_ERROR("mimeTypeFilter is nullptr");
         return ERR_INVALID_VALUE;
     }
