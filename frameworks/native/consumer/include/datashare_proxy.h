@@ -18,6 +18,7 @@
 
 #include <iremote_proxy.h>
 #include <memory>
+
 #include "idatashare.h"
 
 namespace OHOS {
@@ -58,10 +59,41 @@ public:
 
     virtual Uri DenormalizeUri(const Uri &uri) override;
 
+    int AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl) override;
+
+    int DelQueryTemplate(const std::string &uri, int64_t subscriberId) override;
+
+    std::vector<OperationResult> Publish(const Data &data, const std::string &bundleName) override;
+
+    Data GetPublishedData(const std::string &bundleName) override;
+
+    std::vector<OperationResult> SubscribeRdbData(const std::vector<std::string> &uris, const TemplateId &templateId,
+        const sptr<IDataProxyRdbObserver> &observer) override;
+
+    std::vector<OperationResult> UnSubscribeRdbData(
+        const std::vector<std::string> &uris, const TemplateId &templateId) override;
+
+    std::vector<OperationResult> EnableSubscribeRdbData(
+        const std::vector<std::string> &uris, const TemplateId &templateId) override;
+
+    std::vector<OperationResult> DisableSubscribeRdbData(
+        const std::vector<std::string> &uris, const TemplateId &templateId) override;
+
+    std::vector<OperationResult> SubscribePublishedData(const std::vector<std::string> &uris, int64_t subscriberId,
+        const sptr<IDataProxyPublishedDataObserver> &observer) override;
+
+    std::vector<OperationResult> UnSubscribePublishedData(
+        const std::vector<std::string> &uris, int64_t subscriberId) override;
+
+    std::vector<OperationResult> EnableSubscribePublishedData(
+        const std::vector<std::string> &uris, int64_t subscriberId) override;
+
+    std::vector<OperationResult> DisableSubscribePublishedData(
+        const std::vector<std::string> &uris, int64_t subscriberId) override;
+
 private:
     static inline BrokerDelegator<DataShareProxy> delegator_;
 };
 } // namespace DataShare
 } // namespace OHOS
 #endif // DATASHARE_PROXY_H
-
