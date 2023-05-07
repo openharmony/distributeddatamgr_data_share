@@ -100,7 +100,7 @@ struct PublishedDataItem {
     std::string key_;
     /** The subscriber id */
     int64_t subscriberId_;
-	/** The published data. If the data is large, use Ashmem. Do not access, only for ipc */
+    /** The published data. If the data is large, use Ashmem. Do not access, only for ipc */
     std::variant<AshmemNode, std::string> value_;
     PublishedDataItem(){};
     virtual ~PublishedDataItem()

@@ -175,7 +175,6 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, 
  */
 bool DataShareHelper::Release()
 {
-    LOG_INFO("Release Start");
     connection_ = nullptr;
     uri_ = Uri("");
     return true;
