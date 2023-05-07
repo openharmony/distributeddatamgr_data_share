@@ -845,9 +845,9 @@ napi_value NapiDataShareHelper::Napi_Off(napi_env env, napi_callback_info info)
         error = std::make_shared<ParametersTypeError>("type", "string"), error, nullptr);
     std::string type = DataShareJSUtils::Convert2String(env, argv[0]);
     if (type == "rdbDataChange") {
-        return Napi_UnSubscribeRdbObserver(env, argc, argv, self);
+        return Napi_UnsubscribeRdbObserver(env, argc, argv, self);
     } else if (type == "publishedDataChange") {
-        return Napi_UnSubscribePublishedObserver(env, argc, argv, self);
+        return Napi_UnsubscribePublishedObserver(env, argc, argv, self);
     }
     NAPI_ASSERT_BASE(env, type == "dataChange", "type is not dataChange", nullptr);
 
@@ -982,7 +982,7 @@ napi_value NapiDataShareHelper::Napi_SubscribeRdbObserver(napi_env env, size_t a
     return DataShareJSUtils::Convert2JSValue(env, results);
 }
 
-napi_value NapiDataShareHelper::Napi_UnSubscribeRdbObserver(napi_env env, size_t argc, napi_value *argv,
+napi_value NapiDataShareHelper::Napi_UnsubscribeRdbObserver(napi_env env, size_t argc, napi_value *argv,
     napi_value self)
 {
     std::vector<OperationResult> results;
@@ -1064,7 +1064,7 @@ napi_value NapiDataShareHelper::Napi_SubscribePublishedObserver(napi_env env, si
     return DataShareJSUtils::Convert2JSValue(env, results);
 }
 
-napi_value NapiDataShareHelper::Napi_UnSubscribePublishedObserver(napi_env env, size_t argc, napi_value *argv,
+napi_value NapiDataShareHelper::Napi_UnsubscribePublishedObserver(napi_env env, size_t argc, napi_value *argv,
     napi_value self)
 {
     std::vector<OperationResult> results;

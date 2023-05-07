@@ -51,9 +51,9 @@ private:
     static napi_value GetConstructor(napi_env env);
     static napi_value Initialize(napi_env env, napi_callback_info info);
     static napi_value Napi_SubscribeRdbObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
-    static napi_value Napi_UnSubscribeRdbObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
+    static napi_value Napi_UnsubscribeRdbObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
     static napi_value Napi_SubscribePublishedObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
-    static napi_value Napi_UnSubscribePublishedObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
+    static napi_value Napi_UnsubscribePublishedObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
 
     bool HasRegisteredObserver(napi_env env, std::list<sptr<NAPIDataShareObserver>> &list, napi_value callback);
     void RegisteredObserver(napi_env env, const std::string &uri, napi_value callback);

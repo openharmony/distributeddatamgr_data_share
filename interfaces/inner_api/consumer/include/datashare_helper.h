@@ -333,7 +333,7 @@ public:
      * @param templateId, the template of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> UnSubscribeRdbData(const std::vector<std::string> &uris = std::vector<std::string>(),
+    std::vector<OperationResult> UnsubscribeRdbData(const std::vector<std::string> &uris = std::vector<std::string>(),
         const TemplateId &templateId = TemplateId());
 
     /**
@@ -342,8 +342,7 @@ public:
      * @param templateId, the template of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> EnableRdbSubs(const std::vector<std::string> &uris,
-        const TemplateId &templateId);
+    std::vector<OperationResult> EnableRdbSubs(const std::vector<std::string> &uris, const TemplateId &templateId);
 
     /**
      * @brief Disable observers by the given uris and template.
@@ -351,8 +350,7 @@ public:
      * @param templateId, the template of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> DisableRdbSubs(const std::vector<std::string> &uris,
-        const TemplateId &templateId);
+    std::vector<OperationResult> DisableRdbSubs(const std::vector<std::string> &uris, const TemplateId &templateId);
 
     /**
      * @brief Registers observers to observe published data specified by the given uris and subscriberId.
@@ -370,7 +368,7 @@ public:
      * @param subscriberId, the subscriberId of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> UnSubscribePublishedData(
+    std::vector<OperationResult> UnsubscribePublishedData(
         const std::vector<std::string> &uris = std::vector<std::string>(), int64_t subscriberId = 0);
 
     /**
@@ -379,8 +377,7 @@ public:
      * @param subscriberId, the subscriberId of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> EnableSubscribePublishedData(const std::vector<std::string> &uris,
-        int64_t subscriberId);
+    std::vector<OperationResult> EnablePubSubs(const std::vector<std::string> &uris, int64_t subscriberId);
 
     /**
      * @brief Disable observers by the given uris and template.
@@ -388,8 +385,7 @@ public:
      * @param subscriberId, the subscriberId of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> DisableSubscribePublishedData(const std::vector<std::string> &uris,
-        int64_t subscriberId);
+    std::vector<OperationResult> DisablePubSubs(const std::vector<std::string> &uris, int64_t subscriberId);
 
 private:
     DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,

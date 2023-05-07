@@ -900,7 +900,7 @@ std::vector<OperationResult> DataShareHelper::SubscribeRdbData(const std::vector
     return manager->AddObservers(proxy, uris, templateId, callback);
 }
 
-std::vector<OperationResult> DataShareHelper::UnSubscribeRdbData(const std::vector<std::string> &uris,
+std::vector<OperationResult> DataShareHelper::UnsubscribeRdbData(const std::vector<std::string> &uris,
     const TemplateId &templateId)
 {
     LOG_DEBUG("Start UnSubscribeRdbData");
@@ -927,7 +927,7 @@ std::vector<OperationResult> DataShareHelper::UnSubscribeRdbData(const std::vect
     return manager->DelObservers(proxy, uris, templateId);
 }
 
-std::vector<OperationResult> DataShareHelper::EnableSubscribeRdbData(const std::vector<std::string> &uris,
+std::vector<OperationResult> DataShareHelper::EnableRdbSubs(const std::vector<std::string> &uris,
     const TemplateId &templateId)
 {
     LOG_DEBUG("Start EnableSubscribeRdbData");
@@ -954,7 +954,7 @@ std::vector<OperationResult> DataShareHelper::EnableSubscribeRdbData(const std::
     return manager->EnableObservers(proxy, uris, templateId);
 }
 
-std::vector<OperationResult> DataShareHelper::DisableSubscribeRdbData(const std::vector<std::string> &uris,
+std::vector<OperationResult> DataShareHelper::DisableRdbSubs(const std::vector<std::string> &uris,
     const TemplateId &templateId)
 {
     LOG_DEBUG("Start DisableSubscribeRdbData");
@@ -1007,7 +1007,7 @@ std::vector<OperationResult> DataShareHelper::SubscribePublishedData(const std::
     return manager->AddObservers(proxy, uris, subscriberId, callback);
 }
 
-std::vector<OperationResult> DataShareHelper::UnSubscribePublishedData(const std::vector<std::string> &uris,
+std::vector<OperationResult> DataShareHelper::UnsubscribePublishedData(const std::vector<std::string> &uris,
     int64_t subscriberId)
 {
     LOG_DEBUG("Start UnSubscribePublishedData");
@@ -1034,7 +1034,7 @@ std::vector<OperationResult> DataShareHelper::UnSubscribePublishedData(const std
     return manager->DelObservers(proxy, uris, subscriberId);
 }
 
-std::vector<OperationResult> DataShareHelper::EnableSubscribePublishedData(const std::vector<std::string> &uris,
+std::vector<OperationResult> DataShareHelper::EnablePubSubs(const std::vector<std::string> &uris,
     int64_t subscriberId)
 {
     LOG_DEBUG("Start UnSubscribePublishedData");
@@ -1061,7 +1061,7 @@ std::vector<OperationResult> DataShareHelper::EnableSubscribePublishedData(const
     return manager->EnableObservers(proxy, uris, subscriberId);
 }
 
-std::vector<OperationResult> DataShareHelper::DisableSubscribePublishedData(const std::vector<std::string> &uris,
+std::vector<OperationResult> DataShareHelper::DisablePubSubs(const std::vector<std::string> &uris,
     int64_t subscriberId)
 {
     LOG_DEBUG("Start UnSubscribePublishedData");
