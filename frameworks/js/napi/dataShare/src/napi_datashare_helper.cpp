@@ -797,21 +797,25 @@ napi_value NapiDataShareHelper::Napi_On(napi_env env, napi_callback_info info)
     size_t argc = MAX_ARGC;
     napi_value argv[MAX_ARGC] = { nullptr };
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, nullptr));
-    std::shared_ptr<Error> error = nullptr;
-    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, argc == ARGS_THREE || argc == ARGS_FOUR,
-        error = std::make_shared<ParametersNumError>("3 or 4"), error, nullptr);
+    NAPI_ASSERT(env, argc == ARGS_THREE || argc == ARGS_FOUR, "wrong count of args");
 
     napi_valuetype valueType;
     NAPI_CALL(env, napi_typeof(env, argv[0], &valueType));
-    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
-        error = std::make_shared<ParametersTypeError>("type", "string"), error, nullptr);
+    if (valueType != napi_string) {
+        LOG_ERROR("type is not string");
+        return nullptr;
+    }
+
     std::string type = DataShareJSUtils::Convert2String(env, argv[0]);
     if (type == "rdbDataChange") {
         return Napi_SubscribeRdbObserver(env, argc, argv, self);
     } else if (type == "publishedDataChange") {
         return Napi_SubscribePublishedObserver(env, argc, argv, self);
     }
-    NAPI_ASSERT_BASE(env, type == "dataChange", "type is not dataChange", nullptr);
+    if (type != "dataChange") {
+        LOG_ERROR("wrong register type : %{public}s", type.c_str());
+        return nullptr;
+    }
 
     NapiDataShareHelper *proxy = nullptr;
     NAPI_CALL_BASE(env, napi_unwrap(env, self, reinterpret_cast<void **>(&proxy)), nullptr);
@@ -835,21 +839,25 @@ napi_value NapiDataShareHelper::Napi_Off(napi_env env, napi_callback_info info)
     size_t argc = MAX_ARGC;
     napi_value argv[MAX_ARGC] = { nullptr };
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, nullptr));
-    std::shared_ptr<Error> error = nullptr;
-    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, argc == ARGS_TWO || argc == ARGS_THREE || argc == ARGS_FOUR,
-        error = std::make_shared<ParametersNumError>("2 or 3 or 4"), error, nullptr);
+    NAPI_ASSERT(env, argc == ARGS_TWO || argc == ARGS_THREE || argc == ARGS_FOUR, "wrong count of args");
 
     napi_valuetype valueType;
     NAPI_CALL(env, napi_typeof(env, argv[0], &valueType));
-    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
-        error = std::make_shared<ParametersTypeError>("type", "string"), error, nullptr);
+    if (valueType != napi_string) {
+        LOG_ERROR("type is not string");
+        return nullptr;
+    }
+
     std::string type = DataShareJSUtils::Convert2String(env, argv[0]);
     if (type == "rdbDataChange") {
         return Napi_UnsubscribeRdbObserver(env, argc, argv, self);
     } else if (type == "publishedDataChange") {
         return Napi_UnsubscribePublishedObserver(env, argc, argv, self);
     }
-    NAPI_ASSERT_BASE(env, type == "dataChange", "type is not dataChange", nullptr);
+    if (type != "dataChange") {
+        LOG_ERROR("wrong register type : %{public}s", type.c_str());
+        return nullptr;
+    }
 
     NapiDataShareHelper *proxy = nullptr;
     NAPI_CALL_BASE(env, napi_unwrap(env, self, reinterpret_cast<void **>(&proxy)), nullptr);
