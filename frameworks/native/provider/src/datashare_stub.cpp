@@ -123,12 +123,10 @@ ErrCode DataShareStub::CmdOpenRawFile(MessageParcel &data, MessageParcel &reply)
         return ERR_INVALID_VALUE;
     }
     int fd = OpenRawFile(uri, mode);
-    if (!reply.WriteFileDescriptor(fd)) {
-        LOG_ERROR("fail to WriteFileDescriptor fd");
-        close(fd);
+    if (!ITypesUtil::Marshal(reply, fd)) {
+        LOG_ERROR("Marshal value is nullptr");
         return ERR_INVALID_VALUE;
     }
-    close(fd);
     return DATA_SHARE_NO_ERROR;
 }
 
