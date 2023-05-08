@@ -59,16 +59,6 @@ void ProxyDatasTest::SetUpTestCase(void)
         .domain = "test.domain",
         .permList = {
             {
-                .permissionName = "ohos.permission.test",
-                .bundleName = "ohos.datashareproxyclienttest.demo",
-                .grantMode = 1,
-                .availableLevel = APL_NORMAL,
-                .label = "label",
-                .labelId = 1,
-                .description = "ohos.datashareproxyclienttest.demo",
-                .descriptionId = 1
-            },
-            {
                 .permissionName = "ohos.permission.GET_BUNDLE_INFO",
                 .bundleName = "ohos.datashareproxyclienttest.demo",
                 .grantMode = 1,
@@ -80,13 +70,6 @@ void ProxyDatasTest::SetUpTestCase(void)
             }
         },
         .permStateList = {
-            {
-                .permissionName = "ohos.permission.test",
-                .isGeneral = true,
-                .resDeviceID = { "local" },
-                .grantStatus = { PermissionState::PERMISSION_GRANTED },
-                .grantFlags = { 1 }
-            },
             {
                 .permissionName = "ohos.permission.GET_BUNDLE_INFO",
                 .isGeneral = true,

@@ -28,21 +28,21 @@ struct Index {
         .fontWeight(FontWeight.Bold)
 
       Text(`${this.message}`)
-        .fontSize(30)
-        .height('15%')
+        .fontSize(35)
+        .height('20%')
         .width('100%')
         .textAlign(TextAlign.Center)
 
       Row() {
         Button() {
           Text('Connect')
-            .fontSize(25)
+            .fontSize(20)
             .fontWeight(FontWeight.Bold)
         }.type(ButtonType.Capsule)
         .margin({
-          top: 20
+          top: 25
         })
-        .width('45%')
+        .width('40%')
         .height('8%')
         .backgroundColor('#0ddffb')
         .onClick(async () => {
@@ -54,13 +54,13 @@ struct Index {
 
         Button() {
           Text('Disconnect')
-            .fontSize(25)
+            .fontSize(20)
             .fontWeight(FontWeight.Bold)
         }.type(ButtonType.Capsule)
         .margin({
-          top: 20
+          top: 25
         })
-        .width('45%')
+        .width('40%')
         .height('8%')
         .backgroundColor('#0ddffb')
         .onClick(async () => {
@@ -74,13 +74,13 @@ struct Index {
       Row() {
         Button() {
           Text('Insert')
-            .fontSize(25)
+            .fontSize(20)
             .fontWeight(FontWeight.Bold)
         }.type(ButtonType.Capsule)
         .margin({
-          top: 20
+          top: 25
         })
-        .width('45%')
+        .width('40%')
         .height('8%')
         .backgroundColor('#0ddffb')
         .onClick(async () => {
