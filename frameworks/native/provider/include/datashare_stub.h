@@ -46,6 +46,7 @@ private:
 
     using RequestFuncType = int (DataShareStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, RequestFuncType> stubFuncMap_;
+    static constexpr int VALUEBUCKET_MAX_COUNT = 3000;
 };
 } // namespace DataShare
 } // namespace OHOS
