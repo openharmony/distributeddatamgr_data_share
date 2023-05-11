@@ -14,6 +14,16 @@
  limitations under the License.
 -->
 <configuration ver="2.0">
+    <target name="ProxyDatasTest">
+        <preparer>
+            <option name="push" value="datashareproxy_bundle/proxydatas_with_permission.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/proxydatas_with_permission.hap"/>
+            <option name="shell" value="aa start -b com.acts.ohos.data.datasharetest -a MainAbility"/>
+        </preparer>
+        <cleaner>
+            <option name="shell" value="bm uninstall -n com.acts.ohos.data.datasharetest"/>
+        </cleaner>
+    </target>
     <target name="SlientAccessTest">
         <preparer>
             <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
