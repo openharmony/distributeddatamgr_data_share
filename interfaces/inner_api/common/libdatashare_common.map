@@ -21,7 +21,7 @@
     *DataShareValuesBucket*;
     *Error*;
     *ISharedResultSet*;
-    *ITypesUtils*;
+    *ITypesUtil*;
   local:
     *;
 };

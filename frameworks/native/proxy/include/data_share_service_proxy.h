@@ -16,15 +16,15 @@
 #ifndef DATASHARESERVICE_DATA_SHARE_SERVICE_PROXY_H
 #define DATASHARESERVICE_DATA_SHARE_SERVICE_PROXY_H
 
-#include <iremote_proxy.h>
-
 #include <atomic>
+#include <iremote_proxy.h>
 #include <list>
 
+#include "data_proxy_observer.h"
+#include "datashare_business_error.h"
 #include "datashare_values_bucket.h"
 #include "idata_share_service.h"
 #include "uri.h"
-#include "datashare_business_error.h"
 
 namespace OHOS::DataShare {
 class DataShareServiceProxy : public IRemoteProxy<IDataShareService>, public BaseProxy {
@@ -32,10 +32,10 @@ public:
     explicit DataShareServiceProxy(const sptr<IRemoteObject> &object);
     virtual int Insert(const Uri &uri, const DataShareValuesBucket &valuesBucket) override;
 
-    virtual  int Update(const Uri &uri, const DataSharePredicates &predicate,
-                        const DataShareValuesBucket &valuesBucket) override;
+    virtual int Update(const Uri &uri, const DataSharePredicates &predicate,
+        const DataShareValuesBucket &valuesBucket) override;
 
-    virtual  int Delete(const Uri &uri, const DataSharePredicates &predicate) override;
+    virtual int Delete(const Uri &uri, const DataSharePredicates &predicate) override;
 
     virtual std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
         std::vector<std::string> &columns, DatashareBusinessError &businessError) override;
@@ -59,6 +59,38 @@ public:
     virtual Uri NormalizeUri(const Uri &uri) override;
 
     virtual Uri DenormalizeUri(const Uri &uri) override;
+
+    int AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl) override;
+
+    int DelQueryTemplate(const std::string &uri, int64_t subscriberId) override;
+
+    std::vector<OperationResult> Publish(const Data &data, const std::string &bundleName) override;
+
+    Data GetPublishedData(const std::string &bundleName) override;
+
+    std::vector<OperationResult> SubscribeRdbData(const std::vector<std::string> &uris, const TemplateId &templateId,
+        const sptr<IDataProxyRdbObserver> &observer) override;
+
+    std::vector<OperationResult> UnSubscribeRdbData(
+        const std::vector<std::string> &uris, const TemplateId &templateId) override;
+
+    std::vector<OperationResult> EnableSubscribeRdbData(
+        const std::vector<std::string> &uris, const TemplateId &templateId) override;
+
+    std::vector<OperationResult> DisableSubscribeRdbData(
+        const std::vector<std::string> &uris, const TemplateId &templateId) override;
+
+    std::vector<OperationResult> SubscribePublishedData(const std::vector<std::string> &uris, int64_t subscriberId,
+        const sptr<IDataProxyPublishedDataObserver> &observer) override;
+
+    std::vector<OperationResult> UnSubscribePublishedData(
+        const std::vector<std::string> &uris, int64_t subscriberId) override;
+
+    std::vector<OperationResult> EnableSubscribePublishedData(
+        const std::vector<std::string> &uris, int64_t subscriberId) override;
+
+    std::vector<OperationResult> DisableSubscribePublishedData(
+        const std::vector<std::string> &uris, int64_t subscriberId) override;
 
 private:
     static inline BrokerDelegator<DataShareServiceProxy> delegator_;

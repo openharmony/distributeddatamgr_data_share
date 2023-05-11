@@ -19,6 +19,7 @@ ohos_shared_library("datashare") {
     "${datashare_napi_path}/dataShare/include",
     "${datashare_common_napi_path}/include",
     "${datashare_common_native_path}/include",
+    "${datashare_napi_path}/observer/include",
   ]
 
   sources = [
@@ -27,6 +28,8 @@ ohos_shared_library("datashare") {
     "${datashare_napi_path}/dataShare/src/napi_datashare_inner_observer.cpp",
     "${datashare_napi_path}/dataShare/src/napi_datashare_observer.cpp",
     "${datashare_napi_path}/dataShare/src/native_datashare_module.cpp",
+    "${datashare_napi_path}/observer/src/napi_observer.cpp",
+    "${datashare_napi_path}/observer/src/napi_subscriber_manager.cpp",
   ]
 
   deps = [

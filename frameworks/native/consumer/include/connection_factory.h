@@ -26,6 +26,7 @@ class ConnectionFactory {
 public:
     ~ConnectionFactory() = default;
     std::shared_ptr<BaseConnection> GetConnection(Uri &uri, const sptr<IRemoteObject> token);
+    std::shared_ptr<BaseConnection> GetConnection(const Uri &uri, const CreateOptions &options);
     static ConnectionFactory& GetInstance();
 
 private:

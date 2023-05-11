@@ -16,15 +16,17 @@
 #ifndef DATASHARE_HELPER_H
 #define DATASHARE_HELPER_H
 
-
 #include <map>
 #include <memory>
 #include <mutex>
+#include <published_data_subscriber_manager.h>
 #include <string>
 
 #include "base_connection.h"
-#include "context.h"
+#include "app/context.h"
 #include "datashare_business_error.h"
+#include "datashare_template.h"
+#include "rdb_subscriber_manager.h"
 #include "uri.h"
 
 using Uri = OHOS::Uri;
@@ -33,7 +35,7 @@ namespace OHOS {
 namespace AppExecFwk {
 class PacMap;
 class IDataAbilityObserver;
-}
+} // namespace AppExecFwk
 
 namespace DataShare {
 using string = std::string;
@@ -88,6 +90,16 @@ public:
      * @return Returns the created DataShareHelper instance.
      */
     static std::shared_ptr<DataShareHelper> Creator(const sptr<IRemoteObject> &token, const std::string &strUri);
+
+    /**
+     * @brief Creates a DataShareHelper instance with the Uri and {@link #CreateOptions} .
+     *
+     * @param strUri Indicates the database table or disk file to operate.
+     * @param options Indicates the optional config.
+     *
+     * @return Returns the created DataShareHelper instance with a specified Uri.
+     */
+    static std::shared_ptr<DataShareHelper> Creator(const std::string &strUri, const CreateOptions &options);
 
     /**
      * @brief Releases the client resource of the Data share.
@@ -273,17 +285,122 @@ public:
      */
     Uri DenormalizeUri(Uri &uri);
 
+    /**
+     * @brief Adds a template of {@link #SubscribeRdbData}.
+     * @param uri, the uri to add.
+     * @param subscriberId, the subscribe id to add.
+     * @param tpl, the template to add.
+     * @return Returns the error code.
+     */
+    int AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl);
+
+    /**
+     * @brief Deletes a template of {@link #SubscribeRdbData}
+     * @param uri, the uri to delete.
+     * @param subscriberId, the subscribe id to delete.
+     * @return Returns the error code.
+     */
+    int DelQueryTemplate(const std::string &uri, int64_t subscriberId);
+
+    /**
+     * @brief Update a single data into host data area.
+     * @param data, the data to publish.
+     * @param bundleName the bundleName of data to publish.
+     * @return Returns the error code.
+     */
+    std::vector<OperationResult> Publish(const Data &data, const std::string &bundleName);
+
+    /**
+     * @brief Get published data by bundleName.
+     * @param bundleName, the bundleName of data.
+     * @return Data {@link #Data}
+     */
+    Data GetPublishedData(const std::string &bundleName);
+
+    /**
+     * @brief Registers observers to observe rdb data specified by the given uris and template.
+     * @param uris, the paths of the data to operate.
+     * @param templateId, the template of observers.
+     * @param callback, the callback function of observers.
+     * @return Returns the error code.
+     */
+    std::vector<OperationResult> SubscribeRdbData(const std::vector<std::string> &uris, const TemplateId &templateId,
+        const std::function<void(const RdbChangeNode &changeNode)> &callback);
+
+    /**
+     * @brief Unregisters observers used for monitoring data specified by the given uris and template.
+     * @param uris, the paths of the data to operate, if uris is empty, Unregisters all observers.
+     * @param templateId, the template of observers.
+     * @return Returns the error code.
+     */
+    std::vector<OperationResult> UnsubscribeRdbData(const std::vector<std::string> &uris = std::vector<std::string>(),
+        const TemplateId &templateId = TemplateId());
+
+    /**
+     * @brief Enable observers by the given uris and template.
+     * @param uris, the paths of the data to operate.
+     * @param templateId, the template of observers.
+     * @return Returns the error code.
+     */
+    std::vector<OperationResult> EnableRdbSubs(const std::vector<std::string> &uris, const TemplateId &templateId);
+
+    /**
+     * @brief Disable observers by the given uris and template.
+     * @param uris, the paths of the data to operate.
+     * @param templateId, the template of observers.
+     * @return Returns the error code.
+     */
+    std::vector<OperationResult> DisableRdbSubs(const std::vector<std::string> &uris, const TemplateId &templateId);
+
+    /**
+     * @brief Registers observers to observe published data specified by the given uris and subscriberId.
+     * @param uris, the uris of the data to operate.
+     * @param subscriberId, the subscriberId of observers.
+     * @param callback, the callback function of observers.
+     * @return Returns the error code.
+     */
+    std::vector<OperationResult> SubscribePublishedData(const std::vector<std::string> &uris, int64_t subscriberId,
+        const std::function<void(const PublishedDataChangeNode &changeNode)> &callback);
+
+    /**
+     * @brief Unregisters observers used for monitoring data specified by the given uris and subscriberId.
+     * @param uris, the uris of the data to operate, if uris is empty, Unregisters all observers.
+     * @param subscriberId, the subscriberId of observers.
+     * @return Returns the error code.
+     */
+    std::vector<OperationResult> UnsubscribePublishedData(
+        const std::vector<std::string> &uris = std::vector<std::string>(), int64_t subscriberId = 0);
+
+    /**
+     * @brief Enable observers by the given uris and subscriberId.
+     * @param uris, the paths of the data to operate.
+     * @param subscriberId, the subscriberId of observers.
+     * @return Returns the error code.
+     */
+    std::vector<OperationResult> EnablePubSubs(const std::vector<std::string> &uris, int64_t subscriberId);
+
+    /**
+     * @brief Disable observers by the given uris and template.
+     * @param uris, the paths of the data to operate.
+     * @param subscriberId, the subscriberId of observers.
+     * @return Returns the error code.
+     */
+    std::vector<OperationResult> DisablePubSubs(const std::vector<std::string> &uris, int64_t subscriberId);
+
 private:
     DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,
-         std::shared_ptr<BaseConnection> dataShareConnection);
+        std::shared_ptr<BaseConnection> dataShareConnection);
     DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri);
+    DataShareHelper(const CreateOptions &options, const Uri &uri, std::shared_ptr<BaseConnection> dataShareConnection);
     bool isDataShareService_ = false;
     sptr<IRemoteObject> token_ = {};
     Uri uri_ = Uri("");
     std::shared_ptr<BaseConnection> connection_ = nullptr;
     static bool RegObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     static bool UnregObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    std::shared_ptr<RdbSubscriberManager> rdbSubscriberManager_ = nullptr;
+    std::shared_ptr<PublishedDataSubscriberManager> publishedDataSubscriberManager_ = nullptr;
 };
-}  // namespace DataShare
-}  // namespace OHOS
-#endif  // DATASHARE_HELPER_H
+} // namespace DataShare
+} // namespace OHOS
+#endif // DATASHARE_HELPER_H
