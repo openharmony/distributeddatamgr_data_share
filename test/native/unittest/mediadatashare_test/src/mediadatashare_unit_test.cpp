@@ -32,6 +32,43 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Media {
+template <typename T>
+class ConditionLock {
+public:
+    explicit ConditionLock() {}
+    ~ConditionLock() {}
+public:
+    void Notify(const T &data)
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        data_ = data;
+        isSet_ = true;
+        cv_.notify_one();
+    }
+
+    T Wait()
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        cv_.wait_for(lock, std::chrono::seconds(INTERVAL), [this]() { return isSet_; });
+        T data = data_;
+        cv_.notify_one();
+        return data;
+    }
+
+    void Clear()
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        isSet_ = false;
+        cv_.notify_one();
+    }
+
+private:
+    bool isSet_ = false;
+    T data_;
+    std::mutex mutex_;
+    std::condition_variable cv_;
+    static constexpr int64_t INTERVAL = 5;
+};
 class DataShareObserverTest : public DataShare::DataShareObserver {
 public:
     DataShareObserverTest() {}
@@ -40,8 +77,7 @@ public:
     void OnChange(const ChangeInfo &changeInfo) override
     {
         changeInfo_ = changeInfo;
-        std::unique_lock<std::mutex> lock(mutex_);
-        condition_.notify_one();
+        data.Notify(changeInfo);
     }
 
     void Clear()
@@ -50,11 +86,11 @@ public:
         changeInfo_.uris_.clear();
         changeInfo_.data_ = nullptr;
         changeInfo_.size_ = 0;
+        data.Clear();
     }
 
     ChangeInfo changeInfo_;
-    std::mutex mutex_;
-    std::condition_variable condition_;
+    ConditionLock<ChangeInfo> data;
 };
 
 constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
@@ -1251,23 +1287,21 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_001, TestSize.Level0
     EXPECT_EQ((retVal > 0), true);
     ChangeInfo uriChanges = { DataShareObserver::ChangeType::INSERT, { uri } };
     helper->NotifyChangeExt(uriChanges);
-    {
-        unique_lock<mutex> lock(dataObserver->mutex_);
-        dataObserver->condition_.wait_for(lock, 1s);
-        EXPECT_TRUE(ChangeInfoEqual(dataObserver->changeInfo_, uriChanges));
-        dataObserver->Clear();
-    }
+
+    dataObserver->data.Wait();
+    EXPECT_TRUE(ChangeInfoEqual(dataObserver->changeInfo_, uriChanges));
+    dataObserver->Clear();
+
     Uri descendantsUri(MEDIALIBRARY_DATA_URI + "/com.ohos.example");
     helper->Insert(descendantsUri, valuesBucket);
     EXPECT_EQ((retVal > 0), true);
     ChangeInfo descendantsChanges = { DataShareObserver::ChangeType::INSERT, { descendantsUri } };
     helper->NotifyChangeExt(descendantsChanges);
-    {
-        unique_lock<mutex> lock(dataObserver->mutex_);
-        dataObserver->condition_.wait_for(lock, 1s);
-        EXPECT_TRUE(ChangeInfoEqual(dataObserver->changeInfo_, descendantsChanges));
-        dataObserver->Clear();
-    }
+
+    dataObserver->data.Wait();
+    EXPECT_TRUE(ChangeInfoEqual(dataObserver->changeInfo_, descendantsChanges));
+    dataObserver->Clear();
+
     DataShare::DataSharePredicates deletePredicates;
     string selections = MEDIA_DATA_DB_TITLE + " = 'Datashare_Observer_Test001'";
     deletePredicates.SetWhereClause(selections);
@@ -1276,12 +1310,11 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_001, TestSize.Level0
     char data[] = { 0x01, 0x02, 0x03, 0x04, 0x05 };
     ChangeInfo delChanges = { DataShareObserver::ChangeType::DELETE, { uri }, data, sizeof(data)/sizeof(data[0]) } ;
     helper->NotifyChangeExt(delChanges);
-    {
-        unique_lock<mutex> lock(dataObserver->mutex_);
-        dataObserver->condition_.wait_for(lock, 1s);
-        EXPECT_TRUE(ChangeInfoEqual(dataObserver->changeInfo_, delChanges));
-        dataObserver->Clear();
-    }
+
+    dataObserver->data.Wait();
+    EXPECT_TRUE(ChangeInfoEqual(dataObserver->changeInfo_, delChanges));
+    dataObserver->Clear();
+
     helper->UnregisterObserverExt(uri, dataObserver);
     LOG_INFO("MediaDataShare_ObserverExt_001 end");
 }
@@ -1301,19 +1334,17 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_001, TestS
     EXPECT_EQ((retVal > 0), true);
     ChangeInfo uriChanges = { DataShareObserver::ChangeType::INSERT, { uri } };
     helper->NotifyChangeExt(uriChanges);
-    {
-        unique_lock<mutex> lock(dataObserver->mutex_);
-        dataObserver->condition_.wait_for(lock, 1s);
-        EXPECT_TRUE(ChangeInfoEqual(dataObserver->changeInfo_, uriChanges));
-        dataObserver->Clear();
-    }
+
+    dataObserver->data.Wait();
+    EXPECT_TRUE(ChangeInfoEqual(dataObserver->changeInfo_, uriChanges));
+    dataObserver->Clear();
+
     helper->UnregisterObserverExt(uri, dataObserver);
     helper->NotifyChangeExt({ DataShareObserver::ChangeType::DELETE, { uri } });
-    {
-        unique_lock<mutex> lock(dataObserver->mutex_);
-        dataObserver->condition_.wait_for(lock, 1s);
-        EXPECT_FALSE(ChangeInfoEqual(dataObserver->changeInfo_, uriChanges));
-    }
+
+    dataObserver->data.Wait();
+    EXPECT_FALSE(ChangeInfoEqual(dataObserver->changeInfo_, uriChanges));
+    dataObserver->Clear();
     LOG_INFO("MediaDataShare_UnregisterObserverExt_001 end");
 }
 } // namespace Media
