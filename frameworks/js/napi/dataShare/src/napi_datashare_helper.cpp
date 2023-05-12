@@ -666,18 +666,16 @@ napi_value NapiDataShareHelper::Napi_AddTemplate(napi_env env, napi_callback_inf
     NAPI_ASSERT_BASE(env, !uri.empty(), "convert uri failed", nullptr);
 
     NAPI_CALL(env, napi_typeof(env, argv[1], &valueType));
-    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_number,
-        error = std::make_shared<ParametersTypeError>("subscriberId", "int64_t"), error, nullptr);
-    int64_t subscriberId = 0;
-    napi_status status = napi_get_value_int64(env, argv[1], &subscriberId);
-    NAPI_ASSERT_BASE(env, status == napi_ok, "convert subscriberId failed", nullptr);
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
+        error = std::make_shared<ParametersTypeError>("subscriberId", "string"), error, nullptr);
+    std::string subscriberId = DataShareJSUtils::Convert2String(env, argv[1]);
 
     NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_object,
         error = std::make_shared<ParametersTypeError>("template", "Template"), error, nullptr);
     Template tpl = DataShareJSUtils::Convert2Template(env, argv[PARAM2]);
 
-    auto res = proxy->datashareHelper_->AddQueryTemplate(uri, subscriberId, tpl);
+    auto res = proxy->datashareHelper_->AddQueryTemplate(uri, atoll(subscriberId.c_str()), tpl);
     return DataShareJSUtils::Convert2JSValue(env, res);
 }
 
@@ -704,13 +702,11 @@ napi_value NapiDataShareHelper::Napi_DelTemplate(napi_env env, napi_callback_inf
     NAPI_ASSERT_BASE(env, !uri.empty(), "convert uri failed", nullptr);
 
     NAPI_CALL(env, napi_typeof(env, argv[1], &valueType));
-    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_number,
-        error = std::make_shared<ParametersTypeError>("subscriberId", "int64_t"), error, nullptr);
-    int64_t subscriberId = 0;
-    napi_status status = napi_get_value_int64(env, argv[1], &subscriberId);
-    NAPI_ASSERT_BASE(env, status == napi_ok, "convert subscriberId failed", nullptr);
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
+        error = std::make_shared<ParametersTypeError>("subscriberId", "string"), error, nullptr);
+    std::string subscriberId = DataShareJSUtils::Convert2String(env, argv[1]);
 
-    auto res = proxy->datashareHelper_->DelQueryTemplate(uri, subscriberId);
+    auto res = proxy->datashareHelper_->DelQueryTemplate(uri, atoll(subscriberId.c_str()));
     return DataShareJSUtils::Convert2JSValue(env, res);
 }
 
@@ -1056,10 +1052,8 @@ napi_value NapiDataShareHelper::Napi_SubscribePublishedObserver(napi_env env, si
 
     NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_number,
-        error = std::make_shared<ParametersTypeError>("subscriberId", "int64_t"), error, jsResults);
-    int64_t subscriberId = 0;
-    napi_status status = napi_get_value_int64(env, argv[2], &subscriberId);
-    NAPI_ASSERT_BASE(env, status == napi_ok, "convert subscriberId failed", jsResults);
+        error = std::make_shared<ParametersTypeError>("subscriberId", "string"), error, jsResults);
+    std::string subscriberId = DataShareJSUtils::Convert2String(env, argv[PARAM2]);
 
     NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
@@ -1069,7 +1063,7 @@ napi_value NapiDataShareHelper::Napi_SubscribePublishedObserver(napi_env env, si
         LOG_ERROR("proxy->jsPublishedObsManager_ is nullptr");
         return jsResults;
     }
-    results = proxy->jsPublishedObsManager_->AddObservers(env, argv[PARAM3], uris, subscriberId);
+    results = proxy->jsPublishedObsManager_->AddObservers(env, argv[PARAM3], uris, atoll(subscriberId.c_str()));
     return DataShareJSUtils::Convert2JSValue(env, results);
 }
 
@@ -1096,11 +1090,8 @@ napi_value NapiDataShareHelper::Napi_UnsubscribePublishedObserver(napi_env env, 
 
     NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_number,
-        error = std::make_shared<ParametersTypeError>("subscriberId", "int64_t"), error, jsResults);
-    int64_t subscriberId = 0;
-    napi_status status = napi_get_value_int64(env, argv[2], &subscriberId);
-    NAPI_ASSERT_BASE(env, status == napi_ok, "convert subscriberId failed", jsResults);
-
+        error = std::make_shared<ParametersTypeError>("subscriberId", "string"), error, jsResults);
+    std::string subscriberId = DataShareJSUtils::Convert2String(env, argv[PARAM2]);
     if (proxy->jsPublishedObsManager_ == nullptr) {
         LOG_ERROR("proxy->jsPublishedObsManager_ is nullptr");
         return jsResults;
@@ -1110,10 +1101,10 @@ napi_value NapiDataShareHelper::Napi_UnsubscribePublishedObserver(napi_env env, 
         NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
             error = std::make_shared<ParametersTypeError>("callback", "function"), error, jsResults);
-        results = proxy->jsPublishedObsManager_->DelObservers(env, argv[PARAM3], uris, subscriberId);
+        results = proxy->jsPublishedObsManager_->DelObservers(env, argv[PARAM3], uris, atoll(subscriberId.c_str()));
         return DataShareJSUtils::Convert2JSValue(env, results);
     }
-    results = proxy->jsPublishedObsManager_->DelObservers(env, nullptr, uris, subscriberId);
+    results = proxy->jsPublishedObsManager_->DelObservers(env, nullptr, uris, atoll(subscriberId.c_str()));
     return DataShareJSUtils::Convert2JSValue(env, results);
 }
 } // namespace DataShare

@@ -190,7 +190,7 @@ void NapiPublishedSubscriberManager::Emit(const PublishedDataChangeNode &changeN
             LOG_WARN("%{private}s nobody subscribe, but still notify", data.key_.c_str());
         }
         for (auto &obs : callbacks) {
-            results[obs].datas_.push_back(data);
+            results[obs].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
         }
     }
     for (auto &[callback, node] : results) {
