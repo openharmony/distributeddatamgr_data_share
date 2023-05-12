@@ -23,6 +23,8 @@
 
 namespace OHOS {
 namespace Media {
+using Uri = OHOS::Uri;
+using ChangeInfo = OHOS::DataShare::DataShareObserver::ChangeInfo;
 class MediaDataShareUnitTest : public testing::Test {
 public:
     /* SetUpTestCase:The preset action of the test suite is executed before the first TestCase */
@@ -36,6 +38,8 @@ public:
 
     /* TearDown:Execute after each test case */
     void TearDown();
+    bool UrisEqual(std::list<Uri> uri1, std::list<Uri> uri2);
+    bool ChangeInfoEqual(const ChangeInfo &changeInfo, const ChangeInfo &expectChangeInfo);
 };
 
 class IDataAbilityObserverTest : public AAFwk::IDataAbilityObserver {
@@ -50,22 +54,6 @@ public:
     }
 };
 
-class DataShareObserverTest : public DataShare::DataShareObserver {
-public:
-    DataShareObserverTest() {}
-    ~DataShareObserverTest() {}
-
-    void OnChange(const ChangeInfo &changeInfo) override
-    {
-        changeInfo_ = changeInfo;
-        std::unique_lock<std::mutex> lock(mutex_);
-        condition_.notify_one();
-    }
-
-    ChangeInfo changeInfo_;
-    std::mutex mutex_;
-    std::condition_variable condition_;
-};
 } // namespace Media
 } // namespace OHOS
 

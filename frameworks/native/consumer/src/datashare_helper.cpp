@@ -16,6 +16,7 @@
 #include "datashare_helper.h"
 
 #include "connection_factory.h"
+#include "concurrent_map.h"
 #include "data_ability_observer_interface.h"
 #include "data_ability_observer_stub.h"
 #include "dataobs_mgr_client.h"
@@ -38,10 +39,19 @@ public:
     void OnChangeExt(const ChangeInfo &info);
     static DataShareObserver::ChangeInfo ConvertInfo(const AAFwk::ChangeInfo &info);
     static AAFwk::ChangeInfo ConvertInfo(const DataShareObserver::ChangeInfo &info);
-
+    static sptr<ObserverImpl> GetObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer);
+    static bool FindObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer);
+    static bool DeleteObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer);
 private:
+    struct ObserverParam {
+        sptr<ObserverImpl>  obs_;
+        std::list<Uri> uris_;
+    };
     std::shared_ptr<DataShareObserver> dataShareObserver_;
+    static ConcurrentMap<DataShareObserver *, ObserverParam> observers_;
 };
+
+ConcurrentMap<DataShareObserver *, ObserverImpl::ObserverParam> ObserverImpl::observers_;
 
 DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,
     std::shared_ptr<BaseConnection> dataShareConnection)
@@ -574,13 +584,14 @@ void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataSh
         LOG_ERROR("get DataObsMgrClient failed");
         return;
     }
-    sptr<ObserverImpl> obs(new (std::nothrow) ObserverImpl(dataObserver));
+    sptr<ObserverImpl> obs = ObserverImpl::GetObserver(uri, dataObserver);
     if (obs == nullptr) {
         LOG_ERROR("new ObserverImpl failed");
         return;
     }
     ErrCode ret = obsMgrClient->RegisterObserverExt(uri, obs, isDescendants);
     if (ret != ERR_OK) {
+        ObserverImpl::DeleteObserver(uri, dataObserver);
         LOG_ERROR("RegisterObserverExt failed");
     }
     return;
@@ -604,7 +615,13 @@ void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<Data
         LOG_ERROR("get DataObsMgrClient failed");
         return;
     }
-    sptr<ObserverImpl> obs(new (std::nothrow) ObserverImpl(dataObserver));
+
+    if (!ObserverImpl::FindObserver(uri, dataObserver)) {
+        LOG_ERROR("observer not exit!");
+        return;
+    }
+
+    sptr<ObserverImpl> obs = ObserverImpl::GetObserver(uri, dataObserver);
     if (obs == nullptr) {
         LOG_ERROR("new ObserverImpl failed");
         return;
@@ -612,6 +629,8 @@ void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<Data
     ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, obs);
     if (ret != ERR_OK) {
         LOG_ERROR("UnregisterObserverExt failed");
+    } else {
+        ObserverImpl::DeleteObserver(uri, dataObserver);
     }
     return;
 }
@@ -742,23 +761,7 @@ void ObserverImpl::OnChangeExt(const ChangeInfo &info)
 DataShareObserver::ChangeInfo ObserverImpl::ConvertInfo(const AAFwk::ChangeInfo &info)
 {
     DataShareObserver::ChangeInfo changeInfo;
-    switch (info.changeType_) {
-        case AAFwk::ChangeInfo::INSERT:
-            changeInfo.changeType_ = DataShareObserver::INSERT;
-            break;
-        case AAFwk::ChangeInfo::DELETE:
-            changeInfo.changeType_ = DataShareObserver::DELETE;
-            break;
-        case AAFwk::ChangeInfo::UPDATE:
-            changeInfo.changeType_ = DataShareObserver::UPDATE;
-            break;
-        case AAFwk::ChangeInfo::OTHER:
-            changeInfo.changeType_ = DataShareObserver::OTHER;
-            break;
-        default:
-            changeInfo.changeType_ = DataShareObserver::INVAILD;
-            break;
-    }
+    changeInfo.changeType_ = static_cast<const DataShareObserver::ChangeType>(info.changeType_);
     changeInfo.uris_ = std::move(info.uris_);
     changeInfo.data_ = info.data_;
     changeInfo.size_ = info.size_;
@@ -768,27 +771,54 @@ DataShareObserver::ChangeInfo ObserverImpl::ConvertInfo(const AAFwk::ChangeInfo 
 AAFwk::ChangeInfo ObserverImpl::ConvertInfo(const DataShareObserver::ChangeInfo &info)
 {
     AAFwk::ChangeInfo changeInfo;
-    switch (info.changeType_) {
-        case DataShareObserver::INSERT:
-            changeInfo.changeType_ = AAFwk::ChangeInfo::INSERT;
-            break;
-        case DataShareObserver::DELETE:
-            changeInfo.changeType_ = AAFwk::ChangeInfo::DELETE;
-            break;
-        case DataShareObserver::UPDATE:
-            changeInfo.changeType_ = AAFwk::ChangeInfo::UPDATE;
-            break;
-        case DataShareObserver::OTHER:
-            changeInfo.changeType_ = AAFwk::ChangeInfo::OTHER;
-            break;
-        default:
-            changeInfo.changeType_ = AAFwk::ChangeInfo::INVAILD;
-            break;
-    }
+    changeInfo.changeType_ = static_cast<const AAFwk::ChangeInfo::ChangeType>(info.changeType_);
     changeInfo.uris_ = std::move(info.uris_);
-    changeInfo.data_ = info.data_;
+    changeInfo.data_ = const_cast<void*>(info.data_);
     changeInfo.size_ = info.size_;
     return changeInfo;
+}
+
+sptr<ObserverImpl> ObserverImpl::GetObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer)
+{
+    sptr<ObserverImpl> result = nullptr;
+    observers_.Compute(observer.get(), [&result, &uri, &observer](const auto &key, auto &value) {
+        if (value.obs_ == nullptr) {
+            value.obs_ = new (std::nothrow) ObserverImpl(observer);
+            value.uris_.push_back(uri);
+        } else {
+            auto it = std::find(value.uris_.begin(), value.uris_.end(), uri);
+            if (it == value.uris_.end()) {
+                value.uris_.push_back(uri);
+            }
+        }
+
+        result = value.obs_;
+        return result != nullptr;
+    });
+
+    return result;
+}
+
+bool ObserverImpl::FindObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer)
+{
+    auto result = observers_.Find(observer.get());
+    if (result.first) {
+        auto it = std::find(result.second.uris_.begin(), result.second.uris_.end(), uri);
+        if (it == result.second.uris_.end()) {
+            return false;
+        }
+    }
+    return result.first;
+}
+
+bool ObserverImpl::DeleteObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer)
+{
+    return observers_.ComputeIfPresent(observer.get(), [&uri](auto &key, auto &value) {
+        value.uris_.remove_if([&uri](const auto &value) {
+            return uri == value;
+        });
+        return !value.uris_.empty();
+    });
 }
 
 int DataShareHelper::AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl)
