@@ -132,9 +132,9 @@ void NapiPublishedObserver::OnChange(PublishedDataChangeNode &changeNode)
         LOG_ERROR("Failed to create observerWorker");
         return;
     }
-    observerWorker->getParam = [node = std::move(changeNode)](napi_env env) {
-        PublishedDataChangeNode node1 = std::move(node);
-        return DataShareJSUtils::Convert2JSValue(env, node1);
+    std::shared_ptr<PublishedDataChangeNode> node = std::make_shared<PublishedDataChangeNode>(std::move(changeNode));
+    observerWorker->getParam = [node](napi_env env) {
+        return DataShareJSUtils::Convert2JSValue(env, *node);
     };
 
     uv_work_t *work = new (std::nothrow) uv_work_t();
