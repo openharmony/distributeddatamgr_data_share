@@ -53,7 +53,7 @@ public:
 
 struct ObserverWorker {
     std::weak_ptr<NapiObserver> observer_;
-    std::function<napi_value()> getParam;
+    std::function<napi_value(napi_env)> getParam;
     explicit ObserverWorker(std::shared_ptr<NapiObserver> observerIn) : observer_(observerIn) {}
 };
 } // namespace DataShare

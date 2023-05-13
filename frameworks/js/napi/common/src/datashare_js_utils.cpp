@@ -349,8 +349,7 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const RdbChangeNode &
     if (templateId == nullptr) {
         return nullptr;
     }
-    napi_value data = nullptr;
-    data = Convert2JSValue(env, changeNode.data_);
+    napi_value data = Convert2JSValue(env, changeNode.data_);
     if (data == nullptr) {
         return nullptr;
     }
@@ -396,8 +395,7 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, PublishedDataItem &pu
     napi_value jsPublishedDataItem = nullptr;
     napi_create_object(env, &jsPublishedDataItem);
 
-    napi_value key = nullptr;
-    key = Convert2JSValue(env, publishedDataItem.key_);
+    napi_value key = Convert2JSValue(env, publishedDataItem.key_);
     if (key == nullptr) {
         return nullptr;
     }
@@ -412,7 +410,7 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, PublishedDataItem &pu
     if (publishedDataItem.IsAshmem()) {
         sptr<Ashmem> ashmem = publishedDataItem.MoveOutAshmem();
         if (ashmem == nullptr) {
-		    LOG_ERROR("MoveOutAshmem null Ashmem");
+            LOG_ERROR("MoveOutAshmem null Ashmem");
             return nullptr;
         }
         data = Convert2JSValue(env, ashmem);
