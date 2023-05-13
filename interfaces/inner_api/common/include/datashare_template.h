@@ -200,7 +200,11 @@ struct PublishedDataItem {
         if (IsAshmem()) {
             const AshmemNode &node = std::get<AshmemNode>(value_);
             if (node.ashmem != nullptr) {
+                node.ashmem->MapReadOnlyAshmem();
                 uint8_t *data = (uint8_t *)node.ashmem->ReadFromAshmem(node.ashmem->GetAshmemSize(), 0);
+                if (data == nullptr) {
+                    return std::vector<uint8_t>();
+                }
                 return std::vector<uint8_t>(data, data + node.ashmem->GetAshmemSize());
             }
             return std::vector<uint8_t>();
