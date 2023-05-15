@@ -147,19 +147,16 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_Publish_Test_001::Start");
     auto helper = dataShareHelper;
     std::string bundleName = "ohos.datashareproxyclienttest.demo";
-    // PublishedDataItem item1("key1", SUBSCRIBER_ID, "value1");
-    std::vector<PublishedDataItem> items;
-    items.emplace_back(PublishedDataItem("key1", SUBSCRIBER_ID, "value1"));
     Data data;
-    data.datas_ = items;
+    data.datas_.emplace_back("key1", SUBSCRIBER_ID, "value1");
     std::vector<OperationResult> results = helper->Publish(data, bundleName);
-    EXPECT_EQ(results.size(), items.size());
+    EXPECT_EQ(results.size(), data.datas_.size());
     for (auto const &result : results) {
         EXPECT_EQ(result.errCode_, 0);
     }
 
     auto getData = helper->GetPublishedData(bundleName);
-    EXPECT_EQ(getData.datas_.size(), items.size());
+    EXPECT_EQ(getData.datas_.size(), data.datas_.size());
     for (auto &publishedDataItem : getData.datas_) {
         EXPECT_EQ(publishedDataItem.subscriberId_, SUBSCRIBER_ID);
         bool isString = publishedDataItem.IsString();
