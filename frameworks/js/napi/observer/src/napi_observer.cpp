@@ -43,13 +43,14 @@ void NapiObserver::CallbackFunc(uv_work_t *work, int status)
         return;
     }
     napi_value callback = nullptr;
-    napi_value param[1];
+    napi_value param[2];
     napi_value global = nullptr;
     napi_value result;
     napi_get_reference_value(observer->env_, observer->ref_, &callback);
     napi_get_global(observer->env_, &global);
-    param[0] = innerWorker->getParam();
-    napi_status callStatus = napi_call_function(observer->env_, global, callback, 1, param, &result);
+    napi_get_undefined(observer->env_, &param[0]);
+    param[1] = innerWorker->getParam(observer->env_);
+    napi_status callStatus = napi_call_function(observer->env_, global, callback, 2, param, &result);
     napi_close_handle_scope(observer->env_, scope);
     if (callStatus != napi_ok) {
         LOG_ERROR("napi_call_function failed status : %{public}d", callStatus);
@@ -99,7 +100,7 @@ void NapiRdbObserver::OnChange(const RdbChangeNode &changeNode)
         LOG_ERROR("Failed to create observerWorker");
         return;
     }
-    observerWorker->getParam = [&changeNode, env = env_]() {
+    observerWorker->getParam = [changeNode](napi_env env) {
         return DataShareJSUtils::Convert2JSValue(env, changeNode);
     };
 
@@ -131,8 +132,9 @@ void NapiPublishedObserver::OnChange(PublishedDataChangeNode &changeNode)
         LOG_ERROR("Failed to create observerWorker");
         return;
     }
-    observerWorker->getParam = [&changeNode, env = env_]() {
-        return DataShareJSUtils::Convert2JSValue(env, changeNode);
+    std::shared_ptr<PublishedDataChangeNode> node = std::make_shared<PublishedDataChangeNode>(std::move(changeNode));
+    observerWorker->getParam = [node](napi_env env) {
+        return DataShareJSUtils::Convert2JSValue(env, *node);
     };
 
     uv_work_t *work = new (std::nothrow) uv_work_t();

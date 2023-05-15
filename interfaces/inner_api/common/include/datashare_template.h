@@ -24,7 +24,6 @@
 
 namespace OHOS {
 namespace DataShare {
-static constexpr int ASHMEM_REF_COUNT = 2;
 /**
  *  Specifies the predicates structure of the template.
  */
@@ -103,6 +102,8 @@ struct PublishedDataItem {
     /** The published data. If the data is large, use Ashmem. Do not access, only for ipc */
     std::variant<AshmemNode, std::string> value_;
     PublishedDataItem(){};
+    PublishedDataItem(const PublishedDataItem &) = delete;
+    PublishedDataItem &operator=(const PublishedDataItem &) = delete;
     virtual ~PublishedDataItem()
     {
         if (value_.index() == 0) {
@@ -113,43 +114,103 @@ struct PublishedDataItem {
             }
         }
     }
-    PublishedDataItem(const std::string &key, int64_t subscriberId, const std::string &value)
-        : key_(key), subscriberId_(subscriberId), value_(value)
+    PublishedDataItem(
+        const std::string &key, int64_t subscriberId, std::variant<std::vector<uint8_t>, std::string> value)
+        : key_(key), subscriberId_(subscriberId)
     {
+        if (value.index() == 0) {
+            std::vector<uint8_t> &vecValue = std::get<std::vector<uint8_t>>(value);
+            sptr<Ashmem> mem = Ashmem::CreateAshmem((key_ + std::to_string(subscriberId_)).c_str(), vecValue.size());
+            if (mem == nullptr) {
+                return;
+            }
+            if (!mem->MapReadAndWriteAshmem()) {
+                mem->CloseAshmem();
+                return;
+            }
+            if (!mem->WriteToAshmem(vecValue.data(), vecValue.size(), 0)) {
+                mem->UnmapAshmem();
+                mem->CloseAshmem();
+                return;
+            }
+            AshmemNode node = { mem, true };
+            value_ = std::move(node);
+        } else {
+            value_ = std::move(std::get<std::string>(value));
+        }
     }
+
+    PublishedDataItem(PublishedDataItem &&item)
+    {
+        key_ = std::move(item.key_);
+        subscriberId_ = std::move(item.subscriberId_);
+        value_ = std::move(item.value_);
+        if (item.IsAshmem()) {
+            item.MoveOutAshmem();
+        }
+    }
+
+    PublishedDataItem &operator=(PublishedDataItem &&item)
+    {
+        key_ = std::move(item.key_);
+        subscriberId_ = std::move(item.subscriberId_);
+        value_ = std::move(item.value_);
+        if (item.IsAshmem()) {
+            item.MoveOutAshmem();
+        }
+        return *this;
+    }
+
     inline bool IsAshmem() const
     {
         return value_.index() == 0;
     }
+
     inline bool IsString() const
     {
         return value_.index() == 1;
     }
+
     sptr<Ashmem> MoveOutAshmem()
     {
         if (IsAshmem()) {
             AshmemNode &node = std::get<AshmemNode>(value_);
+            if (!node.isManaged) {
+                return nullptr;
+            }
             node.isManaged = false;
             return std::move(node.ashmem);
         }
         return nullptr;
     }
+
     void SetAshmem(sptr<Ashmem> ashmem, bool isManaged = false)
     {
         AshmemNode node = { ashmem, isManaged };
-        value_ = node;
+        value_ = std::move(node);
     }
-    bool Get(std::string &value)
-    {
-        if (IsString()) {
-            value = std::get<std::string>(value_);
-            return true;
-        }
-        return false;
-    }
+
     void Set(const std::string &value)
     {
         value_ = value;
+    }
+
+    std::variant<std::vector<uint8_t>, std::string> GetData() const
+    {
+        if (IsAshmem()) {
+            const AshmemNode &node = std::get<AshmemNode>(value_);
+            if (node.ashmem != nullptr) {
+                node.ashmem->MapReadOnlyAshmem();
+                uint8_t *data = (uint8_t *)node.ashmem->ReadFromAshmem(node.ashmem->GetAshmemSize(), 0);
+                if (data == nullptr) {
+                    return std::vector<uint8_t>();
+                }
+                return std::vector<uint8_t>(data, data + node.ashmem->GetAshmemSize());
+            }
+            return std::vector<uint8_t>();
+        } else {
+            return std::get<std::string>(value_);
+        }
     }
 };
 

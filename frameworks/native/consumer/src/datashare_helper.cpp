@@ -932,7 +932,7 @@ std::vector<OperationResult> DataShareHelper::SubscribeRdbData(const std::vector
 std::vector<OperationResult> DataShareHelper::UnsubscribeRdbData(const std::vector<std::string> &uris,
     const TemplateId &templateId)
 {
-    LOG_DEBUG("Start UnSubscribeRdbData");
+    LOG_DEBUG("Start UnsubscribeRdbData");
     std::vector<OperationResult> results;
     auto connection = connection_;
     if (connection == nullptr) {

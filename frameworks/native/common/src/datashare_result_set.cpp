@@ -15,7 +15,6 @@
 #include "datashare_result_set.h"
 
 #include <securec.h>
-
 #include <sstream>
 
 #include "adaptor.h"

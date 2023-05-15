@@ -320,8 +320,7 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const TemplateId &tem
 {
     napi_value tplId = nullptr;
     napi_create_object(env, &tplId);
-    napi_value subscriberId = nullptr;
-    subscriberId = Convert2JSValue(env, templateId.subscriberId_);
+    napi_value subscriberId = Convert2JSValue(env, std::to_string(templateId.subscriberId_));
     if (subscriberId == nullptr) {
         return nullptr;
     }
@@ -350,8 +349,7 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const RdbChangeNode &
     if (templateId == nullptr) {
         return nullptr;
     }
-    napi_value data = nullptr;
-    data = Convert2JSValue(env, changeNode.data_);
+    napi_value data = Convert2JSValue(env, changeNode.data_);
     if (data == nullptr) {
         return nullptr;
     }
@@ -397,14 +395,13 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, PublishedDataItem &pu
     napi_value jsPublishedDataItem = nullptr;
     napi_create_object(env, &jsPublishedDataItem);
 
-    napi_value key = nullptr;
-    key = Convert2JSValue(env, publishedDataItem.key_);
+    napi_value key = Convert2JSValue(env, publishedDataItem.key_);
     if (key == nullptr) {
         return nullptr;
     }
 
     napi_value subscriberId = nullptr;
-    subscriberId = Convert2JSValue(env, publishedDataItem.subscriberId_);
+    subscriberId = Convert2JSValue(env, std::to_string(publishedDataItem.subscriberId_));
     if (subscriberId == nullptr) {
         return nullptr;
     }
@@ -413,15 +410,12 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, PublishedDataItem &pu
     if (publishedDataItem.IsAshmem()) {
         sptr<Ashmem> ashmem = publishedDataItem.MoveOutAshmem();
         if (ashmem == nullptr) {
+            LOG_ERROR("MoveOutAshmem null Ashmem");
             return nullptr;
         }
         data = Convert2JSValue(env, ashmem);
     } else {
-        std::string valueStr;
-        if (!publishedDataItem.Get(valueStr)) {
-            return nullptr;
-        }
-        data = Convert2JSValue(env, valueStr);
+        data = Convert2JSValue(env, std::get<std::string>(publishedDataItem.GetData()));
     }
     if (data == nullptr) {
         return nullptr;
@@ -574,21 +568,12 @@ TemplateId DataShareJSUtils::Convert2TemplateId(napi_env env, napi_value value)
     }
 
     TemplateId templateId;
-    napi_value jsSubscriberId = nullptr;
-    auto status = napi_get_named_property(env, value, "subscriberId", &jsSubscriberId);
-    if (status != napi_ok) {
-        LOG_ERROR("Convert predicates failed");
-        return {};
-    }
-    if (jsSubscriberId == nullptr) {
+    std::string strSubId;
+    if (!UnwrapStringByPropertyName(env, value, "subscriberId", strSubId)) {
         LOG_ERROR("Convert subscriberId failed");
         return {};
     }
-    status = napi_get_value_int64(env, jsSubscriberId, &templateId.subscriberId_);
-    if (status != napi_ok) {
-        LOG_ERROR("Convert subscriberId failed");
-        return {};
-    }
+    templateId.subscriberId_ = atoll(strSubId.c_str());
     if (!UnwrapStringByPropertyName(env, value, "bundleNameOfOwner", templateId.bundleName_)) {
         LOG_ERROR("Convert bundleNameOfOwner failed");
         return {};
@@ -627,18 +612,12 @@ bool DataShareJSUtils::UnwrapPublishedDataItem(napi_env env, napi_value jsObject
         LOG_ERROR("Convert dataValue failed, type is %{public}d", valueType);
         return false;
     }
-    napi_value jsSubscriberId = nullptr;
-    auto status =  napi_get_named_property(env, jsObject, "subscriberId", &jsSubscriberId);
-    if (status != napi_ok || jsSubscriberId == nullptr) {
-        LOG_ERROR("get jsSubscriberId failed, status is %{public}d", status);
-        return false;
+    std::string strSubId;
+    if (!UnwrapStringByPropertyName(env, jsObject, "subscriberId", strSubId)) {
+        LOG_ERROR("Convert subscriberId failed");
+        return {};
     }
-
-    status = napi_get_value_int64(env, jsSubscriberId, &publishedDataItem.subscriberId_);
-    if (status != napi_ok) {
-        LOG_ERROR("Convert subscriberId failed, status is %{public}d", status);
-        return false;
-    }
+    publishedDataItem.subscriberId_ = atoll(strSubId.c_str());
     return true;
 }
 
@@ -680,7 +659,7 @@ bool DataShareJSUtils::UnwrapPublishedDataItemVector(napi_env env, napi_value va
             LOG_ERROR("UnwrapPublishedDataItem failed");
             return false;
         }
-        publishedDataItems.emplace_back(publishedDataItem);
+        publishedDataItems.emplace_back(std::move(publishedDataItem));
     }
     return true;
 }
