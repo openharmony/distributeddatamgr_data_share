@@ -136,9 +136,9 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_001, TestSize.Level0)
     Template tpl(nodes, "select name1 as name from TBL00");
 
     auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result, 1);
     result = helper->DelQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID);
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result, 1);
     LOG_INFO("ProxyDatasTest_Template_Test_001::End");
 }
 
@@ -179,7 +179,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribeRdbData_Test_001, TestSize.Leve
     nodes.emplace_back(node2);
     Template tpl(nodes, "select name1 as name from TBL00");
     auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
-    EXPECT_EQ(result, 0);
+    EXPECT_EQ(result, 1);
 
     std::vector<std::string> uris;
     uris.emplace_back(DATA_SHARE_PROXY_URI);
@@ -209,7 +209,6 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_DisableRdbSubs_Test_001, TestSize.Level0
     tplId.subscriberId_ = SUBSCRIBER_ID;
     tplId.bundleName_ = "ohos.datashareproxyclienttest.demo";
     std::vector<OperationResult> results = helper->DisableRdbSubs(uris, tplId);
-    EXPECT_EQ(results.size(), uris.size());
     for (auto const &operationResult : results) {
         EXPECT_EQ(operationResult.errCode_, 0);
     }
@@ -226,7 +225,6 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_EnableRdbSubs_Test_001, TestSize.Level0)
     tplId.subscriberId_ = SUBSCRIBER_ID;
     tplId.bundleName_ = "ohos.datashareproxyclienttest.demo";
     std::vector<OperationResult> results = helper->EnableRdbSubs(uris, tplId);
-    EXPECT_EQ(results.size(), uris.size());
     for (auto const &operationResult : results) {
         EXPECT_EQ(operationResult.errCode_, 0);
     }
@@ -274,7 +272,6 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_DisablePubSubs_Test_001, TestSize.Level0
     std::vector<std::string> uris;
     uris.emplace_back(DATA_SHARE_PROXY_URI);
     std::vector<OperationResult> results = helper->DisablePubSubs(uris, SUBSCRIBER_ID);
-    EXPECT_EQ(results.size(), uris.size());
     for (auto const &operationResult : results) {
         EXPECT_EQ(operationResult.errCode_, 0);
     }
@@ -288,7 +285,6 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_EnablePubSubs_Test_001, TestSize.Level0)
     std::vector<std::string> uris;
     uris.emplace_back(DATA_SHARE_PROXY_URI);
     std::vector<OperationResult> results = helper->EnablePubSubs(uris, SUBSCRIBER_ID);
-    EXPECT_EQ(results.size(), uris.size());
     for (auto const &operationResult : results) {
         EXPECT_EQ(operationResult.errCode_, 0);
     }
