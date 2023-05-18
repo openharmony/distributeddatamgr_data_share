@@ -27,8 +27,11 @@ namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
 namespace {
-const std::string SCHEME_DATASHARE = "datashare";
-const std::string SCHEME_DATASHARE_PROXY = "datashareproxy";
+static constexpr const char *SCHEME_DATASHARE = "datashare";
+static constexpr const char *SCHEME_DATASHARE_PROXY = "datashareproxy";
+static constexpr const char *FILE_SCHEMA = "file";
+static constexpr const char *DATA_SHARE_PREFIX = "datashare:///";
+static constexpr const char *FILE_PREFIX = "file://";
 constexpr int INVALID_VALUE = -1;
 } // namespace
 class ObserverImpl : public AAFwk::DataAbilityObserverStub {
@@ -85,6 +88,15 @@ DataShareHelper::~DataShareHelper()
 {
 }
 
+std::string DataShareHelper::TransferUriPrefix(const std::string &originPrefix, const std::string &replacedPrefix,
+    const std::string &originUriStr)
+{
+    if (originUriStr.find(originPrefix) != 0) {
+        return originUriStr;
+    }
+    return replacedPrefix + originUriStr.substr(originPrefix.length());
+}
+
 /**
  * @brief You can use this method to specify the Uri of the data to operate and set the binding relationship
  * between the ability using the Data template (data share for short) and the associated client process in
@@ -123,7 +135,9 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
         return nullptr;
     }
 
-    Uri uri(strUri);
+    std::string replacedUriStr = TransferUriPrefix(FILE_PREFIX, DATA_SHARE_PREFIX, strUri);
+    Uri uri(replacedUriStr);
+
     if (uri.GetScheme() != SCHEME_DATASHARE) {
         LOG_ERROR("the Scheme is not datashare, Scheme: %{public}s", uri.GetScheme().c_str());
         return nullptr;
