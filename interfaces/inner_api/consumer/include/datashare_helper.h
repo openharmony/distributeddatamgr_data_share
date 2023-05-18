@@ -398,6 +398,7 @@ private:
     std::shared_ptr<BaseConnection> connection_ = nullptr;
     static bool RegObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     static bool UnregObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    static void TransferUriPrefix(const std::string &originPrefix, const std::string &replacedPrefix, Uri &uri);
     std::shared_ptr<RdbSubscriberManager> rdbSubscriberManager_ = nullptr;
     std::shared_ptr<PublishedDataSubscriberManager> publishedDataSubscriberManager_ = nullptr;
 };
