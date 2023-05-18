@@ -29,7 +29,7 @@ using namespace AppExecFwk;
 namespace {
 const std::string SCHEME_DATASHARE = "datashare";
 const std::string SCHEME_DATASHARE_PROXY = "datashareproxy";
-const std::string FILE_SCHEMA = "file";
+const std::string FILE_SCHEME = "file";
 const std::string DATA_SHARE_PREFIX = "datashare:///";
 const std::string FILE_PREFIX = "file://";
 constexpr int INVALID_VALUE = -1;
@@ -136,7 +136,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
     }
 
     Uri uri(strUri);
-    if (uri.GetScheme() == FILE_SCHEMA) {
+    if (uri.GetScheme() == FILE_SCHEME) {
         TransferUriPrefix(FILE_PREFIX, DATA_SHARE_PREFIX, uri);
     }
 
