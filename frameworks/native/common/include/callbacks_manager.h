@@ -187,13 +187,14 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::EnableObservers(co
                 continue;
             }
             std::vector<std::shared_ptr<Observer>> enabledObservers = GetEnabledObservers(key);
-            if (enabledObservers.size() == 0) {
-                firstRegisterKey.emplace_back(key);
-            }
             for (auto &item: callbacks_[key]) {
                 item.enabled_ = true;
             }
-            result.emplace_back(key, E_OK);
+            if (!enabledObservers.empty()) {
+                result.emplace_back(key, E_OK);
+                continue;
+            }
+            firstRegisterKey.emplace_back(key);
         }
     }
     processOnFirstEnabled(firstRegisterKey, result);
@@ -215,13 +216,14 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::DisableObservers(c
                 continue;
             }
             std::vector<std::shared_ptr<Observer>> enabledObservers = GetEnabledObservers(key);
-            if (enabledObservers.size() > 0) {
-                lastDisabledKeys.emplace_back(key);
-            }
             for (auto &item: callbacks_[key]) {
                 item.enabled_ = false;
             }
-            result.emplace_back(key, E_OK);
+            if (enabledObservers.empty()) {
+                result.emplace_back(key, E_OK);
+                continue;
+            }
+            lastDisabledKeys.emplace_back(key);
         }
     }
     processOnLastDisable(lastDisabledKeys, result);
