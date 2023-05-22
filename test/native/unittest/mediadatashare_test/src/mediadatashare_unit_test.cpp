@@ -198,7 +198,7 @@ void MediaDataShareUnitTest::SetUpTestCase(void)
 }
 
 void MediaDataShareUnitTest::TearDownTestCase(void)
-{    
+{  
     LOG_INFO("TearDownTestCase invoked");
     std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
     ASSERT_TRUE(g_dataShareHelper != nullptr);
