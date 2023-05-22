@@ -49,8 +49,8 @@ ohos_unittest("NativeDataShareTest") {
     "//third_party/json/include",
   ]
 
-  sources = [
-    "./unittest/mediadatashare_test/src/mediadatashare_unit_test.cpp"]
+  sources =
+      [ "./unittest/mediadatashare_test/src/mediadatashare_unit_test.cpp" ]
 
   deps = []
 
