@@ -18,7 +18,6 @@
 
 #include "accesstoken_kit.h"
 #include "dataobs_mgr_changeinfo.h"
-#include "datashare_helper.h"
 #include "datashare_log.h"
 #include "hap_token_info.h"
 #include "iservice_registry.h"
@@ -29,7 +28,6 @@ namespace OHOS {
 namespace DataShare {
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
-using ChangeInfo = DataShareObserver::ChangeInfo;
 
 template <typename T>
 class ConditionLock {

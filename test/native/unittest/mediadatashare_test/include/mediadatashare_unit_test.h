@@ -23,6 +23,7 @@
 
 namespace OHOS {
 namespace DataShare {
+using ChangeInfo = DataShareObserver::ChangeInfo;
 class MediaDataShareUnitTest : public testing::Test {
 public:
     /* SetUpTestCase:The preset action of the test suite is executed before the first TestCase */
