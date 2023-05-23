@@ -21,7 +21,7 @@ let DB_NAME = "DB00.db";
 let TBL_NAME = "TBL00";
 let DDL_TBL_CREATE = "CREATE TABLE IF NOT EXISTS "
 + TBL_NAME
-+ " (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER, phoneNumber DOUBLE, isStudent BOOLEAN, Binary BINARY)";
++ " (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER, phoneNumber DOUBLE, isStudent BOOLEAN, Binary BINARY, number INTEGER)";
 let DDL_TABLE_USER_SQL = "CREATE TABLE IF NOT EXISTS user (userId INTEGER PRIMARY KEY AUTOINCREMENT, firstName TEXT, lastName TEXT, age INTEGER , balance DOUBLE  NOT NULL)";
 let DDL_TABLE_BOOK_SQL = "CREATE TABLE IF NOT EXISTS book (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, userId INTEGER, FOREIGN KEY (userId) REFERENCES user (userId) ON UPDATE NO ACTION ON DELETE CASCADE)";
 
@@ -42,23 +42,6 @@ extends Extension {
         let err = {"code":0};
         callback(err);
         console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility onCreate end');
-    }
-
-    async getFileTypes(uri: string, mimeTypeFilter: string, callback) {
-        console.info('[ttt] [DataShareTest] <<Provider>> [getFileTypes] enter');
-        let ret = new Array("type01", "type00", "type03");
-        console.info('[ttt] [DataShareTest] <<Provider>> [getFileTypes] leave, ret:' + ret);
-        let err = {"code":0};
-        await callback(err,ret);
-        return ret;
-    }
-
-    async openFile(uri: string, mode: string, callback) {
-        console.info('[ttt] [DataShareTest] <<Provider>> [openFile] enter');
-        let ret = 12345;
-        let err = {"code":0};
-        await callback(err,ret);
-        console.info('[ttt] [DataShareTest] <<Provider>> [openFile] leave, ret:' + ret);
     }
 
     async insert(uri, value, callback) {
@@ -152,15 +135,6 @@ extends Extension {
         console.info('[ttt] [DataShareTest] <<Provider>> [query] leave');
     }
 
-    async getType(uri: string, callback) {
-        console.info('[ttt] [DataShareTest] <<Provider>> [getType] enter');
-        let ret = "image";
-        console.info('[ttt] [DataShareTest] <<Provider>> [getType] leave, ret:' + ret);
-        let err = {"code":0};
-        await callback(err,ret);
-        return ret;
-    }
-
     async batchInsert(uri: string, valueBuckets, callback) {
         console.info('[ttt] [DataShareTest] <<Provider>> [batchInsert] enter');
         if (valueBuckets == null || valueBuckets.length == undefined) {
@@ -169,7 +143,7 @@ extends Extension {
         }
         console.info('[ttt] [DataShareTest] <<Provider>> [batchInsert] valueBuckets.length:' + valueBuckets.length);
         let resultNum = valueBuckets.length
-        await rdbStore.batchinsert(TBL_NAME, valueBuckets, function (err, ret) {
+        await rdbStore.batchInsert(TBL_NAME, valueBuckets, function (err, ret) {
             console.info('[ttt] [DataShareTest] <<Provider>> [batchInsert] callback ret:' + ret);
             if (callback != undefined) {
                 callback(err, ret);

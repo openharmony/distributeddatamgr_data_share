@@ -22,9 +22,8 @@
 #include "datashare_helper.h"
 
 namespace OHOS {
-namespace Media {
-using Uri = OHOS::Uri;
-using ChangeInfo = OHOS::DataShare::DataShareObserver::ChangeInfo;
+namespace DataShare {
+using ChangeInfo = DataShareObserver::ChangeInfo;
 class MediaDataShareUnitTest : public testing::Test {
 public:
     /* SetUpTestCase:The preset action of the test suite is executed before the first TestCase */
