@@ -29,7 +29,6 @@ using namespace AppExecFwk;
 namespace {
 static constexpr const char *SCHEME_DATASHARE = "datashare";
 static constexpr const char *SCHEME_DATASHARE_PROXY = "datashareproxy";
-static constexpr const char *FILE_SCHEMA = "file";
 static constexpr const char *DATA_SHARE_PREFIX = "datashare:///";
 static constexpr const char *FILE_PREFIX = "file://";
 constexpr int INVALID_VALUE = -1;
