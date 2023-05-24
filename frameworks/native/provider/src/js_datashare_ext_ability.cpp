@@ -16,20 +16,20 @@
 #include "js_datashare_ext_ability.h"
 
 #include "ability_info.h"
+#include "data_share_manager_impl.h"
 #include "dataobs_mgr_client.h"
-#include "datashare_stub_impl.h"
 #include "datashare_log.h"
+#include "datashare_predicates_proxy.h"
+#include "datashare_stub_impl.h"
+#include "iservice_registry.h"
 #include "js_datashare_ext_ability_context.h"
 #include "js_runtime.h"
 #include "js_runtime_utils.h"
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
 #include "napi_common_util.h"
 #include "napi_common_want.h"
-#include "napi_remote_object.h"
-
 #include "napi_datashare_values_bucket.h"
-#include "datashare_predicates_proxy.h"
+#include "napi_remote_object.h"
+#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -131,6 +131,7 @@ void JsDataShareExtAbility::OnStart(const AAFwk::Want &want)
     NativeValue* argv[] = {nativeWant};
     CallObjectMethod("onCreate", argv, sizeof(argv)/sizeof(argv[0]));
     napi_close_handle_scope(env, scope);
+    NotifyToDataShareService();
 }
 
 sptr<IRemoteObject> JsDataShareExtAbility::OnConnect(const AAFwk::Want &want)
@@ -778,6 +779,34 @@ napi_valuetype JsDataShareExtAbility::UnWrapPropertyType(napi_env env, napi_valu
     napi_valuetype type = napi_undefined;
     napi_typeof(env, value, &type);
     return type;
+}
+
+void JsDataShareExtAbility::NotifyToDataShareService()
+{
+    auto manager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (manager == nullptr) {
+        LOG_ERROR("get system ability manager failed");
+        return;
+    }
+    auto remoteObject = manager->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+    if (remoteObject == nullptr) {
+        LOG_ERROR("CheckSystemAbility failed");
+        return;
+    }
+    auto serviceProxy = std::make_shared<DataShareKvServiceProxy>(remoteObject);
+    if (serviceProxy == nullptr) {
+        LOG_ERROR("make_shared failed");
+        return;
+    }
+    auto remote = serviceProxy->GetFeatureInterface("data_share");
+    if (remote == nullptr) {
+        LOG_ERROR("Get DataShare service failed!");
+        return;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    remote->SendRequest(DataShareServiceProxy::DATA_SHARE_SERVICE_CMD_NOTIFY, data, reply, option);
 }
 
 bool MakeNapiColumn(napi_env env, napi_value &napiColumns, const std::vector<std::string> &columns)
