@@ -88,7 +88,7 @@ constexpr int E_URI_NOT_EXIST = (E_BASE + 48);
 /**
 * @brief Cannot find the bundleName
 */
-    constexpr int E_BUNDLE_NAME_NOT_EXIST = (E_BASE + 49);
+constexpr int E_BUNDLE_NAME_NOT_EXIST = (E_BASE + 49);
 } // namespace DataShare
 } // namespace OHOS
 
