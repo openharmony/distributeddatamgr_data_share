@@ -14,7 +14,6 @@
  */
 
 #include "ishared_result_set_stub.h"
-#include <sys/prctl.h>
 #include "datashare_log.h"
 #include "datashare_errno.h"
 

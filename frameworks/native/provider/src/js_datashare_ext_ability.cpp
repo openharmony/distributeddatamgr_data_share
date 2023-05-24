@@ -806,7 +806,7 @@ void JsDataShareExtAbility::NotifyToDataShareService()
     MessageParcel data;
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
-    remote->SendRequest(DataShareServiceProxy::DATA_SHARE_SERVICE_CMD_NOTIFY, data, reply, option);
+    remote->SendRequest(IDataShareService::DATA_SHARE_SERVICE_CMD_NOTIFY, data, reply, option);
 }
 
 bool MakeNapiColumn(napi_env env, napi_value &napiColumns, const std::vector<std::string> &columns)
