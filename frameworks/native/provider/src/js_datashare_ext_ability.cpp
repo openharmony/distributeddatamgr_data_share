@@ -806,6 +806,10 @@ void JsDataShareExtAbility::NotifyToDataShareService()
     MessageParcel data;
     MessageParcel reply;
     MessageOption option(MessageOption::TF_ASYNC);
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return;
+    }
     remote->SendRequest(IDataShareService::DATA_SHARE_SERVICE_CMD_NOTIFY, data, reply, option);
 }
 
