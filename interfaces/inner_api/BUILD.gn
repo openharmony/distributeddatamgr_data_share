@@ -123,6 +123,7 @@ ohos_shared_library("datashare_provider") {
     "ipc:ipc_single",
     "ipc_js:rpc",
     "napi:ace_napi",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "distributeddatamgr"
