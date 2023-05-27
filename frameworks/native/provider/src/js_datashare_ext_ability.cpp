@@ -133,7 +133,6 @@ void JsDataShareExtAbility::OnStart(const AAFwk::Want &want)
     context->isNeedNotify_ = true;
     CallObjectMethod("onCreate", argv, sizeof(argv)/sizeof(argv[0]), context);
     napi_close_handle_scope(env, scope);
-    NotifyToDataShareService();
 }
 
 sptr<IRemoteObject> JsDataShareExtAbility::OnConnect(const AAFwk::Want &want)
