@@ -134,7 +134,6 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
         [holder = connection](const auto *) {
         holder->DisconnectDataShareExtAbility();
     });
-
     if (!dataShareConnection->ConnectDataShareExtAbility(uri, token)) {
         LOG_ERROR("connect failed");
         return nullptr;
