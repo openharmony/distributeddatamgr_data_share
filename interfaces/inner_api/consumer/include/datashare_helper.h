@@ -235,12 +235,12 @@ public:
 
 private:
     DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,
-        const sptr<DataShareConnection> dataShareConnection);
+        std::shared_ptr<DataShareConnection> dataShareConnection);
     DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri);
     bool isDataShareService_ = false;
     sptr<IRemoteObject> token_ = {};
     Uri uri_ = Uri("");
-    sptr<DataShareConnection> dataShareConnection_ = nullptr;
+    std::shared_ptr<DataShareConnection> dataShareConnection_ = nullptr;
     static bool RegObserver (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     static bool UnregObserver (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
 };

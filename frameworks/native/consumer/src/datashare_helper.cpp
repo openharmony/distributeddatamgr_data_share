@@ -31,7 +31,7 @@ constexpr int INVALID_VALUE = -1;
 }  // namespace
 
 DataShareHelper::DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,
-    sptr<DataShareConnection> dataShareConnection)
+    std::shared_ptr<DataShareConnection> dataShareConnection)
 {
     LOG_INFO("DataShareHelper::DataShareHelper start");
     token_ = token;
@@ -124,11 +124,16 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
         }
         LOG_ERROR("create DataShareHelper failed");
     }
-    sptr<DataShareConnection> dataShareConnection = new (std::nothrow) DataShareConnection(uri);
-    if (dataShareConnection == nullptr) {
-        LOG_ERROR("create dataShareConnection failed");
+
+    sptr<DataShareConnection> connection = new (std::nothrow) DataShareConnection(uri);
+    if (connection == nullptr) {
+        LOG_ERROR("create dataShareConnection failed.");
         return nullptr;
     }
+    auto dataShareConnection = std::shared_ptr<DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
+        holder->DisconnectDataShareExtAbility();
+    });
+
     if (!dataShareConnection->ConnectDataShareExtAbility(uri, token)) {
         LOG_ERROR("connect failed");
         return nullptr;

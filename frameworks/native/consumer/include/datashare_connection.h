@@ -71,8 +71,14 @@ public:
         std::condition_variable condition;
         std::mutex mutex;
     };
-private:
+
+    /**
+     * @brief disconnect remote ability of DataShareExtAbility.
+     */
     void DisconnectDataShareExtAbility();
+
+private:
+
     void SetDataShareProxy(sptr<IDataShare> proxy);
     bool IsExtAbilityConnected();
 
