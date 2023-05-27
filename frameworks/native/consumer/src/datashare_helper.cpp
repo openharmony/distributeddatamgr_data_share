@@ -130,7 +130,8 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
         LOG_ERROR("create dataShareConnection failed.");
         return nullptr;
     }
-    auto dataShareConnection = std::shared_ptr<DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
+    auto dataShareConnection = std::shared_ptr<DataShareConnection>(connection.GetRefPtr(),
+        [holder = connection](const auto *) {
         holder->DisconnectDataShareExtAbility();
     });
 
