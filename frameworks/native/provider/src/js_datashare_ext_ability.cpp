@@ -278,8 +278,8 @@ NativeValue *JsDataShareExtAbility::CallObjectMethod(
         args[i] = argv[i];
     }
 
-    args[argc] = nativeEngine.CreateFunction(
-        ASYNC_CALLBACK_NAME.c_str(), ASYNC_CALLBACK_NAME.length(), JsDataShareExtAbility::AsyncCallbackWithContext, point);
+    args[argc] = nativeEngine.CreateFunction(ASYNC_CALLBACK_NAME.c_str(), ASYNC_CALLBACK_NAME.length(),
+        JsDataShareExtAbility::AsyncCallbackWithContext, point);
 
     auto result = handleEscape.Escape(nativeEngine.CallFunction(value, method, args, count));
     delete[] args;
