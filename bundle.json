@@ -1,13 +1,13 @@
 {
     "name": "@ohos/data_share",
     "version": "3.2.0",
+    "homePage": "https://gitee.com/openharmony",
     "license": "Apache License 2.0",
+    "repository": "https://gitee.com/openharmony/distributeddatamgr_data_share",
     "description": "allows an application to manage its own data and share data with other applications",
-    "domain": "os",
+    "domain": "ohos",
     "language": "",
     "publishAs": "code-segment",
-    "homePage": "https://gitee.com/openharmony",
-    "repository": "https://gitee.com/openharmony/distributeddatamgr_data_share",
     "private": false,
     "scripts": {},
     "tags": [
