@@ -50,6 +50,7 @@
         "ram": "10240KB",
         "deps": {
             "components": [
+                "relational_store",
                 "access_token",
                 "ability_runtime",
                 "ipc_js",
