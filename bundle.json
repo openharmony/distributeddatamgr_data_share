@@ -1,11 +1,11 @@
 {
-    "name": "@ohos/distributeddatamgr_data_share",
-    "version": "3.1.0",
-    "description": "Local Data Management",
+    "name": "@ohos/data_share",
+    "version": "3.2.0",
     "homePage": "https://gitee.com/openharmony",
-    "license": "Apache V2",
+    "license": "Apache License 2.0",
     "repository": "https://gitee.com/openharmony/distributeddatamgr_data_share",
-    "domain": "os",
+    "description": "allows an application to manage its own data and share data with other applications",
+    "domain": "ohos",
     "language": "",
     "publishAs": "code-segment",
     "private": false,
@@ -46,8 +46,8 @@
         "adapted_system_type": [
             "standard"
         ],
-        "rom": "",
-        "ram": "",
+        "rom": "3584KB",
+        "ram": "10240KB",
         "deps": {
             "components": [
                 "relational_store",
