@@ -129,9 +129,10 @@ void JsDataShareExtAbility::OnStart(const AAFwk::Want &want)
     napi_value napiWant = OHOS::AppExecFwk::WrapWant(env, want);
     NativeValue* nativeWant = reinterpret_cast<NativeValue*>(napiWant);
     NativeValue* argv[] = {nativeWant};
-    CallObjectMethod("onCreate", argv, sizeof(argv)/sizeof(argv[0]));
+    std::shared_ptr<AsyncContext> context = std::make_shared<AsyncContext>();
+    context->isNeedNotify_ = true;
+    CallObjectMethod("onCreate", argv, sizeof(argv)/sizeof(argv[0]), context);
     napi_close_handle_scope(env, scope);
-    NotifyToDataShareService();
 }
 
 sptr<IRemoteObject> JsDataShareExtAbility::OnConnect(const AAFwk::Want &want)
@@ -213,6 +214,76 @@ NativeValue* JsDataShareExtAbility::AsyncCallback(NativeEngine* engine, NativeCa
     }
 
     return engine->CreateUndefined();
+}
+
+NativeValue* JsDataShareExtAbility::AsyncCallbackWithContext(NativeEngine* engine, NativeCallbackInfo* info)
+{
+    if (engine == nullptr || info == nullptr) {
+        LOG_ERROR("invalid param.");
+        return nullptr;
+    }
+    if (info->functionInfo == nullptr || info->functionInfo->data == nullptr) {
+        LOG_ERROR("invalid object.");
+        return engine->CreateUndefined();
+    }
+
+    AsyncPoint* instance = static_cast<AsyncPoint*>(info->functionInfo->data);
+    if (instance != nullptr) {
+        if (instance->context->isNeedNotify_) {
+            NotifyToDataShareService();
+        }
+    }
+    delete instance;
+    return engine->CreateUndefined();
+}
+
+NativeValue *JsDataShareExtAbility::CallObjectMethod(
+    const char *name, NativeValue *argv[], size_t argc, std::shared_ptr<AsyncContext> asyncContext)
+{
+    if (!jsObj_) {
+        LOG_WARN("Not found DataShareExtAbility.js");
+        return nullptr;
+    }
+
+    HandleEscape handleEscape(jsRuntime_);
+    auto &nativeEngine = jsRuntime_.GetNativeEngine();
+
+    NativeValue *value = jsObj_->Get();
+    NativeObject *obj = ConvertNativeValueTo<NativeObject>(value);
+    if (obj == nullptr) {
+        LOG_ERROR("Failed to get DataShareExtAbility object");
+        return nullptr;
+    }
+
+    NativeValue *method = obj->GetProperty(name);
+    if (method == nullptr) {
+        LOG_ERROR("Failed to get '%{public}s' from DataShareExtAbility object", name);
+        return nullptr;
+    }
+
+    AsyncPoint *point = new (std::nothrow)AsyncPoint();
+    if (point == nullptr) {
+        LOG_ERROR("JsDataShareExtAbility::CallObjectMethod new AsyncPoint error.");
+        return nullptr;
+    }
+    point->context = asyncContext;
+    size_t count = argc + 1;
+    NativeValue **args = new (std::nothrow) NativeValue *[count];
+    if (args == nullptr) {
+        LOG_ERROR("JsDataShareExtAbility::CallObjectMethod new NativeValue error.");
+        delete point;
+        return nullptr;
+    }
+    for (size_t i = 0; i < argc; i++) {
+        args[i] = argv[i];
+    }
+
+    args[argc] = nativeEngine.CreateFunction(ASYNC_CALLBACK_NAME.c_str(), ASYNC_CALLBACK_NAME.length(),
+        JsDataShareExtAbility::AsyncCallbackWithContext, point);
+
+    auto result = handleEscape.Escape(nativeEngine.CallFunction(value, method, args, count));
+    delete[] args;
+    return result;
 }
 
 NativeValue* JsDataShareExtAbility::CallObjectMethod(const char* name, NativeValue* const* argv, size_t argc,
