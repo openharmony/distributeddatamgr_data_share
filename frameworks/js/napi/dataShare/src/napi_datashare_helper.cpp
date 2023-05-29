@@ -1089,7 +1089,7 @@ napi_value NapiDataShareHelper::Napi_UnsubscribePublishedObserver(napi_env env, 
         DataShareJSUtils::Convert2StrVector(env, argv[1], DataShareJSUtils::DEFAULT_BUF_SIZE);
 
     NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
-    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_number,
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
         error = std::make_shared<ParametersTypeError>("subscriberId", "string"), error, jsResults);
     std::string subscriberId = DataShareJSUtils::Convert2String(env, argv[PARAM2]);
     if (proxy->jsPublishedObsManager_ == nullptr) {
