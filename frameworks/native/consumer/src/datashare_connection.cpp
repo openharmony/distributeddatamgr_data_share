@@ -86,12 +86,12 @@ bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
     } else {
         want.SetUri(uri_);
     }
-    std::unique_lock<std::mutex> lock(condition_.mutex);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, this, token);
     if (ret != ERR_OK) {
         LOG_ERROR("connect ability failed, ret = %{public}d", ret);
         return false;
     }
+    std::unique_lock<std::mutex> lock(condition_.mutex);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ != nullptr; })) {
         LOG_INFO("connect ability ended successfully");
@@ -104,15 +104,16 @@ bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
  */
 void DataShareConnection::DisconnectDataShareExtAbility()
 {
+    uri_ = Uri("");
     if (dataShareProxy_ == nullptr) {
         return;
     }
-    std::unique_lock<std::mutex> lock(condition_.mutex);
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(this);
     if (ret != ERR_OK) {
         LOG_ERROR("disconnect ability failed, ret = %{public}d", ret);
         return;
     }
+    std::unique_lock<std::mutex> lock(condition_.mutex);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ == nullptr; })) {
         LOG_INFO("disconnect ability ended successfully");
@@ -142,8 +143,6 @@ void DataShareConnection::SetDataShareProxy(sptr<IDataShare> proxy)
 
 DataShareConnection::~DataShareConnection()
 {
-    uri_ = Uri("");
-    DisconnectDataShareExtAbility();
 }
 }  // namespace DataShare
 }  // namespace OHOS
