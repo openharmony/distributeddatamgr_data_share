@@ -696,9 +696,9 @@ napi_value DataSharePredicatesProxy::Limit(napi_env env, napi_callback_info info
     napi_get_cb_info(env, info, &argc, args, &thiz, nullptr);
     NAPI_ASSERT(env, argc > 1, "Invalid argvs!");
     int number = 0;
-    napi_status status = napi_get_value_int32(env, args[0], &number);
+    napi_get_value_int32(env, args[0], &number);
     int offset = 0;
-    status = napi_get_value_int32(env, args[1], &offset);
+    napi_get_value_int32(env, args[1], &offset);
     auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");

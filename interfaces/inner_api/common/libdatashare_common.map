@@ -22,6 +22,9 @@
     *Error*;
     *ISharedResultSet*;
     *ITypesUtil*;
+    *DataShareManagerImpl*;
+    *DataShareServiceProxy*;
+    *DataShareKvServiceProxy*;
   local:
     *;
 };

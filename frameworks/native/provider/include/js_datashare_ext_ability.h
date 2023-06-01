@@ -300,14 +300,23 @@ public:
     {
         businessError_ = businessError;
     }
-
+    struct AsyncContext {
+        bool isNeedNotify_ = false;
+    };
 private:
+    struct AsyncPoint {
+        std::shared_ptr<AsyncContext> context;
+    };
     NativeValue* CallObjectMethod(const char *name, NativeValue * const *argv = nullptr, size_t argc = 0,
         bool isAsync = true);
+    NativeValue *CallObjectMethod(
+        const char *name, NativeValue **argv, size_t argc, std::shared_ptr<AsyncContext> asyncContext);
     void GetSrcPath(std::string &srcPath);
     napi_value MakePredicates(napi_env env, const DataSharePredicates &predicates);
     static NativeValue* AsyncCallback(NativeEngine* engine, NativeCallbackInfo* info);
+    static NativeValue* AsyncCallbackWithContext(NativeEngine* engine, NativeCallbackInfo* info);
     void CheckAndSetAsyncResult(NativeEngine* engine);
+    static void NotifyToDataShareService();
     static void UnWrapBusinessError(napi_env env, napi_value info, DatashareBusinessError &businessError);
     static napi_valuetype UnWrapPropertyType(napi_env env, napi_value info,
         const std::string &key);

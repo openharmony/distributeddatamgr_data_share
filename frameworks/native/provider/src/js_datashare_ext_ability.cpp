@@ -16,20 +16,20 @@
 #include "js_datashare_ext_ability.h"
 
 #include "ability_info.h"
+#include "data_share_manager_impl.h"
 #include "dataobs_mgr_client.h"
-#include "datashare_stub_impl.h"
 #include "datashare_log.h"
+#include "datashare_predicates_proxy.h"
+#include "datashare_stub_impl.h"
+#include "iservice_registry.h"
 #include "js_datashare_ext_ability_context.h"
 #include "js_runtime.h"
 #include "js_runtime_utils.h"
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
 #include "napi_common_util.h"
 #include "napi_common_want.h"
-#include "napi_remote_object.h"
-
 #include "napi_datashare_values_bucket.h"
-#include "datashare_predicates_proxy.h"
+#include "napi_remote_object.h"
+#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -129,7 +129,9 @@ void JsDataShareExtAbility::OnStart(const AAFwk::Want &want)
     napi_value napiWant = OHOS::AppExecFwk::WrapWant(env, want);
     NativeValue* nativeWant = reinterpret_cast<NativeValue*>(napiWant);
     NativeValue* argv[] = {nativeWant};
-    CallObjectMethod("onCreate", argv, sizeof(argv)/sizeof(argv[0]));
+    std::shared_ptr<AsyncContext> context = std::make_shared<AsyncContext>();
+    context->isNeedNotify_ = true;
+    CallObjectMethod("onCreate", argv, sizeof(argv)/sizeof(argv[0]), context);
     napi_close_handle_scope(env, scope);
 }
 
@@ -212,6 +214,76 @@ NativeValue* JsDataShareExtAbility::AsyncCallback(NativeEngine* engine, NativeCa
     }
 
     return engine->CreateUndefined();
+}
+
+NativeValue* JsDataShareExtAbility::AsyncCallbackWithContext(NativeEngine* engine, NativeCallbackInfo* info)
+{
+    if (engine == nullptr || info == nullptr) {
+        LOG_ERROR("invalid param.");
+        return nullptr;
+    }
+    if (info->functionInfo == nullptr || info->functionInfo->data == nullptr) {
+        LOG_ERROR("invalid object.");
+        return engine->CreateUndefined();
+    }
+
+    AsyncPoint* instance = static_cast<AsyncPoint*>(info->functionInfo->data);
+    if (instance != nullptr) {
+        if (instance->context->isNeedNotify_) {
+            NotifyToDataShareService();
+        }
+    }
+    delete instance;
+    return engine->CreateUndefined();
+}
+
+NativeValue *JsDataShareExtAbility::CallObjectMethod(
+    const char *name, NativeValue *argv[], size_t argc, std::shared_ptr<AsyncContext> asyncContext)
+{
+    if (!jsObj_) {
+        LOG_WARN("Not found DataShareExtAbility.js");
+        return nullptr;
+    }
+
+    HandleEscape handleEscape(jsRuntime_);
+    auto &nativeEngine = jsRuntime_.GetNativeEngine();
+
+    NativeValue *value = jsObj_->Get();
+    NativeObject *obj = ConvertNativeValueTo<NativeObject>(value);
+    if (obj == nullptr) {
+        LOG_ERROR("Failed to get DataShareExtAbility object");
+        return nullptr;
+    }
+
+    NativeValue *method = obj->GetProperty(name);
+    if (method == nullptr) {
+        LOG_ERROR("Failed to get '%{public}s' from DataShareExtAbility object", name);
+        return nullptr;
+    }
+
+    AsyncPoint *point = new (std::nothrow)AsyncPoint();
+    if (point == nullptr) {
+        LOG_ERROR("JsDataShareExtAbility::CallObjectMethod new AsyncPoint error.");
+        return nullptr;
+    }
+    point->context = asyncContext;
+    size_t count = argc + 1;
+    NativeValue **args = new (std::nothrow) NativeValue *[count];
+    if (args == nullptr) {
+        LOG_ERROR("JsDataShareExtAbility::CallObjectMethod new NativeValue error.");
+        delete point;
+        return nullptr;
+    }
+    for (size_t i = 0; i < argc; i++) {
+        args[i] = argv[i];
+    }
+
+    args[argc] = nativeEngine.CreateFunction(ASYNC_CALLBACK_NAME.c_str(), ASYNC_CALLBACK_NAME.length(),
+        JsDataShareExtAbility::AsyncCallbackWithContext, point);
+
+    auto result = handleEscape.Escape(nativeEngine.CallFunction(value, method, args, count));
+    delete[] args;
+    return result;
 }
 
 NativeValue* JsDataShareExtAbility::CallObjectMethod(const char* name, NativeValue* const* argv, size_t argc,
@@ -778,6 +850,38 @@ napi_valuetype JsDataShareExtAbility::UnWrapPropertyType(napi_env env, napi_valu
     napi_valuetype type = napi_undefined;
     napi_typeof(env, value, &type);
     return type;
+}
+
+void JsDataShareExtAbility::NotifyToDataShareService()
+{
+    auto manager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (manager == nullptr) {
+        LOG_ERROR("get system ability manager failed");
+        return;
+    }
+    auto remoteObject = manager->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+    if (remoteObject == nullptr) {
+        LOG_ERROR("CheckSystemAbility failed");
+        return;
+    }
+    auto serviceProxy = std::make_shared<DataShareKvServiceProxy>(remoteObject);
+    if (serviceProxy == nullptr) {
+        LOG_ERROR("make_shared failed");
+        return;
+    }
+    auto remote = serviceProxy->GetFeatureInterface("data_share");
+    if (remote == nullptr) {
+        LOG_ERROR("Get DataShare service failed!");
+        return;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_ASYNC);
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return;
+    }
+    remote->SendRequest(IDataShareService::DATA_SHARE_SERVICE_CMD_NOTIFY, data, reply, option);
 }
 
 bool MakeNapiColumn(napi_env env, napi_value &napiColumns, const std::vector<std::string> &columns)

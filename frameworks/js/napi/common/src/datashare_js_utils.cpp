@@ -615,7 +615,7 @@ bool DataShareJSUtils::UnwrapPublishedDataItem(napi_env env, napi_value jsObject
     std::string strSubId;
     if (!UnwrapStringByPropertyName(env, jsObject, "subscriberId", strSubId)) {
         LOG_ERROR("Convert subscriberId failed");
-        return {};
+        return false;
     }
     publishedDataItem.subscriberId_ = atoll(strSubId.c_str());
     return true;
@@ -640,7 +640,6 @@ bool DataShareJSUtils::UnwrapPublishedDataItemVector(napi_env env, napi_value va
     std::vector<PublishedDataItem> &publishedDataItems)
 {
     uint32_t arraySize = 0;
-    std::string strValue;
 
     if (!IsArrayForNapiValue(env, value, arraySize)) {
         LOG_ERROR("IsArrayForNapiValue is false");

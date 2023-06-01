@@ -106,11 +106,11 @@ struct PublishedDataItem {
     PublishedDataItem &operator=(const PublishedDataItem &) = delete;
     virtual ~PublishedDataItem()
     {
-        if (value_.index() == 0) {
-            AshmemNode &node = std::get<AshmemNode>(value_);
-            if (node.isManaged && node.ashmem != nullptr) {
-                node.ashmem->UnmapAshmem();
-                node.ashmem->CloseAshmem();
+        AshmemNode *node = std::get_if<AshmemNode>(&value_);
+        if (node != nullptr) {
+            if (node->isManaged && node->ashmem != nullptr) {
+                node->ashmem->UnmapAshmem();
+                node->ashmem->CloseAshmem();
             }
         }
     }
