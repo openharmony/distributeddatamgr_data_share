@@ -578,6 +578,39 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_021, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_021, End");
 }
 
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_022, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_Predicates_Test_023::Start");
+    DataShare::DataSharePredicates predicates;
+    int res = predicates.SetWhereClause("`data2` > ?");
+    EXPECT_EQ(res, 0);
+    string clause = predicates.GetWhereClause();
+    EXPECT_EQ(clause, "`data2` > ?");
+    LOG_INFO("MediaDataShare_Predicates_Test_023, End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_023, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_Predicates_Test_024::Start");
+    DataShare::DataSharePredicates predicates;
+    int res = predicates.SetWhereArgs(std::vector<std::string> { "-5" });
+    EXPECT_EQ(res, 0);
+    vector<string> args = predicates.GetWhereArgs();
+    EXPECT_EQ(args[0], "-5");
+    LOG_INFO("MediaDataShare_Predicates_Test_024, End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_024, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_Predicates_Test_025::Start");
+    DataShare::DataSharePredicates predicates;
+    int res = predicates.SetOrder("data3");
+    EXPECT_EQ(res, 0);
+    string order = predicates.GetOrder();
+    EXPECT_EQ(order, "data3");
+    LOG_INFO("MediaDataShare_Predicates_Test_025, End");
+}
+
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ValuesBucket_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ValuesBucket_Test_001::Start");
