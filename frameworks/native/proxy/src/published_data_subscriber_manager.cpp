@@ -136,10 +136,9 @@ std::vector<OperationResult> PublishedDataSubscriberManager::EnableObservers(std
 std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(std::shared_ptr<BaseProxy> proxy,
     const std::vector<std::string> &uris, int64_t subscriberId)
 {
-    std::vector<OperationResult> results;
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return results;
+        return std::vector<OperationResult>();
     }
     std::vector<Key> keys;
     std::for_each(uris.begin(), uris.end(), [&keys, &subscriberId](auto &uri) {
@@ -172,7 +171,7 @@ void PublishedDataSubscriberManager::Emit(PublishedDataChangeNode &changeNode)
             LOG_WARN("%{private}s nobody subscribe, but still notify", data.key_.c_str());
             continue;
         }
-        for (auto &obs : callbacks) {
+        for (auto const &obs : callbacks) {
             results[obs].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
         }
     }

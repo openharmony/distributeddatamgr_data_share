@@ -19,13 +19,13 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include <published_data_subscriber_manager.h>
 #include <string>
 
-#include "base_connection.h"
 #include "app/context.h"
+#include "base_connection.h"
 #include "datashare_business_error.h"
 #include "datashare_template.h"
+#include "published_data_subscriber_manager.h"
 #include "rdb_subscriber_manager.h"
 #include "uri.h"
 
@@ -398,6 +398,8 @@ private:
     std::shared_ptr<BaseConnection> connection_ = nullptr;
     static bool RegObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
     static bool UnregObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    static std::string TransferUriPrefix(const std::string &originPrefix, const std::string &replacedPrefix,
+        const std::string &originUriStr);
     std::shared_ptr<RdbSubscriberManager> rdbSubscriberManager_ = nullptr;
     std::shared_ptr<PublishedDataSubscriberManager> publishedDataSubscriberManager_ = nullptr;
 };

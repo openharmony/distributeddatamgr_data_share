@@ -35,7 +35,8 @@ public:
      * @param string Specifies the parameter of the type.
      * @param values is the value of the corresponding type.
      */
-    explicit DataShareValuesBucket(std::map<std::string, DataShareValueObject::Type> values) : valuesMap(std::move(values)){};
+    explicit DataShareValuesBucket(std::map<std::string, DataShareValueObject::Type> values)
+        : valuesMap(std::move(values)){};
     /**
      * @brief Destructor.
      */

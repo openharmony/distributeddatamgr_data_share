@@ -141,10 +141,9 @@ std::vector<OperationResult> RdbSubscriberManager::EnableObservers(std::shared_p
 std::vector<OperationResult> RdbSubscriberManager::DisableObservers(std::shared_ptr<BaseProxy> proxy,
     const std::vector<std::string> &uris, const TemplateId &templateId)
 {
-    std::vector<OperationResult> results;
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return results;
+        return std::vector<OperationResult>();
     }
     std::vector<Key> keys;
     std::for_each(uris.begin(), uris.end(), [&keys, &templateId](auto &uri) {

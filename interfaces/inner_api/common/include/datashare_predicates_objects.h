@@ -48,7 +48,8 @@ public:
     /**
      * @brief Use Type replace variant namespace.
      */
-    using Type = std::variant<std::monostate, std::vector<int>, std::vector<int64_t>, std::vector<std::string>, std::vector<double>>;
+    using Type = std::variant<std::monostate, std::vector<int>, std::vector<int64_t>,
+        std::vector<std::string>, std::vector<double>>;
     Type value;
 
     /**
