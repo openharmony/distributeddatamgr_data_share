@@ -1179,7 +1179,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ToAbsSharedResultSet_Test_001, T
     LOG_INFO("MediaDataShare_ToAbsSharedResultSet_Test_001::Start");
     std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
     DataShare::DataSharePredicates predicates;
-    predicates.Contains("name", "dataShareTest");
+    predicates.EqualTo("name", "dataShareTest003");
     vector<string> columns;
     Uri uri(MEDIALIBRARY_DATA_URI);
     auto resultSet = helper->Query(uri, predicates, columns);
@@ -1189,7 +1189,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ToAbsSharedResultSet_Test_001, T
     if (absSharedResultSet!= nullptr) {
         absSharedResultSet->GetRowCount(rowCount);
     }
-    EXPECT_EQ(rowCount, 3);
+    EXPECT_EQ(rowCount, 1);
     LOG_INFO("MediaDataShare_ToAbsSharedResultSet_Test_001 End");
 }
 } // namespace DataShare
