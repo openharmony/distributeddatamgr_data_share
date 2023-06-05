@@ -23,6 +23,8 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "token_setproc.h"
+#include "rdb_data_ability_utils.h"
+#include "abs_shared_result_set.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -1170,6 +1172,25 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_001, TestS
     EXPECT_FALSE(ChangeInfoEqual(dataObserver->changeInfo_, uriChanges));
     dataObserver->Clear();
     LOG_INFO("MediaDataShare_UnregisterObserverExt_001 end");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ToAbsSharedResultSet_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_ToAbsSharedResultSet_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo("name", "dataShareTest003");
+    vector<string> columns;
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    auto resultSet = helper->Query(uri, predicates, columns);
+    std::shared_ptr<NativeRdb::AbsSharedResultSet> absSharedResultSet =
+        RdbDataAbilityAdapter::RdbDataAbilityUtils::ToAbsSharedResultSet(resultSet);
+    int rowCount = 0;
+    if (absSharedResultSet!= nullptr) {
+        absSharedResultSet->GetRowCount(rowCount);
+    }
+    EXPECT_EQ(rowCount, 1);
+    LOG_INFO("MediaDataShare_ToAbsSharedResultSet_Test_001 End");
 }
 } // namespace DataShare
 } // namespace OHOS

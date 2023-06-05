@@ -71,7 +71,7 @@ ohos_unittest("NativeDataShareTest") {
     "hitrace_native:hitrace_meter",
     "ipc:ipc_single",
     "media_library:media_library",
-    "relational_store:native_rdb",
+    "relational_store:rdb_data_ability_adapter",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
