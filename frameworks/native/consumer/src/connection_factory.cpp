@@ -20,6 +20,8 @@
 #include "datashare_connection.h"
 #include "datashare_log.h"
 #include "data_share_manager_impl.h"
+#include "rdb_subscriber_manager.h"
+#include "published_data_subscriber_manager.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -62,7 +64,13 @@ ConnectionFactory& ConnectionFactory::GetInstance()
 
 ConnectionFactory::ConnectionFactory()
 {
-    service_ = std::make_shared<DataShareManagerImpl>();
+    auto dataShareManagerImpl = std::make_shared<DataShareManagerImpl>();
+    dataShareManagerImpl->SetDeathCallback([](std::shared_ptr<BaseProxy> baseProxy) {
+        LOG_INFO("RecoverObs start");
+        RdbSubscriberManager::GetInstance().RecoverObservers(baseProxy);
+        PublishedDataSubscriberManager::GetInstance().RecoverObservers(baseProxy);
+    });
+    service_ = dataShareManagerImpl;
 }
 }
 }

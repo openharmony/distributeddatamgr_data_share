@@ -23,8 +23,6 @@
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include "rdb_subscriber_manager.h"
-#include "published_data_subscriber_manager.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -99,12 +97,6 @@ std::shared_ptr<BaseProxy> DataShareManagerImpl::GetDataShareService()
     return dataShareService_;
 }
 
-void DataShareManagerImpl::RecoverObs()
-{
-    RdbSubscriberManager::GetInstance().RecoverObservers(dataShareService_);
-    PublishedDataSubscriberManager::GetInstance().RecoverObservers(dataShareService_);
-}
-
 DataShareManagerImpl::DataShareManagerImpl() : BaseConnection(ConnectionType::SILENCE)
 {
     LOG_INFO("construct");
@@ -151,14 +143,18 @@ void DataShareManagerImpl::ResetServiceHandle()
     dataShareService_ = nullptr;
 }
 
+void DataShareManagerImpl::SetDeathCallback(std::function<void(std::shared_ptr<BaseProxy>)> deathCallback)
+{
+    deathCallback_ = deathCallback;
+}
+
 void DataShareManagerImpl::OnRemoteDied()
 {
     LOG_INFO("#######datashare service has dead");
     ResetServiceHandle();
     auto taskid = pool_->Schedule(std::chrono::seconds(WAIT_TIME), [this]() {
         if (GetDataShareService() != nullptr) {
-            LOG_DEBUG("start recover obs");
-            RecoverObs();
+            deathCallback_(dataShareService_);
         }
     });
     if (taskid == ExecutorPool::INVALID_TASK_ID) {

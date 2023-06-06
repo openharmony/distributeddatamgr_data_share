@@ -39,6 +39,7 @@ public:
     void OnRemoteDied();
     std::shared_ptr<BaseProxy> GetDataShareProxy() override;
     bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> &token) override;
+    void SetDeathCallback(std::function<void(std::shared_ptr<BaseProxy>)> deathCallback);
 
     class ServiceDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
@@ -56,7 +57,6 @@ public:
 
 private:
     void LinkToDeath(const sptr<IRemoteObject> remote);
-    void RecoverObs();
 
     sptr<DataShareServiceProxy> GetDataShareServiceProxy();
 
@@ -74,6 +74,7 @@ private:
     static constexpr int MAX_THREADS = 2;
     static constexpr int MIN_THREADS = 0;
     std::shared_ptr<ExecutorPool> pool_;
+    std::function<void(std::shared_ptr<BaseProxy>)> deathCallback_ = {};
 };
 
 class DataShareKvServiceProxy : public IRemoteProxy<DataShare::IKvStoreDataService> {
