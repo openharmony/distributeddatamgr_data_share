@@ -108,7 +108,7 @@ void DataShareManagerImpl::RecoverObs()
 DataShareManagerImpl::DataShareManagerImpl() : BaseConnection(ConnectionType::SILENCE)
 {
     LOG_INFO("construct");
-    pool_ = std::make_shared<ExecutorPool>(2, 0);
+    pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS);
 }
 
 DataShareManagerImpl::~DataShareManagerImpl()
@@ -124,7 +124,6 @@ bool DataShareManagerImpl::ConnectDataShare(const Uri &uri, const sptr<IRemoteOb
 
     std::lock_guard<std::mutex> lock(mutex_);
     if (dataShareService_ != nullptr) {
-        LOG_INFO("ndy dataShareService_ != nullptr");
         return true;
     }
 

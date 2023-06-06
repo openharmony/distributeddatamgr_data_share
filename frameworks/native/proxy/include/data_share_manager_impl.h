@@ -71,6 +71,8 @@ private:
     static constexpr int GET_SA_RETRY_TIMES = 3;
     static constexpr int RETRY_INTERVAL = 1;
     static constexpr int WAIT_TIME = 2;
+    static constexpr int MAX_THREADS = 2;
+    static constexpr int MIN_THREADS = 0;
     std::shared_ptr<ExecutorPool> pool_;
 };
 

@@ -921,7 +921,7 @@ Data DataShareHelper::GetPublishedData(const std::string &bundleName)
 std::vector<OperationResult> DataShareHelper::SubscribeRdbData(const std::vector<std::string> &uris,
     const TemplateId &templateId, const std::function<void(const RdbChangeNode &changeNode)> &callback)
 {
-    LOG_INFO("ndy Start SubscribeRdbData");
+    LOG_DEBUG("Start SubscribeRdbData");
     std::vector<OperationResult> results;
     auto connection = connection_;
     if (connection == nullptr) {
@@ -943,7 +943,7 @@ std::vector<OperationResult> DataShareHelper::SubscribeRdbData(const std::vector
 std::vector<OperationResult> DataShareHelper::UnsubscribeRdbData(const std::vector<std::string> &uris,
     const TemplateId &templateId)
 {
-    LOG_INFO("ndy Start UnsubscribeRdbData");
+    LOG_DEBUG("Start UnsubscribeRdbData");
     std::vector<OperationResult> results;
     auto connection = connection_;
     if (connection == nullptr) {
