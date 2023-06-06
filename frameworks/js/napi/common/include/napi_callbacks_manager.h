@@ -29,13 +29,14 @@ public:
     std::vector<OperationResult> AddObservers(const std::vector<Key> &keys, const std::shared_ptr<Observer> observer,
         std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
             std::vector<OperationResult> &)>);
+
     std::vector<OperationResult> DelObservers(const std::vector<Key> &keys,
         const std::shared_ptr<Observer> observer = nullptr,
         std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
-            std::vector<OperationResult> &)>
-            processOnLastDel = NapiCallbacksManager::DefaultProcess);
+            std::vector<OperationResult> &)> processOnLastDel = NapiCallbacksManager::DefaultProcess);
 
     std::vector<std::shared_ptr<Observer>> GetEnabledObservers(const Key &);
+
     int GetEnabledSubscriberSize();
 
 private:

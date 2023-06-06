@@ -106,7 +106,7 @@ public:
     std::vector<OperationResult> AddObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris,
         int64_t subscriberId);
     std::vector<OperationResult> DelObservers(napi_env env, napi_value callback,
-        const std::vector<std::string> &uris = std::vector<std::string>(), int64_t subscriberId = 0);
+        const std::vector<std::string> &uris, int64_t subscriberId);
     void Emit(const PublishedDataChangeNode &changeNode);
 
 private:

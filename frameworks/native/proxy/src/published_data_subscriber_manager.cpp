@@ -160,7 +160,8 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(st
         keys.emplace_back(uri, subscriberId);
     });
     return BaseCallbacks::DisableObservers(keys,
-        [&proxy, &subscriberId, this](const std::vector<Key> &lastDisabledKeys, std::vector<OperationResult> &opResult) {
+        [&proxy, &subscriberId, this](
+        const std::vector<Key> &lastDisabledKeys, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDisabledUris;
             std::for_each(lastDisabledKeys.begin(), lastDisabledKeys.end(), [&lastDisabledUris](auto &result) {
                 lastDisabledUris.emplace_back(result);

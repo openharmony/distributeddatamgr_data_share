@@ -55,7 +55,7 @@ std::vector<OperationResult> NapiRdbSubscriberManager::AddObservers(napi_env env
                 }
             }
             if (failedKeys.size() > 0) {
-                NapiCallbacksManager::DelObservers(failedKeys, observer);
+                BaseCallbacks::DelObservers(failedKeys, observer);
             }
         });
 }
