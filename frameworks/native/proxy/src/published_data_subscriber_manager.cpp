@@ -20,8 +20,9 @@
 
 namespace OHOS {
 namespace DataShare {
-std::vector<OperationResult> PublishedDataSubscriberManager::AddObservers(std::shared_ptr<BaseProxy> proxy,
-    const std::vector<std::string> &uris, int64_t subscriberId, const PublishedDataCallback &callback)
+std::vector<OperationResult> PublishedDataSubscriberManager::AddObservers(void *subscriber,
+    std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId,
+    const PublishedDataCallback &callback)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -31,9 +32,9 @@ std::vector<OperationResult> PublishedDataSubscriberManager::AddObservers(std::s
     std::for_each(uris.begin(), uris.end(), [&keys, &subscriberId](auto &uri) {
         keys.emplace_back(uri, subscriberId);
     });
-    return BaseCallbacks::AddObservers(keys, std::make_shared<Observer>(callback),
-        [&proxy, &subscriberId, this](const std::vector<Key> &firstAddKeys, const std::shared_ptr<Observer> observer,
-            std::vector<OperationResult> &opResult) {
+    return BaseCallbacks::AddObservers(keys, subscriber, std::make_shared<Observer>(callback),
+        [&proxy, subscriber, &subscriberId, this](const std::vector<Key> &firstAddKeys,
+            const std::shared_ptr<Observer> observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> firstAddUris;
             std::for_each(firstAddKeys.begin(), firstAddKeys.end(), [&firstAddUris](auto &result) {
                 firstAddUris.emplace_back(result);
@@ -53,34 +54,48 @@ std::vector<OperationResult> PublishedDataSubscriberManager::AddObservers(std::s
                 }
             }
             if (failedKeys.size() > 0) {
-                BaseCallbacks::DelObservers(failedKeys, observer);
+                BaseCallbacks::DelObservers(failedKeys, subscriber);
             }
             Destroy();
         });
 }
 
-std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(std::shared_ptr<BaseProxy> proxy,
-    const std::vector<std::string> &uris, int64_t subscriberId)
+std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *subscriber,
+    std::shared_ptr<BaseProxy> proxy)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();
     }
+    return BaseCallbacks::DelObservers(subscriber,
+        [&proxy, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
+            // delete all obs by subscriber
+            for (const auto &key : lastDelKeys) {
+                auto unsubResult =
+                    proxy->UnSubscribePublishedData(std::vector<std::string>(1, key.uri_), key.subscriberId_);
+                opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
+            }
+            Destroy();
+        });
+}
+
+std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *subscriber,
+    std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId)
+{
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return std::vector<OperationResult>();
+    }
+    if (uris.empty()) {
+        return DelObservers(subscriber, proxy);
+    }
+
     std::vector<Key> keys;
     std::for_each(uris.begin(), uris.end(), [&keys, &subscriberId](auto &uri) {
         keys.emplace_back(uri, subscriberId);
     });
-    return BaseCallbacks::DelObservers(keys, nullptr,
-        [&proxy, &subscriberId, &uris, this](const std::vector<Key> &lastDelKeys,
-            const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
-            // delete all obs
-            if (uris.empty()) {
-                for (const auto &key : lastDelKeys) {
-                    proxy->UnSubscribePublishedData(std::vector<std::string>(1, key.uri_), key.subscriberId_);
-                }
-                Destroy();
-                return;
-            }
+    return BaseCallbacks::DelObservers(keys, subscriber,
+        [&proxy, &subscriberId, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
                 lastDelUris.emplace_back(result);
@@ -145,8 +160,7 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(st
         keys.emplace_back(uri, subscriberId);
     });
     return BaseCallbacks::DisableObservers(keys,
-        [&proxy, &subscriberId, this](const std::vector<Key> &lastDisabledKeys,
-                                      std::vector<OperationResult> &opResult) {
+        [&proxy, &subscriberId, this](const std::vector<Key> &lastDisabledKeys, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDisabledUris;
             std::for_each(lastDisabledKeys.begin(), lastDisabledKeys.end(), [&lastDisabledUris](auto &result) {
                 lastDisabledUris.emplace_back(result);
@@ -159,6 +173,19 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(st
             opResult.insert(opResult.end(), results.begin(), results.end());
             Destroy();
         });
+}
+
+void PublishedDataSubscriberManager::RecoverObservers(std::shared_ptr<BaseProxy> proxy)
+{
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return;
+    }
+    return BaseCallbacks::RecoverObservers([&proxy, this](const std::vector<Key> &Keys) {
+        for (auto const &key : Keys) {
+            proxy->SubscribePublishedData(std::vector<std::string>(1, key.uri_), key.subscriberId_, serviceCallback_);
+        }
+    });
 }
 
 void PublishedDataSubscriberManager::Emit(PublishedDataChangeNode &changeNode)
@@ -201,6 +228,12 @@ void PublishedDataSubscriberManager::Destroy()
         LOG_INFO("no valid subscriber, delete callback");
         serviceCallback_ = nullptr;
     }
+}
+
+PublishedDataSubscriberManager &PublishedDataSubscriberManager::GetInstance()
+{
+    static PublishedDataSubscriberManager manager;
+    return manager;
 }
 
 PublishedDataSubscriberManager::PublishedDataSubscriberManager()

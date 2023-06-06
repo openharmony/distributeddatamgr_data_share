@@ -25,6 +25,8 @@
     *DataShareManagerImpl*;
     *DataShareServiceProxy*;
     *DataShareKvServiceProxy*;
+    *PublishedDataSubscriberManager*;
+    *RdbSubscriberManager*;
   local:
     *;
 };

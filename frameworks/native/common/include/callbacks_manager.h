@@ -26,46 +26,55 @@ namespace OHOS::DataShare {
 template<class Key, class Observer>
 class CallbacksManager {
 public:
-    std::vector<OperationResult> AddObservers(const std::vector<Key> &keys, const std::shared_ptr<Observer> observer,
-        std::function<void(
-            const std::vector<Key> &, const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &)>);
-    std::vector<OperationResult> DelObservers(const std::vector<Key> &keys,
-        const std::shared_ptr<Observer> observer = nullptr,
-        std::function<void(
-            const std::vector<Key> &, const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &)>
-            processOnLastDel = CallbacksManager::DefaultProcess);
-    std::vector<OperationResult> EnableObservers(
-        const std::vector<Key> &keys, std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)>);
+    std::vector<OperationResult> AddObservers(const std::vector<Key> &keys, void *subscriber,
+        const std::shared_ptr<Observer> observer,
+        std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
+            std::vector<OperationResult> &)>);
+
+    std::vector<OperationResult> DelObservers(const std::vector<Key> &keys, void *subscriber,
+        std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnLastDel =
+            CallbacksManager::DefaultProcess);
+
+    std::vector<OperationResult> DelObservers(void *subscriber,
+        std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnLastDel =
+            CallbacksManager::DefaultProcess);
+
+    std::vector<OperationResult> EnableObservers(const std::vector<Key> &keys,
+        std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)>);
 
     std::vector<OperationResult> DisableObservers(const std::vector<Key> &keys,
         std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnLastDel =
-            CallbacksManager::DefaultProcess2);
+            CallbacksManager::DefaultProcess);
+
     std::vector<std::shared_ptr<Observer>> GetEnabledObservers(const Key &);
+
     int GetEnabledSubscriberSize();
+
+    void RecoverObservers(std::function<void(const std::vector<Key> &)> RecoverObservers);
+
 private:
-    static void DefaultProcess2(const std::vector<Key> &, std::vector<OperationResult> &){};
-    static void DefaultProcess(
-        const std::vector<Key> &, const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &){};
+    static void DefaultProcess(const std::vector<Key> &, std::vector<OperationResult> &){};
     struct ObserverNode {
         std::shared_ptr<Observer> observer_;
         bool enabled_;
-        ObserverNode(const std::shared_ptr<Observer> &observer) : observer_(observer)
+        void *subscriber_;
+        ObserverNode(const std::shared_ptr<Observer> &observer, void *subscriber)
+            : observer_(observer), subscriber_(subscriber)
         {
             enabled_ = true;
         };
-        ObserverNode(const std::shared_ptr<Observer> &observer, bool enabled)
-            : observer_(observer), enabled_(enabled){};
     };
-    bool IsRegistered(const Observer &, const std::vector<ObserverNode> &);
+    void DelLocalObservers(const Key &key, void *subscriber, std::vector<Key> &lastDelKeys,
+        std::vector<OperationResult> &result);
+    void DelLocalObservers(void *subscriber, std::vector<Key> &lastDelKeys, std::vector<OperationResult> &result);
     std::recursive_mutex mutex_{};
     std::map<Key, std::vector<ObserverNode>> callbacks_;
 };
 
 template<class Key, class Observer>
 std::vector<OperationResult> CallbacksManager<Key, Observer>::AddObservers(const std::vector<Key> &keys,
-    const std::shared_ptr<Observer> observer,
-    std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
-        std::vector<OperationResult> &)> processOnFirstAdd)
+    void *subscriber, const std::shared_ptr<Observer> observer, std::function<void(const std::vector<Key> &,
+    const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &)> processOnFirstAdd)
 {
     std::vector<OperationResult> result;
     std::vector<Key> firstRegisterKey;
@@ -73,16 +82,12 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::AddObservers(const
         std::lock_guard<decltype(mutex_)> lck(mutex_);
         for (auto &key : keys) {
             std::vector<std::shared_ptr<Observer>> enabledObservers = GetEnabledObservers(key);
-            if (enabledObservers.size() == 0) {
-                callbacks_[key].emplace_back(ObserverNode(observer));
+            if (enabledObservers.empty()) {
+                callbacks_[key].emplace_back(ObserverNode(observer, subscriber));
                 firstRegisterKey.emplace_back(key);
                 continue;
             }
-            if (IsRegistered(*observer, callbacks_[key])) {
-                result.emplace_back(static_cast<std::string>(key), E_REGISTERED_REPEATED);
-                continue;
-            }
-            callbacks_[key].emplace_back(observer);
+            callbacks_[key].emplace_back(ObserverNode(observer, subscriber));
             result.emplace_back(key, E_OK);
         }
     }
@@ -91,67 +96,92 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::AddObservers(const
 }
 
 template<class Key, class Observer>
-bool CallbacksManager<Key, Observer>::IsRegistered(const Observer &observer, const std::vector<ObserverNode> &observers)
+void CallbacksManager<Key, Observer>::RecoverObservers(std::function<void(const std::vector<Key> &)> RecoverObservers)
 {
-    for (auto &item : observers) {
-        if (*(item.observer_) == observer) {
-            return true;
+    std::vector<Key> keys;
+    {
+        std::lock_guard<decltype(mutex_)> lck(mutex_);
+        for (auto &it : callbacks_) {
+            keys.emplace_back(it.first);
         }
     }
-    return false;
+    RecoverObservers(keys);
+}
+
+
+template<class Key, class Observer>
+void CallbacksManager<Key, Observer>::DelLocalObservers(void *subscriber, std::vector<Key> &lastDelKeys,
+    std::vector<OperationResult> &result)
+{
+    for (auto &it : callbacks_) {
+        DelLocalObservers(it.first, subscriber, lastDelKeys, result);
+    }
 }
 
 template<class Key, class Observer>
-std::vector<OperationResult> CallbacksManager<Key, Observer>::DelObservers(const std::vector<Key> &keys,
-    const std::shared_ptr<Observer> observer, std::function<void(const std::vector<Key> &,
-    const std::shared_ptr<Observer> &, std::vector<OperationResult> &)> processOnLastDel)
+void CallbacksManager<Key, Observer>::DelLocalObservers(const Key &key, void *subscriber,
+    std::vector<Key> &lastDelKeys, std::vector<OperationResult> &result)
+{
+    auto it = callbacks_.find(key);
+    if (it == callbacks_.end()) {
+        result.emplace_back(key, E_UNREGISTERED_EMPTY);
+        return;
+    }
+    std::vector<ObserverNode> &callbacks = it->second;
+    auto callbackIt = callbacks.begin();
+    while (callbackIt != callbacks.end()) {
+        if (callbackIt->subscriber_ != subscriber) {
+            callbackIt++;
+            continue;
+        }
+        callbackIt = callbacks.erase(callbackIt);
+    }
+    if (!it->second.empty()) {
+        result.emplace_back(key, E_OK);
+        return;
+    }
+    lastDelKeys.emplace_back(key);
+}
+
+template<class Key, class Observer>
+std::vector<OperationResult> CallbacksManager<Key, Observer>::DelObservers(void *subscriber,
+    std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnLastDel)
 {
     std::vector<OperationResult> result;
     std::vector<Key> lastDelKeys;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
-        if (keys.empty() && observer == nullptr) {
-            for (auto &it : callbacks_) {
-                lastDelKeys.emplace_back(it.first);
-            }
-            callbacks_.clear();
+        DelLocalObservers(subscriber, lastDelKeys, result);
+        if (lastDelKeys.empty()) {
+            return result;
         }
-        for (auto &key : keys) {
-            auto it = callbacks_.find(key);
-            if (it == callbacks_.end()) {
-                result.emplace_back(key, E_UNREGISTERED_EMPTY);
-                continue;
-            }
-            if (observer == nullptr) {
-                callbacks_.erase(key);
-                lastDelKeys.emplace_back(key);
-                continue;
-            }
-            if (!IsRegistered(*observer, it->second)) {
-                result.emplace_back(key, E_UNREGISTERED_EMPTY);
-                continue;
-            }
-            std::vector<ObserverNode> &callbacks = it->second;
-            auto callbackIt = callbacks.begin();
-            while (callbackIt != callbacks.end()) {
-                if (!(*(callbackIt->observer_) == *observer)) {
-                    callbackIt++;
-                    continue;
-                }
-                callbackIt = callbacks.erase(callbackIt);
-            }
-            if (!it->second.empty()) {
-                result.emplace_back(key, E_OK);
-                continue;
-            }
+        for (auto &key : lastDelKeys) {
             callbacks_.erase(key);
-            lastDelKeys.emplace_back(key);
+        }
+    }
+    processOnLastDel(lastDelKeys, result);
+    return result;
+}
+
+template<class Key, class Observer>
+std::vector<OperationResult> CallbacksManager<Key, Observer>::DelObservers(const std::vector<Key> &keys,
+    void *subscriber, std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnLastDel)
+{
+    std::vector<OperationResult> result;
+    std::vector<Key> lastDelKeys;
+    {
+        std::lock_guard<decltype(mutex_)> lck(mutex_);
+        for (auto &key : keys) {
+            DelLocalObservers(key, subscriber, lastDelKeys, result);
         }
         if (lastDelKeys.empty()) {
             return result;
         }
+        for (auto &key : lastDelKeys) {
+            callbacks_.erase(key);
+        }
     }
-    processOnLastDel(lastDelKeys, observer, result);
+    processOnLastDel(lastDelKeys, result);
     return result;
 }
 
@@ -187,7 +217,7 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::EnableObservers(co
                 continue;
             }
             std::vector<std::shared_ptr<Observer>> enabledObservers = GetEnabledObservers(key);
-            for (auto &item: callbacks_[key]) {
+            for (auto &item : callbacks_[key]) {
                 item.enabled_ = true;
             }
             if (!enabledObservers.empty()) {
@@ -216,7 +246,7 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::DisableObservers(c
                 continue;
             }
             std::vector<std::shared_ptr<Observer>> enabledObservers = GetEnabledObservers(key);
-            for (auto &item: callbacks_[key]) {
+            for (auto &item : callbacks_[key]) {
                 item.enabled_ = false;
             }
             if (enabledObservers.empty()) {
@@ -235,7 +265,7 @@ int CallbacksManager<Key, Observer>::GetEnabledSubscriberSize()
     int count = 0;
     std::lock_guard<decltype(mutex_)> lck(mutex_);
     for (auto &[key, value] : callbacks_) {
-        for (const auto &callback:value) {
+        for (const auto &callback : value) {
             if (callback.enabled_) {
                 count++;
             }

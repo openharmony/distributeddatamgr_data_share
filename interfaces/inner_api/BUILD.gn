@@ -57,9 +57,6 @@ ohos_shared_library("datashare_consumer") {
     "${datashare_native_consumer_path}/src/datashare_connection.cpp",
     "${datashare_native_consumer_path}/src/datashare_helper.cpp",
     "${datashare_native_consumer_path}/src/datashare_proxy.cpp",
-    "${datashare_native_proxy_path}/src/data_proxy_observer_stub.cpp",
-    "${datashare_native_proxy_path}/src/published_data_subscriber_manager.cpp",
-    "${datashare_native_proxy_path}/src/rdb_subscriber_manager.cpp",
   ]
   configs = [ ":ability_config" ]
   public_configs = [ ":datashare_public_config" ]

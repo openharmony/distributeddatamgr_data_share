@@ -23,6 +23,8 @@
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "rdb_subscriber_manager.h"
+#include "published_data_subscriber_manager.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -97,9 +99,16 @@ std::shared_ptr<BaseProxy> DataShareManagerImpl::GetDataShareService()
     return dataShareService_;
 }
 
+void DataShareManagerImpl::RecoverObs()
+{
+    RdbSubscriberManager::GetInstance().RecoverObservers(dataShareService_);
+    PublishedDataSubscriberManager::GetInstance().RecoverObservers(dataShareService_);
+}
+
 DataShareManagerImpl::DataShareManagerImpl() : BaseConnection(ConnectionType::SILENCE)
 {
     LOG_INFO("construct");
+    pool_ = std::make_shared<ExecutorPool>(2, 0);
 }
 
 DataShareManagerImpl::~DataShareManagerImpl()
@@ -114,6 +123,11 @@ bool DataShareManagerImpl::ConnectDataShare(const Uri &uri, const sptr<IRemoteOb
     }
 
     std::lock_guard<std::mutex> lock(mutex_);
+    if (dataShareService_ != nullptr) {
+        LOG_INFO("ndy dataShareService_ != nullptr");
+        return true;
+    }
+
     auto service = GetDataShareServiceProxy();
     if (service == nullptr) {
         return false;
@@ -142,6 +156,17 @@ void DataShareManagerImpl::OnRemoteDied()
 {
     LOG_INFO("#######datashare service has dead");
     ResetServiceHandle();
+    auto taskid = pool_->Schedule(std::chrono::seconds(WAIT_TIME), [this]() {
+        if (GetDataShareService() != nullptr) {
+            LOG_DEBUG("start recover obs");
+            RecoverObs();
+        }
+    });
+    if (taskid == ExecutorPool::INVALID_TASK_ID) {
+        LOG_ERROR("create scheduler failed, over the max capacity");
+        return;
+    }
+    LOG_DEBUG("create scheduler success");
 }
 
 DataShareKvServiceProxy::DataShareKvServiceProxy(const sptr<IRemoteObject> &impl)

@@ -46,7 +46,7 @@ struct PublishedObserverMapKey {
         }
         return subscriberId_ < node.subscriberId_;
     }
-    operator std::string () const
+    operator std::string() const
     {
         return uri_;
     }
@@ -63,23 +63,27 @@ private:
     PublishedDataCallback callback_;
 };
 
-class PublishedDataSubscriberManager : public CallbacksManager<PublishedObserverMapKey, PublishedDataObserver>  {
+class PublishedDataSubscriberManager : public CallbacksManager<PublishedObserverMapKey, PublishedDataObserver> {
 public:
     using Key = PublishedObserverMapKey;
     using Observer = PublishedDataObserver;
     using BaseCallbacks = CallbacksManager<PublishedObserverMapKey, PublishedDataObserver>;
-    PublishedDataSubscriberManager();
-    std::vector<OperationResult> AddObservers(std::shared_ptr<BaseProxy> proxy,
+    static PublishedDataSubscriberManager &GetInstance();
+
+    std::vector<OperationResult> AddObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
         const std::vector<std::string> &uris, int64_t subscriberId, const PublishedDataCallback &callback);
-    std::vector<OperationResult> DelObservers(std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris,
-        int64_t subscriberId);
+    std::vector<OperationResult> DelObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
+        const std::vector<std::string> &uris, int64_t subscriberId);
+    std::vector<OperationResult> DelObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy);
     std::vector<OperationResult> EnableObservers(std::shared_ptr<BaseProxy> proxy,
         const std::vector<std::string> &uris, int64_t subscriberId);
     std::vector<OperationResult> DisableObservers(std::shared_ptr<BaseProxy> proxy,
         const std::vector<std::string> &uris, int64_t subscriberId);
+    void RecoverObservers(std::shared_ptr<BaseProxy> proxy);
     void Emit(PublishedDataChangeNode &changeNode);
 
 private:
+    PublishedDataSubscriberManager();
     bool Init();
     void Destroy();
     sptr<PublishedDataObserverStub> serviceCallback_;

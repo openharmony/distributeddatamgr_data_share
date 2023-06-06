@@ -22,6 +22,8 @@
 #include "dataobs_mgr_client.h"
 #include "datashare_log.h"
 #include "datashare_result_set.h"
+#include "rdb_subscriber_manager.h"
+#include "published_data_subscriber_manager.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -78,13 +80,14 @@ DataShareHelper::DataShareHelper(const CreateOptions &options, const Uri &uri,
     uri_ = uri;
     isDataShareService_ = options.isProxy_;
     connection_ = dataShareConnection;
-    rdbSubscriberManager_ = std::make_shared<RdbSubscriberManager>();
-    publishedDataSubscriberManager_ =
-        std::make_shared<PublishedDataSubscriberManager>();
 }
 
 DataShareHelper::~DataShareHelper()
 {
+    if (isDataShareService_) {
+        UnsubscribeRdbData();
+        UnsubscribePublishedData();
+    }
 }
 
 std::string DataShareHelper::TransferUriPrefix(const std::string &originPrefix, const std::string &replacedPrefix,
@@ -918,7 +921,7 @@ Data DataShareHelper::GetPublishedData(const std::string &bundleName)
 std::vector<OperationResult> DataShareHelper::SubscribeRdbData(const std::vector<std::string> &uris,
     const TemplateId &templateId, const std::function<void(const RdbChangeNode &changeNode)> &callback)
 {
-    LOG_DEBUG("Start SubscribeRdbData");
+    LOG_INFO("ndy Start SubscribeRdbData");
     std::vector<OperationResult> results;
     auto connection = connection_;
     if (connection == nullptr) {
@@ -934,18 +937,13 @@ std::vector<OperationResult> DataShareHelper::SubscribeRdbData(const std::vector
         LOG_ERROR("dataShareProxy is nullptr");
         return results;
     }
-    auto manager = rdbSubscriberManager_;
-    if (manager == nullptr) {
-        LOG_ERROR("rdbSubscriberManager_ is nullptr");
-        return results;
-    }
-    return manager->AddObservers(proxy, uris, templateId, callback);
+    return RdbSubscriberManager::GetInstance().AddObservers(this, proxy, uris, templateId, callback);
 }
 
 std::vector<OperationResult> DataShareHelper::UnsubscribeRdbData(const std::vector<std::string> &uris,
     const TemplateId &templateId)
 {
-    LOG_DEBUG("Start UnsubscribeRdbData");
+    LOG_INFO("ndy Start UnsubscribeRdbData");
     std::vector<OperationResult> results;
     auto connection = connection_;
     if (connection == nullptr) {
@@ -961,12 +959,7 @@ std::vector<OperationResult> DataShareHelper::UnsubscribeRdbData(const std::vect
         LOG_ERROR("dataShareProxy is nullptr");
         return results;
     }
-    auto manager = rdbSubscriberManager_;
-    if (manager == nullptr) {
-        LOG_ERROR("rdbSubscriberManager_ is nullptr");
-        return results;
-    }
-    return manager->DelObservers(proxy, uris, templateId);
+    return RdbSubscriberManager::GetInstance().DelObservers(this, proxy, uris, templateId);
 }
 
 std::vector<OperationResult> DataShareHelper::EnableRdbSubs(const std::vector<std::string> &uris,
@@ -988,12 +981,7 @@ std::vector<OperationResult> DataShareHelper::EnableRdbSubs(const std::vector<st
         LOG_ERROR("dataShareProxy is nullptr");
         return results;
     }
-    auto manager = rdbSubscriberManager_;
-    if (manager == nullptr) {
-        LOG_ERROR("rdbSubscriberManager_ is nullptr");
-        return results;
-    }
-    return manager->EnableObservers(proxy, uris, templateId);
+    return RdbSubscriberManager::GetInstance().EnableObservers(proxy, uris, templateId);
 }
 
 std::vector<OperationResult> DataShareHelper::DisableRdbSubs(const std::vector<std::string> &uris,
@@ -1015,12 +1003,7 @@ std::vector<OperationResult> DataShareHelper::DisableRdbSubs(const std::vector<s
         LOG_ERROR("dataShareProxy is nullptr");
         return results;
     }
-    auto manager = rdbSubscriberManager_;
-    if (manager == nullptr) {
-        LOG_ERROR("rdbSubscriberManager_ is nullptr");
-        return results;
-    }
-    return manager->DisableObservers(proxy, uris, templateId);
+    return RdbSubscriberManager::GetInstance().DisableObservers(proxy, uris, templateId);
 }
 
 std::vector<OperationResult> DataShareHelper::SubscribePublishedData(const std::vector<std::string> &uris,
@@ -1041,12 +1024,7 @@ std::vector<OperationResult> DataShareHelper::SubscribePublishedData(const std::
         LOG_ERROR("dataShareProxy is nullptr");
         return results;
     }
-    auto manager = publishedDataSubscriberManager_;
-    if (manager == nullptr) {
-        LOG_ERROR("rdbSubscriberManager_ is nullptr");
-        return results;
-    }
-    return manager->AddObservers(proxy, uris, subscriberId, callback);
+    return PublishedDataSubscriberManager::GetInstance().AddObservers(this, proxy, uris, subscriberId, callback);
 }
 
 std::vector<OperationResult> DataShareHelper::UnsubscribePublishedData(const std::vector<std::string> &uris,
@@ -1068,12 +1046,7 @@ std::vector<OperationResult> DataShareHelper::UnsubscribePublishedData(const std
         LOG_ERROR("dataShareProxy is nullptr");
         return results;
     }
-    auto manager = publishedDataSubscriberManager_;
-    if (manager == nullptr) {
-        LOG_ERROR("rdbSubscriberManager_ is nullptr");
-        return results;
-    }
-    return manager->DelObservers(proxy, uris, subscriberId);
+    return PublishedDataSubscriberManager::GetInstance().DelObservers(this, proxy, uris, subscriberId);
 }
 
 std::vector<OperationResult> DataShareHelper::EnablePubSubs(const std::vector<std::string> &uris,
@@ -1095,12 +1068,7 @@ std::vector<OperationResult> DataShareHelper::EnablePubSubs(const std::vector<st
         LOG_ERROR("dataShareProxy is nullptr");
         return results;
     }
-    auto manager = publishedDataSubscriberManager_;
-    if (manager == nullptr) {
-        LOG_ERROR("rdbSubscriberManager_ is nullptr");
-        return results;
-    }
-    return manager->EnableObservers(proxy, uris, subscriberId);
+    return PublishedDataSubscriberManager::GetInstance().EnableObservers(proxy, uris, subscriberId);
 }
 
 std::vector<OperationResult> DataShareHelper::DisablePubSubs(const std::vector<std::string> &uris,
@@ -1122,12 +1090,7 @@ std::vector<OperationResult> DataShareHelper::DisablePubSubs(const std::vector<s
         LOG_ERROR("dataShareProxy is nullptr");
         return results;
     }
-    auto manager = publishedDataSubscriberManager_;
-    if (manager == nullptr) {
-        LOG_ERROR("rdbSubscriberManager_ is nullptr");
-        return results;
-    }
-    return manager->DisableObservers(proxy, uris, subscriberId);
+    return PublishedDataSubscriberManager::GetInstance().DisableObservers(proxy, uris, subscriberId);
 }
 } // namespace DataShare
 } // namespace OHOS

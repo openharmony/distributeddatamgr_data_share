@@ -26,6 +26,7 @@
 #include "iremote_object.h"
 #include "refbase.h"
 #include "base_connection.h"
+#include "executor_pool.h"
 
 namespace OHOS::DataShare {
 class DataShareKvServiceProxy;
@@ -55,6 +56,7 @@ public:
 
 private:
     void LinkToDeath(const sptr<IRemoteObject> remote);
+    void RecoverObs();
 
     sptr<DataShareServiceProxy> GetDataShareServiceProxy();
 
@@ -69,6 +71,7 @@ private:
     static constexpr int GET_SA_RETRY_TIMES = 3;
     static constexpr int RETRY_INTERVAL = 1;
     static constexpr int WAIT_TIME = 2;
+    std::shared_ptr<ExecutorPool> pool_;
 };
 
 class DataShareKvServiceProxy : public IRemoteProxy<DataShare::IKvStoreDataService> {
