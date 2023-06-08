@@ -220,14 +220,14 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::EnableObservers(
                 continue;
             }
             std::vector<std::shared_ptr<Observer>> enabledObservers = GetEnabledObservers(key);
-            bool flag = false;
+            bool hasEnabled = false;
             for (auto &item : callbacks_[key]) {
                 if (item.subscriber_ == subscriber) {
                     item.enabled_ = true;
-                    flag = true;
+	                hasEnabled = true;
                 }
             }
-            if (!flag) {
+            if (!hasEnabled) {
                 result.emplace_back(key, E_SUBSCRIBER_NOT_EXIST);
                 continue;
             }
@@ -263,14 +263,14 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::DisableObservers(
                 continue;
             }
 
-            bool flag = false;
+            bool hasDisabled = false;
             for (auto &item : callbacks_[key]) {
                 if (item.subscriber_ == subscriber) {
                     item.enabled_ = false;
-                    flag = true;
+	                hasDisabled = true;
                 }
             }
-            if (!flag) {
+            if (!hasDisabled) {
                 result.emplace_back(key, E_SUBSCRIBER_NOT_EXIST);
                 continue;
             }
