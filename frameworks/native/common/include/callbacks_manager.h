@@ -224,7 +224,7 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::EnableObservers(
             for (auto &item : callbacks_[key]) {
                 if (item.subscriber_ == subscriber) {
                     item.enabled_ = true;
-	                hasEnabled = true;
+                    hasEnabled = true;
                 }
             }
             if (!hasEnabled) {
@@ -267,7 +267,7 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::DisableObservers(
             for (auto &item : callbacks_[key]) {
                 if (item.subscriber_ == subscriber) {
                     item.enabled_ = false;
-	                hasDisabled = true;
+                    hasDisabled = true;
                 }
             }
             if (!hasDisabled) {
