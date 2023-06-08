@@ -100,6 +100,7 @@ std::shared_ptr<BaseProxy> DataShareManagerImpl::GetDataShareService()
 DataShareManagerImpl::DataShareManagerImpl() : BaseConnection(ConnectionType::SILENCE)
 {
     LOG_INFO("construct");
+    pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS);
 }
 
 DataShareManagerImpl::~DataShareManagerImpl()
@@ -114,6 +115,10 @@ bool DataShareManagerImpl::ConnectDataShare(const Uri &uri, const sptr<IRemoteOb
     }
 
     std::lock_guard<std::mutex> lock(mutex_);
+    if (dataShareService_ != nullptr) {
+        return true;
+    }
+
     auto service = GetDataShareServiceProxy();
     if (service == nullptr) {
         return false;
@@ -138,10 +143,25 @@ void DataShareManagerImpl::ResetServiceHandle()
     dataShareService_ = nullptr;
 }
 
+void DataShareManagerImpl::SetDeathCallback(std::function<void(std::shared_ptr<BaseProxy>)> deathCallback)
+{
+    deathCallback_ = deathCallback;
+}
+
 void DataShareManagerImpl::OnRemoteDied()
 {
     LOG_INFO("#######datashare service has dead");
     ResetServiceHandle();
+    auto taskid = pool_->Schedule(std::chrono::seconds(WAIT_TIME), [this]() {
+        if (GetDataShareService() != nullptr) {
+            deathCallback_(dataShareService_);
+        }
+    });
+    if (taskid == ExecutorPool::INVALID_TASK_ID) {
+        LOG_ERROR("create scheduler failed, over the max capacity");
+        return;
+    }
+    LOG_DEBUG("create scheduler success");
 }
 
 DataShareKvServiceProxy::DataShareKvServiceProxy(const sptr<IRemoteObject> &impl)

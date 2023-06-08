@@ -19,8 +19,8 @@
 
 namespace OHOS {
 namespace DataShare {
-std::vector<OperationResult> NapiRdbSubscriberManager::AddObservers(
-    napi_env env, napi_value callback, const std::vector<std::string> &uris, const TemplateId &templateId)
+std::vector<OperationResult> NapiRdbSubscriberManager::AddObservers(napi_env env, napi_value callback,
+    const std::vector<std::string> &uris, const TemplateId &templateId)
 {
     auto datashareHelper = dataShareHelper_.lock();
     if (datashareHelper == nullptr) {
@@ -60,8 +60,8 @@ std::vector<OperationResult> NapiRdbSubscriberManager::AddObservers(
         });
 }
 
-std::vector<OperationResult> NapiRdbSubscriberManager::DelObservers(
-    napi_env env, napi_value callback, const std::vector<std::string> &uris, const TemplateId &templateId)
+std::vector<OperationResult> NapiRdbSubscriberManager::DelObservers(napi_env env, napi_value callback,
+    const std::vector<std::string> &uris, const TemplateId &templateId)
 {
     auto dataShareHelper = dataShareHelper_.lock();
     if (dataShareHelper == nullptr) {
@@ -72,16 +72,9 @@ std::vector<OperationResult> NapiRdbSubscriberManager::DelObservers(
     std::for_each(uris.begin(), uris.end(), [&keys, &templateId](auto &uri) {
         keys.emplace_back(uri, templateId);
     });
-    return BaseCallbacks::DelObservers(keys,
-        callback == nullptr ? nullptr : std::make_shared<Observer>(env, callback),
-        [&dataShareHelper, &templateId, &callback, &uris](const std::vector<Key> &lastDelKeys,
-            const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
-            // delete all obs
-            if (callback == nullptr && uris.empty()) {
-                dataShareHelper->UnsubscribeRdbData();
-                return;
-            }
-
+    return BaseCallbacks::DelObservers(keys, callback == nullptr ? nullptr : std::make_shared<Observer>(env, callback),
+        [&dataShareHelper, &templateId](const std::vector<Key> &lastDelKeys, const std::shared_ptr<Observer> &observer,
+            std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
                 lastDelUris.emplace_back(result);
@@ -105,8 +98,8 @@ void NapiRdbSubscriberManager::Emit(const RdbChangeNode &changeNode)
     }
 }
 
-std::vector<OperationResult> NapiPublishedSubscriberManager::AddObservers(
-    napi_env env, napi_value callback, const std::vector<std::string> &uris, int64_t subscriberId)
+std::vector<OperationResult> NapiPublishedSubscriberManager::AddObservers(napi_env env, napi_value callback,
+    const std::vector<std::string> &uris, int64_t subscriberId)
 {
     auto dataShareHelper = dataShareHelper_.lock();
     if (dataShareHelper == nullptr) {
@@ -128,8 +121,8 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::AddObservers(
             if (firstAddUris.empty()) {
                 return;
             }
-            auto subResults = dataShareHelper->SubscribePublishedData(
-                firstAddUris, subscriberId, [this](const PublishedDataChangeNode &changeNode) {
+            auto subResults = dataShareHelper->SubscribePublishedData(firstAddUris, subscriberId,
+                [this](const PublishedDataChangeNode &changeNode) {
                     Emit(changeNode);
                 });
             std::vector<Key> failedKeys;
@@ -146,8 +139,8 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::AddObservers(
         });
 }
 
-std::vector<OperationResult> NapiPublishedSubscriberManager::DelObservers(
-    napi_env env, napi_value callback, const std::vector<std::string> &uris, int64_t subscriberId)
+std::vector<OperationResult> NapiPublishedSubscriberManager::DelObservers(napi_env env, napi_value callback,
+    const std::vector<std::string> &uris, int64_t subscriberId)
 {
     auto dataShareHelper = dataShareHelper_.lock();
     if (dataShareHelper == nullptr) {
@@ -158,16 +151,9 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::DelObservers(
     std::for_each(uris.begin(), uris.end(), [&keys, &subscriberId](auto &uri) {
         keys.emplace_back(uri, subscriberId);
     });
-    return BaseCallbacks::DelObservers(keys,
-        callback == nullptr ? nullptr : std::make_shared<Observer>(env, callback),
+    return BaseCallbacks::DelObservers(keys, callback == nullptr ? nullptr : std::make_shared<Observer>(env, callback),
         [&dataShareHelper, &subscriberId, &callback, &uris](const std::vector<Key> &lastDelKeys,
             const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
-            // delete all obs
-            if (callback == nullptr && uris.empty()) {
-                dataShareHelper->UnsubscribePublishedData();
-                return;
-            }
-
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
                 lastDelUris.emplace_back(result);
@@ -184,7 +170,7 @@ void NapiPublishedSubscriberManager::Emit(const PublishedDataChangeNode &changeN
 {
     std::map<std::shared_ptr<Observer>, PublishedDataChangeNode> results;
     for (auto &data : changeNode.datas_) {
-        PublishedObserverMapKey key(data.key_, data.subscriberId_);
+        Key key(data.key_, data.subscriberId_);
         auto callbacks = BaseCallbacks::GetEnabledObservers(key);
         if (callbacks.empty()) {
             LOG_WARN("%{private}s nobody subscribe, but still notify", data.key_.c_str());

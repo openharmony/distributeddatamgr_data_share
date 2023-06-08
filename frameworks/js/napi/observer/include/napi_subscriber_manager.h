@@ -19,7 +19,7 @@
 #include <memory>
 #include <uv.h>
 
-#include "callbacks_manager.h"
+#include "napi_callbacks_manager.h"
 #include "datashare_helper.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
@@ -28,35 +28,85 @@
 
 namespace OHOS {
 namespace DataShare {
-class NapiRdbSubscriberManager : public CallbacksManager<RdbObserverMapKey, NapiRdbObserver> {
+struct NapiRdbObserverMapKey {
+    std::string uri_;
+    TemplateId templateId_;
+    NapiRdbObserverMapKey(const std::string &uri, const TemplateId &templateId) : uri_(uri), templateId_(templateId){};
+    bool operator==(const NapiRdbObserverMapKey &node) const
+    {
+        return uri_ == node.uri_ && templateId_ == node.templateId_;
+    }
+    bool operator!=(const NapiRdbObserverMapKey &node) const
+    {
+        return !(node == *this);
+    }
+    bool operator<(const NapiRdbObserverMapKey &node) const
+    {
+        if (uri_ != node.uri_) {
+            return uri_ < node.uri_;
+        }
+        return templateId_ < node.templateId_;
+    }
+    operator std::string() const
+    {
+        return uri_;
+    }
+};
+
+class NapiRdbSubscriberManager : public NapiCallbacksManager<NapiRdbObserverMapKey, NapiRdbObserver> {
 public:
-    using Key = RdbObserverMapKey;
+    using Key = NapiRdbObserverMapKey;
     using Observer = NapiRdbObserver;
-    using BaseCallbacks = CallbacksManager<RdbObserverMapKey, NapiRdbObserver>;
+    using BaseCallbacks = NapiCallbacksManager<NapiRdbObserverMapKey, NapiRdbObserver>;
     explicit NapiRdbSubscriberManager(std::weak_ptr<DataShareHelper> dataShareHelper)
         : dataShareHelper_(dataShareHelper){};
     std::vector<OperationResult> AddObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris,
         const TemplateId &templateId);
     std::vector<OperationResult> DelObservers(napi_env env, napi_value callback,
-        const std::vector<std::string> &uris = std::vector<std::string>(),
-        const TemplateId &templateId = TemplateId());
+        const std::vector<std::string> &uris, const TemplateId &templateId);
     void Emit(const RdbChangeNode &changeNode);
 
 private:
     std::weak_ptr<DataShareHelper> dataShareHelper_;
 };
 
-class NapiPublishedSubscriberManager : public CallbacksManager<PublishedObserverMapKey, NapiPublishedObserver> {
+struct NapiPublishedObserverMapKey {
+    std::string uri_;
+    int64_t subscriberId_;
+    NapiPublishedObserverMapKey(const std::string &uri, int64_t subscriberId) : uri_(uri),
+        subscriberId_(subscriberId){};
+    bool operator==(const NapiPublishedObserverMapKey &node) const
+    {
+        return uri_ == node.uri_ && subscriberId_ == node.subscriberId_;
+    }
+    bool operator!=(const NapiPublishedObserverMapKey &node) const
+    {
+        return !(node == *this);
+    }
+    bool operator<(const NapiPublishedObserverMapKey &node) const
+    {
+        if (uri_ != node.uri_) {
+            return uri_ < node.uri_;
+        }
+        return subscriberId_ < node.subscriberId_;
+    }
+    operator std::string() const
+    {
+        return uri_;
+    }
+};
+
+class NapiPublishedSubscriberManager : public NapiCallbacksManager<NapiPublishedObserverMapKey, NapiPublishedObserver> {
 public:
-    using Key = PublishedObserverMapKey;
+    using Key = NapiPublishedObserverMapKey;
     using Observer = NapiPublishedObserver;
-    using BaseCallbacks = CallbacksManager<PublishedObserverMapKey, NapiPublishedObserver>;
+    using BaseCallbacks = NapiCallbacksManager<NapiPublishedObserverMapKey, NapiPublishedObserver>;
     explicit NapiPublishedSubscriberManager(std::weak_ptr<DataShareHelper> dataShareHelper)
         : dataShareHelper_(dataShareHelper){};
     std::vector<OperationResult> AddObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris,
         int64_t subscriberId);
     std::vector<OperationResult> DelObservers(napi_env env, napi_value callback,
-        const std::vector<std::string> &uris = std::vector<std::string>(), int64_t subscriberId = 0);
+        const std::vector<std::string> &uris, int64_t subscriberId);
     void Emit(const PublishedDataChangeNode &changeNode);
 
 private:

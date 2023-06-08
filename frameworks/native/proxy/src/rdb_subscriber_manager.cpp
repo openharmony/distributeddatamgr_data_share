@@ -20,12 +20,18 @@
 
 namespace OHOS {
 namespace DataShare {
+RdbSubscriberManager &RdbSubscriberManager::GetInstance()
+{
+    static RdbSubscriberManager manager;
+    return manager;
+}
+
 RdbSubscriberManager::RdbSubscriberManager()
 {
     serviceCallback_ = nullptr;
 }
 
-std::vector<OperationResult> RdbSubscriberManager::AddObservers(std::shared_ptr<BaseProxy> proxy,
+std::vector<OperationResult> RdbSubscriberManager::AddObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
     const std::vector<std::string> &uris, const TemplateId &templateId, const RdbCallback &callback)
 {
     if (proxy == nullptr) {
@@ -36,8 +42,8 @@ std::vector<OperationResult> RdbSubscriberManager::AddObservers(std::shared_ptr<
     std::for_each(uris.begin(), uris.end(), [&keys, &templateId](auto &uri) {
         keys.emplace_back(uri, templateId);
     });
-    return BaseCallbacks::AddObservers(keys, std::make_shared<Observer>(callback),
-        [&proxy, &templateId, this](const std::vector<Key> &firstAddKeys,
+    return BaseCallbacks::AddObservers(keys, subscriber, std::make_shared<Observer>(callback),
+        [&proxy, subscriber, &templateId, this](const std::vector<Key> &firstAddKeys,
             const std::shared_ptr<Observer> observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> firstAddUris;
             std::for_each(firstAddKeys.begin(), firstAddKeys.end(), [&firstAddUris](auto &result) {
@@ -58,34 +64,29 @@ std::vector<OperationResult> RdbSubscriberManager::AddObservers(std::shared_ptr<
                 }
             }
             if (!failedKeys.empty()) {
-                BaseCallbacks::DelObservers(failedKeys, observer);
+                BaseCallbacks::DelObservers(failedKeys, subscriber);
             }
             Destroy();
         });
 }
 
-std::vector<OperationResult> RdbSubscriberManager::DelObservers(std::shared_ptr<BaseProxy> proxy,
+std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
     const std::vector<std::string> &uris, const TemplateId &templateId)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();
     }
+    if (uris.empty()) {
+        return DelObservers(subscriber, proxy);
+    }
+
     std::vector<Key> keys;
     std::for_each(uris.begin(), uris.end(), [&keys, &templateId](auto &uri) {
         keys.emplace_back(uri, templateId);
     });
-    return BaseCallbacks::DelObservers(keys, nullptr,
-        [&proxy, &templateId, &uris, this](const std::vector<Key> &lastDelKeys,
-            const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
-            // delete all obs
-            if (uris.empty()) {
-                for (const auto& key : lastDelKeys) {
-                    proxy->UnSubscribeRdbData(std::vector<std::string>(1, key.uri_), key.templateId_);
-                }
-                Destroy();
-                return;
-            }
+    return BaseCallbacks::DelObservers(keys, subscriber,
+        [&proxy, &templateId, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
                 lastDelUris.emplace_back(result);
@@ -103,7 +104,24 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(std::shared_ptr<
         });
 }
 
-std::vector<OperationResult> RdbSubscriberManager::EnableObservers(std::shared_ptr<BaseProxy> proxy,
+std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy)
+{
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return std::vector<OperationResult>();
+    }
+    return BaseCallbacks::DelObservers(subscriber,
+        [&proxy, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
+            // delete all obs by subscriber
+            for (const auto &key : lastDelKeys) {
+                auto unsubResult = proxy->UnSubscribeRdbData(std::vector<std::string>(1, key.uri_), key.templateId_);
+                opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
+            }
+            Destroy();
+        });
+}
+
+std::vector<OperationResult> RdbSubscriberManager::EnableObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
     const std::vector<std::string> &uris, const TemplateId &templateId)
 {
     if (proxy == nullptr) {
@@ -114,8 +132,9 @@ std::vector<OperationResult> RdbSubscriberManager::EnableObservers(std::shared_p
     std::for_each(uris.begin(), uris.end(), [&keys, &templateId](auto &uri) {
         keys.emplace_back(uri, templateId);
     });
-    return BaseCallbacks::EnableObservers(keys,
-        [&proxy, &templateId, this](const std::vector<Key> &firstAddKeys, std::vector<OperationResult> &opResult) {
+    return BaseCallbacks::EnableObservers(keys, subscriber,
+        [&proxy, subscriber, &templateId, this](const std::vector<Key> &firstAddKeys,
+        std::vector<OperationResult> &opResult) {
             std::vector<std::string> firstAddUris;
             std::for_each(firstAddKeys.begin(), firstAddKeys.end(), [&firstAddUris](auto &result) {
                 firstAddUris.emplace_back(result);
@@ -133,12 +152,12 @@ std::vector<OperationResult> RdbSubscriberManager::EnableObservers(std::shared_p
                 }
             }
             if (!failedKeys.empty()) {
-                BaseCallbacks::DisableObservers(failedKeys);
+                BaseCallbacks::DisableObservers(failedKeys, subscriber);
             }
         });
 }
 
-std::vector<OperationResult> RdbSubscriberManager::DisableObservers(std::shared_ptr<BaseProxy> proxy,
+std::vector<OperationResult> RdbSubscriberManager::DisableObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
     const std::vector<std::string> &uris, const TemplateId &templateId)
 {
     if (proxy == nullptr) {
@@ -149,7 +168,7 @@ std::vector<OperationResult> RdbSubscriberManager::DisableObservers(std::shared_
     std::for_each(uris.begin(), uris.end(), [&keys, &templateId](auto &uri) {
         keys.emplace_back(uri, templateId);
     });
-    return BaseCallbacks::DisableObservers(keys,
+    return BaseCallbacks::DisableObservers(keys, subscriber,
         [&proxy, &templateId, this](const std::vector<Key> &lastDisabledKeys, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDisabledUris;
             std::for_each(lastDisabledKeys.begin(), lastDisabledKeys.end(), [&lastDisabledUris](auto &result) {
@@ -163,6 +182,29 @@ std::vector<OperationResult> RdbSubscriberManager::DisableObservers(std::shared_
             opResult.insert(opResult.end(), results.begin(), results.end());
             Destroy();
         });
+}
+
+void RdbSubscriberManager::RecoverObservers(std::shared_ptr<BaseProxy> proxy)
+{
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return;
+    }
+    return BaseCallbacks::RecoverObservers([&proxy, this](const std::vector<Key> &Keys) {
+        std::map<TemplateId, std::vector<std::string>> keysMap;
+        for (auto const &key : Keys) {
+            keysMap[key.templateId_].emplace_back(key.uri_);
+        }
+        for (auto const &[templateId, uris] : keysMap) {
+            auto results = proxy->SubscribeRdbData(uris, templateId, serviceCallback_);
+            for (const auto& result : results) {
+                if (result.errCode_ != E_OK) {
+                    LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d",
+                        result.key_.c_str(), result.errCode_);
+                }
+            }
+        }
+    });
 }
 
 void RdbSubscriberManager::Emit(const RdbChangeNode &changeNode)
@@ -180,7 +222,9 @@ bool RdbSubscriberManager::Init()
 {
     if (serviceCallback_ == nullptr) {
         LOG_INFO("callback init");
-        serviceCallback_ = new RdbObserverStub([this](const RdbChangeNode &changeNode) { Emit(changeNode); });
+        serviceCallback_ = new RdbObserverStub([this](const RdbChangeNode &changeNode) {
+            Emit(changeNode);
+        });
     }
     return true;
 }
