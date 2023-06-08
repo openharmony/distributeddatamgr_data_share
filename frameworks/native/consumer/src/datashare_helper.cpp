@@ -981,7 +981,7 @@ std::vector<OperationResult> DataShareHelper::EnableRdbSubs(const std::vector<st
         LOG_ERROR("dataShareProxy is nullptr");
         return results;
     }
-    return RdbSubscriberManager::GetInstance().EnableObservers(proxy, uris, templateId);
+    return RdbSubscriberManager::GetInstance().EnableObservers(this, proxy, uris, templateId);
 }
 
 std::vector<OperationResult> DataShareHelper::DisableRdbSubs(const std::vector<std::string> &uris,
@@ -1003,7 +1003,7 @@ std::vector<OperationResult> DataShareHelper::DisableRdbSubs(const std::vector<s
         LOG_ERROR("dataShareProxy is nullptr");
         return results;
     }
-    return RdbSubscriberManager::GetInstance().DisableObservers(proxy, uris, templateId);
+    return RdbSubscriberManager::GetInstance().DisableObservers(this, proxy, uris, templateId);
 }
 
 std::vector<OperationResult> DataShareHelper::SubscribePublishedData(const std::vector<std::string> &uris,
@@ -1068,7 +1068,7 @@ std::vector<OperationResult> DataShareHelper::EnablePubSubs(const std::vector<st
         LOG_ERROR("dataShareProxy is nullptr");
         return results;
     }
-    return PublishedDataSubscriberManager::GetInstance().EnableObservers(proxy, uris, subscriberId);
+    return PublishedDataSubscriberManager::GetInstance().EnableObservers(this, proxy, uris, subscriberId);
 }
 
 std::vector<OperationResult> DataShareHelper::DisablePubSubs(const std::vector<std::string> &uris,
@@ -1090,7 +1090,7 @@ std::vector<OperationResult> DataShareHelper::DisablePubSubs(const std::vector<s
         LOG_ERROR("dataShareProxy is nullptr");
         return results;
     }
-    return PublishedDataSubscriberManager::GetInstance().DisableObservers(proxy, uris, subscriberId);
+    return PublishedDataSubscriberManager::GetInstance().DisableObservers(this, proxy, uris, subscriberId);
 }
 } // namespace DataShare
 } // namespace OHOS

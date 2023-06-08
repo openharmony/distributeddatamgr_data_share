@@ -121,7 +121,7 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
         });
 }
 
-std::vector<OperationResult> RdbSubscriberManager::EnableObservers(std::shared_ptr<BaseProxy> proxy,
+std::vector<OperationResult> RdbSubscriberManager::EnableObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
     const std::vector<std::string> &uris, const TemplateId &templateId)
 {
     if (proxy == nullptr) {
@@ -132,8 +132,9 @@ std::vector<OperationResult> RdbSubscriberManager::EnableObservers(std::shared_p
     std::for_each(uris.begin(), uris.end(), [&keys, &templateId](auto &uri) {
         keys.emplace_back(uri, templateId);
     });
-    return BaseCallbacks::EnableObservers(keys,
-        [&proxy, &templateId, this](const std::vector<Key> &firstAddKeys, std::vector<OperationResult> &opResult) {
+    return BaseCallbacks::EnableObservers(keys, subscriber,
+        [&proxy, subscriber, &templateId, this](const std::vector<Key> &firstAddKeys,
+        std::vector<OperationResult> &opResult) {
             std::vector<std::string> firstAddUris;
             std::for_each(firstAddKeys.begin(), firstAddKeys.end(), [&firstAddUris](auto &result) {
                 firstAddUris.emplace_back(result);
@@ -151,12 +152,12 @@ std::vector<OperationResult> RdbSubscriberManager::EnableObservers(std::shared_p
                 }
             }
             if (!failedKeys.empty()) {
-                BaseCallbacks::DisableObservers(failedKeys);
+                BaseCallbacks::DisableObservers(failedKeys, subscriber);
             }
         });
 }
 
-std::vector<OperationResult> RdbSubscriberManager::DisableObservers(std::shared_ptr<BaseProxy> proxy,
+std::vector<OperationResult> RdbSubscriberManager::DisableObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
     const std::vector<std::string> &uris, const TemplateId &templateId)
 {
     if (proxy == nullptr) {
@@ -167,7 +168,7 @@ std::vector<OperationResult> RdbSubscriberManager::DisableObservers(std::shared_
     std::for_each(uris.begin(), uris.end(), [&keys, &templateId](auto &uri) {
         keys.emplace_back(uri, templateId);
     });
-    return BaseCallbacks::DisableObservers(keys,
+    return BaseCallbacks::DisableObservers(keys, subscriber,
         [&proxy, &templateId, this](const std::vector<Key> &lastDisabledKeys, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDisabledUris;
             std::for_each(lastDisabledKeys.begin(), lastDisabledKeys.end(), [&lastDisabledUris](auto &result) {
@@ -190,8 +191,17 @@ void RdbSubscriberManager::RecoverObservers(std::shared_ptr<BaseProxy> proxy)
         return;
     }
     return BaseCallbacks::RecoverObservers([&proxy, this](const std::vector<Key> &Keys) {
+        std::map<TemplateId, std::vector<std::string>> keysMap;
         for (auto const &key : Keys) {
-            proxy->SubscribeRdbData(std::vector<std::string>(1, key.uri_), key.templateId_, serviceCallback_);
+            keysMap[key.templateId_].emplace_back(key.uri_);
+        }
+        for (auto const &[templateId, uris] : keysMap) {
+            auto results = proxy->SubscribeRdbData(uris, templateId, serviceCallback_);
+            for (const auto& result : results) {
+                if (result.errCode_ != E_OK) {
+                    LOG_WARN("RecoverObservers failed, uri is %{public}s", result.key_.c_str());
+                }
+            }
         }
     });
 }

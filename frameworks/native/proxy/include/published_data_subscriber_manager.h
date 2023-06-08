@@ -28,12 +28,20 @@ namespace OHOS {
 namespace DataShare {
 struct PublishedObserverMapKey {
     std::string uri_;
+    std::string clearUri_;
     int64_t subscriberId_;
-    PublishedObserverMapKey(const std::string &uri, int64_t subscriberId)
-        : uri_(uri), subscriberId_(subscriberId){};
+    PublishedObserverMapKey(const std::string &uri, int64_t subscriberId) : uri_(uri), subscriberId_(subscriberId)
+    {
+        auto pos = uri_.find_first_of('?');
+        if (pos != std::string::npos) {
+            clearUri_ = uri_.substr(0, pos);
+        } else {
+            clearUri_ = uri_;
+        }
+    };
     bool operator==(const PublishedObserverMapKey &node) const
     {
-        return uri_ == node.uri_ && subscriberId_ == node.subscriberId_;
+        return clearUri_ == node.clearUri_ && subscriberId_ == node.subscriberId_;
     }
     bool operator!=(const PublishedObserverMapKey &node) const
     {
@@ -41,8 +49,8 @@ struct PublishedObserverMapKey {
     }
     bool operator<(const PublishedObserverMapKey &node) const
     {
-        if (uri_ != node.uri_) {
-            return uri_ < node.uri_;
+        if (clearUri_ != node.clearUri_) {
+            return clearUri_ < node.clearUri_;
         }
         return subscriberId_ < node.subscriberId_;
     }
@@ -75,9 +83,9 @@ public:
     std::vector<OperationResult> DelObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
         const std::vector<std::string> &uris, int64_t subscriberId);
     std::vector<OperationResult> DelObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy);
-    std::vector<OperationResult> EnableObservers(std::shared_ptr<BaseProxy> proxy,
+    std::vector<OperationResult> EnableObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
         const std::vector<std::string> &uris, int64_t subscriberId);
-    std::vector<OperationResult> DisableObservers(std::shared_ptr<BaseProxy> proxy,
+    std::vector<OperationResult> DisableObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
         const std::vector<std::string> &uris, int64_t subscriberId);
     void RecoverObservers(std::shared_ptr<BaseProxy> proxy);
     void Emit(PublishedDataChangeNode &changeNode);

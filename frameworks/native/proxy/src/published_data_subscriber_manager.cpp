@@ -70,10 +70,13 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
     return BaseCallbacks::DelObservers(subscriber,
         [&proxy, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             // delete all obs by subscriber
-            for (const auto &key : lastDelKeys) {
-                auto unsubResult =
-                    proxy->UnSubscribePublishedData(std::vector<std::string>(1, key.uri_), key.subscriberId_);
-                opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
+            std::map<int64_t, std::vector<std::string>> keysMap;
+            for (auto const &key : lastDelKeys) {
+                keysMap[key.subscriberId_].emplace_back(key.uri_);
+            }
+            for (auto const &[subscriberId, uris] : keysMap) {
+                auto results = proxy->UnSubscribePublishedData(uris, subscriberId);
+                opResult.insert(opResult.end(), results.begin(), results.end());
             }
             Destroy();
         });
@@ -113,8 +116,8 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
         });
 }
 
-std::vector<OperationResult> PublishedDataSubscriberManager::EnableObservers(std::shared_ptr<BaseProxy> proxy,
-    const std::vector<std::string> &uris, int64_t subscriberId)
+std::vector<OperationResult> PublishedDataSubscriberManager::EnableObservers(void *subscriber,
+    std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -124,8 +127,9 @@ std::vector<OperationResult> PublishedDataSubscriberManager::EnableObservers(std
     std::for_each(uris.begin(), uris.end(), [&keys, &subscriberId](auto &uri) {
         keys.emplace_back(uri, subscriberId);
     });
-    return BaseCallbacks::EnableObservers(keys,
-        [&proxy, &subscriberId, this](const std::vector<Key> &firstAddKeys, std::vector<OperationResult> &opResult) {
+    return BaseCallbacks::EnableObservers(keys, subscriber,
+        [&proxy, &subscriberId, subscriber, this](const std::vector<Key> &firstAddKeys,
+        std::vector<OperationResult> &opResult) {
             std::vector<std::string> firstAddUris;
             std::for_each(firstAddKeys.begin(), firstAddKeys.end(), [&firstAddUris](auto &result) {
                 firstAddUris.emplace_back(result);
@@ -143,13 +147,13 @@ std::vector<OperationResult> PublishedDataSubscriberManager::EnableObservers(std
                 }
             }
             if (failedKeys.size() > 0) {
-                BaseCallbacks::DisableObservers(failedKeys);
+                BaseCallbacks::DisableObservers(failedKeys, subscriber);
             }
         });
 }
 
-std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(std::shared_ptr<BaseProxy> proxy,
-    const std::vector<std::string> &uris, int64_t subscriberId)
+std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(void *subscriber,
+    std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -159,9 +163,9 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(st
     std::for_each(uris.begin(), uris.end(), [&keys, &subscriberId](auto &uri) {
         keys.emplace_back(uri, subscriberId);
     });
-    return BaseCallbacks::DisableObservers(keys,
-        [&proxy, &subscriberId, this](
-        const std::vector<Key> &lastDisabledKeys, std::vector<OperationResult> &opResult) {
+    return BaseCallbacks::DisableObservers(keys, subscriber,
+        [&proxy, &subscriberId, this](const std::vector<Key> &lastDisabledKeys,
+        std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDisabledUris;
             std::for_each(lastDisabledKeys.begin(), lastDisabledKeys.end(), [&lastDisabledUris](auto &result) {
                 lastDisabledUris.emplace_back(result);
@@ -183,8 +187,17 @@ void PublishedDataSubscriberManager::RecoverObservers(std::shared_ptr<BaseProxy>
         return;
     }
     return BaseCallbacks::RecoverObservers([&proxy, this](const std::vector<Key> &Keys) {
+        std::map<int64_t, std::vector<std::string>> keysMap;
         for (auto const &key : Keys) {
-            proxy->SubscribePublishedData(std::vector<std::string>(1, key.uri_), key.subscriberId_, serviceCallback_);
+            keysMap[key.subscriberId_].emplace_back(key.uri_);
+        }
+        for (auto const &[subscriberId, uris] : keysMap) {
+            auto results = proxy->SubscribePublishedData(uris, subscriberId, serviceCallback_);
+            for (const auto& result : results) {
+                if (result.errCode_ != E_OK) {
+                    LOG_WARN("RecoverObservers failed, uri is %{public}s", result.key_.c_str());
+                }
+            }
         }
     });
 }

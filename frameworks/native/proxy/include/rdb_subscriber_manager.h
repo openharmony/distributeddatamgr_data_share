@@ -75,9 +75,9 @@ public:
     std::vector<OperationResult> DelObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
         const std::vector<std::string> &uris, const TemplateId &templateId);
     std::vector<OperationResult> DelObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy);
-    std::vector<OperationResult> EnableObservers(std::shared_ptr<BaseProxy> proxy,
+    std::vector<OperationResult> EnableObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
         const std::vector<std::string> &uris, const TemplateId &templateId);
-    std::vector<OperationResult> DisableObservers(std::shared_ptr<BaseProxy> proxy,
+    std::vector<OperationResult> DisableObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
         const std::vector<std::string> &uris, const TemplateId &templateId);
     void RecoverObservers(std::shared_ptr<BaseProxy> proxy);
     void Emit(const RdbChangeNode &changeNode);
