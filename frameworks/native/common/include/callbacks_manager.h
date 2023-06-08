@@ -259,7 +259,7 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::DisableObservers(
             }
             std::vector<std::shared_ptr<Observer>> enabledObservers = GetEnabledObservers(key);
             if (enabledObservers.empty()) {
-                result.emplace_back(key, E_OK);
+                result.emplace_back(key, E_SUBSCRIBER_NOT_EXIST);
                 continue;
             }
 

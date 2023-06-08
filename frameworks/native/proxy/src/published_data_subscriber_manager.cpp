@@ -195,7 +195,8 @@ void PublishedDataSubscriberManager::RecoverObservers(std::shared_ptr<BaseProxy>
             auto results = proxy->SubscribePublishedData(uris, subscriberId, serviceCallback_);
             for (const auto& result : results) {
                 if (result.errCode_ != E_OK) {
-                    LOG_WARN("RecoverObservers failed, uri is %{public}s", result.key_.c_str());
+                    LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d",
+                        result.key_.c_str(), result.errCode_);
                 }
             }
         }

@@ -199,7 +199,8 @@ void RdbSubscriberManager::RecoverObservers(std::shared_ptr<BaseProxy> proxy)
             auto results = proxy->SubscribeRdbData(uris, templateId, serviceCallback_);
             for (const auto& result : results) {
                 if (result.errCode_ != E_OK) {
-                    LOG_WARN("RecoverObservers failed, uri is %{public}s", result.key_.c_str());
+                    LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d",
+                        result.key_.c_str(), result.errCode_);
                 }
             }
         }
