@@ -367,7 +367,7 @@ std::vector<OperationResult> DataShareStub::Publish(const Data &data, const std:
     return {};
 }
 
-Data DataShareStub::GetPublishedData(const std::string &bundleName)
+Data DataShareStub::GetPublishedData(const std::string &bundleName, int &resultCode)
 {
     return {};
 }

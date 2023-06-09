@@ -311,9 +311,10 @@ public:
     /**
      * @brief Get published data by bundleName.
      * @param bundleName, the bundleName of data.
+     * @param resultCode, the errcode returned by function
      * @return Data {@link #Data}
      */
-    Data GetPublishedData(const std::string &bundleName);
+    Data GetPublishedData(const std::string &bundleName, int &resultCode);
 
     /**
      * @brief Registers observers to observe rdb data specified by the given uris and template.

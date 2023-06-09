@@ -898,7 +898,7 @@ std::vector<OperationResult> DataShareHelper::Publish(const Data &data,
     return proxy->Publish(data, bundleName);
 }
 
-Data DataShareHelper::GetPublishedData(const std::string &bundleName)
+Data DataShareHelper::GetPublishedData(const std::string &bundleName, int &resultCode)
 {
     Data results;
     auto connection = connection_;
@@ -915,7 +915,7 @@ Data DataShareHelper::GetPublishedData(const std::string &bundleName)
         LOG_ERROR("GetDataShareProxy is nullptr");
         return results;
     }
-    return proxy->GetPublishedData(bundleName);
+    return proxy->GetPublishedData(bundleName, resultCode);
 }
 
 std::vector<OperationResult> DataShareHelper::SubscribeRdbData(const std::vector<std::string> &uris,

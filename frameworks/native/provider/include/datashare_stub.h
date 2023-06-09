@@ -49,7 +49,7 @@ private:
     int AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl) override;
     int DelQueryTemplate(const std::string &uri, int64_t subscriberId) override;
     std::vector<OperationResult> Publish(const Data &data, const std::string &bundleName) override;
-    Data GetPublishedData(const std::string &bundleName) override;
+    Data GetPublishedData(const std::string &bundleName, int &resultCode) override;
     std::vector<OperationResult> SubscribeRdbData(const std::vector<std::string> &uris, const TemplateId &templateId,
         const sptr<IDataProxyRdbObserver> &observer) override;
     std::vector<OperationResult> UnSubscribeRdbData(

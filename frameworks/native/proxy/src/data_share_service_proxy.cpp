@@ -244,7 +244,7 @@ std::vector<OperationResult> DataShareServiceProxy::Publish(const Data &data, co
     return results;
 }
 
-Data DataShareServiceProxy::GetPublishedData(const std::string &bundleName)
+Data DataShareServiceProxy::GetPublishedData(const std::string &bundleName, int &resultCode)
 {
     Data results;
     MessageParcel data;
@@ -264,7 +264,7 @@ Data DataShareServiceProxy::GetPublishedData(const std::string &bundleName)
         LOG_ERROR("AddTemplate fail to SendRequest, err: %{public}d", err);
         return results;
     }
-    ITypesUtil::Unmarshal(reply, results.datas_);
+    ITypesUtil::Unmarshal(reply, results.datas_, resultCode);
     return results;
 }
 
