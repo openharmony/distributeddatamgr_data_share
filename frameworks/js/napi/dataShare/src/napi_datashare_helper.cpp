@@ -787,7 +787,8 @@ napi_value NapiDataShareHelper::Napi_GetPublishedData(napi_env env, napi_callbac
             LOG_ERROR("dataShareHelper_ is nullptr");
             return;
         }
-        context->publishData = context->proxy->datashareHelper_->GetPublishedData(context->bundleName, context->resultNumber);
+        context->publishData = context->proxy->datashareHelper_->GetPublishedData(context->bundleName,
+            context->resultNumber);
         context->status = napi_ok;
     };
     context->SetAction(std::move(input), std::move(output));
