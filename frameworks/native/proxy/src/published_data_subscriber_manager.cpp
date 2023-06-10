@@ -176,7 +176,6 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(vo
 
             auto results = proxy->DisableSubscribePublishedData(lastDisabledUris, subscriberId);
             opResult.insert(opResult.end(), results.begin(), results.end());
-            Destroy();
         });
 }
 
