@@ -65,7 +65,7 @@ public:
 
     std::vector<OperationResult> Publish(const Data &data, const std::string &bundleName) override;
 
-    Data GetPublishedData(const std::string &bundleName) override;
+    Data GetPublishedData(const std::string &bundleName, int &resultCode) override;
 
     std::vector<OperationResult> SubscribeRdbData(const std::vector<std::string> &uris, const TemplateId &templateId,
         const sptr<IDataProxyRdbObserver> &observer) override;

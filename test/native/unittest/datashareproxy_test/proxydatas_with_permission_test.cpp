@@ -23,6 +23,7 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "token_setproc.h"
+#include "datashare_errno.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -136,10 +137,29 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_001, TestSize.Level0)
     Template tpl(nodes, "select name1 as name from TBL00");
 
     auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
-    EXPECT_EQ(result, 1);
+    EXPECT_EQ(result, 0);
     result = helper->DelQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID);
-    EXPECT_EQ(result, 1);
+    EXPECT_EQ(result, 0);
     LOG_INFO("ProxyDatasTest_Template_Test_001::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_002, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_Template_Test_002::Start");
+    auto helper = dataShareHelper;
+    PredicateTemplateNode node1("p1", "select name0 as name from TBL00");
+    PredicateTemplateNode node2("p2", "select name1 as name from TBL00");
+    std::vector<PredicateTemplateNode> nodes;
+    nodes.emplace_back(node1);
+    nodes.emplace_back(node2);
+    Template tpl(nodes, "select name1 as name from TBL00");
+
+    std::string errorUri = "datashareproxy://com.acts.ohos.data.datasharetest";
+    auto result = helper->AddQueryTemplate(errorUri, SUBSCRIBER_ID, tpl);
+    EXPECT_EQ(result, E_URI_NOT_EXIST);
+    result = helper->DelQueryTemplate(errorUri, SUBSCRIBER_ID);
+    EXPECT_EQ(result, E_URI_NOT_EXIST);
+    LOG_INFO("ProxyDatasTest_Template_Test_002::End");
 }
 
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level0)
@@ -155,7 +175,9 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level0)
         EXPECT_EQ(result.errCode_, 0);
     }
 
-    auto getData = helper->GetPublishedData(bundleName);
+    int errCode = 0;
+    auto getData = helper->GetPublishedData(bundleName, errCode);
+    EXPECT_EQ(errCode, 0);
     EXPECT_EQ(getData.datas_.size(), data.datas_.size());
     for (auto &publishedDataItem : getData.datas_) {
         EXPECT_EQ(publishedDataItem.subscriberId_, SUBSCRIBER_ID);
@@ -166,6 +188,25 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level0)
         EXPECT_EQ(std::get<std::string>(value), "value1");
     }
     LOG_INFO("ProxyDatasTest_Publish_Test_001::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_002, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_Publish_Test_002::Start");
+    auto helper = dataShareHelper;
+    std::string bundleName = "com.acts.ohos.error";
+    Data data;
+    data.datas_.emplace_back("datashareproxy://com.acts.ohos.error", SUBSCRIBER_ID, "value1");
+    std::vector<OperationResult> results = helper->Publish(data, bundleName);
+    EXPECT_EQ(results.size(), data.datas_.size());
+    for (auto const &result : results) {
+        EXPECT_EQ(result.errCode_, E_BUNDLE_NAME_NOT_EXIST);
+    }
+
+    int errCode = 0;
+    auto getData = helper->GetPublishedData(bundleName, errCode);
+    EXPECT_EQ(errCode, E_BUNDLE_NAME_NOT_EXIST);
+    LOG_INFO("ProxyDatasTest_Publish_Test_002::End");
 }
 
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribeRdbData_Test_001, TestSize.Level0)
@@ -179,7 +220,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribeRdbData_Test_001, TestSize.Leve
     nodes.emplace_back(node2);
     Template tpl(nodes, "select name1 as name from TBL00");
     auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
-    EXPECT_EQ(result, 1);
+    EXPECT_EQ(result, 0);
 
     std::vector<std::string> uris;
     uris.emplace_back(DATA_SHARE_PROXY_URI);

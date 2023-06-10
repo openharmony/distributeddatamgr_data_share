@@ -196,7 +196,7 @@ public:
 
     virtual std::vector<OperationResult> Publish(const Data &data, const std::string &bundleName) = 0;
 
-    virtual Data GetPublishedData(const std::string &bundleName) = 0;
+    virtual Data GetPublishedData(const std::string &bundleName, int &resultCode) = 0;
 
     virtual std::vector<OperationResult> SubscribeRdbData(const std::vector<std::string> &uris,
         const TemplateId &templateId, const sptr<IDataProxyRdbObserver> &observer) = 0;

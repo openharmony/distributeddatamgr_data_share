@@ -63,6 +63,20 @@ private:
     int code_ = E_OK;
     std::string message_ = "";
 };
+
+class UriNotExistError : public Error {
+public:
+    UriNotExistError() = default;
+    std::string GetMessage() const override;
+    int GetCode() const override;
+};
+
+class DataAreaNotExistError : public Error {
+public:
+    DataAreaNotExistError() = default;
+    std::string GetMessage() const override;
+    int GetCode() const override;
+};
 } // namespace DataShare
 } // namespace OHOS
 #endif // DATASHARE_ERROR_IMPL_H

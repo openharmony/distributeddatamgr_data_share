@@ -459,7 +459,7 @@ std::vector<OperationResult> DataShareProxy::Publish(const Data &data, const std
     return std::vector<OperationResult>();
 }
 
-Data DataShareProxy::GetPublishedData(const std::string &bundleName)
+Data DataShareProxy::GetPublishedData(const std::string &bundleName, int &resultCode)
 {
     return Data();
 }

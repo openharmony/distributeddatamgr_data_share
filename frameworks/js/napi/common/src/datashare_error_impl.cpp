@@ -66,5 +66,25 @@ std::string BusinessError::GetMessage() const
 {
     return message_;
 }
+
+std::string UriNotExistError::GetMessage() const
+{
+    return "The uri is not exist.";
+}
+
+int UriNotExistError::GetCode() const
+{
+    return EXCEPTION_URI_NOT_EXIST;
+}
+
+std::string DataAreaNotExistError::GetMessage() const
+{
+    return "The data area is not exist.";
+}
+
+int DataAreaNotExistError::GetCode() const
+{
+    return EXCEPTION_DATA_AREA_NOT_EXIST;
+}
 } // namespace DataShare
 } // namespace OHOS

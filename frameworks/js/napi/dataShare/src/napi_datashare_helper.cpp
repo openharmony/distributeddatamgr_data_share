@@ -669,6 +669,8 @@ napi_value NapiDataShareHelper::Napi_AddTemplate(napi_env env, napi_callback_inf
     Template tpl = DataShareJSUtils::Convert2Template(env, argv[PARAM2]);
 
     auto res = proxy->datashareHelper_->AddQueryTemplate(uri, atoll(subscriberId.c_str()), tpl);
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, res != E_URI_NOT_EXIST && res != E_BUNDLE_NAME_NOT_EXIST,
+        error = std::make_shared<UriNotExistError>(), error, nullptr);
     return DataShareJSUtils::Convert2JSValue(env, res);
 }
 
@@ -700,6 +702,8 @@ napi_value NapiDataShareHelper::Napi_DelTemplate(napi_env env, napi_callback_inf
     std::string subscriberId = DataShareJSUtils::Convert2String(env, argv[1]);
 
     auto res = proxy->datashareHelper_->DelQueryTemplate(uri, atoll(subscriberId.c_str()));
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, res != E_URI_NOT_EXIST && res != E_BUNDLE_NAME_NOT_EXIST,
+        error = std::make_shared<UriNotExistError>(), error, nullptr);
     return DataShareJSUtils::Convert2JSValue(env, res);
 }
 
@@ -730,6 +734,12 @@ napi_value NapiDataShareHelper::Napi_Publish(napi_env env, napi_callback_info in
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
         NAPI_ASSERT_BASE(env, context->status == napi_ok, "exec failed", napi_generic_failure);
+        for (auto &operationResult : context->results) {
+            if (operationResult.errCode_ == E_BUNDLE_NAME_NOT_EXIST) {
+                context->error = std::make_shared<DataAreaNotExistError>();
+                return napi_generic_failure;
+            }
+        }
         *result = DataShareJSUtils::Convert2JSValue(env, context->results);
         context->results.clear();
         return napi_ok;
@@ -765,6 +775,10 @@ napi_value NapiDataShareHelper::Napi_GetPublishedData(napi_env env, napi_callbac
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
         NAPI_ASSERT_BASE(env, context->status == napi_ok, "exec failed", napi_generic_failure);
+        if (context->resultNumber == E_BUNDLE_NAME_NOT_EXIST) {
+            context->error = std::make_shared<DataAreaNotExistError>();
+            return napi_generic_failure;
+        }
         *result = DataShareJSUtils::Convert2JSValue(env, context->publishData.datas_);
         return napi_ok;
     };
@@ -773,7 +787,8 @@ napi_value NapiDataShareHelper::Napi_GetPublishedData(napi_env env, napi_callbac
             LOG_ERROR("dataShareHelper_ is nullptr");
             return;
         }
-        context->publishData = context->proxy->datashareHelper_->GetPublishedData(context->bundleName);
+        context->publishData = context->proxy->datashareHelper_->GetPublishedData(context->bundleName,
+            context->resultNumber);
         context->status = napi_ok;
     };
     context->SetAction(std::move(input), std::move(output));

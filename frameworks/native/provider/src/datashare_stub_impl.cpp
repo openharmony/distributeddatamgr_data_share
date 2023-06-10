@@ -401,7 +401,7 @@ std::vector<OperationResult> DataShareStubImpl::Publish(
     return std::vector<OperationResult>();
 }
 
-Data DataShareStubImpl::GetPublishedData(const std::string &bundleName)
+Data DataShareStubImpl::GetPublishedData(const std::string &bundleName, int &resultCode)
 {
     return Data();
 }
