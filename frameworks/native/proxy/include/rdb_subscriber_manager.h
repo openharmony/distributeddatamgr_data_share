@@ -29,11 +29,20 @@ namespace OHOS {
 namespace DataShare {
 struct RdbObserverMapKey {
     std::string uri_;
+    std::string clearUri_;
     TemplateId templateId_;
-    RdbObserverMapKey(const std::string &uri, const TemplateId &templateId) : uri_(uri), templateId_(templateId){};
+    RdbObserverMapKey(const std::string &uri, const TemplateId &templateId) : uri_(uri), templateId_(templateId)
+    {
+        auto pos = uri_.find_first_of('?');
+        if (pos != std::string::npos) {
+            clearUri_ = uri_.substr(0, pos);
+        } else {
+            clearUri_ = uri_;
+        }
+    }
     bool operator==(const RdbObserverMapKey &node) const
     {
-        return uri_ == node.uri_ && templateId_ == node.templateId_;
+        return clearUri_ == node.clearUri_ && templateId_ == node.templateId_;
     }
     bool operator!=(const RdbObserverMapKey &node) const
     {
@@ -41,8 +50,8 @@ struct RdbObserverMapKey {
     }
     bool operator<(const RdbObserverMapKey &node) const
     {
-        if (uri_ != node.uri_) {
-            return uri_ < node.uri_;
+        if (clearUri_ != node.clearUri_) {
+            return clearUri_ < node.clearUri_;
         }
         return templateId_ < node.templateId_;
     }
