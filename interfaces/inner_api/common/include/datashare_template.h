@@ -19,7 +19,6 @@
 #include <string>
 #include <variant>
 #include <vector>
-#include "hilog/log.h"
 #include "iremote_object.h"
 
 namespace OHOS {
@@ -104,114 +103,24 @@ struct PublishedDataItem {
     PublishedDataItem(){};
     PublishedDataItem(const PublishedDataItem &) = delete;
     PublishedDataItem &operator=(const PublishedDataItem &) = delete;
-    virtual ~PublishedDataItem()
-    {
-        AshmemNode *node = std::get_if<AshmemNode>(&value_);
-        if (node != nullptr) {
-            if (node->isManaged && node->ashmem != nullptr) {
-                node->ashmem->UnmapAshmem();
-                node->ashmem->CloseAshmem();
-            }
-        }
-    }
-    PublishedDataItem(
-        const std::string &key, int64_t subscriberId, std::variant<std::vector<uint8_t>, std::string> value)
-        : key_(key), subscriberId_(subscriberId)
-    {
-        if (value.index() == 0) {
-            std::vector<uint8_t> &vecValue = std::get<std::vector<uint8_t>>(value);
-            sptr<Ashmem> mem = Ashmem::CreateAshmem((key_ + std::to_string(subscriberId_)).c_str(), vecValue.size());
-            if (mem == nullptr) {
-                return;
-            }
-            if (!mem->MapReadAndWriteAshmem()) {
-                mem->CloseAshmem();
-                return;
-            }
-            if (!mem->WriteToAshmem(vecValue.data(), vecValue.size(), 0)) {
-                mem->UnmapAshmem();
-                mem->CloseAshmem();
-                return;
-            }
-            AshmemNode node = { mem, true };
-            value_ = std::move(node);
-        } else {
-            value_ = std::move(std::get<std::string>(value));
-        }
-    }
+    virtual ~PublishedDataItem();
+    PublishedDataItem(const std::string &key,
+        int64_t subscriberId, std::variant<std::vector<uint32_t>, std::string> value);
+    PublishedDataItem(PublishedDataItem &&item);
 
-    PublishedDataItem(PublishedDataItem &&item)
-    {
-        key_ = std::move(item.key_);
-        subscriberId_ = std::move(item.subscriberId_);
-        value_ = std::move(item.value_);
-        if (item.IsAshmem()) {
-            item.MoveOutAshmem();
-        }
-    }
+    PublishedDataItem &operator=(PublishedDataItem &&item);
 
-    PublishedDataItem &operator=(PublishedDataItem &&item)
-    {
-        key_ = std::move(item.key_);
-        subscriberId_ = std::move(item.subscriberId_);
-        value_ = std::move(item.value_);
-        if (item.IsAshmem()) {
-            item.MoveOutAshmem();
-        }
-        return *this;
-    }
+    bool IsAshmem() const;
 
-    inline bool IsAshmem() const
-    {
-        return value_.index() == 0;
-    }
+    bool IsString() const;
 
-    inline bool IsString() const
-    {
-        return value_.index() == 1;
-    }
+    sptr<Ashmem> MoveOutAshmem();
 
-    sptr<Ashmem> MoveOutAshmem()
-    {
-        if (IsAshmem()) {
-            AshmemNode &node = std::get<AshmemNode>(value_);
-            if (!node.isManaged) {
-                return nullptr;
-            }
-            node.isManaged = false;
-            return std::move(node.ashmem);
-        }
-        return nullptr;
-    }
+    void SetAshmem(sptr<Ashmem> ashmem, bool isManaged = false);
 
-    void SetAshmem(sptr<Ashmem> ashmem, bool isManaged = false)
-    {
-        AshmemNode node = { ashmem, isManaged };
-        value_ = std::move(node);
-    }
+    void Set(const std::string &value);
 
-    void Set(const std::string &value)
-    {
-        value_ = value;
-    }
-
-    std::variant<std::vector<uint8_t>, std::string> GetData() const
-    {
-        if (IsAshmem()) {
-            const AshmemNode &node = std::get<AshmemNode>(value_);
-            if (node.ashmem != nullptr) {
-                node.ashmem->MapReadOnlyAshmem();
-                uint8_t *data = (uint8_t *)node.ashmem->ReadFromAshmem(node.ashmem->GetAshmemSize(), 0);
-                if (data == nullptr) {
-                    return std::vector<uint8_t>();
-                }
-                return std::vector<uint8_t>(data, data + node.ashmem->GetAshmemSize());
-            }
-            return std::vector<uint8_t>();
-        } else {
-            return std::get<std::string>(value_);
-        }
-    }
+    std::variant<std::vector<uint32_t>, std::string> GetData() const;
 };
 
 /** Specifies the published data structure. */
