@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define LOG_TAG "DataShareAbsResultSet"
+
 #include "datashare_abs_result_set.h"
 
 #include <algorithm>

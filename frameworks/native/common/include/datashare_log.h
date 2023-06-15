@@ -16,10 +16,6 @@
 #ifndef DATASHARE_LOG_PRINT_H
 #define DATASHARE_LOG_PRINT_H
 
-#ifndef LOG_TAG
-#define LOG_TAG
-#endif
-
 #include "hilog/log.h"
 
 namespace OHOS::DataShare {
@@ -36,7 +32,7 @@ static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
         using HiLog = OHOS::HiviewDFX::HiLog;                                             \
         auto lable = LogLabel();                                                          \
         if (HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_DEBUG)) {              \
-            HiLog::Debug(lable, "::[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, FILENAME, __LINE__, \
+            HiLog::Debug(lable, "[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, FILENAME, __LINE__, \
                 ##__VA_ARGS__);                                                           \
         }                                                                                 \
     } while (0)
@@ -46,7 +42,7 @@ static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
         using HiLog = OHOS::HiviewDFX::HiLog;                                             \
         auto lable = LogLabel();                                                          \
         if (HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_INFO)) {               \
-            HiLog::Info(lable, "::[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, FILENAME, __LINE__, \
+            HiLog::Info(lable, "[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, FILENAME, __LINE__, \
                 ##__VA_ARGS__);                                                           \
         }                                                                                 \
     } while (0)
@@ -56,7 +52,7 @@ static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
         using HiLog = OHOS::HiviewDFX::HiLog;                                             \
         auto lable = LogLabel();                                                          \
         if (HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_WARN)) {               \
-            HiLog::Warn(lable, "::[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, FILENAME, __LINE__, \
+            HiLog::Warn(lable, "[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, FILENAME, __LINE__, \
                 ##__VA_ARGS__);                                                           \
         }                                                                                 \
     } while (0)
@@ -66,7 +62,7 @@ static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
         using HiLog = OHOS::HiviewDFX::HiLog;                                             \
         auto lable = LogLabel();                                                          \
         if (HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_ERROR)) {              \
-            HiLog::Error(lable, "::[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, FILENAME, __LINE__, \
+            HiLog::Error(lable, "[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, FILENAME, __LINE__, \
                 ##__VA_ARGS__);                                                           \
         }                                                                                 \
     } while (0)
@@ -76,7 +72,7 @@ static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
         using HiLog = OHOS::HiviewDFX::HiLog;                                             \
         auto lable = LogLabel();                                                          \
         if (HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_FATAL)) {              \
-            HiLog::Fatal(lable, "::[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, FILENAME, __LINE__, \
+            HiLog::Fatal(lable, "[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, FILENAME, __LINE__, \
                 ##__VA_ARGS__);                                                           \
         }                                                                                 \
     } while (0)
