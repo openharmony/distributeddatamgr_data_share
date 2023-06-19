@@ -22,28 +22,32 @@
 
 #include "data_share_service_proxy.h"
 #include "data_share_errno.h"
-#include "idata_share_service.h"
 #include "iremote_object.h"
 #include "refbase.h"
-#include "base_connection.h"
-#include "executor_pool.h"
 
-namespace OHOS::DataShare {
+namespace OHOS {
+class ExecutorPool;
+namespace DataShare {
 class DataShareKvServiceProxy;
-class DataShareManagerImpl : public BaseConnection {
+class DataShareManagerImpl {
 public:
-    std::shared_ptr<BaseProxy> GetDataShareService();
-
     DataShareManagerImpl();
+
     virtual ~DataShareManagerImpl();
+
+    std::shared_ptr<DataShareServiceProxy> GetServiceProxy();
+
     void OnRemoteDied();
-    std::shared_ptr<BaseProxy> GetDataShareProxy() override;
-    bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> &token) override;
-    void SetDeathCallback(std::function<void(std::shared_ptr<BaseProxy>)> deathCallback);
+
+    void SetDeathCallback(std::function<void(std::shared_ptr<DataShareServiceProxy>)> deathCallback);
+
+    void SetBundleName(const std::string &bundleName);
 
     class ServiceDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        explicit ServiceDeathRecipient(DataShareManagerImpl *owner) : owner_(owner) {}
+        explicit ServiceDeathRecipient(DataShareManagerImpl *owner) : owner_(owner)
+        {
+        }
         void OnRemoteDied(const wptr<IRemoteObject> &object) override
         {
             if (owner_ != nullptr) {
@@ -74,14 +78,8 @@ private:
     static constexpr int MAX_THREADS = 2;
     static constexpr int MIN_THREADS = 0;
     std::shared_ptr<ExecutorPool> pool_;
-    std::function<void(std::shared_ptr<BaseProxy>)> deathCallback_ = {};
+    std::function<void(std::shared_ptr<DataShareServiceProxy>)> deathCallback_ = {};
 };
-
-class DataShareKvServiceProxy : public IRemoteProxy<DataShare::IKvStoreDataService> {
-public:
-    explicit DataShareKvServiceProxy(const sptr<IRemoteObject> &impl);
-    ~DataShareKvServiceProxy() = default;
-    sptr<IRemoteObject> GetFeatureInterface(const std::string &name) override;
-};
+}
 } // namespace OHOS::DataShare
 #endif

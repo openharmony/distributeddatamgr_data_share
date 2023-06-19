@@ -19,12 +19,15 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <list>
 #include <string>
 
 #include "app/context.h"
-#include "base_connection.h"
 #include "datashare_business_error.h"
+#include "datashare_predicates.h"
+#include "datashare_result_set.h"
 #include "datashare_template.h"
+#include "datashare_values_bucket.h"
 #include "uri.h"
 
 using Uri = OHOS::Uri;
@@ -59,12 +62,12 @@ public:
     virtual void OnChange(const ChangeInfo &changeInfo) = 0;
 };
 
-class DataShareHelper final : public std::enable_shared_from_this<DataShareHelper> {
+class DataShareHelper : public std::enable_shared_from_this<DataShareHelper> {
 public:
     /**
      * @brief Destructor.
      */
-    ~DataShareHelper();
+    virtual ~DataShareHelper() = default;
 
     /**
      * @brief Creates a DataShareHelper instance with the Uri specified based on the given Context.
@@ -97,7 +100,8 @@ public:
      *
      * @return Returns the created DataShareHelper instance with a specified Uri.
      */
-    static std::shared_ptr<DataShareHelper> Creator(const std::string &strUri, const CreateOptions &options);
+    static std::shared_ptr<DataShareHelper> Creator(const std::string &strUri, const CreateOptions &options,
+        const std::string &bundleName = "");
 
     /**
      * @brief Releases the client resource of the Data share.
@@ -105,7 +109,7 @@ public:
      *
      * @return Returns true if the resource is successfully released; returns false otherwise.
      */
-    bool Release();
+    virtual bool Release() = 0;
 
     /**
      * @brief Obtains the MIME types of files supported.
@@ -115,7 +119,7 @@ public:
      *
      * @return Returns the matched MIME types. If there is no match, null is returned.
      */
-    std::vector<std::string> GetFileTypes(Uri &uri, const std::string &mimeTypeFilter);
+    virtual std::vector<std::string> GetFileTypes(Uri &uri, const std::string &mimeTypeFilter) = 0;
 
     /**
      * @brief Opens a file in a specified remote path.
@@ -128,7 +132,7 @@ public:
      *
      * @return Returns the file descriptor.
      */
-    int OpenFile(Uri &uri, const std::string &mode);
+    virtual int OpenFile(Uri &uri, const std::string &mode) = 0;
 
     /**
      * @brief This is like openFile, open a file that need to be able to return sub-sections of files，often assets
@@ -142,7 +146,7 @@ public:
      *
      * @return Returns the RawFileDescriptor object containing file descriptor.
      */
-    int OpenRawFile(Uri &uri, const std::string &mode);
+    virtual int OpenRawFile(Uri &uri, const std::string &mode) = 0;
 
     /**
      * @brief Inserts a single data record into the database.
@@ -152,7 +156,7 @@ public:
      *
      * @return Returns the index of the inserted data record.
      */
-    int Insert(Uri &uri, const DataShareValuesBucket &value);
+    virtual int Insert(Uri &uri, const DataShareValuesBucket &value) = 0;
 
     /**
      * @brief Updates data records in the database.
@@ -163,7 +167,7 @@ public:
      *
      * @return Returns the number of data records updated.
      */
-    int Update(Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value);
+    virtual int Update(Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) = 0;
 
     /**
      * @brief Deletes one or more data records from the database.
@@ -173,7 +177,7 @@ public:
      *
      * @return Returns the number of data records deleted.
      */
-    int Delete(Uri &uri, const DataSharePredicates &predicates);
+    virtual int Delete(Uri &uri, const DataSharePredicates &predicates) = 0;
 
     /**
      * @brief Query records from the database.
@@ -185,8 +189,8 @@ public:
      *
      * @return Returns the query result.
      */
-    std::shared_ptr<DataShareResultSet> Query(Uri &uri, const DataSharePredicates &predicates,
-        std::vector<std::string> &columns, DatashareBusinessError *businessError = nullptr);
+    virtual std::shared_ptr<DataShareResultSet> Query(Uri &uri, const DataSharePredicates &predicates,
+        std::vector<std::string> &columns, DatashareBusinessError *businessError = nullptr) = 0;
 
     /**
      * @brief Obtains the MIME type matching the data specified by the URI of the Data share. This method should be
@@ -196,7 +200,7 @@ public:
      *
      * @return Returns the MIME type that matches the data specified by uri.
      */
-    std::string GetType(Uri &uri);
+    virtual std::string GetType(Uri &uri) = 0;
 
     /**
      * @brief Inserts multiple data records into the database.
@@ -206,7 +210,7 @@ public:
      *
      * @return Returns the number of data records inserted.
      */
-    int BatchInsert(Uri &uri, const std::vector<DataShareValuesBucket> &values);
+    virtual int BatchInsert(Uri &uri, const std::vector<DataShareValuesBucket> &values) = 0;
 
     /**
      * @brief Registers an observer to DataObsMgr specified by the given Uri.
@@ -214,7 +218,7 @@ public:
      * @param uri, Indicates the path of the data to operate.
      * @param dataObserver, Indicates the IDataAbilityObserver object.
      */
-    void RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    virtual void RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 
     /**
      * @brief Deregisters an observer used for DataObsMgr specified by the given Uri.
@@ -222,14 +226,14 @@ public:
      * @param uri, Indicates the path of the data to operate.
      * @param dataObserver, Indicates the IDataAbilityObserver object.
      */
-    void UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    virtual void UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 
     /**
      * @brief Notifies the registered observers of a change to the data resource specified by Uri.
      *
      * @param uri, Indicates the path of the data to operate.
      */
-    void NotifyChange(const Uri &uri);
+    virtual void NotifyChange(const Uri &uri) = 0;
 
     /**
      * Registers an observer to DataObsMgr specified by the given Uri.
@@ -238,8 +242,7 @@ public:
      * @param dataObserver, Indicates the IDataAbilityObserver object.
      * @param isDescendants, Indicates the Whether to note the change of descendants.
      */
-    void RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
-        bool isDescendants);
+    void RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver, bool isDescendants);
 
     /**
      * Deregisters an observer used for DataObsMgr specified by the given Uri.
@@ -269,7 +272,7 @@ public:
      *
      * @return Returns the normalized Uri object if the Data share supports URI normalization; returns null otherwise.
      */
-    Uri NormalizeUri(Uri &uri);
+    virtual Uri NormalizeUri(Uri &uri) = 0;
 
     /**
      * @brief Converts the given normalized uri generated by normalizeUri(ohos.utils.net.Uri) into a denormalized one.
@@ -281,7 +284,7 @@ public:
      * to this method if there is nothing to do; returns null if the data identified by the original Uri cannot be found
      * in the current environment.
      */
-    Uri DenormalizeUri(Uri &uri);
+    virtual Uri DenormalizeUri(Uri &uri) = 0;
 
     /**
      * @brief Adds a template of {@link #SubscribeRdbData}.
@@ -290,7 +293,7 @@ public:
      * @param tpl, the template to add.
      * @return Returns the error code.
      */
-    int AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl);
+    virtual int AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl) = 0;
 
     /**
      * @brief Deletes a template of {@link #SubscribeRdbData}
@@ -298,7 +301,7 @@ public:
      * @param subscriberId, the subscribe id to delete.
      * @return Returns the error code.
      */
-    int DelQueryTemplate(const std::string &uri, int64_t subscriberId);
+    virtual int DelQueryTemplate(const std::string &uri, int64_t subscriberId) = 0;
 
     /**
      * @brief Update a single data into host data area.
@@ -306,7 +309,7 @@ public:
      * @param bundleName the bundleName of data to publish.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> Publish(const Data &data, const std::string &bundleName);
+    virtual std::vector<OperationResult> Publish(const Data &data, const std::string &bundleName) = 0;
 
     /**
      * @brief Get published data by bundleName.
@@ -314,7 +317,7 @@ public:
      * @param resultCode, the errcode returned by function
      * @return Data {@link #Data}
      */
-    Data GetPublishedData(const std::string &bundleName, int &resultCode);
+    virtual Data GetPublishedData(const std::string &bundleName, int &resultCode) = 0;
 
     /**
      * @brief Registers observers to observe rdb data specified by the given uris and template.
@@ -323,8 +326,8 @@ public:
      * @param callback, the callback function of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> SubscribeRdbData(const std::vector<std::string> &uris, const TemplateId &templateId,
-        const std::function<void(const RdbChangeNode &changeNode)> &callback);
+    virtual std::vector<OperationResult> SubscribeRdbData(const std::vector<std::string> &uris,
+        const TemplateId &templateId, const std::function<void(const RdbChangeNode &changeNode)> &callback) = 0;
 
     /**
      * @brief Unregisters observers used for monitoring data specified by the given uris and template.
@@ -332,8 +335,8 @@ public:
      * @param templateId, the template of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> UnsubscribeRdbData(const std::vector<std::string> &uris = std::vector<std::string>(),
-        const TemplateId &templateId = TemplateId());
+    virtual std::vector<OperationResult> UnsubscribeRdbData(const std::vector<std::string> &uris,
+        const TemplateId &templateId) = 0;
 
     /**
      * @brief Enable observers by the given uris and template.
@@ -341,7 +344,8 @@ public:
      * @param templateId, the template of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> EnableRdbSubs(const std::vector<std::string> &uris, const TemplateId &templateId);
+    virtual std::vector<OperationResult> EnableRdbSubs(const std::vector<std::string> &uris,
+        const TemplateId &templateId) = 0;
 
     /**
      * @brief Disable observers by the given uris and template.
@@ -349,7 +353,8 @@ public:
      * @param templateId, the template of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> DisableRdbSubs(const std::vector<std::string> &uris, const TemplateId &templateId);
+    virtual std::vector<OperationResult> DisableRdbSubs(const std::vector<std::string> &uris,
+        const TemplateId &templateId) = 0;
 
     /**
      * @brief Registers observers to observe published data specified by the given uris and subscriberId.
@@ -358,8 +363,8 @@ public:
      * @param callback, the callback function of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> SubscribePublishedData(const std::vector<std::string> &uris, int64_t subscriberId,
-        const std::function<void(const PublishedDataChangeNode &changeNode)> &callback);
+    virtual std::vector<OperationResult> SubscribePublishedData(const std::vector<std::string> &uris,
+        int64_t subscriberId, const std::function<void(const PublishedDataChangeNode &changeNode)> &callback) = 0;
 
     /**
      * @brief Unregisters observers used for monitoring data specified by the given uris and subscriberId.
@@ -367,8 +372,8 @@ public:
      * @param subscriberId, the subscriberId of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> UnsubscribePublishedData(
-        const std::vector<std::string> &uris = std::vector<std::string>(), int64_t subscriberId = 0);
+    virtual std::vector<OperationResult> UnsubscribePublishedData(const std::vector<std::string> &uris,
+        int64_t subscriberId) = 0;
 
     /**
      * @brief Enable observers by the given uris and subscriberId.
@@ -376,7 +381,7 @@ public:
      * @param subscriberId, the subscriberId of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> EnablePubSubs(const std::vector<std::string> &uris, int64_t subscriberId);
+    virtual std::vector<OperationResult> EnablePubSubs(const std::vector<std::string> &uris, int64_t subscriberId) = 0;
 
     /**
      * @brief Disable observers by the given uris and template.
@@ -384,21 +389,18 @@ public:
      * @param subscriberId, the subscriberId of observers.
      * @return Returns the error code.
      */
-    std::vector<OperationResult> DisablePubSubs(const std::vector<std::string> &uris, int64_t subscriberId);
+    virtual std::vector<OperationResult> DisablePubSubs(const std::vector<std::string> &uris, int64_t subscriberId) = 0;
 
 private:
-    DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri,
-        std::shared_ptr<BaseConnection> dataShareConnection);
-    DataShareHelper(const sptr<IRemoteObject> &token, const Uri &uri);
-    DataShareHelper(const CreateOptions &options, const Uri &uri, std::shared_ptr<BaseConnection> dataShareConnection);
-    bool isDataShareService_ = false;
-    sptr<IRemoteObject> token_ = {};
-    Uri uri_ = Uri("");
-    std::shared_ptr<BaseConnection> connection_ = nullptr;
-    static bool RegObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
-    static bool UnregObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    static std::shared_ptr<DataShareHelper> CreateDataShareHelper(const std::string &bundleName = "");
+
+    static std::shared_ptr<DataShareHelper> CreateDataShareHelper(Uri &uri, const sptr<IRemoteObject> &token);
+
     static std::string TransferUriPrefix(const std::string &originPrefix, const std::string &replacedPrefix,
         const std::string &originUriStr);
+
+protected:
+    bool needCleanSubscriber_ = false;
 };
 } // namespace DataShare
 } // namespace OHOS

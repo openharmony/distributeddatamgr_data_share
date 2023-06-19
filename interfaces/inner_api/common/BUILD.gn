@@ -57,8 +57,7 @@ ohos_shared_library("datashare_common") {
     "${datashare_common_native_path}/src/ishared_result_set_proxy.cpp",
     "${datashare_common_native_path}/src/ishared_result_set_stub.cpp",
     "${datashare_common_native_path}/src/shared_block.cpp",
-    "${datashare_native_proxy_path}/src/data_share_manager_impl.cpp",
-    "${datashare_native_proxy_path}/src/data_share_service_proxy.cpp",
+    "${datashare_common_native_path}/src/ikvstore_data_service.cpp",
   ]
 
   deps = [ "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native" ]
@@ -80,7 +79,6 @@ ohos_shared_library("datashare_common") {
     "ipc:ipc_napi_common",
     "ipc:ipc_single",
     "napi:ace_napi",
-    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "distributeddatamgr"

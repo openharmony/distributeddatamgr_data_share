@@ -20,7 +20,6 @@
 #include <memory>
 
 #include "ability_connect_callback_stub.h"
-#include "base_connection.h"
 #include "datashare_proxy.h"
 #include "event_handler.h"
 #include "want.h"
@@ -28,7 +27,7 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-class DataShareConnection : public AAFwk::AbilityConnectionStub, public BaseConnection {
+class DataShareConnection : public AAFwk::AbilityConnectionStub {
 public:
     DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token) : uri_(uri), token_(token) {}
     virtual ~DataShareConnection();
@@ -66,15 +65,15 @@ public:
      *
      * @return the proxy of datashare extension ability.
      */
-    std::shared_ptr<BaseProxy> GetDataShareProxy() override;
-    bool ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> &token)  override ;
+    std::shared_ptr<DataShareProxy> GetDataShareProxy(const Uri &uri, const sptr<IRemoteObject> &token);
+
 private:
     struct ConnectCondition {
         std::condition_variable condition;
         std::mutex mutex;
     };
     void SetDataShareProxy(sptr<DataShareProxy> proxy);
-    bool ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
+    std::shared_ptr<DataShareProxy> ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
     std::mutex mutex_;
     std::shared_ptr<DataShareProxy> dataShareProxy_;
     ConnectCondition condition_;

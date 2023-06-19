@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace DataShare {
 std::vector<OperationResult> PublishedDataSubscriberManager::AddObservers(void *subscriber,
-    std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId,
+    std::shared_ptr<DataShareServiceProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId,
     const PublishedDataCallback &callback)
 {
     if (proxy == nullptr) {
@@ -61,7 +61,7 @@ std::vector<OperationResult> PublishedDataSubscriberManager::AddObservers(void *
 }
 
 std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *subscriber,
-    std::shared_ptr<BaseProxy> proxy)
+    std::shared_ptr<DataShareServiceProxy> proxy)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -83,7 +83,7 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
 }
 
 std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *subscriber,
-    std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId)
+    std::shared_ptr<DataShareServiceProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -117,7 +117,7 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
 }
 
 std::vector<OperationResult> PublishedDataSubscriberManager::EnableObservers(void *subscriber,
-    std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId)
+    std::shared_ptr<DataShareServiceProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -153,7 +153,7 @@ std::vector<OperationResult> PublishedDataSubscriberManager::EnableObservers(voi
 }
 
 std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(void *subscriber,
-    std::shared_ptr<BaseProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId)
+    std::shared_ptr<DataShareServiceProxy> proxy, const std::vector<std::string> &uris, int64_t subscriberId)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -179,7 +179,7 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(vo
         });
 }
 
-void PublishedDataSubscriberManager::RecoverObservers(std::shared_ptr<BaseProxy> proxy)
+void PublishedDataSubscriberManager::RecoverObservers(std::shared_ptr<DataShareServiceProxy> proxy)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");

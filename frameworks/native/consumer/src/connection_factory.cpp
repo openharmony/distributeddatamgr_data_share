@@ -17,20 +17,21 @@
 
 #include <memory>
 
-#include "datashare_connection.h"
 #include "datashare_log.h"
-#include "data_share_manager_impl.h"
 #include "rdb_subscriber_manager.h"
 #include "published_data_subscriber_manager.h"
 
 namespace OHOS {
 namespace DataShare {
-std::shared_ptr<BaseConnection> ConnectionFactory::GetConnection(Uri &uri,  const sptr<IRemoteObject> token)
+std::shared_ptr<DataShareManagerImpl> ConnectionFactory::GetDataShareService(const std::string &bundleName)
 {
-    if (uri.GetQuery().find("Proxy=true") != std::string::npos && service_->ConnectDataShare(uri, token)) {
-        return service_;
-    }
+    service_->SetBundleName(bundleName);
+    return service_;
+}
 
+std::shared_ptr<DataShareConnection> ConnectionFactory::GetDataShareConnection(Uri &uri,
+    const sptr<IRemoteObject> token)
+{
     sptr<DataShareConnection> connection = new (std::nothrow) DataShareConnection(uri, token);
     if (connection == nullptr) {
         LOG_ERROR("Factory Create DataShareConnection failed.");
@@ -41,21 +42,6 @@ std::shared_ptr<BaseConnection> ConnectionFactory::GetConnection(Uri &uri,  cons
     });
 }
 
-std::shared_ptr<BaseConnection> ConnectionFactory::GetConnection(const Uri &uri, const CreateOptions &options)
-{
-    if (options.isProxy_ && service_->ConnectDataShare(uri, options.token_)) {
-        return service_;
-    }
-
-    sptr<DataShareConnection> connection = new (std::nothrow) DataShareConnection(uri, options.token_);
-    if (connection == nullptr) {
-        LOG_ERROR("Factory Create DataShareConnection failed.");
-        return nullptr;
-    }
-    return  std::shared_ptr<DataShareConnection>(
-        connection.GetRefPtr(), [holder = connection](const auto *) {});
-}
-
 ConnectionFactory& ConnectionFactory::GetInstance()
 {
     static ConnectionFactory manager;
@@ -64,13 +50,12 @@ ConnectionFactory& ConnectionFactory::GetInstance()
 
 ConnectionFactory::ConnectionFactory()
 {
-    auto dataShareManagerImpl = std::make_shared<DataShareManagerImpl>();
-    dataShareManagerImpl->SetDeathCallback([](std::shared_ptr<BaseProxy> baseProxy) {
+    service_ = std::make_shared<DataShareManagerImpl>();
+    service_->SetDeathCallback([](std::shared_ptr<DataShareServiceProxy> proxy) {
         LOG_INFO("RecoverObs start");
-        RdbSubscriberManager::GetInstance().RecoverObservers(baseProxy);
-        PublishedDataSubscriberManager::GetInstance().RecoverObservers(baseProxy);
+        RdbSubscriberManager::GetInstance().RecoverObservers(proxy);
+        PublishedDataSubscriberManager::GetInstance().RecoverObservers(proxy);
     });
-    service_ = dataShareManagerImpl;
 }
 }
 }
