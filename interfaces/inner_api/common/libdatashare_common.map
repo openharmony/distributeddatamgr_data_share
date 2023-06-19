@@ -25,6 +25,7 @@
     *DataShareManagerImpl*;
     *DataShareServiceProxy*;
     *DataShareKvServiceProxy*;
+    *PublishedDataItem*;
   local:
     *;
 };

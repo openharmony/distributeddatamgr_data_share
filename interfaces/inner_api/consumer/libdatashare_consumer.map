@@ -18,6 +18,7 @@
     *DataShareAbsResultSet*;
     *DataShareSharedResultSet*;
     *DataShareProxy*;
+    *PublishedDataItem*;
   local:
     *;
 };
