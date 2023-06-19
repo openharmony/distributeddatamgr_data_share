@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#include "provider_special_controller.h"
+#include "ext_special_controller.h"
 #include "datashare_log.h"
 
 namespace OHOS {
 namespace DataShare {
 constexpr int INVALID_VALUE = -1;
-int ProviderSpecialController::OpenFile(const Uri &uri, const std::string &mode)
+int ExtSpecialController::OpenFile(const Uri &uri, const std::string &mode)
 {
     auto connection = connection_;
     if (connection == nullptr) {
@@ -34,7 +34,7 @@ int ProviderSpecialController::OpenFile(const Uri &uri, const std::string &mode)
     return proxy->OpenFile(uri, mode);
 }
 
-int ProviderSpecialController::OpenRawFile(const Uri &uri, const std::string &mode)
+int ExtSpecialController::OpenRawFile(const Uri &uri, const std::string &mode)
 {
     auto connection = connection_;
     if (connection == nullptr) {
@@ -49,7 +49,7 @@ int ProviderSpecialController::OpenRawFile(const Uri &uri, const std::string &mo
     return proxy->OpenRawFile(uri, mode);
 }
 
-std::string ProviderSpecialController::GetType(const Uri &uri)
+std::string ExtSpecialController::GetType(const Uri &uri)
 {
     auto connection = connection_;
     if (connection == nullptr) {
@@ -64,7 +64,7 @@ std::string ProviderSpecialController::GetType(const Uri &uri)
     return proxy->GetType(uri);
 }
 
-int ProviderSpecialController::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values)
+int ExtSpecialController::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
     auto connection = connection_;
     if (connection == nullptr) {
@@ -79,7 +79,7 @@ int ProviderSpecialController::BatchInsert(const Uri &uri, const std::vector<Dat
     return proxy->BatchInsert(uri, values);
 }
 
-Uri ProviderSpecialController::NormalizeUri(const Uri &uri)
+Uri ExtSpecialController::NormalizeUri(const Uri &uri)
 {
     auto connection = connection_;
     if (connection == nullptr) {
@@ -94,7 +94,7 @@ Uri ProviderSpecialController::NormalizeUri(const Uri &uri)
     return proxy->NormalizeUri(uri);
 }
 
-Uri ProviderSpecialController::DenormalizeUri(const Uri &uri)
+Uri ExtSpecialController::DenormalizeUri(const Uri &uri)
 {
     auto connection = connection_;
     if (connection == nullptr) {
@@ -109,7 +109,7 @@ Uri ProviderSpecialController::DenormalizeUri(const Uri &uri)
     return proxy->DenormalizeUri(uri);
 }
 
-std::vector<std::string> ProviderSpecialController::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
+std::vector<std::string> ExtSpecialController::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
 {
     auto connection = connection_;
     if (connection == nullptr) {
@@ -124,7 +124,7 @@ std::vector<std::string> ProviderSpecialController::GetFileTypes(const Uri &uri,
     return proxy->GetFileTypes(uri, mimeTypeFilter);
 }
 
-ProviderSpecialController::ProviderSpecialController(std::shared_ptr<DataShareConnection> connection, const Uri &uri,
+ExtSpecialController::ExtSpecialController(std::shared_ptr<DataShareConnection> connection, const Uri &uri,
     const sptr<IRemoteObject> &token)
     : connection_(connection), token_(token), uri_(uri)
 {

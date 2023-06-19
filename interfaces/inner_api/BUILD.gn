@@ -56,8 +56,8 @@ ohos_shared_library("datashare_consumer") {
       [ "//foundation/distributeddatamgr/kv_store/frameworks/common" ]
 
   sources = [
+    "${datashare_native_consumer_path}/controller/provider/src/ext_special_controller.cpp",
     "${datashare_native_consumer_path}/controller/provider/src/general_controller_provider_impl.cpp",
-    "${datashare_native_consumer_path}/controller/provider/src/provider_special_controller.cpp",
     "${datashare_native_consumer_path}/controller/service/src/general_controller_service_impl.cpp",
     "${datashare_native_consumer_path}/controller/service/src/persistent_data_controller.cpp",
     "${datashare_native_consumer_path}/controller/service/src/published_data_controller.cpp",

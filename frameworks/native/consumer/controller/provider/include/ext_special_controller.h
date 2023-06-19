@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef PROVIDER_SPECIAL_CONTROLLER_H
-#define PROVIDER_SPECIAL_CONTROLLER_H
+#ifndef EXT_SPECIAL_CONTROLLER_H
+#define EXT_SPECIAL_CONTROLLER_H
 
 #include "datashare_connection.h"
 #include "datashare_values_bucket.h"
@@ -22,11 +22,11 @@
 
 namespace OHOS{
 namespace DataShare {
-class ProviderSpecialController {
+class ExtSpecialController {
 public:
-    ProviderSpecialController(std::shared_ptr<DataShareConnection> connection, const Uri &uri,
+    ExtSpecialController(std::shared_ptr<DataShareConnection> connection, const Uri &uri,
         const sptr<IRemoteObject> &token);
-    virtual ~ProviderSpecialController() = default;
+    virtual ~ExtSpecialController() = default;
 
     int OpenFile(const Uri &uri, const std::string &mode);
 
@@ -50,4 +50,4 @@ private:
 }
 }
 
-#endif //LDBPROJ_PROVIDER_SPECIAL_CONTROLLER_H
+#endif // EXT_SPECIAL_CONTROLLER_H

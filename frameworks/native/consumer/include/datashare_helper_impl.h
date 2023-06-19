@@ -17,9 +17,9 @@
 #define DATA_SHARE_HELPER_IMPL_H
 
 #include "datashare_helper.h"
+#include "ext_special_controller.h"
 #include "general_controller.h"
 #include "persistent_data_controller.h"
-#include "provider_special_controller.h"
 #include "published_data_controller.h"
 
 namespace OHOS::DataShare {
@@ -93,7 +93,7 @@ public:
     std::vector<OperationResult> DisablePubSubs(const std::vector<std::string> &uris, int64_t subscriberId) override;
 
 private:
-    std::shared_ptr<ProviderSpecialController> providerSpCtl_ = nullptr;
+    std::shared_ptr<ExtSpecialController> extSpCtl_ = nullptr;
     std::shared_ptr<GeneralController> generalCtl_ = nullptr;
     std::shared_ptr<PersistentDataController> persistentDataCtl_ = nullptr;
     std::shared_ptr<PublishedDataController> publishedDataCtl_ = nullptr;

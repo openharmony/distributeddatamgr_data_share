@@ -23,9 +23,6 @@
 
 #include "general_controller_porvider_impl.h"
 #include "general_controller_service_impl.h"
-#include "persistent_data_controller.h"
-#include "provider_special_controller.h"
-#include "published_data_controller.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -35,7 +32,7 @@ DataShareHelperImpl::DataShareHelperImpl(const Uri &uri, const sptr<IRemoteObjec
     std::shared_ptr<DataShareConnection> connection)
 {
     generalCtl_ = std::make_shared<GeneralControllerProviderImpl>(connection, uri, token);
-    providerSpCtl_ = std::make_shared<ProviderSpecialController>(connection, uri, token);
+    extSpCtl_ = std::make_shared<ExtSpecialController>(connection, uri, token);
 }
 
 DataShareHelperImpl::DataShareHelperImpl(std::shared_ptr<DataShareManagerImpl> serviceImpl)
@@ -55,7 +52,7 @@ DataShareHelperImpl::~DataShareHelperImpl()
 
 bool DataShareHelperImpl::Release()
 {
-    providerSpCtl_ = nullptr;
+    extSpCtl_ = nullptr;
     generalCtl_->Release();
     return true;
 }
@@ -63,34 +60,34 @@ bool DataShareHelperImpl::Release()
 std::vector<std::string> DataShareHelperImpl::GetFileTypes(Uri &uri, const std::string &mimeTypeFilter)
 {
     std::vector<std::string> matchedMIMEs;
-    auto providerSpCtl = providerSpCtl_;
-    if (providerSpCtl == nullptr) {
-        LOG_ERROR("providerSpCtl is nullptr");
+    auto extSpCtl = extSpCtl_;
+    if (extSpCtl == nullptr) {
+        LOG_ERROR("extSpCtl is nullptr");
         return matchedMIMEs;
     }
-    return providerSpCtl->GetFileTypes(uri, mimeTypeFilter);
+    return extSpCtl->GetFileTypes(uri, mimeTypeFilter);
 }
 
 int DataShareHelperImpl::OpenFile(Uri &uri, const std::string &mode)
 {
     int fd = INVALID_VALUE;
-    auto providerSpCtl = providerSpCtl_;
-    if (providerSpCtl == nullptr) {
-        LOG_ERROR("providerSpCtl is nullptr");
+    auto extSpCtl = extSpCtl_;
+    if (extSpCtl == nullptr) {
+        LOG_ERROR("extSpCtl is nullptr");
         return fd;
     }
-    return providerSpCtl->OpenFile(uri, mode);
+    return extSpCtl->OpenFile(uri, mode);
 }
 
 int DataShareHelperImpl::OpenRawFile(Uri &uri, const std::string &mode)
 {
     int fd = INVALID_VALUE;
-    auto providerSpCtl = providerSpCtl_;
-    if (providerSpCtl == nullptr) {
-        LOG_ERROR("providerSpCtl is nullptr");
+    auto extSpCtl = extSpCtl_;
+    if (extSpCtl == nullptr) {
+        LOG_ERROR("extSpCtl is nullptr");
         return fd;
     }
-    return providerSpCtl->OpenRawFile(uri, mode);
+    return extSpCtl->OpenRawFile(uri, mode);
 }
 
 int DataShareHelperImpl::Insert(Uri &uri, const DataShareValuesBucket &value)
@@ -146,23 +143,23 @@ std::shared_ptr<DataShareResultSet> DataShareHelperImpl::Query(Uri &uri, const D
 std::string DataShareHelperImpl::GetType(Uri &uri)
 {
     std::string type;
-    auto providerSpCtl = providerSpCtl_;
-    if (providerSpCtl == nullptr) {
-        LOG_ERROR("providerSpCtl is nullptr");
+    auto extSpCtl = extSpCtl_;
+    if (extSpCtl == nullptr) {
+        LOG_ERROR("extSpCtl is nullptr");
         return type;
     }
-    return providerSpCtl->GetType(uri);
+    return extSpCtl->GetType(uri);
 }
 
 int DataShareHelperImpl::BatchInsert(Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
     int ret = INVALID_VALUE;
-    auto providerSpCtl = providerSpCtl_;
-    if (providerSpCtl == nullptr) {
+    auto extSpCtl = extSpCtl_;
+    if (extSpCtl == nullptr) {
         LOG_ERROR("providerSepOperator is nullptr");
         return ret;
     }
-    return providerSpCtl->BatchInsert(uri, values);
+    return extSpCtl->BatchInsert(uri, values);
 }
 
 void DataShareHelperImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
@@ -208,23 +205,23 @@ void DataShareHelperImpl::NotifyChange(const Uri &uri)
 Uri DataShareHelperImpl::NormalizeUri(Uri &uri)
 {
     Uri uriValue("");
-    auto providerSpCtl = providerSpCtl_;
-    if (providerSpCtl == nullptr) {
-        LOG_ERROR("providerSpCtl is nullptr");
+    auto extSpCtl = extSpCtl_;
+    if (extSpCtl == nullptr) {
+        LOG_ERROR("extSpCtl is nullptr");
         return uriValue;
     }
-    return providerSpCtl->NormalizeUri(uri);
+    return extSpCtl->NormalizeUri(uri);
 }
 
 Uri DataShareHelperImpl::DenormalizeUri(Uri &uri)
 {
     Uri uriValue("");
-    auto providerSpCtl = providerSpCtl_;
-    if (providerSpCtl == nullptr) {
-        LOG_ERROR("providerSpCtl is nullptr");
+    auto extSpCtl = extSpCtl_;
+    if (extSpCtl == nullptr) {
+        LOG_ERROR("extSpCtl is nullptr");
         return uriValue;
     }
-    return providerSpCtl->DenormalizeUri(uri);
+    return extSpCtl->DenormalizeUri(uri);
 }
 
 int DataShareHelperImpl::AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl)
