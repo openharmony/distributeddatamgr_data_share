@@ -19,41 +19,13 @@ namespace OHOS {
 namespace DataShare {
 PublishedDataItem::~PublishedDataItem()
 {
-    AshmemNode *node = std::get_if<AshmemNode>(&value_);
-    if (node != nullptr) {
-        if (node->isManaged && node->ashmem != nullptr) {
-            node->ashmem->UnmapAshmem();
-            node->ashmem->CloseAshmem();
-        }
-    }
+    Clear();
 }
 
-PublishedDataItem::PublishedDataItem(
-    const std::string &key, int64_t subscriberId, std::variant<std::vector<uint32_t>, std::string> value)
-
+PublishedDataItem::PublishedDataItem(const std::string &key, int64_t subscriberId, DataType value)
     : key_(key), subscriberId_(subscriberId)
 {
-    if (value.index() == 0) {
-        std::vector<uint32_t> &vecValue = std::get<std::vector<uint32_t>>(value);
-        auto size = vecValue.size() * sizeof(uint32_t);
-        sptr<Ashmem> mem = Ashmem::CreateAshmem((key_ + std::to_string(subscriberId_)).c_str(), size);
-        if (mem == nullptr) {
-            return;
-        }
-        if (!mem->MapReadAndWriteAshmem()) {
-            mem->CloseAshmem();
-            return;
-        }
-        if (!mem->WriteToAshmem(vecValue.data(), size, 0)) {
-            mem->UnmapAshmem();
-            mem->CloseAshmem();
-            return;
-        }
-        AshmemNode node = { mem, true };
-        value_ = std::move(node);
-    } else {
-        value_ = std::move(std::get<std::string>(value));
-    }
+    Set(value);
 }
 
 PublishedDataItem::PublishedDataItem(PublishedDataItem &&item)
@@ -100,24 +72,45 @@ bool PublishedDataItem::IsString() const
     return value_.index() == 1;
 }
 
-void PublishedDataItem::Set(const std::string &value)
+void PublishedDataItem::Set(DataType &value)
 {
-    value_ = value;
+    Clear();
+    if (value.index() == 0) {
+        std::vector<uint8_t> &vecValue = std::get<std::vector<uint8_t>>(value);
+        auto size = vecValue.size();
+        sptr<Ashmem> mem = Ashmem::CreateAshmem((key_ + std::to_string(subscriberId_)).c_str(), size);
+        if (mem == nullptr) {
+            return;
+        }
+        if (!mem->MapReadAndWriteAshmem()) {
+            mem->CloseAshmem();
+            return;
+        }
+        if (!mem->WriteToAshmem(vecValue.data(), size, 0)) {
+            mem->UnmapAshmem();
+            mem->CloseAshmem();
+            return;
+        }
+        AshmemNode node = { mem, true };
+        value_ = std::move(node);
+    } else {
+        value_ = std::move(std::get<std::string>(value));
+    }
 }
 
-std::variant<std::vector<uint32_t>, std::string> PublishedDataItem::GetData() const
+PublishedDataItem::DataType PublishedDataItem::GetData() const
 {
     if (IsAshmem()) {
         const AshmemNode &node = std::get<AshmemNode>(value_);
         if (node.ashmem != nullptr) {
             node.ashmem->MapReadOnlyAshmem();
-            uint32_t *data = (uint32_t *)node.ashmem->ReadFromAshmem(node.ashmem->GetAshmemSize(), 0);
+            uint8_t *data = (uint8_t *)node.ashmem->ReadFromAshmem(node.ashmem->GetAshmemSize(), 0);
             if (data == nullptr) {
-                return std::vector<uint32_t>();
+                return std::vector<uint8_t>();
             }
-            return std::vector<uint32_t>(data, data + node.ashmem->GetAshmemSize()/sizeof(uint32_t));
+            return std::vector<uint8_t>(data, data + node.ashmem->GetAshmemSize());
         }
-        return std::vector<uint32_t>();
+        return std::vector<uint8_t>();
     } else {
         return std::get<std::string>(value_);
     }
@@ -127,6 +120,18 @@ void PublishedDataItem::SetAshmem(sptr<Ashmem> ashmem, bool isManaged)
 {
     AshmemNode node = { ashmem, isManaged };
     value_ = std::move(node);
+}
+
+void PublishedDataItem::Clear()
+{
+    AshmemNode *node = std::get_if<AshmemNode>(&value_);
+    if (node != nullptr) {
+        if (node->isManaged && node->ashmem != nullptr) {
+            node->ashmem->UnmapAshmem();
+            node->ashmem->CloseAshmem();
+        }
+        value_ = "";
+    }
 }
 } // namespace DataShare
 } // namespace OHOS

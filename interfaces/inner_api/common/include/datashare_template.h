@@ -94,6 +94,7 @@ struct AshmemNode {
  * Specifies the published item structure.
  */
 struct PublishedDataItem {
+    using DataType = std::variant<std::vector<uint8_t>, std::string>;
     /** The key of the published data. */
     std::string key_;
     /** The subscriber id */
@@ -105,22 +106,18 @@ struct PublishedDataItem {
     PublishedDataItem &operator=(const PublishedDataItem &) = delete;
     virtual ~PublishedDataItem();
     PublishedDataItem(const std::string &key,
-        int64_t subscriberId, std::variant<std::vector<uint32_t>, std::string> value);
+        int64_t subscriberId, DataType value);
     PublishedDataItem(PublishedDataItem &&item);
-
     PublishedDataItem &operator=(PublishedDataItem &&item);
-
     bool IsAshmem() const;
-
     bool IsString() const;
-
     sptr<Ashmem> MoveOutAshmem();
-
     void SetAshmem(sptr<Ashmem> ashmem, bool isManaged = false);
+    void Set(DataType &value);
+    DataType GetData() const;
 
-    void Set(const std::string &value);
-
-    std::variant<std::vector<uint32_t>, std::string> GetData() const;
+private:
+    void Clear();
 };
 
 /** Specifies the published data structure. */

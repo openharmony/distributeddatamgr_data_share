@@ -59,19 +59,32 @@ std::vector<std::string> DataShareJSUtils::Convert2StrVector(napi_env env, napi_
 std::vector<uint8_t> DataShareJSUtils::Convert2U8Vector(napi_env env, napi_value input_array)
 {
     bool isTypedArray = false;
+    bool isArrayBuffer = false;
     napi_is_typedarray(env, input_array, &isTypedArray);
     if (!isTypedArray) {
-        return {};
+        napi_is_arraybuffer(env, input_array, &isArrayBuffer);
+        if (!isArrayBuffer) {
+            LOG_ERROR("unknow type");
+            return {};
+        }
     }
-
-    napi_typedarray_type type;
-    napi_value input_buffer = nullptr;
-    size_t byte_offset = 0;
     size_t length = 0;
     void *data = nullptr;
-    napi_get_typedarray_info(env, input_array, &type, &length, &data, &input_buffer, &byte_offset);
-    if (type != napi_uint8_array || data == nullptr) {
-        return {};
+    if (isTypedArray) {
+        napi_typedarray_type type;
+        napi_value input_buffer = nullptr;
+        size_t byte_offset = 0;
+        napi_get_typedarray_info(env, input_array, &type, &length, &data, &input_buffer, &byte_offset);
+        if (type != napi_uint8_array || data == nullptr) {
+            LOG_ERROR("napi_get_typedarray_info err");
+            return {};
+        }
+    } else {
+        napi_get_arraybuffer_info(env, input_array, &data, &length);
+        if (data == nullptr || length <= 0) {
+            LOG_ERROR("napi_get_arraybuffer_info err");
+            return {};
+        }
     }
     return std::vector<uint8_t>((uint8_t *)data, ((uint8_t *)data) + length);
 }
@@ -157,9 +170,8 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::string &va
     return jsValue;
 }
 
-napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<uint8_t> &value)
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<uint8_t> &value, bool isTypedArray)
 {
-    napi_value jsValue;
     void *native = nullptr;
     napi_value buffer = nullptr;
     if (value.empty()) {
@@ -173,6 +185,10 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<uin
     if (memcpy_s(native, value.size(), value.data(), value.size()) != EOK && value.size() > 0) {
         return nullptr;
     }
+    if (!isTypedArray) {
+        return buffer;
+    }
+    napi_value jsValue;
     status = napi_create_typedarray(env, napi_uint8_array, value.size(), buffer, 0, &jsValue);
     if (status != napi_ok) {
         return nullptr;
@@ -359,37 +375,6 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const RdbChangeNode &
     return jsRdbChangeNode;
 }
 
-napi_value DataShareJSUtils::Convert2JSValue(napi_env env, sptr<Ashmem> &ashmem)
-{
-    napi_value global = nullptr;
-    napi_status status = napi_get_global(env, &global);
-    if (status != napi_ok) {
-        LOG_ERROR("get napi global failed");
-        return nullptr;
-    }
-    napi_value constructor = nullptr;
-    status = napi_get_named_property(env, global, "AshmemConstructor_", &constructor);
-    if (status != napi_ok) {
-        LOG_ERROR("get Ashmem constructor failed");
-        return nullptr;
-    }
-    napi_value jsAshmem;
-    status = napi_new_instance(env, constructor, 0, nullptr, &jsAshmem);
-    if (status != napi_ok) {
-        LOG_ERROR("failed to construct js Ashmem");
-        return nullptr;
-    }
-
-    NAPIAshmem *napiAshmem = nullptr;
-    napi_unwrap(env, jsAshmem, (void **)&napiAshmem);
-    if (napiAshmem == nullptr) {
-        LOG_ERROR("napiAshmem is null");
-        return nullptr;
-    }
-    napiAshmem->SetAshmem(ashmem);
-    return jsAshmem;
-}
-
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, PublishedDataItem &publishedDataItem)
 {
     napi_value jsPublishedDataItem = nullptr;
@@ -408,12 +393,7 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, PublishedDataItem &pu
 
     napi_value data = nullptr;
     if (publishedDataItem.IsAshmem()) {
-        sptr<Ashmem> ashmem = publishedDataItem.MoveOutAshmem();
-        if (ashmem == nullptr) {
-            LOG_ERROR("MoveOutAshmem null Ashmem");
-            return nullptr;
-        }
-        data = Convert2JSValue(env, ashmem);
+        data = Convert2JSValue(env, std::get<std::vector<uint8_t>>(publishedDataItem.GetData()), false);
     } else {
         data = Convert2JSValue(env, std::get<std::string>(publishedDataItem.GetData()));
     }
@@ -599,15 +579,13 @@ bool DataShareJSUtils::UnwrapPublishedDataItem(napi_env env, napi_value jsObject
     napi_value jsDataValue = nullptr;
     napi_get_property(env, jsObject, jsDataKey, &jsDataValue);
     napi_typeof(env, jsDataValue, &valueType);
+    PublishedDataItem::DataType value;
     if (valueType == napi_object) {
-        sptr<Ashmem> ashmem = Convert2Ashmem(env, jsDataValue);
-        if (ashmem == nullptr) {
-            LOG_ERROR("Convert ashmem failed");
-            return false;
-        }
-        publishedDataItem.SetAshmem(ashmem);
+        value = Convert2U8Vector(env, jsDataValue);
+        publishedDataItem.Set(value);
     } else if (valueType == napi_string) {
-        publishedDataItem.Set(Convert2String(env, jsDataValue));
+        value = Convert2String(env, jsDataValue);
+        publishedDataItem.Set(value);
     } else {
         LOG_ERROR("Convert dataValue failed, type is %{public}d", valueType);
         return false;
@@ -677,32 +655,6 @@ Data DataShareJSUtils::Convert2PublishedData(napi_env env, napi_value value)
         return {};
     }
     return data;
-}
-
-sptr<Ashmem> DataShareJSUtils::Convert2Ashmem(napi_env env, napi_value value)
-{
-    napi_value global = nullptr;
-    napi_get_global(env, &global);
-    napi_value constructor = nullptr;
-    napi_status status = napi_get_named_property(env, global, "AshmemConstructor_", &constructor);
-    if (status != napi_ok) {
-        LOG_ERROR("get Ashmem constructor failed");
-        return nullptr;
-    }
-    bool isAshmem = false;
-    napi_instanceof(env, value, constructor, &isAshmem);
-    if (!isAshmem) {
-        LOG_ERROR("parameter is not instanceof Ashmem");
-        return nullptr;
-    }
-    NAPIAshmem *napiAshmem = nullptr;
-    napi_unwrap(env, value, (void **)&napiAshmem);
-    if (napiAshmem == nullptr) {
-        LOG_ERROR("napiAshmem is null");
-        return nullptr;
-    }
-    sptr<Ashmem> nativeAshmem = napiAshmem->GetAshmem();
-    return nativeAshmem;
 }
 
 bool DataShareJSUtils::UnwrapStringByPropertyName(

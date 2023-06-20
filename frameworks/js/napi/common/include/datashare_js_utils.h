@@ -25,8 +25,6 @@
 #include "datashare_template.h"
 #include "datashare_value_object.h"
 #include "napi/native_api.h"
-#include "napi/native_common.h"
-#include "napi/native_node_api.h"
 
 #define NAPI_ASSERT_ERRCODE(env, assertion, error)                                                          \
 do {                                                                                                        \
@@ -70,12 +68,11 @@ public:
     static Template Convert2Template(napi_env env, napi_value value);
     static TemplateId Convert2TemplateId(napi_env env, napi_value value);
     static Data Convert2PublishedData(napi_env env, napi_value value);
-    static sptr<Ashmem> Convert2Ashmem(napi_env env, napi_value value);
 
     static napi_value Convert2JSValue(napi_env env, const std::monostate &value = {});
     static napi_value Convert2JSValue(napi_env env, const std::vector<std::string> &value);
     static napi_value Convert2JSValue(napi_env env, const std::string &value);
-    static napi_value Convert2JSValue(napi_env env, const std::vector<uint8_t> &value);
+    static napi_value Convert2JSValue(napi_env env, const std::vector<uint8_t> &value, bool isTypedArray = true);
     static napi_value Convert2JSValue(napi_env env, int32_t value);
     static napi_value Convert2JSValue(napi_env env, int64_t value);
     static napi_value Convert2JSValue(napi_env env, double value);
@@ -85,7 +82,6 @@ public:
     static napi_value Convert2JSValue(napi_env env, const std::variant<Types...> &value);
     static napi_value Convert2JSValue(napi_env env, const TemplateId &templateId);
     static napi_value Convert2JSValue(napi_env env, const RdbChangeNode &changeNode);
-    static napi_value Convert2JSValue(napi_env env, sptr<Ashmem> &ashmem);
     static napi_value Convert2JSValue(napi_env env, PublishedDataItem &publishedDataItem);
     static napi_value Convert2JSValue(napi_env env, std::vector<PublishedDataItem> &publishedDataItems);
     static napi_value Convert2JSValue(napi_env env, PublishedDataChangeNode &changeNode);
