@@ -393,7 +393,6 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, PublishedDataItem &pu
 
     napi_value data = nullptr;
     if (publishedDataItem.IsAshmem()) {
-
         data = Convert2JSValue(env, std::get<std::vector<uint8_t>>(publishedDataItem.GetData()), false);
     } else {
         data = Convert2JSValue(env, std::get<std::string>(publishedDataItem.GetData()));
