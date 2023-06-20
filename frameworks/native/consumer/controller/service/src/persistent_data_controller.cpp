@@ -20,18 +20,9 @@
 namespace OHOS {
 namespace DataShare {
 constexpr int INVALID_VALUE = -1;
-PersistentDataController::PersistentDataController(std::shared_ptr<DataShareManagerImpl> service) : service_(service)
-{
-}
-
 int PersistentDataController::AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl)
 {
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return INVALID_VALUE;
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return INVALID_VALUE;
@@ -41,12 +32,7 @@ int PersistentDataController::AddQueryTemplate(const std::string &uri, int64_t s
 
 int PersistentDataController::DelQueryTemplate(const std::string &uri, int64_t subscriberId)
 {
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return INVALID_VALUE;
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return INVALID_VALUE;
@@ -58,12 +44,7 @@ std::vector<OperationResult> PersistentDataController::SubscribeRdbData(void *su
     const std::vector<std::string> &uris, const TemplateId &templateId,
     std::function<void(const RdbChangeNode &)> callback)
 {
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return std::vector<OperationResult>();
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();
@@ -74,16 +55,12 @@ std::vector<OperationResult> PersistentDataController::SubscribeRdbData(void *su
 std::vector<OperationResult> PersistentDataController::UnSubscribeRdbData(void *subscriber,
     const std::vector<std::string> &uris, const TemplateId &templateId)
 {
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return std::vector<OperationResult>();
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();
     }
+
     if (uris.empty()) {
         return RdbSubscriberManager::GetInstance().DelObservers(subscriber, proxy);
     }
@@ -93,12 +70,7 @@ std::vector<OperationResult> PersistentDataController::UnSubscribeRdbData(void *
 std::vector<OperationResult> PersistentDataController::EnableSubscribeRdbData(void *subscriber,
     const std::vector<std::string> &uris, const TemplateId &templateId)
 {
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return std::vector<OperationResult>();
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();
@@ -109,12 +81,7 @@ std::vector<OperationResult> PersistentDataController::EnableSubscribeRdbData(vo
 std::vector<OperationResult> PersistentDataController::DisableSubscribeRdbData(void *subscriber,
     const std::vector<std::string> &uris, const TemplateId &templateId)
 {
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return std::vector<OperationResult>();
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();

@@ -124,6 +124,21 @@ std::vector<std::string> ExtSpecialController::GetFileTypes(const Uri &uri, cons
     return proxy->GetFileTypes(uri, mimeTypeFilter);
 }
 
+void ExtSpecialController::NotifyChange(const Uri &uri)
+{
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("connection is nullptr");
+        return;
+    }
+    auto proxy = connection->GetDataShareProxy(uri_, token_);
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return;
+    }
+    proxy->NotifyChange(uri);
+}
+
 ExtSpecialController::ExtSpecialController(std::shared_ptr<DataShareConnection> connection, const Uri &uri,
     const sptr<IRemoteObject> &token)
     : connection_(connection), token_(token), uri_(uri)

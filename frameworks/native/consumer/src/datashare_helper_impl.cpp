@@ -35,16 +35,16 @@ DataShareHelperImpl::DataShareHelperImpl(const Uri &uri, const sptr<IRemoteObjec
     extSpCtl_ = std::make_shared<ExtSpecialController>(connection, uri, token);
 }
 
-DataShareHelperImpl::DataShareHelperImpl(std::shared_ptr<DataShareManagerImpl> serviceImpl)
+DataShareHelperImpl::DataShareHelperImpl()
 {
-    generalCtl_ = std::make_shared<GeneralControllerServiceImpl>(serviceImpl);
-    persistentDataCtl_ = std::make_shared<PersistentDataController>(serviceImpl);
-    publishedDataCtl_ = std::make_shared<PublishedDataController>(serviceImpl);
+    generalCtl_ = std::make_shared<GeneralControllerServiceImpl>();
+    persistentDataCtl_ = std::make_shared<PersistentDataController>();
+    publishedDataCtl_ = std::make_shared<PublishedDataController>();
 }
 
 DataShareHelperImpl::~DataShareHelperImpl()
 {
-    if (needCleanSubscriber_) {
+    if (persistentDataCtl_ != nullptr && publishedDataCtl_ != nullptr) {
         persistentDataCtl_->UnSubscribeRdbData(this, {}, {});
         publishedDataCtl_->UnSubscribePublishedData(this, {}, {});
     }
@@ -53,72 +53,66 @@ DataShareHelperImpl::~DataShareHelperImpl()
 bool DataShareHelperImpl::Release()
 {
     extSpCtl_ = nullptr;
-    generalCtl_->Release();
+    generalCtl_ = nullptr;
     return true;
 }
 
 std::vector<std::string> DataShareHelperImpl::GetFileTypes(Uri &uri, const std::string &mimeTypeFilter)
 {
-    std::vector<std::string> matchedMIMEs;
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
-        return matchedMIMEs;
+        return std::vector<std::string>();
     }
     return extSpCtl->GetFileTypes(uri, mimeTypeFilter);
 }
 
 int DataShareHelperImpl::OpenFile(Uri &uri, const std::string &mode)
 {
-    int fd = INVALID_VALUE;
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
-        return fd;
+        return INVALID_VALUE;
     }
     return extSpCtl->OpenFile(uri, mode);
 }
 
 int DataShareHelperImpl::OpenRawFile(Uri &uri, const std::string &mode)
 {
-    int fd = INVALID_VALUE;
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
-        return fd;
+        return INVALID_VALUE;
     }
     return extSpCtl->OpenRawFile(uri, mode);
 }
 
 int DataShareHelperImpl::Insert(Uri &uri, const DataShareValuesBucket &value)
 {
-    int index = INVALID_VALUE;
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl_ is nullptr");
-        return index;
+        return INVALID_VALUE;
     }
     return generalCtl->Insert(uri, value);
 }
 
 int DataShareHelperImpl::Update(Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
 {
-    int index = INVALID_VALUE;
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
-        return index;
+        return INVALID_VALUE;
     }
     return generalCtl->Update(uri, predicates, value);
 }
 
 int DataShareHelperImpl::Delete(Uri &uri, const DataSharePredicates &predicates)
 {
-    int index = INVALID_VALUE;
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
-        return index;
+        return INVALID_VALUE;
     }
     return generalCtl->Delete(uri, predicates);
 }
@@ -126,14 +120,13 @@ int DataShareHelperImpl::Delete(Uri &uri, const DataSharePredicates &predicates)
 std::shared_ptr<DataShareResultSet> DataShareHelperImpl::Query(Uri &uri, const DataSharePredicates &predicates,
     std::vector<std::string> &columns, DatashareBusinessError *businessError)
 {
-    std::shared_ptr<DataShareResultSet> resultSet = nullptr;
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
-        return resultSet;
+        return nullptr;
     }
     DatashareBusinessError error;
-    resultSet = generalCtl->Query(uri, predicates, columns, error);
+    auto resultSet = generalCtl->Query(uri, predicates, columns, error);
     if (businessError != nullptr) {
         *businessError = error;
     }
@@ -142,22 +135,20 @@ std::shared_ptr<DataShareResultSet> DataShareHelperImpl::Query(Uri &uri, const D
 
 std::string DataShareHelperImpl::GetType(Uri &uri)
 {
-    std::string type;
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
-        return type;
+        return "";
     }
     return extSpCtl->GetType(uri);
 }
 
 int DataShareHelperImpl::BatchInsert(Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
-    int ret = INVALID_VALUE;
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("providerSepOperator is nullptr");
-        return ret;
+        return INVALID_VALUE;
     }
     return extSpCtl->BatchInsert(uri, values);
 }
@@ -194,76 +185,70 @@ void DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::I
 
 void DataShareHelperImpl::NotifyChange(const Uri &uri)
 {
-    auto generalCtl = generalCtl_;
-    if (generalCtl == nullptr) {
-        LOG_ERROR("generalCtl is nullptr");
+    auto extSpCtl = extSpCtl_;
+    if (extSpCtl == nullptr) {
+        LOG_ERROR("extSpCtl is nullptr");
         return;
     }
-    return generalCtl->NotifyChange(uri);
+    return extSpCtl->NotifyChange(uri);
 }
 
 Uri DataShareHelperImpl::NormalizeUri(Uri &uri)
 {
-    Uri uriValue("");
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
-        return uriValue;
+        return Uri("");
     }
     return extSpCtl->NormalizeUri(uri);
 }
 
 Uri DataShareHelperImpl::DenormalizeUri(Uri &uri)
 {
-    Uri uriValue("");
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
-        return uriValue;
+        return Uri("");
     }
     return extSpCtl->DenormalizeUri(uri);
 }
 
 int DataShareHelperImpl::AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl)
 {
-    int errNum = INVALID_VALUE;
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
-        return errNum;
+        return INVALID_VALUE;
     }
     return persistentDataCtl->AddQueryTemplate(uri, subscriberId, tpl);
 }
 
 int DataShareHelperImpl::DelQueryTemplate(const std::string &uri, int64_t subscriberId)
 {
-    int errNum = INVALID_VALUE;
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
-        return errNum;
+        return INVALID_VALUE;
     }
     return persistentDataCtl->DelQueryTemplate(uri, subscriberId);
 }
 
 std::vector<OperationResult> DataShareHelperImpl::Publish(const Data &data, const std::string &bundleName)
 {
-    std::vector<OperationResult> results;
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
-        return results;
+        return std::vector<OperationResult>();
     }
     return publishedDataCtl->Publish(data, bundleName);
 }
 
 Data DataShareHelperImpl::GetPublishedData(const std::string &bundleName, int &resultCode)
 {
-    Data results;
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
-        return results;
+        return Data();
     }
     return publishedDataCtl->GetPublishedData(bundleName, resultCode);
 }
@@ -272,11 +257,10 @@ std::vector<OperationResult> DataShareHelperImpl::SubscribeRdbData(const std::ve
     const TemplateId &templateId, const std::function<void(const RdbChangeNode &changeNode)> &callback)
 {
     LOG_DEBUG("Start SubscribeRdbData");
-    std::vector<OperationResult> results;
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
-        return results;
+        return std::vector<OperationResult>();
     }
     return persistentDataCtl->SubscribeRdbData(this, uris, templateId, callback);
 }
@@ -285,11 +269,10 @@ std::vector<OperationResult> DataShareHelperImpl::UnsubscribeRdbData(const std::
     const TemplateId &templateId)
 {
     LOG_DEBUG("Start UnsubscribeRdbData");
-    std::vector<OperationResult> results;
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
-        return results;
+        return std::vector<OperationResult>();
     }
     return persistentDataCtl->UnSubscribeRdbData(this, uris, templateId);
 }
@@ -298,11 +281,10 @@ std::vector<OperationResult> DataShareHelperImpl::EnableRdbSubs(const std::vecto
     const TemplateId &templateId)
 {
     LOG_DEBUG("Start EnableSubscribeRdbData");
-    std::vector<OperationResult> results;
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
-        return results;
+        return std::vector<OperationResult>();
     }
     return persistentDataCtl->EnableSubscribeRdbData(this, uris, templateId);
 }
@@ -311,11 +293,10 @@ std::vector<OperationResult> DataShareHelperImpl::DisableRdbSubs(const std::vect
     const TemplateId &templateId)
 {
     LOG_DEBUG("Start DisableSubscribeRdbData");
-    std::vector<OperationResult> results;
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
-        return results;
+        return std::vector<OperationResult>();
     }
     return persistentDataCtl->DisableSubscribeRdbData(this, uris, templateId);
 }
@@ -323,11 +304,11 @@ std::vector<OperationResult> DataShareHelperImpl::DisableRdbSubs(const std::vect
 std::vector<OperationResult> DataShareHelperImpl::SubscribePublishedData(const std::vector<std::string> &uris,
     int64_t subscriberId, const std::function<void(const PublishedDataChangeNode &changeNode)> &callback)
 {
-    std::vector<OperationResult> results;
+    LOG_DEBUG("Start SubscribePublishedData");
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
-        return results;
+        return std::vector<OperationResult>();
     }
     return publishedDataCtl->SubscribePublishedData(this, uris, subscriberId, callback);
 }
@@ -336,11 +317,10 @@ std::vector<OperationResult> DataShareHelperImpl::UnsubscribePublishedData(const
     int64_t subscriberId)
 {
     LOG_DEBUG("Start UnSubscribePublishedData");
-    std::vector<OperationResult> results;
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
-        return results;
+        return std::vector<OperationResult>();
     }
     return publishedDataCtl->UnSubscribePublishedData(this, uris, subscriberId);
 }
@@ -349,11 +329,10 @@ std::vector<OperationResult> DataShareHelperImpl::EnablePubSubs(const std::vecto
     int64_t subscriberId)
 {
     LOG_DEBUG("Start UnSubscribePublishedData");
-    std::vector<OperationResult> results;
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
-        return results;
+        return std::vector<OperationResult>();
     }
     return publishedDataCtl->EnableSubscribePublishedData(this, uris, subscriberId);
 }
@@ -362,11 +341,10 @@ std::vector<OperationResult> DataShareHelperImpl::DisablePubSubs(const std::vect
     int64_t subscriberId)
 {
     LOG_DEBUG("Start UnSubscribePublishedData");
-    std::vector<OperationResult> results;
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
-        return results;
+        return std::vector<OperationResult>();
     }
     return publishedDataCtl->DisableSubscribePublishedData(this, uris, subscriberId);
 }

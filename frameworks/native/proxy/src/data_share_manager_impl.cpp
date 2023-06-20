@@ -23,9 +23,17 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "executor_pool.h"
+#include "rdb_subscriber_manager.h"
+#include "published_data_subscriber_manager.h"
 
 namespace OHOS {
 namespace DataShare {
+DataShareManagerImpl& DataShareManagerImpl::GetInstance()
+{
+    static DataShareManagerImpl manager;
+    return manager;
+}
+
 std::shared_ptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
 {
     int retry = 0;
@@ -84,6 +92,11 @@ DataShareManagerImpl::DataShareManagerImpl()
 {
     LOG_INFO("construct");
     pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS);
+    SetDeathCallback([](std::shared_ptr<DataShareServiceProxy> proxy) {
+        LOG_INFO("RecoverObs start");
+        RdbSubscriberManager::GetInstance().RecoverObservers(proxy);
+        PublishedDataSubscriberManager::GetInstance().RecoverObservers(proxy);
+    });
 }
 
 DataShareManagerImpl::~DataShareManagerImpl()

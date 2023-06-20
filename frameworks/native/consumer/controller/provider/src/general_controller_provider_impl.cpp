@@ -22,16 +22,15 @@ namespace DataShare {
 constexpr int INVALID_VALUE = -1;
 int GeneralControllerProviderImpl::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
-    int index = INVALID_VALUE;
     auto connection = connection_;
     if (connection == nullptr) {
         LOG_ERROR("connection is nullptr");
-        return index;
+        return INVALID_VALUE;
     }
     auto proxy = connection->GetDataShareProxy(uri_, token_);
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return index;
+        return INVALID_VALUE;
     }
     return proxy->Insert(uri, value);
 }
@@ -39,32 +38,30 @@ int GeneralControllerProviderImpl::Insert(const Uri &uri, const DataShareValuesB
 int GeneralControllerProviderImpl::Update(const Uri &uri, const DataSharePredicates &predicates,
     const DataShareValuesBucket &value)
 {
-    int index = INVALID_VALUE;
     auto connection = connection_;
     if (connection == nullptr) {
         LOG_ERROR("connection is nullptr");
-        return index;
+        return INVALID_VALUE;
     }
     auto proxy = connection->GetDataShareProxy(uri_, token_);
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return index;
+        return INVALID_VALUE;
     }
     return proxy->Update(uri, predicates, value);
 }
 
 int GeneralControllerProviderImpl::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
-    int index = INVALID_VALUE;
     auto connection = connection_;
     if (connection == nullptr) {
         LOG_ERROR("connection is nullptr");
-        return index;
+        return INVALID_VALUE;
     }
     auto proxy = connection->GetDataShareProxy(uri_, token_);
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return index;
+        return INVALID_VALUE;
     }
     return proxy->Delete(uri, predicates);
 }
@@ -117,30 +114,9 @@ void GeneralControllerProviderImpl::UnregisterObserver(const Uri &uri,
     proxy->UnregisterObserver(uri, dataObserver);
 }
 
-void GeneralControllerProviderImpl::NotifyChange(const Uri &uri)
-{
-    auto connection = connection_;
-    if (connection == nullptr) {
-        LOG_ERROR("connection is nullptr");
-        return;
-    }
-    auto proxy = connection->GetDataShareProxy(uri_, token_);
-    if (proxy == nullptr) {
-        LOG_ERROR("proxy is nullptr");
-        return;
-    }
-    proxy->NotifyChange(uri);
-}
-
 GeneralControllerProviderImpl::GeneralControllerProviderImpl(std::shared_ptr<DataShareConnection> connection,
     const Uri &uri, const sptr<IRemoteObject> &token) : connection_(connection), token_(token), uri_(uri)
 {
-}
-
-void GeneralControllerProviderImpl::Release()
-{
-    connection_ = nullptr;
-    uri_ = Uri("");
 }
 } // namespace DataShare
 } // namespace OHOS

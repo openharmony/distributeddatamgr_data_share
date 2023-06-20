@@ -46,10 +46,6 @@ public:
     virtual void RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 
     virtual void UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
-
-    virtual void NotifyChange(const Uri &uri) = 0;
-
-    virtual void Release() = 0;
 };
 } // namespace DataShare
 } // namespace OHOS

@@ -20,7 +20,7 @@
 #include "datashare_values_bucket.h"
 #include "uri.h"
 
-namespace OHOS{
+namespace OHOS {
 namespace DataShare {
 class ExtSpecialController {
 public:
@@ -41,6 +41,8 @@ public:
     Uri DenormalizeUri(const Uri &uri);
 
     std::vector<std::string> GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter);
+    
+    void NotifyChange(const Uri &uri);
 
 private:
     std::shared_ptr<DataShareConnection> connection_ = nullptr;

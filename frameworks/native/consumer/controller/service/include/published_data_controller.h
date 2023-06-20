@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DataShare {
 class PublishedDataController {
 public:
-    explicit PublishedDataController(std::shared_ptr<DataShareManagerImpl> service);
+    PublishedDataController() = default;
 
     virtual ~PublishedDataController() = default;
 
@@ -42,9 +42,6 @@ public:
 
     std::vector<OperationResult> DisableSubscribePublishedData(void *subscriber, const std::vector<std::string> &uris,
         int64_t subscriberId);
-
-private:
-    std::shared_ptr<DataShareManagerImpl> service_ = nullptr;
 };
 
 } // namespace DataShare

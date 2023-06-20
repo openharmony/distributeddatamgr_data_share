@@ -23,7 +23,7 @@ namespace OHOS {
 namespace DataShare {
 class PersistentDataController {
 public:
-    explicit PersistentDataController(std::shared_ptr<DataShareManagerImpl> service);
+    PersistentDataController() = default;
 
     virtual ~PersistentDataController() = default;
 
@@ -42,9 +42,6 @@ public:
 
     std::vector<OperationResult> DisableSubscribeRdbData(void *subscriber, const std::vector<std::string> &uris,
         const TemplateId &templateId);
-
-private:
-    std::shared_ptr<DataShareManagerImpl> service_ = nullptr;
 };
 } // namespace DataShare
 } // namespace OHOS

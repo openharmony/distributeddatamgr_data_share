@@ -45,10 +45,6 @@ public:
 
     void UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
 
-    void NotifyChange(const Uri &uri) override;
-
-    void Release() override;
-
 private:
     std::shared_ptr<DataShareConnection> connection_ = nullptr;
     sptr<IRemoteObject> token_ = {};

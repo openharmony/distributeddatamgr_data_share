@@ -21,23 +21,12 @@
 namespace OHOS {
 namespace DataShare {
 constexpr int INVALID_VALUE = -1;
-GeneralControllerServiceImpl::GeneralControllerServiceImpl(std::shared_ptr<DataShareManagerImpl> service)
-    : service_(service)
-{
-}
-
 int GeneralControllerServiceImpl::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
-    int index = INVALID_VALUE;
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return index;
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return index;
+        return INVALID_VALUE;
     }
     return proxy->Insert(uri, value);
 }
@@ -45,32 +34,20 @@ int GeneralControllerServiceImpl::Insert(const Uri &uri, const DataShareValuesBu
 int GeneralControllerServiceImpl::Update(const Uri &uri, const DataSharePredicates &predicates,
     const DataShareValuesBucket &value)
 {
-    int index = INVALID_VALUE;
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return index;
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return index;
+        return INVALID_VALUE;
     }
     return proxy->Update(uri, predicates, value);
 }
 
 int GeneralControllerServiceImpl::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
-    int index = INVALID_VALUE;
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return index;
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return index;
+        return INVALID_VALUE;
     }
     return proxy->Delete(uri, predicates);
 }
@@ -78,12 +55,7 @@ int GeneralControllerServiceImpl::Delete(const Uri &uri, const DataSharePredicat
 std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Uri &uri,
     const DataSharePredicates &predicates, std::vector<std::string> &columns, DatashareBusinessError &businessError)
 {
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return nullptr;
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return nullptr;
@@ -117,14 +89,6 @@ void GeneralControllerServiceImpl::UnregisterObserver(const Uri &uri,
     if (ret != ERR_OK) {
         LOG_ERROR("UnregisterObserver failed");
     }
-}
-
-void GeneralControllerServiceImpl::NotifyChange(const Uri &uri)
-{
-}
-
-void GeneralControllerServiceImpl::Release()
-{
 }
 } // namespace DataShare
 } // namespace OHOS

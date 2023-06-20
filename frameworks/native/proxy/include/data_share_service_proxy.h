@@ -23,7 +23,7 @@
 #include "idata_share_service.h"
 
 namespace OHOS::DataShare {
-class DataShareServiceProxy : public IRemoteProxy<IDataShareService> {
+class DataShareServiceProxy final : public IRemoteProxy<IDataShareService> {
 public:
     explicit DataShareServiceProxy(const sptr<IRemoteObject> &object);
     int Insert(const Uri &uri, const DataShareValuesBucket &valuesBucket) override;

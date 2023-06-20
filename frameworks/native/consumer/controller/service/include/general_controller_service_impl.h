@@ -27,7 +27,7 @@ class IDataAbilityObserver;
 namespace DataShare {
 class GeneralControllerServiceImpl : public GeneralController {
 public:
-    explicit GeneralControllerServiceImpl(std::shared_ptr<DataShareManagerImpl> service);
+    GeneralControllerServiceImpl() = default;
 
     virtual ~GeneralControllerServiceImpl() = default;
 
@@ -43,13 +43,6 @@ public:
     void RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
 
     void UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
-
-    void NotifyChange(const Uri &uri) override;
-
-    void Release() override;
-
-private:
-    std::shared_ptr<DataShareManagerImpl> service_ = nullptr;
 };
 } // namespace DataShare
 } // namespace OHOS

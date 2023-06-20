@@ -16,7 +16,6 @@
 #include "datashare_helper.h"
 #include "datashare_helper_impl.h"
 
-#include "connection_factory.h"
 #include "concurrent_map.h"
 #include "data_ability_observer_interface.h"
 #include "data_ability_observer_stub.h"
@@ -110,13 +109,13 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
     }
 
     if (uri.GetQuery().find("Proxy=true") != std::string::npos) {
-        return CreateDataShareHelper();
+        return CreateServiceHelper();
     }
-    return CreateDataShareHelper(uri, token);
+    return CreateExtHelper(uri, token);
 }
 
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, const CreateOptions &options,
-                                                          const std::string &bundleName)
+    const std::string &bundleName)
 {
     Uri uri(strUri);
     if (!options.isProxy_ && options.token_ == nullptr) {
@@ -128,38 +127,37 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, 
         return nullptr;
     }
     if (options.isProxy_) {
-        auto helper = CreateDataShareHelper(bundleName);
-        helper->needCleanSubscriber_ = true;
-        return helper;
+        return CreateServiceHelper(bundleName);
     }
-    return CreateDataShareHelper(uri, options.token_);
+    return CreateExtHelper(uri, options.token_);
 }
 
-std::shared_ptr<DataShareHelper> DataShareHelper::CreateDataShareHelper(const std::string &bundleName)
+std::shared_ptr<DataShareHelper> DataShareHelper::CreateServiceHelper(const std::string &bundleName)
 {
-    auto service = ConnectionFactory::GetInstance().GetDataShareService(bundleName);
-    DataShareHelper *dataShareHelper = new (std::nothrow) DataShareHelperImpl(service);
-    if (dataShareHelper == nullptr) {
-        LOG_ERROR("create DataShareHelper in slient mode failed");
+    DataShareManagerImpl::GetInstance().SetBundleName(bundleName);
+    if (DataShareManagerImpl::GetInstance().GetServiceProxy() == nullptr) {
+        LOG_ERROR("service proxy is nullptr.");
         return nullptr;
     }
-    return std::shared_ptr<DataShareHelper>(dataShareHelper);
+    return std::make_shared<DataShareHelperImpl>();
 }
 
-std::shared_ptr<DataShareHelper> DataShareHelper::CreateDataShareHelper(Uri &uri, const sptr<IRemoteObject> &token)
+std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, const sptr<IRemoteObject> &token)
 {
-    auto connection = ConnectionFactory::GetInstance().GetDataShareConnection(uri, token);
-    if (connection == nullptr || connection->GetDataShareProxy(uri, token) == nullptr) {
+    sptr<DataShareConnection> connection = new (std::nothrow) DataShareConnection(uri, token);
+    if (connection == nullptr) {
+        LOG_ERROR("Create DataShareConnection failed.");
+        return nullptr;
+    }
+    auto dataShareConnection =
+        std::shared_ptr<DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
+            holder->DisconnectDataShareExtAbility();
+        });
+    if (dataShareConnection->GetDataShareProxy(uri, token) == nullptr) {
         LOG_ERROR("connect failed");
         return nullptr;
     }
-    DataShareHelper *ptrDataShareHelper = new (std::nothrow) DataShareHelperImpl(uri, token, connection);
-    if (ptrDataShareHelper == nullptr) {
-        LOG_ERROR("create DataShareHelper failed");
-        connection = nullptr;
-        return nullptr;
-    }
-    return std::shared_ptr<DataShareHelper>(ptrDataShareHelper);
+    return std::make_shared<DataShareHelperImpl>(uri, token, dataShareConnection);
 }
 
 /**
@@ -192,7 +190,6 @@ void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataSh
         ObserverImpl::DeleteObserver(uri, dataObserver);
         LOG_ERROR("RegisterObserverExt failed");
     }
-    return;
 }
 
 /**
@@ -227,10 +224,9 @@ void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<Data
     ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, obs);
     if (ret != ERR_OK) {
         LOG_ERROR("UnregisterObserverExt failed");
-    } else {
-        ObserverImpl::DeleteObserver(uri, dataObserver);
+        return;
     }
-    return;
+    ObserverImpl::DeleteObserver(uri, dataObserver);
 }
 
 /**
@@ -252,7 +248,6 @@ void DataShareHelper::NotifyChangeExt(const DataShareObserver::ChangeInfo &chang
     if (ret != ERR_OK) {
         LOG_ERROR("NotifyChangeExt failed");
     }
-    return;
 }
 
 void ObserverImpl::OnChange() {}

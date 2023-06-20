@@ -20,18 +20,9 @@
 
 namespace OHOS {
 namespace DataShare {
-PublishedDataController::PublishedDataController(std::shared_ptr<DataShareManagerImpl> service) : service_(service)
-{
-}
-
 std::vector<OperationResult> PublishedDataController::Publish(const Data &data, const std::string &bundleName)
 {
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return std::vector<OperationResult>();
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();
@@ -41,12 +32,7 @@ std::vector<OperationResult> PublishedDataController::Publish(const Data &data, 
 
 Data PublishedDataController::GetPublishedData(const std::string &bundleName, int &resultCode)
 {
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return Data();
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return Data();
@@ -58,12 +44,7 @@ std::vector<OperationResult> PublishedDataController::SubscribePublishedData(voi
     const std::vector<std::string> &uris, int64_t subscriberId,
     const std::function<void(const PublishedDataChangeNode &changeNode)> &callback)
 {
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return std::vector<OperationResult>();
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();
@@ -74,12 +55,7 @@ std::vector<OperationResult> PublishedDataController::SubscribePublishedData(voi
 std::vector<OperationResult> PublishedDataController::UnSubscribePublishedData(void *subscriber,
     const std::vector<std::string> &uris, int64_t subscriberId)
 {
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return std::vector<OperationResult>();
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();
@@ -93,12 +69,7 @@ std::vector<OperationResult> PublishedDataController::UnSubscribePublishedData(v
 std::vector<OperationResult> PublishedDataController::EnableSubscribePublishedData(void *subscriber,
     const std::vector<std::string> &uris, int64_t subscriberId)
 {
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return std::vector<OperationResult>();
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();
@@ -109,12 +80,7 @@ std::vector<OperationResult> PublishedDataController::EnableSubscribePublishedDa
 std::vector<OperationResult> PublishedDataController::DisableSubscribePublishedData(void *subscriber,
     const std::vector<std::string> &uris, int64_t subscriberId)
 {
-    auto service = service_;
-    if (service == nullptr) {
-        LOG_ERROR("service is nullptr");
-        return std::vector<OperationResult>();
-    }
-    auto proxy = service->GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();

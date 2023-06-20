@@ -392,15 +392,12 @@ public:
     virtual std::vector<OperationResult> DisablePubSubs(const std::vector<std::string> &uris, int64_t subscriberId) = 0;
 
 private:
-    static std::shared_ptr<DataShareHelper> CreateDataShareHelper(const std::string &bundleName = "");
-
-    static std::shared_ptr<DataShareHelper> CreateDataShareHelper(Uri &uri, const sptr<IRemoteObject> &token);
+    static std::shared_ptr<DataShareHelper> CreateServiceHelper(const std::string &bundleName = "");
+	
+    static std::shared_ptr<DataShareHelper> CreateExtHelper(Uri &uri, const sptr<IRemoteObject> &token);
 
     static std::string TransferUriPrefix(const std::string &originPrefix, const std::string &replacedPrefix,
         const std::string &originUriStr);
-
-protected:
-    bool needCleanSubscriber_ = false;
 };
 } // namespace DataShare
 } // namespace OHOS

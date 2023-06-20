@@ -31,7 +31,7 @@ namespace DataShare {
 class DataShareKvServiceProxy;
 class DataShareManagerImpl {
 public:
-    DataShareManagerImpl();
+    static DataShareManagerImpl& GetInstance();
 
     virtual ~DataShareManagerImpl();
 
@@ -60,6 +60,8 @@ public:
     };
 
 private:
+    DataShareManagerImpl();
+
     void LinkToDeath(const sptr<IRemoteObject> remote);
 
     sptr<DataShareServiceProxy> GetDataShareServiceProxy();

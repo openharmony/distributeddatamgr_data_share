@@ -61,7 +61,6 @@ ohos_shared_library("datashare_consumer") {
     "${datashare_native_consumer_path}/controller/service/src/general_controller_service_impl.cpp",
     "${datashare_native_consumer_path}/controller/service/src/persistent_data_controller.cpp",
     "${datashare_native_consumer_path}/controller/service/src/published_data_controller.cpp",
-    "${datashare_native_consumer_path}/src/connection_factory.cpp",
     "${datashare_native_consumer_path}/src/datashare_connection.cpp",
     "${datashare_native_consumer_path}/src/datashare_helper.cpp",
     "${datashare_native_consumer_path}/src/datashare_helper_impl.cpp",

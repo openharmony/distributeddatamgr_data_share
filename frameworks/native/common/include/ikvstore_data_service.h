@@ -24,13 +24,11 @@ namespace OHOS {
 namespace DataShare {
 class IKvStoreDataService : public IRemoteBroker {
 public:
-    enum
-    {
+    enum {
         GET_FEATURE_INTERFACE = 0
     };
 
-    enum
-    {
+    enum {
         DATA_SHARE_ERROR = -1,
         DATA_SHARE_OK = 0,
     };
