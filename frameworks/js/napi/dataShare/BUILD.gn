@@ -33,9 +33,8 @@ ohos_shared_library("datashare") {
   ]
 
   deps = [
-    "${ability_runtime_inner_api_path}/dataobs_manager:dataobs_manager",
-    "${ability_runtime_napi_path}/inner/napi_common:napi_common",
     "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_innerapi_path}:datashare_consumer",
     "//third_party/libuv:uv",
   ]
 
@@ -44,11 +43,11 @@ ohos_shared_library("datashare") {
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:abilitykit_native",
+    "ability_runtime:dataobs_manager",
     "ability_runtime:napi_base_context",
+    "ability_runtime:napi_common",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
-    "data_share:datashare_common",
-    "data_share:datashare_consumer",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "napi:ace_napi",
@@ -71,12 +70,13 @@ ohos_shared_library("datasharepredicates") {
     "${datashare_napi_path}/dataShare/src/native_datashare_predicates_module.cpp",
   ]
 
-  deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
+  deps = [
+    "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_innerapi_path}:datashare_consumer",
+  ]
 
   external_deps = [
     "c_utils:utils",
-    "data_share:datashare_common",
-    "data_share:datashare_consumer",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "napi:ace_napi",
