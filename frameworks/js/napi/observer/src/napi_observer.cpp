@@ -76,7 +76,7 @@ bool NapiObserver::operator==(const NapiObserver &rhs) const
     napi_get_reference_value(env_, ref_, &value1);
 
     napi_value value2 = nullptr;
-    napi_get_reference_value(env_, ref_, &value2);
+    napi_get_reference_value(env_, rhs.ref_, &value2);
 
     bool isEqual = false;
     napi_strict_equals(env_, value1, value2, &isEqual);
