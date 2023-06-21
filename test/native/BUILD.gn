@@ -53,8 +53,8 @@ ohos_unittest("NativeDataShareTest") {
       [ "./unittest/mediadatashare_test/src/mediadatashare_unit_test.cpp" ]
 
   deps = [
-    "${datashare_innerapi_path}/common:datashare_common",
     "${datashare_innerapi_path}:datashare_consumer",
+    "${datashare_innerapi_path}/common:datashare_common",
   ]
 
   external_deps = [
@@ -93,8 +93,8 @@ ohos_unittest("SlientAccessTest") {
   sources = [ "./unittest/mediadatashare_test/src/slientaccess_test.cpp" ]
 
   deps = [
-    "${datashare_innerapi_path}/common:datashare_common",
     "${datashare_innerapi_path}:datashare_consumer",
+    "${datashare_innerapi_path}/common:datashare_common",
   ]
 
   external_deps = [
@@ -129,8 +129,8 @@ ohos_unittest("ErrorCodeTest") {
   sources = [ "./unittest/mediadatashare_test/src/errorcode_test.cpp" ]
 
   deps = [
-    "${datashare_innerapi_path}/common:datashare_common",
     "${datashare_innerapi_path}:datashare_consumer",
+    "${datashare_innerapi_path}/common:datashare_common",
   ]
 
   external_deps = [
@@ -165,8 +165,8 @@ ohos_unittest("JoinTest") {
   sources = [ "./unittest/mediadatashare_test/src/join_test.cpp" ]
 
   deps = [
-    "${datashare_innerapi_path}/common:datashare_common",
     "${datashare_innerapi_path}:datashare_consumer",
+    "${datashare_innerapi_path}/common:datashare_common",
   ]
 
   external_deps = [
@@ -202,8 +202,8 @@ ohos_unittest("ProxyDatasTest") {
       [ "./unittest/datashareproxy_test/proxydatas_with_permission_test.cpp" ]
 
   deps = [
-    "${datashare_innerapi_path}/common:datashare_common",
     "${datashare_innerapi_path}:datashare_consumer",
+    "${datashare_innerapi_path}/common:datashare_common",
   ]
 
   external_deps = [
