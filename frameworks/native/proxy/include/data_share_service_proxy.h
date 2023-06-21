@@ -20,45 +20,21 @@
 #include <iremote_proxy.h>
 #include <list>
 
-#include "data_proxy_observer.h"
-#include "datashare_business_error.h"
-#include "datashare_values_bucket.h"
 #include "idata_share_service.h"
-#include "uri.h"
 
 namespace OHOS::DataShare {
-class DataShareServiceProxy : public IRemoteProxy<IDataShareService>, public BaseProxy {
+class DataShareServiceProxy final : public IRemoteProxy<IDataShareService> {
 public:
     explicit DataShareServiceProxy(const sptr<IRemoteObject> &object);
-    virtual int Insert(const Uri &uri, const DataShareValuesBucket &valuesBucket) override;
+    int Insert(const Uri &uri, const DataShareValuesBucket &valuesBucket) override;
 
-    virtual int Update(const Uri &uri, const DataSharePredicates &predicate,
+    int Update(const Uri &uri, const DataSharePredicates &predicate,
         const DataShareValuesBucket &valuesBucket) override;
 
-    virtual int Delete(const Uri &uri, const DataSharePredicates &predicate) override;
+    int Delete(const Uri &uri, const DataSharePredicates &predicate) override;
 
-    virtual std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
+    std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
         std::vector<std::string> &columns, DatashareBusinessError &businessError) override;
-
-    virtual std::vector<std::string> GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter) override;
-
-    virtual int OpenFile(const Uri &uri, const std::string &mode) override;
-
-    virtual int OpenRawFile(const Uri &uri, const std::string &mode) override;
-
-    virtual std::string GetType(const Uri &uri) override;
-
-    virtual int BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values) override;
-
-    virtual bool RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
-
-    virtual bool UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
-
-    virtual bool NotifyChange(const Uri &uri) override;
-
-    virtual Uri NormalizeUri(const Uri &uri) override;
-
-    virtual Uri DenormalizeUri(const Uri &uri) override;
 
     int AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl) override;
 

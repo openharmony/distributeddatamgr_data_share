@@ -70,10 +70,11 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
 /**
  * @brief connect remote ability of DataShareExtAbility.
  */
-bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token)
+std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(const Uri &uri,
+    const sptr<IRemoteObject> &token)
 {
     if (dataShareProxy_ != nullptr) {
-        return true;
+        return dataShareProxy_;
     }
 
     AAFwk::Want want;
@@ -85,14 +86,14 @@ bool DataShareConnection::ConnectDataShareExtAbility(const Uri &uri, const sptr<
     ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, this, token);
     if (ret != ERR_OK) {
         LOG_ERROR("connect ability failed, ret = %{public}d", ret);
-        return false;
+        return nullptr;
     }
     std::unique_lock<std::mutex> lock(condition_.mutex);
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ != nullptr; })) {
         LOG_DEBUG("connect ability ended successfully");
     }
-    return dataShareProxy_ != nullptr;
+    return dataShareProxy_;
 }
 
 /**
@@ -133,12 +134,8 @@ DataShareConnection::~DataShareConnection()
 {
 }
 
-std::shared_ptr<BaseProxy> DataShareConnection::GetDataShareProxy()
-{
-    return dataShareProxy_;
-}
-
-bool DataShareConnection::ConnectDataShare(const Uri & uri, const sptr<IRemoteObject> &token)
+std::shared_ptr<DataShareProxy> DataShareConnection::GetDataShareProxy(const Uri &uri,
+    const sptr<IRemoteObject> &token)
 {
     return ConnectDataShareExtAbility(uri, token);
 }

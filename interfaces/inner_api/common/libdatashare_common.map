@@ -22,8 +22,6 @@
     *Error*;
     *ISharedResultSet*;
     *ITypesUtil*;
-    *DataShareManagerImpl*;
-    *DataShareServiceProxy*;
     *DataShareKvServiceProxy*;
     *PublishedDataItem*;
   local:

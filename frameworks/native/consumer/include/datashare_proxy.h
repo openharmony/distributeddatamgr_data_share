@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace DataShare {
-class DataShareProxy : public IRemoteProxy<IDataShare>, public BaseProxy {
+class DataShareProxy final : public IRemoteProxy<IDataShare> {
 public:
     explicit DataShareProxy(const sptr<IRemoteObject>& remote) : IRemoteProxy<IDataShare>(remote) {}
 
@@ -58,38 +58,6 @@ public:
     virtual Uri NormalizeUri(const Uri &uri) override;
 
     virtual Uri DenormalizeUri(const Uri &uri) override;
-
-    int AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl) override;
-
-    int DelQueryTemplate(const std::string &uri, int64_t subscriberId) override;
-
-    std::vector<OperationResult> Publish(const Data &data, const std::string &bundleName) override;
-
-    Data GetPublishedData(const std::string &bundleName, int &resultCode) override;
-
-    std::vector<OperationResult> SubscribeRdbData(const std::vector<std::string> &uris, const TemplateId &templateId,
-        const sptr<IDataProxyRdbObserver> &observer) override;
-
-    std::vector<OperationResult> UnSubscribeRdbData(
-        const std::vector<std::string> &uris, const TemplateId &templateId) override;
-
-    std::vector<OperationResult> EnableSubscribeRdbData(
-        const std::vector<std::string> &uris, const TemplateId &templateId) override;
-
-    std::vector<OperationResult> DisableSubscribeRdbData(
-        const std::vector<std::string> &uris, const TemplateId &templateId) override;
-
-    std::vector<OperationResult> SubscribePublishedData(const std::vector<std::string> &uris, int64_t subscriberId,
-        const sptr<IDataProxyPublishedDataObserver> &observer) override;
-
-    std::vector<OperationResult> UnSubscribePublishedData(
-        const std::vector<std::string> &uris, int64_t subscriberId) override;
-
-    std::vector<OperationResult> EnableSubscribePublishedData(
-        const std::vector<std::string> &uris, int64_t subscriberId) override;
-
-    std::vector<OperationResult> DisableSubscribePublishedData(
-        const std::vector<std::string> &uris, int64_t subscriberId) override;
 
 private:
     static inline BrokerDelegator<DataShareProxy> delegator_;

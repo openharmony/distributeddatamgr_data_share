@@ -16,11 +16,12 @@
 #include "js_datashare_ext_ability.h"
 
 #include "ability_info.h"
-#include "data_share_manager_impl.h"
 #include "dataobs_mgr_client.h"
 #include "datashare_log.h"
 #include "datashare_predicates_proxy.h"
 #include "datashare_stub_impl.h"
+#include "ikvstore_data_service.h"
+#include "idata_share_service.h"
 #include "iservice_registry.h"
 #include "js_datashare_ext_ability_context.h"
 #include "js_runtime.h"

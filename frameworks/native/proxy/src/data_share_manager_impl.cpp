@@ -17,15 +17,23 @@
 
 #include <thread>
 
-#include "data_share_service_proxy.h"
 #include "datashare_log.h"
-#include "idata_share_service.h"
+#include "ikvstore_data_service.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
+#include "executor_pool.h"
+#include "rdb_subscriber_manager.h"
+#include "published_data_subscriber_manager.h"
 
 namespace OHOS {
 namespace DataShare {
+DataShareManagerImpl& DataShareManagerImpl::GetInstance()
+{
+    static DataShareManagerImpl manager;
+    return manager;
+}
+
 std::shared_ptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
 {
     int retry = 0;
@@ -80,27 +88,15 @@ sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
     return iface_cast<DataShareServiceProxy>(remote);
 }
 
-std::shared_ptr<BaseProxy> DataShareManagerImpl::GetDataShareService()
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (dataShareService_ != nullptr) {
-        return dataShareService_;
-    }
-    auto service = GetDataShareServiceProxy();
-    if (service == nullptr) {
-        return nullptr;
-    }
-    sptr<IDataShareService> serviceBase = service;
-    LinkToDeath(serviceBase->AsObject().GetRefPtr());
-    dataShareService_ =
-        std::shared_ptr<DataShareServiceProxy>(service.GetRefPtr(), [holder = service](const auto *) {});
-    return dataShareService_;
-}
-
-DataShareManagerImpl::DataShareManagerImpl() : BaseConnection(ConnectionType::SILENCE)
+DataShareManagerImpl::DataShareManagerImpl()
 {
     LOG_INFO("construct");
     pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS);
+    SetDeathCallback([](std::shared_ptr<DataShareServiceProxy> proxy) {
+        LOG_INFO("RecoverObs start");
+        RdbSubscriberManager::GetInstance().RecoverObservers(proxy);
+        PublishedDataSubscriberManager::GetInstance().RecoverObservers(proxy);
+    });
 }
 
 DataShareManagerImpl::~DataShareManagerImpl()
@@ -108,30 +104,25 @@ DataShareManagerImpl::~DataShareManagerImpl()
     LOG_INFO("destroy");
 }
 
-bool DataShareManagerImpl::ConnectDataShare(const Uri &uri, const sptr<IRemoteObject> &token)
+std::shared_ptr<DataShareServiceProxy> DataShareManagerImpl::GetServiceProxy()
 {
     if (dataShareService_ != nullptr) {
-        return true;
+        return dataShareService_;
     }
 
     std::lock_guard<std::mutex> lock(mutex_);
     if (dataShareService_ != nullptr) {
-        return true;
+        return dataShareService_;
     }
 
     auto service = GetDataShareServiceProxy();
     if (service == nullptr) {
-        return false;
+        return nullptr;
     }
     sptr<IDataShareService> serviceBase = service;
     LinkToDeath(serviceBase->AsObject().GetRefPtr());
     dataShareService_ = std::shared_ptr<DataShareServiceProxy>(
             service.GetRefPtr(), [holder = service](const auto *) {});
-    return true;
-}
-
-std::shared_ptr<BaseProxy> DataShareManagerImpl::GetDataShareProxy()
-{
     return dataShareService_;
 }
 
@@ -143,9 +134,14 @@ void DataShareManagerImpl::ResetServiceHandle()
     dataShareService_ = nullptr;
 }
 
-void DataShareManagerImpl::SetDeathCallback(std::function<void(std::shared_ptr<BaseProxy>)> deathCallback)
+void DataShareManagerImpl::SetDeathCallback(std::function<void(std::shared_ptr<DataShareServiceProxy>)> deathCallback)
 {
     deathCallback_ = deathCallback;
+}
+
+void DataShareManagerImpl::SetBundleName(const std::string &bundleName)
+{
+    bundleName_ = bundleName;
 }
 
 void DataShareManagerImpl::OnRemoteDied()
@@ -153,7 +149,7 @@ void DataShareManagerImpl::OnRemoteDied()
     LOG_INFO("#######datashare service has dead");
     ResetServiceHandle();
     auto taskid = pool_->Schedule(std::chrono::seconds(WAIT_TIME), [this]() {
-        if (GetDataShareService() != nullptr) {
+        if (GetServiceProxy() != nullptr) {
             deathCallback_(dataShareService_);
         }
     });
@@ -162,40 +158,6 @@ void DataShareManagerImpl::OnRemoteDied()
         return;
     }
     LOG_DEBUG("create scheduler success");
-}
-
-DataShareKvServiceProxy::DataShareKvServiceProxy(const sptr<IRemoteObject> &impl)
-    : IRemoteProxy<DataShare::IKvStoreDataService>(impl)
-{
-    LOG_DEBUG("Init data service proxy.");
-}
-
-sptr<IRemoteObject> DataShareKvServiceProxy::GetFeatureInterface(const std::string &name)
-{
-    LOG_INFO("GetDataShareService enter.");
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(DataShareKvServiceProxy::GetDescriptor())) {
-        LOG_ERROR("Write descriptor failed");
-        return nullptr;
-    }
-    if (!data.WriteString(name)) {
-        LOG_ERROR("Write name failed");
-        return nullptr;
-    }
-
-    MessageParcel reply;
-    MessageOption mo { MessageOption::TF_SYNC };
-    int32_t error = Remote()->SendRequest(GET_FEATURE_INTERFACE, data, reply, mo);
-    if (error != 0) {
-        LOG_ERROR("SendRequest returned %{public}d", error);
-        return nullptr;
-    }
-    auto remoteObject = reply.ReadRemoteObject();
-    if (remoteObject == nullptr) {
-        LOG_ERROR("Remote object is nullptr!");
-        return nullptr;
-    }
-    return remoteObject;
 }
 }
 }

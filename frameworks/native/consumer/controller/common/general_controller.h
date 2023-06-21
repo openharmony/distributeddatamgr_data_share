@@ -13,10 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef I_DATASHARE_H
-#define I_DATASHARE_H
-
-#include <iremote_broker.h>
+#include <memory>
+#include <string_ex.h>
 
 #include "datashare_business_error.h"
 #include "datashare_predicates.h"
@@ -24,37 +22,17 @@
 #include "datashare_values_bucket.h"
 #include "uri.h"
 
+#ifndef GENERAL_CONTROLLER_H
+#define GENERAL_CONTROLLER_H
 namespace OHOS {
 namespace AAFwk {
 class IDataAbilityObserver;
 }
 
 namespace DataShare {
-class IDataShare : public IRemoteBroker {
+class GeneralController {
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DataShare.IDataShare");
-
-    enum {
-        CMD_GET_FILE_TYPES = 1,
-        CMD_OPEN_FILE,
-        CMD_OPEN_RAW_FILE,
-        CMD_INSERT,
-        CMD_UPDATE,
-        CMD_DELETE,
-        CMD_QUERY,
-        CMD_GET_TYPE,
-        CMD_BATCH_INSERT,
-        CMD_REGISTER_OBSERVER,
-        CMD_UNREGISTER_OBSERVER,
-        CMD_NOTIFY_CHANGE,
-        CMD_NORMALIZE_URI,
-        CMD_DENORMALIZE_URI,
-        CMD_EXECUTE_BATCH,
-    };
-
-    virtual int OpenFile(const Uri &uri, const std::string &mode) = 0;
-
-    virtual int OpenRawFile(const Uri &uri, const std::string &mode) = 0;
+    virtual ~GeneralController() = default;
 
     virtual int Insert(const Uri &uri, const DataShareValuesBucket &value) = 0;
 
@@ -65,23 +43,10 @@ public:
     virtual std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
         std::vector<std::string> &columns, DatashareBusinessError &businessError) = 0;
 
-    virtual std::string GetType(const Uri &uri) = 0;
+    virtual void RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 
-    virtual int BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values) = 0;
-
-    virtual bool RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
-
-    virtual bool UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
-
-    virtual bool NotifyChange(const Uri &uri) = 0;
-
-    virtual Uri NormalizeUri(const Uri &uri) = 0;
-
-    virtual Uri DenormalizeUri(const Uri &uri) = 0;
-
-    virtual std::vector<std::string> GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter) = 0;
+    virtual void UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 };
 } // namespace DataShare
 } // namespace OHOS
-#endif // I_DATASHARE_H
-
+#endif // GENERAL_CONTROLLER_H

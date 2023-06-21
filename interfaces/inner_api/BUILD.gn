@@ -42,6 +42,9 @@ config("datashare_public_config") {
     "provider/include",
     "${datashare_common_napi_path}/include",
     "${datashare_common_native_path}/include",
+    "${datashare_native_consumer_path}/controller/common",
+    "${datashare_native_consumer_path}/controller/provider/include",
+    "${datashare_native_consumer_path}/controller/service/include",
     "${datashare_native_consumer_path}/include",
     "${datashare_native_provider_path}/include",
     "${datashare_native_proxy_path}/include",
@@ -53,11 +56,18 @@ ohos_shared_library("datashare_consumer") {
       [ "//foundation/distributeddatamgr/kv_store/frameworks/common" ]
 
   sources = [
-    "${datashare_native_consumer_path}/src/connection_factory.cpp",
+    "${datashare_native_consumer_path}/controller/provider/src/ext_special_controller.cpp",
+    "${datashare_native_consumer_path}/controller/provider/src/general_controller_provider_impl.cpp",
+    "${datashare_native_consumer_path}/controller/service/src/general_controller_service_impl.cpp",
+    "${datashare_native_consumer_path}/controller/service/src/persistent_data_controller.cpp",
+    "${datashare_native_consumer_path}/controller/service/src/published_data_controller.cpp",
     "${datashare_native_consumer_path}/src/datashare_connection.cpp",
     "${datashare_native_consumer_path}/src/datashare_helper.cpp",
+    "${datashare_native_consumer_path}/src/datashare_helper_impl.cpp",
     "${datashare_native_consumer_path}/src/datashare_proxy.cpp",
     "${datashare_native_proxy_path}/src/data_proxy_observer_stub.cpp",
+    "${datashare_native_proxy_path}/src/data_share_manager_impl.cpp",
+    "${datashare_native_proxy_path}/src/data_share_service_proxy.cpp",
     "${datashare_native_proxy_path}/src/published_data_subscriber_manager.cpp",
     "${datashare_native_proxy_path}/src/rdb_subscriber_manager.cpp",
   ]
@@ -80,6 +90,7 @@ ohos_shared_library("datashare_consumer") {
     "ipc:ipc_single",
     "ipc_js:rpc",
     "napi:ace_napi",
+    "samgr:samgr_proxy",
   ]
 
   subsystem_name = "distributeddatamgr"

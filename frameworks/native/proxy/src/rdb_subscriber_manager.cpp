@@ -31,7 +31,8 @@ RdbSubscriberManager::RdbSubscriberManager()
     serviceCallback_ = nullptr;
 }
 
-std::vector<OperationResult> RdbSubscriberManager::AddObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
+std::vector<OperationResult> RdbSubscriberManager::AddObservers(void *subscriber,
+    std::shared_ptr<DataShareServiceProxy> proxy,
     const std::vector<std::string> &uris, const TemplateId &templateId, const RdbCallback &callback)
 {
     if (proxy == nullptr) {
@@ -70,8 +71,8 @@ std::vector<OperationResult> RdbSubscriberManager::AddObservers(void *subscriber
         });
 }
 
-std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
-    const std::vector<std::string> &uris, const TemplateId &templateId)
+std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber,
+    std::shared_ptr<DataShareServiceProxy> proxy, const std::vector<std::string> &uris, const TemplateId &templateId)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -104,7 +105,8 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
         });
 }
 
-std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy)
+std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber,
+    std::shared_ptr<DataShareServiceProxy> proxy)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -121,8 +123,8 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
         });
 }
 
-std::vector<OperationResult> RdbSubscriberManager::EnableObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
-    const std::vector<std::string> &uris, const TemplateId &templateId)
+std::vector<OperationResult> RdbSubscriberManager::EnableObservers(void *subscriber,
+    std::shared_ptr<DataShareServiceProxy> proxy, const std::vector<std::string> &uris, const TemplateId &templateId)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -157,8 +159,8 @@ std::vector<OperationResult> RdbSubscriberManager::EnableObservers(void *subscri
         });
 }
 
-std::vector<OperationResult> RdbSubscriberManager::DisableObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
-    const std::vector<std::string> &uris, const TemplateId &templateId)
+std::vector<OperationResult> RdbSubscriberManager::DisableObservers(void *subscriber,
+    std::shared_ptr<DataShareServiceProxy> proxy, const std::vector<std::string> &uris, const TemplateId &templateId)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -184,7 +186,7 @@ std::vector<OperationResult> RdbSubscriberManager::DisableObservers(void *subscr
         });
 }
 
-void RdbSubscriberManager::RecoverObservers(std::shared_ptr<BaseProxy> proxy)
+void RdbSubscriberManager::RecoverObservers(std::shared_ptr<DataShareServiceProxy> proxy)
 {
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -228,6 +230,7 @@ bool RdbSubscriberManager::Init()
     }
     return true;
 }
+
 void RdbSubscriberManager::Destroy()
 {
     if (BaseCallbacks::GetEnabledSubscriberSize() == 0) {

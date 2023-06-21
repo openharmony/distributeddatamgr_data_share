@@ -23,6 +23,7 @@
 #include "datashare_template.h"
 #include "idatashare.h"
 #include "iremote_stub.h"
+#include "data_share_service_proxy.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -78,16 +79,16 @@ public:
     using BaseCallbacks = CallbacksManager<PublishedObserverMapKey, PublishedDataObserver>;
     static PublishedDataSubscriberManager &GetInstance();
 
-    std::vector<OperationResult> AddObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
+    std::vector<OperationResult> AddObservers(void *subscriber, std::shared_ptr<DataShareServiceProxy> proxy,
         const std::vector<std::string> &uris, int64_t subscriberId, const PublishedDataCallback &callback);
-    std::vector<OperationResult> DelObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
+    std::vector<OperationResult> DelObservers(void *subscriber, std::shared_ptr<DataShareServiceProxy> proxy,
         const std::vector<std::string> &uris, int64_t subscriberId);
-    std::vector<OperationResult> DelObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy);
-    std::vector<OperationResult> EnableObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
+    std::vector<OperationResult> DelObservers(void *subscriber, std::shared_ptr<DataShareServiceProxy> proxy);
+    std::vector<OperationResult> EnableObservers(void *subscriber, std::shared_ptr<DataShareServiceProxy> proxy,
         const std::vector<std::string> &uris, int64_t subscriberId);
-    std::vector<OperationResult> DisableObservers(void *subscriber, std::shared_ptr<BaseProxy> proxy,
+    std::vector<OperationResult> DisableObservers(void *subscriber, std::shared_ptr<DataShareServiceProxy> proxy,
         const std::vector<std::string> &uris, int64_t subscriberId);
-    void RecoverObservers(std::shared_ptr<BaseProxy> proxy);
+    void RecoverObservers(std::shared_ptr<DataShareServiceProxy> proxy);
     void Emit(PublishedDataChangeNode &changeNode);
 
 private:

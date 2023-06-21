@@ -125,56 +125,6 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri,
     return result;
 }
 
-int DataShareServiceProxy::OpenFile(const Uri &uri, const std::string &mode)
-{
-    return 0;
-}
-
-std::vector<std::string> DataShareServiceProxy::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
-{
-    return std::vector<std::string>();
-}
-
-int DataShareServiceProxy::OpenRawFile(const Uri &uri, const std::string &mode)
-{
-    return 0;
-}
-
-std::string DataShareServiceProxy::GetType(const Uri &uri)
-{
-    return std::string();
-}
-
-int DataShareServiceProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values)
-{
-    return 0;
-}
-
-bool DataShareServiceProxy::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
-{
-    return false;
-}
-
-bool DataShareServiceProxy::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
-{
-    return false;
-}
-
-bool DataShareServiceProxy::NotifyChange(const Uri &uri)
-{
-    return false;
-}
-
-Uri DataShareServiceProxy::NormalizeUri(const Uri &uri)
-{
-    return Uri("");
-}
-
-Uri DataShareServiceProxy::DenormalizeUri(const Uri &uri)
-{
-    return Uri("");
-}
-
 int DataShareServiceProxy::AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl)
 {
     MessageParcel data;
