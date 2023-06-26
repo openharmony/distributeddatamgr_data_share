@@ -74,11 +74,9 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
     return BaseCallbacks::DelObservers(subscriber,
         [&proxy, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             // delete all obs by subscriber
-            for (auto &key : lastDelKeys) {
-                lastChangeNodeMap_.erase(key);
-            }
             std::map<int64_t, std::vector<std::string>> keysMap;
             for (auto const &key : lastDelKeys) {
+                lastChangeNodeMap_.erase(key);
                 keysMap[key.subscriberId_].emplace_back(key.uri_);
             }
             for (auto const &[subscriberId, uris] : keysMap) {
@@ -106,11 +104,9 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
     });
     return BaseCallbacks::DelObservers(keys, subscriber,
         [&proxy, &subscriberId, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
-            for (auto &key : lastDelKeys) {
-                lastChangeNodeMap_.erase(key);
-            }
             std::vector<std::string> lastDelUris;
-            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
+            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
+                lastChangeNodeMap_.erase(result);
                 lastDelUris.emplace_back(result);
             });
             if (lastDelUris.empty()) {
