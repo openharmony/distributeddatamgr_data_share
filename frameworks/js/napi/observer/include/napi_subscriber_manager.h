@@ -53,11 +53,11 @@ struct NapiRdbObserverMapKey {
     }
 };
 
-class NapiRdbSubscriberManager : public NapiCallbacksManager<NapiRdbObserverMapKey, NapiRdbObserver, RdbChangeNode> {
+class NapiRdbSubscriberManager : public NapiCallbacksManager<NapiRdbObserverMapKey, NapiRdbObserver> {
 public:
     using Key = NapiRdbObserverMapKey;
     using Observer = NapiRdbObserver;
-    using BaseCallbacks = NapiCallbacksManager<NapiRdbObserverMapKey, NapiRdbObserver, RdbChangeNode>;
+    using BaseCallbacks = NapiCallbacksManager<NapiRdbObserverMapKey, NapiRdbObserver>;
     explicit NapiRdbSubscriberManager(std::weak_ptr<DataShareHelper> dataShareHelper)
         : dataShareHelper_(dataShareHelper){};
     std::vector<OperationResult> AddObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris,
@@ -69,6 +69,7 @@ public:
 private:
     void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
     std::weak_ptr<DataShareHelper> dataShareHelper_;
+    std::map<Key, RdbChangeNode> lastChangeNodeMap_;
 };
 
 struct NapiPublishedObserverMapKey {
@@ -97,13 +98,11 @@ struct NapiPublishedObserverMapKey {
     }
 };
 
-class NapiPublishedSubscriberManager : public NapiCallbacksManager<NapiPublishedObserverMapKey,
-                                           NapiPublishedObserver, PublishedDataChangeNode> {
+class NapiPublishedSubscriberManager : public NapiCallbacksManager<NapiPublishedObserverMapKey, NapiPublishedObserver> {
 public:
     using Key = NapiPublishedObserverMapKey;
     using Observer = NapiPublishedObserver;
-    using BaseCallbacks = NapiCallbacksManager<NapiPublishedObserverMapKey, NapiPublishedObserver,
-        PublishedDataChangeNode>;
+    using BaseCallbacks = NapiCallbacksManager<NapiPublishedObserverMapKey, NapiPublishedObserver>;
     explicit NapiPublishedSubscriberManager(std::weak_ptr<DataShareHelper> dataShareHelper)
         : dataShareHelper_(dataShareHelper){};
     std::vector<OperationResult> AddObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris,
@@ -115,6 +114,7 @@ public:
 private:
     void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
     std::weak_ptr<DataShareHelper> dataShareHelper_;
+    std::map<Key, PublishedDataChangeNode> lastChangeNodeMap_;
 };
 } // namespace DataShare
 } // namespace OHOS

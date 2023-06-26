@@ -92,6 +92,9 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
     });
     return BaseCallbacks::DelObservers(keys, subscriber,
         [&proxy, &templateId, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
+            for (auto &key : lastDelKeys) {
+                lastChangeNodeMap_.erase(key);
+            }
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
                 lastDelUris.emplace_back(result);
@@ -119,6 +122,9 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
     return BaseCallbacks::DelObservers(subscriber,
         [&proxy, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             // delete all obs by subscriber
+            for (auto &key : lastDelKeys) {
+                lastChangeNodeMap_.erase(key);
+            }
             for (const auto &key : lastDelKeys) {
                 auto unsubResult = proxy->UnSubscribeRdbData(std::vector<std::string>(1, key.uri_), key.templateId_);
                 opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
@@ -139,8 +145,8 @@ std::vector<OperationResult> RdbSubscriberManager::EnableObservers(void *subscri
         keys.emplace_back(uri, templateId);
     });
     return BaseCallbacks::EnableObservers(keys, subscriber,
-        [this](const std::vector<Key> &keys, std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap) {
-            Emit(keys, obsMap);
+        [this](std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap) {
+            Emit(obsMap);
         },
         [&proxy, subscriber, &templateId, this](const std::vector<Key> &firstAddKeys,
         std::vector<OperationResult> &opResult) {
@@ -189,7 +195,6 @@ std::vector<OperationResult> RdbSubscriberManager::DisableObservers(void *subscr
 
             auto results = proxy->DisableSubscribeRdbData(lastDisabledUris, templateId);
             opResult.insert(opResult.end(), results.begin(), results.end());
-            Destroy();
         });
 }
 
@@ -238,8 +243,7 @@ void RdbSubscriberManager::Emit(const std::vector<Key> &keys, const std::shared_
     }
 }
 
-void RdbSubscriberManager::Emit(const std::vector<Key> &keys,
-    std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap)
+void RdbSubscriberManager::Emit(std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap)
 {
     for (auto &[key, obsVector] : obsMap) {
         auto it = lastChangeNodeMap_.find(key);

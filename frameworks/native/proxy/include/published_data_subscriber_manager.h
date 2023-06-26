@@ -72,12 +72,11 @@ private:
     PublishedDataCallback callback_;
 };
 
-class PublishedDataSubscriberManager : public CallbacksManager<PublishedObserverMapKey, PublishedDataObserver,
-                                           PublishedDataChangeNode> {
+class PublishedDataSubscriberManager : public CallbacksManager<PublishedObserverMapKey, PublishedDataObserver> {
 public:
     using Key = PublishedObserverMapKey;
     using Observer = PublishedDataObserver;
-    using BaseCallbacks = CallbacksManager<PublishedObserverMapKey, PublishedDataObserver, PublishedDataChangeNode>;
+    using BaseCallbacks = CallbacksManager<PublishedObserverMapKey, PublishedDataObserver>;
     static PublishedDataSubscriberManager &GetInstance();
 
     std::vector<OperationResult> AddObservers(void *subscriber, std::shared_ptr<DataShareServiceProxy> proxy,
@@ -94,11 +93,12 @@ public:
 
 private:
     void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
-    void Emit(const std::vector<Key> &keys, std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap);
+    void Emit(std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap);
     PublishedDataSubscriberManager();
     bool Init();
     void Destroy();
     sptr<PublishedDataObserverStub> serviceCallback_;
+    std::map<Key, PublishedDataChangeNode> lastChangeNodeMap_;
 };
 } // namespace DataShare
 } // namespace OHOS

@@ -74,6 +74,9 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
     return BaseCallbacks::DelObservers(subscriber,
         [&proxy, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             // delete all obs by subscriber
+            for (auto &key : lastDelKeys) {
+                lastChangeNodeMap_.erase(key);
+            }
             std::map<int64_t, std::vector<std::string>> keysMap;
             for (auto const &key : lastDelKeys) {
                 keysMap[key.subscriberId_].emplace_back(key.uri_);
@@ -103,6 +106,9 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
     });
     return BaseCallbacks::DelObservers(keys, subscriber,
         [&proxy, &subscriberId, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
+            for (auto &key : lastDelKeys) {
+                lastChangeNodeMap_.erase(key);
+            }
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
                 lastDelUris.emplace_back(result);
@@ -132,9 +138,8 @@ std::vector<OperationResult> PublishedDataSubscriberManager::EnableObservers(voi
         keys.emplace_back(uri, subscriberId);
     });
     return BaseCallbacks::EnableObservers(
-        keys, subscriber, [this](const std::vector<Key> &keys,
-                              std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap) {
-            Emit(keys, obsMap);
+        keys, subscriber, [this](std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap) {
+            Emit(obsMap);
         },
         [&proxy, &subscriberId, subscriber, this](const std::vector<Key> &firstAddKeys,
         std::vector<OperationResult> &opResult) {
@@ -248,22 +253,16 @@ void PublishedDataSubscriberManager::Emit(const std::vector<Key> &keys, const st
     observer->OnChange(node);
 }
 
-void PublishedDataSubscriberManager::Emit(const std::vector<Key> &keys,
-    std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap)
+void PublishedDataSubscriberManager::Emit(std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap)
 {
     std::map<std::shared_ptr<Observer>, PublishedDataChangeNode> results;
-    for (auto &key : keys) {
+    for (auto &[key, obsVector] : obsMap) {
         auto it = lastChangeNodeMap_.find(key);
         if (it == lastChangeNodeMap_.end()) {
             continue;
         }
         for (auto &data : it->second.datas_) {
             PublishedObserverMapKey mapKey(data.key_, data.subscriberId_);
-            auto iter = obsMap.find(mapKey);
-            if (iter == obsMap.end()) {
-                continue;
-            }
-            auto obsVector = iter->second;
             for (auto &obs : obsVector) {
                 results[obs].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
                 results[obs].ownerBundleName_ = it->second.ownerBundleName_;
