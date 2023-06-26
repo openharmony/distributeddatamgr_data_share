@@ -161,8 +161,7 @@ std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::DelObservers(
 }
 
 template<class Key, class Observer>
-std::vector<std::shared_ptr<Observer>> NapiCallbacksManager<Key, Observer>::GetEnabledObservers(
-    const Key &inputKey)
+std::vector<std::shared_ptr<Observer>> NapiCallbacksManager<Key, Observer>::GetEnabledObservers(const Key &inputKey)
 {
     std::lock_guard<decltype(mutex_)> lck(mutex_);
     auto it = callbacks_.find(inputKey);

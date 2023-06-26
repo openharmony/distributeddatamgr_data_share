@@ -174,7 +174,7 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::DelObservers(napi_e
         keys.emplace_back(uri, subscriberId);
     });
     return BaseCallbacks::DelObservers(keys, callback == nullptr ? nullptr : std::make_shared<Observer>(env, callback),
-        [&dataShareHelper, &subscriberId, &callback, &uris,this](const std::vector<Key> &lastDelKeys,
+        [&dataShareHelper, &subscriberId, &callback, &uris, this](const std::vector<Key> &lastDelKeys,
             const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
             for (auto &key : lastDelKeys) {
                 lastChangeNodeMap_.erase(key);

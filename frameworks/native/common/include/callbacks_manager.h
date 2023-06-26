@@ -167,7 +167,7 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::DelObservers(void 
             return result;
         }
         for (auto &key : lastDelKeys) {
-            callbacks_.erase(key);          
+            callbacks_.erase(key);
         }
     }
     processOnLastDel(lastDelKeys, result);
