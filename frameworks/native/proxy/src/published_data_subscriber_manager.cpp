@@ -32,7 +32,11 @@ std::vector<OperationResult> PublishedDataSubscriberManager::AddObservers(void *
     std::for_each(uris.begin(), uris.end(), [&keys, &subscriberId](auto &uri) {
         keys.emplace_back(uri, subscriberId);
     });
-    return BaseCallbacks::AddObservers(keys, subscriber, std::make_shared<Observer>(callback),
+    return BaseCallbacks::AddObservers(
+        keys, subscriber, std::make_shared<Observer>(callback),
+        [this](const std::vector<Key> &localRegisterKeys, const std::shared_ptr<Observer> observer) {
+            Emit(localRegisterKeys, observer);
+        },
         [&proxy, subscriber, &subscriberId, this](const std::vector<Key> &firstAddKeys,
             const std::shared_ptr<Observer> observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> firstAddUris;
@@ -127,7 +131,11 @@ std::vector<OperationResult> PublishedDataSubscriberManager::EnableObservers(voi
     std::for_each(uris.begin(), uris.end(), [&keys, &subscriberId](auto &uri) {
         keys.emplace_back(uri, subscriberId);
     });
-    return BaseCallbacks::EnableObservers(keys, subscriber,
+    return BaseCallbacks::EnableObservers(
+        keys, subscriber, [this](const std::vector<Key> &keys,
+                              std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap) {
+            Emit(keys, obsMap);
+        },
         [&proxy, &subscriberId, subscriber, this](const std::vector<Key> &firstAddKeys,
         std::vector<OperationResult> &opResult) {
             std::vector<std::string> firstAddUris;
@@ -212,12 +220,57 @@ void PublishedDataSubscriberManager::Emit(PublishedDataChangeNode &changeNode)
             LOG_WARN("%{private}s nobody subscribe, but still notify", data.key_.c_str());
             continue;
         }
+        lastChangeNodeMap_[key].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
+        lastChangeNodeMap_[key].ownerBundleName_ = changeNode.ownerBundleName_;
         for (auto const &obs : callbacks) {
             results[obs].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
         }
     }
     for (auto &[callback, node] : results) {
         node.ownerBundleName_ = changeNode.ownerBundleName_;
+        callback->OnChange(node);
+    }
+}
+
+void PublishedDataSubscriberManager::Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer)
+{
+    PublishedDataChangeNode node;
+    for (auto &key : keys) {
+        auto it = lastChangeNodeMap_.find(key);
+        if (it == lastChangeNodeMap_.end()) {
+            continue;
+        }
+        for (auto &data : it->second.datas_) {
+            node.datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
+        }
+        node.ownerBundleName_ = it->second.ownerBundleName_;
+    }
+    observer->OnChange(node);
+}
+
+void PublishedDataSubscriberManager::Emit(const std::vector<Key> &keys,
+    std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap)
+{
+    std::map<std::shared_ptr<Observer>, PublishedDataChangeNode> results;
+    for (auto &key : keys) {
+        auto it = lastChangeNodeMap_.find(key);
+        if (it == lastChangeNodeMap_.end()) {
+            continue;
+        }
+        for (auto &data : it->second.datas_) {
+            PublishedObserverMapKey mapKey(data.key_, data.subscriberId_);
+            auto iter = obsMap.find(mapKey);
+            if (iter == obsMap.end()) {
+                continue;
+            }
+            auto obsVector = iter->second;
+            for (auto &obs : obsVector) {
+                results[obs].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
+                results[obs].ownerBundleName_ = it->second.ownerBundleName_;
+            }
+        }
+    }
+    for (auto &[callback, node] : results) {
         callback->OnChange(node);
     }
 }

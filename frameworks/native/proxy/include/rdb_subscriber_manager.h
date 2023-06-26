@@ -73,11 +73,11 @@ private:
     RdbCallback callback_;
 };
 
-class RdbSubscriberManager : public CallbacksManager<RdbObserverMapKey, RdbObserver> {
+class RdbSubscriberManager : public CallbacksManager<RdbObserverMapKey, RdbObserver, RdbChangeNode> {
 public:
     using Key = RdbObserverMapKey;
     using Observer = RdbObserver;
-    using BaseCallbacks = CallbacksManager<RdbObserverMapKey, RdbObserver>;
+    using BaseCallbacks = CallbacksManager<RdbObserverMapKey, RdbObserver, RdbChangeNode>;
     static RdbSubscriberManager &GetInstance();
 
     std::vector<OperationResult> AddObservers(void *subscriber, std::shared_ptr<DataShareServiceProxy> proxy,
@@ -93,6 +93,8 @@ public:
     void Emit(const RdbChangeNode &changeNode);
 
 private:
+    void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
+    void Emit(const std::vector<Key> &keys, std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap);
     RdbSubscriberManager();
     bool Init();
     void Destroy();

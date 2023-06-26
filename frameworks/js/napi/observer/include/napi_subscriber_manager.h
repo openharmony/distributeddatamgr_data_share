@@ -53,11 +53,11 @@ struct NapiRdbObserverMapKey {
     }
 };
 
-class NapiRdbSubscriberManager : public NapiCallbacksManager<NapiRdbObserverMapKey, NapiRdbObserver> {
+class NapiRdbSubscriberManager : public NapiCallbacksManager<NapiRdbObserverMapKey, NapiRdbObserver, RdbChangeNode> {
 public:
     using Key = NapiRdbObserverMapKey;
     using Observer = NapiRdbObserver;
-    using BaseCallbacks = NapiCallbacksManager<NapiRdbObserverMapKey, NapiRdbObserver>;
+    using BaseCallbacks = NapiCallbacksManager<NapiRdbObserverMapKey, NapiRdbObserver, RdbChangeNode>;
     explicit NapiRdbSubscriberManager(std::weak_ptr<DataShareHelper> dataShareHelper)
         : dataShareHelper_(dataShareHelper){};
     std::vector<OperationResult> AddObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris,
@@ -67,6 +67,7 @@ public:
     void Emit(const RdbChangeNode &changeNode);
 
 private:
+    void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
     std::weak_ptr<DataShareHelper> dataShareHelper_;
 };
 
@@ -96,11 +97,13 @@ struct NapiPublishedObserverMapKey {
     }
 };
 
-class NapiPublishedSubscriberManager : public NapiCallbacksManager<NapiPublishedObserverMapKey, NapiPublishedObserver> {
+class NapiPublishedSubscriberManager : public NapiCallbacksManager<NapiPublishedObserverMapKey,
+                                           NapiPublishedObserver, PublishedDataChangeNode> {
 public:
     using Key = NapiPublishedObserverMapKey;
     using Observer = NapiPublishedObserver;
-    using BaseCallbacks = NapiCallbacksManager<NapiPublishedObserverMapKey, NapiPublishedObserver>;
+    using BaseCallbacks = NapiCallbacksManager<NapiPublishedObserverMapKey, NapiPublishedObserver,
+        PublishedDataChangeNode>;
     explicit NapiPublishedSubscriberManager(std::weak_ptr<DataShareHelper> dataShareHelper)
         : dataShareHelper_(dataShareHelper){};
     std::vector<OperationResult> AddObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris,
@@ -110,6 +113,7 @@ public:
     void Emit(const PublishedDataChangeNode &changeNode);
 
 private:
+    void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
     std::weak_ptr<DataShareHelper> dataShareHelper_;
 };
 } // namespace DataShare

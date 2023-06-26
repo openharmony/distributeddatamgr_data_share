@@ -23,10 +23,11 @@
 #include "datashare_template.h"
 
 namespace OHOS::DataShare {
-template<class Key, class Observer>
+template<class Key, class Observer, class ChangeNode>
 class NapiCallbacksManager {
 public:
     std::vector<OperationResult> AddObservers(const std::vector<Key> &keys, const std::shared_ptr<Observer> observer,
+        std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer)>,
         std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
             std::vector<OperationResult> &)>);
 
@@ -55,15 +56,21 @@ private:
     bool IsRegistered(const Observer &, const std::vector<ObserverNode> &);
     std::recursive_mutex mutex_{};
     std::map<Key, std::vector<ObserverNode>> callbacks_;
+
+protected:
+    std::map<Key, ChangeNode> lastChangeNodeMap_;
 };
 
-template<class Key, class Observer>
-std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::AddObservers(const std::vector<Key> &keys,
-    const std::shared_ptr<Observer> observer, std::function<void(const std::vector<Key> &,
-        const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &)> processOnFirstAdd)
+template<class Key, class Observer, class ChangeNode>
+std::vector<OperationResult> NapiCallbacksManager<Key, Observer, ChangeNode>::AddObservers(
+    const std::vector<Key> &keys, const std::shared_ptr<Observer> observer,
+    std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer)> processOnLocalAdd,
+    std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
+        std::vector<OperationResult> &)> processOnFirstAdd)
 {
     std::vector<OperationResult> result;
     std::vector<Key> firstRegisterKey;
+    std::vector<Key> localRegisterKey;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
         for (auto &key : keys) {
@@ -77,16 +84,20 @@ std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::AddObservers(c
                 result.emplace_back(static_cast<std::string>(key), E_REGISTERED_REPEATED);
                 continue;
             }
+            localRegisterKey.emplace_back(key);
             callbacks_[key].emplace_back(observer);
             result.emplace_back(key, E_OK);
         }
+    }
+    if (!localRegisterKey.empty()) {
+        processOnLocalAdd(localRegisterKey, observer);
     }
     processOnFirstAdd(firstRegisterKey, observer, result);
     return result;
 }
 
-template<class Key, class Observer>
-bool NapiCallbacksManager<Key, Observer>::IsRegistered(const Observer &observer,
+template<class Key, class Observer, class ChangeNode>
+bool NapiCallbacksManager<Key, Observer, ChangeNode>::IsRegistered(const Observer &observer,
     const std::vector<ObserverNode> &observers)
 {
     for (auto &item : observers) {
@@ -97,9 +108,9 @@ bool NapiCallbacksManager<Key, Observer>::IsRegistered(const Observer &observer,
     return false;
 }
 
-template<class Key, class Observer>
-std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::DelObservers(const std::vector<Key> &keys,
-    const std::shared_ptr<Observer> observer,
+template<class Key, class Observer, class ChangeNode>
+std::vector<OperationResult> NapiCallbacksManager<Key, Observer, ChangeNode>::DelObservers(
+    const std::vector<Key> &keys, const std::shared_ptr<Observer> observer,
     std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &, std::vector<OperationResult> &)>
         processOnLastDel)
 {
@@ -147,13 +158,17 @@ std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::DelObservers(c
         if (lastDelKeys.empty()) {
             return result;
         }
+        for (auto &key : lastDelKeys) {
+            lastChangeNodeMap_.erase(key);
+        }
     }
     processOnLastDel(lastDelKeys, observer, result);
     return result;
 }
 
-template<class Key, class Observer>
-std::vector<std::shared_ptr<Observer>> NapiCallbacksManager<Key, Observer>::GetEnabledObservers(const Key &inputKey)
+template<class Key, class Observer, class ChangeNode>
+std::vector<std::shared_ptr<Observer>> NapiCallbacksManager<Key, Observer, ChangeNode>::GetEnabledObservers(
+    const Key &inputKey)
 {
     std::lock_guard<decltype(mutex_)> lck(mutex_);
     auto it = callbacks_.find(inputKey);
@@ -169,8 +184,8 @@ std::vector<std::shared_ptr<Observer>> NapiCallbacksManager<Key, Observer>::GetE
     return results;
 }
 
-template<class Key, class Observer>
-int NapiCallbacksManager<Key, Observer>::GetEnabledSubscriberSize()
+template<class Key, class Observer, class ChangeNode>
+int NapiCallbacksManager<Key, Observer, ChangeNode>::GetEnabledSubscriberSize()
 {
     int count = 0;
     std::lock_guard<decltype(mutex_)> lck(mutex_);

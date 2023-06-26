@@ -72,11 +72,12 @@ private:
     PublishedDataCallback callback_;
 };
 
-class PublishedDataSubscriberManager : public CallbacksManager<PublishedObserverMapKey, PublishedDataObserver> {
+class PublishedDataSubscriberManager : public CallbacksManager<PublishedObserverMapKey, PublishedDataObserver,
+                                           PublishedDataChangeNode> {
 public:
     using Key = PublishedObserverMapKey;
     using Observer = PublishedDataObserver;
-    using BaseCallbacks = CallbacksManager<PublishedObserverMapKey, PublishedDataObserver>;
+    using BaseCallbacks = CallbacksManager<PublishedObserverMapKey, PublishedDataObserver, PublishedDataChangeNode>;
     static PublishedDataSubscriberManager &GetInstance();
 
     std::vector<OperationResult> AddObservers(void *subscriber, std::shared_ptr<DataShareServiceProxy> proxy,
@@ -92,6 +93,8 @@ public:
     void Emit(PublishedDataChangeNode &changeNode);
 
 private:
+    void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
+    void Emit(const std::vector<Key> &keys, std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap);
     PublishedDataSubscriberManager();
     bool Init();
     void Destroy();
