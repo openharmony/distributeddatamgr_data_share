@@ -90,5 +90,15 @@ void GeneralControllerServiceImpl::UnregisterObserver(const Uri &uri,
         LOG_ERROR("UnregisterObserver failed");
     }
 }
+
+void GeneralControllerServiceImpl::NotifyChange(const Uri &uri)
+{
+    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return;
+    }
+    proxy->Notify(uri.ToString());
+}
 } // namespace DataShare
 } // namespace OHOS

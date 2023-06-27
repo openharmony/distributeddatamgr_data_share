@@ -43,6 +43,8 @@ public:
     void RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
 
     void UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
+
+    void NotifyChange(const Uri &uri) override;
 };
 } // namespace DataShare
 } // namespace OHOS
