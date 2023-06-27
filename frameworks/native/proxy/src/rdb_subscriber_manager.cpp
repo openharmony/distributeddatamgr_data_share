@@ -43,7 +43,11 @@ std::vector<OperationResult> RdbSubscriberManager::AddObservers(void *subscriber
     std::for_each(uris.begin(), uris.end(), [&keys, &templateId](auto &uri) {
         keys.emplace_back(uri, templateId);
     });
-    return BaseCallbacks::AddObservers(keys, subscriber, std::make_shared<Observer>(callback),
+    return BaseCallbacks::AddObservers(
+        keys, subscriber, std::make_shared<Observer>(callback),
+        [this](const std::vector<Key> &localRegisterKeys, const std::shared_ptr<Observer> observer) {
+            Emit(localRegisterKeys, observer);
+        },
         [&proxy, subscriber, &templateId, this](const std::vector<Key> &firstAddKeys,
             const std::shared_ptr<Observer> observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> firstAddUris;
@@ -89,8 +93,9 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
     return BaseCallbacks::DelObservers(keys, subscriber,
         [&proxy, &templateId, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
-            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
+            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
                 lastDelUris.emplace_back(result);
+                lastChangeNodeMap_.erase(result);
             });
             if (lastDelUris.empty()) {
                 return;
@@ -116,6 +121,7 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
         [&proxy, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             // delete all obs by subscriber
             for (const auto &key : lastDelKeys) {
+                lastChangeNodeMap_.erase(key);
                 auto unsubResult = proxy->UnSubscribeRdbData(std::vector<std::string>(1, key.uri_), key.templateId_);
                 opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
             }
@@ -135,6 +141,9 @@ std::vector<OperationResult> RdbSubscriberManager::EnableObservers(void *subscri
         keys.emplace_back(uri, templateId);
     });
     return BaseCallbacks::EnableObservers(keys, subscriber,
+        [this](std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap) {
+            Emit(obsMap);
+        },
         [&proxy, subscriber, &templateId, this](const std::vector<Key> &firstAddKeys,
         std::vector<OperationResult> &opResult) {
             std::vector<std::string> firstAddUris;
@@ -182,7 +191,6 @@ std::vector<OperationResult> RdbSubscriberManager::DisableObservers(void *subscr
 
             auto results = proxy->DisableSubscribeRdbData(lastDisabledUris, templateId);
             opResult.insert(opResult.end(), results.begin(), results.end());
-            Destroy();
         });
 }
 
@@ -212,10 +220,34 @@ void RdbSubscriberManager::RecoverObservers(std::shared_ptr<DataShareServiceProx
 void RdbSubscriberManager::Emit(const RdbChangeNode &changeNode)
 {
     RdbObserverMapKey key(changeNode.uri_, changeNode.templateId_);
+    lastChangeNodeMap_[key] = changeNode;
     auto callbacks = BaseCallbacks::GetEnabledObservers(key);
     for (auto &obs : callbacks) {
         if (obs != nullptr) {
             obs->OnChange(changeNode);
+        }
+    }
+}
+
+void RdbSubscriberManager::Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer)
+{
+    for (auto const &key : keys) {
+        auto it = lastChangeNodeMap_.find(key);
+        if (it != lastChangeNodeMap_.end()) {
+            observer->OnChange(it->second);
+        }
+    }
+}
+
+void RdbSubscriberManager::Emit(std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap)
+{
+    for (auto &[key, obsVector] : obsMap) {
+        auto it = lastChangeNodeMap_.find(key);
+        if (it == lastChangeNodeMap_.end()) {
+            continue;
+        }
+        for (auto &obs : obsVector) {
+            obs->OnChange(it->second);
         }
     }
 }

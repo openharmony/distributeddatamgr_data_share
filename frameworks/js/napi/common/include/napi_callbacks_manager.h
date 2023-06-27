@@ -27,6 +27,7 @@ template<class Key, class Observer>
 class NapiCallbacksManager {
 public:
     std::vector<OperationResult> AddObservers(const std::vector<Key> &keys, const std::shared_ptr<Observer> observer,
+        std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer)>,
         std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
             std::vector<OperationResult> &)>);
 
@@ -58,12 +59,15 @@ private:
 };
 
 template<class Key, class Observer>
-std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::AddObservers(const std::vector<Key> &keys,
-    const std::shared_ptr<Observer> observer, std::function<void(const std::vector<Key> &,
-        const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &)> processOnFirstAdd)
+std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::AddObservers(
+    const std::vector<Key> &keys, const std::shared_ptr<Observer> observer,
+    std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer)> processOnLocalAdd,
+    std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
+        std::vector<OperationResult> &)> processOnFirstAdd)
 {
     std::vector<OperationResult> result;
     std::vector<Key> firstRegisterKey;
+    std::vector<Key> localRegisterKey;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
         for (auto &key : keys) {
@@ -77,9 +81,13 @@ std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::AddObservers(c
                 result.emplace_back(static_cast<std::string>(key), E_REGISTERED_REPEATED);
                 continue;
             }
+            localRegisterKey.emplace_back(key);
             callbacks_[key].emplace_back(observer);
             result.emplace_back(key, E_OK);
         }
+    }
+    if (!localRegisterKey.empty()) {
+        processOnLocalAdd(localRegisterKey, observer);
     }
     processOnFirstAdd(firstRegisterKey, observer, result);
     return result;
@@ -98,8 +106,8 @@ bool NapiCallbacksManager<Key, Observer>::IsRegistered(const Observer &observer,
 }
 
 template<class Key, class Observer>
-std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::DelObservers(const std::vector<Key> &keys,
-    const std::shared_ptr<Observer> observer,
+std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::DelObservers(
+    const std::vector<Key> &keys, const std::shared_ptr<Observer> observer,
     std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &, std::vector<OperationResult> &)>
         processOnLastDel)
 {

@@ -32,7 +32,11 @@ std::vector<OperationResult> NapiRdbSubscriberManager::AddObservers(napi_env env
     std::for_each(uris.begin(), uris.end(), [&keys, &templateId](auto &uri) {
         keys.emplace_back(uri, templateId);
     });
-    return BaseCallbacks::AddObservers(keys, std::make_shared<Observer>(env, callback),
+    return BaseCallbacks::AddObservers(
+        keys, std::make_shared<Observer>(env, callback),
+        [this](const std::vector<Key> &localRegisterKeys, const std::shared_ptr<Observer> observer) {
+            Emit(localRegisterKeys, observer);
+        },
         [&datashareHelper, &templateId, this](const std::vector<Key> &firstAddKeys,
             const std::shared_ptr<Observer> observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> firstAddUris;
@@ -73,10 +77,11 @@ std::vector<OperationResult> NapiRdbSubscriberManager::DelObservers(napi_env env
         keys.emplace_back(uri, templateId);
     });
     return BaseCallbacks::DelObservers(keys, callback == nullptr ? nullptr : std::make_shared<Observer>(env, callback),
-        [&dataShareHelper, &templateId](const std::vector<Key> &lastDelKeys, const std::shared_ptr<Observer> &observer,
-            std::vector<OperationResult> &opResult) {
+        [&dataShareHelper, &templateId, this](const std::vector<Key> &lastDelKeys,
+            const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
-            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
+            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
+                lastChangeNodeMap_.erase(result);
                 lastDelUris.emplace_back(result);
             });
             if (lastDelUris.empty()) {
@@ -90,10 +95,21 @@ std::vector<OperationResult> NapiRdbSubscriberManager::DelObservers(napi_env env
 void NapiRdbSubscriberManager::Emit(const RdbChangeNode &changeNode)
 {
     Key key(changeNode.uri_, changeNode.templateId_);
+    lastChangeNodeMap_[key] = changeNode;
     auto callbacks = BaseCallbacks::GetEnabledObservers(key);
     for (auto &obs : callbacks) {
         if (obs != nullptr) {
             obs->OnChange(changeNode);
+        }
+    }
+}
+
+void NapiRdbSubscriberManager::Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer)
+{
+    for (auto const &key : keys) {
+        auto it = lastChangeNodeMap_.find(key);
+        if (it != lastChangeNodeMap_.end()) {
+            observer->OnChange(it->second);
         }
     }
 }
@@ -111,7 +127,11 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::AddObservers(napi_e
     std::for_each(uris.begin(), uris.end(), [&keys, &subscriberId](auto &uri) {
         keys.emplace_back(uri, subscriberId);
     });
-    return BaseCallbacks::AddObservers(keys, std::make_shared<Observer>(env, callback),
+    return BaseCallbacks::AddObservers(
+        keys, std::make_shared<Observer>(env, callback),
+        [this](const std::vector<Key> &localRegisterKeys, const std::shared_ptr<Observer> observer) {
+            Emit(localRegisterKeys, observer);
+        },
         [&dataShareHelper, &subscriberId, this](const std::vector<Key> &firstAddKeys,
             const std::shared_ptr<Observer> observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> firstAddUris;
@@ -152,10 +172,11 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::DelObservers(napi_e
         keys.emplace_back(uri, subscriberId);
     });
     return BaseCallbacks::DelObservers(keys, callback == nullptr ? nullptr : std::make_shared<Observer>(env, callback),
-        [&dataShareHelper, &subscriberId, &callback, &uris](const std::vector<Key> &lastDelKeys,
+        [&dataShareHelper, &subscriberId, &callback, &uris, this](const std::vector<Key> &lastDelKeys,
             const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
-            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
+            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
+                lastChangeNodeMap_.erase(result);
                 lastDelUris.emplace_back(result);
             });
             if (lastDelUris.empty()) {
@@ -168,13 +189,20 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::DelObservers(napi_e
 
 void NapiPublishedSubscriberManager::Emit(const PublishedDataChangeNode &changeNode)
 {
+    for (auto &data : changeNode.datas_) {
+        Key key(data.key_, data.subscriberId_);
+        lastChangeNodeMap_[key].datas_.clear();
+    }
     std::map<std::shared_ptr<Observer>, PublishedDataChangeNode> results;
     for (auto &data : changeNode.datas_) {
         Key key(data.key_, data.subscriberId_);
         auto callbacks = BaseCallbacks::GetEnabledObservers(key);
         if (callbacks.empty()) {
             LOG_WARN("%{private}s nobody subscribe, but still notify", data.key_.c_str());
+            continue;
         }
+        lastChangeNodeMap_[key].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
+        lastChangeNodeMap_[key].ownerBundleName_ = changeNode.ownerBundleName_;
         for (auto const &obs : callbacks) {
             results[obs].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
         }
@@ -183,6 +211,22 @@ void NapiPublishedSubscriberManager::Emit(const PublishedDataChangeNode &changeN
         node.ownerBundleName_ = changeNode.ownerBundleName_;
         callback->OnChange(node);
     }
+}
+
+void NapiPublishedSubscriberManager::Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer)
+{
+    PublishedDataChangeNode node;
+    for (auto &key : keys) {
+        auto it = lastChangeNodeMap_.find(key);
+        if (it == lastChangeNodeMap_.end()) {
+            continue;
+        }
+        for (auto &data : it->second.datas_) {
+            node.datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
+        }
+        node.ownerBundleName_ = it->second.ownerBundleName_;
+    }
+    observer->OnChange(node);
 }
 } // namespace DataShare
 } // namespace OHOS

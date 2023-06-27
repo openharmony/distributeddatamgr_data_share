@@ -67,7 +67,9 @@ public:
     void Emit(const RdbChangeNode &changeNode);
 
 private:
+    void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
     std::weak_ptr<DataShareHelper> dataShareHelper_;
+    std::map<Key, RdbChangeNode> lastChangeNodeMap_;
 };
 
 struct NapiPublishedObserverMapKey {
@@ -110,7 +112,9 @@ public:
     void Emit(const PublishedDataChangeNode &changeNode);
 
 private:
+    void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
     std::weak_ptr<DataShareHelper> dataShareHelper_;
+    std::map<Key, PublishedDataChangeNode> lastChangeNodeMap_;
 };
 } // namespace DataShare
 } // namespace OHOS

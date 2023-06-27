@@ -93,10 +93,13 @@ public:
     void Emit(const RdbChangeNode &changeNode);
 
 private:
+    void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
+    void Emit(std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap);
     RdbSubscriberManager();
     bool Init();
     void Destroy();
     sptr<RdbObserverStub> serviceCallback_;
+    std::map<Key, RdbChangeNode> lastChangeNodeMap_;
 };
 } // namespace DataShare
 } // namespace OHOS

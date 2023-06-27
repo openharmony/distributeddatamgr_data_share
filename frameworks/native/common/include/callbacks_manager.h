@@ -28,6 +28,7 @@ class CallbacksManager {
 public:
     std::vector<OperationResult> AddObservers(const std::vector<Key> &keys, void *subscriber,
         const std::shared_ptr<Observer> observer,
+        std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer)>,
         std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
             std::vector<OperationResult> &)>);
 
@@ -40,6 +41,7 @@ public:
             CallbacksManager::DefaultProcess);
 
     std::vector<OperationResult> EnableObservers(const std::vector<Key> &keys, void *subscriber,
+        std::function<void(std::map<Key, std::vector<std::shared_ptr<Observer>>> &)> processOnLocalEnabled,
         std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)>);
 
     std::vector<OperationResult> DisableObservers(const std::vector<Key> &keys, void *subscriber,
@@ -73,11 +75,14 @@ private:
 
 template<class Key, class Observer>
 std::vector<OperationResult> CallbacksManager<Key, Observer>::AddObservers(const std::vector<Key> &keys,
-    void *subscriber, const std::shared_ptr<Observer> observer, std::function<void(const std::vector<Key> &,
-    const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &)> processOnFirstAdd)
+    void *subscriber, const std::shared_ptr<Observer> observer,
+    std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer)> processOnLocalAdd,
+    std::function<void(const std::vector<Key> &,
+        const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &)> processOnFirstAdd)
 {
     std::vector<OperationResult> result;
     std::vector<Key> firstRegisterKey;
+    std::vector<Key> localRegisterKey;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
         for (auto &key : keys) {
@@ -87,9 +92,13 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::AddObservers(const
                 firstRegisterKey.emplace_back(key);
                 continue;
             }
+            localRegisterKey.emplace_back(key);
             callbacks_[key].emplace_back(observer, subscriber);
             result.emplace_back(key, E_OK);
         }
+    }
+    if (!localRegisterKey.empty()) {
+        processOnLocalAdd(localRegisterKey, observer);
     }
     processOnFirstAdd(firstRegisterKey, observer, result);
     return result;
@@ -207,10 +216,12 @@ std::vector<std::shared_ptr<Observer>> CallbacksManager<Key, Observer>::GetEnabl
 template<class Key, class Observer>
 std::vector<OperationResult> CallbacksManager<Key, Observer>::EnableObservers(
     const std::vector<Key> &keys, void *subscriber,
+    std::function<void(std::map<Key, std::vector<std::shared_ptr<Observer>>> &)> processOnLocalEnabled,
     std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnFirstEnabled)
 {
     std::vector<OperationResult> result;
     std::vector<Key> firstRegisterKey;
+    std::map<Key, std::vector<std::shared_ptr<Observer>>> localEnabledObservers;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
         for (auto &key : keys) {
@@ -223,6 +234,7 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::EnableObservers(
             bool hasEnabled = false;
             for (auto &item : callbacks_[key]) {
                 if (item.subscriber_ == subscriber) {
+                    localEnabledObservers[key].emplace_back(item.observer_);
                     item.enabled_ = true;
                     hasEnabled = true;
                 }
@@ -235,16 +247,20 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::EnableObservers(
                 result.emplace_back(key, E_OK);
                 continue;
             }
+            localEnabledObservers.erase(key);
             firstRegisterKey.emplace_back(key);
         }
+    }
+    if (!localEnabledObservers.empty()) {
+            processOnLocalEnabled(localEnabledObservers);
     }
     processOnFirstEnabled(firstRegisterKey, result);
     return result;
 }
 
 template<class Key, class Observer>
-std::vector<OperationResult> CallbacksManager<Key, Observer>::DisableObservers(
-    const std::vector<Key> &keys, void *subscriber,
+std::vector<OperationResult> CallbacksManager<Key, Observer>::DisableObservers(const std::vector<Key> &keys,
+    void *subscriber,
     std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnLastDisable)
 {
     std::vector<OperationResult> result;

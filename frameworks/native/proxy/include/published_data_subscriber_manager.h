@@ -92,10 +92,13 @@ public:
     void Emit(PublishedDataChangeNode &changeNode);
 
 private:
+    void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
+    void Emit(std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap);
     PublishedDataSubscriberManager();
     bool Init();
     void Destroy();
     sptr<PublishedDataObserverStub> serviceCallback_;
+    std::map<Key, PublishedDataChangeNode> lastChangeNodeMap_;
 };
 } // namespace DataShare
 } // namespace OHOS
