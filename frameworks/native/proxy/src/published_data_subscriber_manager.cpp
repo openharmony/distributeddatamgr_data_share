@@ -213,6 +213,10 @@ void PublishedDataSubscriberManager::RecoverObservers(std::shared_ptr<DataShareS
 
 void PublishedDataSubscriberManager::Emit(PublishedDataChangeNode &changeNode)
 {
+    for (auto &data : changeNode.datas_) {
+        Key key(data.key_, data.subscriberId_);
+        lastChangeNodeMap_[key].datas_.clear();
+    }
     std::map<std::shared_ptr<Observer>, PublishedDataChangeNode> results;
     for (auto &data : changeNode.datas_) {
         PublishedObserverMapKey key(data.key_, data.subscriberId_);

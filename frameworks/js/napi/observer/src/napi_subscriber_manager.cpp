@@ -189,6 +189,10 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::DelObservers(napi_e
 
 void NapiPublishedSubscriberManager::Emit(const PublishedDataChangeNode &changeNode)
 {
+    for (auto &data : changeNode.datas_) {
+        Key key(data.key_, data.subscriberId_);
+        lastChangeNodeMap_[key].datas_.clear();
+    }
     std::map<std::shared_ptr<Observer>, PublishedDataChangeNode> results;
     for (auto &data : changeNode.datas_) {
         Key key(data.key_, data.subscriberId_);
