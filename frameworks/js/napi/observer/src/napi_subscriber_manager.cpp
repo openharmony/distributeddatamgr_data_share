@@ -77,8 +77,8 @@ std::vector<OperationResult> NapiRdbSubscriberManager::DelObservers(napi_env env
         keys.emplace_back(uri, templateId);
     });
     return BaseCallbacks::DelObservers(keys, callback == nullptr ? nullptr : std::make_shared<Observer>(env, callback),
-        [&dataShareHelper, &templateId, this](const std::vector<Key> &lastDelKeys, const std::shared_ptr<Observer> &observer,
-            std::vector<OperationResult> &opResult) {
+        [&dataShareHelper, &templateId, this](const std::vector<Key> &lastDelKeys,
+            const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
                 lastChangeNodeMap_.erase(result);
