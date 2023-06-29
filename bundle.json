@@ -57,7 +57,7 @@
                 "c_utils",
                 "hisysevent",
                 "hitrace",
-                "hiviewdfx_hilog",
+                "hilog",
                 "ipc",
                 "ipc_js",
                 "libuv",
