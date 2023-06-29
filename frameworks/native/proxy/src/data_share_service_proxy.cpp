@@ -429,5 +429,26 @@ std::vector<OperationResult> DataShareServiceProxy::DisableSubscribePublishedDat
     ITypesUtil::Unmarshal(reply, results);
     return results;
 }
+
+void DataShareServiceProxy::Notify(const std::string &uri)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return;
+    }
+    if (!ITypesUtil::Marshal(data, uri)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_NOTIFY_OBSERVERS, data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("Notify fail to SendRequest. err: %{public}d", err);
+        return;
+    }
+}
 } // namespace DataShare
 } // namespace OHOS

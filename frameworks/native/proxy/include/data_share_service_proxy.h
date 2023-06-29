@@ -67,6 +67,7 @@ public:
 
     std::vector<OperationResult> DisableSubscribePublishedData(
         const std::vector<std::string> &uris, int64_t subscriberId) override;
+    void Notify(const std::string &uri) override;
 
 private:
     static inline BrokerDelegator<DataShareServiceProxy> delegator_;

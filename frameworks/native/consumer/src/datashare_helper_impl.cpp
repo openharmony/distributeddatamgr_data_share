@@ -185,12 +185,12 @@ void DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::I
 
 void DataShareHelperImpl::NotifyChange(const Uri &uri)
 {
-    auto extSpCtl = extSpCtl_;
-    if (extSpCtl == nullptr) {
+    auto generalCtl = generalCtl_;
+    if (generalCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
         return;
     }
-    return extSpCtl->NotifyChange(uri);
+    return generalCtl->NotifyChange(uri);
 }
 
 Uri DataShareHelperImpl::NormalizeUri(Uri &uri)
