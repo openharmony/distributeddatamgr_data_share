@@ -417,7 +417,7 @@ Uri DataShareProxy::NormalizeUri(const Uri &uri)
     MessageParcel reply;
     MessageOption option;
     int32_t err = Remote()->SendRequest(
-        static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_NORMALIZE_URI,data, reply, option);
+        static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_NORMALIZE_URI,data), reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("NormalizeUri fail to SendRequest. err: %{public}d", err);
         return Uri("");
