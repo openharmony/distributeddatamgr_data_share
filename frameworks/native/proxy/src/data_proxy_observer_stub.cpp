@@ -17,10 +17,10 @@
 
 #include "datashare_itypes_utils.h"
 #include "datashare_log.h"
+#include "distributeddata_data_share_ipc_interface_code.h"
 
 namespace OHOS {
 namespace DataShare {
-static constexpr int REQUEST_CODE = 0;
 int RdbObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     std::u16string descriptor = RdbObserverStub::GetDescriptor();
@@ -29,7 +29,7 @@ int RdbObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
         LOG_ERROR("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
-    if (code != REQUEST_CODE) {
+    if (code != static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::REQUEST_CODE)) {
         LOG_ERROR("not support code:%u", code);
         return ERR_INVALID_STATE;
     }
@@ -74,7 +74,7 @@ int PublishedDataObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &dat
         LOG_ERROR("local descriptor is not equal to remote");
         return ERR_INVALID_STATE;
     }
-    if (code != REQUEST_CODE) {
+    if (code != static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::REQUEST_CODE)) {
         LOG_ERROR("not support code:%u", code);
         return ERR_INVALID_STATE;
     }

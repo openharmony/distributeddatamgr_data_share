@@ -54,7 +54,9 @@ int ISharedResultSetProxy::GetAllColumnNames(std::vector<std::string> &columnNam
     request.WriteInterfaceToken(GetDescriptor());
     MessageParcel reply;
     MessageOption msgOption;
-    int errCode = Remote()->SendRequest(FUNC_GET_ALL_COLUMN_NAMES, request, reply, msgOption);
+    int errCode = Remote()->SendRequest(
+        static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::FUNC_GET_ALL_COLUMN_NAMES),
+        request, reply, msgOption);
     if (errCode != 0) {
         LOG_ERROR("IPC Error %{public}x", errCode);
         return -errCode;
@@ -81,7 +83,9 @@ int ISharedResultSetProxy::GetRowCount(int &count)
     request.WriteInterfaceToken(GetDescriptor());
     MessageParcel reply;
     MessageOption msgOption;
-    int errCode = Remote()->SendRequest(FUNC_GET_ROW_COUNT, request, reply, msgOption);
+    int errCode = Remote()->SendRequest(
+        static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::FUNC_GET_ROW_COUNT),
+        request, reply, msgOption);
     if (errCode != 0) {
         LOG_ERROR("IPC Error %{public}x", errCode);
         return -errCode;
@@ -105,7 +109,9 @@ bool ISharedResultSetProxy::OnGo(int oldRowIndex, int newRowIndex, int *cachedIn
     request.WriteInt32(newRowIndex);
     MessageParcel reply;
     MessageOption msgOption;
-    int errCode = Remote()->SendRequest(FUNC_ON_GO, request, reply, msgOption);
+    int errCode = Remote()->SendRequest(
+        static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::FUNC_ON_GO),
+        request, reply, msgOption);
     if (errCode != 0) {
         LOG_ERROR("IPC Error %{public}x", errCode);
         return false;
@@ -127,7 +133,9 @@ int ISharedResultSetProxy::Close()
     request.WriteInterfaceToken(GetDescriptor());
     MessageParcel reply;
     MessageOption msgOption;
-    int errCode = Remote()->SendRequest(FUNC_CLOSE, request, reply, msgOption);
+    int errCode = Remote()->SendRequest(
+        static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::FUNC_CLOSE),
+        request, reply, msgOption);
     if (errCode != 0) {
         LOG_ERROR("IPC Error %{public}x", errCode);
         return -errCode;

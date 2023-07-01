@@ -22,6 +22,7 @@
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
 #include "datashare_values_bucket.h"
+#include "distributeddata_data_share_ipc_interface_code.h"
 #include "uri.h"
 
 namespace OHOS {
@@ -33,24 +34,6 @@ namespace DataShare {
 class IDataShare : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DataShare.IDataShare");
-
-    enum {
-        CMD_GET_FILE_TYPES = 1,
-        CMD_OPEN_FILE,
-        CMD_OPEN_RAW_FILE,
-        CMD_INSERT,
-        CMD_UPDATE,
-        CMD_DELETE,
-        CMD_QUERY,
-        CMD_GET_TYPE,
-        CMD_BATCH_INSERT,
-        CMD_REGISTER_OBSERVER,
-        CMD_UNREGISTER_OBSERVER,
-        CMD_NOTIFY_CHANGE,
-        CMD_NORMALIZE_URI,
-        CMD_DENORMALIZE_URI,
-        CMD_EXECUTE_BATCH,
-    };
 
     virtual int OpenFile(const Uri &uri, const std::string &mode) = 0;
 

@@ -40,7 +40,8 @@ protected:
 private:
     using Handler = int(ISharedResultSetStub::*)(MessageParcel &request, MessageParcel &reply);
     std::shared_ptr<DataShareResultSet> resultSet_;
-    static constexpr Handler handlers[FUNC_BUTT] {
+    static constexpr Handler handlers[
+        static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::FUNC_BUTT)] {
         &ISharedResultSetStub::HandleGetRowCountRequest,
         &ISharedResultSetStub::HandleGetAllColumnNamesRequest,
         &ISharedResultSetStub::HandleOnGoRequest,
