@@ -19,6 +19,8 @@
 #include "datashare_log.h"
 #include "ishared_result_set.h"
 
+using namespace OHOS::DistributedShare::DataShare::DataShareServiceInterfaceCode;
+
 namespace OHOS {
 namespace DataShare {
 DataShareServiceProxy::DataShareServiceProxy(const sptr<IRemoteObject> &object)
@@ -42,7 +44,7 @@ int32_t DataShareServiceProxy::Insert(const Uri &uri, const DataShareValuesBucke
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_INSERT, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_INSERT), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("Insert fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
         return DATA_SHARE_ERROR;
@@ -66,7 +68,7 @@ int32_t DataShareServiceProxy::Update(const Uri &uri,
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_UPDATE, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_UPDATE), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("Update fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
         return DATA_SHARE_ERROR;
@@ -89,7 +91,7 @@ int32_t DataShareServiceProxy::Delete(const Uri &uri, const DataSharePredicates 
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_DELETE, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_DELETE), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("Delete fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
         return DATA_SHARE_ERROR;
@@ -114,7 +116,7 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri,
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_QUERY, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_QUERY), data, reply, option);
     
     auto result = ISharedResultSet::ReadFromParcel(reply);
     businessError.SetCode(reply.ReadInt32());
@@ -139,7 +141,7 @@ int DataShareServiceProxy::AddQueryTemplate(const std::string &uri, int64_t subs
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_ADD_TEMPLATE, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_ADD_TEMPLATE), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("AddTemplate fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
         return DATA_SHARE_ERROR;
@@ -161,7 +163,7 @@ int DataShareServiceProxy::DelQueryTemplate(const std::string &uri, int64_t subs
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_DEL_TEMPLATE, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_DEL_TEMPLATE), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("AddTemplate fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
         return DATA_SHARE_ERROR;
@@ -184,7 +186,7 @@ std::vector<OperationResult> DataShareServiceProxy::Publish(const Data &data, co
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_PUBLISH, parcel, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_PUBLISH), parcel, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("Publish fail to SendRequest. err: %{public}d", err);
         return results;
@@ -209,7 +211,7 @@ Data DataShareServiceProxy::GetPublishedData(const std::string &bundleName, int 
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_GET_DATA, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_GET_DATA), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("AddTemplate fail to SendRequest, err: %{public}d", err);
         return results;
@@ -239,7 +241,7 @@ std::vector<OperationResult> DataShareServiceProxy::SubscribeRdbData(const std::
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_SUBSCRIBE_RDB, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_SUBSCRIBE_RDB), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("SubscribeRdbData fail to SendRequest. err: %{public}d", err);
         return results;
@@ -265,7 +267,7 @@ std::vector<OperationResult> DataShareServiceProxy::UnSubscribeRdbData(
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_UNSUBSCRIBE_RDB, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_UNSUBSCRIBE_RDB), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("fail to SendRequest. err: %{public}d", err);
         return results;
@@ -291,7 +293,7 @@ std::vector<OperationResult> DataShareServiceProxy::EnableSubscribeRdbData(
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_ENABLE_SUBSCRIBE_RDB, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_ENABLE_SUBSCRIBE_RDB), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("fail to SendRequest. err: %{public}d", err);
         return results;
@@ -317,7 +319,7 @@ std::vector<OperationResult> DataShareServiceProxy::DisableSubscribeRdbData(
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_DISABLE_SUBSCRIBE_RDB, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_DISABLE_SUBSCRIBE_RDB), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
         return results;
@@ -346,7 +348,7 @@ std::vector<OperationResult> DataShareServiceProxy::SubscribePublishedData(
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_SUBSCRIBE_PUBLISHED, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_SUBSCRIBE_PUBLISHED), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
         return results;
@@ -371,7 +373,7 @@ std::vector<OperationResult> DataShareServiceProxy::UnSubscribePublishedData(
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_UNSUBSCRIBE_PUBLISHED, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_UNSUBSCRIBE_PUBLISHED), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
         return results;
@@ -396,7 +398,7 @@ std::vector<OperationResult> DataShareServiceProxy::EnableSubscribePublishedData
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_ENABLE_SUBSCRIBE_PUBLISHED, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_ENABLE_SUBSCRIBE_PUBLISHED), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
         return results;
@@ -421,7 +423,7 @@ std::vector<OperationResult> DataShareServiceProxy::DisableSubscribePublishedDat
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_DISABLE_SUBSCRIBE_PUBLISHED, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_DISABLE_SUBSCRIBE_PUBLISHED), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
         return results;
@@ -444,7 +446,7 @@ void DataShareServiceProxy::Notify(const std::string &uri)
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(DATA_SHARE_SERVICE_CMD_NOTIFY_OBSERVERS, data, reply, option);
+    int32_t err = Remote()->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_NOTIFY_OBSERVERS), data, reply, option);
     if (err != NO_ERROR) {
         LOG_ERROR("Notify fail to SendRequest. err: %{public}d", err);
         return;
