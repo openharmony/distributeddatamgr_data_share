@@ -23,7 +23,7 @@
 #include "iremote_stub.h"
 
 namespace OHOS::DataShare {
-using namespace OHOS::DistributedShare::DataShare::ISharedResultInterfaceCode;
+using namespace OHOS::DistributedShare::DataShare;
 
 class ISharedResultSetStub : public IRemoteStub<ISharedResultSet> {
 public:
@@ -42,7 +42,7 @@ protected:
 private:
     using Handler = int(ISharedResultSetStub::*)(MessageParcel &request, MessageParcel &reply);
     std::shared_ptr<DataShareResultSet> resultSet_;
-    static constexpr Handler handlers[static_cast<uint32_t>(FUNC_BUTT)] {
+    static constexpr Handler handlers[static_cast<uint32_t>(ISharedResultInterfaceCode::FUNC_BUTT)] {
         &ISharedResultSetStub::HandleGetRowCountRequest,
         &ISharedResultSetStub::HandleGetAllColumnNamesRequest,
         &ISharedResultSetStub::HandleOnGoRequest,
