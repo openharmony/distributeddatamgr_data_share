@@ -36,7 +36,7 @@ enum class IDataShareInterfaceCode {
     CMD_NORMALIZE_URI,
     CMD_DENORMALIZE_URI,
     CMD_EXECUTE_BATCH,
-}
+};
 
 enum class ISharedResultInterfaceCode {
     FUNC_GET_ROW_COUNT,
@@ -66,7 +66,7 @@ enum class ISharedResultInterfaceCode {
     FUNC_GET_COLUMN_TYPE,
     FUNC_GET_ROW_INDEX,
     FUNC_BUTT,
-}
+};
 
 enum class DataShareServiceInterfaceCode {
     DATA_SHARE_SERVICE_CMD_INSERT,
@@ -88,11 +88,11 @@ enum class DataShareServiceInterfaceCode {
     DATA_SHARE_SERVICE_CMD_NOTIFY,
     DATA_SHARE_SERVICE_CMD_NOTIFY_OBSERVERS,
     DATA_SHARE_SERVICE_CMD_MAX
-}
+};
 
 enum class IKvStoreDataInterfaceCode {
     GET_FEATURE_INTERFACE = 0
-}
+};
 }
 } // namespace OHOS
 
