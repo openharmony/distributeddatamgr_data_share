@@ -32,7 +32,7 @@
 #include "napi_remote_object.h"
 #include "system_ability_definition.h"
 
-using namespace OHOS::DistributedShare::DataShare::DataShareServiceInterfaceCode;
+using namespace OHOS::DistributedShare::DataShare;
 
 namespace OHOS {
 namespace DataShare {
@@ -884,7 +884,8 @@ void JsDataShareExtAbility::NotifyToDataShareService()
         LOG_ERROR("Write descriptor failed!");
         return;
     }
-    remote->SendRequest(static_cast<uint32_t>(DATA_SHARE_SERVICE_CMD_NOTIFY), data, reply, option);
+    remote->SendRequest(
+        static_cast<uint32_t>(DataShareServiceInterfaceCode::DATA_SHARE_SERVICE_CMD_NOTIFY), data, reply, option);
 }
 
 bool MakeNapiColumn(napi_env env, napi_value &napiColumns, const std::vector<std::string> &columns)
