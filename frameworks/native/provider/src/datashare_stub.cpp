@@ -22,40 +22,28 @@
 #include "ishared_result_set.h"
 #include "unistd.h"
 
+using namespace OHOS::DistributedShare::DataShare::IDataShareInterfaceCode;
+
 namespace OHOS {
 namespace DataShare {
 constexpr int DEFAULT_NUMBER = -1;
 constexpr int PERMISSION_ERROR_NUMBER = -2;
 DataShareStub::DataShareStub()
 {
-    stubFuncMap_[static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_GET_FILE_TYPES)]
-        = &DataShareStub::CmdGetFileTypes;
-    stubFuncMap_[static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_OPEN_FILE)]
-        = &DataShareStub::CmdOpenFile;
-    stubFuncMap_[static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_OPEN_RAW_FILE)]
-        = &DataShareStub::CmdOpenRawFile;
-    stubFuncMap_[static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_INSERT)]
-        = &DataShareStub::CmdInsert;
-    stubFuncMap_[static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_UPDATE)]
-        = &DataShareStub::CmdUpdate;
-    stubFuncMap_[static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_DELETE)]
-        = &DataShareStub::CmdDelete;
-    stubFuncMap_[static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_QUERY)]
-        = &DataShareStub::CmdQuery;
-    stubFuncMap_[static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_GET_TYPE)]
-        = &DataShareStub::CmdGetType;
-    stubFuncMap_[static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_BATCH_INSERT)]
-        = &DataShareStub::CmdBatchInsert;
-    stubFuncMap_[static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_REGISTER_OBSERVER)]
-        = &DataShareStub::CmdRegisterObserver;
-    stubFuncMap_[static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_UNREGISTER_OBSERVER)]
-        = &DataShareStub::CmdUnregisterObserver;
-    stubFuncMap_[static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_NOTIFY_CHANGE)]
-        = &DataShareStub::CmdNotifyChange;
-    stubFuncMap_[static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_NORMALIZE_URI)]
-        = &DataShareStub::CmdNormalizeUri;
-    stubFuncMap_[static_cast<uint32_t>(DistributedShare::DataShare::DataShareInterfaceCode::CMD_DENORMALIZE_URI)]
-        = &DataShareStub::CmdDenormalizeUri;
+    stubFuncMap_[static_cast<uint32_t>(CMD_GET_FILE_TYPES)] = &DataShareStub::CmdGetFileTypes;
+    stubFuncMap_[static_cast<uint32_t>(CMD_OPEN_FILE)] = &DataShareStub::CmdOpenFile;
+    stubFuncMap_[static_cast<uint32_t>(CMD_OPEN_RAW_FILE)] = &DataShareStub::CmdOpenRawFile;
+    stubFuncMap_[static_cast<uint32_t>(CMD_INSERT)] = &DataShareStub::CmdInsert;
+    stubFuncMap_[static_cast<uint32_t>(CMD_UPDATE)] = &DataShareStub::CmdUpdate;
+    stubFuncMap_[static_cast<uint32_t>(CMD_DELETE)] = &DataShareStub::CmdDelete;
+    stubFuncMap_[static_cast<uint32_t>(CMD_QUERY)] = &DataShareStub::CmdQuery;
+    stubFuncMap_[static_cast<uint32_t>(CMD_GET_TYPE)] = &DataShareStub::CmdGetType;
+    stubFuncMap_[static_cast<uint32_t>(CMD_BATCH_INSERT)] = &DataShareStub::CmdBatchInsert;
+    stubFuncMap_[static_cast<uint32_t>(CMD_REGISTER_OBSERVER)] = &DataShareStub::CmdRegisterObserver;
+    stubFuncMap_[static_cast<uint32_t>(CMD_UNREGISTER_OBSERVER)] = &DataShareStub::CmdUnregisterObserver;
+    stubFuncMap_[static_cast<uint32_t>(CMD_NOTIFY_CHANGE)] = &DataShareStub::CmdNotifyChange;
+    stubFuncMap_[static_cast<uint32_t>(CMD_NORMALIZE_URI)] = &DataShareStub::CmdNormalizeUri;
+    stubFuncMap_[static_cast<uint32_t>(CMD_DENORMALIZE_URI)] = &DataShareStub::CmdDenormalizeUri;
 }
 
 DataShareStub::~DataShareStub()
