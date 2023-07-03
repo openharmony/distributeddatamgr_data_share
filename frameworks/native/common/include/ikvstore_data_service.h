@@ -19,15 +19,12 @@
 
 #include "iremote_broker.h"
 #include "iremote_proxy.h"
+#include "distributeddata_data_share_ipc_interface_code.h"
 
 namespace OHOS {
 namespace DataShare {
 class IKvStoreDataService : public IRemoteBroker {
 public:
-    enum {
-        GET_FEATURE_INTERFACE = 0
-    };
-
     enum {
         DATA_SHARE_ERROR = -1,
         DATA_SHARE_OK = 0,

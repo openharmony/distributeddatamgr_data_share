@@ -25,6 +25,8 @@
 #include "ishared_result_set.h"
 #include "pac_map.h"
 
+using namespace OHOS::DistributedShare::DataShare;
+
 namespace OHOS {
 namespace DataShare {
 constexpr int32_t PERMISSION_ERR = 1;
@@ -52,7 +54,8 @@ std::vector<std::string> DataShareProxy::GetFileTypes(const Uri &uri, const std:
         return types;
     }
 
-    int32_t err = Remote()->SendRequest(CMD_GET_FILE_TYPES, data, reply, option);
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_GET_FILE_TYPES), data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("GetFileTypes fail to SendRequest. err: %{public}d", err);
     }
@@ -85,7 +88,8 @@ int DataShareProxy::OpenFile(const Uri &uri, const std::string &mode)
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(CMD_OPEN_FILE, data, reply, option);
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_OPEN_FILE), data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("OpenFile fail to SendRequest. err: %{public}d", err);
         return fd;
@@ -121,7 +125,8 @@ int DataShareProxy::OpenRawFile(const Uri &uri, const std::string &mode)
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(CMD_OPEN_RAW_FILE, data, reply, option);
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_OPEN_RAW_FILE), data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("OpenRawFile fail to SendRequest. err: %{public}d", err);
         return fd;
@@ -149,7 +154,8 @@ int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(CMD_INSERT, data, reply, option);
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERT), data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("Insert fail to SendRequest. err: %{public}d", err);
         return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : index;
@@ -162,8 +168,7 @@ int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
     return index;
 }
 
-int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates,
-    const DataShareValuesBucket &value)
+int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
 {
     int index = -1;
     MessageParcel data;
@@ -177,7 +182,8 @@ int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(CMD_UPDATE, data, reply, option);
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_UPDATE), data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("Update fail to SendRequest. err: %{public}d", err);
         return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : index;
@@ -204,7 +210,8 @@ int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(CMD_DELETE, data, reply, option);
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_DELETE), data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("Delete fail to SendRequest. err: %{public}d", err);
         return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : index;
@@ -216,8 +223,8 @@ int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates
     return index;
 }
 
-std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri,
-    const DataSharePredicates &predicates, std::vector<std::string> &columns, DatashareBusinessError &businessError)
+std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri, const DataSharePredicates &predicates,
+    std::vector<std::string> &columns, DatashareBusinessError &businessError)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
@@ -230,7 +237,8 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri,
     }
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(CMD_QUERY, data, reply, option);
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_QUERY), data, reply, option);
     auto result = ISharedResultSet::ReadFromParcel(reply);
     businessError.SetCode(reply.ReadInt32());
     businessError.SetMessage(reply.ReadString());
@@ -258,7 +266,8 @@ std::string DataShareProxy::GetType(const Uri &uri)
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(CMD_GET_TYPE, data, reply, option);
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_GET_TYPE), data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("GetFileTypes fail to SendRequest. err: %{public}d", err);
         return type;
@@ -292,7 +301,8 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(CMD_BATCH_INSERT, data, reply, option);
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_BATCH_INSERT), data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("fail to SendRequest. err: %{public}d", err);
         return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : ret;
@@ -321,7 +331,8 @@ bool DataShareProxy::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbi
 
     MessageParcel reply;
     MessageOption option;
-    int32_t result = Remote()->SendRequest(CMD_REGISTER_OBSERVER, data, reply, option);
+    int32_t result = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_REGISTER_OBSERVER), data, reply, option);
     if (result == ERR_NONE) {
         LOG_INFO("SendRequest ok, retval is %{public}d", reply.ReadInt32());
     } else {
@@ -347,7 +358,8 @@ bool DataShareProxy::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataA
 
     MessageParcel reply;
     MessageOption option;
-    int32_t result = Remote()->SendRequest(CMD_UNREGISTER_OBSERVER, data, reply, option);
+    int32_t result = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_UNREGISTER_OBSERVER), data, reply, option);
     if (result == ERR_NONE) {
         LOG_INFO("SendRequest ok, retval is %{public}d", reply.ReadInt32());
     } else {
@@ -373,7 +385,8 @@ bool DataShareProxy::NotifyChange(const Uri &uri)
 
     MessageParcel reply;
     MessageOption option;
-    int32_t result = Remote()->SendRequest(CMD_NOTIFY_CHANGE, data, reply, option);
+    int32_t result = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_NOTIFY_CHANGE), data, reply, option);
     if (result == ERR_NONE) {
         LOG_INFO("SendRequest ok, retval is %{public}d", reply.ReadInt32());
     } else {
@@ -399,7 +412,8 @@ Uri DataShareProxy::NormalizeUri(const Uri &uri)
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(CMD_NORMALIZE_URI, data, reply, option);
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_NORMALIZE_URI), data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("NormalizeUri fail to SendRequest. err: %{public}d", err);
         return Uri("");
@@ -429,7 +443,8 @@ Uri DataShareProxy::DenormalizeUri(const Uri &uri)
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(CMD_DENORMALIZE_URI, data, reply, option);
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_DENORMALIZE_URI), data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("DenormalizeUri fail to SendRequest. err: %{public}d", err);
         return Uri("");

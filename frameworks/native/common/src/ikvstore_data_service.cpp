@@ -16,6 +16,8 @@
 #include "ikvstore_data_service.h"
 #include "datashare_log.h"
 
+using namespace OHOS::DistributedShare::DataShare;
+
 namespace OHOS {
 namespace DataShare {
 DataShareKvServiceProxy::DataShareKvServiceProxy(const sptr<IRemoteObject> &impl)
@@ -39,7 +41,8 @@ sptr<IRemoteObject> DataShareKvServiceProxy::GetFeatureInterface(const std::stri
 
     MessageParcel reply;
     MessageOption mo { MessageOption::TF_SYNC };
-    int32_t error = Remote()->SendRequest(GET_FEATURE_INTERFACE, data, reply, mo);
+    int32_t error = Remote()->SendRequest(
+        static_cast<uint32_t>(IKvStoreDataInterfaceCode::GET_FEATURE_INTERFACE), data, reply, mo);
     if (error != 0) {
         LOG_ERROR("SendRequest returned %{public}d", error);
         return nullptr;
