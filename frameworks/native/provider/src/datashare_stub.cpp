@@ -382,7 +382,7 @@ ErrCode DataShareStub::CmdExecuteBatch(MessageParcel &data, MessageParcel &reply
 
 int DataShareStub::ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result)
 {
-    return -1;
+    return 0;
 }
 } // namespace DataShare
 } // namespace OHOS

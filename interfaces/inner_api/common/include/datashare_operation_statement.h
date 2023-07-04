@@ -34,7 +34,7 @@ struct OperationStatement {
     DataShareValuesBucket valuesBucket;
 };
 
-enum ExecErrorCode {
+enum ExecErrorCode : int32_t {
     EXEC_SUCCESS = 0,
     EXEC_FAILED,
     EXEC_PARTIAL_SUCCESS,

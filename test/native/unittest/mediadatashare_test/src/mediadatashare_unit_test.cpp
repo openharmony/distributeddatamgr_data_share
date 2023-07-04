@@ -1192,5 +1192,40 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ToAbsSharedResultSet_Test_001, T
     EXPECT_EQ(rowCount, 1);
     LOG_INFO("MediaDataShare_ToAbsSharedResultSet_Test_001 End");
 }
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ExecuteBatch_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_ExecuteBatch_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    
+    std::vector<DataShare::OperationStatement> statements;
+    DataShare::OperationStatement statement1;
+    statement1.operationType = INSERT;
+    statement1.uri = "datashare:///uri1";
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("DB_NUM", 150);
+    valuesBucket.Put("DB_TITLE", "ExecuteBatch_Test002");
+    statement1.valuesBucket = valuesBucket;
+    DataShare::DataSharePredicates predicates;
+    predicates.SetWhereClause("`DB_NUM` > 100");
+    statement1.predicates = predicates;
+    statements.emplace_back(statement1);
+
+    DataShare::OperationStatement statement2;
+    statement2.operationType = DELETE;
+    statement2.uri = "datashareproxy://com.uri2";
+    DataShare::DataShareValuesBucket valuesBucket1;
+    valuesBucket1.Put("DB_TITLE2", "ExecuteBatch_Test002");
+    statement2.valuesBucket = valuesBucket1;
+    DataShare::DataSharePredicates predicates1;
+    predicates1.SetWhereClause("`DB_TITLE` = ExecuteBatch_Test002");
+    statement2.predicates = predicates1;
+    statements.emplace_back(statement2);
+
+    DataShare::ExecResultSet resultSet;
+    auto ret = helper->ExecuteBatch(statements, resultSet);
+    EXPECT_EQ(ret, 0);
+    LOG_INFO("MediaDataShare_ExecuteBatch_Test_001 End");
+}
 } // namespace DataShare
 } // namespace OHOS
