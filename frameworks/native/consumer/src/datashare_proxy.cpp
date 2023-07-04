@@ -317,14 +317,13 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
 
 int DataShareProxy::ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result)
 {
-    LOG_INFO("begin.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
         return -1;
     }
     if (!ITypesUtil::Marshal(data, statements)) {
-        LOG_ERROR("fail to Marshalling");
+        LOG_ERROR("fail to Marshal");
         return -1;
     }
 
@@ -337,13 +336,11 @@ int DataShareProxy::ExecuteBatch(const std::vector<OperationStatement> &statemen
         return -1;
     }
     if (!ITypesUtil::Unmarshal(reply, result)) {
-        LOG_ERROR("fail to Unmarshal index");
+        LOG_ERROR("fail to Unmarshal result");
         return -1;
     }
-    LOG_INFO("end successfully.");
     return 0;
 }
-
 
 bool DataShareProxy::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {

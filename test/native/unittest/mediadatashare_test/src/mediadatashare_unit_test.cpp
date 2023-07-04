@@ -1197,7 +1197,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ExecuteBatch_Test_001, TestSize.
 {
     LOG_INFO("MediaDataShare_ExecuteBatch_Test_001::Start");
     std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
-    
+
     std::vector<DataShare::OperationStatement> statements;
     DataShare::OperationStatement statement1;
     statement1.operationType = INSERT;
