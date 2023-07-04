@@ -24,6 +24,7 @@
 
 #include "app/context.h"
 #include "datashare_business_error.h"
+#include "datashare_operation_statement.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
 #include "datashare_template.h"
@@ -211,6 +212,16 @@ public:
      * @return Returns the number of data records inserted.
      */
     virtual int BatchInsert(Uri &uri, const std::vector<DataShareValuesBucket> &values) = 0;
+
+    /**
+     * @brief Performs batch operations on the database.
+     *
+     * @param statements Indicates a list of database operation statement on the database.
+     * @param result Indicates the result of the operation.
+     *
+     * @return Returns the ipc result.
+     */
+    virtual int ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result) = 0;
 
     /**
      * @brief Registers an observer to DataObsMgr specified by the given Uri.

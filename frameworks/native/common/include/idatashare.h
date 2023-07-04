@@ -19,6 +19,7 @@
 #include <iremote_broker.h>
 
 #include "datashare_business_error.h"
+#include "datashare_operation_statement.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
 #include "datashare_values_bucket.h"
@@ -52,6 +53,7 @@ public:
 
     virtual int BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values) = 0;
 
+    virtual int ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result) = 0;
     virtual bool RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 
     virtual bool UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;

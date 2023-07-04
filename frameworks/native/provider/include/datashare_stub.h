@@ -45,6 +45,9 @@ private:
     ErrCode CmdNotifyChange(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdNormalizeUri(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdDenormalizeUri(MessageParcel &data, MessageParcel &reply);
+    ErrCode CmdExecuteBatch(MessageParcel &data, MessageParcel &reply);
+
+    virtual int ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result) override;
 
     using RequestFuncType = int (DataShareStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, RequestFuncType> stubFuncMap_;

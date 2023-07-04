@@ -153,6 +153,17 @@ int DataShareHelperImpl::BatchInsert(Uri &uri, const std::vector<DataShareValues
     return extSpCtl->BatchInsert(uri, values);
 }
 
+
+int DataShareHelperImpl::ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result)
+{
+    auto extSpCtl = extSpCtl_;
+    if (extSpCtl == nullptr) {
+        LOG_ERROR("providerSepOperator is nullptr");
+        return INVALID_VALUE;
+    }
+    return extSpCtl->ExecuteBatch(statements, result);
+}
+
 void DataShareHelperImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     LOG_INFO("Start");

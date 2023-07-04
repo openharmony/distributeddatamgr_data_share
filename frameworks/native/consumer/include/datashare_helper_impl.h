@@ -52,6 +52,8 @@ public:
 
     int BatchInsert(Uri &uri, const std::vector<DataShareValuesBucket> &values) override;
 
+    int ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result) override;
+
     void RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
 
     void UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
