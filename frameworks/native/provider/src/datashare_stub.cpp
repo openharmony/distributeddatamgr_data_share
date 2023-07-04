@@ -20,6 +20,7 @@
 #include "datashare_log.h"
 #include "ipc_types.h"
 #include "ishared_result_set.h"
+#include "datashare_operation_statement.h"
 #include "unistd.h"
 
 using namespace OHOS::DistributedShare::DataShare;
@@ -47,6 +48,7 @@ DataShareStub::DataShareStub()
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_NORMALIZE_URI)] = &DataShareStub::CmdNormalizeUri;
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_DENORMALIZE_URI)] =
         &DataShareStub::CmdDenormalizeUri;
+    stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_EXECUTE_BATCH)] = &DataShareStub::CmdExecuteBatch;
 }
 
 DataShareStub::~DataShareStub()
@@ -355,6 +357,32 @@ ErrCode DataShareStub::CmdDenormalizeUri(MessageParcel &data, MessageParcel &rep
         return ERR_INVALID_VALUE;
     }
     return DATA_SHARE_NO_ERROR;
+}
+
+ErrCode DataShareStub::CmdExecuteBatch(MessageParcel &data, MessageParcel &reply)
+{
+    LOG_INFO("ndy CmdExecuteBatch start");
+    std::vector<OperationStatement> statements;
+    ExecResultSet result;
+    if (!ITypesUtil::Unmarshal(data, statements)) {
+        LOG_ERROR("Unmarshalling OperationStatement failed");
+        return ERR_INVALID_VALUE;
+    }
+    auto ret = ExecuteBatch(statements, result);
+    if (ret == DEFAULT_NUMBER) {
+        LOG_ERROR("ExecuteBatch error");
+        return ERR_INVALID_VALUE;
+    }
+    if (!ITypesUtil::Marshal(reply, result)) {
+        LOG_ERROR("fail to write result");
+        return ERR_INVALID_VALUE;
+    }
+    return DATA_SHARE_NO_ERROR;
+}
+
+int DataShareStub::ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result)
+{
+    return 0;
 }
 } // namespace DataShare
 } // namespace OHOS

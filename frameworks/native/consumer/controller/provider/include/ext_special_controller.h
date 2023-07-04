@@ -17,6 +17,7 @@
 #define EXT_SPECIAL_CONTROLLER_H
 
 #include "datashare_connection.h"
+#include "datashare_operation_statement.h"
 #include "datashare_values_bucket.h"
 #include "uri.h"
 
@@ -35,6 +36,8 @@ public:
     std::string GetType(const Uri &uri);
 
     int BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values);
+	
+    int ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result);
 
     Uri NormalizeUri(const Uri &uri);
 

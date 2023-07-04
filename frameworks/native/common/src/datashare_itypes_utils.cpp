@@ -185,4 +185,58 @@ bool Unmarshalling(DataShareValuesBucket &bucket, MessageParcel &parcel)
 {
     return ITypesUtil::Unmarshal(parcel, bucket.valuesMap);
 }
+
+template<>
+bool Marshalling(const OperationStatement &operationStatement, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, static_cast<int32_t>(operationStatement.operationType),
+        operationStatement.uri, operationStatement.valuesBucket, operationStatement.predicates);
+}
+
+template<>
+bool Unmarshalling(OperationStatement &operationStatement, MessageParcel &parcel)
+{
+    int type;
+    if (!ITypesUtil::Unmarshalling(type, parcel)) {
+        return false;
+    }
+    operationStatement.operationType = static_cast<DataShare::Operation>(type);
+    return ITypesUtil::Unmarshal(parcel, operationStatement.uri,
+        operationStatement.valuesBucket, operationStatement.predicates);
+}
+
+template<>
+bool Marshalling(const ExecResult &execResult, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, static_cast<int32_t>(execResult.operationType), execResult.code,
+        execResult.message);
+}
+
+template<>
+bool Unmarshalling(ExecResult &execResult, MessageParcel &parcel)
+{
+    int type;
+    if (!ITypesUtil::Unmarshalling(type, parcel)) {
+        return false;
+    }
+    execResult.operationType = static_cast<DataShare::Operation>(type);
+    return ITypesUtil::Unmarshal(parcel, execResult.code, execResult.message);
+}
+
+template<>
+bool Marshalling(const ExecResultSet &execResultSet, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, static_cast<int32_t>(execResultSet.errorCode), execResultSet.results);
+}
+
+template<>
+bool Unmarshalling(ExecResultSet &execResultSet, MessageParcel &parcel)
+{
+    int errorCode;
+    if (!ITypesUtil::Unmarshalling(errorCode, parcel)) {
+        return false;
+    }
+    execResultSet.errorCode = static_cast<DataShare::ExecErrorCode>(errorCode);
+    return ITypesUtil::Unmarshal(parcel, execResultSet.results);
+}
 } // namespace OHOS::ITypesUtil

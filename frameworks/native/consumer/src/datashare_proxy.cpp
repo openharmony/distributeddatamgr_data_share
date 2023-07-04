@@ -315,6 +315,33 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
     return ret;
 }
 
+int DataShareProxy::ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
+        LOG_ERROR("WriteInterfaceToken failed");
+        return -1;
+    }
+    if (!ITypesUtil::Marshal(data, statements)) {
+        LOG_ERROR("fail to Marshal");
+        return -1;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_EXECUTE_BATCH), data, reply, option);
+    if (err != DATA_SHARE_NO_ERROR) {
+        LOG_ERROR("fail to SendRequest. err: %{public}d", err);
+        return -1;
+    }
+    if (!ITypesUtil::Unmarshal(reply, result)) {
+        LOG_ERROR("fail to Unmarshal result");
+        return -1;
+    }
+    return 0;
+}
+
 bool DataShareProxy::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     LOG_INFO("begin.");

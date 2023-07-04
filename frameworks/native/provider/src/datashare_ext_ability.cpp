@@ -110,6 +110,11 @@ int DataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataShare
     return -1;
 }
 
+int DataShareExtAbility::ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result)
+{
+    return -1;
+}
+
 bool DataShareExtAbility::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     return true;

@@ -16,6 +16,7 @@
 #ifndef DATASHARE_COMMON_ITYPES_UTIL_H
 #define DATASHARE_COMMON_ITYPES_UTIL_H
 
+#include "datashare_operation_statement.h"
 #include "datashare_predicates.h"
 #include "datashare_template.h"
 #include "datashare_values_bucket.h"
@@ -34,7 +35,9 @@ using PublishedDataChangeNode = DataShare::PublishedDataChangeNode;
 using OperationResult = DataShare::OperationResult;
 using DataShareValuesBucket = DataShare::DataShareValuesBucket;
 using AshmemNode = DataShare::AshmemNode;
-
+using OperationStatement = DataShare::OperationStatement;
+using ExecResult = DataShare::ExecResult;
+using ExecResultSet = DataShare::ExecResultSet;
 
 template<>
 bool Marshalling(const Predicates &bucket, MessageParcel &parcel);
@@ -110,5 +113,23 @@ bool Unmarshalling(OperationResult &predicateTemplateNode, MessageParcel &parcel
 
 template<>
 bool Marshalling(const TemplateId &changeNode, MessageParcel &parcel);
+
+template<>
+bool Marshalling(const OperationStatement &operationStatement, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(OperationStatement &operationStatement, MessageParcel &parcel);
+
+template<>
+bool Marshalling(const ExecResult &execResult, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(ExecResult &execResult, MessageParcel &parcel);
+
+template<>
+bool Marshalling(const ExecResultSet &execResultSet, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(ExecResultSet &execResultSet, MessageParcel &parcel);
 }
 #endif
