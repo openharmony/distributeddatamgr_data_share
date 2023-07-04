@@ -153,12 +153,11 @@ int DataShareHelperImpl::BatchInsert(Uri &uri, const std::vector<DataShareValues
     return extSpCtl->BatchInsert(uri, values);
 }
 
-
 int DataShareHelperImpl::ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result)
 {
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
-        LOG_ERROR("providerSepOperator is nullptr");
+        LOG_ERROR("extSpCtl is nullptr");
         return INVALID_VALUE;
     }
     return extSpCtl->ExecuteBatch(statements, result);

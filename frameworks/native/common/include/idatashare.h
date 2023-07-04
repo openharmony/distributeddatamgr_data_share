@@ -54,6 +54,7 @@ public:
     virtual int BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values) = 0;
 
     virtual int ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result) = 0;
+
     virtual bool RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 
     virtual bool UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
