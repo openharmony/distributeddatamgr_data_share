@@ -59,12 +59,9 @@
                 "hitrace",
                 "hilog",
                 "ipc",
-                "ipc_js",
-                "libuv",
                 "napi",
                 "relational_store",
-                "samgr",
-                "utils_base"
+                "samgr"
             ],
             "third_party": [
                 "libuv"
