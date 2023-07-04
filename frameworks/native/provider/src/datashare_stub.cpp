@@ -361,7 +361,6 @@ ErrCode DataShareStub::CmdDenormalizeUri(MessageParcel &data, MessageParcel &rep
 
 ErrCode DataShareStub::CmdExecuteBatch(MessageParcel &data, MessageParcel &reply)
 {
-    LOG_INFO("ndy CmdExecuteBatch start");
     std::vector<OperationStatement> statements;
     ExecResultSet result;
     if (!ITypesUtil::Unmarshal(data, statements)) {
