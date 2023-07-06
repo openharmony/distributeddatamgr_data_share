@@ -49,7 +49,7 @@ private:
     ErrCode CmdInsertExt(MessageParcel &data, MessageParcel &reply);
 
     virtual int ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result) override;
-    virtual int Insert(const Uri &uri, const DataShareValuesBucket &value, std::string &result) override;
+    int Insert(const Uri &uri, const DataShareValuesBucket &value, std::string &result) override;
 
     using RequestFuncType = int (DataShareStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, RequestFuncType> stubFuncMap_;
