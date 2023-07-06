@@ -168,7 +168,7 @@ public:
      *
      * @return Returns the index of the inserted data record.
      */
-    virtual int Insert(Uri &uri, const DataShareValuesBucket &value, std::string &result) = 0;
+    virtual int InsertExt(Uri &uri, const DataShareValuesBucket &value, std::string &result) = 0;
 
     /**
      * @brief Updates data records in the database.

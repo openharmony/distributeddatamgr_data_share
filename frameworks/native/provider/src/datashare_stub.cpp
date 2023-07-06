@@ -406,7 +406,7 @@ int DataShareStub::ExecuteBatch(const std::vector<OperationStatement> &statement
     return 0;
 }
 
-int DataShareStub::Insert(const Uri &uri, const DataShareValuesBucket &value, std::string &result)
+int DataShareStub::InsertExt(const Uri &uri, const DataShareValuesBucket &value, std::string &result)
 {
     return 0;
 }

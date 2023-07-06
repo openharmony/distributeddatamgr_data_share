@@ -168,7 +168,7 @@ int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
     return index;
 }
 
-int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value, std::string &result)
+int DataShareProxy::InsertExt(const Uri &uri, const DataShareValuesBucket &value, std::string &result)
 {
     int index = -1;
     MessageParcel data;
