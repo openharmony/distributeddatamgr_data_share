@@ -91,7 +91,8 @@ enum class DataShareServiceInterfaceCode {
 };
 
 enum class IKvStoreDataInterfaceCode {
-    GET_FEATURE_INTERFACE = 0
+    GET_FEATURE_INTERFACE = 0,
+    REGISTERCLIENTDEATHOBSERVER
 };
 }
 } // namespace OHOS

@@ -32,6 +32,8 @@ public:
 
     virtual sptr<IRemoteObject> GetFeatureInterface(const std::string &name) = 0;
 
+    virtual uint32_t RegisterClientDeathObserver(const std::string &appId, sptr<IRemoteObject> observer) = 0;
+
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DistributedKv.IKvStoreDataService");
 };
 
@@ -40,6 +42,7 @@ public:
     explicit DataShareKvServiceProxy(const sptr<IRemoteObject> &impl);
     ~DataShareKvServiceProxy() = default;
     sptr<IRemoteObject> GetFeatureInterface(const std::string &name) override;
+    uint32_t RegisterClientDeathObserver(const std::string &appId, sptr<IRemoteObject> observer) override;
 };
 }
 }
