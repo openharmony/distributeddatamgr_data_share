@@ -99,8 +99,8 @@ int DataShareHelperImpl::Insert(Uri &uri, const DataShareValuesBucket &value)
 
 int DataShareHelperImpl::InsertExt(Uri &uri, const DataShareValuesBucket &value, std::string &result)
 {
-    auto providerSpCtl = providerSpCtl_;
-    if (providerSpCtl == nullptr) {
+    auto extSpCtl = extSpCtl_;
+    if (extSpCtl == nullptr) {
         LOG_ERROR("providerSpCtl is nullptr");
         return INVALID_VALUE;
     }
