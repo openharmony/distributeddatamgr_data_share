@@ -183,7 +183,7 @@ int DataShareProxy::InsertExt(const Uri &uri, const DataShareValuesBucket &value
     MessageParcel reply;
     MessageOption option;
     int32_t err = Remote()->SendRequest(
-        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERTEXT), data, reply, option);
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERT_EXT), data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
         LOG_ERROR("Insert fail to SendRequest. err: %{public}d", err);
         return index;
