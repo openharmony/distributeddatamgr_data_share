@@ -39,6 +39,8 @@ public:
 	
     int ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result);
 
+    int Insert(Uri &uri, const DataShareValuesBucket &value, std::string &result);
+
     Uri NormalizeUri(const Uri &uri);
 
     Uri DenormalizeUri(const Uri &uri);
