@@ -49,7 +49,7 @@ DataShareStub::DataShareStub()
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_DENORMALIZE_URI)] =
         &DataShareStub::CmdDenormalizeUri;
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_EXECUTE_BATCH)] = &DataShareStub::CmdExecuteBatch;
-    stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERT_EXT] = &DataShareStub::CmdInsertExt;
+    stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERT_EXT)] = &DataShareStub::CmdInsertExt;
 }
 
 DataShareStub::~DataShareStub()
