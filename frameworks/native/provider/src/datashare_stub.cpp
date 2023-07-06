@@ -389,7 +389,7 @@ ErrCode DataShareStub::CmdInsertExt(MessageParcel &data, MessageParcel &reply)
         return ERR_INVALID_VALUE;
     }
     std::string result;
-    int index = Insert(uri, value, result);
+    int index = InsertExt(uri, value, result);
     if (index == DEFAULT_NUMBER) {
         LOG_ERROR("Insert inner error");
         return ERR_INVALID_VALUE;
