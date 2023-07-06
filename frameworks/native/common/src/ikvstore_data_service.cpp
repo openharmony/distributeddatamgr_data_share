@@ -56,7 +56,7 @@ sptr<IRemoteObject> DataShareKvServiceProxy::GetFeatureInterface(const std::stri
     return remoteObject;
 }
 
-uint32_t DataShareKvServiceProxy::RegisterClientDeathObserver( const std::string &appId, sptr<IRemoteObject> observer)
+uint32_t DataShareKvServiceProxy::RegisterClientDeathObserver(const std::string &appId, sptr<IRemoteObject> observer)
 {
     if (observer == nullptr) {
         LOG_ERROR("observer is nullptr");
