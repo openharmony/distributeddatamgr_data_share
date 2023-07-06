@@ -79,7 +79,7 @@ int ExtSpecialController::BatchInsert(const Uri &uri, const std::vector<DataShar
     return proxy->BatchInsert(uri, values);
 }
 
-int ProviderSpecialController::InsertExt(Uri &uri, const DataShareValuesBucket &value, std::string &result)
+int ExtSpecialController::InsertExt(Uri &uri, const DataShareValuesBucket &value, std::string &result)
 {
     auto connection = connection_;
     if (connection == nullptr) {
