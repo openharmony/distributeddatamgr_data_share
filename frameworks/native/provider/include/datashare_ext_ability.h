@@ -113,6 +113,17 @@ public:
     virtual int Insert(const Uri &uri, const DataShareValuesBucket &value);
 
     /**
+     * @brief Inserts a single data record into the database.
+     *
+     * @param uri Indicates the path of the data to operate.
+     * @param value  Indicates the data record to insert. If this parameter is null, a blank row will be inserted.
+     * @param result  Indicates the data result to insert.
+     *
+     * @return Returns the index of the inserted data record.
+     */
+    virtual int InsertExt(const Uri &uri, const DataShareValuesBucket &value, std::string &result);
+
+    /**
      * @brief Updates data records in the database.
      *
      * @param uri Indicates the path of data to update.

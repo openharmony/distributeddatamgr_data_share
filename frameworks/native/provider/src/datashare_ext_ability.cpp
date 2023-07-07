@@ -83,6 +83,11 @@ int DataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &val
     return -1;
 }
 
+int DataShareExtAbility::InsertExt(const Uri &uri, const DataShareValuesBucket &value, std::string &result)
+{
+    return -1;
+}
+
 int DataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &predicates,
     const DataShareValuesBucket &value)
 {

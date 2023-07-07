@@ -1227,5 +1227,19 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ExecuteBatch_Test_001, TestSize.
     EXPECT_EQ(ret, 0);
     LOG_INFO("MediaDataShare_ExecuteBatch_Test_001 End");
 }
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_InsertExt_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_InsertExt_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_TRUE(helper != nullptr);
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "Datashare_CRUD_Test001");
+    std::string str;
+    int ret = helper->InsertExt(uri, valuesBucket, str);
+    EXPECT_EQ(ret, 0);
+    LOG_INFO("MediaDataShare_InsertExt_Test_001 End");
+}
 } // namespace DataShare
 } // namespace OHOS

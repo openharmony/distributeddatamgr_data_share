@@ -97,6 +97,16 @@ int DataShareHelperImpl::Insert(Uri &uri, const DataShareValuesBucket &value)
     return generalCtl->Insert(uri, value);
 }
 
+int DataShareHelperImpl::InsertExt(Uri &uri, const DataShareValuesBucket &value, std::string &result)
+{
+    auto extSpCtl = extSpCtl_;
+    if (extSpCtl == nullptr) {
+        LOG_ERROR("providerSpCtl is nullptr");
+        return INVALID_VALUE;
+    }
+    return extSpCtl->InsertExt(uri, value, result);
+}
+
 int DataShareHelperImpl::Update(Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
 {
     auto generalCtl = generalCtl_;

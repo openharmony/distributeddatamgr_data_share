@@ -36,6 +36,7 @@ enum class IDataShareInterfaceCode {
     CMD_NORMALIZE_URI,
     CMD_DENORMALIZE_URI,
     CMD_EXECUTE_BATCH,
+    CMD_INSERT_EXT,
 };
 
 enum class ISharedResultInterfaceCode {

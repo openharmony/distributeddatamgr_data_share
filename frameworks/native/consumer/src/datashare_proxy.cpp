@@ -168,6 +168,33 @@ int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
     return index;
 }
 
+int DataShareProxy::InsertExt(const Uri &uri, const DataShareValuesBucket &value, std::string &result)
+{
+    int index = -1;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
+        LOG_ERROR("WriteInterfaceToken failed");
+        return index;
+    }
+    if (!ITypesUtil::Marshal(data, uri, value)) {
+        LOG_ERROR("fail to Marshal value");
+        return index;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERT_EXT), data, reply, option);
+    if (err != DATA_SHARE_NO_ERROR) {
+        LOG_ERROR("Insert fail to SendRequest. err: %{public}d", err);
+        return index;
+    }
+    if (!ITypesUtil::Unmarshal(reply, index, result)) {
+        LOG_ERROR("fail to Unmarshal index");
+        return index;
+    }
+    return index;
+}
+
 int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
 {
     int index = -1;

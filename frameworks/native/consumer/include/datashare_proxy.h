@@ -37,6 +37,8 @@ public:
 
     virtual int Insert(const Uri &uri, const DataShareValuesBucket &value) override;
 
+    virtual int InsertExt(const Uri &uri, const DataShareValuesBucket &value, std::string &result) override;
+
     virtual int Update(const Uri &uri, const DataSharePredicates &predicates,
         const DataShareValuesBucket &value) override;
 

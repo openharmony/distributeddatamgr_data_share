@@ -49,6 +49,7 @@ DataShareStub::DataShareStub()
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_DENORMALIZE_URI)] =
         &DataShareStub::CmdDenormalizeUri;
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_EXECUTE_BATCH)] = &DataShareStub::CmdExecuteBatch;
+    stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERT_EXT)] = &DataShareStub::CmdInsertExt;
 }
 
 DataShareStub::~DataShareStub()
@@ -379,7 +380,33 @@ ErrCode DataShareStub::CmdExecuteBatch(MessageParcel &data, MessageParcel &reply
     return DATA_SHARE_NO_ERROR;
 }
 
+ErrCode DataShareStub::CmdInsertExt(MessageParcel &data, MessageParcel &reply)
+{
+    Uri uri("");
+    DataShareValuesBucket value;
+    if (!ITypesUtil::Unmarshal(data, uri, value)) {
+        LOG_ERROR("Unmarshalling value is nullptr");
+        return ERR_INVALID_VALUE;
+    }
+    std::string result;
+    int index = InsertExt(uri, value, result);
+    if (index == DEFAULT_NUMBER) {
+        LOG_ERROR("Insert inner error");
+        return ERR_INVALID_VALUE;
+    }
+    if (!ITypesUtil::Marshal(reply, index, result)) {
+        LOG_ERROR("fail to write result");
+        return ERR_INVALID_VALUE;
+    }
+    return DATA_SHARE_NO_ERROR;
+}
+
 int DataShareStub::ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result)
+{
+    return 0;
+}
+
+int DataShareStub::InsertExt(const Uri &uri, const DataShareValuesBucket &value, std::string &result)
 {
     return 0;
 }

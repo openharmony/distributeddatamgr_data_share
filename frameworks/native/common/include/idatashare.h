@@ -42,6 +42,8 @@ public:
 
     virtual int Insert(const Uri &uri, const DataShareValuesBucket &value) = 0;
 
+    virtual int InsertExt(const Uri &uri, const DataShareValuesBucket &value, std::string &result) = 0;
+
     virtual int Update(const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) = 0;
 
     virtual int Delete(const Uri &uri, const DataSharePredicates &predicates) = 0;
