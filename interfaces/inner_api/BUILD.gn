@@ -48,7 +48,7 @@ config("datashare_public_config") {
     "${datashare_native_consumer_path}/include",
     "${datashare_native_provider_path}/include",
     "${datashare_native_proxy_path}/include",
-    "//foundation/ability/ability_runtime/interfaces/inner_api/dataobs_manager/include",
+    "${ability_runtime_inner_api_path}/dataobs_manager/include",
   ]
 }
 
@@ -83,9 +83,9 @@ ohos_shared_library("datashare_consumer") {
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_context_native",
-    "ability_runtime:extension_manager",
     "ability_runtime:app_context",
     "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
