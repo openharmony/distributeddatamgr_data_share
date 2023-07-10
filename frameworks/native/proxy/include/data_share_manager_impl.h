@@ -22,6 +22,7 @@
 
 #include "data_share_service_proxy.h"
 #include "data_share_errno.h"
+#include "idata_share_client_death_observer.h"
 #include "iremote_object.h"
 #include "refbase.h"
 
@@ -68,6 +69,8 @@ private:
 
     void ResetServiceHandle();
 
+    void RegisterClientDeathObserver();
+
     static std::shared_ptr<DataShareKvServiceProxy> GetDistributedDataManager();
 
     std::mutex mutex_;
@@ -81,6 +84,7 @@ private:
     static constexpr int MIN_THREADS = 0;
     std::shared_ptr<ExecutorPool> pool_;
     std::function<void(std::shared_ptr<DataShareServiceProxy>)> deathCallback_ = {};
+    sptr<IRemoteObject> clientDeathObserverPtr_;
 };
 }
 } // namespace OHOS::DataShare

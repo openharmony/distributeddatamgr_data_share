@@ -85,7 +85,24 @@ sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
         LOG_ERROR("Get DataShare service failed!");
         return nullptr;
     }
+    RegisterClientDeathObserver();
     return iface_cast<DataShareServiceProxy>(remote);
+}
+
+void DataShareManagerImpl::RegisterClientDeathObserver()
+{
+    if (dataMgrService_ == nullptr || bundleName_.empty()) {
+        return;
+    }
+    LOG_INFO("RegisterClientDeathObserver bundleName is %{public}s", bundleName_.c_str());
+    if (clientDeathObserverPtr_ == nullptr) {
+        clientDeathObserverPtr_ = new (std::nothrow) DataShareClientDeathObserverStub();
+    }
+    if (clientDeathObserverPtr_ == nullptr) {
+        LOG_WARN("new KvStoreClientDeathObserver failed");
+        return;
+    }
+    dataMgrService_->RegisterClientDeathObserver(bundleName_, clientDeathObserverPtr_);
 }
 
 DataShareManagerImpl::DataShareManagerImpl()

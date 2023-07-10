@@ -14,6 +14,7 @@
  */
 
 #include "ikvstore_data_service.h"
+#include "datashare_itypes_utils.h"
 #include "datashare_log.h"
 
 using namespace OHOS::DistributedShare::DataShare;
@@ -53,6 +54,33 @@ sptr<IRemoteObject> DataShareKvServiceProxy::GetFeatureInterface(const std::stri
         return nullptr;
     }
     return remoteObject;
+}
+
+uint32_t DataShareKvServiceProxy::RegisterClientDeathObserver(const std::string &appId, sptr<IRemoteObject> observer)
+{
+    if (observer == nullptr) {
+        LOG_ERROR("observer is nullptr");
+        return -1;
+    }
+
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(DataShareKvServiceProxy::GetDescriptor())) {
+        LOG_ERROR("write descriptor failed");
+        return -1;
+    }
+    if (!ITypesUtil::Marshal(data, appId, observer)) {
+        LOG_ERROR("remote observer fail");
+        return -1;
+    }
+    MessageOption mo { MessageOption::TF_SYNC };
+    int32_t error = Remote()->SendRequest(
+        static_cast<uint32_t>(IKvStoreDataInterfaceCode::REGISTERCLIENTDEATHOBSERVER), data, reply, mo);
+    if (error != 0) {
+        LOG_WARN("failed during IPC. errCode %{public}d", error);
+        return -1;
+    }
+    return static_cast<uint32_t>(reply.ReadInt32());
 }
 }
 }
