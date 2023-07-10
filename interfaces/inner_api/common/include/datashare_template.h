@@ -105,8 +105,7 @@ struct PublishedDataItem {
     PublishedDataItem(const PublishedDataItem &) = delete;
     PublishedDataItem &operator=(const PublishedDataItem &) = delete;
     virtual ~PublishedDataItem();
-    PublishedDataItem(const std::string &key,
-        int64_t subscriberId, DataType value);
+    PublishedDataItem(const std::string &key, int64_t subscriberId, DataType value);
     PublishedDataItem(PublishedDataItem &&item);
     PublishedDataItem &operator=(PublishedDataItem &&item);
     bool IsAshmem() const;
