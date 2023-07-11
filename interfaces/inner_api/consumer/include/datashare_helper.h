@@ -16,13 +16,13 @@
 #ifndef DATASHARE_HELPER_H
 #define DATASHARE_HELPER_H
 
+#include <list>
 #include <map>
 #include <memory>
 #include <mutex>
-#include <list>
 #include <string>
 
-#include "app/context.h"
+#include "data_ability_observer_interface.h"
 #include "datashare_business_error.h"
 #include "datashare_operation_statement.h"
 #include "datashare_predicates.h"
@@ -69,17 +69,6 @@ public:
      * @brief Destructor.
      */
     virtual ~DataShareHelper() = default;
-
-    /**
-     * @brief Creates a DataShareHelper instance with the Uri specified based on the given Context.
-     *
-     * @param context Indicates the Context object on OHOS.
-     * @param strUri Indicates the database table or disk file to operate.
-     *
-     * @return Returns the created DataShareHelper instance with a specified Uri.
-     */
-    static std::shared_ptr<DataShareHelper> Creator(const std::shared_ptr<AppExecFwk::Context> &context,
-        const std::string &strUri);
 
     /**
      * @brief You can use this method to specify the Uri of the data to operate and set the binding relationship

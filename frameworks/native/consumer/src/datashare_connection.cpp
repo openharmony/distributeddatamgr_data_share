@@ -15,7 +15,7 @@
 
 #include "datashare_connection.h"
 
-#include "ability_manager_client.h"
+#include "ams_mgr_proxy.h"
 #include "datashare_proxy.h"
 #include "datashare_log.h"
 
@@ -76,14 +76,8 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
     if (dataShareProxy_ != nullptr) {
         return dataShareProxy_;
     }
-
-    AAFwk::Want want;
-    if (uri_.ToString().empty()) {
-        want.SetUri(uri);
-    } else {
-        want.SetUri(uri_);
-    }
-    ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, this, token);
+    auto reqUri = uri_.ToString().empty() ? uri.ToString() : uri_.ToString();
+    ErrCode ret = AmsMgrProxy::GetInstance()->Connect(reqUri, this, token);
     if (ret != ERR_OK) {
         LOG_ERROR("connect ability failed, ret = %{public}d", ret);
         return nullptr;
@@ -105,7 +99,7 @@ void DataShareConnection::DisconnectDataShareExtAbility()
     if (dataShareProxy_ == nullptr) {
         return;
     }
-    ErrCode ret = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(this);
+    ErrCode ret = AmsMgrProxy::GetInstance()->DisConnect(this);
     if (ret != ERR_OK) {
         LOG_ERROR("disconnect ability failed, ret = %{public}d", ret);
         return;
