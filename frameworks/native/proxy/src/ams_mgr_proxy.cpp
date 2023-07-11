@@ -15,6 +15,7 @@
 #include "ams_mgr_proxy.h"
 
 #include "datashare_log.h"
+#include "extension_ability_info.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -52,7 +53,7 @@ bool AmsMgrProxy::Connect(
     want.SetUri(uri);
     std::lock_guard<std::mutex> lock(mutex_);
     if (ConnectSA()) {
-        return proxy_->ConnectAbility(want, connect, callerToken);
+        return proxy_->ConnectAbilityCommon(want, connect, callerToken, AppExecFwk::ExtensionAbilityType::DATASHARE);
     }
     return false;
 }
