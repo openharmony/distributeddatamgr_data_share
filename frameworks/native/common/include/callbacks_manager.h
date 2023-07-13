@@ -26,6 +26,17 @@ namespace OHOS::DataShare {
 template<class Key, class Observer>
 class CallbacksManager {
 public:
+    struct ObserverNodeOnEnabled {
+        ObserverNodeOnEnabled(const std::shared_ptr<Observer> &observer) : observer_(observer)
+        {
+            isNotifyOnEnabled_ = false;
+        };
+        ObserverNodeOnEnabled(const std::shared_ptr<Observer> &observer, bool isNotifyOnEnabled)
+            : observer_(observer), isNotifyOnEnabled_(isNotifyOnEnabled) {};
+        std::shared_ptr<Observer> observer_;
+        bool isNotifyOnEnabled_;
+    };
+
     std::vector<OperationResult> AddObservers(const std::vector<Key> &keys, void *subscriber,
         const std::shared_ptr<Observer> observer,
         std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer)>,
@@ -41,7 +52,7 @@ public:
             CallbacksManager::DefaultProcess);
 
     std::vector<OperationResult> EnableObservers(const std::vector<Key> &keys, void *subscriber,
-        std::function<void(std::map<Key, std::vector<std::shared_ptr<Observer>>> &)> processOnLocalEnabled,
+        std::function<void(std::map<Key, std::vector<ObserverNodeOnEnabled>> &)> processOnLocalEnabled,
         std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)>);
 
     std::vector<OperationResult> DisableObservers(const std::vector<Key> &keys, void *subscriber,
@@ -54,16 +65,21 @@ public:
     int GetEnabledSubscriberSize(const Key &key);
     void RecoverObservers(std::function<void(const std::vector<Key> &)> recoverObservers);
 
+    void SetObserversNotNotifiedOnEnabled(const Key &key, const std::vector<ObserverNodeOnEnabled> &observers);
+    void SetObserversNotifiedOnEnabled(const Key &key);
+
 private:
     static void DefaultProcess(const std::vector<Key> &, std::vector<OperationResult> &){};
     struct ObserverNode {
         std::shared_ptr<Observer> observer_;
         bool enabled_;
         void *subscriber_;
+        bool isNotifyOnEnabled_;
         ObserverNode(const std::shared_ptr<Observer> &observer, void *subscriber)
             : observer_(observer), subscriber_(subscriber)
         {
             enabled_ = true;
+            isNotifyOnEnabled_ = false;
         };
     };
     void DelLocalObservers(const Key &key, void *subscriber, std::vector<Key> &lastDelKeys,
@@ -216,12 +232,12 @@ std::vector<std::shared_ptr<Observer>> CallbacksManager<Key, Observer>::GetEnabl
 template<class Key, class Observer>
 std::vector<OperationResult> CallbacksManager<Key, Observer>::EnableObservers(
     const std::vector<Key> &keys, void *subscriber,
-    std::function<void(std::map<Key, std::vector<std::shared_ptr<Observer>>> &)> processOnLocalEnabled,
+    std::function<void(std::map<Key, std::vector<ObserverNodeOnEnabled>> &)> processOnLocalEnabled,
     std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnFirstEnabled)
 {
     std::vector<OperationResult> result;
     std::vector<Key> firstRegisterKey;
-    std::map<Key, std::vector<std::shared_ptr<Observer>>> localEnabledObservers;
+    std::map<Key, std::vector<ObserverNodeOnEnabled>> localEnabledObservers;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
         for (auto &key : keys) {
@@ -234,7 +250,7 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::EnableObservers(
             bool hasEnabled = false;
             for (auto &item : callbacks_[key]) {
                 if (item.subscriber_ == subscriber) {
-                    localEnabledObservers[key].emplace_back(item.observer_);
+                    localEnabledObservers[key].emplace_back(item.observer_, item.isNotifyOnEnabled_);
                     item.enabled_ = true;
                     hasEnabled = true;
                 }
@@ -329,6 +345,42 @@ int CallbacksManager<Key, Observer>::GetEnabledSubscriberSize(const Key &key)
         }
     }
     return count;
+}
+
+template<class Key, class Observer>
+void CallbacksManager<Key, Observer>::SetObserversNotNotifiedOnEnabled(const Key &key,
+    const std::vector<ObserverNodeOnEnabled> &observersNodes)
+{
+    std::lock_guard<decltype(mutex_)> lck(mutex_);
+    auto it = callbacks_.find(key);
+    if (it == callbacks_.end()) {
+        return;
+    }
+    std::vector<ObserverNode> &callbacks = it->second;
+    for (const auto &observerNode : observersNodes) {
+        for (auto &callback : callbacks) {
+            if (observerNode.observer_ == callback.observer_) {
+                callback.isNotifyOnEnabled_ = false;
+                break;
+            }
+        }
+    }
+}
+
+template<class Key, class Observer>
+void CallbacksManager<Key, Observer>::SetObserversNotifiedOnEnabled(const Key &key)
+{
+    std::lock_guard<decltype(mutex_)> lck(mutex_);
+    auto it = callbacks_.find(key);
+    if (it == callbacks_.end()) {
+        return;
+    }
+    std::vector<ObserverNode> &callbacks = it->second;
+    for (auto &observerNode : callbacks) {
+        if (!observerNode.enabled_) {
+            observerNode.isNotifyOnEnabled_ = true;
+        }
+    }
 }
 } // namespace OHOS::DataShare
 #endif // DATA_SHARE_CALLBACKS_MANAGER_H

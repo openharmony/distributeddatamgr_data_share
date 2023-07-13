@@ -134,8 +134,8 @@ std::vector<OperationResult> PublishedDataSubscriberManager::EnableObservers(voi
         keys.emplace_back(uri, subscriberId);
     });
     return BaseCallbacks::EnableObservers(
-        keys, subscriber, [this](std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap) {
-            Emit(obsMap);
+        keys, subscriber, [this](std::map<Key, std::vector<ObserverNodeOnEnabled>> &obsMap) {
+            EmitOnEnable(obsMap);
         },
         [&proxy, &subscriberId, subscriber, this](const std::vector<Key> &firstAddKeys,
         std::vector<OperationResult> &opResult) {
@@ -230,6 +230,7 @@ void PublishedDataSubscriberManager::Emit(PublishedDataChangeNode &changeNode)
         for (auto const &obs : callbacks) {
             results[obs].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
         }
+        BaseCallbacks::SetObserversNotifiedOnEnabled(key);
     }
     for (auto &[callback, node] : results) {
         node.ownerBundleName_ = changeNode.ownerBundleName_;
@@ -253,7 +254,7 @@ void PublishedDataSubscriberManager::Emit(const std::vector<Key> &keys, const st
     observer->OnChange(node);
 }
 
-void PublishedDataSubscriberManager::Emit(std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap)
+void PublishedDataSubscriberManager::EmitOnEnable(std::map<Key, std::vector<ObserverNodeOnEnabled>> &obsMap)
 {
     std::map<std::shared_ptr<Observer>, PublishedDataChangeNode> results;
     for (auto &[key, obsVector] : obsMap) {
@@ -264,13 +265,18 @@ void PublishedDataSubscriberManager::Emit(std::map<Key, std::vector<std::shared_
         for (auto &data : it->second.datas_) {
             PublishedObserverMapKey mapKey(data.key_, data.subscriberId_);
             for (auto &obs : obsVector) {
-                results[obs].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
-                results[obs].ownerBundleName_ = it->second.ownerBundleName_;
+                if (obs.isNotifyOnEnabled_) {
+                    results[obs.observer_].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
+                    results[obs.observer_].ownerBundleName_ = it->second.ownerBundleName_;
+                }
             }
         }
     }
     for (auto &[callback, node] : results) {
         callback->OnChange(node);
+    }
+    for (auto &[key, obsVector] : obsMap) {
+        BaseCallbacks::SetObserversNotNotifiedOnEnabled(key, obsVector);
     }
 }
 
