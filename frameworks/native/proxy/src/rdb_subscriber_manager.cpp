@@ -252,7 +252,6 @@ void RdbSubscriberManager::EmitOnEnable(std::map<Key, std::vector<ObserverNodeOn
                 obs.observer_->OnChange(it->second);
             }
         }
-        BaseCallbacks::SetObserversNotNotifiedOnEnabled(key, obsVector);
     }
 }
 

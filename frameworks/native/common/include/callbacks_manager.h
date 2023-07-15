@@ -27,11 +27,7 @@ template<class Key, class Observer>
 class CallbacksManager {
 public:
     struct ObserverNodeOnEnabled {
-        ObserverNodeOnEnabled(const std::shared_ptr<Observer> &observer) : observer_(observer)
-        {
-            isNotifyOnEnabled_ = false;
-        };
-        ObserverNodeOnEnabled(const std::shared_ptr<Observer> &observer, bool isNotifyOnEnabled)
+        ObserverNodeOnEnabled(const std::shared_ptr<Observer> &observer, bool isNotifyOnEnabled = false)
             : observer_(observer), isNotifyOnEnabled_(isNotifyOnEnabled) {};
         std::shared_ptr<Observer> observer_;
         bool isNotifyOnEnabled_;
@@ -65,7 +61,6 @@ public:
     int GetEnabledSubscriberSize(const Key &key);
     void RecoverObservers(std::function<void(const std::vector<Key> &)> recoverObservers);
 
-    void SetObserversNotNotifiedOnEnabled(const Key &key, const std::vector<ObserverNodeOnEnabled> &observers);
     void SetObserversNotifiedOnEnabled(const Key &key);
 
 private:
@@ -249,11 +244,15 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::EnableObservers(
             std::vector<std::shared_ptr<Observer>> enabledObservers = GetEnabledObservers(key);
             bool hasEnabled = false;
             for (auto &item : callbacks_[key]) {
-                if (item.subscriber_ == subscriber) {
-                    localEnabledObservers[key].emplace_back(item.observer_, item.isNotifyOnEnabled_);
-                    item.enabled_ = true;
-                    hasEnabled = true;
+                if (item.subscriber_ != subscriber) {
+                    continue;
                 }
+                hasEnabled = true;
+                if (item.enabled_) {
+                    continue;
+                }
+                localEnabledObservers[key].emplace_back(item.observer_, item.isNotifyOnEnabled_);
+                item.enabled_ = true;
             }
             if (!hasEnabled) {
                 result.emplace_back(key, E_SUBSCRIBER_NOT_EXIST);
@@ -268,7 +267,7 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::EnableObservers(
         }
     }
     if (!localEnabledObservers.empty()) {
-            processOnLocalEnabled(localEnabledObservers);
+        processOnLocalEnabled(localEnabledObservers);
     }
     processOnFirstEnabled(firstRegisterKey, result);
     return result;
@@ -345,26 +344,6 @@ int CallbacksManager<Key, Observer>::GetEnabledSubscriberSize(const Key &key)
         }
     }
     return count;
-}
-
-template<class Key, class Observer>
-void CallbacksManager<Key, Observer>::SetObserversNotNotifiedOnEnabled(const Key &key,
-    const std::vector<ObserverNodeOnEnabled> &observersNodes)
-{
-    std::lock_guard<decltype(mutex_)> lck(mutex_);
-    auto it = callbacks_.find(key);
-    if (it == callbacks_.end()) {
-        return;
-    }
-    std::vector<ObserverNode> &callbacks = it->second;
-    for (const auto &observerNode : observersNodes) {
-        for (auto &callback : callbacks) {
-            if (observerNode.observer_ == callback.observer_) {
-                callback.isNotifyOnEnabled_ = false;
-                break;
-            }
-        }
-    }
 }
 
 template<class Key, class Observer>

@@ -271,7 +271,6 @@ void PublishedDataSubscriberManager::EmitOnEnable(std::map<Key, std::vector<Obse
                 }
             }
         }
-        BaseCallbacks::SetObserversNotNotifiedOnEnabled(key, obsVector);
     }
     for (auto &[callback, node] : results) {
         callback->OnChange(node);
