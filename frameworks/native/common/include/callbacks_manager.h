@@ -298,6 +298,7 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::DisableObservers(c
             for (auto &item : callbacks_[key]) {
                 if (item.subscriber_ == subscriber) {
                     item.enabled_ = false;
+                    item.isNotifyOnEnabled_ = false;
                     hasDisabled = true;
                 }
             }
