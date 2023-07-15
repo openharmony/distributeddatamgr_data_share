@@ -111,7 +111,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Insert_Test_001, TestSize.Level0)
 
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_QUERY_Test_001, TestSize.Level0)
 {
-    LOG_INFO("ErrorCodeTest_QUERY_Test_001::Start");
+    LOG_INFO("ProxyDatasTest_QUERY_Test_001::Start");
     auto helper = dataShareHelper;
     Uri uri(DATA_SHARE_PROXY_URI);
     DataShare::DataSharePredicates predicates;
@@ -122,7 +122,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QUERY_Test_001, TestSize.Level0)
     int result = 0;
     resultSet->GetRowCount(result);
     EXPECT_EQ(result, 1);
-    LOG_INFO("ErrorCodeTest_QUERY_Test_001::End");
+    LOG_INFO("ProxyDatasTest_QUERY_Test_001::End");
 }
 
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_001, TestSize.Level0)
@@ -209,9 +209,9 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_002, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_Publish_Test_002::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribeRdbData_Test_001, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Level0)
 {
-    LOG_INFO("ProxyDatasTest_SubscribeRdbData_Test_001::Start");
+    LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_001::Start");
     auto helper = dataShareHelper;
     PredicateTemplateNode node1("p1", "select name0 as name from TBL00");
     PredicateTemplateNode node2("p2", "select name1 as name from TBL00");
@@ -227,66 +227,39 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribeRdbData_Test_001, TestSize.Leve
     TemplateId tplId;
     tplId.subscriberId_ = SUBSCRIBER_ID;
     tplId.bundleName_ = "ohos.datashareproxyclienttest.demo";
-    std::vector<OperationResult> results =
+    std::vector<OperationResult> results1 =
         helper->SubscribeRdbData(uris, tplId, [&tplId](const RdbChangeNode &changeNode) {
             EXPECT_EQ(changeNode.uri_, DATA_SHARE_PROXY_URI);
             EXPECT_EQ(changeNode.templateId_.bundleName_, tplId.bundleName_);
             EXPECT_EQ(changeNode.templateId_.subscriberId_, tplId.subscriberId_);
         });
-    EXPECT_EQ(results.size(), uris.size());
-    for (auto const &operationResult : results) {
+        EXPECT_EQ(results1.size(), uris.size());
+    for (auto const &operationResult : results1) {
         EXPECT_EQ(operationResult.errCode_, 0);
     }
-    LOG_INFO("ProxyDatasTest_SubscribeRdbData_Test_001::End");
-}
+    std::vector<OperationResult> results2 = helper->DisableRdbSubs(uris, tplId);
+    for (auto const &operationResult : results2) {
+        EXPECT_EQ(operationResult.errCode_, 0);
+    }
+    std::vector<OperationResult> results3 = helper->EnableRdbSubs(uris, tplId);
+    for (auto const &operationResult : results3) {
+        EXPECT_EQ(operationResult.errCode_, 0);
+    }
+    Uri uri(DATA_SHARE_PROXY_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string name0 = "wang";
+    valuesBucket.Put(TBL_NAME0, name0);
+    std::string name1 = "wu";
+    valuesBucket.Put(TBL_NAME1, name1);
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_DisableRdbSubs_Test_001, TestSize.Level0)
-{
-    LOG_INFO("ProxyDatasTest_DisableRdbSubs_Test_001::Start");
-    auto helper = dataShareHelper;
-    std::vector<std::string> uris;
-    uris.emplace_back(DATA_SHARE_PROXY_URI);
-    TemplateId tplId;
-    tplId.subscriberId_ = SUBSCRIBER_ID;
-    tplId.bundleName_ = "ohos.datashareproxyclienttest.demo";
-    std::vector<OperationResult> results = helper->DisableRdbSubs(uris, tplId);
-    for (auto const &operationResult : results) {
+    std::vector<OperationResult> results4 = helper->UnsubscribeRdbData(uris, tplId);
+    EXPECT_EQ(results4.size(), uris.size());
+    for (auto const &operationResult : results4) {
         EXPECT_EQ(operationResult.errCode_, 0);
     }
-    LOG_INFO("ProxyDatasTest_DisableRdbSubs_Test_001::End");
-}
-
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_EnableRdbSubs_Test_001, TestSize.Level0)
-{
-    LOG_INFO("ProxyDatasTest_EnableRdbSubs_Test_001::Start");
-    auto helper = dataShareHelper;
-    std::vector<std::string> uris;
-    uris.emplace_back(DATA_SHARE_PROXY_URI);
-    TemplateId tplId;
-    tplId.subscriberId_ = SUBSCRIBER_ID;
-    tplId.bundleName_ = "ohos.datashareproxyclienttest.demo";
-    std::vector<OperationResult> results = helper->EnableRdbSubs(uris, tplId);
-    for (auto const &operationResult : results) {
-        EXPECT_EQ(operationResult.errCode_, 0);
-    }
-    LOG_INFO("ProxyDatasTest_EnableRdbSubs_Test_001::End");
-}
-
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_UnsubscribeRdbData_Test_001, TestSize.Level0)
-{
-    LOG_INFO("ProxyDatasTest_UnSubscribeRdbData_Test_001::Start");
-    auto helper = dataShareHelper;
-    std::vector<std::string> uris;
-    uris.emplace_back(DATA_SHARE_PROXY_URI);
-    TemplateId tplId;
-    tplId.subscriberId_ = SUBSCRIBER_ID;
-    tplId.bundleName_ = "ohos.datashareproxyclienttest.demo";
-    std::vector<OperationResult> results = helper->UnsubscribeRdbData(uris, tplId);
-    EXPECT_EQ(results.size(), uris.size());
-    for (auto const &operationResult : results) {
-        EXPECT_EQ(operationResult.errCode_, 0);
-    }
-    LOG_INFO("ProxyDatasTest_UnSubscribeRdbData_Test_001::End");
+    LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_001::End");
 }
 
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribePublishedData_Test_001, TestSize.Level0)
