@@ -1216,6 +1216,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ExecuteBatch_Test_001, TestSize.
     DataShare::ExecResultSet resultSet;
     auto ret = helper->ExecuteBatch(statements, resultSet);
     EXPECT_EQ(ret, 0);
+    EXPECT_EQ(resultSet.errorCode, ExecErrorCode::EXEC_FAILED);
     LOG_INFO("MediaDataShare_ExecuteBatch_Test_001 End");
 }
 
@@ -1230,7 +1231,28 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_InsertExt_Test_001, TestSize.Lev
     std::string str;
     int ret = helper->InsertExt(uri, valuesBucket, str);
     EXPECT_EQ(ret, 0);
+    EXPECT_EQ(str, "res");
     LOG_INFO("MediaDataShare_InsertExt_Test_001 End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_TransferUri_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_TransferUri_Test_001::Start");
+    Uri uri(FILE_DATA_URI);
+
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    EXPECT_NE(saManager, nullptr);
+    if (saManager == nullptr) {
+        LOG_ERROR("GetSystemAbilityManager get samgr failed.");
+    }
+    auto remoteObj = saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID);
+    EXPECT_NE(remoteObj, nullptr);
+    if (remoteObj == nullptr) {
+        LOG_ERROR("GetSystemAbility service failed.");
+    }
+    std::shared_ptr<DataShare::DataShareHelper> helper = DataShare::DataShareHelper::Creator(remoteObj, FILE_DATA_URI);
+    EXPECT_NE(helper, nullptr);
+    LOG_INFO("MediaDataShare_TransferUri_Test_001 End");
 }
 } // namespace DataShare
 } // namespace OHOS
