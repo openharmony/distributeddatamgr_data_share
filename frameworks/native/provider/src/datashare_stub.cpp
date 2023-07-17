@@ -403,13 +403,11 @@ ErrCode DataShareStub::CmdInsertExt(MessageParcel &data, MessageParcel &reply)
 
 int DataShareStub::ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result)
 {
-    result.errorCode = ExecErrorCode::EXEC_FAILED; 
     return 0;
 }
 
 int DataShareStub::InsertExt(const Uri &uri, const DataShareValuesBucket &value, std::string &result)
 {
-    result = "res";
     return 0;
 }
 } // namespace DataShare

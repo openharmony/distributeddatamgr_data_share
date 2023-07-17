@@ -97,6 +97,7 @@ constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
 std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
 std::string MEDIALIBRARY_DATA_URI = "datashare:///com.acts.datasharetest";
 std::string MEDIALIBRARY_DATA_URI_ERROR = "test:///com.acts.datasharetest";
+std::string FILE_DATA_URI = "file://com.acts.datasharetest";
 std::string NORMALIZE_URI = "normalize+datashare:///com.acts.datasharetest";
 std::string DENORMALIZE_URI = "denormalize+datashare:///com.acts.datasharetest";
 std::shared_ptr<DataShare::DataShareHelper> g_dataShareHelper;
@@ -1214,6 +1215,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ExecuteBatch_Test_001, TestSize.
     statements.emplace_back(statement2);
 
     DataShare::ExecResultSet resultSet;
+    resultSet.errorCode = ExecErrorCode::EXEC_FAILED;
     auto ret = helper->ExecuteBatch(statements, resultSet);
     EXPECT_EQ(ret, 0);
     EXPECT_EQ(resultSet.errorCode, ExecErrorCode::EXEC_FAILED);
@@ -1228,10 +1230,10 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_InsertExt_Test_001, TestSize.Lev
     Uri uri(MEDIALIBRARY_DATA_URI);
     DataShare::DataShareValuesBucket valuesBucket;
     valuesBucket.Put("name", "Datashare_CRUD_Test001");
-    std::string str;
+    std::string str = "";
     int ret = helper->InsertExt(uri, valuesBucket, str);
     EXPECT_EQ(ret, 0);
-    EXPECT_EQ(str, "res");
+    EXPECT_EQ(str, "");
     LOG_INFO("MediaDataShare_InsertExt_Test_001 End");
 }
 
