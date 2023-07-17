@@ -34,6 +34,7 @@ std::shared_ptr<DataShare::DataShareHelper> dataShareHelper;
 std::string TBL_NAME0 = "name0";
 std::string TBL_NAME1 = "name1";
 constexpr int SUBSCRIBER_ID = 100;
+int callbackTimes = 0;
 
 class ProxyDatasTest : public testing::Test {
 public:
@@ -232,8 +233,9 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Le
             EXPECT_EQ(changeNode.uri_, DATA_SHARE_PROXY_URI);
             EXPECT_EQ(changeNode.templateId_.bundleName_, tplId.bundleName_);
             EXPECT_EQ(changeNode.templateId_.subscriberId_, tplId.subscriberId_);
+            callbackTimes++;
         });
-        EXPECT_EQ(results1.size(), uris.size());
+    EXPECT_EQ(results1.size(), uris.size());
     for (auto const &operationResult : results1) {
         EXPECT_EQ(operationResult.errCode_, 0);
     }
@@ -246,19 +248,28 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Le
         EXPECT_EQ(operationResult.errCode_, 0);
     }
     Uri uri(DATA_SHARE_PROXY_URI);
-    DataShare::DataShareValuesBucket valuesBucket;
+    DataShare::DataShareValuesBucket valuesBucket1;
     std::string name0 = "wang";
-    valuesBucket.Put(TBL_NAME0, name0);
+    valuesBucket1.Put(TBL_NAME0, name0);
     std::string name1 = "wu";
-    valuesBucket.Put(TBL_NAME1, name1);
-    int retVal = helper->Insert(uri, valuesBucket);
-    EXPECT_EQ((retVal > 0), true);
+    valuesBucket1.Put(TBL_NAME1, name1);
+    int retVal1 = helper->Insert(uri, valuesBucket1);
+    EXPECT_EQ((retVal1 > 0), true);
+    EXPECT_EQ(callbackTimes, 2);
 
     std::vector<OperationResult> results4 = helper->UnsubscribeRdbData(uris, tplId);
     EXPECT_EQ(results4.size(), uris.size());
     for (auto const &operationResult : results4) {
         EXPECT_EQ(operationResult.errCode_, 0);
     }
+    DataShare::DataShareValuesBucket valuesBucket2;
+    std::string name2 = "Lao";
+    valuesBucket2.Put(TBL_NAME0, name2);
+    std::string name3 = "liu";
+    valuesBucket2.Put(TBL_NAME1, name3);
+    int retVal2 = helper->Insert(uri, valuesBucket2);
+    EXPECT_EQ((retVal2 > 0), true);
+    EXPECT_EQ(callbackTimes, 2);
     LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_001::End");
 }
 

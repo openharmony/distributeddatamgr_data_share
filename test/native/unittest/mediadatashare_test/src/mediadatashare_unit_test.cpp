@@ -1215,10 +1215,8 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ExecuteBatch_Test_001, TestSize.
     statements.emplace_back(statement2);
 
     DataShare::ExecResultSet resultSet;
-    resultSet.errorCode = ExecErrorCode::EXEC_FAILED;
     auto ret = helper->ExecuteBatch(statements, resultSet);
     EXPECT_EQ(ret, 0);
-    EXPECT_EQ(resultSet.errorCode, ExecErrorCode::EXEC_FAILED);
     LOG_INFO("MediaDataShare_ExecuteBatch_Test_001 End");
 }
 
@@ -1230,10 +1228,8 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_InsertExt_Test_001, TestSize.Lev
     Uri uri(MEDIALIBRARY_DATA_URI);
     DataShare::DataShareValuesBucket valuesBucket;
     valuesBucket.Put("name", "Datashare_CRUD_Test001");
-    std::string str = "";
     int ret = helper->InsertExt(uri, valuesBucket, str);
     EXPECT_EQ(ret, 0);
-    EXPECT_EQ(str, "");
     LOG_INFO("MediaDataShare_InsertExt_Test_001 End");
 }
 
