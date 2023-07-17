@@ -159,8 +159,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
     auto exec = [ctxInfo](AsyncCall::Context *ctx) {
         if (ctxInfo->options.enabled_) {
             ctxInfo->options.token_ = ctxInfo->contextS->GetToken();
-            ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->strUri, ctxInfo->options,
-                ctxInfo->contextS->GetBundleName());
+            ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->strUri, ctxInfo->options);
         } else {
             ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextS->GetToken(), ctxInfo->strUri);
         }
