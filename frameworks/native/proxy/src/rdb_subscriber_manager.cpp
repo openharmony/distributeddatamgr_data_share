@@ -141,8 +141,8 @@ std::vector<OperationResult> RdbSubscriberManager::EnableObservers(void *subscri
         keys.emplace_back(uri, templateId);
     });
     return BaseCallbacks::EnableObservers(keys, subscriber,
-        [this](std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap) {
-            Emit(obsMap);
+        [this](std::map<Key, std::vector<ObserverNodeOnEnabled>> &obsMap) {
+            EmitOnEnable(obsMap);
         },
         [&proxy, subscriber, &templateId, this](const std::vector<Key> &firstAddKeys,
         std::vector<OperationResult> &opResult) {
@@ -227,6 +227,7 @@ void RdbSubscriberManager::Emit(const RdbChangeNode &changeNode)
             obs->OnChange(changeNode);
         }
     }
+    BaseCallbacks::SetObserversNotifiedOnEnabled(key);
 }
 
 void RdbSubscriberManager::Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer)
@@ -239,7 +240,7 @@ void RdbSubscriberManager::Emit(const std::vector<Key> &keys, const std::shared_
     }
 }
 
-void RdbSubscriberManager::Emit(std::map<Key, std::vector<std::shared_ptr<Observer>>> &obsMap)
+void RdbSubscriberManager::EmitOnEnable(std::map<Key, std::vector<ObserverNodeOnEnabled>> &obsMap)
 {
     for (auto &[key, obsVector] : obsMap) {
         auto it = lastChangeNodeMap_.find(key);
@@ -247,7 +248,9 @@ void RdbSubscriberManager::Emit(std::map<Key, std::vector<std::shared_ptr<Observ
             continue;
         }
         for (auto &obs : obsVector) {
-            obs->OnChange(it->second);
+            if (obs.isNotifyOnEnabled_) {
+                obs.observer_->OnChange(it->second);
+            }
         }
     }
 }
