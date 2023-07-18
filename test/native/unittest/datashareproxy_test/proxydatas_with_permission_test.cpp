@@ -34,7 +34,7 @@ std::shared_ptr<DataShare::DataShareHelper> dataShareHelper;
 std::string TBL_NAME0 = "name0";
 std::string TBL_NAME1 = "name1";
 constexpr int SUBSCRIBER_ID = 100;
-int g_callbackTimes = 0;
+std::atomic_int g_callbackTimes = 0;
 
 class ProxyDatasTest : public testing::Test {
 public:
