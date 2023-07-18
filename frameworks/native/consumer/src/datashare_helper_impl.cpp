@@ -31,14 +31,14 @@ constexpr int INVALID_VALUE = -1;
 DataShareHelperImpl::DataShareHelperImpl(const Uri &uri, const sptr<IRemoteObject> &token,
     std::shared_ptr<DataShareConnection> connection)
 {
-    LOG_ERROR("starts");
+    LOG_DEBUG("starts");
     generalCtl_ = std::make_shared<GeneralControllerProviderImpl>(connection, uri, token);
     extSpCtl_ = std::make_shared<ExtSpecialController>(connection, uri, token);
 }
 
 DataShareHelperImpl::DataShareHelperImpl()
 {
-    LOG_ERROR("starts");
+    LOG_DEBUG("starts");
     generalCtl_ = std::make_shared<GeneralControllerServiceImpl>();
     persistentDataCtl_ = std::make_shared<PersistentDataController>();
     publishedDataCtl_ = std::make_shared<PublishedDataController>();
