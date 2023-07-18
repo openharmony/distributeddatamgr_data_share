@@ -1228,6 +1228,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_InsertExt_Test_001, TestSize.Lev
     Uri uri(MEDIALIBRARY_DATA_URI);
     DataShare::DataShareValuesBucket valuesBucket;
     valuesBucket.Put("name", "Datashare_CRUD_Test001");
+    std::string str;
     int ret = helper->InsertExt(uri, valuesBucket, str);
     EXPECT_EQ(ret, 0);
     LOG_INFO("MediaDataShare_InsertExt_Test_001 End");
