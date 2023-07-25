@@ -32,15 +32,11 @@ namespace DataShare {
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
 
-template<typename T> class ConditionLock {
+template <typename T>
+class ConditionLock {
 public:
-    explicit ConditionLock()
-    {
-    }
-    ~ConditionLock()
-    {
-    }
-
+    explicit ConditionLock() {}
+    ~ConditionLock() {}
 public:
     void Notify(const T &data)
     {
@@ -49,7 +45,7 @@ public:
         isSet_ = true;
         cv_.notify_one();
     }
-
+    
     T Wait()
     {
         std::unique_lock<std::mutex> lock(mutex_);
@@ -58,7 +54,7 @@ public:
         cv_.notify_one();
         return data;
     }
-
+    
     void Clear()
     {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -76,19 +72,15 @@ private:
 
 class DataShareObserverTest : public DataShare::DataShareObserver {
 public:
-    DataShareObserverTest()
-    {
-    }
-    ~DataShareObserverTest()
-    {
-    }
-
+    DataShareObserverTest() {}
+    ~DataShareObserverTest() {}
+    
     void OnChange(const ChangeInfo &changeInfo) override
     {
         changeInfo_ = changeInfo;
         data.Notify(changeInfo);
     }
-
+    
     void Clear()
     {
         changeInfo_.changeType_ = INVAILD;
@@ -97,7 +89,7 @@ public:
         changeInfo_.size_ = 0;
         data.Clear();
     }
-
+    
     ChangeInfo changeInfo_;
     ConditionLock<ChangeInfo> data;
 };
@@ -132,7 +124,9 @@ bool MediaDataShareUnitTest::UrisEqual(std::list<Uri> uri1, std::list<Uri> uri2)
     if (uri1.size() != uri2.size()) {
         return false;
     }
-    auto cmp = [](const Uri &first, const Uri &second) { return first.ToString() < second.ToString(); };
+    auto cmp = [](const Uri &first, const Uri &second) {
+        return first.ToString() < second.ToString();
+    };
     uri1.sort(cmp);
     uri2.sort(cmp);
     auto it1 = uri1.begin();
@@ -150,21 +144,22 @@ bool MediaDataShareUnitTest::ChangeInfoEqual(const ChangeInfo &changeInfo, const
     if (changeInfo.changeType_ != expectChangeInfo.changeType_) {
         return false;
     }
-
+    
     if (!UrisEqual(changeInfo.uris_, expectChangeInfo.uris_)) {
         return false;
     }
-
+    
     if (changeInfo.size_ != expectChangeInfo.size_) {
         return false;
     }
-
+    
     if (changeInfo.data_ == nullptr && expectChangeInfo.data_ == nullptr) {
         return true;
     }
-
+    
     return memcmp(changeInfo.data_, expectChangeInfo.data_, expectChangeInfo.size_) == 0;
 }
+
 
 void MediaDataShareUnitTest::SetUpTestCase(void)
 {
@@ -173,7 +168,7 @@ void MediaDataShareUnitTest::SetUpTestCase(void)
     ASSERT_TRUE(g_dataShareHelper != nullptr);
     int sleepTime = 1;
     sleep(sleepTime);
-
+    
     Uri uri(MEDIALIBRARY_DATA_URI);
     DataShare::DataShareValuesBucket valuesBucket;
     double valueD1 = 20.07;
@@ -183,7 +178,7 @@ void MediaDataShareUnitTest::SetUpTestCase(void)
     valuesBucket.Put("age", value1);
     int retVal = g_dataShareHelper->Insert(uri, valuesBucket);
     EXPECT_EQ((retVal > 0), true);
-
+    
     valuesBucket.Clear();
     double valueD2 = 20.08;
     valuesBucket.Put("phoneNumber", valueD2);
@@ -192,7 +187,7 @@ void MediaDataShareUnitTest::SetUpTestCase(void)
     valuesBucket.Put("age", value2);
     retVal = g_dataShareHelper->Insert(uri, valuesBucket);
     EXPECT_EQ((retVal > 0), true);
-
+    
     valuesBucket.Clear();
     double valueD3 = 20.09;
     valuesBucket.Put("phoneNumber", valueD3);
@@ -215,18 +210,14 @@ void MediaDataShareUnitTest::TearDownTestCase(void)
     int retVal = helper->Delete(deleteAssetUri, predicates);
     LOG_INFO("TearDownTestCase Delete retVal: %{public}d", retVal);
     EXPECT_EQ((retVal >= 0), true);
-
+    
     bool result = helper->Release();
     EXPECT_EQ(result, true);
     LOG_INFO("TearDownTestCase end");
 }
 
-void MediaDataShareUnitTest::SetUp(void)
-{
-}
-void MediaDataShareUnitTest::TearDown(void)
-{
-}
+void MediaDataShareUnitTest::SetUp(void) {}
+void MediaDataShareUnitTest::TearDown(void) {}
 
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_001, TestSize.Level0)
 {
@@ -1267,9 +1258,15 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_TransferUri_Test_001, TestSize.L
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_InsertUrlNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_InsertUrlNullTest_001::Start");
-    auto helper = g_dataShareHelper;
+    std::shared_ptr<DataShare::DataShareHelper> helper;
+    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    int sleepTime = 1;
+    sleep(sleepTime);
+    
     std::string emptyString = "";
     Uri uri(emptyString);
+    DataShare::DataShareValuesBucket valuesBucket;
     double valueD1 = 20.07;
     valuesBucket.Put("phoneNumber", valueD1);
     valuesBucket.Put("name", "controllerTest001");
@@ -1283,9 +1280,14 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_InsertUrlNullTest_001, TestSize.
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperInsertExtControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperInsertExtControllerNullTest_001::Start");
-    auto helper = g_dataShareHelper;
+    std::shared_ptr<DataShare::DataShareHelper> helper;
+    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    int sleepTime = 1;
+    sleep(sleepTime);
+    
     Uri uri(DATA_SHARE_URI);
-    helper.Release();
+    helper->Release();
     DataShare::DataShareValuesBucket valuesBucket;
     double valueD1 = 20.07;
     valuesBucket.Put("phoneNumber", valueD1);
@@ -1293,7 +1295,7 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperInsertExtControllerNullTes
     int value1 = 1001;
     valuesBucket.Put("age", value1);
     std::string result;
-    int retVal = g_dataShareHelper->InsertExt(uri, valuesBucket, result);
+    int retVal = helper->InsertExt(uri, valuesBucket, result);
     EXPECT_EQ((retVal < 0), true);
     LOG_INFO("ControllerTest_HelperInsertExtControllerNullTest_001::End");
 }
@@ -1301,14 +1303,19 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperInsertExtControllerNullTes
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperUpdateControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperUpdateControllerNullTest_001::Start");
-    auto helper = g_dataShareHelper;
+    std::shared_ptr<DataShare::DataShareHelper> helper;
+    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    int sleepTime = 1;
+    sleep(sleepTime);
+    
     Uri uri(DATA_SHARE_URI);
-    helper.Release();
+    helper->Release();
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo("name", "Datashare_CRUD_Test001");
     DataShare::DataShareValuesBucket valuesBucket;
     valuesBucket.Put("name", "Datashare_CRUD_Test002");
-    retVal = helper->Update(uri, predicates, valuesBucket);
+    int retVal = helper->Update(uri, predicates, valuesBucket);
     EXPECT_EQ((retVal < 0), true);
     LOG_INFO("ControllerTest_HelperUpdateControllerNullTest_001::End");
 }
@@ -1316,12 +1323,17 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperUpdateControllerNullTest_0
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperDeleteControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperDeleteControllerNullTest_001::Start");
-    auto helper = g_dataShareHelper;
+    std::shared_ptr<DataShare::DataShareHelper> helper;
+    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    int sleepTime = 1;
+    sleep(sleepTime);
+    
     Uri uri(DATA_SHARE_URI);
-    helper.Release();
+    helper->Release();
     DataShare::DataSharePredicates deletePredicates;
     deletePredicates.EqualTo("age", 1112);
-    retVal = helper->Delete(uri, deletePredicates);
+    int retVal = helper->Delete(uri, deletePredicates);
     EXPECT_EQ((retVal < 0), true);
     LOG_INFO("ControllerTest_HelperDeleteControllerNullTest_001::End");
 }
@@ -1329,9 +1341,14 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperDeleteControllerNullTest_0
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperQueryControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperQueryControllerNullTest_001::Start");
-    auto helper = g_dataShareHelper;
+    std::shared_ptr<DataShare::DataShareHelper> helper;
+    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    int sleepTime = 1;
+    sleep(sleepTime);
+    
     Uri uri(DATA_SHARE_URI);
-    helper.Release();
+    helper->Release();
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo("name", "dataShareTest003");
     predicates.Limit(1, 0);
@@ -1344,9 +1361,14 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperQueryControllerNullTest_00
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperBatchInsertControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperBatchInsertControllerNullTest_001::Start");
-    auto helper = g_dataShareHelper;
+    std::shared_ptr<DataShare::DataShareHelper> helper;
+    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    int sleepTime = 1;
+    sleep(sleepTime);
+    
     Uri uri(DATA_SHARE_URI);
-    helper.Release();
+    helper->Release();
     DataShare::DataShareValuesBucket valuesBucket1;
     valuesBucket1.Put("name", "dataShareTest006");
     valuesBucket1.Put("phoneNumber", 20.6);
@@ -1357,16 +1379,21 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperBatchInsertControllerNullT
     values.push_back(valuesBucket1);
     values.push_back(valuesBucket2);
     int result = helper->BatchInsert(uri, values);
-    EXPECT_EQ((retVal < 0), true);
+    EXPECT_EQ((result < 0), true);
     LOG_INFO("ControllerTest_HelperBatchInsertControllerNullTest_001::End");
 }
 
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperExecuteBatchControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperExecuteBatchControllerNullTest_001::Start");
-    auto helper = g_dataShareHelper;
+    std::shared_ptr<DataShare::DataShareHelper> helper;
+    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    int sleepTime = 1;
+    sleep(sleepTime);
+    
     Uri uri(DATA_SHARE_URI);
-    helper.Release();
+    helper->Release();
     std::vector<DataShare::OperationStatement> statements;
     DataShare::OperationStatement statement1;
     statement1.operationType = INSERT;
@@ -1395,6 +1422,36 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperExecuteBatchControllerNull
     auto ret = helper->ExecuteBatch(statements, resultSet);
     EXPECT_EQ((ret < 0), true);
     LOG_INFO("ControllerTest_HelperExecuteBatchControllerNullTest_001::End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperRegisterObserverControllerNullTest_001, TestSize.Level0)
+{
+    LOG_INFO("ControllerTest_HelperRegisterObserverControllerNullTest_001 start");
+    std::shared_ptr<DataShare::DataShareHelper> helper;
+    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    int sleepTime = 1;
+    sleep(sleepTime);
+    
+    ASSERT_TRUE(helper != nullptr);
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    helper->Release();
+    std::shared_ptr<DataShareObserverTest> dataObserver = std::make_shared<DataShareObserverTest>();
+    helper->RegisterObserver(uri, dataObserver);
+    
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "Datashare_Observer_Test001");
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal < 0), true);
+    helper->NotifyChange(uri);
+    
+    DataShare::DataSharePredicates deletePredicates;
+    deletePredicates.EqualTo("name", "Datashare_Observer_Test001");
+    retVal = helper->Delete(uri, deletePredicates);
+    EXPECT_EQ((retVal < 0), true);
+    helper->NotifyChange(uri);
+    helper->UnregisterObserver(uri, dataObserver);
+    LOG_INFO("ControllerTest_HelperRegisterObserverControllerNullTest_001 end");
 }
 } // namespace DataShare
 } // namespace OHOS
