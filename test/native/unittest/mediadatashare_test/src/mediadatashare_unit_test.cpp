@@ -1258,9 +1258,8 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_TransferUri_Test_001, TestSize.L
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_InsertUrlNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_InsertUrlNullTest_001::Start");
-    std::shared_ptr<DataShare::DataShareHelper> helper;
-    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
-    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(helper != nullptr);
     int sleepTime = 1;
     sleep(sleepTime);
     
@@ -1280,9 +1279,8 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_InsertUrlNullTest_001, TestSize.
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperInsertExtControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperInsertExtControllerNullTest_001::Start");
-    std::shared_ptr<DataShare::DataShareHelper> helper;
-    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
-    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(helper != nullptr);
     int sleepTime = 1;
     sleep(sleepTime);
     
@@ -1303,9 +1301,8 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperInsertExtControllerNullTes
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperUpdateControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperUpdateControllerNullTest_001::Start");
-    std::shared_ptr<DataShare::DataShareHelper> helper;
-    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
-    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(helper != nullptr);
     int sleepTime = 1;
     sleep(sleepTime);
     
@@ -1323,9 +1320,8 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperUpdateControllerNullTest_0
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperDeleteControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperDeleteControllerNullTest_001::Start");
-    std::shared_ptr<DataShare::DataShareHelper> helper;
-    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
-    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(helper != nullptr);
     int sleepTime = 1;
     sleep(sleepTime);
     
@@ -1341,9 +1337,8 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperDeleteControllerNullTest_0
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperQueryControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperQueryControllerNullTest_001::Start");
-    std::shared_ptr<DataShare::DataShareHelper> helper;
-    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
-    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(helper != nullptr);
     int sleepTime = 1;
     sleep(sleepTime);
     
@@ -1361,9 +1356,8 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperQueryControllerNullTest_00
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperBatchInsertControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperBatchInsertControllerNullTest_001::Start");
-    std::shared_ptr<DataShare::DataShareHelper> helper;
-    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
-    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(helper != nullptr);
     int sleepTime = 1;
     sleep(sleepTime);
     
@@ -1386,9 +1380,8 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperBatchInsertControllerNullT
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperExecuteBatchControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperExecuteBatchControllerNullTest_001::Start");
-    std::shared_ptr<DataShare::DataShareHelper> helper;
-    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
-    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    auto helper= CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(helper != nullptr);
     int sleepTime = 1;
     sleep(sleepTime);
     
@@ -1427,16 +1420,15 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperExecuteBatchControllerNull
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperRegisterObserverControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperRegisterObserverControllerNullTest_001 start");
-    std::shared_ptr<DataShare::DataShareHelper> helper;
-    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
-    ASSERT_TRUE(g_dataShareHelper != nullptr);
+    auto helper= CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_TRUE(helper != nullptr);
     int sleepTime = 1;
     sleep(sleepTime);
     
     ASSERT_TRUE(helper != nullptr);
     Uri uri(MEDIALIBRARY_DATA_URI);
     helper->Release();
-    std::shared_ptr<DataShareObserverTest> dataObserver = std::make_shared<DataShareObserverTest>();
+    sptr<IDataAbilityObserverTest> dataObserver;
     helper->RegisterObserver(uri, dataObserver);
     
     DataShare::DataShareValuesBucket valuesBucket;
