@@ -112,6 +112,8 @@ void ErrorCodeTest::TearDownTestCase(void)
 {
     auto tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.datashareclienttest.demo", 0);
     AccessTokenKit::DeleteToken(tokenId);
+    g_slientAccessHelper = nullptr;
+    dataShareHelper = nullptr;
 }
 
 void ErrorCodeTest::SetUp(void) {}
