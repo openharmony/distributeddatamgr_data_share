@@ -25,8 +25,8 @@ class AmsMgrProxy final : public std::enable_shared_from_this<AmsMgrProxy> {
 public:
     ~AmsMgrProxy();
     static std::shared_ptr<AmsMgrProxy> GetInstance();
-    bool Connect(const std::string &uri, const sptr<IRemoteObject> &connect, const sptr<IRemoteObject> &callerToken);
-    bool DisConnect(sptr<IRemoteObject> connect);
+    int Connect(const std::string &uri, const sptr<IRemoteObject> &connect, const sptr<IRemoteObject> &callerToken);
+    int DisConnect(sptr<IRemoteObject> connect);
 private:
     using Proxy = AAFwk::ExtensionManagerProxy;
     AmsMgrProxy() = default;
