@@ -38,3 +38,5 @@ datashare_native_consumer_path =
     "${datashare_base_path}/frameworks/native/consumer"
 
 datashare_native_proxy_path = "${datashare_base_path}/frameworks/native/proxy"
+
+kv_store_path = "//foundation/distributeddatamgr/kv_store"

@@ -53,8 +53,10 @@ config("datashare_public_config") {
 }
 
 ohos_shared_library("datashare_consumer") {
-  include_dirs =
-      [ "//foundation/distributeddatamgr/kv_store/frameworks/common" ]
+  include_dirs = [
+    "${kv_store_path}/frameworks/common",
+    "${kv_store_path}/interfaces/innerkits/distributeddata/include",
+  ]
 
   sources = [
     "${datashare_native_consumer_path}/controller/provider/src/ext_special_controller.cpp",
