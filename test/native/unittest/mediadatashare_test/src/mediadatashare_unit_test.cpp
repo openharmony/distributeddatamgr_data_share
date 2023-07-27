@@ -1383,7 +1383,6 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperRegisterObserverController
     LOG_INFO("ControllerTest_HelperRegisterObserverControllerNullTest_001 start");
     auto helper= CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
     ASSERT_TRUE(helper != nullptr);
-    ASSERT_TRUE(helper != nullptr);
     Uri uri(MEDIALIBRARY_DATA_URI);
     helper->Release();
     sptr<IDataAbilityObserverTest> dataObserver;
