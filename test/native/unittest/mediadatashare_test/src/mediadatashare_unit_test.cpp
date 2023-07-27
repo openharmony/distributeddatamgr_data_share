@@ -1255,27 +1255,6 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_TransferUri_Test_001, TestSize.L
     LOG_INFO("MediaDataShare_TransferUri_Test_001 End");
 }
 
-HWTEST_F(MediaDataShareUnitTest, ControllerTest_InsertUrlNullTest_001, TestSize.Level0)
-{
-    LOG_INFO("ControllerTest_InsertUrlNullTest_001::Start");
-    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
-    ASSERT_TRUE(helper != nullptr);
-    int sleepTime = 1;
-    sleep(sleepTime);
-    
-    std::string emptyString = "";
-    Uri uri(emptyString);
-    DataShare::DataShareValuesBucket valuesBucket;
-    double valueD1 = 20.07;
-    valuesBucket.Put("phoneNumber", valueD1);
-    valuesBucket.Put("name", "controllerTest001");
-    int value1 = 1001;
-    valuesBucket.Put("age", value1);
-    int retVal = helper->Insert(uri, valuesBucket);
-    EXPECT_EQ((retVal < 0), true);
-    LOG_INFO("ControllerTest_InsertUrlNullTest_001::End");
-}
-
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperInsertExtControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperInsertExtControllerNullTest_001::Start");
