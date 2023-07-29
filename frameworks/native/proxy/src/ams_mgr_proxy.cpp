@@ -53,6 +53,7 @@ int AmsMgrProxy::Connect(
     want.SetUri(uri);
     std::lock_guard<std::mutex> lock(mutex_);
     if (ConnectSA()) {
+        LOG_INFO("connect datashareextability start");
         int ret = proxy_->ConnectAbilityCommon(want, connect, callerToken, AppExecFwk::ExtensionAbilityType::DATASHARE);
         if (ret != ERR_OK) {
             LOG_ERROR("connect ability failed, ret = %{public}d", ret);
