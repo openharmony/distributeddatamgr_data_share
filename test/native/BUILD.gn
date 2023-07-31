@@ -24,6 +24,7 @@ group("unittest") {
     ":NativeDataShareTest",
     ":ProxyDatasTest",
     ":SlientAccessTest",
+    ":ControllerTest",
     "resource/datashare_ext_bundle:datashare_ext",
     "resource/datashareproxy_bundle/proxydatas_with_permission:proxydatas_with_permission",
     "resource/errorcode_ext_bundle:errorcode_ext",
@@ -217,6 +218,57 @@ ohos_unittest("ProxyDatasTest") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+}
+
+ohos_unittest("ControllerTest") {
+  module_out_path = "data_share/native_datashare"
+
+  include_dirs = [
+    "//foundation/ability/ability_runtime/interfaces/inner_api/ability_manager/include",
+    "//foundation/ability/ability_runtime/interfaces/inner_api/app_manager/include/appmgr",
+    "//foundation/ability/ability_runtime/interfaces/inner_api/dataobs_manager/include",
+    "//foundation/ability/ability_runtime/interfaces/kits/native/ability/native",
+    "//base/security/access_token/frameworks/common/include",
+    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
+    "//foundation/aafwk/standard/interfaces/innerkits/uri/include",
+    "//commonlibrary/c_utils/base/include",
+    "//utils/system/safwk/native/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//third_party/json/include",
+    "//foundation/distributeddatamgr/data_share/interfaces/inner_api/consumer/include",
+    "//foundation/distributeddatamgr/data_share/frameworks/native/consumer/controller/common",
+    "//foundation/distributeddatamgr/data_share/frameworks/native/consumer/controller/provider/include",
+    "//foundation/distributeddatamgr/data_share/frameworks/native/consumer/controller/service/include",
+    "//foundation/distributeddatamgr/data_share/frameworks/native/consumer/include",
+    "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common/include"
+  ]
+
+  sources = [ "./unittest/mediadatashare_test/src/controller_test.cpp" ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer",
+    "${datashare_innerapi_path}/common:datashare_common",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:dataobs_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_single",
+    "media_library:media_library",
+    "relational_store:rdb_data_ability_adapter",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
