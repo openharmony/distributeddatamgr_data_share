@@ -66,7 +66,7 @@ ohos_shared_library("datashare_common") {
 
   configs = [ ":ability_config" ]
   public_configs = [ ":datashare_public_config" ]
-  #version_script = "libdatashare_common.map"
+  version_script = "libdatashare_common.map"
   innerapi_tags = [ "platformsdk" ]
 
   external_deps = [
