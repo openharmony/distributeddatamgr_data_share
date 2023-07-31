@@ -722,14 +722,14 @@ napi_value NapiDataShareHelper::Napi_Publish(napi_env env, napi_callback_info in
         NAPI_CALL_BASE(env, napi_typeof(env, argv[1], &valueType), napi_invalid_arg);
         NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_string,
             context->error = std::make_shared<ParametersTypeError>("bundleName", "string"), napi_invalid_arg);
+        context->publishData = DataShareJSUtils::Convert2PublishedData(env, argv[0]);
+        context->bundleName = DataShareJSUtils::Convert2String(env, argv[1]);
         if (argc > 2) {
             NAPI_CALL_BASE(env, napi_typeof(env, argv[PARAM2], &valueType), napi_invalid_arg);
             if (valueType == napi_number) {
                 napi_get_value_int32(env, argv[PARAM2], &(context->publishData.version_));
             }
         }
-        context->publishData = DataShareJSUtils::Convert2PublishedData(env, argv[0]);
-        context->bundleName = DataShareJSUtils::Convert2String(env, argv[1]);
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
