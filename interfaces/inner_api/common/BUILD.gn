@@ -92,7 +92,7 @@ ohos_shared_library("datashare_common") {
   part_name = "data_share"
 }
 
-ohos_shared_library("datashare_common_static") {
+ohos_static_library("datashare_common_static") {
   include_dirs = datashare_common_include_dirs
 
   sources = datashare_common_sources
