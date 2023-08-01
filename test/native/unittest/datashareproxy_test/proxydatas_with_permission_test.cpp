@@ -25,6 +25,8 @@
 #include "token_setproc.h"
 #include "datashare_errno.h"
 
+#include "published_data_subscriber_manager.h"
+
 namespace OHOS {
 namespace DataShare {
 using namespace testing::ext;
@@ -44,6 +46,7 @@ public:
     void TearDown();
 };
 
+using namespace OHOS::DataShare;
 void ProxyDatasTest::SetUpTestCase(void)
 {
     LOG_INFO("SetUpTestCase invoked");
@@ -125,6 +128,42 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QUERY_Test_001, TestSize.Level0)
     resultSet->GetRowCount(result);
     EXPECT_EQ(result, 1);
     LOG_INFO("ProxyDatasTest_QUERY_Test_001::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_ResultSet_Test_001::Start");
+    auto helper = dataShareHelper;
+    Uri uri(DATA_SHARE_PROXY_URI);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_NAME0, "wang");
+    std::vector<string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    EXPECT_NE(resultSet, nullptr);
+
+    int result = 0;
+    resultSet->GetRowCount(result);
+    EXPECT_EQ(result, 1);
+
+    AppDataFwk::SharedBlock *block = nullptr;
+    ASSERT_TRUE(resultSet != nullptr);
+    bool hasBlock = resultSet->HasBlock();
+    EXPECT_EQ(hasBlock, true);
+    block = resultSet->GetBlock();
+    EXPECT_NE(block, nullptr);
+    
+    std::vector<uint8_t> blob;
+    int err = resultSet->GetBlob(-1, blob);
+    EXPECT_EQ(err, 1008);
+    resultSet->SetBlock(nullptr);
+    EXPECT_EQ(nullptr, resultSet->GetBlock());
+    std::string stringValue;
+    result = resultSet->GetString(0, stringValue);
+    EXPECT_EQ(result, 1001);
+    int intValue;
+    result = resultSet->GetInt(0, intValue);
+    EXPECT_EQ(result, 1001);
+    LOG_INFO("ProxyDatasTest_ResultSet_Test_001::End");
 }
 
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_001, TestSize.Level0)
@@ -318,6 +357,20 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_UnsubscribePublishedData_Test_001, TestS
         EXPECT_EQ(operationResult.errCode_, 0);
     }
     LOG_INFO("ProxyDatasTest_UnsubscribePublishedData_Test_001::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_AddObserversProxyNull_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_AddObserversProxyNull_Test_001::Start");
+    void *subscriber = nullptr;
+    std::shared_ptr<DataShareServiceProxy> proxy = nullptr;
+    const std::vector<std::string> uris = {};
+    int64_t subscriberId = 0;
+    const PublishedDataCallback callback = [](const PublishedDataChangeNode &changeNode){};
+    std::vector<OperationResult> results = PublishedDataSubscriberManager::GetInstance().AddObservers(subscriber,
+        proxy, uris, subscriberId, callback);
+    EXPECT_EQ(results.size(), uris.size());
+    LOG_INFO("ProxyDatasTest_AddObserversProxyNull_Test_001::End");
 }
 } // namespace DataShare
 } // namespace OHOS

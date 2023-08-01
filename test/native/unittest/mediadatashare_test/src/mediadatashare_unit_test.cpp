@@ -797,7 +797,6 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_001, TestSize.Lev
     std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
     DataShare::DataSharePredicates predicates;
     predicates.Contains("name", "dataShareTest");
-    std::vector<string> columns;
     DataShare::DataShareResultSet resultSet;
     std::vector<string> names;
     int err = resultSet.GetAllColumnNames(names);
