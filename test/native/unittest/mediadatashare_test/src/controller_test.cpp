@@ -32,6 +32,7 @@
 #include "ext_special_controller.h"
 #include "general_controller.h"
 #include "datashare_connection.h"
+#include "extension_manager_proxy.h"
 
 namespace OHOS {
 namespace DataShare {

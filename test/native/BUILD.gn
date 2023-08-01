@@ -243,14 +243,16 @@ ohos_unittest("ControllerTest") {
     "//foundation/distributeddatamgr/data_share/frameworks/native/consumer/controller/provider/include",
     "//foundation/distributeddatamgr/data_share/frameworks/native/consumer/controller/service/include",
     "//foundation/distributeddatamgr/data_share/frameworks/native/consumer/include",
-    "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common/include"
+    "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common/include",
+    "//foundation/distributeddatamgr/data_share/frameworks/native/proxy/include",
+    "//foundation/ability/ability_runtime/interfaces/inner_api/extension_manager/include/"
   ]
 
   sources = [ "./unittest/mediadatashare_test/src/controller_test.cpp" ]
 
   deps = [
-    "${datashare_innerapi_path}:datashare_consumer",
-    "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
   ]
 
   external_deps = [
