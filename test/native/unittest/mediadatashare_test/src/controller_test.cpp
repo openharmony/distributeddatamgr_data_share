@@ -39,9 +39,6 @@ namespace DataShare {
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
 
-std::string g_dataShareUri = "datashare:///com.acts.datasharetest";
-std::string g_slientAccessUri = "datashare:///com.acts.datasharetest/entry/DB00/TBL00?Proxy=true";
-
 class ControllerTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -51,11 +48,7 @@ public:
 };
 
 void ControllerTest::SetUpTestCase(void) {}
-void ControllerTest::TearDownTestCase(void)
-{
-    auto tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.datashareclienttest.demo", 0);
-    AccessTokenKit::DeleteToken(tokenId);
-}
+void ControllerTest::TearDownTestCase(void) {}
 void ControllerTest::SetUp(void) {}
 void ControllerTest::TearDown(void) {}
 
