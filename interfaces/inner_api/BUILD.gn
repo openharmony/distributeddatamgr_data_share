@@ -52,49 +52,53 @@ config("datashare_public_config") {
   ]
 }
 
+datashare_consumer_sources = [
+  "${datashare_native_consumer_path}/controller/provider/src/ext_special_controller.cpp",
+  "${datashare_native_consumer_path}/controller/provider/src/general_controller_provider_impl.cpp",
+  "${datashare_native_consumer_path}/controller/service/src/general_controller_service_impl.cpp",
+  "${datashare_native_consumer_path}/controller/service/src/persistent_data_controller.cpp",
+  "${datashare_native_consumer_path}/controller/service/src/published_data_controller.cpp",
+  "${datashare_native_consumer_path}/src/datashare_connection.cpp",
+  "${datashare_native_consumer_path}/src/datashare_helper.cpp",
+  "${datashare_native_consumer_path}/src/datashare_helper_impl.cpp",
+  "${datashare_native_consumer_path}/src/datashare_proxy.cpp",
+  "${datashare_native_proxy_path}/src/ams_mgr_proxy.cpp",
+  "${datashare_native_proxy_path}/src/data_proxy_observer_stub.cpp",
+  "${datashare_native_proxy_path}/src/data_share_manager_impl.cpp",
+  "${datashare_native_proxy_path}/src/data_share_service_proxy.cpp",
+  "${datashare_native_proxy_path}/src/idata_share_client_death_observer.cpp",
+  "${datashare_native_proxy_path}/src/published_data_subscriber_manager.cpp",
+  "${datashare_native_proxy_path}/src/rdb_subscriber_manager.cpp",
+]
+
+datashare_consumer_external_deps = [
+  "ability_base:want",
+  "ability_base:zuri",
+  "ability_runtime:ability_context_native",
+  "ability_runtime:app_context",
+  "ability_runtime:dataobs_manager",
+  "ability_runtime:extension_manager",
+  "c_utils:utils",
+  "common_event_service:cesfwk_innerkits",
+  "hilog:libhilog",
+  "ipc:ipc_single",
+  "ipc_js:rpc",
+  "napi:ace_napi",
+  "samgr:samgr_proxy",
+]
+
 ohos_shared_library("datashare_consumer") {
   include_dirs =
       [ "//foundation/distributeddatamgr/kv_store/frameworks/common" ]
 
-  sources = [
-    "${datashare_native_consumer_path}/controller/provider/src/ext_special_controller.cpp",
-    "${datashare_native_consumer_path}/controller/provider/src/general_controller_provider_impl.cpp",
-    "${datashare_native_consumer_path}/controller/service/src/general_controller_service_impl.cpp",
-    "${datashare_native_consumer_path}/controller/service/src/persistent_data_controller.cpp",
-    "${datashare_native_consumer_path}/controller/service/src/published_data_controller.cpp",
-    "${datashare_native_consumer_path}/src/datashare_connection.cpp",
-    "${datashare_native_consumer_path}/src/datashare_helper.cpp",
-    "${datashare_native_consumer_path}/src/datashare_helper_impl.cpp",
-    "${datashare_native_consumer_path}/src/datashare_proxy.cpp",
-    "${datashare_native_proxy_path}/src/ams_mgr_proxy.cpp",
-    "${datashare_native_proxy_path}/src/data_proxy_observer_stub.cpp",
-    "${datashare_native_proxy_path}/src/data_share_manager_impl.cpp",
-    "${datashare_native_proxy_path}/src/data_share_service_proxy.cpp",
-    "${datashare_native_proxy_path}/src/idata_share_client_death_observer.cpp",
-    "${datashare_native_proxy_path}/src/published_data_subscriber_manager.cpp",
-    "${datashare_native_proxy_path}/src/rdb_subscriber_manager.cpp",
-  ]
+  sources = datashare_consumer_sources
   configs = [ ":ability_config" ]
   public_configs = [ ":datashare_public_config" ]
   version_script = "consumer/libdatashare_consumer.map"
   innerapi_tags = [ "platformsdk" ]
   deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
 
-  external_deps = [
-    "ability_base:want",
-    "ability_base:zuri",
-    "ability_runtime:ability_context_native",
-    "ability_runtime:app_context",
-    "ability_runtime:dataobs_manager",
-    "ability_runtime:extension_manager",
-    "c_utils:utils",
-    "common_event_service:cesfwk_innerkits",
-    "hilog:libhilog",
-    "ipc:ipc_single",
-    "ipc_js:rpc",
-    "napi:ace_napi",
-    "samgr:samgr_proxy",
-  ]
+  external_deps = datashare_consumer_external_deps
 
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
@@ -162,6 +166,20 @@ ohos_shared_library("datashare_ext_ability_module") {
   ]
 
   relative_install_dir = "extensionability/"
+  subsystem_name = "distributeddatamgr"
+  part_name = "data_share"
+}
+
+ohos_static_library("datashare_consumer_static") {
+  include_dirs = [ "${kvstore_base_path}/frameworks/common" ]
+
+  sources = datashare_consumer_sources
+  configs = [ ":ability_config" ]
+  public_configs = [ ":datashare_public_config" ]
+  deps = [ "${datashare_innerapi_path}/common:datashare_common_static" ]
+
+  external_deps = datashare_consumer_external_deps
+
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
 }

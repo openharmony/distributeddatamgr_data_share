@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "general_controller_porvider_impl.h"
+#include "general_controller_provider_impl.h"
 
 #include "datashare_log.h"
 
