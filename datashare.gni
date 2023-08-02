@@ -38,3 +38,15 @@ datashare_native_consumer_path =
     "${datashare_base_path}/frameworks/native/consumer"
 
 datashare_native_proxy_path = "${datashare_base_path}/frameworks/native/proxy"
+
+foundation_path = "//foundation"
+
+kvstore_base_path = "//foundation/distributeddatamgr/kv_store"
+
+access_token_path = "//base/security/access_token"
+
+commonlibrary_cutils_path = "//commonlibrary/c_utils"
+
+utils_system_safwk_path = "//utils/system/safwk"
+
+thirdparty_json_path = "//third_party/json"

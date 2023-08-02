@@ -39,8 +39,8 @@ namespace DataShare {
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
 
-std::string g_DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
-std::string g_SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB00/TBL00?Proxy=true";
+std::string g_dataShareUri = "datashare:///com.acts.datasharetest";
+std::string g_slientAccessUri = "datashare:///com.acts.datasharetest/entry/DB00/TBL00?Proxy=true";
 
 class ControllerTest : public testing::Test {
 public:

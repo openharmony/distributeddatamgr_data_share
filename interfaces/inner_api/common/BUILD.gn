@@ -37,8 +37,8 @@ datashare_common_include_dirs = [
   "${datashare_base_path}/interfaces/inner_api/consumer/include",
   "${datashare_base_path}/interfaces/inner_api/provider/include",
   "${datashare_native_proxy_path}/include",
-  "//foundation/communication/ipc/ipc/native/src/napi_common/include",
-  "//foundation/distributeddatamgr/kv_store/frameworks/common",
+  "${foundation_path}/communication/ipc/ipc/native/src/napi_common/include",
+  "${kvstore_base_path}/frameworks/common",
 ]
 
 datashare_common_sources = [
