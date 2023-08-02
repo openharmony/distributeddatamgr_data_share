@@ -232,7 +232,7 @@ ohos_unittest("ControllerTest") {
     "${ability_runtime_inner_api_path}/dataobs_manager/include",
     "${ability_runtime_path}/interfaces/kits/native/ability/native",
     "${access_token_path}/frameworks/common/include",
-    "${access_hilog_path}/interfaces/native/innerkits/include",
+    "${base_hiviewdfx_hilog_path}/interfaces/native/innerkits/include",
     "${foundation_path}/aafwk/standard/interfaces/innerkits/uri/include",
     "${commonlibrary_cutils_path}/base/include",
     "${utils_system_safwk_path}/native/include",
