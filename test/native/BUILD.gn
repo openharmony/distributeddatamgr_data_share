@@ -19,12 +19,12 @@ group("unittest") {
   deps = []
 
   deps += [
+    ":ControllerTest",
     ":ErrorCodeTest",
     ":JoinTest",
     ":NativeDataShareTest",
     ":ProxyDatasTest",
     ":SlientAccessTest",
-    ":ControllerTest",
     "resource/datashare_ext_bundle:datashare_ext",
     "resource/datashareproxy_bundle/proxydatas_with_permission:proxydatas_with_permission",
     "resource/errorcode_ext_bundle:errorcode_ext",
@@ -245,7 +245,7 @@ ohos_unittest("ControllerTest") {
     "//foundation/distributeddatamgr/data_share/frameworks/native/consumer/include",
     "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common/include",
     "//foundation/distributeddatamgr/data_share/frameworks/native/proxy/include",
-    "//foundation/ability/ability_runtime/interfaces/inner_api/extension_manager/include/"
+    "//foundation/ability/ability_runtime/interfaces/inner_api/extension_manager/include/",
   ]
 
   sources = [ "./unittest/mediadatashare_test/src/controller_test.cpp" ]

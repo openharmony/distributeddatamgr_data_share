@@ -172,7 +172,7 @@ ohos_shared_library("datashare_ext_ability_module") {
 
 ohos_static_library("datashare_consumer_static") {
   include_dirs =
-  [ "//foundation/distributeddatamgr/kv_store/frameworks/common" ]
+      [ "//foundation/distributeddatamgr/kv_store/frameworks/common" ]
 
   sources = datashare_consumer_sources
   configs = [ ":ability_config" ]
