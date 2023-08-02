@@ -372,5 +372,28 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_AddObserversProxyNull_Test_001, TestSize
     EXPECT_EQ(results.size(), uris.size());
     LOG_INFO("ProxyDatasTest_AddObserversProxyNull_Test_001::End");
 }
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_shareBlock_Null_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_shareBlock_Null_Test_001::Start");
+    DataShareBlockWriterImpl impl;
+    int result = impl.AllocRow();
+    EXPECT_EQ(result, 1001);
+    result = impl.Write(1);
+    EXPECT_EQ(result, 1001);
+    int64_t intValue = 0;
+    result = impl.Write(1, intValue);
+    EXPECT_EQ(result, 1001);
+    double doubleValue = 0.0;
+    result = impl.Write(1, doubleValue);
+    EXPECT_EQ(result, 1001);
+    uint8_t *unitValue = nullptr;
+    result = impl.Write(1, unitValue, 0);
+    EXPECT_EQ(result, 1001);
+    char *charValue = nullptr;
+    result = impl.Write(1, charValue, 0);
+    EXPECT_EQ(result, 1001);
+    LOG_INFO("ProxyDatasTest_shareBlock_Null_Test_001::End");
+}
 } // namespace DataShare
 } // namespace OHOS
