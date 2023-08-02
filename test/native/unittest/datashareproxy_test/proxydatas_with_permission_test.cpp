@@ -26,6 +26,10 @@
 #include "datashare_errno.h"
 
 #include "published_data_subscriber_manager.h"
+#include "ishared_result_set_stub.h"
+#include "message_parcel.h"
+#include "ikvstore_data_service.h"
+#include "shared_block.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -154,15 +158,15 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_001, TestSize.Level0)
     
     std::vector<uint8_t> blob;
     int err = resultSet->GetBlob(-1, blob);
-    EXPECT_EQ(err, 1008);
+    EXPECT_EQ(err, E_INVALID_COLUMN_INDEX);
     resultSet->SetBlock(nullptr);
     EXPECT_EQ(nullptr, resultSet->GetBlock());
     std::string stringValue;
     result = resultSet->GetString(0, stringValue);
-    EXPECT_EQ(result, 1001);
+    EXPECT_EQ(result, E_ERROR);
     int intValue;
     result = resultSet->GetInt(0, intValue);
-    EXPECT_EQ(result, 1001);
+    EXPECT_EQ(result, E_ERROR);
     LOG_INFO("ProxyDatasTest_ResultSet_Test_001::End");
 }
 
@@ -378,22 +382,71 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_shareBlock_Null_Test_001, TestSize.Level
     LOG_INFO("ProxyDatasTest_shareBlock_Null_Test_001::Start");
     DataShareBlockWriterImpl impl;
     int result = impl.AllocRow();
-    EXPECT_EQ(result, 1001);
+    EXPECT_EQ(result, E_ERROR);
     result = impl.Write(1);
-    EXPECT_EQ(result, 1001);
+    EXPECT_EQ(result, E_ERROR);
     int64_t intValue = 0;
     result = impl.Write(1, intValue);
-    EXPECT_EQ(result, 1001);
+    EXPECT_EQ(result, E_ERROR);
     double doubleValue = 0.0;
     result = impl.Write(1, doubleValue);
-    EXPECT_EQ(result, 1001);
+    EXPECT_EQ(result, E_ERROR);
     uint8_t *unitValue = nullptr;
     result = impl.Write(1, unitValue, 0);
-    EXPECT_EQ(result, 1001);
+    EXPECT_EQ(result, E_ERROR);
     char *charValue = nullptr;
     result = impl.Write(1, charValue, 0);
-    EXPECT_EQ(result, 1001);
+    EXPECT_EQ(result, E_ERROR);
     LOG_INFO("ProxyDatasTest_shareBlock_Null_Test_001::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSetStubNull_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_ResultSetStubNull_Test_001::Start");
+    ISharedResultSetStub stub(nullptr);
+    std::shared_ptr<DataShareResultSet> result = nullptr;
+    OHOS::MessageParcel parcel;
+    sptr<ISharedResultSet> resultSet = stub.CreateStub(result, parcel);
+    EXPECT_EQ(resultSet, nullptr);
+    LOG_INFO("ProxyDatasTest_ResultSetStubNull_Test_001::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_RegisterClientDeathObserverNull_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_RegisterClientDeathObserverNull_Test_001::Start");
+    DataShareKvServiceProxy proxy(nullptr);
+    std::string appId;
+    uint32_t result = proxy.RegisterClientDeathObserver(appId, nullptr);
+    EXPECT_EQ(result, -1);
+    LOG_INFO("ProxyDatasTest_RegisterClientDeathObserverNull_Test_001::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_mReadOnlyInvalid_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_RegisterClientDeathObserverNull_Test_001::Start");
+    std::string name;
+    size_t size = 0;
+    bool readOnly = true;
+    AppDataFwk::SharedBlock temp(name, nullptr, size, readOnly);
+    int result = temp.Clear();
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    result = temp.SetColumnNum(1);
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    result = temp.AllocRow();
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    result = temp.FreeLastRow();
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    int64_t intValue = 0;
+    result = temp.PutLong(1, 1, intValue);
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    double doubleValue = 0.0;
+    result = temp.PutDouble(1, 1, doubleValue);
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    result = temp.PutNull(1, 1);
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    result = temp.SetRawData(nullptr, size);
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    LOG_INFO("ProxyDatasTest_RegisterClientDeathObserverNull_Test_001::End");
 }
 } // namespace DataShare
 } // namespace OHOS

@@ -197,6 +197,8 @@ ohos_unittest("ProxyDatasTest") {
     "//utils/system/safwk/native/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/distributeddatamgr/data_share/frameworks/native/proxy/include/",
+    "//foundation/distributeddatamgr/data_share/frameworks/native/common/include/",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include/",
   ]
 
   sources =
