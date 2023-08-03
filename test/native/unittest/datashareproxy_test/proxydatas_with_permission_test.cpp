@@ -464,6 +464,19 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CreatorPossibleNull_Test_001, TestSize.L
     LOG_INFO("ProxyDatasTest_CreatorPossibleNull_Test_001::End");
 }
 
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_CreatorPossibleNull_Test_002, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_CreatorPossibleNull_Test_002::Start");
+    std::string strUri;
+    CreateOptions options;
+    options.token_ = nullptr;
+    options.isProxy_ = false;
+    std::string bundleName;
+    std::shared_ptr<DataShareHelper> dataHelper = DataShare::DataShareHelper::Creator(strUri, options, bundleName);
+    EXPECT_EQ(dataHelper, nullptr);
+    LOG_INFO("ProxyDatasTest_CreatorPossibleNull_Test_002::End");
+}
+
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_001, TestSize.Level0)
 {
     LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_001::Start");
