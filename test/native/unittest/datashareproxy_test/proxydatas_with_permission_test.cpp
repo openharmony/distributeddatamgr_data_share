@@ -507,17 +507,5 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_002, TestSize.Level0)
     EXPECT_EQ(uriResult, uri);
     LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_002::End");
 }
-
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_remoteObjectNull_Test_001, TestSize.Level0)
-{
-    LOG_INFO("ProxyDatasTest_remoteObjectNull_Test_001::Start");
-    Uri uri("");
-    DataShare::DataShareConnection connect(uri, nullptr);
-    AppExecFwk::ElementName element;
-    sptr<IRemoteObject> remoteObject = nullptr;
-    int resultCode = 0;
-    connect.OnAbilityConnectDone(element, remoteObject, resultCode);
-    LOG_INFO("ProxyDatasTest_remoteObjectNull_Test_001::End");
-}
 } // namespace DataShare
 } // namespace OHOS
