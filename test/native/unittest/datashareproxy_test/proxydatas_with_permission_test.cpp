@@ -30,6 +30,8 @@
 #include "message_parcel.h"
 #include "ikvstore_data_service.h"
 #include "shared_block.h"
+#include "uri.h"
+#include "datashare_connection.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -51,6 +53,7 @@ public:
 };
 
 using namespace OHOS::DataShare;
+using Uri = OHOS::Uri;
 void ProxyDatasTest::SetUpTestCase(void)
 {
     LOG_INFO("SetUpTestCase invoked");
@@ -423,7 +426,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_RegisterClientDeathObserverNull_Test_001
 
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_mReadOnlyInvalid_Test_001, TestSize.Level0)
 {
-    LOG_INFO("ProxyDatasTest_RegisterClientDeathObserverNull_Test_001::Start");
+    LOG_INFO("ProxyDatasTest_mReadOnlyInvalid_Test_001::Start");
     std::string name;
     size_t size = 0;
     bool readOnly = true;
@@ -446,7 +449,63 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_mReadOnlyInvalid_Test_001, TestSize.Leve
     EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
     result = temp.SetRawData(nullptr, size);
     EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
-    LOG_INFO("ProxyDatasTest_RegisterClientDeathObserverNull_Test_001::End");
+    LOG_INFO("ProxyDatasTest_mReadOnlyInvalid_Test_001::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_CreatorPossibleNull_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_CreatorPossibleNull_Test_001::Start");
+    std::string strUri;
+    CreateOptions options;
+    options.token_ = nullptr;
+    std::string bundleName;
+    std::shared_ptr<DataShareHelper> dataHelper = DataShare::DataShareHelper::Creator(strUri, options, bundleName);
+    EXPECT_EQ(dataHelper, nullptr);
+    LOG_INFO("ProxyDatasTest_CreatorPossibleNull_Test_001::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_CreatorPossibleNull_Test_002, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_CreatorPossibleNull_Test_002::Start");
+    std::string strUri;
+    CreateOptions options;
+    options.token_ = nullptr;
+    options.isProxy_ = false;
+    std::string bundleName;
+    std::shared_ptr<DataShareHelper> dataHelper = DataShare::DataShareHelper::Creator(strUri, options, bundleName);
+    EXPECT_EQ(dataHelper, nullptr);
+    LOG_INFO("ProxyDatasTest_CreatorPossibleNull_Test_002::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_001::Start");
+    auto helper = dataShareHelper;
+    bool ret = helper->Release();
+    EXPECT_EQ(ret, true);
+    Uri uri("");
+    std::string str;
+    std::vector<std::string> result = helper->GetFileTypes(uri, str);
+    EXPECT_EQ(result.size(), 0);
+    int err = helper->OpenFile(uri, str);
+    EXPECT_EQ(err, -1);
+    err = helper->OpenRawFile(uri, str);
+    EXPECT_EQ(err, -1);
+    LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_001::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_002, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_002::Start");
+    auto helper = dataShareHelper;
+    bool ret = helper->Release();
+    EXPECT_EQ(ret, true);
+    Uri uri("");
+    Uri uriResult = helper->NormalizeUri(uri);
+    EXPECT_EQ(uriResult, uri);
+    uriResult = helper->DenormalizeUri(uri);
+    EXPECT_EQ(uriResult, uri);
+    LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_002::End");
 }
 } // namespace DataShare
 } // namespace OHOS

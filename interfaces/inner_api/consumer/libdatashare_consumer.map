@@ -22,6 +22,7 @@
     *DataShareManagerImpl*;
     *DataShareServiceProxy*;
     *PublishedDataSubscriberManager*;
+    *DataShareConnection*;
   local:
     *;
 };
