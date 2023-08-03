@@ -840,7 +840,11 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_002, TestSize.Lev
     if (resultSet != nullptr) {
         resultSet->GoToFirstRow();
         resultSet->GetColumnIndex("name", columnIndex);
-        int err = resultSet->GetBlob(columnIndex, blob);
+        std::string columnName;
+        int err = resultSet->GetColumnName(columnIndex, columnName);
+        EXPECT_EQ(err, 0);
+        EXPECT_EQ(columnName, "name");
+        err = resultSet->GetBlob(columnIndex, blob);
         EXPECT_EQ(err, 0);
         EXPECT_NE(blob.size(), 0);
 
