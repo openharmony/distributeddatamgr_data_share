@@ -31,6 +31,7 @@
 #include "ikvstore_data_service.h"
 #include "shared_block.h"
 #include "uri.h"
+#include "datashare_connection.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -425,7 +426,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_RegisterClientDeathObserverNull_Test_001
 
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_mReadOnlyInvalid_Test_001, TestSize.Level0)
 {
-    LOG_INFO("ProxyDatasTest_RegisterClientDeathObserverNull_Test_001::Start");
+    LOG_INFO("ProxyDatasTest_mReadOnlyInvalid_Test_001::Start");
     std::string name;
     size_t size = 0;
     bool readOnly = true;
@@ -448,7 +449,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_mReadOnlyInvalid_Test_001, TestSize.Leve
     EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
     result = temp.SetRawData(nullptr, size);
     EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
-    LOG_INFO("ProxyDatasTest_RegisterClientDeathObserverNull_Test_001::End");
+    LOG_INFO("ProxyDatasTest_mReadOnlyInvalid_Test_001::End");
 }
 
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_CreatorPossibleNull_Test_001, TestSize.Level0)
@@ -492,6 +493,18 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_002, TestSize.Level0)
     uriResult = helper->DenormalizeUri(uri);
     EXPECT_EQ(uriResult, uri);
     LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_002::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_remoteObjectNull_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_remoteObjectNull_Test_001::Start");
+    Uri uri("");
+    DataShare::DataShareConnection connect(uri, nullptr);
+    AppExecFwk::ElementName element;
+    sptr<IRemoteObject> remoteObject = nullptr;
+    int resultCode = 0;
+    connect.OnAbilityConnectDone(element, remoteObject, resultCode);
+    LOG_INFO("ProxyDatasTest_remoteObjectNull_Test_001::End");
 }
 } // namespace DataShare
 } // namespace OHOS
