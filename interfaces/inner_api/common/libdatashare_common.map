@@ -24,6 +24,8 @@
     *ITypesUtil*;
     *DataShareKvServiceProxy*;
     *PublishedDataItem*;
+    *DataShareBlockWriterImpl*;
+    *SharedBlock*;
   local:
     *;
 };

@@ -30,35 +30,52 @@ config("datashare_public_config") {
       [ "${datashare_base_path}/interfaces/inner_api/common/include" ]
 }
 
-ohos_shared_library("datashare_common") {
-  include_dirs = [
-    "${datashare_common_napi_path}/include",
-    "${datashare_common_native_path}/include",
-    "${datashare_base_path}/interfaces/inner_api/common/include",
-    "${datashare_base_path}/interfaces/inner_api/consumer/include",
-    "${datashare_base_path}/interfaces/inner_api/provider/include",
-    "${datashare_native_proxy_path}/include",
-    "//foundation/communication/ipc/ipc/native/src/napi_common/include",
-    "//foundation/distributeddatamgr/kv_store/frameworks/common",
-  ]
+datashare_common_include_dirs = [
+  "${datashare_common_napi_path}/include",
+  "${datashare_common_native_path}/include",
+  "${datashare_base_path}/interfaces/inner_api/common/include",
+  "${datashare_base_path}/interfaces/inner_api/consumer/include",
+  "${datashare_base_path}/interfaces/inner_api/provider/include",
+  "${datashare_native_proxy_path}/include",
+  "${foundation_path}/communication/ipc/ipc/native/src/napi_common/include",
+  "${kvstore_base_path}/frameworks/common",
+]
 
-  sources = [
-    "${datashare_common_napi_path}/src/datashare_error_impl.cpp",
-    "${datashare_common_napi_path}/src/datashare_js_utils.cpp",
-    "${datashare_common_napi_path}/src/datashare_predicates_proxy.cpp",
-    "${datashare_common_napi_path}/src/datashare_result_set_proxy.cpp",
-    "${datashare_common_napi_path}/src/napi_datashare_values_bucket.cpp",
-    "${datashare_common_native_path}/src/datashare_abs_result_set.cpp",
-    "${datashare_common_native_path}/src/datashare_block_writer_impl.cpp",
-    "${datashare_common_native_path}/src/datashare_itypes_utils.cpp",
-    "${datashare_common_native_path}/src/datashare_result_set.cpp",
-    "${datashare_common_native_path}/src/datashare_template.cpp",
-    "${datashare_common_native_path}/src/ikvstore_data_service.cpp",
-    "${datashare_common_native_path}/src/ishared_result_set.cpp",
-    "${datashare_common_native_path}/src/ishared_result_set_proxy.cpp",
-    "${datashare_common_native_path}/src/ishared_result_set_stub.cpp",
-    "${datashare_common_native_path}/src/shared_block.cpp",
-  ]
+datashare_common_sources = [
+  "${datashare_common_napi_path}/src/datashare_error_impl.cpp",
+  "${datashare_common_napi_path}/src/datashare_js_utils.cpp",
+  "${datashare_common_napi_path}/src/datashare_predicates_proxy.cpp",
+  "${datashare_common_napi_path}/src/datashare_result_set_proxy.cpp",
+  "${datashare_common_napi_path}/src/napi_datashare_values_bucket.cpp",
+  "${datashare_common_native_path}/src/datashare_abs_result_set.cpp",
+  "${datashare_common_native_path}/src/datashare_block_writer_impl.cpp",
+  "${datashare_common_native_path}/src/datashare_itypes_utils.cpp",
+  "${datashare_common_native_path}/src/datashare_result_set.cpp",
+  "${datashare_common_native_path}/src/datashare_template.cpp",
+  "${datashare_common_native_path}/src/ikvstore_data_service.cpp",
+  "${datashare_common_native_path}/src/ishared_result_set.cpp",
+  "${datashare_common_native_path}/src/ishared_result_set_proxy.cpp",
+  "${datashare_common_native_path}/src/ishared_result_set_stub.cpp",
+  "${datashare_common_native_path}/src/shared_block.cpp",
+]
+
+datashare_common_external_deps = [
+  "ability_base:zuri",
+  "ability_runtime:abilitykit_native",
+  "c_utils:utils",
+  "hilog:libhilog",
+  "hisysevent:libhisysevent",
+  "hitrace:hitrace_meter",
+  "hitrace:libhitracechain",
+  "ipc:ipc_napi_common",
+  "ipc:ipc_single",
+  "napi:ace_napi",
+]
+
+ohos_shared_library("datashare_common") {
+  include_dirs = datashare_common_include_dirs
+
+  sources = datashare_common_sources
 
   deps = []
 
@@ -69,18 +86,25 @@ ohos_shared_library("datashare_common") {
   version_script = "libdatashare_common.map"
   innerapi_tags = [ "platformsdk" ]
 
-  external_deps = [
-    "ability_base:zuri",
-    "ability_runtime:abilitykit_native",
-    "c_utils:utils",
-    "hilog:libhilog",
-    "hisysevent:libhisysevent",
-    "hitrace:hitrace_meter",
-    "hitrace:libhitracechain",
-    "ipc:ipc_napi_common",
-    "ipc:ipc_single",
-    "napi:ace_napi",
-  ]
+  external_deps = datashare_common_external_deps
+
+  subsystem_name = "distributeddatamgr"
+  part_name = "data_share"
+}
+
+ohos_static_library("datashare_common_static") {
+  include_dirs = datashare_common_include_dirs
+
+  sources = datashare_common_sources
+
+  deps = []
+
+  public_deps = []
+
+  configs = [ ":ability_config" ]
+  public_configs = [ ":datashare_public_config" ]
+
+  external_deps = datashare_common_external_deps
 
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
