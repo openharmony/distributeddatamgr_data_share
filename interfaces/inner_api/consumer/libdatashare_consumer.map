@@ -21,8 +21,6 @@
     *PublishedDataItem*;
     *DataShareManagerImpl*;
     *DataShareServiceProxy*;
-    *PublishedDataSubscriberManager*;
-    *DataShareConnection*;
   local:
     *;
 };
