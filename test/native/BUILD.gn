@@ -318,6 +318,3 @@ ohos_unittest("AbnormalBranchTest") {
     "samgr:samgr_proxy",
   ]
 }
-
-
-
