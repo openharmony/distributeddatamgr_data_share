@@ -106,6 +106,14 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_ResultSet_Test_001, TestSize.Lev
     LOG_INFO("AbnormalBranchTest_ResultSet_Test_001::Start");
     auto helper = dataShareHelper;
     Uri uri(DATA_SHARE_PROXY_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string name0 = "wang";
+    valuesBucket.Put(TBL_NAME0, name0);
+    std::string name1 = "wu";
+    valuesBucket.Put(TBL_NAME1, name1);
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
+
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(TBL_NAME0, "wang");
     std::vector<string> columns;
