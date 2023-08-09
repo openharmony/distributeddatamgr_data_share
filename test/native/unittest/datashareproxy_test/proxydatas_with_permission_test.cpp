@@ -148,7 +148,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_001, TestSize.Level0)
     EXPECT_EQ(hasBlock, true);
     block = resultSet->GetBlock();
     EXPECT_NE(block, nullptr);
-    
+
     std::vector<uint8_t> blob;
     int err = resultSet->GetBlob(-1, blob);
     EXPECT_EQ(err, E_INVALID_COLUMN_INDEX);
