@@ -281,12 +281,12 @@ ohos_unittest("AbnormalBranchTest") {
   module_out_path = "data_share/native_datashare"
 
   include_dirs = [
-    "//base/security/access_token/frameworks/common/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//foundation/aafwk/standard/interfaces/innerkits/uri/include",
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "${access_token_path}/frameworks/common/include",
+    "${base_hiviewdfx_hilog_path}/interfaces/native/innerkits/include",
+    "${foundation_path}/aafwk/standard/interfaces/innerkits/uri/include",
+    "${commonlibrary_cutils_path}/base/include",
+    "${utils_system_safwk_path}/native/include",
+    "${foundation_path}/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/distributeddatamgr/data_share/frameworks/native/proxy/include/",
     "//foundation/distributeddatamgr/data_share/frameworks/native/common/include/",
   ]
