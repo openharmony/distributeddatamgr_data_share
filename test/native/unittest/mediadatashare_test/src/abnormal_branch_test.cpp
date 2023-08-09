@@ -29,16 +29,12 @@
 #include "message_parcel.h"
 #include "ikvstore_data_service.h"
 #include "shared_block.h"
-#include "uri.h"
 #include "datashare_connection.h"
 
 namespace OHOS {
 namespace DataShare {
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
-std::string DATA_SHARE_PROXY_URI = "datashareproxy://com.acts.ohos.data.datasharetest/test";
-std::shared_ptr<DataShare::DataShareHelper> dataShareHelper;
-std::string TBL_NAME0 = "name0";
 
 class AbnormalBranchTest : public testing::Test {
 public:
@@ -48,101 +44,17 @@ public:
     void TearDown();
 };
 
-using namespace OHOS::DataShare;
-using Uri = OHOS::Uri;
 void AbnormalBranchTest::SetUpTestCase(void)
 {
-    LOG_INFO("SetUpTestCase invoked");
-    int sleepTime = 1;
-    sleep(sleepTime);
-
-    HapInfoParams info = { .userID = 100,
-        .bundleName = "ohos.datashareproxyclienttest.demo",
-        .instIndex = 0,
-        .appIDDesc = "ohos.datashareproxyclienttest.demo" };
-    HapPolicyParams policy = { .apl = APL_SYSTEM_BASIC,
-        .domain = "test.domain",
-        .permList = { { .permissionName = "ohos.permission.GET_BUNDLE_INFO",
-            .bundleName = "ohos.datashareproxyclienttest.demo",
-            .grantMode = 1,
-            .availableLevel = APL_SYSTEM_BASIC,
-            .label = "label",
-            .labelId = 1,
-            .description = "ohos.datashareproxyclienttest.demo",
-            .descriptionId = 1 } },
-        .permStateList = { { .permissionName = "ohos.permission.GET_BUNDLE_INFO",
-            .isGeneral = true,
-            .resDeviceID = { "local" },
-            .grantStatus = { PermissionState::PERMISSION_GRANTED },
-            .grantFlags = { 1 } } } };
-    AccessTokenKit::AllocHapToken(info, policy);
-    auto testTokenId =
-        Security::AccessToken::AccessTokenKit::GetHapTokenID(info.userID, info.bundleName, info.instIndex);
-    SetSelfTokenID(testTokenId);
-
-    CreateOptions options;
-    options.enabled_ = true;
-    dataShareHelper = DataShare::DataShareHelper::Creator(DATA_SHARE_PROXY_URI, options);
-    ASSERT_TRUE(dataShareHelper != nullptr);
-    LOG_INFO("SetUpTestCase end");
 }
-
 void AbnormalBranchTest::TearDownTestCase(void)
 {
-    auto tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.datashareclienttest.demo", 0);
-    AccessTokenKit::DeleteToken(tokenId);
-    dataShareHelper = nullptr;
 }
-
 void AbnormalBranchTest::SetUp(void)
 {
 }
 void AbnormalBranchTest::TearDown(void)
 {
-}
-
-HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_ResultSet_Test_001, TestSize.Level0)
-{
-    LOG_INFO("AbnormalBranchTest_ResultSet_Test_001::Start");
-    auto helper = dataShareHelper;
-    Uri uri(DATA_SHARE_PROXY_URI);
-    DataShare::DataShareValuesBucket valuesBucket;
-    std::string name0 = "wang";
-    valuesBucket.Put(TBL_NAME0, name0);
-    std::string name1 = "wu";
-    valuesBucket.Put(TBL_NAME1, name1);
-    int retVal = helper->Insert(uri, valuesBucket);
-    EXPECT_EQ((retVal > 0), true);
-
-    DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(TBL_NAME0, "wang");
-    std::vector<string> columns;
-    auto resultSet = helper->Query(uri, predicates, columns);
-    EXPECT_NE(resultSet, nullptr);
-
-    int result = 0;
-    resultSet->GetRowCount(result);
-    EXPECT_EQ(result, 1);
-
-    AppDataFwk::SharedBlock *block = nullptr;
-    ASSERT_TRUE(resultSet != nullptr);
-    bool hasBlock = resultSet->HasBlock();
-    EXPECT_EQ(hasBlock, true);
-    block = resultSet->GetBlock();
-    EXPECT_NE(block, nullptr);
-    
-    std::vector<uint8_t> blob;
-    int err = resultSet->GetBlob(-1, blob);
-    EXPECT_EQ(err, E_INVALID_COLUMN_INDEX);
-    resultSet->SetBlock(nullptr);
-    EXPECT_EQ(nullptr, resultSet->GetBlock());
-    std::string stringValue;
-    result = resultSet->GetString(0, stringValue);
-    EXPECT_EQ(result, E_ERROR);
-    int intValue;
-    result = resultSet->GetInt(0, intValue);
-    EXPECT_EQ(result, E_ERROR);
-    LOG_INFO("AbnormalBranchTest_ResultSet_Test_001::End");
 }
 
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_shareBlock_Null_Test_001, TestSize.Level0)
@@ -240,37 +152,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_CreatorPossibleNull_Test_002, Te
     std::shared_ptr<DataShareHelper> dataHelper = DataShare::DataShareHelper::Creator(strUri, options, bundleName);
     EXPECT_EQ(dataHelper, nullptr);
     LOG_INFO("AbnormalBranchTest_CreatorPossibleNull_Test_002::End");
-}
-
-HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_extSpCtl_Null_Test_001, TestSize.Level0)
-{
-    LOG_INFO("AbnormalBranchTest_extSpCtl_Null_Test_001::Start");
-    auto helper = dataShareHelper;
-    bool ret = helper->Release();
-    EXPECT_EQ(ret, true);
-    Uri uri("");
-    std::string str;
-    std::vector<std::string> result = helper->GetFileTypes(uri, str);
-    EXPECT_EQ(result.size(), 0);
-    int err = helper->OpenFile(uri, str);
-    EXPECT_EQ(err, -1);
-    err = helper->OpenRawFile(uri, str);
-    EXPECT_EQ(err, -1);
-    LOG_INFO("AbnormalBranchTest_extSpCtl_Null_Test_001::End");
-}
-
-HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_extSpCtl_Null_Test_002, TestSize.Level0)
-{
-    LOG_INFO("AbnormalBranchTest_extSpCtl_Null_Test_002::Start");
-    auto helper = dataShareHelper;
-    bool ret = helper->Release();
-    EXPECT_EQ(ret, true);
-    Uri uri("");
-    Uri uriResult = helper->NormalizeUri(uri);
-    EXPECT_EQ(uriResult, uri);
-    uriResult = helper->DenormalizeUri(uri);
-    EXPECT_EQ(uriResult, uri);
-    LOG_INFO("AbnormalBranchTest_extSpCtl_Null_Test_002::End");
 }
 
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_AddObserversProxyNull_Test_001, TestSize.Level0)

@@ -127,6 +127,42 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QUERY_Test_001, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_QUERY_Test_001::End");
 }
 
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_ResultSet_Test_001::Start");
+    auto helper = dataShareHelper;
+    Uri uri(DATA_SHARE_PROXY_URI);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_NAME0, "wang");
+    std::vector<string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    EXPECT_NE(resultSet, nullptr);
+
+    int result = 0;
+    resultSet->GetRowCount(result);
+    EXPECT_EQ(result, 1);
+
+    AppDataFwk::SharedBlock *block = nullptr;
+    ASSERT_TRUE(resultSet != nullptr);
+    bool hasBlock = resultSet->HasBlock();
+    EXPECT_EQ(hasBlock, true);
+    block = resultSet->GetBlock();
+    EXPECT_NE(block, nullptr);
+    
+    std::vector<uint8_t> blob;
+    int err = resultSet->GetBlob(-1, blob);
+    EXPECT_EQ(err, E_INVALID_COLUMN_INDEX);
+    resultSet->SetBlock(nullptr);
+    EXPECT_EQ(nullptr, resultSet->GetBlock());
+    std::string stringValue;
+    result = resultSet->GetString(0, stringValue);
+    EXPECT_EQ(result, E_ERROR);
+    int intValue;
+    result = resultSet->GetInt(0, intValue);
+    EXPECT_EQ(result, E_ERROR);
+    LOG_INFO("ProxyDatasTest_ResultSet_Test_001::End");
+}
+
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_001, TestSize.Level0)
 {
     LOG_INFO("ProxyDatasTest_Template_Test_001::Start");
@@ -318,6 +354,37 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_UnsubscribePublishedData_Test_001, TestS
         EXPECT_EQ(operationResult.errCode_, 0);
     }
     LOG_INFO("ProxyDatasTest_UnsubscribePublishedData_Test_001::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_001::Start");
+    auto helper = dataShareHelper;
+    bool ret = helper->Release();
+    EXPECT_EQ(ret, true);
+    Uri uri("");
+    std::string str;
+    std::vector<std::string> result = helper->GetFileTypes(uri, str);
+    EXPECT_EQ(result.size(), 0);
+    int err = helper->OpenFile(uri, str);
+    EXPECT_EQ(err, -1);
+    err = helper->OpenRawFile(uri, str);
+    EXPECT_EQ(err, -1);
+    LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_001::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_002, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_002::Start");
+    auto helper = dataShareHelper;
+    bool ret = helper->Release();
+    EXPECT_EQ(ret, true);
+    Uri uri("");
+    Uri uriResult = helper->NormalizeUri(uri);
+    EXPECT_EQ(uriResult, uri);
+    uriResult = helper->DenormalizeUri(uri);
+    EXPECT_EQ(uriResult, uri);
+    LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_002::End");
 }
 } // namespace DataShare
 } // namespace OHOS
