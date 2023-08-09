@@ -19,10 +19,6 @@
     *DataShareSharedResultSet*;
     *DataShareProxy*;
     *PublishedDataItem*;
-    *DataShareManagerImpl*;
-    *DataShareServiceProxy*;
-    *PublishedDataSubscriberManager*;
-    *DataShareConnection*;
   local:
     *;
 };
