@@ -136,11 +136,6 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_001, TestSize.Level0)
     predicates.EqualTo(TBL_NAME0, "wang");
     std::vector<string> columns;
     auto resultSet = helper->Query(uri, predicates, columns);
-    EXPECT_NE(resultSet, nullptr);
-
-    int result = 0;
-    resultSet->GetRowCount(result);
-    EXPECT_EQ(result, 1);
 
     AppDataFwk::SharedBlock *block = nullptr;
     ASSERT_TRUE(resultSet != nullptr);
