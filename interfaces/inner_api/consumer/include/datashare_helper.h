@@ -80,7 +80,8 @@ public:
      *
      * @return Returns the created DataShareHelper instance.
      */
-    static std::shared_ptr<DataShareHelper> Creator(const sptr<IRemoteObject> &token, const std::string &strUri);
+    static std::shared_ptr<DataShareHelper> Creator(
+        const sptr<IRemoteObject> &token, const std::string &strUri, const std::string &extUri = "");
 
     /**
      * @brief Creates a DataShareHelper instance with the Uri and {@link #CreateOptions} .

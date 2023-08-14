@@ -26,8 +26,6 @@ namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
 namespace {
-static constexpr const char *SCHEME_DATASHARE = "datashare";
-static constexpr const char *SCHEME_DATASHARE_PROXY = "datashareproxy";
 static constexpr const char *DATA_SHARE_PREFIX = "datashare:///";
 static constexpr const char *FILE_PREFIX = "file://";
 } // namespace
@@ -72,7 +70,8 @@ std::string DataShareHelper::TransferUriPrefix(const std::string &originPrefix, 
  *
  * @return Returns the created DataShareHelper instance.
  */
-std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObject> &token, const std::string &strUri)
+std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
+    const sptr<IRemoteObject> &token, const std::string &strUri, const std::string &extUri)
 {
     if (token == nullptr) {
         LOG_ERROR("token == nullptr");
@@ -82,13 +81,13 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
     std::string replacedUriStr = TransferUriPrefix(FILE_PREFIX, DATA_SHARE_PREFIX, strUri);
     Uri uri(replacedUriStr);
 
-    if (uri.GetScheme() != SCHEME_DATASHARE) {
-        LOG_ERROR("the Scheme is not datashare, Scheme: %{public}s", uri.GetScheme().c_str());
-        return nullptr;
-    }
-
     if (uri.GetQuery().find("Proxy=true") != std::string::npos) {
-        return CreateServiceHelper();
+        auto result = CreateServiceHelper();
+        if (result != nullptr || extUri.empty()) {
+            return result;
+        }
+        Uri ext(extUri);
+        return CreateExtHelper(ext, token);
     }
     return CreateExtHelper(uri, token);
 }
@@ -99,10 +98,6 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, 
     Uri uri(strUri);
     if (!options.isProxy_ && options.token_ == nullptr) {
         LOG_ERROR("token is nullptr");
-        return nullptr;
-    }
-    if (uri.GetScheme() != SCHEME_DATASHARE_PROXY) {
-        LOG_ERROR("the Scheme is not datashareproxy, Scheme: %{public}s", uri.GetScheme().c_str());
         return nullptr;
     }
     if (options.isProxy_) {
