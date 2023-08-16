@@ -98,10 +98,7 @@ ohos_shared_library("datashare_consumer") {
   public_configs = [ ":datashare_public_config" ]
   version_script = "consumer/libdatashare_consumer.map"
   innerapi_tags = [ "platformsdk" ]
-  deps = [
-    "${datashare_innerapi_path}/common:datashare_common",
-    "${kvstore_base_path}/interfaces/innerkits/distributeddata:distributeddata_inner",
-  ]
+  deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
 
   external_deps = datashare_consumer_external_deps
 
@@ -176,7 +173,10 @@ ohos_shared_library("datashare_ext_ability_module") {
 }
 
 ohos_static_library("datashare_consumer_static") {
-  include_dirs = [ "${kvstore_base_path}/frameworks/common" ]
+  include_dirs = [
+    "${kvstore_base_path}/frameworks/common",
+    "${kvstore_base_path}/interfaces/innerkits/distributeddata/include",
+  ]
 
   sources = datashare_consumer_sources
   configs = [ ":ability_config" ]
