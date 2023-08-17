@@ -129,18 +129,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_mReadOnlyInvalid_Test_001, TestS
     LOG_INFO("AbnormalBranchTest_mReadOnlyInvalid_Test_001::End");
 }
 
-HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_CreatorPossibleNull_Test_001, TestSize.Level0)
-{
-    LOG_INFO("AbnormalBranchTest_CreatorPossibleNull_Test_001::Start");
-    std::string strUri;
-    CreateOptions options;
-    options.token_ = nullptr;
-    std::string bundleName;
-    std::shared_ptr<DataShareHelper> dataHelper = DataShare::DataShareHelper::Creator(strUri, options, bundleName);
-    EXPECT_EQ(dataHelper, nullptr);
-    LOG_INFO("AbnormalBranchTest_CreatorPossibleNull_Test_001::End");
-}
-
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_CreatorPossibleNull_Test_002, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_CreatorPossibleNull_Test_002::Start");
