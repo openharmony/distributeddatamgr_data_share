@@ -21,7 +21,7 @@
 
 #include "extension_manager_proxy.h"
 namespace OHOS::DataShare {
-class AmsMgrProxy  {
+class AmsMgrProxy {
 public:
     ~AmsMgrProxy();
     static AmsMgrProxy* GetInstance();
@@ -48,6 +48,7 @@ private:
     void OnProxyDied();
     bool ConnectSA();
     std::mutex mutex_;
+    static std::mutex pre_mutex_;
     sptr<IRemoteObject> sa_;
     sptr<Proxy> proxy_;
     sptr<AmsMgrProxy::ServiceDeathRecipient> deathRecipient_;
