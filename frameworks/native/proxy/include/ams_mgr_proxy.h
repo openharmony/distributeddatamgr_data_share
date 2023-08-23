@@ -24,7 +24,6 @@ namespace OHOS::DataShare {
 class AmsMgrProxy  {
 public:
     ~AmsMgrProxy();
-    // static std::shared_ptr<AmsMgrProxy> AmsMgrProxy::GetInstance()
     static AmsMgrProxy* GetInstance();
     int Connect(const std::string &uri, const sptr<IRemoteObject> &connect, const sptr<IRemoteObject> &callerToken);
     int DisConnect(sptr<IRemoteObject> connect);
@@ -34,7 +33,6 @@ private:
     class ServiceDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         explicit ServiceDeathRecipient(AmsMgrProxy* owner) : owner_(owner)
-        // explicit ServiceDeathRecipient(std::weak_ptr<AmsMgrProxy> owner) : owner_(owner)
         {
         }
         void OnRemoteDied(const wptr<IRemoteObject> &object) override

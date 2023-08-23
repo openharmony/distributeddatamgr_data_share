@@ -40,19 +40,9 @@ AmsMgrProxy::~AmsMgrProxy()
     }
 }
 
-// std::shared_ptr<AmsMgrProxy> AmsMgrProxy::GetInstance()
-// {
-//     static std::shared_ptr<AmsMgrProxy> proxy(new AmsMgrProxy());
-//     return proxy;
-// }
-
 AmsMgrProxy* AmsMgrProxy::GetInstance()
 {
     static AmsMgrProxy* proxy = nullptr;
-    if(proxy != nullptr) {
-        return proxy;
-    }
-    std::lock_guard<std::mutex> lock(mutex_);
     if(proxy != nullptr) {
         return proxy;
     }

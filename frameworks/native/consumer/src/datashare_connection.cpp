@@ -80,7 +80,7 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
     AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
     if (instance == nullptr) {
         LOG_ERROR("Connect: AmsMgrProxy::GetInstance failed");
-        return;
+        return nullptr;
     }
     ErrCode ret = instance->Connect(reqUri, this, token);
     if (ret != ERR_OK) {

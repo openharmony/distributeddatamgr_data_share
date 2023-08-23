@@ -1044,6 +1044,30 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUD_Test_001, TestSize.Level0)
     LOG_INFO("MediaDataShare_CRUD_Test_001, End");
 }
 
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotImplPredicates_Test_zyp, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_ImplPredicates_Test_001::Start");
+    DataShare::DataSharePredicates predicates;
+    vector<int> inColumn;
+    inColumn.push_back(1);
+    inColumn.push_back(2);
+    inColumn.push_back(3);
+    predicates.In("name", inColumn);
+
+    std::vector<DataShare::OperationItem> operationItems = predicates.GetOperationList();
+    std::string str = std::get<string>(operationItems[0].singleParams[0]);
+    std::vector<int> ret = std::get<std::vector<int>>(operationItems[0].multiParams[0]);
+    EXPECT_EQ(operationItems.size(), 1);
+    EXPECT_EQ(operationItems[0].singleParams[0].index(), 4);
+    EXPECT_EQ(str, "name");
+    EXPECT_EQ(operationItems[0].multiParams[0].index(), 1);
+    for (int i = 0; i < ret.size(); i++) {
+        EXPECT_EQ(ret[i], i + 1);
+    }
+    operationItems.clear();
+    LOG_INFO("MediaDataShare_ImplPredicates_Test_001, End");
+}
+
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotImplPredicates_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_NotImplPredicates_Test_001::Start");
