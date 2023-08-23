@@ -21,10 +21,11 @@
 
 #include "extension_manager_proxy.h"
 namespace OHOS::DataShare {
-class AmsMgrProxy final : public std::enable_shared_from_this<AmsMgrProxy> {
+class AmsMgrProxy  {
 public:
     ~AmsMgrProxy();
-    static std::shared_ptr<AmsMgrProxy> GetInstance();
+    // static std::shared_ptr<AmsMgrProxy> AmsMgrProxy::GetInstance()
+    static AmsMgrProxy* GetInstance();
     int Connect(const std::string &uri, const sptr<IRemoteObject> &connect, const sptr<IRemoteObject> &callerToken);
     int DisConnect(sptr<IRemoteObject> connect);
 private:
@@ -32,19 +33,19 @@ private:
     AmsMgrProxy() = default;
     class ServiceDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        explicit ServiceDeathRecipient(std::weak_ptr<AmsMgrProxy> owner) : owner_(owner)
+        explicit ServiceDeathRecipient(AmsMgrProxy* owner) : owner_(owner)
+        // explicit ServiceDeathRecipient(std::weak_ptr<AmsMgrProxy> owner) : owner_(owner)
         {
         }
         void OnRemoteDied(const wptr<IRemoteObject> &object) override
         {
-            auto owner = owner_.lock();
-            if (owner != nullptr) {
-                owner->OnProxyDied();
+            if (owner_ != nullptr) {
+                owner_->OnProxyDied();
             }
         }
 
     private:
-        std::weak_ptr<AmsMgrProxy> owner_;
+        AmsMgrProxy* owner_;
     };
     void OnProxyDied();
     bool ConnectSA();
