@@ -22,7 +22,6 @@
 #include "want.h"
 
 namespace OHOS::DataShare {
-std::mutex AmsMgrProxy::pre_mutex_;
 
 void AmsMgrProxy::OnProxyDied()
 {
@@ -45,7 +44,11 @@ AmsMgrProxy::~AmsMgrProxy()
 AmsMgrProxy* AmsMgrProxy::GetInstance()
 {
     static AmsMgrProxy* proxy = nullptr;
-    std::lock_guard<std::mutex> lock(pre_mutex_);
+    if (proxy != nullptr) {
+        return proxy;
+    }
+    std::mutex premutex_;
+    std::lock_guard<std::mutex> lock(premutex_);
     if (proxy != nullptr) {
         return proxy;
     }
