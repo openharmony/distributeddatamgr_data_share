@@ -77,7 +77,12 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
         return dataShareProxy_;
     }
     auto reqUri = uri_.ToString().empty() ? uri.ToString() : uri_.ToString();
-    ErrCode ret = AmsMgrProxy::GetInstance()->Connect(reqUri, this, token);
+    AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
+    if (instance == nullptr) {
+        LOG_ERROR("Connect: AmsMgrProxy::GetInstance failed");
+        return nullptr;
+    }
+    ErrCode ret = instance->Connect(reqUri, this, token);
     if (ret != ERR_OK) {
         LOG_ERROR("connect ability failed, ret = %{public}d", ret);
         return nullptr;
@@ -99,7 +104,12 @@ void DataShareConnection::DisconnectDataShareExtAbility()
     if (dataShareProxy_ == nullptr) {
         return;
     }
-    ErrCode ret = AmsMgrProxy::GetInstance()->DisConnect(this);
+    AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
+    if (instance == nullptr) {
+        LOG_ERROR("Disconnect: AmsMgrProxy::GetInstance failed");
+        return;
+    }
+    ErrCode ret = instance->DisConnect(this);
     if (ret != ERR_OK) {
         LOG_ERROR("disconnect ability failed, ret = %{public}d", ret);
         return;
