@@ -72,7 +72,7 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplInsertTest_002, TestSize.Lev
     Uri uri("");
     sptr<DataShare::DataShareConnection> connection =
         new (std::nothrow) DataShare::DataShareConnection(uri, nullptr);
-    auto dataShareConnection = 
+    auto dataShareConnection =
         std::shared_ptr<DataShare::DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
             holder->DisconnectDataShareExtAbility();
         });
@@ -107,7 +107,7 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplUpdateTest_002, TestSize.Lev
     Uri uri("");
     sptr<DataShare::DataShareConnection> connection =
         new (std::nothrow) DataShare::DataShareConnection(uri, nullptr);
-    auto dataShareConnection = 
+    auto dataShareConnection =
         std::shared_ptr<DataShare::DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
             holder->DisconnectDataShareExtAbility();
         });
@@ -141,7 +141,7 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplDeleteTest_002, TestSize.Lev
     Uri uri("");
     sptr<DataShare::DataShareConnection> connection =
         new (std::nothrow) DataShare::DataShareConnection(uri, nullptr);
-    auto dataShareConnection = 
+    auto dataShareConnection =
         std::shared_ptr<DataShare::DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
             holder->DisconnectDataShareExtAbility();
         });
@@ -175,7 +175,7 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplQueryTest_002, TestSize.Leve
     Uri uri("");
     sptr<DataShare::DataShareConnection> connection =
         new (std::nothrow) DataShare::DataShareConnection(uri, nullptr);
-    auto dataShareConnection = 
+    auto dataShareConnection =
         std::shared_ptr<DataShare::DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
             holder->DisconnectDataShareExtAbility();
         });
@@ -216,7 +216,7 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerBatchInsertTest_002,
     Uri uri("");
     sptr<DataShare::DataShareConnection> connection =
         new (std::nothrow) DataShare::DataShareConnection(uri, nullptr);
-    auto dataShareConnection = 
+    auto dataShareConnection =
         std::shared_ptr<DataShare::DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
             holder->DisconnectDataShareExtAbility();
         });
@@ -253,7 +253,7 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerNormalizeUriTest_002
     Uri uri("");
     sptr<DataShare::DataShareConnection> connection =
         new (std::nothrow) DataShare::DataShareConnection(uri, nullptr);
-    auto dataShareConnection = 
+    auto dataShareConnection =
         std::shared_ptr<DataShare::DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
             holder->DisconnectDataShareExtAbility();
         });
@@ -281,7 +281,7 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerDenormalizeUriTest_0
     Uri uri("");
     sptr<DataShare::DataShareConnection> connection =
         new (std::nothrow) DataShare::DataShareConnection(uri, nullptr);
-    auto dataShareConnection = 
+    auto dataShareConnection =
         std::shared_ptr<DataShare::DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
             holder->DisconnectDataShareExtAbility();
         });
