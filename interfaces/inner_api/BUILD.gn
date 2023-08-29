@@ -81,8 +81,8 @@ datashare_consumer_external_deps = [
   "c_utils:utils",
   "common_event_service:cesfwk_innerkits",
   "hilog:libhilog",
+  "ipc:ipc_js",
   "ipc:ipc_single",
-  "ipc_js:rpc",
   "napi:ace_napi",
   "samgr:samgr_proxy",
 ]
@@ -135,8 +135,8 @@ ohos_shared_library("datashare_provider") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
+    "ipc:ipc_js",
     "ipc:ipc_single",
-    "ipc_js:rpc",
     "napi:ace_napi",
     "samgr:samgr_proxy",
   ]

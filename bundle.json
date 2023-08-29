@@ -59,7 +59,6 @@
                 "hitrace",
                 "hilog",
                 "ipc",
-                "ipc_js",
                 "napi",
                 "relational_store",
                 "samgr"
