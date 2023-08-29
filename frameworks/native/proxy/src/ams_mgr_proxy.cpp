@@ -40,9 +40,21 @@ AmsMgrProxy::~AmsMgrProxy()
     }
 }
 
-std::shared_ptr<AmsMgrProxy> AmsMgrProxy::GetInstance()
+AmsMgrProxy* AmsMgrProxy::GetInstance()
 {
-    static std::shared_ptr<AmsMgrProxy> proxy(new AmsMgrProxy());
+    static AmsMgrProxy* proxy = nullptr;
+    if (proxy != nullptr) {
+        return proxy;
+    }
+    std::mutex premutex_;
+    std::lock_guard<std::mutex> lock(premutex_);
+    if (proxy != nullptr) {
+        return proxy;
+    }
+    proxy = new AmsMgrProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("new AmsMgrProxy failed");
+    }
     return proxy;
 }
 
@@ -80,7 +92,7 @@ bool AmsMgrProxy::ConnectSA()
         LOG_ERROR("Failed to GetSystemAbility.");
         return false;
     }
-    deathRecipient_ = new (std::nothrow) AmsMgrProxy::ServiceDeathRecipient(weak_from_this());
+    deathRecipient_ = new (std::nothrow) AmsMgrProxy::ServiceDeathRecipient(this);
     if (deathRecipient_ == nullptr) {
         LOG_ERROR("deathRecipient alloc failed.");
         return false;
