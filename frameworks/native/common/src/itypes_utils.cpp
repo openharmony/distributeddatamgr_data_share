@@ -419,10 +419,7 @@ bool ITypesUtils::Unmarshalling(Parcel &parcel, DataShareValueObject &valueObjec
     }
     valueObject.type = static_cast<DataShareValueObjectType>(type);
     switch (valueObject.type) {
-        case DataShareValueObjectType::TYPE_INT: {
-            valueObject.value = parcel.ReadInt64();
-            break;
-        }
+        case DataShareValueObjectType::TYPE_INT:
         case DataShareValueObjectType::TYPE_INT64: {
             valueObject.value = parcel.ReadInt64();
             break;
