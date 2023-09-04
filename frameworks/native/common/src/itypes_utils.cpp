@@ -375,6 +375,13 @@ bool ITypesUtils::Marshalling(const DataShareValueObject &valueObject, Parcel &p
             }
             break;
         }
+        case DataShareValueObjectType::TYPE_INT64: {
+            if (!parcel.WriteInt64(std::get<int64_t>(valueObject.value))) {
+                LOG_ERROR("valueObject WriteInt64 failed");
+                return false;
+            }
+            break;
+        }
         case DataShareValueObjectType::TYPE_DOUBLE: {
             if (!parcel.WriteDouble(std::get<double>(valueObject.value))) {
                 LOG_ERROR("valueObject WriteDouble failed");
@@ -419,6 +426,10 @@ bool ITypesUtils::Unmarshalling(Parcel &parcel, DataShareValueObject &valueObjec
     valueObject.type = static_cast<DataShareValueObjectType>(type);
     switch (valueObject.type) {
         case DataShareValueObjectType::TYPE_INT: {
+            valueObject.value = parcel.ReadInt64();
+            break;
+        }
+        case DataShareValueObjectType::TYPE_INT64: {
             valueObject.value = parcel.ReadInt64();
             break;
         }
