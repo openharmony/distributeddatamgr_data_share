@@ -361,7 +361,7 @@ bool ITypesUtils::Unmarshalling(Parcel &parcel, DataSharePredicatesObjects &pred
     return true;
 }
 
-bool ITypesUtils::Marshalling(const DataShareValueObject &valueObject)
+bool ITypesUtils::Marshalling(Parcel &parcel, const DataShareValueObject &valueObject)
 {
     switch (valueObject.type) {
         case DataShareValueObjectType::TYPE_INT: {
@@ -409,6 +409,7 @@ bool ITypesUtils::Marshalling(const DataShareValueObject &valueObject)
         default:
             break;
     }
+    return true;
 }
 bool ITypesUtils::Marshalling(const DataShareValueObject &valueObject, Parcel &parcel)
 {
@@ -416,7 +417,7 @@ bool ITypesUtils::Marshalling(const DataShareValueObject &valueObject, Parcel &p
         LOG_ERROR("valueObject write type failed");
         return false;
     }
-    Marshalling(valueObject);
+    Marshalling(parcel, valueObject);
     return true;
 }
 

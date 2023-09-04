@@ -31,7 +31,6 @@ public:
     static bool Unmarshalling(Parcel &parcel, DataSharePredicates &predicates);
 
     static bool Marshalling(const DataShareValuesBucket &valuesBucket, Parcel &parcel);
-    static bool Marshalling(const DataShareValueObject &valueObject);
     static bool Unmarshalling(Parcel &parcel, DataShareValuesBucket &valuesBucket);
 
     static bool Marshalling(const OperationItem &operationItem, Parcel &parcel);
@@ -44,6 +43,7 @@ public:
     static bool Unmarshalling(Parcel &parcel, DataSharePredicatesObjects &predicatesObject);
 
     static bool Marshalling(const DataShareValueObject &valueObject, Parcel &parcel);
+    static bool Marshalling(Parcel &parcel, const DataShareValueObject &valueObject);
     static bool Unmarshalling(Parcel &parcel, DataShareValueObject &valueObject);
 
     static bool Marshalling(const std::string &input, Parcel &data);
