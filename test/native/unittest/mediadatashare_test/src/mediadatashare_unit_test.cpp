@@ -607,10 +607,8 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_024, TestSize.Le
     valuesBucket.Put(MEDIA_DATA_DB_TITLE, "dataShareTest006");
     int64_t value4 = 202308311455;
     valuesBucket.Put(MEDIA_DATA_DB_PARENT_ID, value4);
-    if (helper != nullptr) {
-        int retVal = helper->Insert(uri, valuesBucket);
-        EXPECT_EQ((retVal > 0), true);
-    }
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
     valuesBucket.Clear();
 
     DataShare::DataSharePredicates predicates;
