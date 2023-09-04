@@ -361,16 +361,14 @@ bool ITypesUtils::Unmarshalling(Parcel &parcel, DataSharePredicatesObjects &pred
     return true;
 }
 
-bool ITypesUtils::Marshalling(Parcel &parcel, const DataShareValueObject &valueObject)
+bool ITypesUtils::Marshalling(const DataShareValueObject &valueObject, Parcel &parcel)
 {
+    if (!parcel.WriteInt16((int16_t)valueObject.type)) {
+        LOG_ERROR("valueObject write type failed");
+        return false;
+    }
     switch (valueObject.type) {
-        case DataShareValueObjectType::TYPE_INT: {
-            if (!parcel.WriteInt64(std::get<int64_t>(valueObject.value))) {
-                LOG_ERROR("valueObject WriteInt failed");
-                return false;
-            }
-            break;
-        }
+        case DataShareValueObjectType::TYPE_INT:
         case DataShareValueObjectType::TYPE_INT64: {
             if (!parcel.WriteInt64(std::get<int64_t>(valueObject.value))) {
                 LOG_ERROR("valueObject WriteInt64 failed");
@@ -409,15 +407,6 @@ bool ITypesUtils::Marshalling(Parcel &parcel, const DataShareValueObject &valueO
         default:
             break;
     }
-    return true;
-}
-bool ITypesUtils::Marshalling(const DataShareValueObject &valueObject, Parcel &parcel)
-{
-    if (!parcel.WriteInt16((int16_t)valueObject.type)) {
-        LOG_ERROR("valueObject write type failed");
-        return false;
-    }
-    Marshalling(parcel, valueObject);
     return true;
 }
 
