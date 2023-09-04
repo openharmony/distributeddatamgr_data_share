@@ -616,11 +616,14 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_024, TestSize.Le
 
     vector<string> columns;
     auto resultSet = helper->Query(uri, predicates, columns);
-    int result = 0;
+    int columnIndex = 0;
+    int64_t intResult = 0;
     if (resultSet != nullptr) {
-        resultSet->GetRowCount(result);
+        resultSet->GoToFirstRow();
+        resultSet->GetColumnIndex(MEDIA_DATA_DB_PARENT_ID, columnIndex);
+        resultSet->GetLong(columnIndex, intResult);
     }
-    EXPECT_EQ(result, 1);
+    EXPECT_EQ(intResult, value4);
     LOG_INFO("MediaDataShare_Predicates_Test_024, End");
 }
 
