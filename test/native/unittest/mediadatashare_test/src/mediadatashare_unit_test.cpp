@@ -596,6 +596,36 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_023, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_023, End");
 }
 
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_024, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_Predicates_Test_024::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_mediaDataShareHelper;
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    double valueD4 = 20.10;
+    valuesBucket.Put(MEDIA_DATA_DB_LONGITUDE, valueD4);
+    valuesBucket.Put(MEDIA_DATA_DB_TITLE, "dataShareTest006");
+    int64_t value4 = 202308311455;
+    valuesBucket.Put(MEDIA_DATA_DB_PARENT_ID, value4);
+    if (helper != nullptr) {
+        int retVal = helper->Insert(uri, valuesBucket);
+        EXPECT_EQ((retVal > 0), true);
+    }
+    valuesBucket.Clear();
+
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(MEDIA_DATA_DB_PARENT_ID, value4);
+
+    vector<string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    int result = 0;
+    if (resultSet != nullptr) {
+        resultSet->GetRowCount(result);
+    }
+    EXPECT_EQ(result, 1);
+    LOG_INFO("MediaDataShare_Predicates_Test_024, End");
+}
+
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ValuesBucket_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ValuesBucket_Test_001::Start");
