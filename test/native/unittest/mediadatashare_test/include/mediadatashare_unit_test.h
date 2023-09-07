@@ -20,6 +20,7 @@
 #include <condition_variable>
 #include "data_ability_observer_interface.h"
 #include "datashare_helper.h"
+#include "data_ability_observer_stub.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -41,7 +42,7 @@ public:
     bool ChangeInfoEqual(const ChangeInfo &changeInfo, const ChangeInfo &expectChangeInfo);
 };
 
-class IDataAbilityObserverTest : public AAFwk::IDataAbilityObserver {
+class IDataAbilityObserverTest : public AAFwk::DataAbilityObserverStub {
 public:
     IDataAbilityObserverTest();
     ~IDataAbilityObserverTest()
