@@ -91,9 +91,8 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
     if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ != nullptr; })) {
         LOG_DEBUG("connect ability ended successfully");
-    }
-    else{
-        LOG_DEBUG("connect ability timeout");
+    } else {
+        LOG_DEBUG("connect timeout");
     }
     return dataShareProxy_;
 }
