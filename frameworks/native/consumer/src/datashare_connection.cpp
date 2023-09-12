@@ -92,7 +92,7 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
         [this] { return dataShareProxy_ != nullptr; })) {
         LOG_DEBUG("connect ability ended successfully");
     } else {
-        LOG_DEBUG("connect timeout");
+        LOG_WARN("connect timeout");
     }
     return dataShareProxy_;
 }
