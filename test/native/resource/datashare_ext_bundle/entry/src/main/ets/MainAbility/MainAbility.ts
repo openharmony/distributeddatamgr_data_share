@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,18 +45,44 @@ export default class MainAbility extends Ability {
         console.log("[ttt] [DataShareTest] <<Consumer>> MainAbility onWindowStageCreate")
         globalThis.abilityContext = this.context;
         console.log("[ttt] [DataShareTest] <<Consumer>> MainAbility this.context.databaseDir:" + this.context.databaseDir);
+        
+        this.connectDataShareExtAbility();    
+        this.disconnectDataShareExtAbility();
+        this.on();
+        this.off();
+        this.openFile();
+        this.query();
+        this.insert();
+        this.update();
+        this.delete();
+        this.batchInsert();
+        this.notifyChange();
+        this.getType();
+        this.getFileTypes();
+        this.normalizeUri();
+        this.denormalizeUri();
+
+        windowStage.setUIContent(this.context, "pages/index", null)
+    }
+
+    connectDataShareExtAbility() {
         globalThis.connectDataShareExtAbility = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> connectDataShareExtAbility begin");
             globalThis.dsHelper = await dataShare.createDataShareHelper(this.context, dseUri);
             console.log("[ttt] [DataShareTest] <<Consumer>> connectDataShareExtAbility end");
         })
+    }
 
+    disconnectDataShareExtAbility() {
         globalThis.disconnectDataShareExtAbility = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> disconnectDataShareExtAbility begin");
             globalThis.dsHelper = null;
             console.log("[ttt] [DataShareTest] <<Consumer>> disconnectDataShareExtAbility end");
         })
 
+    }
+
+    on() {
         globalThis.on = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> on begin");
             if (globalThis.dsHelper == null) {
@@ -65,8 +91,10 @@ export default class MainAbility extends Ability {
             }
             await globalThis.dsHelper.on("dataChange", uri, onCallback);
             console.log("[ttt] [DataShareTest] <<Consumer>> on end");
-        })
-
+        }) 
+    }
+    
+    off() {
         globalThis.off = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> off begin");
             if (globalThis.dsHelper == null) {
@@ -77,7 +105,9 @@ export default class MainAbility extends Ability {
             await globalThis.dsHelper.off("dataChange", uri, offCallback);
             console.log("[ttt] [DataShareTest] <<Consumer>> off end");
         })
+    }
 
+    openFile() {
         globalThis.openFile = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> openFile begin");
             if (globalThis.dsHelper == null) {
@@ -88,7 +118,9 @@ export default class MainAbility extends Ability {
             console.log("[ttt] [DataShareTest] <<Consumer>> openFile end, result:" + result);
             return result;
         })
+    }
 
+    query() {
         globalThis.query = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> query begin");
             let da =  new dataSharePredicates.DataSharePredicates();
@@ -109,7 +141,9 @@ export default class MainAbility extends Ability {
             console.log("[ttt] [DataShareTest] <<Consumer>> query end, count:" + count);
             return count;
         })
+    }
 
+    insert() {
         globalThis.insert = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> insert begin");
             if (globalThis.dsHelper == null) {
@@ -123,7 +157,9 @@ export default class MainAbility extends Ability {
             await console.log("[ttt] [DataShareTest] <<Consumer>> insert end, ret:" + ret);
             return ret;
         })
+    }
 
+    update() {
         globalThis.update = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> update begin");
             if (globalThis.dsHelper == null) {
@@ -143,7 +179,9 @@ export default class MainAbility extends Ability {
             console.log("[ttt] [DataShareTest] <<Consumer>> update end, result:" + ret);
             return ret;
         })
+    }
 
+    delete() {
         globalThis.delete = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> delete begin");
             if (globalThis.dsHelper == null) {
@@ -160,7 +198,9 @@ export default class MainAbility extends Ability {
             console.log("[ttt] [DataShareTest] <<Consumer>> delete end, result:" + ret);
             return ret;
         })
+    }
 
+    batchInsert() {
         globalThis.batchInsert = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> batchInsert begin");
             if (globalThis.dsHelper == null) {
@@ -177,7 +217,9 @@ export default class MainAbility extends Ability {
             console.log("[ttt] [DataShareTest] <<Consumer>> batchInsert end, result:" + ret);
             return ret;
         })
+    }
 
+    notifyChange() {
         globalThis.notifyChange = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> notifyChange begin");
             if (globalThis.dsHelper == null) {
@@ -187,7 +229,9 @@ export default class MainAbility extends Ability {
             await globalThis.dsHelper.notifyChange(dseUri);
             console.log("[ttt] [DataShareTest] <<Consumer>> notifyChange end");
         })
-
+    }
+    
+    getType() {
         globalThis.getType = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> getType begin");
             if (globalThis.dsHelper == null) {
@@ -198,7 +242,9 @@ export default class MainAbility extends Ability {
             console.log("[ttt] [DataShareTest] <<Consumer>> getType end, result:" + result);
             return result;
         })
+    }
 
+    getFileTypes() {
         globalThis.getFileTypes = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> getFileTypes begin");
             if (globalThis.dsHelper == null) {
@@ -209,7 +255,9 @@ export default class MainAbility extends Ability {
             console.log("[ttt] [DataShareTest] <<Consumer>> getFileTypes end, result:" + result);
             return result;
         })
+    }
 
+    normalizeUri() {
         globalThis.normalizeUri = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> normalizeUri begin");
             if (globalThis.dsHelper == null) {
@@ -220,7 +268,9 @@ export default class MainAbility extends Ability {
             console.log("[ttt] [DataShareTest] <<Consumer>> normalizeUri end, result:" + result);
             return result;
         })
+    }
 
+    denormalizeUri() {
         globalThis.denormalizeUri = (async () => {
             console.log("[ttt] [DataShareTest] <<Consumer>> denormalizeUri begin");
             if (globalThis.dsHelper == null) {
@@ -231,8 +281,6 @@ export default class MainAbility extends Ability {
             console.log("[ttt] [DataShareTest] <<Consumer>> denormalizeUri end, result:" + result);
             return result;
         })
-
-        windowStage.setUIContent(this.context, "pages/index", null)
     }
 
     onWindowStageDestroy() {
