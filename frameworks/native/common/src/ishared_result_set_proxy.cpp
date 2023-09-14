@@ -18,6 +18,7 @@
 #include "datashare_errno.h"
 #include "datashare_log.h"
 #include "iremote_proxy.h"
+#include "string_ex.h"
 
 using namespace OHOS::DistributedShare::DataShare;
 
@@ -53,7 +54,10 @@ int ISharedResultSetProxy::GetAllColumnNames(std::vector<std::string> &columnNam
         return E_OK;
     }
     MessageParcel request;
-    request.WriteInterfaceToken(GetDescriptor());
+    if (!request.WriteInterfaceToken(GetDescriptor())) {
+        LOG_ERROR("WriteDescriptor is failed, WriteDescriptor = %{public}s", Str16ToStr8(GetDescriptor()).c_str());
+        return INVALID_FD;
+    }
     MessageParcel reply;
     MessageOption msgOption;
     int errCode = Remote()->SendRequest(
@@ -81,7 +85,10 @@ int ISharedResultSetProxy::GetRowCount(int &count)
         return E_OK;
     }
     MessageParcel request;
-    request.WriteInterfaceToken(GetDescriptor());
+    if (!request.WriteInterfaceToken(GetDescriptor())) {
+        LOG_ERROR("WriteDescriptor is failed, WriteDescriptor = %{public}s", Str16ToStr8(GetDescriptor()).c_str());
+        return INVALID_FD;
+    }
     MessageParcel reply;
     MessageOption msgOption;
     int errCode = Remote()->SendRequest(
@@ -104,7 +111,10 @@ int ISharedResultSetProxy::GetRowCount(int &count)
 bool ISharedResultSetProxy::OnGo(int oldRowIndex, int newRowIndex, int *cachedIndex)
 {
     MessageParcel request;
-    request.WriteInterfaceToken(GetDescriptor());
+    if (!request.WriteInterfaceToken(GetDescriptor())) {
+        LOG_ERROR("WriteDescriptor is failed, WriteDescriptor = %{public}s", Str16ToStr8(GetDescriptor()).c_str());
+        return false;
+    }
     request.WriteInt32(oldRowIndex);
     request.WriteInt32(newRowIndex);
     MessageParcel reply;
@@ -129,7 +139,10 @@ int ISharedResultSetProxy::Close()
 {
     DataShareResultSet::Close();
     MessageParcel request;
-    request.WriteInterfaceToken(GetDescriptor());
+    if (!request.WriteInterfaceToken(GetDescriptor())) {
+        LOG_ERROR("WriteDescriptor is failed, WriteDescriptor = %{public}s", Str16ToStr8(GetDescriptor()).c_str());
+        return INVALID_FD;
+    }
     MessageParcel reply;
     MessageOption msgOption;
     int errCode = Remote()->SendRequest(

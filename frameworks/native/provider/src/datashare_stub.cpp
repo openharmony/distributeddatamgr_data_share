@@ -22,6 +22,7 @@
 #include "ishared_result_set.h"
 #include "datashare_operation_statement.h"
 #include "unistd.h"
+#include "string_ex.h"
 
 using namespace OHOS::DistributedShare::DataShare;
 
@@ -63,7 +64,8 @@ int DataShareStub::OnRemoteRequest(uint32_t code, MessageParcel& data, MessagePa
     std::u16string descriptor = DataShareStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        LOG_INFO("local descriptor is not equal to remote");
+        LOG_INFO("local descriptor is not equal to remote, localDescriptor = %{public}s, remoteDescriptor = %{public}s",
+            Str16ToStr8(descriptor).c_str(), Str16ToStr8(remoteDescriptor).c_str());
         return ERR_INVALID_STATE;
     }
 

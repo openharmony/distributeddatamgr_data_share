@@ -16,6 +16,7 @@
 #include "ishared_result_set_stub.h"
 #include "datashare_log.h"
 #include "datashare_errno.h"
+#include "string_ex.h"
 
 namespace OHOS::DataShare {
 std::function<sptr<ISharedResultSet>(std::shared_ptr<DataShareResultSet>,
@@ -52,7 +53,8 @@ int ISharedResultSetStub::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &da
     OHOS::MessageParcel &reply, OHOS::MessageOption &option)
 {
     if (GetDescriptor() != data.ReadInterfaceToken()) {
-        LOG_ERROR("IPC descriptor is  not equal");
+        LOG_ERROR("IPC descriptor is  not equal, GetDescriptor = %{public}s, ReadDescriptor = %{public}s",
+            Str16ToStr8(GetDescriptor()).c_str(), Str16ToStr8(data.ReadInterfaceToken()).c_str());
         return INVALID_FD;
     }
 
