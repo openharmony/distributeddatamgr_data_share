@@ -81,34 +81,32 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
     jsObj_ = jsRuntime_.LoadModule(moduleName, srcPath, abilityInfo_->hapPath,
         abilityInfo_->compileMode == CompileMode::ES_MODULE);
     if (jsObj_ == nullptr) {
-        LOG_ERROR("Failed to get jsObj_");
+        LOG_ERROR("Failed to get jsObj_, moduleName:%{public}s.", moduleName.c_str());
         return;
     }
-    LOG_INFO("ConvertNativeValueTo.");
+
     NativeObject* obj = ConvertNativeValueTo<NativeObject>(jsObj_->Get());
     if (obj == nullptr) {
-        LOG_ERROR("Failed to get JsDataShareExtAbility object");
+        LOG_ERROR("Failed to get JsDataShareExtAbility object, moduleName:%{public}s.", moduleName.c_str());
         return;
     }
 
     auto context = GetContext();
     if (context == nullptr) {
-        LOG_ERROR("Failed to get context");
+        LOG_ERROR("Failed to get context, moduleName:%{public}s.", moduleName.c_str());
         return;
     }
-    LOG_INFO("CreateJsDataShareExtAbilityContext.");
+
     NativeValue* contextObj = CreateJsDataShareExtAbilityContext(engine, context);
-    auto contextRef = jsRuntime_.LoadSystemModule("application.DataShareExtensionAbilityContext",
-        &contextObj, 1);
+    auto contextRef = jsRuntime_.LoadSystemModule("application.DataShareExtensionAbilityContext", &contextObj, 1);
     contextObj = contextRef->Get();
-    LOG_INFO("Bind.");
     context->Bind(jsRuntime_, contextRef.release());
-    LOG_INFO("SetProperty.");
     obj->SetProperty("context", contextObj);
 
     auto nativeObj = ConvertNativeValueTo<NativeObject>(contextObj);
     if (nativeObj == nullptr) {
-        LOG_ERROR("Failed to get datashare extension ability native object");
+        LOG_ERROR("Failed to get datashare extension ability native object, moduleName:%{public}s.",
+            moduleName.c_str());
         return;
     }
     LOG_INFO("Set datashare extension ability context pointer is nullptr: %{public}d", context.get() == nullptr);

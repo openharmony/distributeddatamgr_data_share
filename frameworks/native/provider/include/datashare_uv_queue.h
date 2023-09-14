@@ -50,6 +50,8 @@ private:
         NapiBoolFunc retFunc;
     };
 
+    static void LambdaForWork(uv_work_t* work, int uvstatus);
+
     static void Purge(uv_work_t* work);
 
     napi_env env_ = nullptr;

@@ -28,6 +28,25 @@ DataShareUvQueue::DataShareUvQueue(napi_env env)
     napi_get_uv_event_loop(env, &loop_);
 }
 
+void DataShareUvQueue::LambdaForWork(uv_work_t *work, int uvstatus)
+{
+    if (work == nullptr || work->data == nullptr) {
+        LOG_ERROR("invalid work or work->data.");
+        return;
+    }
+    auto *entry = static_cast<UvEntry*>(work->data);
+    std::unique_lock<std::mutex> lock(entry->mutex);
+    if (entry->func) {
+        entry->func();
+    }
+    entry->done = true;
+    if (entry->purge) {
+        DataShareUvQueue::Purge(work);
+    } else {
+        entry->condition.notify_all();
+    }
+}
+
 void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
 {
     uv_work_t* work = new (std::nothrow) uv_work_t;
@@ -37,24 +56,7 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
     }
     work->data = new UvEntry {env_, std::move(func), false, false, {}, {}, std::move(retFunc)};
     auto status = uv_queue_work(
-        loop_, work, [](uv_work_t* work) {},
-        [](uv_work_t* work, int uvstatus) {
-            if (work == nullptr || work->data == nullptr) {
-                LOG_ERROR("invalid work or work->data.");
-                return;
-            }
-            auto *entry = static_cast<UvEntry*>(work->data);
-            std::unique_lock<std::mutex> lock(entry->mutex);
-            if (entry->func) {
-                entry->func();
-            }
-            entry->done = true;
-            if (entry->purge) {
-                DataShareUvQueue::Purge(work);
-            } else {
-                entry->condition.notify_all();
-            }
-        });
+        loop_, work, [](uv_work_t *work) {}, LambdaForWork);
     if (status != napi_ok) {
         LOG_ERROR("queue work failed");
         DataShareUvQueue::Purge(work);
