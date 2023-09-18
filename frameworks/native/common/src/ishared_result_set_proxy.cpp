@@ -142,8 +142,9 @@ int ISharedResultSetProxy::Close()
 {
     DataShareResultSet::Close();
     MessageParcel request;
-    if (!request.WriteInterfaceToken(GetDescriptor())) {
-        LOG_ERROR("WriteDescriptor is failed, WriteDescriptor = %{public}s", Str16ToStr8(GetDescriptor()).c_str());
+    std::u16string descriptor = ISharedResultSetProxy::GetDescriptor();
+    if (!request.WriteInterfaceToken(descriptor)) {
+        LOG_ERROR("WriteDescriptor is failed, WriteDescriptor = %{public}s", Str16ToStr8(descriptor).c_str());
         return INVALID_FD;
     }
     MessageParcel reply;
