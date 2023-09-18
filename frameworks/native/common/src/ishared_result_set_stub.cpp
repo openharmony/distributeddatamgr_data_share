@@ -55,7 +55,7 @@ int ISharedResultSetStub::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &da
     std::u16string descriptor = ISharedResultSetStub::GetDescriptor();
     std::u16string remoteDescriptor = data.ReadInterfaceToken();
     if (descriptor != remoteDescriptor) {
-        LOG_ERROR("IPC descriptor is  not equal, GetDescriptor = %{public}s, ReadDescriptor = %{public}s",
+        LOG_ERROR("IPC descriptor is  not equal to remote, GetDescriptor = %{public}s, ReadDescriptor = %{public}s",
             Str16ToStr8(descriptor).c_str(), Str16ToStr8(remoteDescriptor).c_str());
         return INVALID_FD;
     }
