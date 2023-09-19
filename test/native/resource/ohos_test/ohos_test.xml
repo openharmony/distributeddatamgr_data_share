@@ -20,7 +20,7 @@
             <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
         </preparer>
         <cleaner>
-            <option name="shell" value="bm uninstall -n com.acts.ohos.data.datasharetest"/>
+            <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
         </cleaner>
     </target>
     <target name="ProxyDatasTest">
