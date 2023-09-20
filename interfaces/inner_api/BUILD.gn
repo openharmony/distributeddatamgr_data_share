@@ -88,8 +88,10 @@ datashare_consumer_external_deps = [
 ]
 
 ohos_shared_library("datashare_consumer") {
-  include_dirs =
-      [ "//foundation/distributeddatamgr/kv_store/frameworks/common" ]
+  include_dirs = [
+    "${kvstore_base_path}/frameworks/common",
+    "${kvstore_base_path}/interfaces/innerkits/distributeddata/include",
+  ]
 
   sources = datashare_consumer_sources
   configs = [ ":ability_config" ]
@@ -171,7 +173,10 @@ ohos_shared_library("datashare_ext_ability_module") {
 }
 
 ohos_static_library("datashare_consumer_static") {
-  include_dirs = [ "${kvstore_base_path}/frameworks/common" ]
+  include_dirs = [
+    "${kvstore_base_path}/frameworks/common",
+    "${kvstore_base_path}/interfaces/innerkits/distributeddata/include",
+  ]
 
   sources = datashare_consumer_sources
   configs = [ ":ability_config" ]
