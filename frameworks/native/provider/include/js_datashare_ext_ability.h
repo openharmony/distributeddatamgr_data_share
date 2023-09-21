@@ -307,10 +307,10 @@ private:
     struct AsyncPoint {
         std::shared_ptr<AsyncContext> context;
     };
-    napi_value CallObjectMethod(const char *name, napi_value const argv = nullptr, size_t argc = 0,
+    napi_value CallObjectMethod(const char *name, napi_value const *argv = nullptr, size_t argc = 0,
         bool isAsync = true);
     napi_value CallObjectMethod(
-        const char *name, napi_value argv, size_t argc, std::shared_ptr<AsyncContext> asyncContext);
+        const char *name, napi_value const *argv, size_t argc, std::shared_ptr<AsyncContext> asyncContext);
     void GetSrcPath(std::string &srcPath);
     napi_value MakePredicates(napi_env env, const DataSharePredicates &predicates);
     static napi_value AsyncCallback(napi_env env, napi_callback_info info);
