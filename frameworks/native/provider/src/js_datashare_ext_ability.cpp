@@ -278,12 +278,10 @@ napi_value JsDataShareExtAbility::CallObjectMethod(
         args[i] = argv[i];
     }
 
-    // args[argc] = nativeEngine.CreateFunction(ASYNC_CALLBACK_NAME.c_str(), ASYNC_CALLBACK_NAME.length(),
-    //     JsDataShareExtAbility::AsyncCallbackWithContext, point);
     napi_create_function(env, ASYNC_CALLBACK_NAME.c_str(), ASYNC_CALLBACK_NAME.length(),
         JsDataShareExtAbility::AsyncCallbackWithContext, point, &args[argc]);
     napi_value callResult;
-    napi_call_function(env, obj, method, args, count, &callResult);    
+    napi_call_function(env, obj, method, count, args, &callResult);
     auto result = handleEscape.Escape(callResult);
     delete[] args;
     return result;
@@ -326,7 +324,6 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
         callbackResultString_ = "";
         callbackResultStringArr_ = {};
         callbackResultObject_ = nullptr;
-        napi_value result = nullptr;
         napi_create_function(env, ASYNC_CALLBACK_NAME.c_str(),
             ASYNC_CALLBACK_NAME.length(), JsDataShareExtAbility::AsyncCallback, this, &args[argc]);
     } else {
@@ -335,7 +332,7 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
 
     SetBlockWaiting(false);
     napi_value remoteNapi;
-    napi_status status = napi_call_function(env, obj, method, argc, count, &remoteNapi);
+    napi_status status = napi_call_function(env, obj, method, count, args, &remoteNapi);
     if(status != napi_ok) {
         return nullptr;
     }
