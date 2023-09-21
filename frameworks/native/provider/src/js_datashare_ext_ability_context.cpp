@@ -26,7 +26,6 @@
 #include "napi_remote_object.h"
 #include "napi_common_start_options.h"
 #include "start_options.h"
-#include "native_engine/native_value.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -38,7 +37,7 @@ public:
         : context_(context) {}
     ~JsDataShareExtAbilityContext() = default;
 
-    static void Finalizer(NativeEngine* engine, void* data, void* hint)
+    static void Finalizer(napi_env env, void* data, void* hint)
     {
         LOG_INFO("JsAbilityContext::Finalizer is called");
         std::unique_ptr<JsDataShareExtAbilityContext>(static_cast<JsDataShareExtAbilityContext*>(data));
@@ -48,15 +47,13 @@ private:
 };
 } // namespace
 
-NativeValue* CreateJsDataShareExtAbilityContext(NativeEngine& engine,
+napi_value CreateJsDataShareExtAbilityContext(napi_env env,
     std::shared_ptr<DataShareExtAbilityContext> context)
 {
     LOG_INFO("CreateJsDataShareExtAbilityContext begin");
-    NativeValue* objValue = CreateJsExtensionContext(engine, context);
-    NativeObject* object = ConvertNativeValueTo<NativeObject>(objValue);
-
+    napi_value objValue = CreateJsExtensionContext(env, context);
     std::unique_ptr<JsDataShareExtAbilityContext> jsContext = std::make_unique<JsDataShareExtAbilityContext>(context);
-    object->SetNativePointer(jsContext.release(), JsDataShareExtAbilityContext::Finalizer, nullptr);
+    napi_wrap(env, objValue, jsContext.release(), JsDataShareExtAbilityContext::Finalizer, nullptr, nullptr);
     return objValue;
 }
 }  // namespace DataShare

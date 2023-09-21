@@ -20,12 +20,12 @@
 
 #include "ability_connect_callback.h"
 #include "datashare_ext_ability_context.h"
-class NativeEngine;
-class NativeValue;
+#include "native_engine/native_value.h"
+
 namespace OHOS {
 namespace DataShare {
 using namespace AbilityRuntime;
-NativeValue* CreateJsDataShareExtAbilityContext(NativeEngine& engine,
+napi_value CreateJsDataShareExtAbilityContext(napi_env env,
     std::shared_ptr<DataShareExtAbilityContext> context);
 } // namespace DataShare
 } // namespace OHOS
