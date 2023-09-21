@@ -76,7 +76,7 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
     moduleName.append("::").append(abilityInfo_->name);
     LOG_INFO("module:%{public}s, srcPath:%{public}s.", moduleName.c_str(), srcPath.c_str());
     HandleScope handleScope(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
 
     jsObj_ = jsRuntime_.LoadModule(
         moduleName, srcPath, abilityInfo_->hapPath, abilityInfo_->compileMode == CompileMode::ES_MODULE);
@@ -84,7 +84,6 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
         LOG_ERROR("Failed to get jsObj_");
         return;
     }
-    LOG_INFO("ConvertNativeValueTo.");
     napi_value obj = jsObj_->GetNapiValue();
     if (obj == nullptr) {
         LOG_ERROR("Failed to get JsDataShareExtAbility object");
@@ -98,8 +97,7 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
     }
     LOG_INFO("CreateJsDataShareExtAbilityContext.");
     napi_value contextObj = CreateJsDataShareExtAbilityContext(env, context);
-    auto contextRef = jsRuntime_.LoadSystemModule("application.DataShareExtensionAbilityContext",
-        *(reinterpret_cast<NativeValue *>(contextObj), 1);
+    auto contextRef = jsRuntime_.LoadSystemModule("application.DataShareExtensionAbilityContext", contextObj, 1);
     contextObj = contextRef->GetNapiValue();
     LOG_INFO("Bind.");
     context->Bind(jsRuntime_, contextRef.release());
@@ -123,7 +121,7 @@ void JsDataShareExtAbility::OnStart(const AAFwk::Want &want)
 {
     Extension::OnStart(want);
     HandleScope handleScope(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
@@ -142,7 +140,7 @@ sptr<IRemoteObject> JsDataShareExtAbility::OnConnect(const AAFwk::Want &want)
     Extension::OnConnect(want);
     sptr<DataShareStubImpl> remoteObject = new (std::nothrow) DataShareStubImpl(
         std::static_pointer_cast<JsDataShareExtAbility>(shared_from_this()),
-        reinterpret_cast<napi_env>(&jsRuntime_.GetNativeEnginePointer()));
+        jsRuntime_.GetNapiEnv());
     if (remoteObject == nullptr) {
         LOG_ERROR("No memory allocated for DataShareStubImpl");
         return nullptr;
@@ -186,13 +184,17 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
         LOG_ERROR("invalid param.");
         return nullptr;
     }
-    if (info->argc < 2 || info->argv[0] == nullptr || info->argv[1] == nullptr) {
+    napi_value self = nullptr;
+    size_t argc = 0;
+    napi_value argv[4] = { nullptr };
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, nullptr));
+    if (argc < 2 || argv[0] == nullptr || argv[1] == nullptr) {
         LOG_ERROR("invalid args.");
         return CreateJsUndefined(env);
     }
 
     DatashareBusinessError businessError;
-    if ((info->argv[0])->TypeOf() == NATIVE_OBJECT) {
+    if ((argv[0])->TypeOf() == NATIVE_OBJECT) {
         LOG_INFO("Error in callback");
         UnWrapBusinessError(env, info->argv[0], businessError);
     }
@@ -218,6 +220,7 @@ napi_value JsDataShareExtAbility::AsyncCallbackWithContext(napi_env env, napi_ca
         LOG_ERROR("invalid param.");
         return nullptr;
     }
+
     if (info->functionInfo == nullptr || info->functionInfo->data == nullptr) {
         LOG_ERROR("invalid object.");
         return CreateJsUndefined(env);
@@ -242,7 +245,7 @@ napi_value JsDataShareExtAbility::CallObjectMethod(
     }
 
     HandleEscape handleEscape(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
     napi_value obj = jsObj_->GetNapiValue();
     if (obj == nullptr) {
         LOG_ERROR("Failed to get DataShareExtAbility object");
@@ -263,7 +266,7 @@ napi_value JsDataShareExtAbility::CallObjectMethod(
     }
     point->context = asyncContext;
     size_t count = argc + 1;
-    napi_value args = new (std::nothrow) napi_value[count];
+    napi_value *args = new (std::nothrow) napi_value[count];
     if (args == nullptr) {
         LOG_ERROR("JsDataShareExtAbility::CallObjectMethod new napivalue error.");
         delete point;
@@ -272,7 +275,6 @@ napi_value JsDataShareExtAbility::CallObjectMethod(
     for (size_t i = 0; i < argc; i++) {
         args[i] = argv[i];
     }
-
     args[argc] = nativeEngine.CreateFunction(ASYNC_CALLBACK_NAME.c_str(), ASYNC_CALLBACK_NAME.length(),
         JsDataShareExtAbility::AsyncCallbackWithContext, point);
 
@@ -295,7 +297,7 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
     }
 
     HandleEscape handleEscape(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
     napi_value obj = jsObj_->GetNapiValue();
     if (obj == nullptr) {
         LOG_ERROR("Failed to get DataShareExtAbility object");
@@ -310,7 +312,7 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
     }
 
     size_t count = argc + 1;
-    napi_value args = new (std::nothrow) napi_value[count];
+    napi_value *args = new (std::nothrow) napi_value[count];
     if (args == nullptr) {
         LOG_ERROR("JsDataShareExtAbility::CallObjectMethod new napivalue error.");
         return nullptr;
@@ -364,7 +366,7 @@ std::vector<std::string> JsDataShareExtAbility::GetFileTypes(const Uri &uri, con
 {
     auto ret = DataShareExtAbility::GetFileTypes(uri, mimeTypeFilter);
     HandleScope handleScope(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
@@ -394,7 +396,7 @@ int JsDataShareExtAbility::OpenFile(const Uri &uri, const std::string &mode)
 {
     auto ret = DataShareExtAbility::OpenFile(uri, mode);
     HandleScope handleScope(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
@@ -424,7 +426,7 @@ int JsDataShareExtAbility::OpenRawFile(const Uri &uri, const std::string &mode)
 {
     auto ret = DataShareExtAbility::OpenRawFile(uri, mode);
     HandleScope handleScope(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
@@ -455,7 +457,7 @@ int JsDataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &v
     int ret = INVALID_VALUE;
     ret = DataShareExtAbility::Insert(uri, value);
     HandleScope handleScope(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
@@ -486,7 +488,7 @@ int JsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pre
     int ret = INVALID_VALUE;
     ret = DataShareExtAbility::Update(uri, predicates, value);
     HandleScope handleScope(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
@@ -524,7 +526,7 @@ int JsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &pre
     int ret = INVALID_VALUE;
     ret = DataShareExtAbility::Delete(uri, predicates);
     HandleScope handleScope(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
@@ -557,7 +559,7 @@ std::shared_ptr<DataShareResultSet> JsDataShareExtAbility::Query(const Uri &uri,
     ret = DataShareExtAbility::Query(uri, predicates, columns, businessError);
 
     HandleScope handleScope(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
@@ -594,7 +596,7 @@ std::string JsDataShareExtAbility::GetType(const Uri &uri)
 {
     auto ret = DataShareExtAbility::GetType(uri);
     HandleScope handleScope(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
@@ -619,7 +621,7 @@ int JsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataSha
     ret = DataShareExtAbility::BatchInsert(uri, values);
 
     HandleScope handleScope(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
@@ -717,7 +719,7 @@ Uri JsDataShareExtAbility::NormalizeUri(const Uri &uri)
 {
     auto ret = DataShareExtAbility::NormalizeUri(uri);
     HandleScope handleScope(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
@@ -740,7 +742,7 @@ Uri JsDataShareExtAbility::DenormalizeUri(const Uri &uri)
 {
     auto ret = DataShareExtAbility::DenormalizeUri(uri);
     HandleScope handleScope(jsRuntime_);
-    napi_env env = (napi_env)jsRuntime_.GetNativeEnginePointer();
+    napi_env env = jsRuntime_.GetNapiEnv();
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
     if (scope == nullptr) {
