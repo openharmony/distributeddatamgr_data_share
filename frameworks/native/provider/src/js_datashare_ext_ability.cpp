@@ -39,6 +39,7 @@ namespace DataShare {
 using namespace AbilityRuntime;
 namespace {
 constexpr int INVALID_VALUE = -1;
+static constexpr int32_t MAX_ARGC = 6;
 const std::string ASYNC_CALLBACK_NAME = "AsyncCallback";
 }
 
@@ -180,8 +181,8 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
         return nullptr;
     }
     napi_value self = nullptr;
-    size_t argc = 0;
-    napi_value argv[4] = { nullptr };
+    size_t argc = MAX_ARGC;
+    napi_value argv[MAX_ARGC] = { nullptr };
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, nullptr));
     if (argc < 2 || argv[0] == nullptr || argv[1] == nullptr) {
         LOG_ERROR("invalid args.");
