@@ -102,7 +102,7 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
     LOG_INFO("Bind.");
     context->Bind(jsRuntime_, contextRef.release());
     LOG_INFO("SetProperty.");
-    napi_set_named_property(env, obj , "context", contextObj);
+    napi_set_named_property(env, obj, "context", contextObj);
     LOG_INFO("Set datashare extension ability context pointer is nullptr: %{public}d", context.get() == nullptr);
     napi_wrap(env, contextObj, new std::weak_ptr<AbilityRuntime::Context>(context),
         [](napi_env, void *data, void *) {
@@ -148,9 +148,9 @@ void JsDataShareExtAbility::CheckAndSetAsyncResult(napi_env env)
     auto result = GetAsyncResult();
     napi_typeof(env, result, &type);
     if (type == napi_valuetype::napi_number) {
-       int32_t value = OHOS::AppExecFwk::UnwrapInt32FromJS(env, result);
-       SetResult(value);
-	} else if (type == napi_valuetype::napi_string) {
+        int32_t value = OHOS::AppExecFwk::UnwrapInt32FromJS(env, result);
+        SetResult(value);
+    } else if (type == napi_valuetype::napi_string) {
         std::string value = OHOS::AppExecFwk::UnwrapStringFromJS(env, result);
         SetResult(value);
     } else if (type == napi_valuetype::napi_object) {
@@ -159,7 +159,7 @@ void JsDataShareExtAbility::CheckAndSetAsyncResult(napi_env env)
         if (proxy == nullptr) {
             std::vector<std::string> value;
             OHOS::AppExecFwk::UnwrapArrayStringFromJS(env, result, value);
-			SetResult(value);
+            SetResult(value);
         } else {
             std::shared_ptr<ResultSetBridge> value = proxy->Create();
             std::shared_ptr<DataShareResultSet> resultSet = std::make_shared<DataShareResultSet>(value);
@@ -248,7 +248,6 @@ napi_value JsDataShareExtAbility::CallObjectMethod(
     HandleEscape handleEscape(jsRuntime_);
     napi_env env = jsRuntime_.GetNapiEnv();
     napi_value obj = jsObj_->GetNapiValue();
-    
     if (obj == nullptr) {
         LOG_ERROR("Failed to get DataShareExtAbility object");
         return nullptr;
@@ -334,7 +333,7 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
     SetBlockWaiting(false);
     napi_value remoteNapi;
     napi_status status = napi_call_function(env, obj, method, count, args, &remoteNapi);
-    if(status != napi_ok) {
+    if (status != napi_ok) {
         return nullptr;
     }
     return handleEscape.Escape(remoteNapi);
