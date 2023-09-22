@@ -82,21 +82,20 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
     jsObj_ = jsRuntime_.LoadModule(
         moduleName, srcPath, abilityInfo_->hapPath, abilityInfo_->compileMode == CompileMode::ES_MODULE);
     if (jsObj_ == nullptr) {
-        LOG_ERROR("Failed to get jsObj_");
+        LOG_ERROR("Failed to get jsObj_, moduleName:%{public}s.", moduleName.c_str());
         return;
     }
     napi_value obj = jsObj_->GetNapiValue();
     if (obj == nullptr) {
-        LOG_ERROR("Failed to get JsDataShareExtAbility object");
+        LOG_ERROR("Failed to get JsDataShareExtAbility object, moduleName:%{public}s.", moduleName.c_str());
         return;
     }
 
     auto context = GetContext();
     if (context == nullptr) {
-        LOG_ERROR("Failed to get context");
+        LOG_ERROR("Failed to get context, moduleName:%{public}s.", moduleName.c_str());
         return;
     }
-    LOG_INFO("CreateJsDataShareExtAbilityContext.");
     napi_value contextObj = CreateJsDataShareExtAbilityContext(env, context);
     auto contextRef = jsRuntime_.LoadSystemModule("application.DataShareExtensionAbilityContext", &contextObj, 1);
     contextObj = contextRef->GetNapiValue();
@@ -149,8 +148,8 @@ void JsDataShareExtAbility::CheckAndSetAsyncResult(napi_env env)
     auto result = GetAsyncResult();
     napi_typeof(env, result, &type);
     if (type == napi_valuetype::napi_number) {
-        int32_t value = OHOS::AppExecFwk::UnwrapInt32FromJS(env, result);
-		SetResult(value);
+       int32_t value = OHOS::AppExecFwk::UnwrapInt32FromJS(env, result);
+       SetResult(value);
 	} else if (type == napi_valuetype::napi_string) {
         std::string value = OHOS::AppExecFwk::UnwrapStringFromJS(env, result);
         SetResult(value);
@@ -284,6 +283,7 @@ napi_value JsDataShareExtAbility::CallObjectMethod(
     napi_value callResult;
     napi_call_function(env, obj, method, count, args, &callResult);
     auto result = handleEscape.Escape(callResult);
+    delete point;
     delete[] args;
     return result;
 }

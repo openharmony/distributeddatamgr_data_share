@@ -20,7 +20,7 @@
 
 #include "ability_connect_callback.h"
 #include "datashare_ext_ability_context.h"
-#include "native_engine/native_value.h"
+#include "napi/native_api.h"
 
 namespace OHOS {
 namespace DataShare {
