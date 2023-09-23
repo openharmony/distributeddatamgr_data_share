@@ -99,13 +99,11 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
     napi_value contextObj = CreateJsDataShareExtAbilityContext(env, context);
     auto contextRef = jsRuntime_.LoadSystemModule("application.DataShareExtensionAbilityContext", &contextObj, 1);
     contextObj = contextRef->GetNapiValue();
-    LOG_INFO("Bind.");
     context->Bind(jsRuntime_, contextRef.release());
-    LOG_INFO("SetProperty.");
     napi_set_named_property(env, obj, "context", contextObj);
     napi_wrap(env, contextObj, new std::weak_ptr<AbilityRuntime::Context>(context),
         [](napi_env, void *data, void *) {
-            LOG_INFO("Finalizer for weak_ptr datashare extension ability context is called");
+            LOG_DEBUG("Finalizer for weak_ptr datashare extension ability context is called");
             delete static_cast<std::weak_ptr<AbilityRuntime::Context>*>(data);
         }, nullptr, nullptr);
 }
@@ -181,9 +179,14 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
     napi_value self = nullptr;
     size_t argc = MAX_ARGC;
     napi_value argv[MAX_ARGC] = { nullptr };
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, nullptr));
+    void* data = nullptr;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, &data));
     if (argc < 2 || argv[0] == nullptr || argv[1] == nullptr) {
-        LOG_ERROR("invalid args.");
+        LOG_ERROR("invalid args, argc : %{public}d.", argc);
+        return CreateJsUndefined(env);
+    }
+    if (data == nullptr) {
+        LOG_ERROR("invalid object.");
         return CreateJsUndefined(env);
     }
 
@@ -194,14 +197,6 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
         LOG_INFO("Error in callback");
         UnWrapBusinessError(env, argv[0], businessError);
     }
-
-    void* data = nullptr;
-    napi_get_cb_info(env, info, nullptr, nullptr, nullptr, &data);
-    if (data == nullptr) {
-        LOG_ERROR("invalid object.");
-        return CreateJsUndefined(env);
-    }
-
     JsDataShareExtAbility* instance = static_cast<JsDataShareExtAbility*>(data);
     if (instance != nullptr) {
         instance->SetBlockWaiting(true);
@@ -282,7 +277,7 @@ napi_value JsDataShareExtAbility::CallObjectMethod(
     napi_call_function(env, obj, method, count, args, &callResult);
     auto result = handleEscape.Escape(callResult);
     delete point;
-    delete[] args;
+    delete []args;
     return result;
 }
 
@@ -332,11 +327,10 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
     SetBlockWaiting(false);
     napi_value remoteNapi = nullptr;
     napi_status status = napi_call_function(env, obj, method, count, args, &remoteNapi);
+    delete []args;
     if (status != napi_ok) {
-        delete[] args;
         return nullptr;
     }
-	delete[] args;
     return handleEscape.Escape(remoteNapi);
 }
 
