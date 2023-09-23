@@ -20,16 +20,16 @@ extern const char _binary_datashare_ext_ability_context_js_end[];
 extern const char _binary_datashare_ext_ability_context_abc_start[];
 extern const char _binary_datashare_ext_ability_context_abc_end[];
 
-static napi_module g_ExtensionContextModule  = {
-    .nm_version = 0,
-    .nm_modname = "application.DataShareExtensionAbilityContext",
-    .nm_filename = "application/libdatashareextensionabilitycontext_napi.so/DataShareExtensionAbilityContext.js",
-};
-
 extern "C" __attribute__((constructor))
 void NAPI_application_DataShareExtensionAbilityContext_AutoRegister()
 {
-    napi_module_register(&g_ExtensionContextModule);
+    auto moduleManager = NativeModuleManager::GetInstance();
+    NativeModule newModuleInfo = {
+        .name = "application.DataShareExtensionAbilityContext",
+        .fileName = "application/libdatashareextensionabilitycontext_napi.so/DataShareExtensionAbilityContext.js",
+    };
+
+    moduleManager->Register(&newModuleInfo);
 }
 
 extern "C" __attribute__((visibility("default")))
