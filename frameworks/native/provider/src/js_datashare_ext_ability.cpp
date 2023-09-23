@@ -281,7 +281,6 @@ napi_value JsDataShareExtAbility::CallObjectMethod(
     napi_value callResult;
     napi_call_function(env, obj, method, count, args, &callResult);
     auto result = handleEscape.Escape(callResult);
-    delete point;
     delete[] args;
     return result;
 }
