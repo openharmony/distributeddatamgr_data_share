@@ -278,9 +278,10 @@ napi_value JsDataShareExtAbility::CallObjectMethod(
 
     napi_create_function(env, ASYNC_CALLBACK_NAME.c_str(), ASYNC_CALLBACK_NAME.length(),
         JsDataShareExtAbility::AsyncCallbackWithContext, point, &args[argc]);
-    napi_value callResult;
+    napi_value callResult = nullptr;
     napi_call_function(env, obj, method, count, args, &callResult);
     auto result = handleEscape.Escape(callResult);
+    delete point;
     delete[] args;
     return result;
 }
@@ -329,11 +330,13 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
     }
 
     SetBlockWaiting(false);
-    napi_value remoteNapi;
+    napi_value remoteNapi = nullptr;
     napi_status status = napi_call_function(env, obj, method, count, args, &remoteNapi);
     if (status != napi_ok) {
+        delete[] args;
         return nullptr;
     }
+	delete[] args;
     return handleEscape.Escape(remoteNapi);
 }
 
