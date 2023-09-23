@@ -29,7 +29,7 @@ static napi_module g_ExtensionModule = {
 extern "C" __attribute__((constructor))
 void NAPI_application_DataShareExtensionAbility_AutoRegister()
 {
-     napi_module_register(&g_ExtensionModule);
+    napi_module_register(&g_ExtensionModule);
 }
 
 extern "C" __attribute__((visibility("default")))
