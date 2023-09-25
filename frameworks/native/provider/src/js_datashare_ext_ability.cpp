@@ -40,7 +40,8 @@ using namespace AbilityRuntime;
 namespace {
 constexpr int INVALID_VALUE = -1;
 static constexpr int32_t MAX_ARGC = 6;
-const std::string ASYNC_CALLBACK_NAME = "AsyncCallback";
+constexpr const char ASYNC_CALLBACK_NAME[] = "AsyncCallback";
+constexpr int CALLBACK_LENGTH = sizeof(ASYNC_CALLBACK_NAME)-1;
 }
 
 bool MakeNapiColumn(napi_env env, napi_value &napiColumns, const std::vector<std::string> &columns);
@@ -271,7 +272,7 @@ napi_value JsDataShareExtAbility::CallObjectMethod(
         args[i] = argv[i];
     }
 
-    napi_create_function(env, ASYNC_CALLBACK_NAME.c_str(), ASYNC_CALLBACK_NAME.length(),
+    napi_create_function(env, ASYNC_CALLBACK_NAME, CALLBACK_LENGTH,
         JsDataShareExtAbility::AsyncCallbackWithContext, point, &args[argc]);
     napi_value callResult = nullptr;
     napi_call_function(env, obj, method, count, args, &callResult);
@@ -317,8 +318,8 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
         callbackResultString_ = "";
         callbackResultStringArr_ = {};
         callbackResultObject_ = nullptr;
-        napi_create_function(env, ASYNC_CALLBACK_NAME.c_str(),
-            ASYNC_CALLBACK_NAME.length(), JsDataShareExtAbility::AsyncCallback, this, &args[argc]);
+        napi_create_function(env, ASYNC_CALLBACK_NAME, CALLBACK_LENGTH,
+            JsDataShareExtAbility::AsyncCallback, this, &args[argc]);
     } else {
         args[argc] = nullptr;
     }
