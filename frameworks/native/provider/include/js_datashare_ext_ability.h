@@ -241,12 +241,12 @@ public:
         isBlockWaiting_ = blockWaiting;
     }
 
-    NativeValue* GetAsyncResult() const
+    napi_value GetAsyncResult() const
     {
         return callbackData_;
     }
 
-    void SetAsyncResult(NativeValue* asyncResult)
+    void SetAsyncResult(napi_value asyncResult)
     {
         callbackData_ = asyncResult;
     }
@@ -307,15 +307,15 @@ private:
     struct AsyncPoint {
         std::shared_ptr<AsyncContext> context;
     };
-    NativeValue* CallObjectMethod(const char *name, NativeValue * const *argv = nullptr, size_t argc = 0,
+    napi_value CallObjectMethod(const char *name, napi_value const *argv = nullptr, size_t argc = 0,
         bool isAsync = true);
-    NativeValue *CallObjectMethod(
-        const char *name, NativeValue **argv, size_t argc, std::shared_ptr<AsyncContext> asyncContext);
+    napi_value CallObjectMethod(
+        const char *name, napi_value const *argv, size_t argc, std::shared_ptr<AsyncContext> asyncContext);
     void GetSrcPath(std::string &srcPath);
     napi_value MakePredicates(napi_env env, const DataSharePredicates &predicates);
-    static NativeValue* AsyncCallback(NativeEngine* engine, NativeCallbackInfo* info);
-    static NativeValue* AsyncCallbackWithContext(NativeEngine* engine, NativeCallbackInfo* info);
-    void CheckAndSetAsyncResult(NativeEngine* engine);
+    static napi_value AsyncCallback(napi_env env, napi_callback_info info);
+    static napi_value AsyncCallbackWithContext(napi_env env, napi_callback_info info);
+    void CheckAndSetAsyncResult(napi_env env);
     static void NotifyToDataShareService();
     static void UnWrapBusinessError(napi_env env, napi_value info, DatashareBusinessError &businessError);
     static napi_valuetype UnWrapPropertyType(napi_env env, napi_value info,
@@ -325,7 +325,7 @@ private:
     JsRuntime& jsRuntime_;
     std::unique_ptr<NativeReference> jsObj_;
     bool isBlockWaiting_ = false;
-    NativeValue* callbackData_ = nullptr;
+    napi_value callbackData_ = nullptr;
     int callbackResultNumber_ = -1;
     std::string callbackResultString_ = "";
     std::vector<std::string> callbackResultStringArr_ = {};
