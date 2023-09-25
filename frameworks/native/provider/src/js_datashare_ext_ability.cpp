@@ -183,7 +183,7 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
     void* data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, &data));
     if (argc < 2 || argv[0] == nullptr || argv[1] == nullptr) {
-        LOG_ERROR("invalid args, argc : %{public}d.", argc);
+        LOG_ERROR("invalid args, argc : %{public}zu.", argc);
         return CreateJsUndefined(env);
     }
     if (data == nullptr) {
