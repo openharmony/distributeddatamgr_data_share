@@ -277,9 +277,9 @@ napi_value JsDataShareExtAbility::CallObjectMethod(
     napi_call_function(env, obj, method, count, args, &callResult);
     auto result = handleEscape.Escape(callResult);
     napi_add_finalizer(env, args[argc], point,
-    [](napi_env env, void* point, void* finalize_hint) {
-        delete static_cast<AsyncPoint *>(point);
-        }, nullptr, nullptr);
+        [](napi_env env, void* point, void* finalize_hint) {
+            delete static_cast<AsyncPoint *>(point);
+            }, nullptr, nullptr);
     delete []args;
     return result;
 }
