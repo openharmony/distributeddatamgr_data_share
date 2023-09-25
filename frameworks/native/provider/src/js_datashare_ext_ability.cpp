@@ -41,7 +41,7 @@ namespace {
 constexpr int INVALID_VALUE = -1;
 static constexpr int32_t MAX_ARGC = 6;
 constexpr const char ASYNC_CALLBACK_NAME[] = "AsyncCallback";
-constexpr int CALLBACK_LENGTH = sizeof(ASYNC_CALLBACK_NAME)-1;
+constexpr int CALLBACK_LENGTH = sizeof(ASYNC_CALLBACK_NAME) - 1;
 }
 
 bool MakeNapiColumn(napi_env env, napi_value &napiColumns, const std::vector<std::string> &columns);
