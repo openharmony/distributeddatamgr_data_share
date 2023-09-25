@@ -19,6 +19,7 @@ extern const char _binary_datashare_ext_ability_js_start[];
 extern const char _binary_datashare_ext_ability_js_end[];
 extern const char _binary_datashare_ext_ability_abc_start[];
 extern const char _binary_datashare_ext_ability_abc_end[];
+static void NAPI_application_DataShareExtensionAbility_AutoRegister();
 
 static napi_module g_ExtensionModule = {
     .nm_version = 0,
