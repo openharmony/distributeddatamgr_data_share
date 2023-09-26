@@ -61,7 +61,6 @@ datashare_common_sources = [
 
 datashare_common_external_deps = [
   "ability_base:zuri",
-  "ability_runtime:abilitykit_native",
   "c_utils:utils",
   "hilog:libhilog",
   "hisysevent:libhisysevent",

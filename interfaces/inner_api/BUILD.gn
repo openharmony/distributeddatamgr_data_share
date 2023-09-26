@@ -74,7 +74,6 @@ datashare_consumer_sources = [
 datashare_consumer_external_deps = [
   "ability_base:want",
   "ability_base:zuri",
-  "ability_runtime:ability_context_native",
   "ability_runtime:app_context",
   "ability_runtime:dataobs_manager",
   "ability_runtime:extension_manager",
