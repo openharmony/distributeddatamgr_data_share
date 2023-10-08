@@ -40,6 +40,7 @@ using namespace AbilityRuntime;
 namespace {
 constexpr int INVALID_VALUE = -1;
 static constexpr int32_t MAX_ARGC = 6;
+static constexpr int32_t MIN_ARGC = 2;
 constexpr const char ASYNC_CALLBACK_NAME[] = "AsyncCallback";
 constexpr int CALLBACK_LENGTH = sizeof(ASYNC_CALLBACK_NAME) - 1;
 }
@@ -182,7 +183,7 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
     napi_value argv[MAX_ARGC] = { nullptr };
     void* data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, &data));
-    if (argc < 2 || argv[0] == nullptr || argv[1] == nullptr) {
+    if (argc < MIN_ARGC || argv[0] == nullptr || argv[1] == nullptr) {
         LOG_ERROR("invalid args, argc : %{public}zu.", argc);
         return CreateJsUndefined(env);
     }

@@ -23,8 +23,8 @@ static void NAPI_application_DataShareExtensionAbilityContext_AutoRegister();
 
 static napi_module g_ExtensionContextModule  = {
     .nm_version = 0,
-    .nm_modname = "application.DataShareExtensionAbilityContext",
     .nm_filename = "application/libdatashareextensionabilitycontext_napi.so/DataShareExtensionAbilityContext.js",
+    .nm_modname = "application.DataShareExtensionAbilityContext",
 };
 
 extern "C" __attribute__((constructor))
