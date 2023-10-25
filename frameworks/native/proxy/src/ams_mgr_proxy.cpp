@@ -69,7 +69,7 @@ int AmsMgrProxy::Connect(
         LOG_INFO("connect datashareextability start, uri = %{public}s.", uri.c_str());
         int ret = proxy_->ConnectAbilityCommon(want, connect, callerToken, AppExecFwk::ExtensionAbilityType::DATASHARE);
         if (ret != ERR_OK) {
-            LOG_ERROR("connect ability failed, uri = ${public}s, ret = %{public}d", uri.c_str(), ret);
+            LOG_ERROR("connect ability failed, uri = %{public}s, ret = %{public}d", uri.c_str(), ret);
         }
         return ret;
     }
