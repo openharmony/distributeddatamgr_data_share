@@ -36,25 +36,18 @@ DataShareManagerImpl& DataShareManagerImpl::GetInstance()
 
 std::shared_ptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
 {
-    int retry = 0;
-    while (++retry <= GET_SA_RETRY_TIMES) {
-        auto manager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (manager == nullptr) {
-            LOG_ERROR("get system ability manager failed");
-            return nullptr;
-        }
-        LOG_INFO("get distributed data manager %{public}d", retry);
-        auto remoteObject = manager->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
-        if (remoteObject == nullptr) {
-            std::this_thread::sleep_for(std::chrono::seconds(RETRY_INTERVAL));
-            continue;
-        }
-        LOG_INFO("get distributed data manager success");
-        return std::make_shared<DataShareKvServiceProxy>(remoteObject);
+    auto manager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (manager == nullptr) {
+        LOG_ERROR("get system ability manager failed");
+        return nullptr;
     }
-
-    LOG_ERROR("get distributed data manager failed");
-    return nullptr;
+    auto remoteObject = manager->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+    if (remoteObject == nullptr) {
+        LOG_ERROR("get distributed data manager failed");
+        return nullptr;
+    }
+    LOG_INFO("get distributed data manager success");
+    return std::make_shared<DataShareKvServiceProxy>(remoteObject);
 }
 
 void DataShareManagerImpl::LinkToDeath(const sptr<IRemoteObject> remote)
