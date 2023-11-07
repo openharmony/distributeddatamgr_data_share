@@ -15,6 +15,12 @@ import("//build/ohos.gni")
 import("//foundation/distributeddatamgr/data_share/datashare.gni")
 
 ohos_shared_library("datashare") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = [
     "${datashare_napi_path}/dataShare/include",
     "${datashare_common_napi_path}/include",
@@ -60,6 +66,12 @@ ohos_shared_library("datashare") {
 }
 
 ohos_shared_library("datasharepredicates") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = [
     "${datashare_common_napi_path}/include",
     "${datashare_common_native_path}/include",
