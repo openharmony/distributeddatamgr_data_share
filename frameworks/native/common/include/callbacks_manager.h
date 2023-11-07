@@ -122,9 +122,7 @@ void CallbacksManager<Key, Observer>::RecoverObservers(std::function<void(const 
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
         for (auto &it : callbacks_) {
-            if (GetEnabledSubscriberSize(it.first) > 0) {
-                keys.emplace_back(it.first);
-            }
+            keys.emplace_back(it.first);
         }
     }
     recoverObservers(keys);
