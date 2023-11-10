@@ -35,6 +35,12 @@ gen_js_obj("datashare_ext_ability_abc") {
 }
 
 ohos_shared_library("datashareextensionability_napi") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   sources = [ "datashare_ext_ability_module.cpp" ]
 
   deps = [

@@ -72,6 +72,12 @@ datashare_common_external_deps = [
 ]
 
 ohos_shared_library("datashare_common") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = datashare_common_include_dirs
 
   sources = datashare_common_sources
@@ -92,6 +98,12 @@ ohos_shared_library("datashare_common") {
 }
 
 ohos_static_library("datashare_common_static") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
   include_dirs = datashare_common_include_dirs
 
   sources = datashare_common_sources
