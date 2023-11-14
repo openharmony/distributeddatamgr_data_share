@@ -278,11 +278,13 @@ public:
 
     void SetResult(const std::vector<std::string> value)
     {
+        std::lock_guard<std::mutex> (resultSetLock_);
         callbackResultStringArr_ = value;
     }
 
     void GetResult(std::shared_ptr<DataShareResultSet> &value)
     {
+        std::lock_guard<std::mutex> (resultSetLock_);
         value = callbackResultObject_;
     }
 
@@ -329,6 +331,7 @@ private:
     int callbackResultNumber_ = -1;
     std::string callbackResultString_ = "";
     std::vector<std::string> callbackResultStringArr_ = {};
+    std::mutex resultSetLock_;
     std::shared_ptr<DataShareResultSet> callbackResultObject_ = nullptr;
     DatashareBusinessError businessError_;
 };
