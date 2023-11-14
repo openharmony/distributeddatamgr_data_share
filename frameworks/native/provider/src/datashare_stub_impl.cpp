@@ -231,7 +231,7 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
             return false;
         }
         extension->SetCallingInfo(info);
-        extension->GetResult(resultSet);
+        extension->GetResultSet(resultSet);
         extension->GetBusinessError(businessError);
         return (resultSet != nullptr);
     };
