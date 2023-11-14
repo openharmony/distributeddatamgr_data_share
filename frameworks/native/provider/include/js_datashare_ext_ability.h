@@ -278,13 +278,13 @@ public:
 
     void SetResult(const std::vector<std::string> value)
     {
-        std::lock_guard<std::mutex> (resultSetLock_);
+        std::lock_guard<std::mutex> lock(resultSetLock_);
         callbackResultStringArr_ = value;
     }
 
     void GetResult(std::shared_ptr<DataShareResultSet> &value)
     {
-        std::lock_guard<std::mutex> (resultSetLock_);
+        std::lock_guard<std::mutex> lock(resultSetLock_);
         value = callbackResultObject_;
     }
 
