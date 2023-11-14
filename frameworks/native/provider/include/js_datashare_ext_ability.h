@@ -281,13 +281,13 @@ public:
         callbackResultStringArr_ = value;
     }
 
-    void GetResult(std::shared_ptr<DataShareResultSet> &value)
+    void GetResultSet(std::shared_ptr<DataShareResultSet> &value)
     {
         std::lock_guard<std::mutex> lock(resultSetLock_);
         value = callbackResultObject_;
     }
 
-    void SetResult(const std::shared_ptr<DataShareResultSet> value)
+    void SetResultSet(const std::shared_ptr<DataShareResultSet> value)
     {
         std::lock_guard<std::mutex> lock(resultSetLock_);
         callbackResultObject_ = value;

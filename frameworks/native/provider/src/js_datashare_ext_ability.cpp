@@ -162,13 +162,13 @@ void JsDataShareExtAbility::CheckAndSetAsyncResult(napi_env env)
         } else {
             std::shared_ptr<ResultSetBridge> value = proxy->Create();
             std::shared_ptr<DataShareResultSet> resultSet = std::make_shared<DataShareResultSet>(value);
-            SetResult(resultSet);
+            SetResultSet(resultSet);
         }
     } else {
         callbackResultNumber_ = -1;
         callbackResultString_ = "";
         callbackResultStringArr_ = {};
-        SetResult(nullptr);
+        SetResultSet(nullptr);
     }
 }
 
@@ -321,7 +321,7 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
         callbackResultNumber_ = -1;
         callbackResultString_ = "";
         callbackResultStringArr_ = {};
-        SetResult(nullptr);
+        SetResultSet(nullptr);
         napi_create_function(env, ASYNC_CALLBACK_NAME, CALLBACK_LENGTH,
             JsDataShareExtAbility::AsyncCallback, this, &args[argc]);
     } else {
