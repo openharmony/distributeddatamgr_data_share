@@ -168,7 +168,7 @@ void JsDataShareExtAbility::CheckAndSetAsyncResult(napi_env env)
         callbackResultNumber_ = -1;
         callbackResultString_ = "";
         callbackResultStringArr_ = {};
-        callbackResultObject_ = nullptr;
+        SetResult(nullptr);
     }
 }
 
@@ -321,7 +321,7 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
         callbackResultNumber_ = -1;
         callbackResultString_ = "";
         callbackResultStringArr_ = {};
-        callbackResultObject_ = nullptr;
+        SetResult(nullptr);
         napi_create_function(env, ASYNC_CALLBACK_NAME, CALLBACK_LENGTH,
             JsDataShareExtAbility::AsyncCallback, this, &args[argc]);
     } else {
