@@ -278,7 +278,6 @@ public:
 
     void SetResult(const std::vector<std::string> value)
     {
-        std::lock_guard<std::mutex> lock(resultSetLock_);
         callbackResultStringArr_ = value;
     }
 
@@ -290,6 +289,7 @@ public:
 
     void SetResult(const std::shared_ptr<DataShareResultSet> value)
     {
+        std::lock_guard<std::mutex> lock(resultSetLock_);
         callbackResultObject_ = value;
     }
 
