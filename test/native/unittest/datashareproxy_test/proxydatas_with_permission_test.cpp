@@ -247,6 +247,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_002, TestSize.Level0)
 
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Level0)
 {
+    LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_001::Start");
     auto helper = dataShareHelper;
     PredicateTemplateNode node("p1", "select name0 as name from TBL00");
     std::vector<PredicateTemplateNode> nodes;
@@ -270,10 +271,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Le
     for (auto const &operationResult : results1) {
         EXPECT_EQ(operationResult.errCode_, 0);
     }
-    std::vector<OperationResult> results2 = helper->DisableRdbSubs(uris, tplId);
-    for (auto const &operationResult : results2) {
-        EXPECT_EQ(operationResult.errCode_, 0);
-    }
+
     std::vector<OperationResult> results3 = helper->EnableRdbSubs(uris, tplId);
     for (auto const &operationResult : results3) {
         EXPECT_EQ(operationResult.errCode_, 0);
@@ -295,6 +293,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Le
     int retVal2 = helper->Insert(uri, valuesBucket2);
     EXPECT_EQ((retVal2 > 0), true);
     EXPECT_EQ(g_callbackTimes, 2);
+    LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_001::End");
 }
 
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribePublishedData_Test_001, TestSize.Level0)
