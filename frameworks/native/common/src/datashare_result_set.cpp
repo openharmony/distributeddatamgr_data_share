@@ -18,6 +18,7 @@
 #include <sstream>
 
 #include "adaptor.h"
+#include "datashare_block_writer_impl.h"
 #include "datashare_errno.h"
 #include "datashare_log.h"
 #include "parcel.h"

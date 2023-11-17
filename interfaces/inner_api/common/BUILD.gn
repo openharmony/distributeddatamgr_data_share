@@ -89,7 +89,10 @@ ohos_shared_library("datashare_common") {
   configs = [ ":ability_config" ]
   public_configs = [ ":datashare_public_config" ]
   version_script = "libdatashare_common.map"
-  innerapi_tags = [ "platformsdk" ]
+  innerapi_tags = [
+    "platformsdk",
+    "sasdk",
+  ]
 
   external_deps = datashare_common_external_deps
 
