@@ -102,10 +102,7 @@ ohos_shared_library("datashare_consumer") {
   configs = [ ":ability_config" ]
   public_configs = [ ":datashare_public_config" ]
   version_script = "consumer/libdatashare_consumer.map"
-  innerapi_tags = [
-    "platformsdk",
-    "sasdk",
-  ]
+  innerapi_tags = [ "platformsdk" ]
   deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
 
   external_deps = datashare_consumer_external_deps

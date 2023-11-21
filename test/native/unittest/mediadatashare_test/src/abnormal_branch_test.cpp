@@ -29,7 +29,6 @@
 #include "message_parcel.h"
 #include "ikvstore_data_service.h"
 #include "shared_block.h"
-#include "datashare_block_writer_impl.h"
 #include "datashare_connection.h"
 
 namespace OHOS {
