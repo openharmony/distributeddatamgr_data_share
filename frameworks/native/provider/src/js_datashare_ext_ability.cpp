@@ -199,7 +199,7 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
         LOG_INFO("Error in callback");
         UnWrapBusinessError(env, argv[0], businessError);
     }
-    JsDataShareExtAbility* instance = static_cast<JsDataShareExtAbility*>(data);
+    JsDataShareExtAbility* instance = reinterpret_cast<JsDataShareExtAbility*>(data);
     if (instance != nullptr) {
         instance->SetBlockWaiting(true);
         instance->SetBusinessError(businessError);
