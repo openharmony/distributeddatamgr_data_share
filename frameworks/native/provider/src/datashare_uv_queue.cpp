@@ -35,16 +35,18 @@ void DataShareUvQueue::LambdaForWork(uv_work_t *work, int uvstatus)
         return;
     }
     auto *entry = static_cast<UvEntry*>(work->data);
-    std::unique_lock<std::mutex> lock(entry->mutex);
-    if (entry->func) {
-        entry->func();
+    {
+        std::unique_lock<std::mutex> lock(entry->mutex);
+        if (entry->func) {
+            entry->func();
+        }
+        entry->done = true;
+        if (!entry->purge) {
+            entry->condition.notify_all();
+            return;
+        }
     }
-    entry->done = true;
-    if (entry->purge) {
-        DataShareUvQueue::Purge(work);
-    } else {
-        entry->condition.notify_all();
-    }
+    DataShareUvQueue::Purge(work);
 }
 
 void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
@@ -55,11 +57,9 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
         return;
     }
     work->data = new UvEntry {env_, std::move(func), false, false, {}, {}, std::move(retFunc)};
-    auto status = uv_queue_work(
-        loop_, work, [](uv_work_t *work) {}, LambdaForWork);
-    if (status != napi_ok) {
-        LOG_ERROR("queue work failed");
-        DataShareUvQueue::Purge(work);
+    if (work->data == nullptr) {
+        delete work;
+        LOG_ERROR("invalid uvEntry.");
         return;
     }
 
@@ -71,10 +71,16 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
             return;
         }
         std::unique_lock<std::mutex> lock(uvEntry->mutex);
+        auto status = uv_queue_work(
+            loop_, work, [](uv_work_t *work) {}, LambdaForWork);
+        if (status != napi_ok) {
+            LOG_ERROR("queue work failed");
+            DataShareUvQueue::Purge(work);
+            return;
+        }
         if (uvEntry->condition.wait_for(lock, std::chrono::seconds(WAIT_TIME), [uvEntry] { return uvEntry->done; })) {
             LOG_INFO("function ended successfully");
         }
-        CheckFuncAndExec(uvEntry->retFunc);
         if (!uvEntry->done && !uv_cancel((uv_req_t*)&work)) {
             LOG_ERROR("uv_cancel failed.");
             uvEntry->purge = true;
@@ -82,6 +88,7 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
         }
     }
 
+    CheckFuncAndExec(uvEntry->retFunc);
     if (!noNeedPurge) {
         DataShareUvQueue::Purge(work);
     }
