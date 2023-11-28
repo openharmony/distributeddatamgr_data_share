@@ -75,6 +75,7 @@ private:
 
     static std::shared_ptr<DataShareKvServiceProxy> GetDistributedDataManager();
 
+    static DataShareManagerImpl* manager_;
     std::mutex mutex_;
     std::shared_ptr<DataShareKvServiceProxy> dataMgrService_;
     std::shared_ptr<DataShareServiceProxy> dataShareService_;

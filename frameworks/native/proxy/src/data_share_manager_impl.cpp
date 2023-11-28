@@ -29,9 +29,10 @@
 namespace OHOS {
 namespace DataShare {
 
+DataShareManagerImpl* DataShareManagerImpl::manager_ = nullptr;
+
 DataShareManagerImpl* DataShareManagerImpl::GetInstance()
 {
-    static DataShareManagerImpl* manager_ = nullptr;
     if (manager_ != nullptr) {
         return manager_;
     }
