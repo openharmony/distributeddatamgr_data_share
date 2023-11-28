@@ -114,7 +114,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateServiceHelper(const std:
         return nullptr;
     }
     manager->SetBundleName(bundleName);
-    if (manager->GetProxy() == nullptr) {
+    if (DataShareManagerImpl::GetServiceProxy() == nullptr) {
         LOG_ERROR("service proxy is nullptr.");
         return nullptr;
     }

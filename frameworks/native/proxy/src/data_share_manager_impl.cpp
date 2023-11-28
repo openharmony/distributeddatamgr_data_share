@@ -29,6 +29,7 @@
 namespace OHOS {
 namespace DataShare {
 
+std::mutex DataShareManagerImpl::pmutex_;
 DataShareManagerImpl* DataShareManagerImpl::manager_ = nullptr;
 
 DataShareManagerImpl* DataShareManagerImpl::GetInstance()
@@ -36,7 +37,6 @@ DataShareManagerImpl* DataShareManagerImpl::GetInstance()
     if (manager_ != nullptr) {
         return manager_;
     }
-    static std::mutex pmutex_;
     std::lock_guard<std::mutex> lock(pmutex_);
     if (manager_ != nullptr) {
         return manager_;
