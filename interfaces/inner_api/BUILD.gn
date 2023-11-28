@@ -115,12 +115,6 @@ ohos_shared_library("datashare_consumer") {
 }
 
 ohos_shared_library("datashare_provider") {
-  branch_protector_ret = "pac_ret"
-  sanitize = {
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
   include_dirs =
       [ "//foundation/distributeddatamgr/kv_store/frameworks/common" ]
 
