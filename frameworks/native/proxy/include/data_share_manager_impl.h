@@ -32,11 +32,9 @@ namespace DataShare {
 class DataShareKvServiceProxy;
 class DataShareManagerImpl {
 public:
-    static DataShareManagerImpl& GetInstance();
+    static DataShareManagerImpl* GetInstance();
 
-    virtual ~DataShareManagerImpl();
-
-    std::shared_ptr<DataShareServiceProxy> GetServiceProxy();
+    static std::shared_ptr<DataShareServiceProxy> GetServiceProxy();
 
     void OnRemoteDied();
 
@@ -63,6 +61,10 @@ public:
 private:
     DataShareManagerImpl();
 
+    virtual ~DataShareManagerImpl();
+
+    std::shared_ptr<DataShareServiceProxy> GetProxy();
+
     void LinkToDeath(const sptr<IRemoteObject> remote);
 
     sptr<DataShareServiceProxy> GetDataShareServiceProxy();
@@ -72,7 +74,8 @@ private:
     void RegisterClientDeathObserver();
 
     static std::shared_ptr<DataShareKvServiceProxy> GetDistributedDataManager();
-
+    static std::mutex pmutex_;
+    static DataShareManagerImpl* manager_;
     std::mutex mutex_;
     std::shared_ptr<DataShareKvServiceProxy> dataMgrService_;
     std::shared_ptr<DataShareServiceProxy> dataShareService_;

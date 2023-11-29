@@ -22,7 +22,7 @@ namespace DataShare {
 constexpr int INVALID_VALUE = -1;
 int PersistentDataController::AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl)
 {
-    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return INVALID_VALUE;
@@ -32,7 +32,7 @@ int PersistentDataController::AddQueryTemplate(const std::string &uri, int64_t s
 
 int PersistentDataController::DelQueryTemplate(const std::string &uri, int64_t subscriberId)
 {
-    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return INVALID_VALUE;
@@ -44,7 +44,7 @@ std::vector<OperationResult> PersistentDataController::SubscribeRdbData(void *su
     const std::vector<std::string> &uris, const TemplateId &templateId,
     std::function<void(const RdbChangeNode &)> callback)
 {
-    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();
@@ -55,7 +55,7 @@ std::vector<OperationResult> PersistentDataController::SubscribeRdbData(void *su
 std::vector<OperationResult> PersistentDataController::UnSubscribeRdbData(void *subscriber,
     const std::vector<std::string> &uris, const TemplateId &templateId)
 {
-    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();
@@ -70,7 +70,7 @@ std::vector<OperationResult> PersistentDataController::UnSubscribeRdbData(void *
 std::vector<OperationResult> PersistentDataController::EnableSubscribeRdbData(void *subscriber,
     const std::vector<std::string> &uris, const TemplateId &templateId)
 {
-    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();
@@ -81,7 +81,7 @@ std::vector<OperationResult> PersistentDataController::EnableSubscribeRdbData(vo
 std::vector<OperationResult> PersistentDataController::DisableSubscribeRdbData(void *subscriber,
     const std::vector<std::string> &uris, const TemplateId &templateId)
 {
-    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return std::vector<OperationResult>();

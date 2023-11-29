@@ -23,7 +23,7 @@ namespace DataShare {
 constexpr int INVALID_VALUE = -1;
 int GeneralControllerServiceImpl::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
-    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return INVALID_VALUE;
@@ -34,7 +34,7 @@ int GeneralControllerServiceImpl::Insert(const Uri &uri, const DataShareValuesBu
 int GeneralControllerServiceImpl::Update(const Uri &uri, const DataSharePredicates &predicates,
     const DataShareValuesBucket &value)
 {
-    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return INVALID_VALUE;
@@ -44,7 +44,7 @@ int GeneralControllerServiceImpl::Update(const Uri &uri, const DataSharePredicat
 
 int GeneralControllerServiceImpl::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
-    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return INVALID_VALUE;
@@ -55,7 +55,7 @@ int GeneralControllerServiceImpl::Delete(const Uri &uri, const DataSharePredicat
 std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Uri &uri,
     const DataSharePredicates &predicates, std::vector<std::string> &columns, DatashareBusinessError &businessError)
 {
-    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return nullptr;
@@ -93,7 +93,7 @@ void GeneralControllerServiceImpl::UnregisterObserver(const Uri &uri,
 
 void GeneralControllerServiceImpl::NotifyChange(const Uri &uri)
 {
-    auto proxy = DataShareManagerImpl::GetInstance().GetServiceProxy();
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return;

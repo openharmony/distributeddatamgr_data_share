@@ -28,11 +28,26 @@
 
 namespace OHOS {
 namespace DataShare {
-DataShareManagerImpl& DataShareManagerImpl::GetInstance()
+
+std::mutex DataShareManagerImpl::pmutex_;
+DataShareManagerImpl* DataShareManagerImpl::manager_ = nullptr;
+
+DataShareManagerImpl* DataShareManagerImpl::GetInstance()
 {
-    static DataShareManagerImpl manager;
-    return manager;
+    if (manager_ != nullptr) {
+        return manager_;
+    }
+    std::lock_guard<std::mutex> lock(pmutex_);
+    if (manager_ != nullptr) {
+        return manager_;
+    }
+    manager_ = new DataShareManagerImpl();
+    if (manager_ == nullptr) {
+        LOG_ERROR("DataShareManagerImpl: GetInstance failed");
+    }
+    return manager_;
 }
+
 
 std::shared_ptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
 {
@@ -114,7 +129,7 @@ DataShareManagerImpl::~DataShareManagerImpl()
     LOG_INFO("destroy");
 }
 
-std::shared_ptr<DataShareServiceProxy> DataShareManagerImpl::GetServiceProxy()
+std::shared_ptr<DataShareServiceProxy> DataShareManagerImpl::GetProxy()
 {
     if (dataShareService_ != nullptr) {
         return dataShareService_;
@@ -134,6 +149,16 @@ std::shared_ptr<DataShareServiceProxy> DataShareManagerImpl::GetServiceProxy()
     dataShareService_ = std::shared_ptr<DataShareServiceProxy>(
             service.GetRefPtr(), [holder = service](const auto *) {});
     return dataShareService_;
+}
+
+std::shared_ptr<DataShareServiceProxy> DataShareManagerImpl::GetServiceProxy()
+{
+    auto manager = DataShareManagerImpl::GetInstance();
+    if (manager == nullptr) {
+        LOG_ERROR("manager_ is nullptr");
+        return nullptr;
+    }
+    return manager->GetProxy();
 }
 
 void DataShareManagerImpl::ResetServiceHandle()

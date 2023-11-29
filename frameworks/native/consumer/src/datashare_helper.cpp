@@ -108,8 +108,13 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, 
 
 std::shared_ptr<DataShareHelper> DataShareHelper::CreateServiceHelper(const std::string &bundleName)
 {
-    DataShareManagerImpl::GetInstance().SetBundleName(bundleName);
-    if (DataShareManagerImpl::GetInstance().GetServiceProxy() == nullptr) {
+    auto manager = DataShareManagerImpl::GetInstance();
+    if (manager == nullptr) {
+        LOG_ERROR("manager_ is nullptr");
+        return nullptr;
+    }
+    manager->SetBundleName(bundleName);
+    if (DataShareManagerImpl::GetServiceProxy() == nullptr) {
         LOG_ERROR("service proxy is nullptr.");
         return nullptr;
     }
