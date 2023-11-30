@@ -20,4 +20,16 @@ import dataSharePredicates from '@ohos.data.dataSharePredicates'
 @Component
 struct Index {
   @State message: string = "Main thread message filed errorcode test"
+
+  build() {
+    Row() {
+      Column() {
+        Text(this.message)
+          .fontSize(50)
+          .fontWeight(FontWeight.Bold)
+      }
+      .width('100%')
+    }
+    .height('100%')
+  }
 }
