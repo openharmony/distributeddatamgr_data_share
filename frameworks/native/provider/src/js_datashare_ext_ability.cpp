@@ -105,7 +105,7 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
     napi_set_named_property(env, obj, "context", contextObj);
     napi_wrap(env, contextObj, new std::weak_ptr<AbilityRuntime::Context>(context),
         [](napi_env, void *data, void *) {
-            LOG_DEBUG("Finalizer for weak_ptr datashare extension ability context is called");
+            LOG_INFO("Finalizer for weak_ptr datashare extension ability context is called");
             delete static_cast<std::weak_ptr<AbilityRuntime::Context>*>(data);
         }, nullptr, nullptr);
 }
