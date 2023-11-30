@@ -22,38 +22,14 @@ struct Index {
   @State message: string = "Main thread message filed errorcode test"
 
   build() {
-    Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Center, justifyContent: FlexAlign.Center }) {
-      Text('DataShare Extension Ability ErrorCode Test')
-        .fontSize(25)
-        .fontWeight(FontWeight.Bold)
-
-      Text(`${this.message}`)
-        .fontSize(25)
-        .height('20%')
-        .width('100%')
-        .textAlign(TextAlign.Center)
-
-      Row() {
-        Button() {
-          Text('Connect')
-            .fontSize(30)
-            .fontWeight(FontWeight.Bold)
-        }.type(ButtonType.Capsule)
-        .margin({
-          top: 25
-        })
-        .width('50%')
-        .height('10%')
-        .backgroundColor('#0ddffb')
-        .onClick(async () => {
-          console.info('[ttt] [DataShareTest] <<UI>> ErrorCode Connect onclick enter')
-          this.message = 'Connect onclick'
-          await globalThis.connectDataShareExtAbility()
-          console.info('[ttt] [DataShareTest] <<UI>> ErrorCode Connect onclick leave')
-        })
+    Row() {
+      Column() {
+        Text(this.message)
+          .fontSize(50)
+          .fontWeight(FontWeight.Bold)
       }
+      .width('100%')
     }
-    .width('100%')
     .height('100%')
   }
 }

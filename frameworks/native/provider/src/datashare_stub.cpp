@@ -112,7 +112,7 @@ ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
     }
     int fd = OpenFile(uri, mode);
     if (fd < 0) {
-        LOG_ERROR("OpenFile fail, fd is %{pubilc}d", fd);
+        LOG_ERROR("OpenFile fail, fd is %{public}d", fd);
         return ERR_INVALID_VALUE;
     }
     if (!reply.WriteFileDescriptor(fd)) {
