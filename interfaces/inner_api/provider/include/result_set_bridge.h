@@ -23,10 +23,6 @@ namespace DataShare {
 // build the bridge between the database's ResultSet and DataShare's ResultSet
 class ResultSetBridge {
 public:
-    class Creator {
-    public:
-        virtual std::shared_ptr<ResultSetBridge> Create() = 0;
-    };
     class Writer {
     public:
         /**

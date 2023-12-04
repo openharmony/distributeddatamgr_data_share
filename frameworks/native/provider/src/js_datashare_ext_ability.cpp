@@ -24,6 +24,7 @@
 #include "idata_share_service.h"
 #include "iservice_registry.h"
 #include "js_datashare_ext_ability_context.h"
+#include "js_proxy.h"
 #include "js_runtime.h"
 #include "js_runtime_utils.h"
 #include "napi_common_util.h"
@@ -153,7 +154,7 @@ void JsDataShareExtAbility::CheckAndSetAsyncResult(napi_env env)
         std::string value = OHOS::AppExecFwk::UnwrapStringFromJS(env, result);
         SetResult(value);
     } else if (type == napi_valuetype::napi_object) {
-        ResultSetBridge::Creator *proxy = nullptr;
+        JSProxy::JSCreator<ResultSetBridge> *proxy = nullptr;
         napi_unwrap(env, result, reinterpret_cast<void **>(&proxy));
         if (proxy == nullptr) {
             std::vector<std::string> value;
