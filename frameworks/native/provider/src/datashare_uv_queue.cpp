@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace DataShare {
-constexpr int WAIT_TIME = 60;
+constexpr int WAIT_TIME = 3;
 constexpr int SLEEP_TIME = 1;
 constexpr int TRY_TIMES = 2000;
 DataShareUvQueue::DataShareUvQueue(napi_env env)
