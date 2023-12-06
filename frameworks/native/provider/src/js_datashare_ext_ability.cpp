@@ -193,6 +193,13 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
         return CreateJsUndefined(env);
     }
 
+    AsyncCallBackPoint* point = static_cast<AsyncCallBackPoint*>(data);
+    auto sharedMember = point->extAbility.lock();
+    if (!sharedMember) {
+        LOG_ERROR("extension ability has been destroyed.");
+        return CreateJsUndefined(env);
+    }
+    JsDataShareExtAbility* instance = sharedMember.get();
     DatashareBusinessError businessError;
     napi_valuetype type = napi_undefined;
     napi_typeof(env, argv[0], &type);
@@ -200,7 +207,6 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
         LOG_INFO("Error in callback");
         UnWrapBusinessError(env, argv[0], businessError);
     }
-    JsDataShareExtAbility* instance = reinterpret_cast<JsDataShareExtAbility*>(data);
     if (instance != nullptr) {
         instance->SetBlockWaiting(true);
         instance->SetBusinessError(businessError);
@@ -286,7 +292,8 @@ napi_value JsDataShareExtAbility::CallObjectMethod(
     return result;
 }
 
-napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value const *argv, size_t argc, bool isAsync)
+napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value const *argv,
+    size_t argc, bool isAsync)
 {
     if (!jsObj_) {
         LOG_WARN("Not found DataShareExtAbility.js");
@@ -319,12 +326,12 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
     }
 
     if (isAsync) {
-        callbackResultNumber_ = -1;
-        callbackResultString_ = "";
-        callbackResultStringArr_ = {};
-        SetResultSet(nullptr);
-        napi_create_function(env, ASYNC_CALLBACK_NAME, CALLBACK_LENGTH,
-            JsDataShareExtAbility::AsyncCallback, this, &args[argc]);
+        auto ret = InitAsyncCallParams(argc, env, args);
+        if (ret != E_OK) {
+            LOG_ERROR("Failed to InitAsyncCallParams in isAsync.");
+            delete [] args;
+            return nullptr;
+        }
     } else {
         args[argc] = nullptr;
     }
@@ -337,6 +344,26 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
         return nullptr;
     }
     return handleEscape.Escape(remoteNapi);
+}
+
+int32_t JsDataShareExtAbility::InitAsyncCallParams(size_t argc, napi_env &env, napi_value *args)
+{
+    AsyncCallBackPoint *point = new (std::nothrow)AsyncCallBackPoint();
+    if (point == nullptr) {
+        return E_ERROR;
+    }
+    callbackResultNumber_ = -1;
+    callbackResultString_ = "";
+    callbackResultStringArr_ = {};
+    SetResultSet(nullptr);
+    point->extAbility = std::static_pointer_cast<JsDataShareExtAbility>(shared_from_this());
+    napi_create_function(env, ASYNC_CALLBACK_NAME, CALLBACK_LENGTH,
+        JsDataShareExtAbility::AsyncCallback, point, &args[argc]);
+    napi_add_finalizer(env, args[argc], point,
+        [](napi_env env, void* point, void* finalize_hint) {
+            delete static_cast<AsyncCallBackPoint *>(point);
+        }, nullptr, nullptr);
+    return E_OK;
 }
 
 void JsDataShareExtAbility::GetSrcPath(std::string &srcPath)

@@ -309,6 +309,9 @@ private:
     struct AsyncPoint {
         std::shared_ptr<AsyncContext> context;
     };
+    struct AsyncCallBackPoint {
+        std::weak_ptr<JsDataShareExtAbility> extAbility;
+    };
     napi_value CallObjectMethod(const char *name, napi_value const *argv = nullptr, size_t argc = 0,
         bool isAsync = true);
     napi_value CallObjectMethod(
@@ -323,6 +326,7 @@ private:
     static napi_valuetype UnWrapPropertyType(napi_env env, napi_value info,
         const std::string &key);
     static std::string UnWrapProperty(napi_env env, napi_value info, const std::string &key);
+    int32_t InitAsyncCallParams(size_t argc, napi_env &env, napi_value *args);
 
     JsRuntime& jsRuntime_;
     std::unique_ptr<NativeReference> jsObj_;
