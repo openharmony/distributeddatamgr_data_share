@@ -194,12 +194,11 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
     }
 
     AsyncCallBackPoint* point = static_cast<AsyncCallBackPoint*>(data);
-    auto sharedMember = point->extAbility.lock();
-    if (!sharedMember) {
+    auto instance = point->extAbility.lock();
+    if (!instance) {
         LOG_ERROR("extension ability has been destroyed.");
         return CreateJsUndefined(env);
     }
-    JsDataShareExtAbility* instance = sharedMember.get();
     DatashareBusinessError businessError;
     napi_valuetype type = napi_undefined;
     napi_typeof(env, argv[0], &type);
