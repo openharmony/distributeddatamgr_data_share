@@ -65,6 +65,7 @@ public:
 
 private:
     static inline BrokerDelegator<DataShareProxy> delegator_;
+    static const size_t MTU_SIZE = 912600; // 900k
 };
 } // namespace DataShare
 } // namespace OHOS

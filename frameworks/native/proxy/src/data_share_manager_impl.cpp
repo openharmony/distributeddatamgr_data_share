@@ -76,7 +76,7 @@ void DataShareManagerImpl::LinkToDeath(const sptr<IRemoteObject> remote)
     if (!remote->AddDeathRecipient(deathRecipient)) {
         LOG_ERROR("add death recipient failed");
     }
-    LOG_ERROR("link to death success");
+    LOG_INFO("link to death success");
 }
 
 sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
