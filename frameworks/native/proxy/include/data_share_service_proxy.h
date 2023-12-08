@@ -69,6 +69,8 @@ public:
         const std::vector<std::string> &uris, int64_t subscriberId) override;
     void Notify(const std::string &uri) override;
 
+    int SetSilentSwitch(const Uri &uri, bool enable) override;
+
 private:
     static inline BrokerDelegator<DataShareServiceProxy> delegator_;
 };

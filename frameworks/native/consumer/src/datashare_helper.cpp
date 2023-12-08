@@ -29,6 +29,7 @@ namespace {
 static constexpr const char *DATA_SHARE_PREFIX = "datashare:///";
 static constexpr const char *FILE_PREFIX = "file://";
 } // namespace
+constexpr int INVALID_VALUE = -1;
 class ObserverImpl : public AAFwk::DataAbilityObserverStub {
 public:
     explicit ObserverImpl(const std::shared_ptr<DataShareObserver> dataShareObserver)
@@ -297,6 +298,16 @@ bool ObserverImpl::DeleteObserver(const Uri& uri, const std::shared_ptr<DataShar
         });
         return !value.uris_.empty();
     });
+}
+
+int DataShareHelper::SetSilentSwitch(Uri &uri, bool enable)
+{
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return INVALID_VALUE;
+    }
+    return proxy->SetSilentSwitch(uri, enable);
 }
 } // namespace DataShare
 } // namespace OHOS

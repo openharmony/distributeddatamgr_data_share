@@ -469,5 +469,29 @@ void DataShareServiceProxy::Notify(const std::string &uri)
         return;
     }
 }
+
+int DataShareServiceProxy::SetSilentSwitch(const Uri &uri, bool enable)
+{
+    const std::string &uriStr = uri.ToString();
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return DATA_SHARE_ERROR;
+    }
+    if (!ITypesUtil::Marshal(data, uriStr, enable)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return DATA_SHARE_ERROR;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_SET_SILENT_SWITCH), data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("SetSilentSwitch fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
+        return DATA_SHARE_ERROR;
+    }
+    return reply.ReadInt32();
+}
 } // namespace DataShare
 } // namespace OHOS

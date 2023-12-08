@@ -30,6 +30,20 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 namespace DataShare {
 static constexpr int MAX_ARGC = 6;
+static bool GetSilentUri(napi_env env, napi_value jsValue, std::string &uri)
+{
+    napi_valuetype valuetype = napi_undefined;
+    napi_typeof(env, jsValue, &valuetype);
+    if (valuetype == napi_undefined || valuetype == napi_null) {
+        return true;
+    }
+    if (valuetype == napi_string) {
+        uri = DataShareJSUtils::Convert2String(env, jsValue);
+        return true;
+    }
+    return false;
+}
+
 static DataSharePredicates UnwrapDataSharePredicates(napi_env env, napi_value value)
 {
     auto predicates = DataSharePredicatesProxy::GetNativePredicates(env, value);
@@ -1114,6 +1128,46 @@ napi_value NapiDataShareHelper::Napi_UnsubscribePublishedObserver(napi_env env, 
     }
     results = proxy->jsPublishedObsManager_->DelObservers(env, nullptr, uris, atoll(subscriberId.c_str()));
     return DataShareJSUtils::Convert2JSValue(env, results);
+}
+
+napi_value NapiDataShareHelper::EnableSilentProxy(napi_env env, napi_callback_info info)
+{
+    return SetSilentSwitch(env, info, true);
+}
+
+napi_value NapiDataShareHelper::DisableSilentProxy(napi_env env, napi_callback_info info)
+{
+    return SetSilentSwitch(env, info, false);
+}
+
+napi_value NapiDataShareHelper::SetSilentSwitch(napi_env env, napi_callback_info info, bool enable)
+{
+    auto context = std::make_shared<CreateContextInfo>();
+    context->silentSwitch = enable;
+    auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
+        if (argc != 1 && argc != 2) {
+            context->error = std::make_shared<ParametersNumError>("1 or 2");
+            return napi_invalid_arg;
+        }
+        context->contextS = OHOS::AbilityRuntime::GetStageModeContext(env, argv[0]);
+        NAPI_ASSERT_CALL_ERRCODE(env, context->contextS != nullptr,
+            context->error = std::make_shared<ParametersTypeError>("contextS", "not nullptr"), napi_invalid_arg);
+        if (argc > 1) {
+            NAPI_ASSERT_CALL_ERRCODE(env, GetSilentUri(env, argv[1], context->strUri),
+                context->error = std::make_shared<ParametersTypeError>("uri", "string"), napi_invalid_arg);
+        }
+        return napi_ok;
+    };
+    auto output = [context](napi_env env, napi_value *result) -> napi_status {
+        return napi_ok;
+    };
+    auto exec = [context](AsyncCall::Context *ctx) {
+        OHOS::Uri uri(context->strUri);
+        DataShareHelper::SetSilentSwitch(uri, context->silentSwitch);
+    };
+    context->SetAction(std::move(input), std::move(output));
+    AsyncCall asyncCall(env, info, context);
+    return asyncCall.Call(env, exec);
 }
 } // namespace DataShare
 } // namespace OHOS

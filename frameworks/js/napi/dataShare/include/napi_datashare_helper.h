@@ -46,6 +46,8 @@ public:
     static napi_value Napi_DelTemplate(napi_env env, napi_callback_info info);
     static napi_value Napi_Publish(napi_env env, napi_callback_info info);
     static napi_value Napi_GetPublishedData(napi_env env, napi_callback_info info);
+    static napi_value EnableSilentProxy(napi_env env, napi_callback_info info);
+    static napi_value DisableSilentProxy(napi_env env, napi_callback_info info);
 
 private:
     static napi_value GetConstructor(napi_env env);
@@ -54,6 +56,7 @@ private:
     static napi_value Napi_UnsubscribeRdbObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
     static napi_value Napi_SubscribePublishedObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
     static napi_value Napi_UnsubscribePublishedObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
+    static napi_value SetSilentSwitch(napi_env env, napi_callback_info info, bool enable);
 
     bool HasRegisteredObserver(napi_env env, std::list<sptr<NAPIDataShareObserver>> &list, napi_value callback);
     void RegisteredObserver(napi_env env, const std::string &uri, napi_value callback);
@@ -75,6 +78,7 @@ private:
         std::shared_ptr<AppExecFwk::Context> contextF = nullptr;
         std::shared_ptr<OHOS::AbilityRuntime::Context> contextS = nullptr;
         std::shared_ptr<DataShareHelper> dataShareHelper = nullptr;
+        bool silentSwitch = false;
         CreateContextInfo() : Context(nullptr, nullptr) {};
         CreateContextInfo(InputAction input, OutputAction output) : Context(std::move(input), std::move(output)) {};
         ~CreateContextInfo()
