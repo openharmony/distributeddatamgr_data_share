@@ -613,7 +613,7 @@ std::shared_ptr<DataShareResultSet> JsDataShareExtAbility::Query(const Uri &uri,
     napi_value argv[] = {napiUri, napiPredicates, napiColumns};
     CallObjectMethod("query", argv, 3);
     napi_close_handle_scope(env, scope);
-    return nullptr;
+    return ret;
 }
 
 std::string JsDataShareExtAbility::GetType(const Uri &uri)
