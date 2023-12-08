@@ -66,10 +66,6 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
     bool noNeedPurge = false;
     auto *uvEntry = static_cast<UvEntry*>(work->data);
     {
-        if (uvEntry == nullptr) {
-            LOG_ERROR("invalid uvEntry.");
-            return;
-        }
         std::unique_lock<std::mutex> lock(uvEntry->mutex);
         auto status = uv_queue_work(
             loop_, work, [](uv_work_t *work) {}, LambdaForWork);
