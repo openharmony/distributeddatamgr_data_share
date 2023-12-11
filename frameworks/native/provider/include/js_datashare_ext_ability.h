@@ -232,13 +232,13 @@ public:
      */
     Uri DenormalizeUri(const Uri &uri) override;
 
-    bool GetRecvResult() const
+    bool GetRecvReply() const
     {
-        return isRecvResult_;
+        return isRecvReply_;
     }
-    void SetRecvResult(bool RecvResult)
+    void SetRecvReply(bool RecvReply)
     {
-        isRecvResult_ = RecvResult;
+        isRecvReply_ = RecvReply;
     }
 
     napi_value GetAsyncResult() const
@@ -330,7 +330,7 @@ private:
 
     JsRuntime& jsRuntime_;
     std::unique_ptr<NativeReference> jsObj_;
-    bool isRecvResult_ = false;
+    bool isRecvReply_ = false;
     napi_value callbackData_ = nullptr;
     int callbackResultNumber_ = -1;
     std::string callbackResultString_ = "";

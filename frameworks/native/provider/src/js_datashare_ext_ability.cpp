@@ -210,7 +210,7 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
         instance->SetBusinessError(businessError);
         instance->SetAsyncResult(argv[1]);
         instance->CheckAndSetAsyncResult(env);
-        instance->SetRecvResult(true);
+        instance->SetRecvReply(true);
     }
     return CreateJsUndefined(env);
 }
@@ -354,7 +354,7 @@ int32_t JsDataShareExtAbility::InitAsyncCallParams(size_t argc, napi_env &env, n
     callbackResultString_ = "";
     callbackResultStringArr_ = {};
     SetResultSet(nullptr);
-    SetRecvResult(false);
+    SetRecvReply(false);
     point->extAbility = std::static_pointer_cast<JsDataShareExtAbility>(shared_from_this());
     napi_create_function(env, ASYNC_CALLBACK_NAME, CALLBACK_LENGTH,
         JsDataShareExtAbility::AsyncCallback, point, &args[argc]);
