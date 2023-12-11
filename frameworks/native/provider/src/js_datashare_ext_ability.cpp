@@ -207,10 +207,10 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
         UnWrapBusinessError(env, argv[0], businessError);
     }
     if (instance != nullptr) {
-        instance->SetBlockWaiting(true);
         instance->SetBusinessError(businessError);
         instance->SetAsyncResult(argv[1]);
         instance->CheckAndSetAsyncResult(env);
+        instance->SetRecvReply(true);
     }
     return CreateJsUndefined(env);
 }
@@ -335,7 +335,6 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
         args[argc] = nullptr;
     }
 
-    SetBlockWaiting(false);
     napi_value remoteNapi = nullptr;
     napi_status status = napi_call_function(env, obj, method, count, args, &remoteNapi);
     delete []args;
@@ -355,6 +354,7 @@ int32_t JsDataShareExtAbility::InitAsyncCallParams(size_t argc, napi_env &env, n
     callbackResultString_ = "";
     callbackResultStringArr_ = {};
     SetResultSet(nullptr);
+    SetRecvReply(false);
     point->extAbility = std::static_pointer_cast<JsDataShareExtAbility>(shared_from_this());
     napi_create_function(env, ASYNC_CALLBACK_NAME, CALLBACK_LENGTH,
         JsDataShareExtAbility::AsyncCallback, point, &args[argc]);
