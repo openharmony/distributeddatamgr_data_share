@@ -233,7 +233,7 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
         extension->SetCallingInfo(info);
         extension->GetResultSet(resultSet);
         extension->GetBusinessError(businessError);
-        return (resultSet != nullptr);
+        return (extension->GetRecvReply() != false);
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);

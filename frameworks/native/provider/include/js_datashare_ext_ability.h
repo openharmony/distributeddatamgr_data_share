@@ -236,9 +236,9 @@ public:
     {
         return isRecvReply_;
     }
-    void SetRecvReply(bool RecvReply)
+    void SetRecvReply(bool recvReply)
     {
-        isRecvReply_ = RecvReply;
+        isRecvReply_ = recvReply;
     }
 
     napi_value GetAsyncResult() const
