@@ -232,13 +232,13 @@ public:
      */
     Uri DenormalizeUri(const Uri &uri) override;
 
-    bool GetBlockWaiting() const
+    bool GetRecvResult() const
     {
-        return isBlockWaiting_;
+        return isRecvResult_;
     }
-    void SetBlockWaiting(bool blockWaiting)
+    void SetRecvResult(bool RecvResult)
     {
-        isBlockWaiting_ = blockWaiting;
+        isRecvResult_ = RecvResult;
     }
 
     napi_value GetAsyncResult() const
@@ -330,7 +330,7 @@ private:
 
     JsRuntime& jsRuntime_;
     std::unique_ptr<NativeReference> jsObj_;
-    bool isBlockWaiting_ = false;
+    bool isRecvResult_ = false;
     napi_value callbackData_ = nullptr;
     int callbackResultNumber_ = -1;
     std::string callbackResultString_ = "";

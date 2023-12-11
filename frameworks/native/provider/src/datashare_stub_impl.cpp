@@ -128,7 +128,7 @@ int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value
             return false;
         }
         extension->GetResult(ret);
-        return (ret != DEFAULT_NUMBER);
+        return (GetRecvResult() != false);
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
