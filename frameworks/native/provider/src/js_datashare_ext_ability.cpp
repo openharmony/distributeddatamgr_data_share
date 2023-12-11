@@ -335,7 +335,6 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
         args[argc] = nullptr;
     }
 
-    SetBlockWaiting(false);
     napi_value remoteNapi = nullptr;
     napi_status status = napi_call_function(env, obj, method, count, args, &remoteNapi);
     delete []args;
