@@ -115,7 +115,11 @@ void DataShareManagerImpl::RegisterClientDeathObserver()
         LOG_WARN("new KvStoreClientDeathObserver failed");
         return;
     }
-    dataMgrService_->RegisterClientDeathObserver(bundleName_, clientDeathObserverPtr_);
+    auto status = dataMgrService_->RegisterClientDeathObserver(bundleName_, clientDeathObserverPtr_);
+    if (status != SUCCESS) {
+        LOG_ERROR("RegisterClientDeathObserver failed");
+        return;
+    }
 }
 
 DataShareManagerImpl::DataShareManagerImpl()
