@@ -62,7 +62,12 @@ std::shared_ptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDat
         return nullptr;
     }
     LOG_INFO("get distributed data manager success");
-    return std::make_shared<DataShareKvServiceProxy>(remoteObject);
+    sptr<DataShareKvServiceProxy> proxy = new (std::nothrow)DataShareKvServiceProxy(remoteObject);
+    if (proxy == nullptr) {
+        LOG_ERROR("new DataShareKvServiceProxy fail.");
+        return nullptr;
+    }
+    return std::shared_ptr<DataShareKvServiceProxy>(proxy.GetRefPtr(), [holder = proxy](const auto *) {});
 }
 
 void DataShareManagerImpl::LinkToDeath(const sptr<IRemoteObject> remote)
