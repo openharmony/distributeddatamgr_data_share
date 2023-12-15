@@ -116,7 +116,7 @@ void DataShareManagerImpl::RegisterClientDeathObserver()
         return;
     }
     auto status = dataMgrService_->RegisterClientDeathObserver(bundleName_, clientDeathObserverPtr_);
-    if (status != SUCCESS) {
+    if (!status) {
         LOG_ERROR("RegisterClientDeathObserver failed");
         return;
     }
