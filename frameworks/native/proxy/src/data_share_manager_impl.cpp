@@ -49,7 +49,7 @@ DataShareManagerImpl* DataShareManagerImpl::GetInstance()
 }
 
 
-std::shared_ptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
+sptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
 {
     auto manager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (manager == nullptr) {
@@ -67,7 +67,7 @@ std::shared_ptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDat
         LOG_ERROR("new DataShareKvServiceProxy fail.");
         return nullptr;
     }
-    return std::shared_ptr<DataShareKvServiceProxy>(proxy.GetRefPtr(), [holder = proxy](const auto *) {});
+    return proxy;
 }
 
 void DataShareManagerImpl::LinkToDeath(const sptr<IRemoteObject> remote)

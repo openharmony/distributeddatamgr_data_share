@@ -73,11 +73,11 @@ private:
 
     void RegisterClientDeathObserver();
 
-    static std::shared_ptr<DataShareKvServiceProxy> GetDistributedDataManager();
+    static sptr<DataShareKvServiceProxy> GetDistributedDataManager();
     static std::mutex pmutex_;
     static DataShareManagerImpl* manager_;
     std::mutex mutex_;
-    std::shared_ptr<DataShareKvServiceProxy> dataMgrService_;
+    sptr<DataShareKvServiceProxy> dataMgrService_;
     std::shared_ptr<DataShareServiceProxy> dataShareService_;
     std::string bundleName_;
     static constexpr int WAIT_TIME = 2;
