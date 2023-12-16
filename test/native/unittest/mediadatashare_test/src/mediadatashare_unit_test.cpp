@@ -1220,7 +1220,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ExecuteBatch_Test_001, TestSize.
 
     std::vector<DataShare::OperationStatement> statements;
     DataShare::OperationStatement statement1;
-    statement1.operationType = INSERT;
+    statement1.operationType = Operation::INSERT;
     statement1.uri = "datashare:///uri1";
     DataShare::DataShareValuesBucket valuesBucket;
     valuesBucket.Put("DB_NUM", 150);
@@ -1232,7 +1232,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ExecuteBatch_Test_001, TestSize.
     statements.emplace_back(statement1);
 
     DataShare::OperationStatement statement2;
-    statement2.operationType = DELETE;
+    statement2.operationType = Operation::DELETE;
     statement2.uri = "datashareproxy://com.uri2";
     DataShare::DataShareValuesBucket valuesBucket1;
     valuesBucket1.Put("DB_TITLE2", "ExecuteBatch_Test002");
@@ -1377,7 +1377,7 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperExecuteBatchControllerNull
     helper->Release();
     std::vector<DataShare::OperationStatement> statements;
     DataShare::OperationStatement statement1;
-    statement1.operationType = INSERT;
+    statement1.operationType = Operation::INSERT;
     statement1.uri = "datashare:///uri1";
     DataShare::DataShareValuesBucket valuesBucket;
     valuesBucket.Put("DB_NUM", 150);
@@ -1389,7 +1389,7 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperExecuteBatchControllerNull
     statements.emplace_back(statement1);
 
     DataShare::OperationStatement statement2;
-    statement2.operationType = DELETE;
+    statement2.operationType = Operation::DELETE;
     statement2.uri = "datashareproxy://com.uri2";
     DataShare::DataShareValuesBucket valuesBucket1;
     valuesBucket1.Put("DB_TITLE2", "ExecuteBatch_Test002");
