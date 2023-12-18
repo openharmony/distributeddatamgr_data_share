@@ -61,12 +61,12 @@ sptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
         LOG_ERROR("get distributed data manager failed");
         return nullptr;
     }
-    LOG_INFO("get distributed data manager success");
     sptr<DataShareKvServiceProxy> proxy = new (std::nothrow)DataShareKvServiceProxy(remoteObject);
     if (proxy == nullptr) {
         LOG_ERROR("new DataShareKvServiceProxy fail.");
         return nullptr;
     }
+    LOG_INFO("get distributed data manager success");
     return proxy;
 }
 
@@ -117,7 +117,7 @@ void DataShareManagerImpl::RegisterClientDeathObserver()
     }
     auto status = dataMgrService_->RegisterClientDeathObserver(bundleName_, clientDeathObserverPtr_);
     if (!status) {
-        LOG_ERROR("RegisterClientDeathObserver failed");
+        LOG_ERROR("RegisterClientDeathObserver failed, bundleName is %{public}s", bundleName_.c_str());
         return;
     }
 }
