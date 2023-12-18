@@ -49,7 +49,7 @@ DataShareManagerImpl* DataShareManagerImpl::GetInstance()
 }
 
 
-std::shared_ptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
+sptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
 {
     auto manager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (manager == nullptr) {
@@ -61,8 +61,13 @@ std::shared_ptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDat
         LOG_ERROR("get distributed data manager failed");
         return nullptr;
     }
+    sptr<DataShareKvServiceProxy> proxy = new (std::nothrow)DataShareKvServiceProxy(remoteObject);
+    if (proxy == nullptr) {
+        LOG_ERROR("new DataShareKvServiceProxy fail.");
+        return nullptr;
+    }
     LOG_INFO("get distributed data manager success");
-    return std::make_shared<DataShareKvServiceProxy>(remoteObject);
+    return proxy;
 }
 
 void DataShareManagerImpl::LinkToDeath(const sptr<IRemoteObject> remote)
@@ -110,7 +115,11 @@ void DataShareManagerImpl::RegisterClientDeathObserver()
         LOG_WARN("new KvStoreClientDeathObserver failed");
         return;
     }
-    dataMgrService_->RegisterClientDeathObserver(bundleName_, clientDeathObserverPtr_);
+    auto status = dataMgrService_->RegisterClientDeathObserver(bundleName_, clientDeathObserverPtr_);
+    if (!status) {
+        LOG_ERROR("RegisterClientDeathObserver failed, bundleName is %{public}s", bundleName_.c_str());
+        return;
+    }
 }
 
 DataShareManagerImpl::DataShareManagerImpl()
