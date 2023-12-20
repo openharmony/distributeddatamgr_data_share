@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace DataShare {
-enum Operation : int32_t {
+enum class Operation : int32_t {
     INSERT = 0,
     UPDATE,
     DELETE,
