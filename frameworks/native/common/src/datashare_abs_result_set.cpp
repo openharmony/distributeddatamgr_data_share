@@ -99,7 +99,7 @@ int DataShareAbsResultSet::GoToFirstRow()
     DISTRIBUTED_DATA_HITRACE(std::string(__FUNCTION__));
     int ret = GoToRow(0);
     if (ret != E_OK) {
-        LOG_WARN("return GoToFirstRow ret is wrong!");
+        LOG_DEBUG("return GoToFirstRow ret is wrong!");
     }
     return ret;
 }
@@ -124,7 +124,7 @@ int DataShareAbsResultSet::GoToNextRow()
 {
     int ret = GoToRow(rowPos_ + 1);
     if (ret != E_OK) {
-        LOG_WARN("return GoToNextRow ret is wrong!");
+        LOG_DEBUG("return GoToNextRow ret is wrong!");
     }
     return ret;
 }

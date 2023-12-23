@@ -175,7 +175,7 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<uin
     void *native = nullptr;
     napi_value buffer = nullptr;
     if (value.empty()) {
-        LOG_ERROR("Convert2JSValue error");
+        LOG_DEBUG("vector is empty");
         return nullptr;
     }
     napi_status status = napi_create_arraybuffer(env, value.size(), &native, &buffer);
