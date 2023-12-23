@@ -91,7 +91,7 @@ int DataShareProxy::OpenFile(const Uri &uri, const std::string &mode)
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_OPEN_FILE), data, reply, option);
     if (err != DATA_SHARE_NO_ERROR) {
-        LOG_DEBUG("OpenFile fail to SendRequest. err: %{public}d", err);
+        LOG_ERROR("OpenFile fail to SendRequest. err: %{public}d", err);
         return fd;
     }
 

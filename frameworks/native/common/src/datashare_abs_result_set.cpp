@@ -97,11 +97,7 @@ int DataShareAbsResultSet::GoTo(int offset)
 int DataShareAbsResultSet::GoToFirstRow()
 {
     DISTRIBUTED_DATA_HITRACE(std::string(__FUNCTION__));
-    int ret = GoToRow(0);
-    if (ret != E_OK) {
-        LOG_DEBUG("return GoToFirstRow ret is wrong!");
-    }
-    return ret;
+    return GoToRow(0);
 }
 
 int DataShareAbsResultSet::GoToLastRow()
@@ -122,20 +118,12 @@ int DataShareAbsResultSet::GoToLastRow()
 
 int DataShareAbsResultSet::GoToNextRow()
 {
-    int ret = GoToRow(rowPos_ + 1);
-    if (ret != E_OK) {
-        LOG_DEBUG("return GoToNextRow ret is wrong!");
-    }
-    return ret;
+    return GoToRow(rowPos_ + 1);
 }
 
 int DataShareAbsResultSet::GoToPreviousRow()
 {
-    int ret = GoToRow(rowPos_ - 1);
-    if (ret != E_OK) {
-        LOG_WARN("return GoToPreviousRow ret is wrong!");
-    }
-    return ret;
+    return GoToRow(rowPos_ - 1);
 }
 
 int DataShareAbsResultSet::IsAtFirstRow(bool &result) const

@@ -112,8 +112,7 @@ ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
     }
     int fd = OpenFile(uri, mode);
     if (fd < 0) {
-        LOG_DEBUG("OpenFile fail, fd is %{public}d", fd);
-        return ERR_INVALID_VALUE;
+        return ERR_INVALID_DATA;
     }
     if (!reply.WriteFileDescriptor(fd)) {
         LOG_ERROR("fail to WriteFileDescriptor fd");
