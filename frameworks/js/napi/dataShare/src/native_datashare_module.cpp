@@ -29,6 +29,8 @@ static napi_value Init(napi_env env, napi_value exports)
     LOG_DEBUG("Init DataShareHelper");
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("createDataShareHelper", NapiDataShareHelper::Napi_CreateDataShareHelper),
+        DECLARE_NAPI_FUNCTION("enableSilentProxy", NapiDataShareHelper::EnableSilentProxy),
+        DECLARE_NAPI_FUNCTION("disableSilentProxy", NapiDataShareHelper::DisableSilentProxy),
     };
     napi_status status = napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc);
     LOG_DEBUG("napi_define_properties status : %{public}d", status);

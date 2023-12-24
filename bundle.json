@@ -119,7 +119,8 @@
                 }
             ],
             "test": [
-                "//foundation/distributeddatamgr/data_share/test/native:unittest"
+                "//foundation/distributeddatamgr/data_share/test/native:unittest",
+                "//foundation/distributeddatamgr/data_share/test/js/data_share:unittest"
             ]
         }
     }

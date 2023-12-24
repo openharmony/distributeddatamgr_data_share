@@ -81,6 +81,8 @@ public:
         int64_t subscriberId) = 0;
 
     virtual void Notify(const std::string &uri) = 0;
+
+    virtual int SetSilentSwitch(const Uri &uri, bool enable) = 0;
 };
 } // namespace OHOS::DataShare
 #endif

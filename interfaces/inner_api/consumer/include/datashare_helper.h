@@ -403,6 +403,14 @@ public:
      */
     virtual std::vector<OperationResult> DisablePubSubs(const std::vector<std::string> &uris, int64_t subscriberId) = 0;
 
+    /**
+     * @brief Set default switch for silent access.
+     * @param uri, the uri to disable/enable.
+     * @param enable, the enable of silent switch.
+     * @return Returns the error code.
+     */
+    static int SetSilentSwitch(Uri &uri, bool enable);
+
 private:
     static std::shared_ptr<DataShareHelper> CreateServiceHelper(const std::string &bundleName = "");
 	
