@@ -382,6 +382,170 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Query_Test_002, TestSize.Le
     LOG_INFO("SlientSwitch_SwitchEnable_Query_Test_002::End");
 }
 
+HWTEST_F(SlientSwitchTest, SlientSwitch_MixedCross_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientSwitch_MixedCross_Test_001::Start");
+    Uri uri(SLIENT_ACCESS_URI);
+    int retVal = DataShareHelper::SetSilentSwitch(uri, true);
+    EXPECT_EQ(retVal, E_OK);
+
+    Uri uri1("*");
+    retVal = DataShareHelper::SetSilentSwitch(uri1, false);
+    EXPECT_EQ(retVal, E_OK);
+
+    auto helper = g_slientAccessHelper;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_NAME, "lisi");
+    vector<string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    int result = 0;
+    if (resultSet != nullptr) {
+        resultSet->GetRowCount(result);
+    }
+    EXPECT_EQ(result, 1);
+    LOG_INFO("SlientSwitch_MixedCross_Test_001::End");
+}
+
+HWTEST_F(SlientSwitchTest, SlientSwitch_MixedCross_Test_002, TestSize.Level0)
+{
+    LOG_INFO("SlientSwitch_MixedCross_Test_002::Start");
+    Uri uri(SLIENT_ACCESS_URI);
+    int retVal = DataShareHelper::SetSilentSwitch(uri, false);
+    EXPECT_EQ(retVal, E_OK);
+
+    Uri uri1("*");
+    retVal = DataShareHelper::SetSilentSwitch(uri1, true);
+    EXPECT_EQ(retVal, E_OK);
+
+    auto helper = g_slientAccessHelper;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_NAME, "lisi");
+    vector<string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    ASSERT_TRUE(resultSet == nullptr);
+    LOG_INFO("SlientSwitch_MixedCross_Test_002::End");
+}
+
+HWTEST_F(SlientSwitchTest, SlientSwitch_MixedCross_Test_003, TestSize.Level0)
+{
+    LOG_INFO("SlientSwitch_MixedCross_Test_003::Start");
+    Uri uri1("*");
+    int retVal = DataShareHelper::SetSilentSwitch(uri1, false);
+    EXPECT_EQ(retVal, E_OK);
+
+    Uri uri(SLIENT_ACCESS_URI);
+    retVal = DataShareHelper::SetSilentSwitch(uri, true);
+    EXPECT_EQ(retVal, E_OK);
+
+    auto helper = g_slientAccessHelper;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_NAME, "lisi");
+    vector<string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    int result = 0;
+    if (resultSet != nullptr) {
+        resultSet->GetRowCount(result);
+    }
+    EXPECT_EQ(result, 1);
+    LOG_INFO("SlientSwitch_MixedCross_Test_003::End");
+}
+
+HWTEST_F(SlientSwitchTest, SlientSwitch_MixedCross_Test_004, TestSize.Level0)
+{
+    LOG_INFO("SlientSwitch_MixedCross_Test_004::Start");
+    Uri uri(SLIENT_ACCESS_URI);
+    int retVal = DataShareHelper::SetSilentSwitch(uri, true);
+    EXPECT_EQ(retVal, E_OK);
+
+    Uri uri1("");
+    retVal = DataShareHelper::SetSilentSwitch(uri1, false);
+    EXPECT_EQ(retVal, E_OK);
+
+    auto helper = g_slientAccessHelper;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_NAME, "lisi");
+    vector<string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    ASSERT_TRUE(resultSet == nullptr);
+    LOG_INFO("SlientSwitch_MixedCross_Test_004::End");
+}
+
+HWTEST_F(SlientSwitchTest, SlientSwitch_MixedCross_Test_005, TestSize.Level0)
+{
+    LOG_INFO("SlientSwitch_MixedCross_Test_005::Start");
+    Uri uri(SLIENT_ACCESS_URI);
+    int retVal = DataShareHelper::SetSilentSwitch(uri, false);
+    EXPECT_EQ(retVal, E_OK);
+
+    Uri uri1("");
+    retVal = DataShareHelper::SetSilentSwitch(uri1, true);
+    EXPECT_EQ(retVal, E_OK);
+
+    auto helper = g_slientAccessHelper;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_NAME, "lisi");
+    vector<string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    int result = 0;
+    if (resultSet != nullptr) {
+        resultSet->GetRowCount(result);
+    }
+    EXPECT_EQ(result, 1);
+    LOG_INFO("SlientSwitch_MixedCross_Test_005::End");
+}
+
+HWTEST_F(SlientSwitchTest, SlientSwitch_MixedCross_Test_006, TestSize.Level0)
+{
+    LOG_INFO("SlientSwitch_MixedCross_Test_006::Start");
+    Uri uri("");
+    int retVal = DataShareHelper::SetSilentSwitch(uri, true);
+    EXPECT_EQ(retVal, E_OK);
+
+    Uri uri1(SLIENT_ACCESS_URI);
+    retVal = DataShareHelper::SetSilentSwitch(uri1, false);
+    EXPECT_EQ(retVal, E_OK);
+
+    auto helper = g_slientAccessHelper;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_NAME, "lisi");
+    vector<string> columns;
+    auto resultSet = helper->Query(uri1, predicates, columns);
+    ASSERT_TRUE(resultSet == nullptr);
+    LOG_INFO("SlientSwitch_MixedCross_Test_006::End");
+}
+
+HWTEST_F(SlientSwitchTest, SlientSwitch_MixedCross_Test_007, TestSize.Level0)
+{
+    LOG_INFO("SlientSwitch_MixedCross_Test_007::Start");
+    Uri uri("datashare:///com.acts.xxxxxx/entry/DB00/TBL00?Proxy=true");
+    int retVal = DataShareHelper::SetSilentSwitch(uri, false);
+    EXPECT_EQ(retVal, E_OK);
+
+    uri = Uri("datashare:///com.acts.xxxxxxsss/baidu");
+    retVal = DataShareHelper::SetSilentSwitch(uri, false);
+    EXPECT_EQ(retVal, E_OK);
+
+    uri = Uri("*");
+    retVal = DataShareHelper::SetSilentSwitch(uri, false);
+    EXPECT_EQ(retVal, E_OK);
+
+    Uri uri1(SLIENT_ACCESS_URI);
+    retVal = DataShareHelper::SetSilentSwitch(uri1, true);
+    EXPECT_EQ(retVal, E_OK);
+
+    auto helper = g_slientAccessHelper;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_NAME, "lisi");
+    vector<string> columns;
+    auto resultSet = helper->Query(uri1, predicates, columns);
+    int result = 0;
+    if (resultSet != nullptr) {
+        resultSet->GetRowCount(result);
+    }
+    EXPECT_EQ(result, 1);
+    LOG_INFO("SlientSwitch_MixedCross_Test_007::End");
+}
+
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Delete_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchDisable_Delete_Test_001::Start");
