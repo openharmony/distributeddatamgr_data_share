@@ -18,6 +18,7 @@
 
 #include <condition_variable>
 #include <memory>
+#include <mutex>
 
 #include "ability_connect_callback_stub.h"
 #include "datashare_proxy.h"
@@ -72,9 +73,8 @@ private:
         std::condition_variable condition;
         std::mutex mutex;
     };
-    void SetDataShareProxy(sptr<DataShareProxy> proxy);
     std::shared_ptr<DataShareProxy> ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
-    std::mutex mutex_;
+    std::mutex mutex_{};
     std::shared_ptr<DataShareProxy> dataShareProxy_;
     ConnectCondition condition_;
     Uri uri_;
