@@ -39,10 +39,12 @@ void DataShareConnection::OnAbilityConnectDone(
              element.GetURI().c_str(), resultCode);
     if (remoteObject == nullptr) {
         LOG_ERROR("remote is nullptr");
+        condition_.condition.notify_all();
         return;
     }
-    std::unique_lock<std::mutex> lock(condition_.mutex);
-    SetDataShareProxy(new (std::nothrow) DataShareProxy(remoteObject));
+    std::lock_guard<std::mutex> lock(mutex_);
+    sptr<DataShareProxy> proxy = new (std::nothrow) DataShareProxy(remoteObject);
+    dataShareProxy_ = std::shared_ptr<DataShareProxy>(proxy.GetRefPtr(), [holder = proxy](const auto *) {});
     condition_.condition.notify_all();
 }
 
@@ -59,14 +61,22 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
 {
     LOG_INFO("on disconnect done, req uri:%{public}s, rev uri:%{public}s, ret=%{public}d", uri_.ToString().c_str(),
              element.GetURI().c_str(), resultCode);
+    std::string uri;
     {
-        std::unique_lock<std::mutex> lock(condition_.mutex);
-        SetDataShareProxy(nullptr);
-        condition_.condition.notify_all();
+        std::lock_guard<std::mutex> lock(mutex_);
+        dataShareProxy_ = nullptr;
+        uri = uri_.ToString();
     }
-    if (!uri_.ToString().empty()) {
-        ConnectDataShareExtAbility(uri_, token_);
+    if (uri.empty()) {
+        return;
     }
+    AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
+    if (instance == nullptr) {
+        LOG_ERROR("get proxy failed uri:%{public}s", uri.c_str());
+        return;
+    }
+    ErrCode ret = instance->Connect(uri, this, token_);
+    LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d", uri.c_str(), ret);
 }
 
 /**
@@ -75,22 +85,27 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
 std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(const Uri &uri,
     const sptr<IRemoteObject> &token)
 {
-    if (dataShareProxy_ != nullptr) {
-        return dataShareProxy_;
+    std::string reqUri;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (dataShareProxy_ != nullptr) {
+            return dataShareProxy_;
+        }
+        reqUri = uri_.ToString().empty() ? uri.ToString() : uri_.ToString();
     }
-    auto reqUri = uri_.ToString().empty() ? uri.ToString() : uri_.ToString();
+
     AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
     if (instance == nullptr) {
-        LOG_ERROR("Connect: AmsMgrProxy::GetInstance failed uri:%{public}s", reqUri.c_str());
+        LOG_ERROR("get proxy failed uri:%{public}s", reqUri.c_str());
         return nullptr;
     }
     ErrCode ret = instance->Connect(reqUri, this, token);
+    LOG_INFO("connect ability, uri = %{public}s. ret = %{public}d", reqUri.c_str(), ret);
     if (ret != ERR_OK) {
-        LOG_ERROR("connect ability failed, uri:%{public}s, ret = %{public}d", reqUri.c_str(), ret);
         return nullptr;
     }
-    std::unique_lock<std::mutex> lock(condition_.mutex);
-    if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
+    std::unique_lock<std::mutex> condLock(condition_.mutex);
+    if (condition_.condition.wait_for(condLock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ != nullptr; })) {
         LOG_DEBUG("connect ability ended successfully uri:%{public}s", reqUri.c_str());
     } else {
@@ -104,41 +119,24 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
  */
 void DataShareConnection::DisconnectDataShareExtAbility()
 {
-    auto uri = uri_.ToString();
-    uri_ = Uri("");
-    if (dataShareProxy_ == nullptr) {
-        return;
+    std::string uri;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        uri = uri_.ToString();
+        uri_ = Uri("");
+        if (dataShareProxy_ == nullptr) {
+            return;
+        }
     }
+
     AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
     if (instance == nullptr) {
-        LOG_ERROR("Disconnect: AmsMgrProxy::GetInstance failed uri:%{public}s", uri.c_str());
+        LOG_ERROR("get proxy failed uri:%{public}s", uri.c_str());
         return;
     }
 
-    LOG_INFO("disconnect uri:%{public}s", uri.c_str());
     ErrCode ret = instance->DisConnect(this);
-    if (ret != ERR_OK) {
-        LOG_ERROR("disconnect ability failed, uri:%{public}s ret = %{public}d", uri.c_str(), ret);
-        return;
-    }
-    std::unique_lock<std::mutex> lock(condition_.mutex);
-    if (condition_.condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
-        [this] { return dataShareProxy_ == nullptr; })) {
-        LOG_DEBUG("disconnect ability successfully uri:%{public}s", uri.c_str());
-    } else {
-        LOG_INFO("disconnect timeout uri:%{public}s", uri.c_str());
-    }
-}
-
-void DataShareConnection::SetDataShareProxy(sptr<DataShareProxy> proxy)
-{
-    if (proxy == nullptr) {
-        dataShareProxy_ = nullptr;
-        return;
-    }
-
-    dataShareProxy_ =
-        std::shared_ptr<DataShareProxy>(proxy.GetRefPtr(), [holder = proxy](const auto *) {});
+    LOG_INFO("disconnect uri:%{public}s, ret = %{public}d", uri.c_str(), ret);
 }
 
 DataShareConnection::~DataShareConnection()

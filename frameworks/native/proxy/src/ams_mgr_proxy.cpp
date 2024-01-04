@@ -54,7 +54,7 @@ AmsMgrProxy* AmsMgrProxy::GetInstance()
     }
     proxy = new AmsMgrProxy();
     if (proxy == nullptr) {
-        LOG_ERROR("new AmsMgrProxy failed");
+        LOG_ERROR("new proxy failed");
     }
     return proxy;
 }
@@ -66,12 +66,7 @@ int AmsMgrProxy::Connect(
     want.SetUri(uri);
     std::lock_guard<std::mutex> lock(mutex_);
     if (ConnectSA()) {
-        LOG_INFO("connect datashareextability start, uri = %{public}s.", uri.c_str());
-        int ret = proxy_->ConnectAbilityCommon(want, connect, callerToken, AppExecFwk::ExtensionAbilityType::DATASHARE);
-        if (ret != ERR_OK) {
-            LOG_ERROR("connect ability failed, uri = %{public}s, ret = %{public}d", uri.c_str(), ret);
-        }
-        return ret;
+        return proxy_->ConnectAbilityCommon(want, connect, callerToken, AppExecFwk::ExtensionAbilityType::DATASHARE);
     }
     return -1;
 }
@@ -90,19 +85,19 @@ bool AmsMgrProxy::ConnectSA()
 
     sa_ = systemAbilityManager->GetSystemAbility(ABILITY_MGR_SERVICE_ID);
     if (sa_ == nullptr) {
-        LOG_ERROR("Failed to GetSystemAbility.");
+        LOG_ERROR("get ability manager service failed.");
         return false;
     }
 
     deathRecipient_ = new (std::nothrow) AmsMgrProxy::ServiceDeathRecipient(this);
     if (deathRecipient_ == nullptr) {
-        LOG_ERROR("deathRecipient alloc failed.");
+        LOG_ERROR("new death recipient failed.");
         return false;
     }
     sa_->AddDeathRecipient(deathRecipient_);
     proxy_ = new (std::nothrow)Proxy(sa_);
     if (proxy_ == nullptr) {
-        LOG_ERROR("proxy_ null, new failed");
+        LOG_ERROR("new proxy failed");
         return false;
     }
     return true;
@@ -112,11 +107,7 @@ int AmsMgrProxy::DisConnect(sptr<IRemoteObject> connect)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (ConnectSA()) {
-        int ret = proxy_->DisconnectAbility(connect);
-        if (ret != ERR_OK) {
-            LOG_ERROR("DisconnectAbility failed, ret = %{public}d", ret);
-        }
-        return ret;
+        return proxy_->DisconnectAbility(connect);
     }
     return -1;
 }
