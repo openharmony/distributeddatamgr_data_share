@@ -84,8 +84,11 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
 
     if (uri.GetQuery().find("Proxy=true") != std::string::npos) {
         auto result = CreateServiceHelper();
-        if (result != nullptr || extUri.empty()) {
+        if (result != nullptr && IsSilentProxyEnable(strUri)) {
             return result;
+        }
+        if (extUri.empty()) {
+            return nullptr;
         }
         Uri ext(extUri);
         return CreateExtHelper(ext, token);
@@ -120,6 +123,16 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateServiceHelper(const std:
         return nullptr;
     }
     return std::make_shared<DataShareHelperImpl>();
+}
+
+bool DataShareHelper::IsSilentProxyEnable(const std::string &uri)
+{
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("Service proxy is nullptr.");
+        return false;
+    }
+    return proxy->IsSilentProxyEnable(uri);
 }
 
 std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, const sptr<IRemoteObject> &token)

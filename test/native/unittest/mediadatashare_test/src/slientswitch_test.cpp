@@ -30,6 +30,8 @@ using namespace OHOS::Security::AccessToken;
 constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
 std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
 std::string SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB00/TBL00?Proxy=true";
+std::string DATA_SHARE_PROXY_URI = "datashare:///com.acts.ohos.data.datasharetest/test";
+constexpr int SUBSCRIBER_ID = 1000;
 std::string TBL_STU_NAME = "name";
 std::string TBL_STU_AGE = "age";
 int32_t ERROR = -1;
@@ -43,7 +45,8 @@ public:
     void TearDown();
 };
 
-std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t systemAbilityId, std::string uri)
+std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t systemAbilityId,
+    const std::string &silentProxyUri, const std::string &providerUri = "")
 {
     LOG_INFO("CreateDataShareHelper start");
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -56,7 +59,7 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t system
         LOG_ERROR("GetSystemAbility service failed.");
         return nullptr;
     }
-    return DataShare::DataShareHelper::Creator(remoteObj, uri);
+    return DataShare::DataShareHelper::Creator(remoteObj, silentProxyUri, providerUri);
 }
 
 void SlientSwitchTest::SetUpTestCase(void)
@@ -446,6 +449,84 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Delete_Test_002, TestSize.L
     retVal = helper->Delete(uri, deletePredicates);
     EXPECT_EQ((retVal > 0), true);
     LOG_INFO("SlientSwitch_SwitchEnable_Delete_Test_002::End");
+}
+
+HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_CreateHelper_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientSwitch_SwitchDisable_CreateHelper_Test_001::Start");
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI);
+    ASSERT_TRUE(helper != nullptr);
+
+    Uri uri("");
+    int retVal = DataShareHelper::SetSilentSwitch(uri, false);
+    EXPECT_EQ(retVal, E_OK);
+
+    helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI);
+    ASSERT_TRUE(helper == nullptr);
+    retVal = DataShareHelper::SetSilentSwitch(uri, true);
+    EXPECT_EQ(retVal, E_OK);
+    LOG_INFO("SlientSwitch_SwitchDisable_CreateHelper_Test_001::End");
+}
+
+Template GetTemplate()
+{
+    PredicateTemplateNode node1("p1", "select name0 as name from TBL00");
+    PredicateTemplateNode node2("p2", "select name1 as name from TBL00");
+    std::vector<PredicateTemplateNode> nodes;
+    nodes.emplace_back(node1);
+    nodes.emplace_back(node2);
+    Template tpl(nodes, "select name1 as name from TBL00");
+    return tpl;
+}
+
+HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_CreateHelper_Test_002, TestSize.Level0)
+{
+    LOG_INFO("SlientSwitch_SwitchDisable_CreateHelper_Test_002::Start");
+    Uri uri("");
+    int retVal = DataShareHelper::SetSilentSwitch(uri, false);
+    EXPECT_EQ(retVal, E_OK);
+
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI, DATA_SHARE_URI);
+    ASSERT_TRUE(helper != nullptr);
+
+    auto tpl = GetTemplate();
+    auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
+    EXPECT_EQ(result, ERROR);
+    retVal = DataShareHelper::SetSilentSwitch(uri, true);
+    EXPECT_EQ(retVal, E_OK);
+    LOG_INFO("SlientSwitch_SwitchDisable_CreateHelper_Test_002::End");
+}
+
+HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_CreateHelper_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientSwitch_SwitchEnable_CreateHelper_Test_001::Start");
+    Uri uri("");
+    int retVal = DataShareHelper::SetSilentSwitch(uri, true);
+    EXPECT_EQ(retVal, E_OK);
+
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI);
+    ASSERT_TRUE(helper != nullptr);
+
+    auto tpl = GetTemplate();
+    auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
+    EXPECT_EQ(result, E_BUNDLE_NAME_NOT_EXIST);
+    LOG_INFO("SlientSwitch_SwitchEnable_CreateHelper_Test_001::End");
+}
+
+HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_CreateHelper_Test_002, TestSize.Level0)
+{
+    LOG_INFO("SlientSwitch_SwitchEnable_CreateHelper_Test_002::Start");
+    Uri uri("");
+    int retVal = DataShareHelper::SetSilentSwitch(uri, true);
+    EXPECT_EQ(retVal, E_OK);
+
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI, DATA_SHARE_URI);
+    ASSERT_TRUE(helper != nullptr);
+
+    auto tpl = GetTemplate();
+    auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
+    EXPECT_EQ(result, E_BUNDLE_NAME_NOT_EXIST);
+    LOG_INFO("SlientSwitch_SwitchEnable_CreateHelper_Test_002::End");
 }
 } // namespace DataShare
 } // namespace OHOS
