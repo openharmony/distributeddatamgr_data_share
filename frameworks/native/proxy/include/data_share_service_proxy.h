@@ -71,6 +71,8 @@ public:
 
     int SetSilentSwitch(const Uri &uri, bool enable) override;
 
+    bool IsSilentProxyEnable(const std::string &uri) override;
+
 private:
     static inline BrokerDelegator<DataShareServiceProxy> delegator_;
 };
