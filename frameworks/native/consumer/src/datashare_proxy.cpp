@@ -144,7 +144,7 @@ int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
     int index = -1;
     MessageParcel data;
-    data.SetDataCapacity(MTU_SIZE);
+    data.SetMaxCapacity(MTU_SIZE);
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
         return index;
@@ -173,7 +173,7 @@ int DataShareProxy::InsertExt(const Uri &uri, const DataShareValuesBucket &value
 {
     int index = -1;
     MessageParcel data;
-    data.SetDataCapacity(MTU_SIZE);
+    data.SetMaxCapacity(MTU_SIZE);
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
         return index;
@@ -201,7 +201,7 @@ int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates
 {
     int index = -1;
     MessageParcel data;
-    data.SetDataCapacity(MTU_SIZE);
+    data.SetMaxCapacity(MTU_SIZE);
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
         return index;
@@ -229,7 +229,7 @@ int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates
 {
     int index = -1;
     MessageParcel data;
-    data.SetDataCapacity(MTU_SIZE);
+    data.SetMaxCapacity(MTU_SIZE);
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
         return index;
@@ -258,7 +258,6 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri, const 
     std::vector<std::string> &columns, DatashareBusinessError &businessError)
 {
     MessageParcel data;
-    data.SetDataCapacity(MTU_SIZE);
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
         return nullptr;
@@ -322,7 +321,7 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
     LOG_INFO("begin.");
     int ret = -1;
     MessageParcel data;
-    data.SetDataCapacity(MTU_SIZE);
+    data.SetMaxCapacity(MTU_SIZE);
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
         return ret;
@@ -351,7 +350,7 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
 int DataShareProxy::ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result)
 {
     MessageParcel data;
-    data.SetDataCapacity(MTU_SIZE);
+    data.SetMaxCapacity(MTU_SIZE);
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
         return -1;
