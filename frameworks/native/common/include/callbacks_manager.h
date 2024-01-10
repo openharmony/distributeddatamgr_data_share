@@ -225,12 +225,12 @@ std::vector<std::shared_ptr<Observer>> CallbacksManager<Key, Observer>::GetEnabl
 template<class Key, class Observer>
 std::vector<OperationResult> CallbacksManager<Key, Observer>::EnableObservers(
     const std::vector<Key> &keys, void *subscriber,
-    std::function<void(std::map<Key, std::vector<ObserverNodeOnEnabled>> &)> processOnLocalEnabled,
-    std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnFirstEnabled)
+    std::function<void(std::map<Key, std::vector<ObserverNodeOnEnabled>> &)> enableLocalFunc,
+    std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> enableServiceFunc)
 {
     std::vector<OperationResult> result;
-    std::vector<Key> firstRegisterKey;
-    std::map<Key, std::vector<ObserverNodeOnEnabled>> localEnabledObservers;
+    std::vector<Key> sendServiceKeys;
+    std::map<Key, std::vector<ObserverNodeOnEnabled>> refreshObservers;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
         for (auto &key : keys) {
@@ -239,35 +239,34 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::EnableObservers(
                 result.emplace_back(key, E_SUBSCRIBER_NOT_EXIST);
                 continue;
             }
-            std::vector<std::shared_ptr<Observer>> enabledObservers = GetEnabledObservers(key);
-            bool hasEnabled = false;
-            for (auto &item : callbacks_[key]) {
-                if (item.subscriber_ != subscriber) {
-                    continue;
+
+            auto& allObservers = it->second;
+            auto iterator = std::find_if(allObservers.begin(), allObservers.end(), [&subscriber](ObserverNode node) {
+                if (node.subscriber_ == subscriber) {
+                    return true;
                 }
-                hasEnabled = true;
-                if (item.enabled_) {
-                    continue;
-                }
-                localEnabledObservers[key].emplace_back(item.observer_, item.isNotifyOnEnabled_);
-                item.enabled_ = true;
-            }
-            if (!hasEnabled) {
+                return false;
+            });
+            if (iterator == allObservers.end()) {
                 result.emplace_back(key, E_SUBSCRIBER_NOT_EXIST);
                 continue;
             }
-            if (!enabledObservers.empty()) {
+            if (iterator->enabled_) {
                 result.emplace_back(key, E_OK);
                 continue;
             }
-            localEnabledObservers.erase(key);
-            firstRegisterKey.emplace_back(key);
+
+            std::vector<std::shared_ptr<Observer>> enabledObservers = GetEnabledObservers(key);
+            if (enabledObservers.empty()) {
+                sendServiceKeys.emplace_back(key);
+            }
+            refreshObservers[key].emplace_back(iterator->observer_, iterator->isNotifyOnEnabled_);
+            iterator->enabled_ = true;
         }
     }
-    if (!localEnabledObservers.empty()) {
-        processOnLocalEnabled(localEnabledObservers);
-    }
-    processOnFirstEnabled(firstRegisterKey, result);
+    enableServiceFunc(sendServiceKeys, result);
+    enableLocalFunc(refreshObservers);
+
     return result;
 }
 
