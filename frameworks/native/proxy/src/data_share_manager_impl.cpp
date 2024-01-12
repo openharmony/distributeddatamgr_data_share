@@ -66,7 +66,6 @@ sptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
         LOG_ERROR("new DataShareKvServiceProxy fail.");
         return nullptr;
     }
-    LOG_INFO("get distributed data manager success");
     return proxy;
 }
 

@@ -30,7 +30,6 @@ napi_value DataSharePredicatesProxy::GetConstructor(napi_env env)
         NAPI_CALL(env, napi_get_reference_value(env, constructor_, &cons));
         return cons;
     }
-    LOG_INFO("Get DataSharePredicates constructor");
     napi_property_descriptor descriptors[] = {
         DECLARE_NAPI_FUNCTION("equalTo", EqualTo),
         DECLARE_NAPI_FUNCTION("notEqualTo", NotEqualTo),

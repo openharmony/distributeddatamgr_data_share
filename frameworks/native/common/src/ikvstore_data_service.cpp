@@ -29,7 +29,6 @@ DataShareKvServiceProxy::DataShareKvServiceProxy(const sptr<IRemoteObject> &impl
 
 sptr<IRemoteObject> DataShareKvServiceProxy::GetFeatureInterface(const std::string &name)
 {
-    LOG_INFO("GetDataShareService enter.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareKvServiceProxy::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed");
