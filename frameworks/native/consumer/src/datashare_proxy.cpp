@@ -388,9 +388,7 @@ bool DataShareProxy::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbi
     MessageOption option;
     int32_t result = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_REGISTER_OBSERVER), data, reply, option);
-    if (result == ERR_NONE) {
-        LOG_DEBUG("SendRequest ok, retval is %{public}d", reply.ReadInt32());
-    } else {
+    if (result != ERR_NONE) {
         LOG_ERROR("SendRequest error, result=%{public}d", result);
         return false;
     }
@@ -413,9 +411,7 @@ bool DataShareProxy::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataA
     MessageOption option;
     int32_t result = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_UNREGISTER_OBSERVER), data, reply, option);
-    if (result == ERR_NONE) {
-        LOG_DEBUG("SendRequest ok, retval is %{public}d", reply.ReadInt32());
-    } else {
+    if (result != ERR_NONE) {
         LOG_ERROR("SendRequest error, result=%{public}d", result);
         return false;
     }
@@ -438,9 +434,7 @@ bool DataShareProxy::NotifyChange(const Uri &uri)
     MessageOption option;
     int32_t result = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_NOTIFY_CHANGE), data, reply, option);
-    if (result == ERR_NONE) {
-        LOG_DEBUG("SendRequest ok, retval is %{public}d", reply.ReadInt32());
-    } else {
+    if (result != ERR_NONE) {
         LOG_ERROR("SendRequest error, result=%{public}d", result);
         return false;
     }

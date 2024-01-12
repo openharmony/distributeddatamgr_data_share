@@ -75,7 +75,7 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
             return;
         }
         if (uvEntry->condition.wait_for(lock, std::chrono::seconds(WAIT_TIME), [uvEntry] { return uvEntry->done; })) {
-            LOG_DEBUG("function ended successfully");
+            LOG_INFO("function ended successfully");
         }
         if (!uvEntry->done && !uv_cancel((uv_req_t*)&work)) {
             LOG_ERROR("uv_cancel failed.");

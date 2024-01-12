@@ -59,7 +59,7 @@ void DataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &record
     const sptr<IRemoteObject> &token)
 {
     ExtensionBase<DataShareExtAbilityContext>::Init(record, application, handler, token);
-    LOG_DEBUG("DataShareExtAbility begin init context");
+    LOG_INFO("DataShareExtAbility begin init context");
 }
 
 std::vector<std::string> DataShareExtAbility::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)

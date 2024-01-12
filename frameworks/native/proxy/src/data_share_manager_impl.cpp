@@ -123,6 +123,7 @@ void DataShareManagerImpl::RegisterClientDeathObserver()
 
 DataShareManagerImpl::DataShareManagerImpl()
 {
+    LOG_INFO("construct");
     pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS);
     SetDeathCallback([](std::shared_ptr<DataShareServiceProxy> proxy) {
         LOG_INFO("RecoverObs start");
@@ -133,6 +134,7 @@ DataShareManagerImpl::DataShareManagerImpl()
 
 DataShareManagerImpl::~DataShareManagerImpl()
 {
+    LOG_INFO("destroy");
 }
 
 std::shared_ptr<DataShareServiceProxy> DataShareManagerImpl::GetProxy()
