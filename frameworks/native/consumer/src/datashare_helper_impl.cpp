@@ -177,7 +177,6 @@ int DataShareHelperImpl::ExecuteBatch(const std::vector<OperationStatement> &sta
 
 void DataShareHelperImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    LOG_INFO("Start");
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         return;
@@ -192,7 +191,6 @@ void DataShareHelperImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDa
 
 void DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    LOG_INFO("Start");
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         return;

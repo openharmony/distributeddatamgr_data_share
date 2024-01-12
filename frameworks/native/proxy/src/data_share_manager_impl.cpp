@@ -66,7 +66,6 @@ sptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
         LOG_ERROR("new DataShareKvServiceProxy fail.");
         return nullptr;
     }
-    LOG_INFO("get distributed data manager success");
     return proxy;
 }
 
@@ -124,7 +123,6 @@ void DataShareManagerImpl::RegisterClientDeathObserver()
 
 DataShareManagerImpl::DataShareManagerImpl()
 {
-    LOG_INFO("construct");
     pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS);
     SetDeathCallback([](std::shared_ptr<DataShareServiceProxy> proxy) {
         LOG_INFO("RecoverObs start");
@@ -135,7 +133,6 @@ DataShareManagerImpl::DataShareManagerImpl()
 
 DataShareManagerImpl::~DataShareManagerImpl()
 {
-    LOG_INFO("destroy");
 }
 
 std::shared_ptr<DataShareServiceProxy> DataShareManagerImpl::GetProxy()

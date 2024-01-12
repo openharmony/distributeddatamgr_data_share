@@ -282,7 +282,6 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri, const 
 
 std::string DataShareProxy::GetType(const Uri &uri)
 {
-    LOG_INFO("begin.");
     std::string type;
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
@@ -312,13 +311,11 @@ std::string DataShareProxy::GetType(const Uri &uri)
         return type;
     }
 
-    LOG_INFO("end successfully.");
     return type;
 }
 
 int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
-    LOG_INFO("begin.");
     int ret = -1;
     MessageParcel data;
     data.SetMaxCapacity(MTU_SIZE);
@@ -343,7 +340,6 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
         LOG_ERROR("fail to Unmarshal index");
         return ret;
     }
-    LOG_INFO("end successfully.");
     return ret;
 }
 
@@ -377,7 +373,6 @@ int DataShareProxy::ExecuteBatch(const std::vector<OperationStatement> &statemen
 
 bool DataShareProxy::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    LOG_INFO("begin.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
@@ -394,18 +389,16 @@ bool DataShareProxy::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbi
     int32_t result = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_REGISTER_OBSERVER), data, reply, option);
     if (result == ERR_NONE) {
-        LOG_INFO("SendRequest ok, retval is %{public}d", reply.ReadInt32());
+        LOG_DEBUG("SendRequest ok, retval is %{public}d", reply.ReadInt32());
     } else {
         LOG_ERROR("SendRequest error, result=%{public}d", result);
         return false;
     }
-    LOG_INFO("end.");
     return true;
 }
 
 bool DataShareProxy::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    LOG_INFO("begin.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
@@ -421,18 +414,16 @@ bool DataShareProxy::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataA
     int32_t result = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_UNREGISTER_OBSERVER), data, reply, option);
     if (result == ERR_NONE) {
-        LOG_INFO("SendRequest ok, retval is %{public}d", reply.ReadInt32());
+        LOG_DEBUG("SendRequest ok, retval is %{public}d", reply.ReadInt32());
     } else {
         LOG_ERROR("SendRequest error, result=%{public}d", result);
         return false;
     }
-    LOG_INFO("end successfully.");
     return true;
 }
 
 bool DataShareProxy::NotifyChange(const Uri &uri)
 {
-    LOG_INFO("begin.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
@@ -448,18 +439,16 @@ bool DataShareProxy::NotifyChange(const Uri &uri)
     int32_t result = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_NOTIFY_CHANGE), data, reply, option);
     if (result == ERR_NONE) {
-        LOG_INFO("SendRequest ok, retval is %{public}d", reply.ReadInt32());
+        LOG_DEBUG("SendRequest ok, retval is %{public}d", reply.ReadInt32());
     } else {
         LOG_ERROR("SendRequest error, result=%{public}d", result);
         return false;
     }
-    LOG_INFO("end successfully.");
     return true;
 }
 
 Uri DataShareProxy::NormalizeUri(const Uri &uri)
 {
-    LOG_INFO("begin.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
@@ -483,13 +472,11 @@ Uri DataShareProxy::NormalizeUri(const Uri &uri)
         LOG_ERROR("fail to Unmarshal index");
         return Uri("");
     }
-    LOG_INFO("end successfully.");
     return info;
 }
 
 Uri DataShareProxy::DenormalizeUri(const Uri &uri)
 {
-    LOG_INFO("begin.");
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
@@ -515,7 +502,6 @@ Uri DataShareProxy::DenormalizeUri(const Uri &uri)
         LOG_ERROR("fail to Unmarshal index");
         return Uri("");
     }
-    LOG_INFO("end successfully.");
     return info;
 }
 } // namespace DataShare

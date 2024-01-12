@@ -159,7 +159,6 @@ ErrCode DataShareStub::CmdInsert(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to WriteInt32 index");
         return ERR_INVALID_VALUE;
     }
-    LOG_INFO("DataShareStub::CmdInsertInner end");
     return DATA_SHARE_NO_ERROR;
 }
 

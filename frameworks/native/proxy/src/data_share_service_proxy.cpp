@@ -26,7 +26,6 @@ using InterfaceCode = OHOS::DistributedShare::DataShare::DataShareServiceInterfa
 DataShareServiceProxy::DataShareServiceProxy(const sptr<IRemoteObject> &object)
     : IRemoteProxy<IDataShareService>(object)
 {
-    LOG_INFO("Construct complete.");
 }
 
 int32_t DataShareServiceProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
