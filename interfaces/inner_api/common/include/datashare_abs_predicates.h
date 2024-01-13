@@ -26,9 +26,7 @@ namespace OHOS {
 namespace DataShare {
 class DataShareAbsPredicates {
 public:
-    struct JsProxy {
-        std::shared_ptr<DataShareAbsPredicates> predicates_;
-    };
+
     /**
      * @brief Destructor.
      */

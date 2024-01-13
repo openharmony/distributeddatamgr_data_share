@@ -31,22 +31,15 @@ config("datashare_public_config") {
 }
 
 datashare_common_include_dirs = [
-  "${datashare_common_napi_path}/include",
   "${datashare_common_native_path}/include",
   "${datashare_base_path}/interfaces/inner_api/common/include",
   "${datashare_base_path}/interfaces/inner_api/consumer/include",
   "${datashare_base_path}/interfaces/inner_api/provider/include",
   "${datashare_native_proxy_path}/include",
-  "${foundation_path}/communication/ipc/ipc/native/src/napi_common/include",
   "${kvstore_base_path}/frameworks/common",
 ]
 
 datashare_common_sources = [
-  "${datashare_common_napi_path}/src/datashare_error_impl.cpp",
-  "${datashare_common_napi_path}/src/datashare_js_utils.cpp",
-  "${datashare_common_napi_path}/src/datashare_predicates_proxy.cpp",
-  "${datashare_common_napi_path}/src/datashare_result_set_proxy.cpp",
-  "${datashare_common_napi_path}/src/napi_datashare_values_bucket.cpp",
   "${datashare_common_native_path}/src/datashare_abs_result_set.cpp",
   "${datashare_common_native_path}/src/datashare_block_writer_impl.cpp",
   "${datashare_common_native_path}/src/datashare_itypes_utils.cpp",
@@ -66,9 +59,7 @@ datashare_common_external_deps = [
   "hisysevent:libhisysevent",
   "hitrace:hitrace_meter",
   "hitrace:libhitracechain",
-  "ipc:ipc_napi",
   "ipc:ipc_single",
-  "napi:ace_napi",
 ]
 
 ohos_shared_library("datashare_common") {

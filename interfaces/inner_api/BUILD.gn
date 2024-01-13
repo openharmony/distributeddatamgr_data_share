@@ -40,7 +40,6 @@ config("datashare_public_config") {
     "common/include",
     "consumer/include",
     "provider/include",
-    "${datashare_common_napi_path}/include",
     "${datashare_common_native_path}/include",
     "${datashare_native_consumer_path}/controller/common",
     "${datashare_native_consumer_path}/controller/provider/include",
@@ -48,6 +47,7 @@ config("datashare_public_config") {
     "${datashare_native_consumer_path}/include",
     "${datashare_native_provider_path}/include",
     "${datashare_native_proxy_path}/include",
+    "${kvstore_common_path}",
     "${ability_runtime_inner_api_path}/dataobs_manager/include",
   ]
 }
@@ -82,7 +82,6 @@ datashare_consumer_external_deps = [
   "hilog:libhilog",
   "ipc:ipc_js",
   "ipc:ipc_single",
-  "napi:ace_napi",
   "samgr:samgr_proxy",
 ]
 
@@ -121,8 +120,10 @@ ohos_shared_library("datashare_provider") {
     cfi_cross_dso = true
     debug = false
   }
-  include_dirs =
-      [ "//foundation/distributeddatamgr/kv_store/frameworks/common" ]
+  include_dirs = [
+    "${datashare_common_napi_path}/include",
+    "${kvstore_common_path}",
+  ]
 
   sources = [
     "${datashare_native_provider_path}/src/datashare_ext_ability.cpp",
@@ -137,7 +138,10 @@ ohos_shared_library("datashare_provider") {
   public_configs = [ ":datashare_public_config" ]
   version_script = "provider/libdatashare_provider.map"
   innerapi_tags = [ "platformsdk" ]
-  deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
+  deps = [
+    "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_napi_path}/dataShare:datashare_jscommon",
+  ]
 
   external_deps = [
     "ability_base:want",
