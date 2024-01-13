@@ -411,7 +411,7 @@ std::vector<std::string> JsDataShareExtAbility::GetFileTypes(const Uri &uri, con
         return ret;
     }
     napi_value argv[] = {napiUri, napiMimeTypeFilter};
-    //represents this function has two parameters
+    //represents this function has 2 parameters
     CallObjectMethod("getFileTypes", argv, 2);
     napi_close_handle_scope(env, scope);
     return ret;
@@ -442,7 +442,7 @@ int JsDataShareExtAbility::OpenFile(const Uri &uri, const std::string &mode)
         return ret;
     }
     napi_value argv[] = {napiUri, napiMode};
-    //represents this function has two parameters
+    //represents this function has 2 parameters
     CallObjectMethod("openFile", argv, 2);
     napi_close_handle_scope(env, scope);
     return ret;
@@ -473,7 +473,7 @@ int JsDataShareExtAbility::OpenRawFile(const Uri &uri, const std::string &mode)
         return ret;
     }
     napi_value argv[] = {napiUri, napiMode};
-    //represents this function has two parameters
+    //represents this function has 2 parameters
     CallObjectMethod("openRawFile", argv, 2, false);
     napi_close_handle_scope(env, scope);
     return ret;
@@ -504,7 +504,7 @@ int JsDataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &v
         return ret;
     }
     napi_value argv[] = {napiUri, napiValue};
-    //represents this function has two parameters
+    //represents this function has 2 parameters
     CallObjectMethod("insert", argv, 2);
     napi_close_handle_scope(env, scope);
     return ret;
@@ -544,7 +544,7 @@ int JsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pre
     }
 
     napi_value argv[] = {napiUri, napiPredicates, napiValue};
-    //represents this function has three parameters
+    //represents this function has 3 parameters
     CallObjectMethod("update", argv, 3);
     napi_close_handle_scope(env, scope);
     return ret;
@@ -576,7 +576,7 @@ int JsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &pre
     }
 
     napi_value argv[] = {napiUri, napiPredicates};
-    //represents this function has two parameters
+    //represents this function has 2 parameters
     CallObjectMethod("delete", argv, 2);
     napi_close_handle_scope(env, scope);
     return ret;
@@ -617,7 +617,7 @@ std::shared_ptr<DataShareResultSet> JsDataShareExtAbility::Query(const Uri &uri,
     }
 
     napi_value argv[] = {napiUri, napiPredicates, napiColumns};
-    //represents this function has three parameters
+    //represents this function has 3 parameters
     CallObjectMethod("query", argv, 3);
     napi_close_handle_scope(env, scope);
     return ret;
@@ -641,7 +641,7 @@ std::string JsDataShareExtAbility::GetType(const Uri &uri)
         return ret;
     }
     napi_value argv[] = {napiUri};
-    //represents this function has one parameter
+    //represents this function has 1 parameter
     CallObjectMethod("getType", argv, 1);
     napi_close_handle_scope(env, scope);
     return ret;
@@ -691,7 +691,7 @@ int JsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataSha
         napi_set_element(env, napiValues, index++, result);
     }
     napi_value argv[] = {napiUri, napiValues};
-    //represents this function has two parameters
+    //represents this function has 2 parameters
     CallObjectMethod("batchInsert", argv, 2);
     napi_close_handle_scope(env, scope);
     return ret;
@@ -766,7 +766,7 @@ Uri JsDataShareExtAbility::NormalizeUri(const Uri &uri)
         return ret;
     }
     napi_value argv[] = {napiUri};
-    //represents this function has one parameter
+    //represents this function has 1 parameter
     CallObjectMethod("normalizeUri", argv, 1);
     napi_close_handle_scope(env, scope);
     return ret;
@@ -790,7 +790,7 @@ Uri JsDataShareExtAbility::DenormalizeUri(const Uri &uri)
         return ret;
     }
     napi_value argv[] = {napiUri};
-    //represents this function has one parameter
+    //represents this function has 1 parameter
     CallObjectMethod("denormalizeUri", argv, 1);
     napi_close_handle_scope(env, scope);
     return ret;
