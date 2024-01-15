@@ -89,7 +89,7 @@ napi_value DataSharePredicatesProxy::New(napi_env env, napi_callback_info info)
             LOG_ERROR("DataSharePredicatesProxy::New new DataSharePredicatesProxy error.");
             return nullptr;
         }
-        proxy->predicates_ = std::make_shared<DataSharePredicates>();
+        proxy->SetInstance(std::make_shared<DataSharePredicates>());
         napi_status ret = napi_wrap(env, thiz, proxy, DataSharePredicatesProxy::Destructor, nullptr, nullptr);
         if (ret != napi_ok) {
             delete proxy;
@@ -132,7 +132,7 @@ napi_value DataSharePredicatesProxy::NewInstance(napi_env env, std::shared_ptr<D
         LOG_ERROR("native instance is nullptr! napi_status:%{public}d!", status);
         return instance;
     }
-    proxy->predicates_ = std::move(value);
+    proxy->SetInstance(value);
     return instance;
 }
 
@@ -145,7 +145,7 @@ std::shared_ptr<DataShareAbsPredicates> DataSharePredicatesProxy::GetNativePredi
     }
     DataSharePredicatesProxy *proxy = nullptr;
     napi_unwrap(env, arg, reinterpret_cast<void **>(&proxy));
-    return proxy->predicates_;
+    return proxy->GetInstance();
 }
 
 void DataSharePredicatesProxy::Destructor(napi_env env, void *nativeObject, void *)
@@ -156,7 +156,7 @@ void DataSharePredicatesProxy::Destructor(napi_env env, void *nativeObject, void
 
 DataSharePredicatesProxy::~DataSharePredicatesProxy()
 {
-    predicates_ = nullptr;
+    SetInstance(nullptr);
 }
 
 DataSharePredicatesProxy::DataSharePredicatesProxy()
@@ -170,7 +170,7 @@ std::shared_ptr<DataShareAbsPredicates> DataSharePredicatesProxy::GetNativePredi
     napi_value thiz;
     napi_get_cb_info(env, info, nullptr, nullptr, &thiz, nullptr);
     napi_unwrap(env, thiz, reinterpret_cast<void **>(&predicatesProxy));
-    return predicatesProxy->predicates_;
+    return predicatesProxy->GetInstance();
 }
 
 napi_value DataSharePredicatesProxy::EqualTo(napi_env env, napi_callback_info info)

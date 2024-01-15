@@ -16,7 +16,7 @@
 #include "datashare_js_utils.h"
 
 #include "datashare_log.h"
-#include "napi_ashmem.h"
+#include "napi/native_common.h"
 #include "securec.h"
 
 namespace OHOS {

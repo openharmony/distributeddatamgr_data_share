@@ -18,13 +18,14 @@
 
 #include <memory>
 #include "datashare_abs_predicates.h"
+#include "js_proxy.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
 
 namespace OHOS {
 namespace DataShare {
-class DataSharePredicatesProxy : private DataShareAbsPredicates::JsProxy {
+class DataSharePredicatesProxy : public JSProxy::JSProxy<DataShareAbsPredicates> {
 public:
     static void Init(napi_env env, napi_value exports);
     static napi_value NewInstance(napi_env env, std::shared_ptr<DataShareAbsPredicates> value);

@@ -14,6 +14,45 @@
 import("//build/ohos.gni")
 import("//foundation/distributeddatamgr/data_share/datashare.gni")
 
+ohos_shared_library("datashare_jscommon") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  include_dirs = [
+    "${datashare_common_native_path}/include",
+    "${datashare_common_napi_path}/include",
+    "${kvstore_common_path}",
+  ]
+
+  sources = [
+    "${datashare_common_napi_path}/src/datashare_js_utils.cpp",
+    "${datashare_common_napi_path}/src/datashare_predicates_proxy.cpp",
+    "${datashare_common_napi_path}/src/napi_datashare_values_bucket.cpp",
+  ]
+
+  deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
+
+  version_script = "libdatashare_jscommon.map"
+
+  external_deps = [
+    "ability_base:zuri",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "hitrace:libhitracechain",
+    "ipc:ipc_napi",
+    "ipc:ipc_single",
+    "napi:ace_napi",
+  ]
+
+  subsystem_name = "distributeddatamgr"
+  part_name = "data_share"
+}
+
 ohos_shared_library("datashare") {
   branch_protector_ret = "pac_ret"
   sanitize = {
@@ -29,6 +68,8 @@ ohos_shared_library("datashare") {
   ]
 
   sources = [
+    "${datashare_common_napi_path}/src/datashare_error_impl.cpp",
+    "${datashare_common_napi_path}/src/datashare_result_set_proxy.cpp",
     "${datashare_napi_path}/dataShare/src/async_call.cpp",
     "${datashare_napi_path}/dataShare/src/napi_datashare_helper.cpp",
     "${datashare_napi_path}/dataShare/src/napi_datashare_inner_observer.cpp",
@@ -39,6 +80,7 @@ ohos_shared_library("datashare") {
   ]
 
   deps = [
+    ":datashare_jscommon",
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
     "//third_party/libuv:uv",
@@ -77,12 +119,10 @@ ohos_shared_library("datasharepredicates") {
     "${datashare_common_native_path}/include",
   ]
 
-  sources = [
-    "${datashare_common_napi_path}/src/datashare_predicates_proxy.cpp",
-    "${datashare_napi_path}/dataShare/src/native_datashare_predicates_module.cpp",
-  ]
+  sources = [ "${datashare_napi_path}/dataShare/src/native_datashare_predicates_module.cpp" ]
 
   deps = [
+    ":datashare_jscommon",
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
   ]
