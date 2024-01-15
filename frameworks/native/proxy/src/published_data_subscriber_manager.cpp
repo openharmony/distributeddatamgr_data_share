@@ -196,11 +196,16 @@ void PublishedDataSubscriberManager::RecoverObservers(std::shared_ptr<DataShareS
     }
 
     std::map<int64_t, std::vector<std::string>> keysMap;
-    BaseCallbacks::RecoverObservers([&keysMap](const std::vector<Key> &Keys) {
-        for (const auto &key : Keys) {
+    std::vector<Key> keys;;
+    std::lock_guard<std::mutex> lock(mutex_);
+    {
+        for (auto& it : lastChangeNodeMap_) {
+            keys.emplace_back(it.first);
+        }
+        for (const auto& key : keys) {
             keysMap[key.subscriberId_].emplace_back(key.uri_);
         }
-    });
+    }
 
     for (const auto &[subscriberId, uris] : keysMap) {
         auto results = proxy->SubscribePublishedData(uris, subscriberId, serviceCallback_);

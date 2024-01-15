@@ -201,18 +201,23 @@ void RdbSubscriberManager::RecoverObservers(std::shared_ptr<DataShareServiceProx
         return;
     }
     std::map<TemplateId, std::vector<std::string>> keysMap;
-    BaseCallbacks::RecoverObservers([&keysMap](const std::vector<Key>& Keys) {
-        for (const auto& key : Keys) {
+    std::vector<Key> keys;
+    std::lock_guard<std::mutex> lock(mutex_);
+    {
+        for (auto& it : lastChangeNodeMap_) {
+            keys.emplace_back(it.first);
+        }
+        for (const auto& key : keys) {
             keysMap[key.templateId_].emplace_back(key.uri_);
         }
-    });
+    }
 
     for (const auto& [templateId, uris] : keysMap) {
         auto results = proxy->SubscribeRdbData(uris, templateId, serviceCallback_);
         for (const auto& result : results) {
             if (result.errCode_ != E_OK) {
-                LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d",
-                    result.key_.c_str(),result.errCode_);
+                LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d", result.key_.c_str(),
+                    result.errCode_);
             }
         }
     }

@@ -59,7 +59,6 @@ public:
 
     int GetEnabledSubscriberSize();
     int GetEnabledSubscriberSize(const Key &key);
-    void RecoverObservers(std::function<void(const std::vector<Key> &)> recoverObservers);
 
     void SetObserversNotifiedOnEnabled(const Key &key);
 
@@ -114,20 +113,6 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::AddObservers(const
     processOnFirstAdd(firstRegisterKey, observer, result);
     return result;
 }
-
-template<class Key, class Observer>
-void CallbacksManager<Key, Observer>::RecoverObservers(std::function<void(const std::vector<Key> &)> recoverObservers)
-{
-    std::vector<Key> keys;
-    {
-        std::lock_guard<decltype(mutex_)> lck(mutex_);
-        for (auto &it : callbacks_) {
-            keys.emplace_back(it.first);
-        }
-    }
-    recoverObservers(keys);
-}
-
 
 template<class Key, class Observer>
 void CallbacksManager<Key, Observer>::DelLocalObservers(void *subscriber, std::vector<Key> &lastDelKeys,
