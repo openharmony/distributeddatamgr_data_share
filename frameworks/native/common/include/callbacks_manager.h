@@ -59,8 +59,7 @@ public:
 
     int GetEnabledSubscriberSize();
     int GetEnabledSubscriberSize(const Key &key);
-    void RecoverObservers(std::function<void(const std::vector<Key> &)> recoverObservers);
-
+    std::vector<Key> GetKeys();
     void SetObserversNotifiedOnEnabled(const Key &key);
 
 private:
@@ -116,7 +115,7 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::AddObservers(const
 }
 
 template<class Key, class Observer>
-void CallbacksManager<Key, Observer>::RecoverObservers(std::function<void(const std::vector<Key> &)> recoverObservers)
+std::vector<Key> CallbacksManager<Key, Observer>::GetKeys()
 {
     std::vector<Key> keys;
     {
@@ -125,9 +124,8 @@ void CallbacksManager<Key, Observer>::RecoverObservers(std::function<void(const 
             keys.emplace_back(it.first);
         }
     }
-    recoverObservers(keys);
+    return keys;
 }
-
 
 template<class Key, class Observer>
 void CallbacksManager<Key, Observer>::DelLocalObservers(void *subscriber, std::vector<Key> &lastDelKeys,

@@ -194,21 +194,21 @@ void PublishedDataSubscriberManager::RecoverObservers(std::shared_ptr<DataShareS
         LOG_ERROR("proxy is nullptr");
         return;
     }
-    return BaseCallbacks::RecoverObservers([&proxy, this](const std::vector<Key> &Keys) {
-        std::map<int64_t, std::vector<std::string>> keysMap;
-        for (auto const &key : Keys) {
-            keysMap[key.subscriberId_].emplace_back(key.uri_);
-        }
-        for (auto const &[subscriberId, uris] : keysMap) {
-            auto results = proxy->SubscribePublishedData(uris, subscriberId, serviceCallback_);
-            for (const auto& result : results) {
-                if (result.errCode_ != E_OK) {
-                    LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d",
-                        result.key_.c_str(), result.errCode_);
-                }
+
+    std::map<int64_t, std::vector<std::string>> keysMap;
+    std::vector<Key> keys = CallbacksManager::GetKeys();
+    for (const auto& key : keys) {
+        keysMap[key.subscriberId_].emplace_back(key.uri_);
+    }
+    for (const auto &[subscriberId, uris] : keysMap) {
+        auto results = proxy->SubscribePublishedData(uris, subscriberId, serviceCallback_);
+        for (const auto& result : results) {
+            if (result.errCode_ != E_OK) {
+                LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d",
+                         result.key_.c_str(), result.errCode_);
             }
         }
-    });
+    }
 }
 
 void PublishedDataSubscriberManager::Emit(PublishedDataChangeNode &changeNode)

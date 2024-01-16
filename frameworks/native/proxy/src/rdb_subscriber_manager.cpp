@@ -200,21 +200,20 @@ void RdbSubscriberManager::RecoverObservers(std::shared_ptr<DataShareServiceProx
         LOG_ERROR("proxy is nullptr");
         return;
     }
-    return BaseCallbacks::RecoverObservers([&proxy, this](const std::vector<Key> &Keys) {
-        std::map<TemplateId, std::vector<std::string>> keysMap;
-        for (auto const &key : Keys) {
-            keysMap[key.templateId_].emplace_back(key.uri_);
-        }
-        for (auto const &[templateId, uris] : keysMap) {
-            auto results = proxy->SubscribeRdbData(uris, templateId, serviceCallback_);
-            for (const auto& result : results) {
-                if (result.errCode_ != E_OK) {
-                    LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d",
-                        result.key_.c_str(), result.errCode_);
-                }
+    std::map<TemplateId, std::vector<std::string>> keysMap;
+    std::vector<Key> keys = CallbacksManager::GetKeys();
+    for (const auto& key : keys) {
+        keysMap[key.templateId_].emplace_back(key.uri_);
+    }
+    for (const auto& [templateId, uris] : keysMap) {
+        auto results = proxy->SubscribeRdbData(uris, templateId, serviceCallback_);
+        for (const auto& result : results) {
+            if (result.errCode_ != E_OK) {
+                LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d", result.key_.c_str(),
+                    result.errCode_);
             }
         }
-    });
+    }
 }
 
 void RdbSubscriberManager::Emit(const RdbChangeNode &changeNode)
