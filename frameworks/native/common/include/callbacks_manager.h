@@ -115,12 +115,12 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::AddObservers(const
 }
 
 template<class Key, class Observer>
-std::vector<Key> & CallbacksManager<Key, Observer>::GetKeys()
+std::vector<Key>& CallbacksManager<Key, Observer>::GetKeys()
 {
     std::vector<Key> keys;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
-        for (auto& it : callbacks_) {
+        for (auto &it : callbacks_) {
             keys.emplace_back(it.first);
         }
     }
