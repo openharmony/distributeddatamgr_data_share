@@ -100,7 +100,6 @@ private:
     void Destroy();
     sptr<RdbObserverStub> serviceCallback_;
     std::map<Key, RdbChangeNode> lastChangeNodeMap_;
-    std::mutex mutex_;
 };
 } // namespace DataShare
 } // namespace OHOS

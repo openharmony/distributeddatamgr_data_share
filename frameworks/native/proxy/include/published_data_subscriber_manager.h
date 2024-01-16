@@ -99,7 +99,6 @@ private:
     void Destroy();
     sptr<PublishedDataObserverStub> serviceCallback_;
     std::map<Key, PublishedDataChangeNode> lastChangeNodeMap_;
-    std::mutex mutex_;
 };
 } // namespace DataShare
 } // namespace OHOS
