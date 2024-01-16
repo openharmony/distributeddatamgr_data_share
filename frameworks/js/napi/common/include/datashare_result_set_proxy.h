@@ -18,13 +18,14 @@
 
 #include <memory>
 #include "datashare_result_set.h"
+#include "js_proxy.h"
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
 
 namespace OHOS {
 namespace DataShare {
-class DataShareResultSetProxy final {
+class DataShareResultSetProxy final : public JSProxy::JSProxy<DataShareResultSet> {
 public:
     DataShareResultSetProxy() = default;
     ~DataShareResultSetProxy();
@@ -58,8 +59,6 @@ private:
     static napi_value GetColumnCount(napi_env env, napi_callback_info info);
     static napi_value GetRowCount(napi_env env, napi_callback_info info);
     static napi_value IsClosed(napi_env env, napi_callback_info info);
-
-    std::shared_ptr<DataShareResultSet> resultSet_;
 };
 } // namespace DataShare
 } // namespace OHOS
