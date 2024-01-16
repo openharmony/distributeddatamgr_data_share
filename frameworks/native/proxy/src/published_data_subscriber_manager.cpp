@@ -195,9 +195,8 @@ void PublishedDataSubscriberManager::RecoverObservers(std::shared_ptr<DataShareS
         return;
     }
 
-    std::vector<Key> keys;
     std::map<int64_t, std::vector<std::string>> keysMap;
-    CallbacksManager::GetKeys(keys);
+    std::vector<Key> keys = CallbacksManager::GetKeys();
     for (const auto& key : keys) {
         keysMap[key.subscriberId_].emplace_back(key.uri_);
     }

@@ -59,7 +59,7 @@ public:
 
     int GetEnabledSubscriberSize();
     int GetEnabledSubscriberSize(const Key &key);
-    void GetKeys(std::vector<Key> &keys);
+    std::vector<Key> &GetKeys();
     void SetObserversNotifiedOnEnabled(const Key &key);
 
 private:
@@ -115,14 +115,17 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::AddObservers(const
 }
 
 template<class Key, class Observer>
-void CallbacksManager<Key, Observer>::GetKeys(std::vector<Key> &keys)
+std::vector<Key> & CallbacksManager<Key, Observer>::GetKeys()
 {
-    std::lock_guard<decltype(mutex_)> lck(mutex_);
-    for (auto& it : callbacks_) {
-        keys.emplace_back(it.first);
+    std::vector<Key> keys;
+    {
+        std::lock_guard<decltype(mutex_)> lck(mutex_);
+        for (auto& it : callbacks_) {
+            keys.emplace_back(it.first);
+        }
     }
+    return keys;
 }
-
 
 template<class Key, class Observer>
 void CallbacksManager<Key, Observer>::DelLocalObservers(void *subscriber, std::vector<Key> &lastDelKeys,

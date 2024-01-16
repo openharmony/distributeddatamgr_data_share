@@ -200,9 +200,8 @@ void RdbSubscriberManager::RecoverObservers(std::shared_ptr<DataShareServiceProx
         LOG_ERROR("proxy is nullptr");
         return;
     }
-    std::vector<Key> keys;
     std::map<TemplateId, std::vector<std::string>> keysMap;
-    CallbacksManager::GetKeys(keys);
+    std::vector<Key> keys = CallbacksManager::GetKeys();
     for (const auto& key : keys) {
         keysMap[key.templateId_].emplace_back(key.uri_);
     }
