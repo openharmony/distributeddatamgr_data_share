@@ -59,7 +59,7 @@ public:
 
     int GetEnabledSubscriberSize();
     int GetEnabledSubscriberSize(const Key &key);
-    std::vector<Key> &GetKeys();
+    std::vector<Key> GetKeys();
     void SetObserversNotifiedOnEnabled(const Key &key);
 
 private:
@@ -115,7 +115,7 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::AddObservers(const
 }
 
 template<class Key, class Observer>
-std::vector<Key>& CallbacksManager<Key, Observer>::GetKeys()
+std::vector<Key> CallbacksManager<Key, Observer>::GetKeys()
 {
     std::vector<Key> keys;
     {
