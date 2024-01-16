@@ -64,7 +64,7 @@ std::shared_ptr<DataShareResultSet> DataShareResultSetProxy::GetNativeObject(
         LOG_ERROR("proxy is null.");
         return nullptr;
     }
-    return proxy->resultSet_;
+    return proxy->GetInstance();
 }
 
 napi_value DataShareResultSetProxy::GetConstructor(napi_env env)
@@ -129,25 +129,25 @@ napi_value DataShareResultSetProxy::Initialize(napi_env env, napi_callback_info 
 DataShareResultSetProxy::~DataShareResultSetProxy()
 {
     LOG_DEBUG("DataShareResultSetProxy destructor!");
-    if (resultSet_ != nullptr && !resultSet_->IsClosed()) {
-        resultSet_->Close();
+    if (GetInstance() != nullptr && !GetInstance()->IsClosed()) {
+        GetInstance()->Close();
     }
 }
 
 DataShareResultSetProxy::DataShareResultSetProxy(std::shared_ptr<DataShareResultSet> resultSet)
 {
-    if (resultSet_ == resultSet) {
+    if (GetInstance() == resultSet) {
         return;
     }
-    resultSet_ = std::move(resultSet);
+    SetInstance(resultSet);
 }
 
 DataShareResultSetProxy &DataShareResultSetProxy::operator=(std::shared_ptr<DataShareResultSet> resultSet)
 {
-    if (resultSet_ == resultSet) {
+    if (GetInstance() == resultSet) {
         return *this;
     }
-    resultSet_ = std::move(resultSet);
+    SetInstance(resultSet);
     return *this;
 }
 
@@ -158,7 +158,7 @@ std::shared_ptr<DataShareResultSet> DataShareResultSetProxy::GetInnerResultSet(n
     napi_value self = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &self, nullptr);
     napi_unwrap(env, self, reinterpret_cast<void **>(&resultSet));
-    return resultSet->resultSet_;
+    return resultSet->GetInstance();
 }
 
 napi_value DataShareResultSetProxy::GoToFirstRow(napi_env env, napi_callback_info info)
@@ -357,13 +357,13 @@ napi_value DataShareResultSetProxy::Close(napi_env env, napi_callback_info info)
     if (resultSet == nullptr) {
         return DataShareJSUtils::Convert2JSValue(env, (errCode == E_OK));
     }
-    auto innerResultSet = resultSet->resultSet_;
+    auto innerResultSet = resultSet->GetInstance();
     if (innerResultSet != nullptr) {
         errCode = innerResultSet->Close();
         if (errCode != E_OK) {
             LOG_ERROR("failed code:%{public}d", errCode);
         }
-        resultSet->resultSet_ = nullptr;
+        resultSet->SetInstance(nullptr);
     } else {
         LOG_ERROR("GetInnerResultSet failed.");
     }
