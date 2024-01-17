@@ -262,18 +262,25 @@ void PublishedDataSubscriberManager::EmitOnEnable(std::map<Key, std::vector<Obse
         if (it == lastChangeNodeMap_.end()) {
             continue;
         }
-        for (auto &data : it->second.datas_) {
-            PublishedObserverMapKey mapKey(data.key_, data.subscriberId_);
-            for (auto &obs : obsVector) {
-                if (obs.isNotifyOnEnabled_) {
-                    results[obs.observer_].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
-                    results[obs.observer_].ownerBundleName_ = it->second.ownerBundleName_;
-                }
-            }
-        }
+        ProcessData(it->second, obsVector, results);
     }
     for (auto &[callback, node] : results) {
         callback->OnChange(node);
+    }
+}
+
+void PublishedDataSubscriberManager::ProcessData(const PublishedDataChangeNode& lastChangeNode,
+    const std::vector<ObserverNodeOnEnabled>& obsVector,
+    std::map<std::shared_ptr<Observer>, PublishedDataChangeNode>& results)
+{
+    for (auto& data : lastChangeNode.datas_) {
+        PublishedObserverMapKey mapKey(data.key_, data.subscriberId_);
+        for (auto& obs : obsVector) {
+            if (obs.isNotifyOnEnabled_) {
+                results[obs.observer_].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
+                results[obs.observer_].ownerBundleName_ = lastChangeNode.ownerBundleName_;
+            }
+        }
     }
 }
 
