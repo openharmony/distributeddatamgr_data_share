@@ -460,6 +460,7 @@ napi_value DataSharePredicatesProxy::Between(napi_env env, napi_callback_info in
     size_t argc = 3;
     napi_value args[3] = { 0 };
     napi_get_cb_info(env, info, &argc, args, &thiz, nullptr);
+    //'argc > 2' represents determine if 'argc' is greater than '2'
     NAPI_ASSERT(env, argc > 2, "Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
     std::string low = DataShareJSUtils::ConvertAny2String(env, args[1]);
@@ -479,6 +480,7 @@ napi_value DataSharePredicatesProxy::NotBetween(napi_env env, napi_callback_info
     size_t argc = 3;
     napi_value args[3] = { 0 };
     napi_get_cb_info(env, info, &argc, args, &thiz, nullptr);
+    //'argc > 2' represents determine if 'argc' is greater than '2'
     NAPI_ASSERT(env, argc > 2, "Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
     std::string low = DataShareJSUtils::ConvertAny2String(env, args[1]);
