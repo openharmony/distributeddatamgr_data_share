@@ -94,8 +94,6 @@ public:
 private:
     void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
     void EmitOnEnable(std::map<Key, std::vector<ObserverNodeOnEnabled>> &obsMap);
-    void ProcessData(const PublishedDataChangeNode& lastChangeNode, const std::vector<ObserverNodeOnEnabled>& obsVector,
-        std::map<std::shared_ptr<Observer>, PublishedDataChangeNode>& results);
     PublishedDataSubscriberManager();
     bool Init();
     void Destroy();
