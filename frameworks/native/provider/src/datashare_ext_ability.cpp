@@ -43,7 +43,7 @@ DataShareExtAbility* DataShareExtAbility::Create(const std::unique_ptr<Runtime>&
         return creator_(runtime);
     }
 
-    LOG_INFO("DataShareExtAbility::Create runtime");
+    LOG_DEBUG("DataShareExtAbility::Create runtime");
     switch (runtime->GetLanguage()) {
         case Runtime::Language::JS:
             return JsDataShareExtAbility::Create(runtime);
@@ -59,7 +59,7 @@ void DataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &record
     const sptr<IRemoteObject> &token)
 {
     ExtensionBase<DataShareExtAbilityContext>::Init(record, application, handler, token);
-    LOG_INFO("DataShareExtAbility begin init context");
+    LOG_DEBUG("DataShareExtAbility begin init context");
 }
 
 std::vector<std::string> DataShareExtAbility::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
