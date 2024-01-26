@@ -228,8 +228,10 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
             value = os.str();
         }
         return E_OK;
+    } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB) {
+        return E_ERROR;
     } else {
-        LOG_ERROR("GetString is failed! type is: %{pbulic}d", type);
+        LOG_ERROR("GetString is failed!");
         return E_ERROR;
     }
 }
