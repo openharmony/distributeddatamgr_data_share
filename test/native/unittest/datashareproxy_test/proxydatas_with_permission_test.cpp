@@ -245,6 +245,34 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_002, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_Publish_Test_002::End");
 }
 
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_003, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_Publish_Test_003::Start");
+    auto helper = dataShareHelper;
+    Data data;
+    std::vector<uint8_t> buffer= {10, 20, 30};
+    data.datas_.emplace_back("datashareproxy://com.acts.ohos.data.datasharetest/test", SUBSCRIBER_ID, buffer);
+    std::string bundleName = "com.acts.ohos.data.datasharetest";
+    std::vector<OperationResult> results = helper->Publish(data, bundleName);
+    EXPECT_EQ(results.size(), data.datas_.size());
+    for (auto const &result : results) {
+        EXPECT_EQ(result.errCode_, 0);
+    }
+
+    int errCode = 0;
+    auto getData = helper->GetPublishedData(bundleName, errCode);
+    EXPECT_EQ(errCode, 0);
+    EXPECT_EQ(getData.datas_.size(), data.datas_.size());
+    for (auto &publishedDataItem : getData.datas_) {
+        EXPECT_EQ(publishedDataItem.subscriberId_, SUBSCRIBER_ID);
+        bool isAshmem = publishedDataItem.IsAshmem();
+        EXPECT_EQ(isAshmem, true);
+        auto value = publishedDataItem.GetData();
+        EXPECT_EQ(std::get<std::vector<uint8_t>>(value)[0], buffer[0]);
+    }
+    LOG_INFO("ProxyDatasTest_Publish_Test_003::End");
+}
+
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Level0)
 {
     LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_001::Start");
