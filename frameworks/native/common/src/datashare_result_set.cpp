@@ -114,7 +114,6 @@ int DataShareResultSet::GetDataType(int columnIndex, DataType &dataType)
     AppDataFwk::SharedBlock::CellUnit *cellUnit =
         sharedBlock_->GetCellUnit(static_cast<uint32_t>(rowPos_) - startRowPos_, static_cast<uint32_t>(columnIndex));
     if (!cellUnit) {
-        LOG_ERROR("cellUnit is null!");
         return E_ERROR;
     }
     dataType = (DataType)cellUnit->type;
@@ -170,7 +169,6 @@ int DataShareResultSet::GetBlob(int columnIndex, std::vector<uint8_t> &value)
 
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
-        LOG_ERROR("cellUnit is null!");
         return E_ERROR;
     }
 
@@ -207,7 +205,6 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
     }
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
-        LOG_ERROR("cellUnit is null!");
         return E_ERROR;
     }
     int type = cellUnit->type;
@@ -244,7 +241,6 @@ int DataShareResultSet::GetInt(int columnIndex, int &value)
     }
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
-        LOG_ERROR("cellUnit is null!");
         return E_ERROR;
     }
     value = (int)cellUnit->cell.longValue;
@@ -259,7 +255,6 @@ int DataShareResultSet::GetLong(int columnIndex, int64_t &value)
     }
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
-        LOG_ERROR("cellUnit is null!");
         return E_ERROR;
     }
 
@@ -296,7 +291,6 @@ int DataShareResultSet::GetDouble(int columnIndex, double &value)
     }
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
-        LOG_ERROR("cellUnit is null!");
         return E_ERROR;
     }
     int type = cellUnit->type;
@@ -332,7 +326,6 @@ int DataShareResultSet::IsColumnNull(int columnIndex, bool &isNull)
     }
     AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
-        LOG_ERROR("cellUnit is null!");
         return E_ERROR;
     }
     if (cellUnit->type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
