@@ -295,10 +295,7 @@ napi_value DataShareResultSetProxy::GetString(napi_env env, napi_callback_info i
     NAPI_CALL(env, napi_get_value_int32(env, args[0], &columnIndex));
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
-        int errCode = innerResultSet->GetString(columnIndex, value);
-        if (errCode != E_OK) {
-            LOG_ERROR("failed code:%{public}d", errCode);
-        }
+        innerResultSet->GetString(columnIndex, value);
     } else {
         LOG_ERROR("GetInnerResultSet failed.");
     }
