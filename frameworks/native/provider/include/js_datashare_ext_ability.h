@@ -316,6 +316,7 @@ private:
         bool isAsync = true);
     napi_value CallObjectMethod(
         const char *name, napi_value const *argv, size_t argc, std::shared_ptr<AsyncContext> asyncContext);
+    void SaveNewCallingInfo(napi_env &env);
     void GetSrcPath(std::string &srcPath);
     napi_value MakePredicates(napi_env env, const DataSharePredicates &predicates);
     static napi_value AsyncCallback(napi_env env, napi_callback_info info);
@@ -328,6 +329,7 @@ private:
     static std::string UnWrapProperty(napi_env env, napi_value info, const std::string &key);
     int32_t InitAsyncCallParams(size_t argc, napi_env &env, napi_value *args);
 
+    static constexpr int ACTIVE_INVOKER = 1;
     JsRuntime& jsRuntime_;
     std::unique_ptr<NativeReference> jsObj_;
     bool isRecvReply_ = false;
