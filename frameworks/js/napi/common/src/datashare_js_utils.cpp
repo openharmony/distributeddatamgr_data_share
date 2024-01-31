@@ -662,11 +662,7 @@ bool DataShareJSUtils::UnwrapStringByPropertyName(
 {
     napi_value jsResult = nullptr;
     auto status = napi_get_named_property(env, jsObject, propertyName, &jsResult);
-    if (status != napi_ok) {
-        LOG_ERROR("Convert bundleNameOfOwner failed");
-        return false;
-    }
-    if (jsResult == nullptr) {
+    if ((status != napi_ok) || (jsResult == nullptr)) {
         LOG_ERROR("Convert bundleNameOfOwner failed");
         return false;
     }

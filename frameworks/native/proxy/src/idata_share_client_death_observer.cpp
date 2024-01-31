@@ -20,12 +20,12 @@ namespace OHOS {
 namespace DataShare {
 DataShareClientDeathObserverStub::DataShareClientDeathObserverStub()
 {
-    LOG_INFO("this client death observer");
+    LOG_DEBUG("this client death observer");
 }
 
 DataShareClientDeathObserverStub::~DataShareClientDeathObserverStub()
 {
-    LOG_INFO("destructor this client death observer");
+    LOG_DEBUG("destructor this client death observer");
 }
 }
 }

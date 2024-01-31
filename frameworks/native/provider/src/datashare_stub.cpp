@@ -74,7 +74,7 @@ int DataShareStub::OnRemoteRequest(uint32_t code, MessageParcel& data, MessagePa
         return (this->*(itFunc->second))(data, reply);
     }
 
-    LOG_INFO("remote request unhandled: %{public}d", code);
+    LOG_DEBUG("remote request unhandled: %{public}d", code);
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
 
