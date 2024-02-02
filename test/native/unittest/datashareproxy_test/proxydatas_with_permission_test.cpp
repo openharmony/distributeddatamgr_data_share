@@ -266,7 +266,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_003, TestSize.Level0)
     for (auto &publishedDataItem : getData.datas_) {
         EXPECT_EQ(publishedDataItem.subscriberId_, SUBSCRIBER_ID);
         bool isAshmem = publishedDataItem.IsAshmem();
-        EXPECT_EQ(isAshmem, true);
+        EXPECT_TRUE(isAshmem);
         auto value = publishedDataItem.GetData();
         EXPECT_EQ(std::get<std::vector<uint8_t>>(value)[0], buffer[0]);
     }
