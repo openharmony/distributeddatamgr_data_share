@@ -17,32 +17,15 @@
 
 namespace OHOS {
 namespace DataShare {
-std::string DataShareStringUtils::SurroundWithQuote(std::string value, std::string quote)
+constexpr int32_t END_SIZE = 6;
+constexpr const char *DEFAULT_ANONYMOUS = "******";
+std::string DataShareStringUtils::Anonymous(const std::string &name)
 {
-    if (value.empty()) {
-        return value;
+    if (name.length() <= END_SIZE) {
+        return DEFAULT_ANONYMOUS;
     }
-    std::string str = quote + value + quote;
-    return str;
-}
 
-// Join array members as parameters of a function call.
-std::string DataShareStringUtils::SurroundWithFunction(std::string function, std::string separator,
-    std::vector<std::string> array)
-{
-    std::string builder(function);
-    builder += "(";
-    bool isFirst = true;
-    for (auto text : array) {
-        if (!isFirst) {
-            builder = builder + " " + separator + " ";
-        } else {
-            isFirst = false;
-        }
-        builder += text;
-    }
-    builder += ")";
-    return builder;
+    return (DEFAULT_ANONYMOUS + name.substr(name.length() - END_SIZE, END_SIZE));
 }
 
 DataShareStringUtils::DataShareStringUtils() {}

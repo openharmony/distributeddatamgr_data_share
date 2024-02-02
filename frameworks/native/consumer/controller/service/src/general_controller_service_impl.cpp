@@ -17,6 +17,7 @@
 
 #include "dataobs_mgr_client.h"
 #include "datashare_log.h"
+#include "datashare_string_utils.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -72,9 +73,8 @@ void GeneralControllerServiceImpl::RegisterObserver(const Uri &uri,
         return;
     }
     ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
-    if (ret != ERR_OK) {
-        LOG_ERROR("RegisterObserver failed");
-    }
+    LOG_INFO("Register observer ret: %{public}d, uri: %{public}s", ret,
+        DataShareStringUtils::Anonymous(uri.ToString()).c_str());
 }
 
 void GeneralControllerServiceImpl::UnregisterObserver(const Uri &uri,
@@ -86,9 +86,8 @@ void GeneralControllerServiceImpl::UnregisterObserver(const Uri &uri,
         return;
     }
     ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver);
-    if (ret != ERR_OK) {
-        LOG_ERROR("UnregisterObserver failed");
-    }
+    LOG_INFO("Unregister observer ret: %{public}d, uri: %{public}s", ret,
+        DataShareStringUtils::Anonymous(uri.ToString()).c_str());
 }
 
 void GeneralControllerServiceImpl::NotifyChange(const Uri &uri)
