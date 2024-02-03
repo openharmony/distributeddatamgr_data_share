@@ -163,7 +163,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
 void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
     bool isDescendants)
 {
-    LOG_INFO("Start");
+    LOG_DEBUG("Start");
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         return;
@@ -193,7 +193,7 @@ void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataSh
  */
 void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver)
 {
-    LOG_INFO("Start");
+    LOG_DEBUG("Start");
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         return;
@@ -229,7 +229,7 @@ void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<Data
  */
 void DataShareHelper::NotifyChangeExt(const DataShareObserver::ChangeInfo &changeInfo)
 {
-    LOG_INFO("Start");
+    LOG_DEBUG("Start");
 
     auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {

@@ -74,7 +74,7 @@ napi_value DataShareResultSetProxy::GetConstructor(napi_env env)
         NAPI_CALL(env, napi_get_reference_value(env, ctorRef_, &cons));
         return cons;
     }
-    LOG_INFO("Get DataShareResultSet constructor");
+    LOG_DEBUG("Get DataShareResultSet constructor");
     napi_property_descriptor clzDes[] = {
         DECLARE_NAPI_FUNCTION("goToFirstRow", GoToFirstRow),
         DECLARE_NAPI_FUNCTION("goToLastRow", GoToLastRow),

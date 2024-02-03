@@ -280,7 +280,7 @@ void PublishedDataSubscriberManager::EmitOnEnable(std::map<Key, std::vector<Obse
 bool PublishedDataSubscriberManager::Init()
 {
     if (serviceCallback_ == nullptr) {
-        LOG_INFO("callback init");
+        LOG_DEBUG("callback init");
         serviceCallback_ = new PublishedDataObserverStub([this](PublishedDataChangeNode &changeNode) {
             Emit(changeNode);
         });

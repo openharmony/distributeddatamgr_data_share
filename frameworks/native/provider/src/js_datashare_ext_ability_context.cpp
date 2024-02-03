@@ -39,7 +39,7 @@ public:
 
     static void Finalizer(napi_env env, void* data, void* hint)
     {
-        LOG_INFO("JsAbilityContext::Finalizer is called");
+        LOG_DEBUG("JsAbilityContext::Finalizer is called");
         std::unique_ptr<JsDataShareExtAbilityContext>(static_cast<JsDataShareExtAbilityContext*>(data));
     }
 private:
@@ -50,7 +50,7 @@ private:
 napi_value CreateJsDataShareExtAbilityContext(napi_env env,
     std::shared_ptr<DataShareExtAbilityContext> context)
 {
-    LOG_INFO("CreateJsDataShareExtAbilityContext begin");
+    LOG_DEBUG("CreateJsDataShareExtAbilityContext begin");
     napi_value objValue = CreateJsExtensionContext(env, context);
     std::unique_ptr<JsDataShareExtAbilityContext> jsContext = std::make_unique<JsDataShareExtAbilityContext>(context);
     napi_wrap(env, objValue, jsContext.release(), JsDataShareExtAbilityContext::Finalizer, nullptr, nullptr);

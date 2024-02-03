@@ -80,7 +80,7 @@ void DataShareManagerImpl::LinkToDeath(const sptr<IRemoteObject> remote)
     if (!remote->AddDeathRecipient(deathRecipient)) {
         LOG_ERROR("add death recipient failed");
     }
-    LOG_INFO("link to death success");
+    LOG_DEBUG("link to death success");
 }
 
 sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
@@ -123,7 +123,6 @@ void DataShareManagerImpl::RegisterClientDeathObserver()
 
 DataShareManagerImpl::DataShareManagerImpl()
 {
-    LOG_INFO("construct");
     pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS);
     SetDeathCallback([](std::shared_ptr<DataShareServiceProxy> proxy) {
         LOG_INFO("RecoverObs start");
@@ -134,7 +133,6 @@ DataShareManagerImpl::DataShareManagerImpl()
 
 DataShareManagerImpl::~DataShareManagerImpl()
 {
-    LOG_INFO("destroy");
 }
 
 std::shared_ptr<DataShareServiceProxy> DataShareManagerImpl::GetProxy()
@@ -171,7 +169,7 @@ std::shared_ptr<DataShareServiceProxy> DataShareManagerImpl::GetServiceProxy()
 
 void DataShareManagerImpl::ResetServiceHandle()
 {
-    LOG_INFO("enter");
+    LOG_DEBUG("enter");
     std::lock_guard<std::mutex> lock(mutex_);
     dataMgrService_ = nullptr;
     dataShareService_ = nullptr;
