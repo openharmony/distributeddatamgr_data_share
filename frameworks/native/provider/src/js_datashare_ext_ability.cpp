@@ -336,12 +336,28 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
     }
 
     napi_value remoteNapi = nullptr;
+    NAPI_CallingInfo oldCallingInfo;
+    NAPI_RemoteObject_saveOldCallingInfo(env, oldCallingInfo);
+    SaveNewCallingInfo(env);
     napi_status status = napi_call_function(env, obj, method, count, args, &remoteNapi);
+    NAPI_RemoteObject_resetOldCallingInfo(env, oldCallingInfo);
     delete []args;
     if (status != napi_ok) {
         return nullptr;
     }
     return handleEscape.Escape(remoteNapi);
+}
+
+void JsDataShareExtAbility::SaveNewCallingInfo(napi_env &env)
+{
+    auto newCallingInfo = GetCallingInfo();
+    CallingInfo callingInfo {
+        .callingPid = newCallingInfo->callingPid,
+        .callingUid = newCallingInfo->callingUid,
+        .callingTokenId = newCallingInfo->callingTokenId,
+        .activeStatus = ACTIVE_INVOKER,
+    };
+    NAPI_RemoteObject_setNewCallingInfo(env, callingInfo);
 }
 
 int32_t JsDataShareExtAbility::InitAsyncCallParams(size_t argc, napi_env &env, napi_value *args)
