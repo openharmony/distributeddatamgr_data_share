@@ -45,12 +45,15 @@ bool DataShareStubImpl::CheckCallingPermission(const std::string &permission)
 
 std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
 {
+    CallingInfo info;
+    GetCallingInfo(info);
     std::vector<std::string> ret;
     std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
         auto extension = client->GetOwner();
         if (extension == nullptr) {
             return;
         }
+        extension->SetCallingInfo(info);
         ret = extension->GetFileTypes(uri, mimeTypeFilter);
     };
     std::function<bool()> getRetFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() -> bool {
@@ -67,12 +70,15 @@ std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const s
 
 int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
 {
+    CallingInfo info;
+    GetCallingInfo(info);
     int ret = -1;
     std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
         auto extension = client->GetOwner();
         if (extension == nullptr) {
             return;
         }
+        extension->SetCallingInfo(info);
         ret = extension->OpenFile(uri, mode);
     };
     std::function<bool()> getRetFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() -> bool {
@@ -89,12 +95,15 @@ int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
 
 int DataShareStubImpl::OpenRawFile(const Uri &uri, const std::string &mode)
 {
+    CallingInfo info;
+    GetCallingInfo(info);
     int ret = -1;
     std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
         auto extension = client->GetOwner();
         if (extension == nullptr) {
             return;
         }
+        extension->SetCallingInfo(info);
         ret = extension->OpenRawFile(uri, mode);
     };
     uvQueue_->SyncCall(syncTaskFunc);
@@ -222,6 +231,7 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
     }
 
     std::function<void()> syncTaskFunc = [=, &columns, &resultSet, &businessError, &extension]() {
+        extension->SetCallingInfo(info);
         resultSet = extension->Query(uri, predicates, columns, businessError);
     };
     std::function<bool()> getRetFunc = [=, &resultSet, &businessError,
@@ -230,7 +240,6 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
         if (extension == nullptr) {
             return false;
         }
-        extension->SetCallingInfo(info);
         extension->GetResultSet(resultSet);
         extension->GetBusinessError(businessError);
         return (extension->GetRecvReply() != false);
@@ -242,12 +251,15 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
 
 std::string DataShareStubImpl::GetType(const Uri &uri)
 {
+    CallingInfo info;
+    GetCallingInfo(info);
     std::string ret = "";
     std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
         auto extension = client->GetOwner();
         if (extension == nullptr) {
             return;
         }
+        extension->SetCallingInfo(info);
         ret = extension->GetType(uri);
     };
     std::function<bool()> getRetFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() -> bool {
@@ -264,6 +276,8 @@ std::string DataShareStubImpl::GetType(const Uri &uri)
 
 int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
+    CallingInfo info;
+    GetCallingInfo(info);
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
     if (extension == nullptr) {
@@ -281,6 +295,7 @@ int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareVa
         if (extension == nullptr) {
             return;
         }
+        extension->SetCallingInfo(info);
         ret = extension->BatchInsert(uri, values);
     };
     std::function<bool()> getRetFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() -> bool {
@@ -330,12 +345,15 @@ bool DataShareStubImpl::NotifyChange(const Uri &uri)
 
 Uri DataShareStubImpl::NormalizeUri(const Uri &uri)
 {
+    CallingInfo info;
+    GetCallingInfo(info);
     Uri urivalue("");
     std::function<void()> syncTaskFunc = [=, &urivalue, client = sptr<DataShareStubImpl>(this)]() {
         auto extension = client->GetOwner();
         if (extension == nullptr) {
             return;
         }
+        extension->SetCallingInfo(info);
         urivalue = extension->NormalizeUri(uri);
     };
     std::function<bool()> getRetFunc = [=, &urivalue, client = sptr<DataShareStubImpl>(this)]() -> bool {
@@ -355,12 +373,15 @@ Uri DataShareStubImpl::NormalizeUri(const Uri &uri)
 
 Uri DataShareStubImpl::DenormalizeUri(const Uri &uri)
 {
+    CallingInfo info;
+    GetCallingInfo(info);
     Uri urivalue("");
     std::function<void()> syncTaskFunc = [=, &urivalue, client = sptr<DataShareStubImpl>(this)]() {
         auto extension = client->GetOwner();
         if (extension == nullptr) {
             return;
         }
+        extension->SetCallingInfo(info);
         urivalue = extension->DenormalizeUri(uri);
     };
     std::function<bool()> getRetFunc = [=, &urivalue, client = sptr<DataShareStubImpl>(this)]() -> bool {
