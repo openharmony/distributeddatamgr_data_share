@@ -351,6 +351,10 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
 void JsDataShareExtAbility::SaveNewCallingInfo(napi_env &env)
 {
     auto newCallingInfo = GetCallingInfo();
+    if (newCallingInfo == nullptr) {
+        LOG_ERROR("newCallingInfo is null.");
+        return;
+    }
     CallingInfo callingInfo {
         .callingPid = newCallingInfo->callingPid,
         .callingUid = newCallingInfo->callingUid,
