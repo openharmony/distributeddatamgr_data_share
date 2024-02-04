@@ -24,9 +24,7 @@ namespace OHOS {
 namespace DataShare {
 class DataShareStringUtils {
 public:
-    static std::string SurroundWithQuote(std::string value, std::string quote);
-    static std::string SurroundWithFunction(std::string function, std::string separator,
-        std::vector<std::string> array);
+    static std::string Anonymous(const std::string &name);
 
 private:
     DataShareStringUtils();
