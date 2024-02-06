@@ -64,7 +64,7 @@ void NAPIInnerObserver::OnChange()
 {
     auto time =
             static_cast<uint64_t>(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
-    LOG_INFO("NAPIInnerObserver dataShare callback Start, times %{public}" PRIu64 ".", time);
+    LOG_INFO("NAPIInnerObserver datashare callback start, times %{public}" PRIu64 ".", time);
     if (ref_ == nullptr) {
         LOG_ERROR("ref_ is nullptr");
         return;
