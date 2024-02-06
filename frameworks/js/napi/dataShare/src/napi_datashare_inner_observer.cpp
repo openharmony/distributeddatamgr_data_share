@@ -16,10 +16,13 @@
 #include "napi_datashare_observer.h"
 
 #include <memory>
+#include <chrono>
+#include <cinttypes>
 #include "datashare_log.h"
 
 namespace OHOS {
 namespace DataShare {
+using namespace std::chrono;
 NAPIInnerObserver::NAPIInnerObserver(napi_env env, napi_value callback)
     : env_(env)
 {
@@ -59,7 +62,9 @@ void NAPIInnerObserver::OnComplete(uv_work_t *work, int status)
 
 void NAPIInnerObserver::OnChange()
 {
-    LOG_DEBUG("NAPIInnerObserver Start");
+    auto time =
+            static_cast<uint64_t>(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
+    LOG_INFO("NAPIInnerObserver dataShare callback Start, times %{public}" PRIu64 ".", time);
     if (ref_ == nullptr) {
         LOG_ERROR("ref_ is nullptr");
         return;
@@ -76,7 +81,8 @@ void NAPIInnerObserver::OnChange()
         return;
     }
     work->data = observerWorker;
-    int ret = uv_queue_work(loop_, work, [](uv_work_t *work) {}, NAPIInnerObserver::OnComplete);
+    int ret = uv_queue_work_with_qos(loop_, work, [](uv_work_t *work) {},
+        NAPIInnerObserver::OnComplete, uv_qos_user_initiated);
     if (ret != 0) {
         LOG_ERROR("uv_queue_work failed");
         delete observerWorker;
