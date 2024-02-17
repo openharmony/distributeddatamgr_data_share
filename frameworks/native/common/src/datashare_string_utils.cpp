@@ -17,7 +17,7 @@
 
 namespace OHOS {
 namespace DataShare {
-constexpr int32_t END_SIZE = 6;
+constexpr int32_t END_SIZE = 10;
 constexpr const char *DEFAULT_ANONYMOUS = "******";
 std::string DataShareStringUtils::Anonymous(const std::string &name)
 {

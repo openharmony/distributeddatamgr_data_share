@@ -12,15 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#define LOG_TAG "DataShareHelper"
 
 #include "datashare_helper.h"
 #include "datashare_helper_impl.h"
 
+#include "adaptor.h"
 #include "concurrent_map.h"
 #include "data_ability_observer_interface.h"
 #include "data_ability_observer_stub.h"
 #include "dataobs_mgr_client.h"
 #include "datashare_log.h"
+#include "datashare_string_utils.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -74,6 +77,7 @@ std::string DataShareHelper::TransferUriPrefix(const std::string &originPrefix, 
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
     const sptr<IRemoteObject> &token, const std::string &strUri, const std::string &extUri)
 {
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     if (token == nullptr) {
         LOG_ERROR("token == nullptr");
         return nullptr;
@@ -99,6 +103,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, const CreateOptions &options,
     const std::string &bundleName)
 {
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     Uri uri(strUri);
     if (!options.isProxy_ && options.token_ == nullptr) {
         LOG_ERROR("token is nullptr");
@@ -163,7 +168,6 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
 void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
     bool isDescendants)
 {
-    LOG_DEBUG("Start");
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         return;
@@ -181,8 +185,9 @@ void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataSh
     ErrCode ret = obsMgrClient->RegisterObserverExt(uri, obs, isDescendants);
     if (ret != ERR_OK) {
         ObserverImpl::DeleteObserver(uri, dataObserver);
-        LOG_ERROR("RegisterObserverExt failed");
     }
+    LOG_INFO("Register observerExt, ret:%{public}d, uri:%{public}s",
+        ret, DataShareStringUtils::Anonymous(uri.ToString()).c_str());
 }
 
 /**
@@ -193,7 +198,6 @@ void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataSh
  */
 void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver)
 {
-    LOG_DEBUG("Start");
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         return;
@@ -215,8 +219,9 @@ void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<Data
         return;
     }
     ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, obs);
+    LOG_INFO("Unregister observerExt, ret:%{public}d, uri:%{public}s",
+        ret, DataShareStringUtils::Anonymous(uri.ToString()).c_str());
     if (ret != ERR_OK) {
-        LOG_ERROR("UnregisterObserverExt failed");
         return;
     }
     ObserverImpl::DeleteObserver(uri, dataObserver);
@@ -229,8 +234,6 @@ void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<Data
  */
 void DataShareHelper::NotifyChangeExt(const DataShareObserver::ChangeInfo &changeInfo)
 {
-    LOG_DEBUG("Start");
-
     auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
         LOG_ERROR("get DataObsMgrClient failed");
@@ -238,9 +241,7 @@ void DataShareHelper::NotifyChangeExt(const DataShareObserver::ChangeInfo &chang
     }
 
     ErrCode ret = obsMgrClient->NotifyChangeExt(ObserverImpl::ConvertInfo(changeInfo));
-    if (ret != ERR_OK) {
-        LOG_ERROR("NotifyChangeExt failed");
-    }
+    LOG_INFO("Notify changeExt, ret:%{public}d", ret);
 }
 
 void ObserverImpl::OnChange() {}
