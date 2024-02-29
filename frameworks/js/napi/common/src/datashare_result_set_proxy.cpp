@@ -17,6 +17,7 @@
 
 #include <functional>
 #include <chrono>
+#include <cinttypes>
 
 #include "datashare_result_set.h"
 #include "datashare_js_utils.h"
