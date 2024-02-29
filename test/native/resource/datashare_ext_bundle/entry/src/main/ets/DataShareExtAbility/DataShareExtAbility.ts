@@ -30,142 +30,142 @@ let rdbStore;
 export default class
 extends Extension {
     async onCreate(want, callback) {
-        console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility onCreate, want:' + want.abilityName);
+        console.log('[ttt] [DataShareTest] DataShareExtAbility onCreate, want:' + want.abilityName);
         console.log("[ttt] [DataShareTest] DataShareExtAbility onCreate this.context.databaseDir:" + this.context.databaseDir);
         // @ts-ignore
         rdbStore = await rdb.getRdbStore(this.context, { name: DB_NAME, securityLevel: rdb.SecurityLevel.S1 });
-        console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility getRdbStore done');
+        console.log('[ttt] [DataShareTest] DataShareExtAbility getRdbStore done');
         await rdbStore.executeSql(DDL_TBL_CREATE, []);
         await rdbStore.executeSql(DDL_TABLE_USER_SQL, []);
         await rdbStore.executeSql(DDL_TABLE_BOOK_SQL, []);
-        console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility executeSql multiple tables done');
+        console.log('[ttt] [DataShareTest] DataShareExtAbility executeSql multiple tables done');
         let err = {"code":0};
         callback(err);
-        console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility onCreate end');
+        console.log('[ttt] [DataShareTest] DataShareExtAbility onCreate end');
     }
 
     async insert(uri, value, callback) {
-        console.info('[ttt] [DataShareTest] <<Provider>> [insert] enter');
+        console.info('[ttt] [DataShareTest] [insert] enter');
         if (value == null) {
-            console.info('[ttt] [DataShareTest] <<Provider>> [insert] invalid valueBuckets');
+            console.info('[ttt] [DataShareTest]  [insert] invalid valueBuckets');
             return;
         }
 
-        console.info('[ttt] [DataShareTest] <<Provider>> [insert] getCallingTokenId:' + rpc.IPCSkeleton.getCallingTokenId());
-        console.info('[ttt] [DataShareTest] <<Provider>> [insert]  value = ' + value);
-        console.info('[ttt] [DataShareTest] <<Provider>> [insert]  value = ' + JSON.stringify(value));
+        console.info('[ttt] [DataShareTest] [insert] getCallingTokenId:' + rpc.IPCSkeleton.getCallingTokenId());
+        console.info('[ttt] [DataShareTest] [insert]  value = ' + value);
+        console.info('[ttt] [DataShareTest] [insert]  value = ' + JSON.stringify(value));
         await rdbStore.insert(TBL_NAME, value, function (err, ret) {
-            console.info('[ttt] [DataShareTest] <<Provider>> [insert] callback ret:' + ret);
+            console.info('[ttt] [DataShareTest] [insert] callback ret:' + ret);
 
             if (callback != undefined) {
                 callback(err, ret);
             }
         });
-        console.info('[ttt] [DataShareTest] <<Provider>> [insert] leave');
+        console.info('[ttt] [DataShareTest] [insert] leave');
     }
 
     async update(uri, predicates, value, callback) {
-        console.info('[ttt] [DataShareTest] <<Provider>> [update] enter');
+        console.info('[ttt] [DataShareTest] [update] enter');
         if (predicates == null || predicates == undefined) {
-            console.info('[ttt] [DataShareTest] <<Provider>> [update] invalid predicates');
+            console.info('[ttt] [DataShareTest] [update] invalid predicates');
             return;
         }
-        console.info('[ttt] [DataShareTest] <<Provider>> [update]  values = ' + value);
-        console.info('[ttt] [DataShareTest] <<Provider>> [update]  values = ' + JSON.stringify(value));
-        console.info('[ttt] [DataShareTest] <<Provider>> [update]  predicates = ' + predicates);
-        console.info('[ttt] [DataShareTest] <<Provider>> [update]  predicates = ' + JSON.stringify(predicates));
+        console.info('[ttt] [DataShareTest] [update]  values = ' + value);
+        console.info('[ttt] [DataShareTest] [update]  values = ' + JSON.stringify(value));
+        console.info('[ttt] [DataShareTest] [update]  predicates = ' + predicates);
+        console.info('[ttt] [DataShareTest]  [update]  predicates = ' + JSON.stringify(predicates));
         try {
             await rdbStore.update(TBL_NAME,value, predicates, function (err, ret) {
-                console.info('[ttt] [DataShareTest] <<Provider>> [update] callback ret:' + ret);
-                console.info('[ttt] [DataShareTest] <<Provider>> [update] callback err:' + err);
+                console.info('[ttt] [DataShareTest] [update] callback ret:' + ret);
+                console.info('[ttt] [DataShareTest] [update] callback err:' + err);
                 if (callback != undefined) {
                     callback(err, ret);
                 }
             });
         } catch (err) {
-            console.error('[ttt] [DataShareTest] <<Provider>> [update] error' + err);
+            console.error('[ttt] [DataShareTest] [update] error' + err);
         }
-        console.info('[ttt] [DataShareTest] <<Provider>> [update] leave');
+        console.info('[ttt] [DataShareTest] [update] leave');
     }
 
     async delete(uri, predicates, callback) {
-        console.info('[ttt] [DataShareTest] <<Provider>> [delete] enter');
+        console.info('[ttt] [DataShareTest] [delete] enter');
         if (predicates == null || predicates == undefined) {
-            console.info('[ttt] [DataShareTest] <<Provider>> [delete] invalid predicates');
+            console.info('[ttt] [DataShareTest] [delete] invalid predicates');
             return;
         }
-        console.info('[ttt] [DataShareTest] <<Provider>> [delete]  predicates = ' + predicates);
-        console.info('[ttt] [DataShareTest] <<Provider>> [delete]  predicates = ' + JSON.stringify(predicates));
+        console.info('[ttt] [DataShareTest] [delete]  predicates = ' + predicates);
+        console.info('[ttt] [DataShareTest] [delete]  predicates = ' + JSON.stringify(predicates));
         try {
             await rdbStore.delete(TBL_NAME,predicates, function (err, ret) {
-                console.info('[ttt] [DataShareTest] <<Provider>> [delete] ret:' + ret);
+                console.info('[ttt] [DataShareTest] [delete] ret:' + ret);
                 if (callback != undefined) {
                     callback(err, ret);
                 }
             });
         } catch (err) {
-            console.error('[ttt] [DataShareTest] <<Provider>> [delete] error' + err);
+            console.error('[ttt] [DataShareTest] [delete] error' + err);
         }
-        console.info('[ttt] [DataShareTest] <<Provider>> [delete] leave');
+        console.info('[ttt] [DataShareTest] [delete] leave');
     }
 
     async query(uri, predicates, columns, callback) {
-        console.info('[ttt] [DataShareTest] <<Provider>> [query] enter');
+        console.info('[ttt] [DataShareTest] [query] enter');
         if (predicates == null || predicates == undefined) {
-            console.info('[ttt] [DataShareTest] <<Provider>> [query] invalid predicates');
+            console.info('[ttt] [DataShareTest] [query] invalid predicates');
         }
-        console.info('[ttt] [DataShareTest] <<Provider>> [query]  values = ' + columns);
-        console.info('[ttt] [DataShareTest] <<Provider>> [query]  values = ' + JSON.stringify(columns));
-        console.info('[ttt] [DataShareTest] <<Provider>> [query]  predicates = ' + predicates);
-        console.info('[ttt] [DataShareTest] <<Provider>> [query]  predicates = ' + JSON.stringify(predicates));
+        console.info('[ttt] [DataShareTest] [query]  values = ' + columns);
+        console.info('[ttt] [DataShareTest] [query]  values = ' + JSON.stringify(columns));
+        console.info('[ttt] [DataShareTest] [query]  predicates = ' + predicates);
+        console.info('[ttt] [DataShareTest] [query]  predicates = ' + JSON.stringify(predicates));
         try {
             await rdbStore.query(TBL_NAME, predicates, columns, function (err, resultSet) {
-                console.info('[ttt] [DataShareTest] <<Provider>> [query] ret: ' + resultSet);
+                console.info('[ttt] [DataShareTest] [query] ret: ' + resultSet);
                 if (resultSet != undefined) {
-                    console.info('[ttt] [DataShareTest] <<Provider>> [query] resultSet.rowCount: ' + resultSet.rowCount);
+                    console.info('[ttt] [DataShareTest] [query] resultSet.rowCount: ' + resultSet.rowCount);
                 }
                 if (callback != undefined) {
                     callback(err, resultSet);
                 }
             });
         } catch (err) {
-            console.error(`[ttt] [DataShareTest] <<Provider>> [query] error: code: ${err.code}, message: ${err.message} `);
+            console.error(`[ttt] [DataShareTest] [query] error: code: ${err.code}, message: ${err.message} `);
             callback(err, undefined);
         }
-        console.info('[ttt] [DataShareTest] <<Provider>> [query] leave');
+        console.info('[ttt] [DataShareTest] [query] leave');
     }
 
     async batchInsert(uri: string, valueBuckets, callback) {
-        console.info('[ttt] [DataShareTest] <<Provider>> [batchInsert] enter');
+        console.info('[ttt] [DataShareTest] [batchInsert] enter');
         if (valueBuckets == null || valueBuckets.length == undefined) {
-            console.info('[ttt] [DataShareTest] <<Provider>> [batchInsert] invalid valueBuckets');
+            console.info('[ttt] [DataShareTest] [batchInsert] invalid valueBuckets');
             return;
         }
-        console.info('[ttt] [DataShareTest] <<Provider>> [batchInsert] valueBuckets.length:' + valueBuckets.length);
+        console.info('[ttt] [DataShareTest] [batchInsert] valueBuckets.length:' + valueBuckets.length);
         let resultNum = valueBuckets.length
         await rdbStore.batchInsert(TBL_NAME, valueBuckets, function (err, ret) {
-            console.info('[ttt] [DataShareTest] <<Provider>> [batchInsert] callback ret:' + ret);
+            console.info('[ttt] [DataShareTest] [batchInsert] callback ret:' + ret);
             if (callback != undefined) {
                 callback(err, ret);
             }
         });
 
-        console.info('[ttt] [DataShareTest] <<Provider>> [batchInsert] leave');
+        console.info('[ttt] [DataShareTest] [batchInsert] leave');
     }
 
     async normalizeUri(uri: string, callback) {
-        console.info('[ttt] [DataShareTest] <<Provider>> [normalizeUri] enter');
+        console.info('[ttt] [DataShareTest] [normalizeUri] enter');
         let ret = "normalize+" + uri;
         let err = {"code":0};
         await callback(err, ret);
-        console.info('[ttt] [DataShareTest] <<Provider>> [normalizeUri] leave, ret:' + ret);
+        console.info('[ttt] [DataShareTest] [normalizeUri] leave, ret:' + ret);
     }
 
     async denormalizeUri(uri: string, callback) {
-        console.info('[ttt] [DataShareTest] <<Provider>> [denormalizeUri] enter');
+        console.info('[ttt] [DataShareTest] [denormalizeUri] enter');
         let ret = "denormalize+" + uri;
         let err = {"code":0};
         await callback(err, ret);
-        console.info('[ttt] [DataShareTest] <<Provider>> [denormalizeUri] leave, ret:' + ret);
+        console.info('[ttt] [DataShareTest] [denormalizeUri] leave, ret:' + ret);
     }
 };
