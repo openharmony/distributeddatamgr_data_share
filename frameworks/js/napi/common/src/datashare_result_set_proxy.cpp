@@ -413,9 +413,6 @@ napi_value DataShareResultSetProxy::GetColumnName(napi_env env, napi_callback_in
     napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     NAPI_ASSERT(env, argc > 0, "Invalid argvs!");
     NAPI_CALL(env, napi_get_value_int32(env, args[0], &columnIndex));
-    if (columnIndex == -1) {
-        return nullptr;
-    }
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
         int errCode = innerResultSet->GetColumnName(columnIndex, columnName);
