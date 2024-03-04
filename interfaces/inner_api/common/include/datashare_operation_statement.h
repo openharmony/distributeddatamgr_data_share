@@ -27,6 +27,17 @@ enum class Operation : int32_t {
     DELETE,
 };
 
+struct UpdateOperation {
+    DataShareValuesBucket valuesBucket;
+    DataSharePredicates predicates;
+};
+using UpdateOperations = std::map<std::string, std::vector<UpdateOperation>>;
+
+struct BatchUpdateResult {
+    std::string uri;
+    std::vector<int> codes;
+};
+
 struct OperationStatement {
     Operation operationType;
     std::string uri;

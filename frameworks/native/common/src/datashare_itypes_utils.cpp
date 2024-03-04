@@ -48,6 +48,30 @@ bool Unmarshalling(Predicates &predicates, MessageParcel &parcel)
 }
 
 template<>
+bool Marshalling(const BatchUpdateResult &result, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, result.uri, result.codes);
+}
+
+template<>
+bool Unmarshalling(BatchUpdateResult &result, MessageParcel &parcel)
+{
+    return ITypesUtil::Unmarshal(parcel, result.uri, result.codes);
+}
+
+template<>
+bool Marshalling(const UpdateOperation &operation, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, operation.valuesBucket, operation.predicates);
+}
+
+template<>
+bool Unmarshalling(UpdateOperation &operation, MessageParcel &parcel)
+{
+    return ITypesUtil::Unmarshal(parcel, operation.valuesBucket, operation.predicates);
+}
+
+template<>
 bool Marshalling(const Operation &operation, MessageParcel &parcel)
 {
     return ITypesUtil::Marshal(parcel, operation.operation, operation.singleParams, operation.multiParams);

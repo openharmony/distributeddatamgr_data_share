@@ -119,6 +119,16 @@ int DataShareHelperImpl::Update(Uri &uri, const DataSharePredicates &predicates,
     return generalCtl->Update(uri, predicates, value);
 }
 
+int DataShareHelperImpl::BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results)
+{
+    auto extSpCtl = extSpCtl_;
+    if (extSpCtl == nullptr) {
+        LOG_ERROR("extSpCtl is nullptr");
+        return INVALID_VALUE;
+    }
+    return extSpCtl->BatchUpdate(operations, results);
+}
+
 int DataShareHelperImpl::Delete(Uri &uri, const DataSharePredicates &predicates)
 {
     auto generalCtl = generalCtl_;

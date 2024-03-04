@@ -139,6 +139,16 @@ public:
         const DataShareValuesBucket &value) override;
 
     /**
+     * @brief Batch updates data records in the database.
+     *
+     * @param updateOperations Indicates the param of data to update.
+     * @param results Indicates the number of data records updated.
+     *
+     * @return Return the execution results of batch updates.
+     */
+    virtual int BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results) override;
+
+    /**
      * @brief Deletes one or more data records from the database.
      *
      * @param uri Indicates the path of the data to operate.
@@ -276,6 +286,16 @@ public:
         value = callbackResultStringArr_;
     }
 
+    void SetResult(const std::vector<BatchUpdateResult> &results)
+    {
+        updateResults_ = results;
+    }
+
+    void GetResult(std::vector<BatchUpdateResult> &results)
+    {
+        results = updateResults_;
+    }
+
     void SetResult(const std::vector<std::string> value)
     {
         callbackResultStringArr_ = value;
@@ -319,6 +339,7 @@ private:
     void SaveNewCallingInfo(napi_env &env);
     void GetSrcPath(std::string &srcPath);
     napi_value MakePredicates(napi_env env, const DataSharePredicates &predicates);
+    napi_value MakeUpdateOperation(napi_env env, const UpdateOperation &updateOperation);
     static napi_value AsyncCallback(napi_env env, napi_callback_info info);
     static napi_value AsyncCallbackWithContext(napi_env env, napi_callback_info info);
     void CheckAndSetAsyncResult(napi_env env);
@@ -326,6 +347,7 @@ private:
     static void UnWrapBusinessError(napi_env env, napi_value info, DatashareBusinessError &businessError);
     static napi_valuetype UnWrapPropertyType(napi_env env, napi_value info,
         const std::string &key);
+    static bool UnwrapBatchUpdateResult(napi_env env, napi_value &info, std::vector<BatchUpdateResult> &results);
     static std::string UnWrapProperty(napi_env env, napi_value info, const std::string &key);
     int32_t InitAsyncCallParams(size_t argc, napi_env &env, napi_value *args);
 
@@ -340,6 +362,7 @@ private:
     std::mutex resultSetLock_;
     std::shared_ptr<DataShareResultSet> callbackResultObject_ = nullptr;
     DatashareBusinessError businessError_;
+    std::vector<BatchUpdateResult> updateResults_ = {};
 };
 } // namespace DataShare
 } // namespace OHOS

@@ -79,6 +79,22 @@ int ExtSpecialController::BatchInsert(const Uri &uri, const std::vector<DataShar
     return proxy->BatchInsert(uri, values);
 }
 
+int ExtSpecialController::BatchUpdate(const UpdateOperations &operations,
+    std::vector<BatchUpdateResult> &results)
+{
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("connection is nullptr");
+        return INVALID_VALUE;
+    }
+    auto proxy = connection->GetDataShareProxy(uri_, token_);
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return INVALID_VALUE;
+    }
+    return proxy->BatchUpdate(operations, results);
+}
+
 int ExtSpecialController::InsertExt(Uri &uri, const DataShareValuesBucket &value, std::string &result)
 {
     auto connection = connection_;

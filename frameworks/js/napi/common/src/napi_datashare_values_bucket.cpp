@@ -47,7 +47,7 @@ bool UnWrapValuesBucket(DataShareValuesBucket &valuesBucket, const napi_env &env
     napi_get_property_names(env, arg, &keys);
     uint32_t arrLen = 0;
     napi_status status = napi_get_array_length(env, keys, &arrLen);
-    if (status != napi_ok) {
+    if (status != napi_ok || arrLen <= 0) {
         LOG_ERROR("ValuesBucket err");
         return false;
     }

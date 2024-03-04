@@ -16,6 +16,8 @@
 #include "datashare_js_utils.h"
 
 #include "datashare_log.h"
+#include "datashare_predicates_proxy.h"
+#include "napi_datashare_values_bucket.h"
 #include "napi/native_common.h"
 #include "securec.h"
 
@@ -674,6 +676,83 @@ bool DataShareJSUtils::UnwrapStringByPropertyName(
     }
     value = DataShareJSUtils::Convert2String(env, jsResult);
     return true;
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<BatchUpdateResult> &result)
+{
+    napi_value resultMap = nullptr;
+    napi_status status = napi_create_object(env, &resultMap);
+    if (status != napi_ok) {
+        LOG_ERROR("napi_create_object : %{public}d", status);
+        return nullptr;
+    }
+    for (const auto &valueArray : result) {
+        napi_value values;
+        if (napi_create_object(env, &values) != napi_ok) {
+            LOG_ERROR("napi_create_object falied");
+            return nullptr;
+        }
+        uint32_t index = 0;
+        for (const auto &value : valueArray.codes) {
+            napi_value jsValue = Convert2JSValue(env, value);
+            if (napi_set_element(env, values, index++, jsValue) != napi_ok) {
+                LOG_ERROR("napi_set_element falied");
+                return nullptr;
+            }
+        }
+        if (napi_set_named_property(env, resultMap, valueArray.uri.c_str(), values)) {
+            LOG_ERROR("napi_set_named_property falied");
+            return nullptr;
+        }
+    }
+    return resultMap;
+}
+
+int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, UpdateOperation& operation)
+{
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, input, &valueType);
+    if (valueType != napi_object) {
+        LOG_ERROR("value is not object");
+        return napi_invalid_arg;
+    }
+    if (Convert2Value(env, input, "predicates", operation.predicates) != napi_ok) {
+        return napi_invalid_arg;
+    }
+    if (Convert2Value(env, input, "values", operation.valuesBucket) != napi_ok) {
+        return napi_invalid_arg;
+    }
+    return napi_ok;
+}
+
+bool DataShareJSUtils::UnwrapDataSharePredicates(napi_env env, napi_value value,
+    DataSharePredicates &dataSharePredicates)
+{
+    auto predicates = DataSharePredicatesProxy::GetNativePredicates(env, value);
+    if (predicates == nullptr) {
+        LOG_ERROR("GetNativePredicates is nullptr.");
+        return false;
+    }
+    dataSharePredicates = DataSharePredicates(predicates->GetOperationList());
+    return true;
+}
+
+int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, DataSharePredicates &predicates)
+{
+    if (!UnwrapDataSharePredicates(env, input, predicates)) {
+        LOG_ERROR("get predicates from js failed");
+        return napi_invalid_arg;
+    }
+    return napi_ok;
+}
+
+int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, DataShareValuesBucket &valueBucket)
+{
+    if (!GetValueBucketObject(valueBucket, env, input)) {
+        LOG_ERROR("get valueBucketObject from js failed");
+        return napi_invalid_arg;
+    }
+    return napi_ok;
 }
 } // namespace DataShare
 } // namespace OHOS

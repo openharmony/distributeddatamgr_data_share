@@ -33,6 +33,8 @@ public:
 
     int OpenRawFile(const Uri &uri, const std::string &mode);
 
+    int BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results);
+
     std::string GetType(const Uri &uri);
 
     int BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values);

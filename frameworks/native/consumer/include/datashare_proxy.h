@@ -42,6 +42,8 @@ public:
     virtual int Update(const Uri &uri, const DataSharePredicates &predicates,
         const DataShareValuesBucket &value) override;
 
+    virtual int BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results) override;
+
     virtual int Delete(const Uri &uri, const DataSharePredicates &predicates) override;
 
     virtual std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
@@ -64,8 +66,10 @@ public:
     virtual Uri DenormalizeUri(const Uri &uri) override;
 
 private:
+    bool CheckSize(const UpdateOperations &operations);
     static inline BrokerDelegator<DataShareProxy> delegator_;
     static const size_t MTU_SIZE = 912600; // 900k
+    static const size_t MAX_SIZE = 4000;
 };
 } // namespace DataShare
 } // namespace OHOS

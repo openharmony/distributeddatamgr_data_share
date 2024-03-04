@@ -179,6 +179,37 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
     return ret;
 }
 
+int DataShareStubImpl::BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results)
+{
+    CallingInfo info;
+    GetCallingInfo(info);
+    auto client = sptr<DataShareStubImpl>(this);
+    auto extension = client->GetOwner();
+    if (extension == nullptr) {
+        return DEFAULT_NUMBER;
+    }
+    if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
+        LOG_ERROR("Check calling permission failed.");
+        return PERMISSION_ERROR_NUMBER;
+    }
+    std::shared_ptr<int> ret = std::make_shared<int>(0);
+    std::function<void()> syncTaskFunc = [extension, ret, operations, info]() {
+        extension->SetCallingInfo(info);
+        std::vector<BatchUpdateResult> tmp;
+        *ret = extension->BatchUpdate(operations, tmp);
+    };
+    std::function<bool()> getRetFunc = [&results, extension]() -> bool {
+        if (extension == nullptr) {
+            return false;
+        }
+        extension->GetResult(results);
+        return extension->GetRecvReply();
+    };
+    std::lock_guard<std::mutex> lock(mutex_);
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
+    return *ret;
+}
+
 int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
     CallingInfo info;
