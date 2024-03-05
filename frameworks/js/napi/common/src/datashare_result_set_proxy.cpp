@@ -276,7 +276,7 @@ napi_value DataShareResultSetProxy::GetBlob(napi_env env, napi_callback_info inf
     NAPI_ASSERT(env, argc > 0, "Invalid argvs!");
     NAPI_CALL(env, napi_get_value_int32(env, args[0], &columnIndex));
     if (columnIndex == -1) {
-        return nullptr;
+        return DataShareJSUtils::Convert2JSValue(env, blob);
     }
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
@@ -300,7 +300,7 @@ napi_value DataShareResultSetProxy::GetString(napi_env env, napi_callback_info i
     NAPI_ASSERT(env, argc > 0, "Invalid argvs!");
     NAPI_CALL(env, napi_get_value_int32(env, args[0], &columnIndex));
     if (columnIndex == -1) {
-        return nullptr;
+        return DataShareJSUtils::Convert2JSValue(env, value);
     }
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
@@ -321,7 +321,7 @@ napi_value DataShareResultSetProxy::GetLong(napi_env env, napi_callback_info inf
     NAPI_ASSERT(env, argc > 0, "Invalid argvs!");
     NAPI_CALL(env, napi_get_value_int32(env, args[0], &columnIndex));
     if (columnIndex == -1) {
-        return nullptr;
+        return DataShareJSUtils::Convert2JSValue(env, value);
     }
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
@@ -345,7 +345,7 @@ napi_value DataShareResultSetProxy::GetDouble(napi_env env, napi_callback_info i
     NAPI_ASSERT(env, argc > 0, "Invalid argvs!");
     NAPI_CALL(env, napi_get_value_int32(env, args[0], &columnIndex));
     if (columnIndex == -1) {
-        return nullptr;
+        return DataShareJSUtils::Convert2JSValue(env, value);
     }
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
@@ -436,7 +436,7 @@ napi_value DataShareResultSetProxy::GetDataType(napi_env env, napi_callback_info
     NAPI_ASSERT(env, argc > 0, "Invalid argvs!");
     NAPI_CALL(env, napi_get_value_int32(env, args[0], &columnIndex));
     if (columnIndex == -1) {
-        return nullptr;
+        return DataShareJSUtils::Convert2JSValue(env, int32_t(dataType));
     }
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
