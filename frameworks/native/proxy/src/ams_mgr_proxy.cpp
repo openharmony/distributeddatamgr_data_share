@@ -59,7 +59,7 @@ AmsMgrProxy* AmsMgrProxy::GetInstance()
     return proxy;
 }
 
-int AmsMgrProxy::Connect(
+__attribute__ ((no_sanitize("cfi"))) int AmsMgrProxy::Connect(
     const std::string &uri, const sptr<IRemoteObject> &connect, const sptr<IRemoteObject> &callerToken)
 {
     AAFwk::Want want;
