@@ -15,10 +15,12 @@
 
 #include "datashare_uv_queue.h"
 #include <thread>
+#include <chrono>
 #include "datashare_log.h"
 
 namespace OHOS {
 namespace DataShare {
+using namespace std::chrono;
 constexpr int WAIT_TIME = 3;
 constexpr int SLEEP_TIME = 1;
 constexpr int TRY_TIMES = 2000;
@@ -75,7 +77,9 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
             return;
         }
         if (uvEntry->condition.wait_for(lock, std::chrono::seconds(WAIT_TIME), [uvEntry] { return uvEntry->done; })) {
-            LOG_INFO("function ended successfully");
+            auto time = static_cast<uint64_t>(duration_cast<milliseconds>(
+                system_clock::now().time_since_epoch()).count());
+            LOG_INFO("function ended successfully. times %{public}" PRIu64 ".", time);
         }
         if (!uvEntry->done && !uv_cancel((uv_req_t*)&work)) {
             LOG_ERROR("uv_cancel failed.");

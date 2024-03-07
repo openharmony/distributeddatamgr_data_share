@@ -16,6 +16,8 @@
 #include "datashare_result_set_proxy.h"
 
 #include <functional>
+#include <chrono>
+#include <cinttypes>
 
 #include "datashare_result_set.h"
 #include "datashare_js_utils.h"
@@ -24,6 +26,7 @@
 
 namespace OHOS {
 namespace DataShare {
+using namespace std::chrono;
 constexpr int MAX_INPUT_COUNT = 10;
 static napi_ref __thread ctorRef_ = nullptr;
 napi_value DataShareResultSetProxy::NewInstance(napi_env env, std::shared_ptr<DataShareResultSet> resultSet)
@@ -272,6 +275,9 @@ napi_value DataShareResultSetProxy::GetBlob(napi_env env, napi_callback_info inf
     napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     NAPI_ASSERT(env, argc > 0, "Invalid argvs!");
     NAPI_CALL(env, napi_get_value_int32(env, args[0], &columnIndex));
+    if (columnIndex == -1) {
+        return DataShareJSUtils::Convert2JSValue(env, blob);
+    }
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
         int errCode = innerResultSet->GetBlob(columnIndex, blob);
@@ -293,6 +299,9 @@ napi_value DataShareResultSetProxy::GetString(napi_env env, napi_callback_info i
     napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     NAPI_ASSERT(env, argc > 0, "Invalid argvs!");
     NAPI_CALL(env, napi_get_value_int32(env, args[0], &columnIndex));
+    if (columnIndex == -1) {
+        return DataShareJSUtils::Convert2JSValue(env, value);
+    }
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
         innerResultSet->GetString(columnIndex, value);
@@ -311,6 +320,9 @@ napi_value DataShareResultSetProxy::GetLong(napi_env env, napi_callback_info inf
     napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     NAPI_ASSERT(env, argc > 0, "Invalid argvs!");
     NAPI_CALL(env, napi_get_value_int32(env, args[0], &columnIndex));
+    if (columnIndex == -1) {
+        return DataShareJSUtils::Convert2JSValue(env, value);
+    }
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
         int errCode = innerResultSet->GetLong(columnIndex, value);
@@ -332,6 +344,9 @@ napi_value DataShareResultSetProxy::GetDouble(napi_env env, napi_callback_info i
     napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     NAPI_ASSERT(env, argc > 0, "Invalid argvs!");
     NAPI_CALL(env, napi_get_value_int32(env, args[0], &columnIndex));
+    if (columnIndex == -1) {
+        return DataShareJSUtils::Convert2JSValue(env, value);
+    }
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
         int errCode = innerResultSet->GetDouble(columnIndex, value);
@@ -379,7 +394,10 @@ napi_value DataShareResultSetProxy::GetColumnIndex(napi_env env, napi_callback_i
     if (innerResultSet != nullptr) {
         int errCode = innerResultSet->GetColumnIndex(columnName, columnIndex);
         if (errCode != E_OK) {
-            LOG_ERROR("failed code:%{public}d", errCode);
+            auto time = static_cast<uint64_t>(duration_cast<milliseconds>(
+                system_clock::now().time_since_epoch()).count());
+            LOG_ERROR("failed code:%{public}d columnIndex: %{public}d. times %{public}" PRIu64 ".",
+                errCode, columnIndex, time);
         }
     } else {
         LOG_ERROR("GetInnerResultSet failed.");
@@ -417,6 +435,9 @@ napi_value DataShareResultSetProxy::GetDataType(napi_env env, napi_callback_info
     napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
     NAPI_ASSERT(env, argc > 0, "Invalid argvs!");
     NAPI_CALL(env, napi_get_value_int32(env, args[0], &columnIndex));
+    if (columnIndex == -1) {
+        return DataShareJSUtils::Convert2JSValue(env, int32_t(dataType));
+    }
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
         int errCode = innerResultSet->GetDataType(columnIndex, dataType);
