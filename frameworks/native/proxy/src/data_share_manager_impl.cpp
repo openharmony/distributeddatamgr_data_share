@@ -45,6 +45,13 @@ DataShareManagerImpl* DataShareManagerImpl::GetInstance()
     if (manager_ == nullptr) {
         LOG_ERROR("DataShareManagerImpl: GetInstance failed");
     }
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        LOG_ERROR("Failed to get saMgrProxy.");
+        return manager_;
+    }
+    sptr<DataShareClientStatusChangeStub> callback(new DataShareClientStatusChangeStub(manager_));
+    saManager->SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, callback);
     return manager_;
 }
 
@@ -199,6 +206,32 @@ void DataShareManagerImpl::OnRemoteDied()
         return;
     }
     LOG_DEBUG("create scheduler success");
+}
+
+void DataShareManagerImpl::SetRegisterCallback(GeneralControllerServiceImpl* ptr,
+    std::function<void()> registerCallback)
+{
+    observers_.ComputeIfAbsent(ptr, [&registerCallback](const GeneralControllerServiceImpl*) {
+        return std::move(registerCallback);
+    });
+}
+
+void DataShareManagerImpl::RemoveRegisterCallback(GeneralControllerServiceImpl* ptr)
+{
+    observers_.Erase(ptr);
+}
+
+void DataShareManagerImpl::OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId)
+{
+    if (systemAbilityId != DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
+        LOG_ERROR("SystemAbilityId must be DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, but it is %{public}d",
+            systemAbilityId);
+        return;
+    }
+    observers_.ForEach([](const auto &, auto &callback) {
+        callback();
+        return false;
+    });
 }
 }
 }

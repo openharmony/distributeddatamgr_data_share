@@ -20,16 +20,19 @@
 #include <memory>
 #include <mutex>
 
+#include "concurrent_map.h"
 #include "data_share_service_proxy.h"
 #include "data_share_errno.h"
 #include "idata_share_client_death_observer.h"
 #include "iremote_object.h"
 #include "refbase.h"
+#include "system_ability_status_change_stub.h"
 
 namespace OHOS {
 class ExecutorPool;
 namespace DataShare {
 class DataShareKvServiceProxy;
+class GeneralControllerServiceImpl;
 class DataShareManagerImpl {
 public:
     static DataShareManagerImpl* GetInstance();
@@ -58,6 +61,30 @@ public:
         DataShareManagerImpl *owner_;
     };
 
+    class DataShareClientStatusChangeStub : public SystemAbilityStatusChangeStub {
+    public:
+        explicit DataShareClientStatusChangeStub(DataShareManagerImpl *owner) : owner_(owner)
+        {
+        }
+        void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override
+        {
+            if (owner_ != nullptr) {
+                owner_->OnAddSystemAbility(systemAbilityId, deviceId);
+            }
+        }
+
+        void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string& deviceId) override
+        {
+        }
+    private:
+        DataShareManagerImpl *owner_;
+    };
+
+    void SetRegisterCallback(GeneralControllerServiceImpl* ptr, std::function<void()> registerCallback);
+    
+    void RemoveRegisterCallback(GeneralControllerServiceImpl* ptr);
+
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId);
 private:
     DataShareManagerImpl();
 
@@ -86,6 +113,7 @@ private:
     std::shared_ptr<ExecutorPool> pool_;
     std::function<void(std::shared_ptr<DataShareServiceProxy>)> deathCallback_ = {};
     sptr<IRemoteObject> clientDeathObserverPtr_;
+    ConcurrentMap<GeneralControllerServiceImpl*, std::function<void()>> observers_;
 };
 }
 } // namespace OHOS::DataShare

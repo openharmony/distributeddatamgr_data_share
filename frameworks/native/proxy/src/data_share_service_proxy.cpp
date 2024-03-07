@@ -15,8 +15,10 @@
 
 #include "data_share_service_proxy.h"
 
+#include "data_ability_observer_interface.h"
 #include "datashare_itypes_utils.h"
 #include "datashare_log.h"
+#include "datashare_string_utils.h"
 #include "ishared_result_set.h"
 
 namespace OHOS {
@@ -518,6 +520,62 @@ bool DataShareServiceProxy::IsSilentProxyEnable(const std::string &uri)
         LOG_ERROR("Is silent proxy Unmarshal failed.");
     }
     return enable;
+}
+
+int DataShareServiceProxy::RegisterObserver(const Uri &uri, const sptr<OHOS::IRemoteObject> &dataObserver)
+{
+    if (dataObserver == nullptr) {
+        LOG_ERROR("DataObserver is nullptr, uri:%{public}s",
+            DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+        return DATA_SHARE_ERROR;
+    }
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write interface token failed");
+        return DATA_SHARE_ERROR;
+    }
+    if (!ITypesUtil::Marshal(data, uri.ToString(), dataObserver)) {
+        LOG_ERROR("Failed to marshalling");
+        return DATA_SHARE_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_REGISTER_OBSERVER), data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("RegisterObserver fail to sendRequest. uri:%{public}s, err:%{public}d",
+            DataShareStringUtils::Anonymous(uri.ToString()).c_str(), err);
+        return DATA_SHARE_ERROR;
+    }
+    return reply.ReadInt32();
+}
+
+int DataShareServiceProxy::UnRegisterObserver(const Uri &uri, const sptr<OHOS::IRemoteObject> &dataObserver)
+{
+    if (dataObserver == nullptr) {
+        LOG_ERROR("DataObserver is nullptr, uri:%{public}s",
+            DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+        return DATA_SHARE_ERROR;
+    }
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write interface token failed");
+        return DATA_SHARE_ERROR;
+    }
+    if (!ITypesUtil::Marshal(data, uri.ToString(), dataObserver)) {
+        LOG_ERROR("Failed to Marshalling");
+        return DATA_SHARE_ERROR;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_UNREGISTER_OBSERVER), data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("UnRegisterObserver fail to sendRequest. uri: %{public}s, err: %{public}d",
+            DataShareStringUtils::Anonymous(uri.ToString()).c_str(), err);
+        return DATA_SHARE_ERROR;
+    }
+    return reply.ReadInt32();
 }
 } // namespace DataShare
 } // namespace OHOS
