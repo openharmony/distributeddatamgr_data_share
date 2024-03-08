@@ -35,13 +35,13 @@ export default class MainAbility extends Ability {
         console.log("[ttt] [datashareproxyTest] <<Consumer>> MainAbility onCreate")
         globalThis.abilityWant = want;
         globalThis.abilityContext = this.context;
-        console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility onCreate, want:' + want.abilityName);
+        console.log('[ttt] [DataShareTest] DataShareExtAbility onCreate, want:' + want.abilityName);
         console.log("[ttt] [DataShareTest] DataShareExtAbility onCreate this.context.databaseDir:" + this.context.databaseDir);
 
         rdbStore = await rdb.getRdbStore(this.context, { name: DB_NAME }, 1);
-        console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility getRdbStore done');
+        console.log('[ttt] [DataShareTest] DataShareExtAbility getRdbStore done');
         await rdbStore.executeSql(DDL_TBL_CREATE, []);
-        console.log('[ttt] [DataShareTest] <<Provider>> DataShareExtAbility executeSql done');
+        console.log('[ttt] [DataShareTest] DataShareExtAbility executeSql done');
     }
 
     onDestroy() {
