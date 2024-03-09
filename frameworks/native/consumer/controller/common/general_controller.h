@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef GENERAL_CONTROLLER_H
+#define GENERAL_CONTROLLER_H
+
 #include <memory>
 #include <string_ex.h>
 
@@ -22,8 +25,6 @@
 #include "datashare_values_bucket.h"
 #include "uri.h"
 
-#ifndef GENERAL_CONTROLLER_H
-#define GENERAL_CONTROLLER_H
 namespace OHOS {
 namespace AAFwk {
 class IDataAbilityObserver;
