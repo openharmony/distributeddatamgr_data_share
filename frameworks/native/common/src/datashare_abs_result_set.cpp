@@ -96,7 +96,6 @@ int DataShareAbsResultSet::GoTo(int offset)
 
 int DataShareAbsResultSet::GoToFirstRow()
 {
-    DISTRIBUTED_DATA_HITRACE(std::string(__FUNCTION__));
     return GoToRow(0);
 }
 

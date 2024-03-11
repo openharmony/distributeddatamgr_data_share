@@ -81,6 +81,8 @@ datashare_consumer_external_deps = [
   "c_utils:utils",
   "common_event_service:cesfwk_innerkits",
   "hilog:libhilog",
+  "hitrace:hitrace_meter",
+  "hitrace:libhitracechain",
   "ipc:ipc_js",
   "ipc:ipc_single",
   "samgr:samgr_proxy",
@@ -94,6 +96,7 @@ ohos_shared_library("datashare_consumer") {
     debug = false
   }
   include_dirs = [
+    "${datashare_common_native_path}/include",
     "${kvstore_base_path}/frameworks/common",
     "${kvstore_base_path}/interfaces/innerkits/distributeddata/include",
   ]
@@ -205,6 +208,7 @@ ohos_static_library("datashare_consumer_static") {
     debug = false
   }
   include_dirs = [
+    "${datashare_common_native_path}/include",
     "${kvstore_base_path}/frameworks/common",
     "${kvstore_base_path}/interfaces/innerkits/distributeddata/include",
   ]

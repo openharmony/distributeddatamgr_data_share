@@ -12,9 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#define LOG_TAG "DataShareHelperImpl"
 
 #include "datashare_helper_impl.h"
 
+#include "adaptor.h"
 #include "concurrent_map.h"
 #include "data_ability_observer_interface.h"
 #include "dataobs_mgr_client.h"
@@ -91,6 +93,7 @@ int DataShareHelperImpl::OpenRawFile(Uri &uri, const std::string &mode)
 
 int DataShareHelperImpl::Insert(Uri &uri, const DataShareValuesBucket &value)
 {
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl_ is nullptr");
@@ -101,6 +104,7 @@ int DataShareHelperImpl::Insert(Uri &uri, const DataShareValuesBucket &value)
 
 int DataShareHelperImpl::InsertExt(Uri &uri, const DataShareValuesBucket &value, std::string &result)
 {
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("providerSpCtl is nullptr");
@@ -111,6 +115,7 @@ int DataShareHelperImpl::InsertExt(Uri &uri, const DataShareValuesBucket &value,
 
 int DataShareHelperImpl::Update(Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
 {
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
@@ -121,6 +126,7 @@ int DataShareHelperImpl::Update(Uri &uri, const DataSharePredicates &predicates,
 
 int DataShareHelperImpl::Delete(Uri &uri, const DataSharePredicates &predicates)
 {
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
@@ -132,6 +138,7 @@ int DataShareHelperImpl::Delete(Uri &uri, const DataSharePredicates &predicates)
 std::shared_ptr<DataShareResultSet> DataShareHelperImpl::Query(Uri &uri, const DataSharePredicates &predicates,
     std::vector<std::string> &columns, DatashareBusinessError *businessError)
 {
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
@@ -157,6 +164,7 @@ std::string DataShareHelperImpl::GetType(Uri &uri)
 
 int DataShareHelperImpl::BatchInsert(Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("providerSepOperator is nullptr");
@@ -205,6 +213,7 @@ void DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::I
 
 void DataShareHelperImpl::NotifyChange(const Uri &uri)
 {
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
@@ -215,6 +224,7 @@ void DataShareHelperImpl::NotifyChange(const Uri &uri)
 
 Uri DataShareHelperImpl::NormalizeUri(Uri &uri)
 {
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
@@ -225,6 +235,7 @@ Uri DataShareHelperImpl::NormalizeUri(Uri &uri)
 
 Uri DataShareHelperImpl::DenormalizeUri(Uri &uri)
 {
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
@@ -255,6 +266,7 @@ int DataShareHelperImpl::DelQueryTemplate(const std::string &uri, int64_t subscr
 
 std::vector<OperationResult> DataShareHelperImpl::Publish(const Data &data, const std::string &bundleName)
 {
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
@@ -265,6 +277,7 @@ std::vector<OperationResult> DataShareHelperImpl::Publish(const Data &data, cons
 
 Data DataShareHelperImpl::GetPublishedData(const std::string &bundleName, int &resultCode)
 {
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
@@ -348,7 +361,7 @@ std::vector<OperationResult> DataShareHelperImpl::UnsubscribePublishedData(const
 std::vector<OperationResult> DataShareHelperImpl::EnablePubSubs(const std::vector<std::string> &uris,
     int64_t subscriberId)
 {
-    LOG_DEBUG("Start UnSubscribePublishedData");
+    LOG_DEBUG("Start enablePubSubs");
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
@@ -360,7 +373,7 @@ std::vector<OperationResult> DataShareHelperImpl::EnablePubSubs(const std::vecto
 std::vector<OperationResult> DataShareHelperImpl::DisablePubSubs(const std::vector<std::string> &uris,
     int64_t subscriberId)
 {
-    LOG_DEBUG("Start UnSubscribePublishedData");
+    LOG_DEBUG("Start disablePubSubs");
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");

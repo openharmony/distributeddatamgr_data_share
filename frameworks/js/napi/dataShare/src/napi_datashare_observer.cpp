@@ -12,8 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#define LOG_TAG "NAPIDataShareObserver"
+
 #include "napi_datashare_observer.h"
 
+#include "adaptor.h"
 #include <memory>
 #include "datashare_log.h"
 
@@ -23,7 +26,7 @@ NAPIDataShareObserver::~NAPIDataShareObserver() {}
 
 void NAPIDataShareObserver::OnChange()
 {
-    LOG_DEBUG("NAPIDataShareObserver Start");
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     observer_->OnChange();
 }
 }  // namespace DataShare
