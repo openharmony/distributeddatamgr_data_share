@@ -36,6 +36,7 @@ public:
     static napi_value Napi_Delete(napi_env env, napi_callback_info info);
     static napi_value Napi_Query(napi_env env, napi_callback_info info);
     static napi_value Napi_Update(napi_env env, napi_callback_info info);
+    static napi_value Napi_BatchUpdate(napi_env env, napi_callback_info info);
     static napi_value Napi_BatchInsert(napi_env env, napi_callback_info info);
     static napi_value Napi_GetType(napi_env env, napi_callback_info info);
     static napi_value Napi_GetFileTypes(napi_env env, napi_callback_info info);
@@ -107,6 +108,8 @@ private:
         Data publishData;
         std::string bundleName;
         std::vector<OperationResult> results;
+        UpdateOperations updateOperations;
+        std::vector<BatchUpdateResult> batchUpdateResult;
 
         ContextInfo() : Context(nullptr, nullptr) {};
         ContextInfo(InputAction input, OutputAction output) : Context(std::move(input), std::move(output)) {};

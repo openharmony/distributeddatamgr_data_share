@@ -44,6 +44,8 @@ public:
     int InsertExt(Uri &uri, const DataShareValuesBucket &value, std::string &result) override;
 
     int Update(Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) override;
+    
+    int BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results) override;
 
     int Delete(Uri &uri, const DataSharePredicates &predicates) override;
 

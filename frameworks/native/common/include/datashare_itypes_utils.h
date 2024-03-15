@@ -38,6 +38,20 @@ using AshmemNode = DataShare::AshmemNode;
 using OperationStatement = DataShare::OperationStatement;
 using ExecResult = DataShare::ExecResult;
 using ExecResultSet = DataShare::ExecResultSet;
+using UpdateOperation = DataShare::UpdateOperation;
+using BatchUpdateResult = DataShare::BatchUpdateResult;
+
+template<>
+bool Marshalling(const BatchUpdateResult &result, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(BatchUpdateResult &result, MessageParcel &parcel);
+
+template<>
+bool Marshalling(const UpdateOperation &operation, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(UpdateOperation &operation, MessageParcel &parcel);
 
 template<>
 bool Marshalling(const Predicates &bucket, MessageParcel &parcel);

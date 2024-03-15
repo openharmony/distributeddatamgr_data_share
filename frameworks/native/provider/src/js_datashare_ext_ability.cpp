@@ -142,6 +142,42 @@ sptr<IRemoteObject> JsDataShareExtAbility::OnConnect(const AAFwk::Want &want)
     return remoteObject->AsObject();
 }
 
+bool JsDataShareExtAbility::UnwrapBatchUpdateResult(napi_env env, napi_value &info,
+    std::vector<BatchUpdateResult> &results)
+{
+    napi_value keys = 0;
+    if (napi_get_property_names(env, info, &keys) != napi_ok) {
+        LOG_ERROR("napi_get_property_names failed");
+        return false;
+    }
+
+    uint32_t arrLen = 0;
+    if (napi_get_array_length(env, keys, &arrLen) != napi_ok) {
+        LOG_ERROR("napi_get_array_length failed");
+        return false;
+    }
+    for (size_t i = 0; i < arrLen; i++) {
+        napi_value key = 0;
+        if (napi_get_element(env, keys, i, &key) != napi_ok) {
+            LOG_ERROR("napi_get_element failed");
+            return false;
+        }
+        BatchUpdateResult batchUpdateResult;
+        batchUpdateResult.uri = DataShareJSUtils::UnwrapStringFromJS(env, key);
+        napi_value value = 0;
+        if (napi_get_property(env, info, key, &value) != napi_ok) {
+            LOG_ERROR("napi_get_property failed");
+            return false;
+        }
+        if (!UnwrapArrayInt32FromJS(env, value, batchUpdateResult.codes)) {
+            LOG_ERROR("UnwrapArrayInt32FromJS failed");
+            return false;
+        }
+        results.push_back(std::move(batchUpdateResult));
+    }
+    return true;
+}
+
 void JsDataShareExtAbility::CheckAndSetAsyncResult(napi_env env)
 {
     napi_valuetype type = napi_undefined;
@@ -157,6 +193,11 @@ void JsDataShareExtAbility::CheckAndSetAsyncResult(napi_env env)
         JSProxy::JSCreator<ResultSetBridge> *proxy = nullptr;
         napi_unwrap(env, result, reinterpret_cast<void **>(&proxy));
         if (proxy == nullptr) {
+            std::vector<BatchUpdateResult> results;
+            if (UnwrapBatchUpdateResult(env, result, results)) {
+                SetResult(results);
+                return;
+            }
             std::vector<std::string> value;
             OHOS::AppExecFwk::UnwrapArrayStringFromJS(env, result, value);
             SetResult(value);
@@ -570,6 +611,50 @@ int JsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pre
     return ret;
 }
 
+int JsDataShareExtAbility::BatchUpdate(const UpdateOperations &operations,
+    std::vector<BatchUpdateResult> &results)
+{
+    int ret = DataShareExtAbility::BatchUpdate(operations, results);
+    HandleScope handleScope(jsRuntime_);
+    napi_env env = jsRuntime_.GetNapiEnv();
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
+    if (scope == nullptr) {
+        return ret;
+    }
+    napi_value jsMap = nullptr;
+    napi_status status = napi_create_object(env, &jsMap);
+    if (status != napi_ok) {
+        LOG_ERROR("napi_create_object : %{public}d", status);
+        napi_close_handle_scope(env, scope);
+        return ret;
+    }
+    for (const auto &valueArray : operations) {
+        napi_value napiValues = nullptr;
+        status = napi_create_array(env, &napiValues);
+        if (status != napi_ok) {
+            LOG_ERROR("napi_create_array status : %{public}d", status);
+            napi_close_handle_scope(env, scope);
+            return ret;
+        }
+        int32_t index = 0;
+        for (const auto &value : valueArray.second) {
+            napi_value jsUpdateOperation = MakeUpdateOperation(env, value);
+            if (jsUpdateOperation == nullptr) {
+                LOG_ERROR("MakeUpdateOperation failed");
+                napi_close_handle_scope(env, scope);
+                return ret;
+            }
+            napi_set_element(env, napiValues, index++, jsUpdateOperation);
+        }
+        napi_set_named_property(env, jsMap, valueArray.first.c_str(), napiValues);
+    }
+    napi_value argv[] = { jsMap };
+    CallObjectMethod("batchUpdate", argv, 1);
+    napi_close_handle_scope(env, scope);
+    return ret;
+}
+
 int JsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
     int ret = INVALID_VALUE;
@@ -918,6 +1003,29 @@ void JsDataShareExtAbility::NotifyToDataShareService()
     }
     remote->SendRequest(
         static_cast<uint32_t>(DataShareServiceInterfaceCode::DATA_SHARE_SERVICE_CMD_NOTIFY), data, reply, option);
+}
+
+napi_value JsDataShareExtAbility::MakeUpdateOperation(napi_env env, const UpdateOperation &updateOperation)
+{
+    napi_value jsValueBucket = NewInstance(env, const_cast<DataShareValuesBucket&>(updateOperation.valuesBucket));
+    napi_value jsPredicates = MakePredicates(env, updateOperation.predicates);
+    if (jsValueBucket == nullptr || jsPredicates == nullptr) {
+        LOG_ERROR("failed to make new instance of UpdateOperation.");
+        return nullptr;
+    }
+    napi_value jsUpdateOperation = nullptr;
+    napi_status status = napi_create_object(env, &jsUpdateOperation);
+    if (status != napi_ok) {
+        LOG_ERROR("JsDataShareExtAbility create object failed");
+        return nullptr;
+    }
+    std::string valuesKey = "values";
+    std::string presKey = "predicates";
+    napi_value jsValueKey = DataShareJSUtils::Convert2JSValue(env, valuesKey);
+    napi_value jsPresKey = DataShareJSUtils::Convert2JSValue(env, presKey);
+    napi_set_property(env, jsUpdateOperation, jsValueKey, jsValueBucket);
+    napi_set_property(env, jsUpdateOperation, jsPresKey, jsPredicates);
+    return jsUpdateOperation;
 }
 
 bool MakeNapiColumn(napi_env env, napi_value &napiColumns, const std::vector<std::string> &columns)

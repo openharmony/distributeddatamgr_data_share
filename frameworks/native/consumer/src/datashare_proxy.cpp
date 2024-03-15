@@ -225,6 +225,37 @@ int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates
     return index;
 }
 
+int DataShareProxy::BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results)
+{
+    int ret = -1;
+    MessageParcel data;
+    data.SetMaxCapacity(MTU_SIZE);
+    if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
+        LOG_ERROR("WriteInterfaceToken failed");
+        return ret;
+    }
+    if (!CheckSize(operations)) {
+        return ret;
+    }
+    if (!ITypesUtil::Marshal(data, operations)) {
+        LOG_ERROR("fail to Marshalling");
+        return ret;
+    }
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_BATCH_UPDATE), data, reply, option);
+    if (err != DATA_SHARE_NO_ERROR) {
+        LOG_ERROR("fail to SendRequest. err: %{public}d", err);
+        return err;
+    }
+    if (!ITypesUtil::Unmarshal(reply, results)) {
+        LOG_ERROR("fail to Unmarshal result");
+        return ret;
+    }
+    return 0;
+}
+
 int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
     int index = -1;
@@ -497,6 +528,19 @@ Uri DataShareProxy::DenormalizeUri(const Uri &uri)
         return Uri("");
     }
     return info;
+}
+
+bool DataShareProxy::CheckSize(const UpdateOperations &operations)
+{
+    size_t size = 0;
+    for (const auto &it : operations) {
+        size += it.second.size();
+    }
+    if (size > MAX_SIZE) {
+        LOG_ERROR("operations size greater than limit");
+        return false;
+    }
+    return true;
 }
 } // namespace DataShare
 } // namespace OHOS

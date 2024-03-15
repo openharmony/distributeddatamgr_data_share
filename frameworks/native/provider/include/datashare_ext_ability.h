@@ -136,6 +136,16 @@ public:
         const DataShareValuesBucket &value);
 
     /**
+     * @brief Batch updates data records in the database.
+     *
+     * @param updateOperations Indicates the param of data to update.
+     * @param results Indicates the number of data records updated.
+     *
+     * @return Return the execution results of batch updates.
+     */
+    virtual int BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results);
+
+    /**
      * @brief Deletes one or more data records from the database.
      *
      * @param uri Indicates the path of the data to operate.

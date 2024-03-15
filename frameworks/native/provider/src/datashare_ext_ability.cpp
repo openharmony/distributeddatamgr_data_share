@@ -94,6 +94,11 @@ int DataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &predi
     return -1;
 }
 
+int DataShareExtAbility::BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results)
+{
+    return 0;
+}
+
 int DataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
     return -1;

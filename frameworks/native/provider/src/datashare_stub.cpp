@@ -51,6 +51,7 @@ DataShareStub::DataShareStub()
         &DataShareStub::CmdDenormalizeUri;
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_EXECUTE_BATCH)] = &DataShareStub::CmdExecuteBatch;
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERT_EXT)] = &DataShareStub::CmdInsertExt;
+    stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_BATCH_UPDATE)] = &DataShareStub::CmdBatchUpdate;
 }
 
 DataShareStub::~DataShareStub()
@@ -181,6 +182,26 @@ ErrCode DataShareStub::CmdUpdate(MessageParcel &data, MessageParcel &reply)
     }
     if (!reply.WriteInt32(index)) {
         LOG_ERROR("fail to WriteInt32 index");
+        return ERR_INVALID_VALUE;
+    }
+    return DATA_SHARE_NO_ERROR;
+}
+
+ErrCode DataShareStub::CmdBatchUpdate(OHOS::MessageParcel &data, OHOS::MessageParcel &reply)
+{
+    UpdateOperations updateOperations;
+    if (!ITypesUtil::Unmarshal(data, updateOperations)) {
+        LOG_ERROR("Unmarshalling updateOperations is nullptr");
+        return ERR_INVALID_VALUE;
+    }
+    std::vector<BatchUpdateResult> results;
+    int ret = BatchUpdate(updateOperations, results);
+    if (ret != E_OK) {
+        LOG_ERROR("BatchUpdate inner error, ret is %{public}d.", ret);
+        return ret;
+    }
+    if (!ITypesUtil::Marshal(reply, results)) {
+        LOG_ERROR("marshalling updateOperations is failed");
         return ERR_INVALID_VALUE;
     }
     return DATA_SHARE_NO_ERROR;
@@ -407,6 +428,11 @@ int DataShareStub::ExecuteBatch(const std::vector<OperationStatement> &statement
 }
 
 int DataShareStub::InsertExt(const Uri &uri, const DataShareValuesBucket &value, std::string &result)
+{
+    return 0;
+}
+
+int DataShareStub::BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results)
 {
     return 0;
 }

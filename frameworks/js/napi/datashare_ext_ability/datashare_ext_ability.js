@@ -38,6 +38,10 @@ class DataShareExtensionAbility {
     console.log('update, uri:' + uri);
   }
 
+  batchUpdate(operations, callback) {
+    console.log('batchUpdate');
+  }
+
   delete(uri, predicates, callback) {
     console.log('delete, uri:' + uri);
   }

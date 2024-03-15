@@ -44,16 +44,6 @@ static bool GetSilentUri(napi_env env, napi_value jsValue, std::string &uri)
     return false;
 }
 
-static DataSharePredicates UnwrapDataSharePredicates(napi_env env, napi_value value)
-{
-    auto predicates = DataSharePredicatesProxy::GetNativePredicates(env, value);
-    if (predicates == nullptr) {
-        LOG_ERROR("GetNativePredicates is nullptr.");
-        return {};
-    }
-    return DataSharePredicates(predicates->GetOperationList());
-}
-
 static bool UnwrapValuesBucketArrayFromJS(napi_env env, napi_value param, std::vector<DataShareValuesBucket> &value)
 {
     uint32_t arraySize = 0;
@@ -194,6 +184,7 @@ napi_value NapiDataShareHelper::GetConstructor(napi_env env)
         DECLARE_NAPI_FUNCTION("query", Napi_Query),
         DECLARE_NAPI_FUNCTION("update", Napi_Update),
         DECLARE_NAPI_FUNCTION("batchInsert", Napi_BatchInsert),
+        DECLARE_NAPI_FUNCTION("batchUpdate", Napi_BatchUpdate),
         DECLARE_NAPI_FUNCTION("normalizeUri", Napi_NormalizeUri),
         DECLARE_NAPI_FUNCTION("denormalizeUri", Napi_DenormalizeUri),
         DECLARE_NAPI_FUNCTION("notifyChange", Napi_NotifyChange),
@@ -330,7 +321,10 @@ napi_value NapiDataShareHelper::Napi_Delete(napi_env env, napi_callback_info inf
             return napi_invalid_arg;
         }
 
-        context->predicates = UnwrapDataSharePredicates(env, argv[1]);
+        if (!DataShareJSUtils::UnwrapDataSharePredicates(env, argv[1], context->predicates)) {
+            context->error = std::make_shared<ParametersTypeError>("predicates", "DataSharePredicates");
+            return napi_invalid_arg;
+        }
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
@@ -370,7 +364,10 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
             return napi_invalid_arg;
         }
 
-        context->predicates = UnwrapDataSharePredicates(env, argv[1]);
+        if (!DataShareJSUtils::UnwrapDataSharePredicates(env, argv[1], context->predicates)) {
+            context->error = std::make_shared<ParametersTypeError>("predicates", "DataSharePredicates");
+            return napi_invalid_arg;
+        }
 
         context->columns = DataShareJSUtils::Convert2StrVector(env, argv[2], DataShareJSUtils::DEFAULT_BUF_SIZE);
         return napi_ok;
@@ -421,7 +418,10 @@ napi_value NapiDataShareHelper::Napi_Update(napi_env env, napi_callback_info inf
             return napi_invalid_arg;
         }
 
-        context->predicates = UnwrapDataSharePredicates(env, argv[1]);
+        if (!DataShareJSUtils::UnwrapDataSharePredicates(env, argv[1], context->predicates)) {
+            context->error = std::make_shared<ParametersTypeError>("predicates", "DataSharePredicates");
+            return napi_invalid_arg;
+        }
 
         context->valueBucket.Clear();
         if (!GetValueBucketObject(context->valueBucket, env, argv[2])) {
@@ -448,6 +448,45 @@ napi_value NapiDataShareHelper::Napi_Update(napi_env env, napi_callback_info inf
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
                 context->proxy->datashareHelper_ == nullptr, context->uri.empty());
+        }
+    };
+    context->SetAction(std::move(input), std::move(output));
+    AsyncCall asyncCall(env, info, context);
+    return asyncCall.Call(env, exec);
+}
+
+napi_value NapiDataShareHelper::Napi_BatchUpdate(napi_env env, napi_callback_info info)
+{
+    auto context = std::make_shared<ContextInfo>();
+    auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
+        if (argc != 1) {
+            context->error = std::make_shared<ParametersNumError>("1");
+            return napi_invalid_arg;
+        }
+        if (DataShareJSUtils::Convert2Value(env, argv[0], context->updateOperations) != napi_ok) {
+            context->error = std::make_shared<ParametersTypeError>("operations",
+                "Record<string, Array<UpdateOperation>>");
+            return napi_invalid_arg;
+        }
+        return napi_ok;
+    };
+    auto output = [context](napi_env env, napi_value *result) -> napi_status {
+        if (context->resultNumber < 0) {
+            context->error = std::make_shared<InnerError>();
+            return napi_generic_failure;
+        }
+        *result = DataShareJSUtils::Convert2JSValue(env, context->batchUpdateResult);
+        return napi_ok;
+    };
+    auto exec = [context](AsyncCall::Context *ctx) {
+        if (context->proxy->datashareHelper_ != nullptr && !context->updateOperations.empty()) {
+            context->resultNumber = context->proxy->datashareHelper_->BatchUpdate(context->updateOperations,
+                context->batchUpdateResult);
+            context->status = napi_ok;
+        } else {
+            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->updateOperations is empty : %{public}d",
+                context->proxy->datashareHelper_ == nullptr, context->updateOperations.empty());
+            context->error = std::make_shared<InnerError>();
         }
     };
     context->SetAction(std::move(input), std::move(output));

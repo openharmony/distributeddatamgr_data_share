@@ -46,6 +46,8 @@ public:
     int Update(const Uri &uri, const DataSharePredicates &predicates,
         const DataShareValuesBucket &value) override;
 
+    int BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results) override;
+
     int Delete(const Uri &uri, const DataSharePredicates &predicates) override;
 
     std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
