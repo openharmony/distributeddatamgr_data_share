@@ -16,6 +16,7 @@
 #include <unistd.h>
 
 #include "accesstoken_kit.h"
+#include "data_ability_observer_stub.h"
 #include "datashare_helper.h"
 #include "datashare_log.h"
 #include "hap_token_info.h"
@@ -30,6 +31,7 @@ using namespace OHOS::Security::AccessToken;
 constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
 std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
 std::string SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB00/TBL00?Proxy=true";
+std::string SLIENT_REGISTER_URI = "datashare:///com.acts.datasharetest/entry/DB00/TBL02?Proxy=true";
 std::string TBL_STU_NAME = "name";
 std::string TBL_STU_AGE = "age";
 std::shared_ptr<DataShare::DataShareHelper> g_slientAccessHelper;
@@ -40,6 +42,31 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+};
+
+class IDataShareAbilityObserverTest : public AAFwk::DataAbilityObserverStub {
+public:
+    IDataShareAbilityObserverTest() =  default;
+
+    ~IDataShareAbilityObserverTest()
+    {}
+
+    void OnChange()
+    {
+        name = "OnChangeName";
+    }
+
+    std::string GetName()
+    {
+        return name;
+    }
+
+    void SetName(std::string name)
+    {
+        this->name = name;
+    }
+private:
+    std::string name;
 };
 
 std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t systemAbilityId, std::string uri)
@@ -178,6 +205,110 @@ HWTEST_F(SlientAccessTest, SlientAccess_Delete_Test_001, TestSize.Level0)
     int retVal = helper->Delete(uri, deletePredicates);
     EXPECT_EQ((retVal > 0), true);
     LOG_INFO("SlientAccess_Delete_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Register_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Register_Test_001::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_URI);
+    sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest());
+    dataObserver->SetName("zhangsan");
+    helper->RegisterObserver(uri, dataObserver);
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "lisi";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
+    EXPECT_EQ(dataObserver->GetName(), "OnChangeName");
+
+    DataShare::DataSharePredicates deletePredicates;
+    deletePredicates.EqualTo(TBL_STU_NAME, "lisi")->And()->EqualTo(TBL_STU_NAME, 25);
+    retVal = helper->Delete(uri, deletePredicates);
+    EXPECT_EQ((retVal >= 0), true);
+    helper->UnregisterObserver(uri, dataObserver);
+    LOG_INFO("SlientAccess_Register_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_RegisterErrorUri_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_RegisterErrorUri_Test_001::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_URI);
+    sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest());
+    dataObserver->SetName("zhangsan");
+    Uri uriRegister(SLIENT_REGISTER_URI);
+    helper->RegisterObserver(uriRegister, dataObserver);
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "lisi";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
+    EXPECT_NE(dataObserver->GetName(), "OnChangeName");
+
+    DataShare::DataSharePredicates deletePredicates;
+    deletePredicates.EqualTo(TBL_STU_NAME, "lisi")->And()->EqualTo(TBL_STU_NAME, 25);
+    retVal = helper->Delete(uri, deletePredicates);
+    EXPECT_EQ((retVal >= 0), true);
+    helper->UnregisterObserver(uriRegister, dataObserver);
+    LOG_INFO("SlientAccess_RegisterErrorUri_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_NoRegister_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_NoRegister_Test_001::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_URI);
+    sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest());
+    dataObserver->SetName("zhangsan");
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "lisi";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
+    EXPECT_NE(dataObserver->GetName(), "OnChangeName");
+
+    DataShare::DataSharePredicates deletePredicates;
+    deletePredicates.EqualTo(TBL_STU_NAME, "lisi")->And()->EqualTo(TBL_STU_NAME, 25);
+    retVal = helper->Delete(uri, deletePredicates);
+    EXPECT_EQ((retVal >= 0), true);
+    helper->UnregisterObserver(uri, dataObserver);
+    LOG_INFO("SlientAccess_NoRegister_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_NoRegister_Test_002, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_NoRegister_Test_002::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_URI);
+    sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest());
+    dataObserver->SetName("zhangsan");
+    helper->RegisterObserver(uri, dataObserver);
+    helper->UnregisterObserver(uri, dataObserver);
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "lisi";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
+    EXPECT_NE(dataObserver->GetName(), "OnChangeName");
+
+    DataShare::DataSharePredicates deletePredicates;
+    deletePredicates.EqualTo(TBL_STU_NAME, "lisi")->And()->EqualTo(TBL_STU_NAME, 25);
+    retVal = helper->Delete(uri, deletePredicates);
+    EXPECT_EQ((retVal >= 0), true);
+    LOG_INFO("SlientAccess_NoRegister_Test_002::End");
 }
 } // namespace DataShare
 } // namespace OHOS

@@ -17,6 +17,7 @@
 
 #include "accesstoken_kit.h"
 #include "datashare_log.h"
+#include "datashare_string_utils.h"
 #include "ipc_skeleton.h"
 
 namespace OHOS {
@@ -348,6 +349,11 @@ bool DataShareStubImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IData
     if (extension == nullptr) {
         return false;
     }
+    if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {
+        LOG_ERROR("Register observer check permission failed. uri: %{public}s",
+            DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+        return PERMISSION_ERROR_NUMBER;
+    }
     return extension->RegisterObserver(uri, dataObserver);
 }
 
@@ -356,6 +362,11 @@ bool DataShareStubImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDa
     auto extension = GetOwner();
     if (extension == nullptr) {
         return false;
+    }
+    if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {
+        LOG_ERROR("UnRegister observer check permission failed. uri: %{public}s",
+            DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+        return PERMISSION_ERROR_NUMBER;
     }
     return extension->UnregisterObserver(uri, dataObserver);
 }

@@ -72,6 +72,12 @@ public:
     int SetSilentSwitch(const Uri &uri, bool enable) override;
 
     bool IsSilentProxyEnable(const std::string &uri) override;
+    
+    int RegisterObserver(const Uri &uri,
+        const sptr<OHOS::IRemoteObject> &dataObserver) override;
+
+    int UnRegisterObserver(const Uri &uri,
+        const sptr<OHOS::IRemoteObject> &dataObserver) override;
 
 private:
     static inline BrokerDelegator<DataShareServiceProxy> delegator_;

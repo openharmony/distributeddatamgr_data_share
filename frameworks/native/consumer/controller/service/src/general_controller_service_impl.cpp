@@ -16,12 +16,19 @@
 #include "general_controller_service_impl.h"
 
 #include "dataobs_mgr_client.h"
+#include "dataobs_mgr_errors.h"
 #include "datashare_log.h"
 #include "datashare_string_utils.h"
 
 namespace OHOS {
 namespace DataShare {
 constexpr int INVALID_VALUE = -1;
+GeneralControllerServiceImpl::~GeneralControllerServiceImpl()
+{
+    auto manager = DataShareManagerImpl::GetInstance();
+    manager->RemoveRegisterCallback(this);
+}
+
 int GeneralControllerServiceImpl::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
     auto proxy = DataShareManagerImpl::GetServiceProxy();
@@ -67,27 +74,48 @@ std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Ur
 void GeneralControllerServiceImpl::RegisterObserver(const Uri &uri,
     const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
-    if (obsMgrClient == nullptr) {
-        LOG_ERROR("get DataObsMgrClient failed");
+    SetRegisterCallback();
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("Proxy is nullptr, uri: %{public}s", DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+        observers_.Compute(dataObserver, [&uri](const auto &, auto &value) {
+            value.emplace_back(uri);
+            return true;
+        });
         return;
     }
-    ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
+    auto ret = proxy->RegisterObserver(uri, dataObserver->AsObject());
     LOG_INFO("Register observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+    if (ret == E_OK || ret == AAFwk::OBS_EXIST) {
+        observers_.Compute(dataObserver, [&uri](const auto &, auto &value) {
+            value.emplace_back(uri);
+            return true;
+        });
+    }
+    return;
 }
 
 void GeneralControllerServiceImpl::UnregisterObserver(const Uri &uri,
     const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
-    if (obsMgrClient == nullptr) {
-        LOG_ERROR("get DataObsMgrClient failed");
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("Proxy is nullptr");
         return;
     }
-    ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver);
-    LOG_INFO("Unregister observer ret: %{public}d, uri: %{public}s", ret,
+    auto ret = proxy->UnRegisterObserver(uri, dataObserver->AsObject());
+    LOG_INFO("UnRegister observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+    if (ret == E_OK) {
+        observers_.Compute(dataObserver, [&uri](const auto &, auto &value) {
+            value.remove_if([&uri](const auto &val) {
+                return uri == val;
+            });
+            return !value.empty();
+        });
+    }
+    return;
 }
 
 void GeneralControllerServiceImpl::NotifyChange(const Uri &uri)
@@ -98,6 +126,32 @@ void GeneralControllerServiceImpl::NotifyChange(const Uri &uri)
         return;
     }
     proxy->Notify(uri.ToString());
+}
+
+void GeneralControllerServiceImpl::SetRegisterCallback()
+{
+    auto manager = DataShareManagerImpl::GetInstance();
+    if (manager == nullptr) {
+        LOG_ERROR("Manager is nullptr");
+        return;
+    }
+    auto registerCallback = [this]() {
+        ReRegisterObserver();
+    };
+    manager->SetRegisterCallback(this, registerCallback);
+}
+
+void GeneralControllerServiceImpl::ReRegisterObserver()
+{
+    LOG_INFO("Distributeddata service on start, reRegister observer.");
+    decltype(observers_) observers(std::move(observers_));
+    observers_.Clear();
+    observers.ForEach([this](const auto &key, const auto &value) {
+        for (const auto &uri : value) {
+            RegisterObserver(uri, key);
+        }
+        return false;
+    });
 }
 } // namespace DataShare
 } // namespace OHOS

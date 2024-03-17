@@ -16,8 +16,12 @@
 #ifndef GENERAL_CONTROLLER_SERVICE_IMPL_H
 #define GENERAL_CONTROLLER_SERVICE_IMPL_H
 
+#include <memory>
+
+#include "concurrent_map.h"
 #include "data_share_manager_impl.h"
 #include "general_controller.h"
+#include "uri.h"
 
 namespace OHOS {
 namespace AAFwk {
@@ -29,7 +33,7 @@ class GeneralControllerServiceImpl : public GeneralController {
 public:
     GeneralControllerServiceImpl() = default;
 
-    virtual ~GeneralControllerServiceImpl() = default;
+    virtual ~GeneralControllerServiceImpl();
 
     int Insert(const Uri &uri, const DataShareValuesBucket &value) override;
 
@@ -45,6 +49,12 @@ public:
     void UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
 
     void NotifyChange(const Uri &uri) override;
+private:
+    void ReRegisterObserver();
+
+    void SetRegisterCallback();
+
+    ConcurrentMap<sptr<AAFwk::IDataAbilityObserver>, std::list<Uri>> observers_;
 };
 } // namespace DataShare
 } // namespace OHOS
