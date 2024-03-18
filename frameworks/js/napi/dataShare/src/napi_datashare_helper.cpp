@@ -192,6 +192,7 @@ napi_value NapiDataShareHelper::GetConstructor(napi_env env)
         DECLARE_NAPI_FUNCTION("delTemplate", Napi_DelTemplate),
         DECLARE_NAPI_FUNCTION("publish", Napi_Publish),
         DECLARE_NAPI_FUNCTION("getPublishedData", Napi_GetPublishedData),
+        DECLARE_NAPI_FUNCTION("close", Napi_Close),
     };
     NAPI_CALL(env, napi_define_class(env, "DataShareHelper", NAPI_AUTO_LENGTH, Initialize, nullptr,
         sizeof(clzDes) / sizeof(napi_property_descriptor), clzDes, &cons));
@@ -247,6 +248,7 @@ napi_value NapiDataShareHelper::Napi_OpenFile(napi_env env, napi_callback_info i
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
+        std::lock_guard<std::mutex> lock(lockHelper_);
         if (context->proxy->datashareHelper_ != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
             context->resultNumber = context->proxy->datashareHelper_->OpenFile(uri, context->mode);
@@ -254,6 +256,7 @@ napi_value NapiDataShareHelper::Napi_OpenFile(napi_env env, napi_callback_info i
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
                 context->proxy->datashareHelper_ == nullptr, context->uri.empty());
+            context->error = std::make_shared<HelperNotExistError>();
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -293,6 +296,7 @@ napi_value NapiDataShareHelper::Napi_Insert(napi_env env, napi_callback_info inf
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
+        std::lock_guard<std::mutex> lock(lockHelper_);
         if (context->proxy->datashareHelper_ != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
             context->resultNumber = context->proxy->datashareHelper_->Insert(uri, context->valueBucket);
@@ -300,6 +304,7 @@ napi_value NapiDataShareHelper::Napi_Insert(napi_env env, napi_callback_info inf
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
                 context->proxy->datashareHelper_ == nullptr, context->uri.empty());
+            context->error = std::make_shared<HelperNotExistError>();
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -336,6 +341,7 @@ napi_value NapiDataShareHelper::Napi_Delete(napi_env env, napi_callback_info inf
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
+        std::lock_guard<std::mutex> lock(lockHelper_);
         if (context->proxy->datashareHelper_ != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
             context->resultNumber = context->proxy->datashareHelper_->Delete(uri, context->predicates);
@@ -343,6 +349,7 @@ napi_value NapiDataShareHelper::Napi_Delete(napi_env env, napi_callback_info inf
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
                 context->proxy->datashareHelper_ == nullptr, context->uri.empty());
+            context->error = std::make_shared<HelperNotExistError>();
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -389,6 +396,7 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
+        std::lock_guard<std::mutex> lock(lockHelper_);
         if (context->proxy->datashareHelper_ != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
             context->resultObject = context->proxy->datashareHelper_->Query(uri,
@@ -397,6 +405,7 @@ napi_value NapiDataShareHelper::Napi_Query(napi_env env, napi_callback_info info
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
                 context->proxy->datashareHelper_ == nullptr, context->uri.empty());
+            context->error = std::make_shared<HelperNotExistError>();
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -440,6 +449,7 @@ napi_value NapiDataShareHelper::Napi_Update(napi_env env, napi_callback_info inf
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
+        std::lock_guard<std::mutex> lock(lockHelper_);
         if (context->proxy->datashareHelper_ != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
             context->resultNumber =
@@ -448,6 +458,7 @@ napi_value NapiDataShareHelper::Napi_Update(napi_env env, napi_callback_info inf
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
                 context->proxy->datashareHelper_ == nullptr, context->uri.empty());
+            context->error = std::make_shared<HelperNotExistError>();
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -479,6 +490,7 @@ napi_value NapiDataShareHelper::Napi_BatchUpdate(napi_env env, napi_callback_inf
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
+        std::lock_guard<std::mutex> lock(lockHelper_);
         if (context->proxy->datashareHelper_ != nullptr && !context->updateOperations.empty()) {
             context->resultNumber = context->proxy->datashareHelper_->BatchUpdate(context->updateOperations,
                 context->batchUpdateResult);
@@ -486,7 +498,7 @@ napi_value NapiDataShareHelper::Napi_BatchUpdate(napi_env env, napi_callback_inf
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->updateOperations is empty : %{public}d",
                 context->proxy->datashareHelper_ == nullptr, context->updateOperations.empty());
-            context->error = std::make_shared<InnerError>();
+            context->error = std::make_shared<HelperNotExistError>();
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -525,6 +537,7 @@ napi_value NapiDataShareHelper::Napi_BatchInsert(napi_env env, napi_callback_inf
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
+        std::lock_guard<std::mutex> lock(lockHelper_);
         if (context->proxy->datashareHelper_ != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
             context->resultNumber = context->proxy->datashareHelper_->BatchInsert(uri, context->values);
@@ -532,6 +545,7 @@ napi_value NapiDataShareHelper::Napi_BatchInsert(napi_env env, napi_callback_inf
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
                 context->proxy->datashareHelper_ == nullptr, context->uri.empty());
+            context->error = std::make_shared<HelperNotExistError>();
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -553,6 +567,7 @@ napi_value NapiDataShareHelper::Napi_GetType(napi_env env, napi_callback_info in
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
+        std::lock_guard<std::mutex> lock(lockHelper_);
         if (context->proxy->datashareHelper_ != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
             context->resultString = context->proxy->datashareHelper_->GetType(uri);
@@ -560,6 +575,7 @@ napi_value NapiDataShareHelper::Napi_GetType(napi_env env, napi_callback_info in
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
                 context->proxy->datashareHelper_ == nullptr, context->uri.empty());
+            context->error = std::make_shared<HelperNotExistError>();
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -589,6 +605,7 @@ napi_value NapiDataShareHelper::Napi_GetFileTypes(napi_env env, napi_callback_in
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
+        std::lock_guard<std::mutex> lock(lockHelper_);
         if (context->proxy->datashareHelper_ != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
             context->resultStrArr = context->proxy->datashareHelper_->GetFileTypes(uri, context->mimeTypeFilter);
@@ -596,6 +613,7 @@ napi_value NapiDataShareHelper::Napi_GetFileTypes(napi_env env, napi_callback_in
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
                 context->proxy->datashareHelper_ == nullptr, context->uri.empty());
+            context->error = std::make_shared<HelperNotExistError>();
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -617,6 +635,7 @@ napi_value NapiDataShareHelper::Napi_NormalizeUri(napi_env env, napi_callback_in
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
+        std::lock_guard<std::mutex> lock(lockHelper_);
         if (context->proxy->datashareHelper_ != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
             Uri uriValue = context->proxy->datashareHelper_->NormalizeUri(uri);
@@ -625,6 +644,7 @@ napi_value NapiDataShareHelper::Napi_NormalizeUri(napi_env env, napi_callback_in
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
                 context->proxy->datashareHelper_ == nullptr, context->uri.empty());
+            context->error = std::make_shared<HelperNotExistError>();
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -646,6 +666,7 @@ napi_value NapiDataShareHelper::Napi_DenormalizeUri(napi_env env, napi_callback_
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
+        std::lock_guard<std::mutex> lock(lockHelper_);
         if (context->proxy->datashareHelper_ != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
             Uri uriValue = context->proxy->datashareHelper_->DenormalizeUri(uri);
@@ -654,6 +675,7 @@ napi_value NapiDataShareHelper::Napi_DenormalizeUri(napi_env env, napi_callback_
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
                 context->proxy->datashareHelper_ == nullptr, context->uri.empty());
+            context->error = std::make_shared<HelperNotExistError>();
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -675,6 +697,7 @@ napi_value NapiDataShareHelper::Napi_NotifyChange(napi_env env, napi_callback_in
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
+        std::lock_guard<std::mutex> lock(lockHelper_);
         if (context->proxy->datashareHelper_ != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
             context->proxy->datashareHelper_->NotifyChange(uri);
@@ -682,6 +705,7 @@ napi_value NapiDataShareHelper::Napi_NotifyChange(napi_env env, napi_callback_in
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
                 context->proxy->datashareHelper_ == nullptr, context->uri.empty());
+            context->error = std::make_shared<HelperNotExistError>();
         }
     };
     context->SetAction(std::move(input), std::move(output));
@@ -934,6 +958,34 @@ napi_value NapiDataShareHelper::Napi_Off(napi_env env, napi_callback_info info)
     }
     proxy->UnRegisteredObserver(env, uri);
     return nullptr;
+}
+
+napi_value NapiDataShareHelper::Napi_Close(napi_env env, napi_callback_info info)
+{
+    auto context = std::make_shared<ContextInfo>();
+    auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
+        return napi_ok;
+    };
+    auto output = [context](napi_env env, napi_value *result) -> napi_status {
+        napi_get_null(env, result);
+        return napi_ok;
+    };
+    auto exec = [context](AsyncCall::Context *ctx) {
+        std::lock_guard<std::mutex> lock(lockHelper_);
+        if (context->proxy->datashareHelper_ != nullptr) {
+            if (context->proxy->datashareHelper_->Release()) {
+                context->proxy->datashareHelper_ = nullptr;
+                context->status = napi_ok;
+            } else {
+                context->error = std::make_shared<InnerError>();
+            }
+        } else {
+            LOG_WARN("The dataShareHelper has been closed.");
+        }
+    };
+    context->SetAction(std::move(input), std::move(output));
+    AsyncCall asyncCall(env, info, context);
+    return asyncCall.Call(env, exec);
 }
 
 bool NapiDataShareHelper::HasRegisteredObserver(napi_env env, std::list<sptr<NAPIDataShareObserver>> &list,

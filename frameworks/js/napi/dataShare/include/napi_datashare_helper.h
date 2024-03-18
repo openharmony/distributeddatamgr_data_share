@@ -49,6 +49,7 @@ public:
     static napi_value Napi_GetPublishedData(napi_env env, napi_callback_info info);
     static napi_value EnableSilentProxy(napi_env env, napi_callback_info info);
     static napi_value DisableSilentProxy(napi_env env, napi_callback_info info);
+    static napi_value Napi_Close(napi_env env, napi_callback_info info);
 
 private:
     static napi_value GetConstructor(napi_env env);
@@ -110,6 +111,7 @@ private:
         std::vector<OperationResult> results;
         UpdateOperations updateOperations;
         std::vector<BatchUpdateResult> batchUpdateResult;
+        static std::mutex lockHelper_;
 
         ContextInfo() : Context(nullptr, nullptr) {};
         ContextInfo(InputAction input, OutputAction output) : Context(std::move(input), std::move(output)) {};
