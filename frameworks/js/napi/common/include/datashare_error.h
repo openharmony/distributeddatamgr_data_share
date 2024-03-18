@@ -28,6 +28,7 @@ public:
     static const int EXCEPTION_HELPER_UNINITIALIZED = 15700010;
     static const int EXCEPTION_URI_NOT_EXIST = 15700011;
     static const int EXCEPTION_DATA_AREA_NOT_EXIST = 15700012;
+    static const int EXCEPTION_HELPER_CLOSED = 15700013;
     virtual ~Error() {};
     virtual std::string GetMessage() const = 0;
     virtual int GetCode() const = 0;

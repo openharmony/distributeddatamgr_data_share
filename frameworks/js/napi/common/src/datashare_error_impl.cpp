@@ -87,14 +87,14 @@ int DataAreaNotExistError::GetCode() const
     return EXCEPTION_DATA_AREA_NOT_EXIST;
 }
 
-std::string HelperNotExistError::GetMessage() const
+std::string HelperAlreadyClosedError::GetMessage() const
 {
-    return "The dataShareHelper has been closed.";
+    return "The DataShareHelper instance is already closed.";
 }
 
-int HelperNotExistError::GetCode() const
+int HelperAlreadyClosedError::GetCode() const
 {
-    return EXCEPTION_HELPER_UNINITIALIZED;
+    return EXCEPTION_HELPER_CLOSED;
 }
 } // namespace DataShare
 } // namespace OHOS

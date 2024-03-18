@@ -78,9 +78,9 @@ public:
     int GetCode() const override;
 };
 
-class HelperNotExistError : public Error {
+class HelperAlreadyClosedError : public Error {
 public:
-    HelperNotExistError() = default;
+    HelperAlreadyClosedError() = default;
     std::string GetMessage() const override;
     int GetCode() const override;
 };
