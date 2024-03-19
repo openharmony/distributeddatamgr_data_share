@@ -68,7 +68,7 @@ public:
 private:
     bool CheckSize(const UpdateOperations &operations);
     static inline BrokerDelegator<DataShareProxy> delegator_;
-    static const size_t MTU_SIZE = 912600; // 900k
+    static const size_t MTU_SIZE = 921600; // 900k
     static const size_t MAX_SIZE = 4000;
 };
 } // namespace DataShare

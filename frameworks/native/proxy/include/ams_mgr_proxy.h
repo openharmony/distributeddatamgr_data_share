@@ -47,6 +47,7 @@ private:
     };
     void OnProxyDied();
     bool ConnectSA();
+    static std::mutex pmutex_;
     std::mutex mutex_;
     sptr<IRemoteObject> sa_;
     sptr<Proxy> proxy_;
