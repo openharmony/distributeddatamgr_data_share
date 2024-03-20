@@ -77,6 +77,13 @@ public:
     std::string GetMessage() const override;
     int GetCode() const override;
 };
+
+class HelperAlreadyClosedError : public Error {
+public:
+    HelperAlreadyClosedError() = default;
+    std::string GetMessage() const override;
+    int GetCode() const override;
+};
 } // namespace DataShare
 } // namespace OHOS
 #endif // DATASHARE_ERROR_IMPL_H

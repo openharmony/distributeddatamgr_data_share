@@ -23,6 +23,7 @@
 #include "data_share_common.h"
 #include "datashare_helper.h"
 #include "napi_datashare_observer.h"
+#include <shared_mutex>
 
 namespace OHOS {
 namespace DataShare {
@@ -49,6 +50,7 @@ public:
     static napi_value Napi_GetPublishedData(napi_env env, napi_callback_info info);
     static napi_value EnableSilentProxy(napi_env env, napi_callback_info info);
     static napi_value DisableSilentProxy(napi_env env, napi_callback_info info);
+    static napi_value Napi_Close(napi_env env, napi_callback_info info);
 
 private:
     static napi_value GetConstructor(napi_env env);
@@ -60,13 +62,18 @@ private:
     static napi_value SetSilentSwitch(napi_env env, napi_callback_info info, bool enable);
 
     bool HasRegisteredObserver(napi_env env, std::list<sptr<NAPIDataShareObserver>> &list, napi_value callback);
-    void RegisteredObserver(napi_env env, const std::string &uri, napi_value callback);
-    void UnRegisteredObserver(napi_env env, const std::string &uri, napi_value callback);
-    void UnRegisteredObserver(napi_env env, const std::string &uri);
+    void RegisteredObserver(napi_env env, const std::string &uri, napi_value callback,
+        std::shared_ptr<DataShareHelper> helper);
+    void UnRegisteredObserver(napi_env env, const std::string &uri, napi_value callback,
+        std::shared_ptr<DataShareHelper> helper);
+    void UnRegisteredObserver(napi_env env, const std::string &uri, std::shared_ptr<DataShareHelper> helper);
     static bool GetOptions(napi_env env, napi_value jsValue, CreateOptions &options);
+    void SetHelper(std::shared_ptr<DataShareHelper> dataShareHelper);
+    std::shared_ptr<DataShareHelper> GetHelper();
     std::shared_ptr<DataShareHelper> datashareHelper_ = nullptr;
     std::map<std::string, std::list<sptr<NAPIDataShareObserver>>> observerMap_;
     std::mutex listMutex_{};
+    std::shared_mutex mutex_;
     std::shared_ptr<NapiRdbSubscriberManager> jsRdbObsManager_ = nullptr;
     std::shared_ptr<NapiPublishedSubscriberManager> jsPublishedObsManager_ = nullptr;
 

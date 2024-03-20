@@ -86,5 +86,15 @@ int DataAreaNotExistError::GetCode() const
 {
     return EXCEPTION_DATA_AREA_NOT_EXIST;
 }
+
+std::string HelperAlreadyClosedError::GetMessage() const
+{
+    return "The DataShareHelper instance is already closed.";
+}
+
+int HelperAlreadyClosedError::GetCode() const
+{
+    return EXCEPTION_HELPER_CLOSED;
+}
 } // namespace DataShare
 } // namespace OHOS
