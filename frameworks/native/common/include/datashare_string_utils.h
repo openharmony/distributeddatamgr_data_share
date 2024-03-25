@@ -26,6 +26,8 @@ class DataShareStringUtils {
 public:
     static std::string Anonymous(const std::string &name);
 
+    static void RemoveUriQuery(std::string &uri);
+
 private:
     DataShareStringUtils();
     ~DataShareStringUtils();

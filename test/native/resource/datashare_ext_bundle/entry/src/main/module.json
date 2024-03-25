@@ -45,6 +45,33 @@
         "uri": "datashare://com.acts.datasharetest",
         "visible": true
       }
+    ],
+    "proxyData":[
+      {
+        "uri": "datashareproxy://com.acts.datasharetest/test",
+        "requiredReadPermission":"ohos.permission.GET_BUNDLE_INFO",
+        "requiredWritePermission":"ohos.permission.WRITE_CONTACTS",
+        "metadata": {
+          "name": "dataProperties",
+          "resource": "$profile:test"
+        }
+      },
+      {
+        "uri": "datashare://com.acts.datasharetest/test",
+        "requiredReadPermission":"ohos.permission.READ_CALL_LOG",
+        "metadata": {
+          "name": "dataProperties",
+          "resource": "$profile:test"
+        }
+      },
+      {
+        "uri": "datashare://com.acts.datasharetest/test/permission",
+        "requiredWritePermission":"ohos.permission.WRITE_CALL_LOG",
+        "metadata": {
+          "name": "dataProperties",
+          "resource": "$profile:test"
+        }
+      }
     ]
   }
 }

@@ -1,0 +1,82 @@
+/*
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#define LOG_TAG "DataSharePermission"
+
+#include "data_share_permission.h"
+
+#include <regex>
+#include <string>
+
+#include "data_share_called_config.h"
+#include "datashare_errno.h"
+#include "datashare_log.h"
+#include "datashare_string_utils.h"
+
+namespace OHOS {
+namespace DataShare {
+using namespace AppExecFwk;
+int DataSharePermission::VerifyPermission(AccessTokenID tokenID, const Uri &uri, bool isRead)
+{
+    if (!VerifyParam(uri)) {
+        LOG_ERROR("Param error, tokenId:0x%{public}x, uri:%{public}s", tokenID,
+            DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+        return ERR_INVALID_VALUE;
+    }
+    Uri uriTemp(uri);
+    auto isProxyData = PROXY_URI_SCHEMA == uriTemp.GetScheme();
+    DataShareCalledConfig calledConfig(uri.ToString());
+    auto [errCode, providerInfo] = calledConfig.GetProviderInfo(isProxyData, tokenID);
+    if (errCode != E_OK) {
+        LOG_ERROR("ProviderInfo failed! token:0x%{public}x, errCode:%{public}d,uri:%{public}s", tokenID,
+            errCode, DataShareStringUtils::Anonymous(providerInfo.uri).c_str());
+        return errCode;
+    }
+    auto permission = providerInfo.readPermission;
+    if (!isRead) {
+        permission = providerInfo.writePermission;
+    }
+    if (permission.empty()) {
+        LOG_ERROR("reject, tokenId:0x%{public}x, uri:%{public}s", tokenID,
+            DataShareStringUtils::Anonymous(providerInfo.uri).c_str());
+        return ERR_PERMISSION_DENIED;
+    }
+    int status =
+        Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenID, permission);
+    if (status != Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
+        LOG_ERROR("Permission denied! token:0x%{public}x,permission:%{public}s,uri:%{public}s",
+            tokenID, permission.c_str(), DataShareStringUtils::Anonymous(providerInfo.uri).c_str());
+        return ERR_PERMISSION_DENIED;
+    }
+    return E_OK;
+}
+
+bool DataSharePermission::VerifyParam(const Uri &uri)
+{
+    if (uri.ToString().empty()) {
+        return false;
+    }
+    Uri uriTemp(uri);
+    std::regex proxyRegex("^datashareproxy://(?!/)([^/].*)");
+    if (std::regex_match(uriTemp.ToString(), proxyRegex)) {
+        return true;
+    }
+    std::regex datashareRegex("^datashare:///(?!/)([^/].*)");
+    if (std::regex_match(uriTemp.ToString(), datashareRegex)) {
+        return true;
+    }
+    return false;
+}
+} // namespace DataShare
+} // namespace OHOS
