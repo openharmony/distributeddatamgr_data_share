@@ -147,26 +147,21 @@ bool MediaDataShareUnitTest::ValueBucketEqual(const VBuckets& v1, const VBuckets
     if (v1.size() != v2.size()) {
         return false;
     }
-
     for (size_t i = 0; i < v1.size(); i++) {
         const VBucket& vb1 = v1[i];
         const VBucket& vb2 = v2[i];
-
         if (vb1.size() != vb2.size()) {
             return false;
         }
-
         for (const auto& pair1 : vb1) {
             const auto& key = pair1.first;
             const auto& value1 = pair1.second;
-
             auto it2 = vb2.find(key);
             if (it2 == vb2.end() || it2->second != value1) {
                 return false;
             }
         }
     }
-
     return true;
 }
 
@@ -1466,7 +1461,7 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperRegisterObserverController
 
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_002, TestSize.Level0)
 {
-    LOG_INFO("MediaDataShare_ObserverExt_001 start");
+    LOG_INFO("MediaDataShare_ObserverExt_002 start");
     std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
     ASSERT_TRUE(helper != nullptr);
     Uri uri(MEDIALIBRARY_DATA_URI);
@@ -1489,12 +1484,12 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_002, TestSize.Level0
     dataObserver->Clear();
 
     helper->UnregisterObserverExt(uri, dataObserver);
-    LOG_INFO("MediaDataShare_ObserverExt_001 end");
+    LOG_INFO("MediaDataShare_ObserverExt_002 end");
 }
 
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_002, TestSize.Level0)
 {
-    LOG_INFO("MediaDataShare_UnregisterObserverExt_001 start");
+    LOG_INFO("MediaDataShare_UnregisterObserverExt_002 start");
     std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
     ASSERT_TRUE(helper != nullptr);
     Uri uri(MEDIALIBRARY_DATA_URI);
@@ -1521,7 +1516,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_002, TestS
     dataObserver->data.Wait();
     EXPECT_FALSE(ChangeInfoEqual(dataObserver->changeInfo_, uriChanges));
     dataObserver->Clear();
-    LOG_INFO("MediaDataShare_UnregisterObserverExt_001 end");
+    LOG_INFO("MediaDataShare_UnregisterObserverExt_002 end");
 }
 } // namespace DataShare
 } // namespace OHOS

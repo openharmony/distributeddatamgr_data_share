@@ -20,10 +20,10 @@
 #include "datashare_log.h"
 #include "datashare_predicates_proxy.h"
 #include "datashare_result_set_proxy.h"
+#include "datashare_valuebucket_convert.h"
 #include "napi_base_context.h"
 #include "napi_common_util.h"
 #include "napi_datashare_values_bucket.h"
-#include "datashare_valuebucket_convert.h"
 
 using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
@@ -644,7 +644,7 @@ napi_value NapiDataShareHelper::Napi_DenormalizeUri(napi_env env, napi_callback_
     return asyncCall.Call(env, exec);
 }
 
-void NapiDataShareHelper::notify(const std::shared_ptr<NapiDataShareHelper::ContextInfo>& context,
+void NapiDataShareHelper::Notify(const std::shared_ptr<NapiDataShareHelper::ContextInfo>& context,
     std::shared_ptr<DataShareHelper>& helper)
 {
     if (!context->isNotifyDetails) {
@@ -690,7 +690,7 @@ napi_value NapiDataShareHelper::Napi_NotifyChange(napi_env env, napi_callback_in
     auto exec = [context](AsyncCall::Context *ctx) {
         auto helper = context->proxy->GetHelper();
         if (helper != nullptr) {
-            notify(context, helper);
+            Notify(context, helper);
         } else {
             LOG_ERROR("helper == nullptr : %{public}d", helper == nullptr);
             context->error = std::make_shared<HelperAlreadyClosedError>();
@@ -950,12 +950,12 @@ napi_value NapiDataShareHelper::Napi_Off(napi_env env, napi_callback_info info)
     } else if (type == "publishedDataChange") {
         return Napi_UnsubscribePublishedObserver(env, argc, argv, self);
     } else if (type == "dataChange") {
-        return Napi_UnRegisterObserver(env, argc, argv, self);
+        return Napi_UnregisterObserver(env, argc, argv, self);
     }
     LOG_ERROR("wrong register type : %{public}s", type.c_str());
     return nullptr;
 }
-napi_value NapiDataShareHelper::Napi_UnRegisterObserver(napi_env env, size_t argc, napi_value *argv, napi_value self)
+napi_value NapiDataShareHelper::Napi_UnregisterObserver(napi_env env, size_t argc, napi_value *argv, napi_value self)
 {
     std::shared_ptr<Error> error = nullptr;
     NapiDataShareHelper* proxy = nullptr;

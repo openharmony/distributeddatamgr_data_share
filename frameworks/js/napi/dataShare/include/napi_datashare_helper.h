@@ -58,7 +58,7 @@ private:
     static napi_value Napi_SubscribeRdbObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
     static napi_value Napi_UnsubscribeRdbObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
     static napi_value Napi_RegisterObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
-    static napi_value Napi_UnRegisterObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
+    static napi_value Napi_UnregisterObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
     static napi_value Napi_SubscribePublishedObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
     static napi_value Napi_UnsubscribePublishedObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
     static napi_value SetSilentSwitch(napi_env env, napi_callback_info info, bool enable);
@@ -141,7 +141,7 @@ private:
             return Context::operator()(env, result);
         }
     };
-    static void notify(const std::shared_ptr<NapiDataShareHelper::ContextInfo>& context,
+    static void Notify(const std::shared_ptr<NapiDataShareHelper::ContextInfo>& context,
         std::shared_ptr<DataShareHelper>& helper);
 };
 } // namespace DataShare
