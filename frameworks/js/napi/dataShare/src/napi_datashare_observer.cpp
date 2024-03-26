@@ -29,5 +29,11 @@ void NAPIDataShareObserver::OnChange()
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     observer_->OnChange();
 }
+
+void NAPIDataShareObserver::OnChange(const ChangeInfo &changeInfo)
+{
+    LOG_DEBUG("NAPIDataShareObserver ChangeInfo Start");
+    observer_->OnChange(changeInfo);
+}
 }  // namespace DataShare
 }  // namespace OHOS

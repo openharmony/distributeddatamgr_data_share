@@ -19,6 +19,7 @@
 #include <chrono>
 #include <cinttypes>
 #include "datashare_log.h"
+#include "napi_datashare_values_bucket.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -49,10 +50,11 @@ void NAPIInnerObserver::OnComplete(uv_work_t *work, int status)
     napi_value callback = nullptr;
     napi_value args[2] = {0};
     napi_value global = nullptr;
-    napi_value result;
     napi_get_reference_value(observer->env_, observer->ref_, &callback);
     napi_get_global(observer->env_, &global);
-    napi_status callStatus = napi_call_function(observer->env_, global, callback, 2, args, &result);
+    napi_get_undefined(observer->env_, &args[0]);
+    args[1] = DataShareJSUtils::Convert2JSValue(observer->env_, innerWorker->result_);
+    napi_status callStatus = napi_call_function(observer->env_, global, callback, 2, args, nullptr);
     napi_close_handle_scope(observer->env_, scope);
     if (callStatus != napi_ok) {
         LOG_ERROR("napi_call_function failed status : %{public}d", callStatus);
@@ -78,6 +80,34 @@ void NAPIInnerObserver::OnChange()
     if (work == nullptr) {
         delete observerWorker;
         LOG_ERROR("Failed to create uv work");
+        return;
+    }
+    work->data = observerWorker;
+    int ret = uv_queue_work_with_qos(loop_, work, [](uv_work_t *work) {},
+        NAPIInnerObserver::OnComplete, uv_qos_user_initiated);
+    if (ret != 0) {
+        LOG_ERROR("uv_queue_work failed");
+        delete observerWorker;
+        delete work;
+    }
+}
+
+void NAPIInnerObserver::OnChange(const DataShareObserver::ChangeInfo &changeInfo)
+{
+    LOG_DEBUG("NAPIInnerObserver Start");
+    if (ref_ == nullptr) {
+        LOG_ERROR("ref_ is nullptr");
+        return;
+    }
+    uv_work_t *work = new (std::nothrow)uv_work_t();
+    if (work == nullptr) {
+        LOG_ERROR("Failed to create uv work");
+        return;
+    }
+    ObserverWorker *observerWorker =
+        new (std::nothrow)ObserverWorker(shared_from_this(), changeInfo);
+    if (observerWorker == nullptr) {
+        LOG_ERROR("Failed to create observerWorker");
         return;
     }
     work->data = observerWorker;

@@ -57,16 +57,19 @@ private:
     static napi_value Initialize(napi_env env, napi_callback_info info);
     static napi_value Napi_SubscribeRdbObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
     static napi_value Napi_UnsubscribeRdbObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
+    static napi_value Napi_RegisterObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
+    static napi_value Napi_UnRegisterObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
     static napi_value Napi_SubscribePublishedObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
     static napi_value Napi_UnsubscribePublishedObserver(napi_env env, size_t argc, napi_value *argv, napi_value self);
     static napi_value SetSilentSwitch(napi_env env, napi_callback_info info, bool enable);
 
     bool HasRegisteredObserver(napi_env env, std::list<sptr<NAPIDataShareObserver>> &list, napi_value callback);
     void RegisteredObserver(napi_env env, const std::string &uri, napi_value callback,
-        std::shared_ptr<DataShareHelper> helper);
+        std::shared_ptr<DataShareHelper> helper, bool isNotifyDetails = false);
     void UnRegisteredObserver(napi_env env, const std::string &uri, napi_value callback,
-        std::shared_ptr<DataShareHelper> helper);
-    void UnRegisteredObserver(napi_env env, const std::string &uri, std::shared_ptr<DataShareHelper> helper);
+        std::shared_ptr<DataShareHelper> helper, bool isNotifyDetails = false);
+    void UnRegisteredObserver(napi_env env, const std::string& uri, std::shared_ptr<DataShareHelper> helper,
+        bool isNotifyDetails = false);
     static bool GetOptions(napi_env env, napi_value jsValue, CreateOptions &options);
     void SetHelper(std::shared_ptr<DataShareHelper> dataShareHelper);
     std::shared_ptr<DataShareHelper> GetHelper();
@@ -117,7 +120,8 @@ private:
         std::vector<OperationResult> results;
         UpdateOperations updateOperations;
         std::vector<BatchUpdateResult> batchUpdateResult;
-
+        DataShareObserver::ChangeInfo changeInfo;
+        bool isNotifyDetails = false;
         ContextInfo() : Context(nullptr, nullptr) {};
         ContextInfo(InputAction input, OutputAction output) : Context(std::move(input), std::move(output)) {};
         virtual ~ContextInfo() {};
@@ -137,6 +141,8 @@ private:
             return Context::operator()(env, result);
         }
     };
+    static void notify(const std::shared_ptr<NapiDataShareHelper::ContextInfo>& context,
+        std::shared_ptr<DataShareHelper>& helper);
 };
 } // namespace DataShare
 } // namespace OHOS

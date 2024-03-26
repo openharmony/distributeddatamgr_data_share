@@ -45,6 +45,9 @@ class DataShareObserver {
 public:
     DataShareObserver() = default;
     virtual ~DataShareObserver() = default;
+    enum SubscriptionType : uint32_t {
+        SUBSCRIPTION_TYPE_EXACT_URI = 0,
+    };
     enum ChangeType : uint32_t {
         INSERT = 0,
         DELETE,
@@ -54,10 +57,14 @@ public:
     };
 
     struct ChangeInfo {
+        using Value = std::variant<std::monostate, int64_t, double, std::string, bool, std::vector<uint8_t>>;
+        using VBucket = std::map<std::string, Value>;
+        using VBuckets = std::vector<VBucket>;
         ChangeType changeType_ = INVAILD;
         std::list<Uri> uris_ = {};
         const void *data_ = nullptr;
         uint32_t size_ = 0;
+        VBuckets valueBuckets_ = {};
     };
 
     virtual void OnChange(const ChangeInfo &changeInfo) = 0;

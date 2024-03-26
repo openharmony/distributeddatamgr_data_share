@@ -24,6 +24,7 @@
 
 #include "datashare_operation_statement.h"
 #include "datashare_template.h"
+#include "datashare_helper.h"
 #include "datashare_value_object.h"
 #include "napi/native_api.h"
 
@@ -64,6 +65,12 @@ public:
     static int32_t Convert2Value(napi_env env,  napi_value input, T &output);
 
     template<typename T>
+    static int32_t Convert2JSValue(napi_env env,  napi_value input, T &output);
+
+    template<typename T>
+    static napi_value Convert2JSValue(napi_env env, const std::vector<T> &value);
+
+    template<typename T>
     static int32_t Convert2Value(napi_env env, napi_value input, std::vector<T> &output);
 
     template<typename T>
@@ -72,9 +79,12 @@ public:
     template<typename T>
     static int32_t Convert2Value(napi_env env, napi_value input, const char* propertyName, T &output);
 
+    static int32_t Convert2Value(napi_env env, napi_value input, std::string &str);
+    static int32_t Convert2Value(napi_env env, napi_value input, DataShareObserver::ChangeType &changeType);
     static int32_t Convert2Value(napi_env env, napi_value input, DataSharePredicates &predicates);
     static int32_t Convert2Value(napi_env env, napi_value input, DataShareValuesBucket &valueBucket);
     static int32_t Convert2Value(napi_env env, napi_value input, UpdateOperation &operation);
+    static int32_t Convert2Value(napi_env env, napi_value input, DataShareObserver::ChangeInfo &changeInfo);
     static std::string Convert2String(napi_env env, napi_value jsStr, size_t max = DEFAULT_BUF_SIZE);
     static std::vector<std::string> Convert2StrVector(napi_env env, napi_value value, size_t strMax);
     static std::vector<uint8_t> Convert2U8Vector(napi_env env, napi_value jsValue);
@@ -91,6 +101,7 @@ public:
     static napi_value Convert2JSValue(napi_env env, const std::vector<uint8_t> &value, bool isTypedArray = true);
     static napi_value Convert2JSValue(napi_env env, int32_t value);
     static napi_value Convert2JSValue(napi_env env, int64_t value);
+    static napi_value Convert2JSValue(napi_env env, uint32_t value);
     static napi_value Convert2JSValue(napi_env env, double value);
     static napi_value Convert2JSValue(napi_env env, bool value);
     static napi_value Convert2JSValue(napi_env env, const std::map<std::string, int> &value);
@@ -103,7 +114,9 @@ public:
     static napi_value Convert2JSValue(napi_env env, PublishedDataChangeNode &changeNode);
     static napi_value Convert2JSValue(napi_env env, const OperationResult &results);
     static napi_value Convert2JSValue(napi_env env, const std::vector<OperationResult> &results);
+    static napi_value Convert2JSValue(napi_env env, const DataShareValuesBucket &valueBucket);
     static std::vector<uint8_t> ConvertU8Vector(napi_env env, napi_value jsValue);
+    static napi_value Convert2JSValue(napi_env env, const DataShareObserver::ChangeInfo &changeInfo);
     static napi_value Convert2JSValue(napi_env env, const std::vector<BatchUpdateResult> &result);
 
     static bool UnwrapDataSharePredicates(napi_env env, napi_value value, DataSharePredicates &dataSharePredicates);
@@ -157,6 +170,21 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, const ch
         return napi_invalid_arg;
     }
     return napi_ok;
+}
+
+template<typename T>
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<T> &value)
+{
+    napi_value jsValue;
+    napi_status status = napi_create_array_with_length(env, value.size(), &jsValue);
+    if (status != napi_ok) {
+        return nullptr;
+    }
+
+    for (size_t i = 0; i < value.size(); ++i) {
+        napi_set_element(env, jsValue, i, Convert2JSValue(env, value[i]));
+    }
+    return jsValue;
 }
 
 template<typename T>

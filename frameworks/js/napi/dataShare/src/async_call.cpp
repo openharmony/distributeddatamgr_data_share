@@ -101,7 +101,7 @@ void AsyncCall::OnExecute(napi_env env, void *data)
 void SetBusinessError(napi_env env, napi_value *businessError, std::shared_ptr<Error> error)
 {
     napi_create_object(env, businessError);
-    if (error != nullptr) {
+    if (error != nullptr && error->GetCode() != Error::EXCEPTION_INNER) {
         napi_value code = nullptr;
         napi_value msg = nullptr;
         napi_create_int32(env, error->GetCode(), &code);

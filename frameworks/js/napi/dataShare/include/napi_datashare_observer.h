@@ -21,11 +21,13 @@
 
 namespace OHOS {
 namespace DataShare {
-class NAPIDataShareObserver : public AAFwk::DataAbilityObserverStub {
+class NAPIDataShareObserver : public AAFwk::DataAbilityObserverStub,
+                              public DataShareObserver {
 public:
     explicit NAPIDataShareObserver(const std::shared_ptr<NAPIInnerObserver> observer) : observer_(observer){};
     virtual ~NAPIDataShareObserver();
     void OnChange() override;
+    void OnChange(const ChangeInfo &changeInfo) override;
     std::shared_ptr<NAPIInnerObserver> observer_ = nullptr;
 };
 }  // namespace DataShare

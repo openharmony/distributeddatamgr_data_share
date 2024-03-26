@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "mediadatashare_unit_test.h"
 
 #include <gtest/gtest.h>
@@ -21,6 +22,7 @@
 #include "accesstoken_kit.h"
 #include "dataobs_mgr_changeinfo.h"
 #include "datashare_log.h"
+#include "datashare_valuebucket_convert.h"
 #include "hap_token_info.h"
 #include "iservice_registry.h"
 #include "rdb_data_ability_utils.h"
@@ -87,6 +89,7 @@ public:
         changeInfo_.uris_.clear();
         changeInfo_.data_ = nullptr;
         changeInfo_.size_ = 0;
+        changeInfo_.valueBuckets_ = {};
         data.Clear();
     }
     
@@ -139,6 +142,34 @@ bool MediaDataShareUnitTest::UrisEqual(std::list<Uri> uri1, std::list<Uri> uri2)
     return true;
 }
 
+bool MediaDataShareUnitTest::ValueBucketEqual(const VBuckets& v1, const VBuckets& v2)
+{
+    if (v1.size() != v2.size()) {
+        return false;
+    }
+
+    for (size_t i = 0; i < v1.size(); i++) {
+        const VBucket& vb1 = v1[i];
+        const VBucket& vb2 = v2[i];
+
+        if (vb1.size() != vb2.size()) {
+            return false;
+        }
+
+        for (const auto& pair1 : vb1) {
+            const auto& key = pair1.first;
+            const auto& value1 = pair1.second;
+
+            auto it2 = vb2.find(key);
+            if (it2 == vb2.end() || it2->second != value1) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 bool MediaDataShareUnitTest::ChangeInfoEqual(const ChangeInfo &changeInfo, const ChangeInfo &expectChangeInfo)
 {
     if (changeInfo.changeType_ != expectChangeInfo.changeType_) {
@@ -153,11 +184,14 @@ bool MediaDataShareUnitTest::ChangeInfoEqual(const ChangeInfo &changeInfo, const
         return false;
     }
     
-    if (changeInfo.data_ == nullptr && expectChangeInfo.data_ == nullptr) {
-        return true;
+    if (changeInfo.size_ != 0) {
+        if (changeInfo.data_ == nullptr && expectChangeInfo.data_ == nullptr) {
+            return false;
+        }
+        return memcmp(changeInfo.data_, expectChangeInfo.data_, expectChangeInfo.size_) == 0;
     }
-    
-    return memcmp(changeInfo.data_, expectChangeInfo.data_, expectChangeInfo.size_) == 0;
+
+    return ValueBucketEqual(changeInfo.valueBuckets_, expectChangeInfo.valueBuckets_);
 }
 
 
@@ -1428,6 +1462,66 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperRegisterObserverController
     helper->NotifyChange(uri);
     helper->UnregisterObserver(uri, dataObserver);
     LOG_INFO("ControllerTest_HelperRegisterObserverControllerNullTest_001 end");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_002, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_ObserverExt_001 start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_TRUE(helper != nullptr);
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    std::shared_ptr<DataShareObserverTest> dataObserver = std::make_shared<DataShareObserverTest>();
+    helper->RegisterObserverExt(uri, dataObserver, false);
+    DataShare::DataShareValuesBucket valuesBucket1;
+    DataShare::DataShareValuesBucket valuesBucket2;
+    valuesBucket1.Put("name", "Datashare_Observer_Test001");
+    valuesBucket2.Put("name", "Datashare_Observer_Test002");
+    std::vector<DataShareValuesBucket> VBuckets = {valuesBucket1, valuesBucket2};
+    int retVal = helper->BatchInsert(uri, VBuckets);
+    EXPECT_EQ((retVal > 0), true);
+    CommonType::VBuckets extends;
+    extends = ValueProxy::Convert(std::move(VBuckets));
+    ChangeInfo uriChanges = { DataShareObserver::ChangeType::INSERT, { uri }, nullptr, 0, extends};
+    helper->NotifyChangeExt(uriChanges);
+
+    dataObserver->data.Wait();
+    EXPECT_TRUE(ChangeInfoEqual(dataObserver->changeInfo_, uriChanges));
+    dataObserver->Clear();
+
+    helper->UnregisterObserverExt(uri, dataObserver);
+    LOG_INFO("MediaDataShare_ObserverExt_001 end");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_002, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_UnregisterObserverExt_001 start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_TRUE(helper != nullptr);
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    std::shared_ptr<DataShareObserverTest> dataObserver = std::make_shared<DataShareObserverTest>();
+    helper->RegisterObserverExt(uri, dataObserver, true);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "Datashare_Observer_Test003");
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
+    std::vector<DataShareValuesBucket> Buckets = {valuesBucket};
+    CommonType::VBuckets extends;
+    extends = ValueProxy::Convert(std::move(Buckets));
+    ChangeInfo uriChanges = { DataShareObserver::ChangeType::INSERT, { uri }, nullptr, 0,  extends};
+    helper->NotifyChangeExt(uriChanges);
+
+    dataObserver->data.Wait();
+    EXPECT_TRUE(ChangeInfoEqual(dataObserver->changeInfo_, uriChanges));
+    dataObserver->Clear();
+
+    helper->UnregisterObserverExt(uri, dataObserver);
+    helper->NotifyChangeExt({ DataShareObserver::ChangeType::DELETE,  { uri }, nullptr, 0,  extends });
+
+    dataObserver->data.Wait();
+    EXPECT_FALSE(ChangeInfoEqual(dataObserver->changeInfo_, uriChanges));
+    dataObserver->Clear();
+    LOG_INFO("MediaDataShare_UnregisterObserverExt_001 end");
 }
 } // namespace DataShare
 } // namespace OHOS

@@ -21,6 +21,7 @@
 #include "napi/native_common.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
+#include "datashare_helper.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -28,14 +29,17 @@ class NAPIInnerObserver : public std::enable_shared_from_this<NAPIInnerObserver>
 public:
     NAPIInnerObserver(napi_env env, napi_value callback);
     void OnChange();
+    void OnChange(const DataShareObserver::ChangeInfo &changeInfo);
     void DeleteReference();
     napi_ref GetCallback();
+
 private:
     static void OnComplete(uv_work_t *work, int status);
     struct ObserverWorker {
         std::weak_ptr<NAPIInnerObserver> observer_;
-        ObserverWorker(std::shared_ptr<NAPIInnerObserver> observerIn)
-            : observer_(observerIn) {}
+        DataShareObserver::ChangeInfo result_;
+        ObserverWorker(std::shared_ptr<NAPIInnerObserver> observerIn, DataShareObserver::ChangeInfo resultIn = {})
+            : observer_(observerIn), result_(resultIn) {}
     };
 
     napi_env env_ = nullptr;

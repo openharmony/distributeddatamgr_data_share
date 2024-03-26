@@ -258,6 +258,7 @@ DataShareObserver::ChangeInfo ObserverImpl::ConvertInfo(const AAFwk::ChangeInfo 
     changeInfo.uris_ = std::move(info.uris_);
     changeInfo.data_ = info.data_;
     changeInfo.size_ = info.size_;
+    changeInfo.valueBuckets_ = std::move(info.valueBuckets_);
     return changeInfo;
 }
 
@@ -268,6 +269,7 @@ AAFwk::ChangeInfo ObserverImpl::ConvertInfo(const DataShareObserver::ChangeInfo 
     changeInfo.uris_ = std::move(info.uris_);
     changeInfo.data_ = const_cast<void*>(info.data_);
     changeInfo.size_ = info.size_;
+    changeInfo.valueBuckets_ =std::move(info.valueBuckets_);
     return changeInfo;
 }
 

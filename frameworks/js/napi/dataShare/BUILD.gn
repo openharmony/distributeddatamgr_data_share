@@ -33,7 +33,10 @@ ohos_shared_library("datashare_jscommon") {
     "${datashare_common_napi_path}/src/napi_datashare_values_bucket.cpp",
   ]
 
-  deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
+  deps = [
+    "${datashare_base_path}/interfaces/inner_api:datashare_consumer",
+    "${datashare_innerapi_path}/common:datashare_common",
+  ]
 
   version_script = "libdatashare_jscommon.map"
 
@@ -71,6 +74,7 @@ ohos_shared_library("datashare") {
     "${datashare_common_napi_path}/src/datashare_error_impl.cpp",
     "${datashare_common_napi_path}/src/datashare_result_set_proxy.cpp",
     "${datashare_napi_path}/dataShare/src/async_call.cpp",
+    "${datashare_napi_path}/dataShare/src/napi_datashare_const_properties.cpp",
     "${datashare_napi_path}/dataShare/src/napi_datashare_helper.cpp",
     "${datashare_napi_path}/dataShare/src/napi_datashare_inner_observer.cpp",
     "${datashare_napi_path}/dataShare/src/napi_datashare_observer.cpp",
