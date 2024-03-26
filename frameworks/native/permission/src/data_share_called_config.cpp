@@ -112,13 +112,15 @@ sptr<AppExecFwk::BundleMgrProxy> DataShareCalledConfig::GetBundleMgrProxy()
     sptr<ISystemAbilityManager> systemAbilityManager =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityManager == nullptr) {
-        LOG_ERROR("Failed to get system ability mgr.");
+        LOG_ERROR("Failed to get system ability mgr.uri: %{public}s",
+            DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
         return nullptr;
     }
 
     proxy_ = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
     if (proxy_ == nullptr) {
-        LOG_ERROR("Failed to get bundle manager proxy.");
+        LOG_ERROR("Failed to get bundle manager proxy.uri: %{public}s",
+            DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
         return nullptr;
     }
     return iface_cast<AppExecFwk::BundleMgrProxy>(proxy_);
@@ -129,7 +131,8 @@ std::pair<bool, AppExecFwk::BundleInfo> DataShareCalledConfig::GetBundleInfoFrom
     AppExecFwk::BundleInfo bundleInfo;
     auto bmsClient = GetBundleMgrProxy();
     if (bmsClient == nullptr) {
-        LOG_ERROR("Get BundleMgrProxy is nullptr!");
+        LOG_ERROR("Get BundleMgrProxy is nullptr!.uri: %{public}s",
+            DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
         return std::make_pair(false, bundleInfo);
     }
     bool ret = bmsClient->GetBundleInfo(providerInfo_.bundleName,

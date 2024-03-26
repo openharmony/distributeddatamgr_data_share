@@ -49,7 +49,7 @@ int DataShareHelperInitError::GetCode() const
 
 std::string InnerError::GetMessage() const
 {
-    return "";
+    return "Inner error.";
 }
 
 int InnerError::GetCode() const

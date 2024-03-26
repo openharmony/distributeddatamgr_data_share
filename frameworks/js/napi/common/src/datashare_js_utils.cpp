@@ -680,32 +680,32 @@ bool DataShareJSUtils::UnwrapStringByPropertyName(
 
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<BatchUpdateResult> &result)
 {
-    napi_value resultMap = nullptr;
-    napi_status status = napi_create_object(env, &resultMap);
+    napi_value jsResult = nullptr;
+    napi_status status = napi_create_object(env, &jsResult);
     if (status != napi_ok) {
-        LOG_ERROR("napi_create_object : %{public}d", status);
+        LOG_ERROR("Create object failed, ret : %{public}d", status);
         return nullptr;
     }
     for (const auto &valueArray : result) {
         napi_value values;
-        if (napi_create_object(env, &values) != napi_ok) {
-            LOG_ERROR("napi_create_object falied");
+        if (napi_create_array(env, &values) != napi_ok) {
+            LOG_ERROR("Create array failed");
             return nullptr;
         }
         uint32_t index = 0;
         for (const auto &value : valueArray.codes) {
             napi_value jsValue = Convert2JSValue(env, value);
             if (napi_set_element(env, values, index++, jsValue) != napi_ok) {
-                LOG_ERROR("napi_set_element falied");
+                LOG_ERROR("Set to array failed");
                 return nullptr;
             }
         }
-        if (napi_set_named_property(env, resultMap, valueArray.uri.c_str(), values)) {
-            LOG_ERROR("napi_set_named_property falied");
+        if (napi_set_named_property(env, jsResult, valueArray.uri.c_str(), values) != napi_ok) {
+            LOG_ERROR("Set to map failed");
             return nullptr;
         }
     }
-    return resultMap;
+    return jsResult;
 }
 
 int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, UpdateOperation& operation)

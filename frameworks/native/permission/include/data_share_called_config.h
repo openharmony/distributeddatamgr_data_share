@@ -34,8 +34,6 @@ namespace OHOS {
 namespace DataShare {
 using namespace OHOS::Security::AccessToken;
 using namespace OHOS::AppExecFwk;
-using BundleInfo = OHOS::AppExecFwk::BundleInfo;
-using ExtensionAbility = OHOS::AppExecFwk::ExtensionAbilityInfo;
 class DataShareCalledConfig {
 public:
 
