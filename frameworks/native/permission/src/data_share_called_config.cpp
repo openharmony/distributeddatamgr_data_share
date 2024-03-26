@@ -41,7 +41,7 @@ int32_t DataShareCalledConfig::GetUserByToken(uint32_t tokenId)
     HapTokenInfo tokenInfo;
     auto result = AccessTokenKit::GetHapTokenInfo(tokenId, tokenInfo);
     if (result != RET_SUCCESS) {
-        LOG_ERROR("token:0x%{public}x, result:%{public}d", tokenId, result);
+        LOG_ERROR("Get user failed!token:0x%{public}x, result:%{public}d", tokenId, result);
         return -1;
     }
     return tokenInfo.userID;
@@ -97,7 +97,7 @@ std::pair<int, DataShareCalledConfig::ProviderInfo> DataShareCalledConfig::GetPr
     providerInfo_.bundleName = bundleName;
     auto ret = GetFromProxyData();
     if (ret != E_OK) {
-        LOG_ERROR("failed! isProxyData:%{public}d, ret: %{public}d, uri: %{public}s",
+        LOG_ERROR("Failed! isProxyData:%{public}d, ret: %{public}d, uri: %{public}s",
             isProxyData, ret, DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
     }
     return std::make_pair(ret, providerInfo_);

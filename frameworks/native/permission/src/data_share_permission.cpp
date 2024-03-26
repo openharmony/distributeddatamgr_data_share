@@ -48,7 +48,7 @@ int DataSharePermission::VerifyPermission(AccessTokenID tokenID, const Uri &uri,
         permission = providerInfo.writePermission;
     }
     if (permission.empty()) {
-        LOG_ERROR("reject, tokenId:0x%{public}x, uri:%{public}s", tokenID,
+        LOG_ERROR("Reject, tokenId:0x%{public}x, uri:%{public}s", tokenID,
             DataShareStringUtils::Anonymous(providerInfo.uri).c_str());
         return ERR_PERMISSION_DENIED;
     }
