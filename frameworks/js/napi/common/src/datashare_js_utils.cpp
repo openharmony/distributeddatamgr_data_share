@@ -308,7 +308,6 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataShareValues
     napi_value res = NewInstance(env, const_cast<DataShareValuesBucket&>(valueBucket));
     if (res == nullptr) {
         LOG_ERROR("failed to make new instance of DataShareValueBucket.");
-        return nullptr;
     }
     return res;
 }
@@ -758,7 +757,6 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, std::str
     napi_get_value_string_utf8(env, input, buf, str_buffer_size + 1, &len);
     buf[len] = 0;
     str = std::string(buf);
-    LOG_ERROR("Convert2Value 2changeInfo.uri :%{public}s.", str.c_str());
     delete[] buf;
     return napi_ok;
 }
@@ -766,7 +764,7 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, std::str
 int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input,
     OHOS::DataShare::DataShareObserver::ChangeType& changeType)
 {
-    uint32_t number;
+    uint32_t number = 0;
     napi_status status = napi_get_value_uint32(env, input, &number);
     changeType = static_cast<OHOS::DataShare::DataShareObserver::ChangeType>(number);
     return status;
@@ -791,9 +789,6 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, DataShar
     if (Convert2Value(env, input, "values", valuebuckets) != napi_ok) {
         return napi_invalid_arg;
     }
-    LOG_INFO("input ChangeInfo.changeType_ is %{public}d", changeInfo.changeType_);
-    LOG_INFO("input ChangeInfo.uri is %{public}s", uriStr.c_str());
-    LOG_INFO("input ChangeInfo.valueBuckets_ is %{public}d", valuebuckets.size());
 
     Uri uri(uriStr);
     changeInfo.uris_.push_back(uri);
@@ -806,9 +801,6 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataShareObserv
     napi_value napiValue = nullptr;
     napi_create_object(env, &napiValue);
     napi_value changeType = Convert2JSValue(env, changeInfo.changeType_);
-    LOG_INFO("output ChangeInfo.changeType_ is %{public}d", changeInfo.changeType_);
-    LOG_INFO("output ChangeInfo.uri is %{public}s", changeInfo.uris_.front().ToString().c_str());
-    LOG_INFO("output ChangeInfo.valueBuckets_ is %{public}d", changeInfo.valueBuckets_.size());
     napi_value uri = Convert2JSValue(env, changeInfo.uris_.front().ToString());
     std::vector<DataShareValuesBucket> VBuckets =
         ValueProxy::Convert(CommonType::VBuckets(changeInfo.valueBuckets_));
