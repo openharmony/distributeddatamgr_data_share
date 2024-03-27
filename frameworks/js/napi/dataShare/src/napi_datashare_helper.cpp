@@ -652,7 +652,7 @@ void NapiDataShareHelper::Notify(const std::shared_ptr<NapiDataShareHelper::Cont
             Uri uri(context->uri);
             helper->NotifyChange(uri);
             context->status = napi_ok;
-            return ;
+            return;
         }
         LOG_ERROR("context->isNotifyDetails is false, but context->uri.empty() is %{public}d", context->uri.empty());
         context->error = std::make_shared<ParametersTypeError>("Uri", "Not Empty");
@@ -661,7 +661,7 @@ void NapiDataShareHelper::Notify(const std::shared_ptr<NapiDataShareHelper::Cont
     if (context->changeInfo.changeType_ != DataShareObserver::INVAILD) {
         helper->NotifyChangeExt(context->changeInfo);
         context->status = napi_ok;
-        return ;
+        return;
     }
     LOG_ERROR("context->isNotifyDetails is true, but context->changeInfo.changeType_ is INVALID : %{public}d",
         context->changeInfo.changeType_);
