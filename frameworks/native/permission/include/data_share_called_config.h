@@ -41,15 +41,16 @@ public:
         std::string writePermission;
         int32_t currentUserId = -1;
     };
-    std::pair<int, ProviderInfo> GetProviderInfo(bool isProxyData, uint32_t tokenId);
+    std::pair<int, ProviderInfo> GetProviderInfo(uint32_t tokenId);
 private:
     sptr<BundleMgrProxy> GetBundleMgrProxy();
     int GetFromProxyData();
     int32_t GetUserByToken(uint32_t tokenId);
-    std::pair<bool, BundleInfo> GetBundleInfoFromBMS(int32_t userId);
+    std::pair<bool, BundleInfo> GetBundleInfoFromBMS();
     std::mutex mutex_;
     ProviderInfo providerInfo_;
     sptr<IRemoteObject> proxy_;
+    static constexpr const char *PROXY_URI_SCHEMA = "datashareproxy";
 };
 } // namespace DataShare
 } // namespace OHOS

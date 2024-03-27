@@ -38,7 +38,6 @@ public:
      */
     static int VerifyPermission(AccessTokenID tokenId, const Uri &uri, bool isRead);
 private:
-    static constexpr const char *PROXY_URI_SCHEMA = "datashareproxy";
     static bool VerifyParam(const Uri &uri);
 };
 } // namespace DataShare

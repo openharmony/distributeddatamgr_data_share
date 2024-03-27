@@ -44,7 +44,8 @@ int32_t DataShareCalledConfig::GetUserByToken(uint32_t tokenId)
     HapTokenInfo tokenInfo;
     auto result = AccessTokenKit::GetHapTokenInfo(tokenId, tokenInfo);
     if (result != RET_SUCCESS) {
-        LOG_ERROR("Get user failed!token:0x%{public}x, result:%{public}d", tokenId, result);
+        LOG_ERROR("Get user failed!token:0x%{public}x, result:%{public}d, uri:%{public}s",
+            tokenId, result, DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
         return -1;
     }
     return tokenInfo.userID;
@@ -52,7 +53,7 @@ int32_t DataShareCalledConfig::GetUserByToken(uint32_t tokenId)
 
 int DataShareCalledConfig::GetFromProxyData()
 {
-    auto [success, bundleInfo] = GetBundleInfoFromBMS(providerInfo_.currentUserId);
+    auto [success, bundleInfo] = GetBundleInfoFromBMS();
     if (!success) {
         LOG_ERROR("Get bundleInfo failed! bundleName:%{public}s, userId:%{public}d, uri:%{public}s",
             providerInfo_.bundleName.c_str(), providerInfo_.currentUserId,
@@ -79,11 +80,10 @@ int DataShareCalledConfig::GetFromProxyData()
     return E_URI_NOT_EXIST;
 }
 
-std::pair<int, DataShareCalledConfig::ProviderInfo> DataShareCalledConfig::GetProviderInfo(bool isProxyData,
-    uint32_t tokenId)
+std::pair<int, DataShareCalledConfig::ProviderInfo> DataShareCalledConfig::GetProviderInfo(uint32_t tokenId)
 {
-    providerInfo_.currentUserId = GetUserByToken(tokenId);
     Uri uriTemp(providerInfo_.uri);
+    auto isProxyData = PROXY_URI_SCHEMA == uriTemp.GetScheme();
     std::string bundleName = uriTemp.GetAuthority();
     if (!isProxyData) {
         std::vector<std::string> pathSegments;
@@ -98,10 +98,11 @@ std::pair<int, DataShareCalledConfig::ProviderInfo> DataShareCalledConfig::GetPr
         return std::make_pair(E_BUNDLE_NAME_NOT_EXIST, providerInfo_);
     }
     providerInfo_.bundleName = bundleName;
+    providerInfo_.currentUserId = GetUserByToken(tokenId);
     auto ret = GetFromProxyData();
     if (ret != E_OK) {
-        LOG_ERROR("Failed! isProxyData:%{public}d, ret: %{public}d, uri: %{public}s",
-            isProxyData, ret, DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
+        LOG_ERROR("Failed! isProxyData:%{public}d,ret:%{public}d,tokenId:0x%{public}x,uri:%{public}s",
+            isProxyData, ret, tokenId, DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
     }
     return std::make_pair(ret, providerInfo_);
 }
@@ -129,7 +130,7 @@ sptr<BundleMgrProxy> DataShareCalledConfig::GetBundleMgrProxy()
     return iface_cast<BundleMgrProxy>(proxy_);
 }
 
-std::pair<bool, BundleInfo> DataShareCalledConfig::GetBundleInfoFromBMS(int32_t userId)
+std::pair<bool, BundleInfo> DataShareCalledConfig::GetBundleInfoFromBMS()
 {
     BundleInfo bundleInfo;
     auto bmsClient = GetBundleMgrProxy();
@@ -139,10 +140,11 @@ std::pair<bool, BundleInfo> DataShareCalledConfig::GetBundleInfoFromBMS(int32_t 
         return std::make_pair(false, bundleInfo);
     }
     bool ret = bmsClient->GetBundleInfo(providerInfo_.bundleName,
-        BundleFlag::GET_BUNDLE_WITH_EXTENSION_INFO, bundleInfo, userId);
+        BundleFlag::GET_BUNDLE_WITH_EXTENSION_INFO, bundleInfo, providerInfo_.currentUserId);
     if (!ret) {
         LOG_ERROR("Get BundleInfo failed! bundleName:%{public}s, userId:%{public}d,uri:%{public}s",
-            providerInfo_.bundleName.c_str(), userId, DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
+            providerInfo_.bundleName.c_str(), providerInfo_.currentUserId,
+            DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
         return std::make_pair(false, bundleInfo);
     }
     return std::make_pair(true, bundleInfo);

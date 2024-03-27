@@ -35,9 +35,8 @@ int DataSharePermission::VerifyPermission(AccessTokenID tokenID, const Uri &uri,
         return ERR_INVALID_VALUE;
     }
     Uri uriTemp(uri);
-    auto isProxyData = PROXY_URI_SCHEMA == uriTemp.GetScheme();
     DataShareCalledConfig calledConfig(uri.ToString());
-    auto [errCode, providerInfo] = calledConfig.GetProviderInfo(isProxyData, tokenID);
+    auto [errCode, providerInfo] = calledConfig.GetProviderInfo(tokenID);
     if (errCode != E_OK) {
         LOG_ERROR("ProviderInfo failed! token:0x%{public}x, errCode:%{public}d,uri:%{public}s", tokenID,
             errCode, DataShareStringUtils::Anonymous(providerInfo.uri).c_str());
