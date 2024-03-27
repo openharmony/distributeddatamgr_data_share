@@ -17,145 +17,37 @@
 
 namespace OHOS::DataShare {
 
-ValueProxy::Value ValueProxy::Convert(DataShareValueObject &&value)
+CommonType::VBuckets ValueProxy::Convert(std::vector<DataShare::DataShareValuesBucket> &&dataShareValuesBuckets)
 {
-    Value proxy;
-    Convert(std::move(value.value), proxy.value_);
-    return proxy;
-}
-
-ValueProxy::Value ValueProxy::Convert(CommonType::Value &&value)
-{
-    Value proxy;
-    Convert(std::move(value), proxy.value_);
-    return proxy;
-}
-
-ValueProxy::Values ValueProxy::Convert(std::vector<DataShareValueObject> &&values)
-{
-    Values proxy;
-    proxy.value_.reserve(values.size());
-    for (auto &value : values) {
-        proxy.value_.emplace_back(Convert(std::move(value)));
+    size_t length = dataShareValuesBuckets.size();
+    CommonType::VBuckets res;
+    res.reserve(length);
+    for (auto &dataShareValuesBucket : dataShareValuesBuckets) {
+        CommonType::VBucket vBucket;
+        for (auto &[k, v] : dataShareValuesBucket.valuesMap) {
+            CommonType::Value value;
+            CommonType::Convert<DataShareValueObject::Type>(std::move(v), value);
+            vBucket.emplace(k, std::move(value));
+        }
+        res.emplace_back(std::move(vBucket));
     }
-    return proxy;
+    return res;
 }
 
-ValueProxy::Values ValueProxy::Convert(std::vector<CommonType::Value> &&values)
+std::vector<DataShareValuesBucket> ValueProxy::Convert(CommonType::VBuckets &&vBuckets)
 {
-    Values proxy;
-    proxy.value_.reserve(values.size());
-    for (auto &value : values) {
-        proxy.value_.emplace_back(Convert(std::move(value)));
+    size_t length = vBuckets.size();
+    std::vector<DataShareValuesBucket> res;
+    res.reserve(length);
+    for (auto &vBucket : vBuckets) {
+        DataShareValuesBucket dataShareValuesBucket;
+        for (auto &[k, v] : vBucket) {
+            DataShareValueObject::Type dataShareValueObject;
+            CommonType::Convert<CommonType::Value>(std::move(v), dataShareValueObject);
+            dataShareValuesBucket.valuesMap.emplace(k, std::move(dataShareValueObject));
+        }
+        res.emplace_back(std::move(dataShareValuesBucket));
     }
-    return proxy;
+    return res;
 }
-
-ValueProxy::Bucket ValueProxy::Convert(DataShareValuesBucket &&bucket)
-{
-    ValueProxy::Bucket proxy;
-    for (auto &[key, value] : bucket.valuesMap) {
-        proxy.value_.insert_or_assign(key, Convert(std::move(value)));
-    }
-    return proxy;
-}
-
-ValueProxy::Bucket ValueProxy::Convert(CommonType::VBucket &&bucket)
-{
-    ValueProxy::Bucket proxy;
-    for (auto &[key, value] : bucket) {
-        proxy.value_.insert_or_assign(key, Convert(std::move(value)));
-    }
-    return proxy;
-}
-
-ValueProxy::Buckets ValueProxy::Convert(std::vector<DataShareValuesBucket> &&buckets)
-{
-    ValueProxy::Buckets proxy;
-    proxy.value_.reserve(buckets.size());
-    for (auto &bucket : buckets) {
-        proxy.value_.emplace_back(Convert(std::move(bucket)));
-    }
-    return proxy;
-}
-
-ValueProxy::Buckets ValueProxy::Convert(std::vector<CommonType::VBucket> &&buckets)
-{
-    ValueProxy::Buckets proxy;
-    proxy.value_.reserve(buckets.size());
-    for (auto &bucket : buckets) {
-        proxy.value_.emplace_back(Convert(std::move(bucket)));
-    }
-    return proxy;
-}
-
-ValueProxy::Value& ValueProxy::Value::operator=(ValueProxy::Value&& value) noexcept
-{
-    if (this == &value) {
-        return *this;
-    }
-    value_ = std::move(value.value_);
-    return *this;
-}
-
-ValueProxy::Value::operator DataShareValueObject()
-{
-    DataShareValueObject object;
-    Convert(std::move(value_), object.value);
-    return object;
-}
-
-ValueProxy::Value::operator CommonType::Value()
-{
-    CommonType::Value object;
-    Convert(std::move(value_), object);
-    return object;
-}
-
-ValueProxy::Values& ValueProxy::Values::operator=(ValueProxy::Values&& values) noexcept
-{
-    if (this == &values) {
-        return *this;
-    }
-    value_ = std::move(values.value_);
-    return *this;
-}
-
-ValueProxy::Bucket& ValueProxy::Bucket::operator=(Bucket&& bucket) noexcept
-{
-    if (this == &bucket) {
-        return *this;
-    }
-    value_ = std::move(bucket.value_);
-    return *this;
-}
-
-ValueProxy::Bucket::operator DataShareValuesBucket()
-{
-    DataShareValuesBucket bucket;
-    for (auto &[key, value] : value_) {
-        bucket.valuesMap.insert_or_assign(key, std::move(value));
-    }
-    value_.clear();
-    return bucket;
-}
-
-ValueProxy::Bucket::operator CommonType::VBucket()
-{
-    CommonType::VBucket bucket;
-    for (auto &[key, value] : value_) {
-        bucket.insert_or_assign(key, std::move(value));
-    }
-    value_.clear();
-    return bucket;
-}
-
-ValueProxy::Buckets &ValueProxy::Buckets::operator=(Buckets &&buckets) noexcept
-    {
-    if (this == &buckets) {
-        return *this;
-    }
-    value_ = std::move(buckets.value_);
-    return *this;
-    }
 } // namespace OHOS::DistributedData

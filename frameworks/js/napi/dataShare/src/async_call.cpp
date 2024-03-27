@@ -34,9 +34,7 @@ AsyncCall::AsyncCall(napi_env env, napi_callback_info info, std::shared_ptr<Cont
         argc = argc - 1;
     }
     napi_status status = (*context)(env, argc, argv, self);
-    if (status != napi_ok) {
-        return;
-    }
+    NAPI_ASSERT_ERRCODE(env, status == napi_ok, context->error);
     context_->ctx = std::move(context);
     napi_create_reference(env, self, 1, &context_->self);
 }
@@ -101,7 +99,7 @@ void AsyncCall::OnExecute(napi_env env, void *data)
 void SetBusinessError(napi_env env, napi_value *businessError, std::shared_ptr<Error> error)
 {
     napi_create_object(env, businessError);
-    if (error != nullptr && error->GetCode() != Error::EXCEPTION_INNER) {
+    if (error != nullptr) {
         napi_value code = nullptr;
         napi_value msg = nullptr;
         napi_create_int32(env, error->GetCode(), &code);
