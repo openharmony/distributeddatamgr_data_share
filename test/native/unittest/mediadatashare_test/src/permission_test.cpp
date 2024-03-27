@@ -54,7 +54,6 @@ void PermissionTest::SetUpTestCase(void)
     LOG_INFO("SetUpTestCase invoked");
     int sleepTime = 3;
     sleep(sleepTime);
-
     HapInfoParams info = {
         .userID = USER_100,
         .bundleName = "ohos.datashareclienttest.demo",

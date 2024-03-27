@@ -24,19 +24,21 @@
 
 namespace OHOS {
 namespace DataShare {
-using namespace OHOS::Security::AccessToken;
 using Uri = OHOS::Uri;
 class DataSharePermission {
 public:
     DataSharePermission() = default;
     ~DataSharePermission() = default;
     /**
-     * @brief Verify access uri hava permission.
-     * @param token token from Verify.
+     * @brief Verify if tokenId has access perimission to uri.
+
+     * @param tokenId Unique identification of application.
      * @param uri, Indicates the path of data to verify perimission.
+     * @param isRead, Obtain read permission for true and write permission for false.
+
      * @return Returns the error code.
      */
-    static int VerifyPermission(AccessTokenID tokenId, const Uri &uri, bool isRead);
+    static int VerifyPermission(Security::AccessToken::AccessTokenID tokenId, const Uri &uri, bool isRead);
 private:
     static bool VerifyParam(const Uri &uri);
 };

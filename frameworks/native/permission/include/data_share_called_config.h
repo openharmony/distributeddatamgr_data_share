@@ -26,7 +26,6 @@
 
 namespace OHOS {
 namespace DataShare {
-using namespace OHOS::AppExecFwk;
 class DataShareCalledConfig {
 public:
 
@@ -43,10 +42,10 @@ public:
     };
     std::pair<int, ProviderInfo> GetProviderInfo(uint32_t tokenId);
 private:
-    sptr<BundleMgrProxy> GetBundleMgrProxy();
+    sptr<OHOS::AppExecFwk::BundleMgrProxy> GetBundleMgrProxy();
     int GetFromProxyData();
     int32_t GetUserByToken(uint32_t tokenId);
-    std::pair<bool, BundleInfo> GetBundleInfoFromBMS();
+    std::pair<bool, OHOS::AppExecFwk::BundleInfo> GetBundleInfoFromBMS();
     std::mutex mutex_;
     ProviderInfo providerInfo_;
     sptr<IRemoteObject> proxy_;

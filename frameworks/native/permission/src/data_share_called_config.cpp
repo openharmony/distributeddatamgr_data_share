@@ -29,6 +29,7 @@
 #include "system_ability_definition.h"
 
 namespace OHOS::DataShare {
+using namespace OHOS::AppExecFwk;
 using namespace OHOS::Security::AccessToken;
 DataShareCalledConfig::DataShareCalledConfig(const std::string &uri)
 {

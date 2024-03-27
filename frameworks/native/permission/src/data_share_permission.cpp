@@ -27,7 +27,7 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-int DataSharePermission::VerifyPermission(AccessTokenID tokenID, const Uri &uri, bool isRead)
+int DataSharePermission::VerifyPermission(Security::AccessToken::AccessTokenID tokenID, const Uri &uri, bool isRead)
 {
     if (!VerifyParam(uri)) {
         LOG_ERROR("Param error, tokenId:0x%{public}x, uri:%{public}s", tokenID,
