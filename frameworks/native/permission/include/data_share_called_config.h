@@ -20,19 +20,12 @@
 #include <memory>
 #include <string>
 
-#include "access_token.h"
-#include "accesstoken_kit.h"
 #include "bundle_info.h"
 #include "bundle_mgr_helper.h"
 #include "bundle_mgr_proxy.h"
-#include "hap_token_info.h"
-#include "refbase.h"
-#include "tokenid_kit.h"
-#include "uri.h"
 
 namespace OHOS {
 namespace DataShare {
-using namespace OHOS::Security::AccessToken;
 using namespace OHOS::AppExecFwk;
 class DataShareCalledConfig {
 public:
@@ -53,10 +46,10 @@ public:
     };
     std::pair<int, ProviderInfo> GetProviderInfo(bool isProxyData, uint32_t tokenId);
 private:
-    sptr<AppExecFwk::BundleMgrProxy> GetBundleMgrProxy();
+    sptr<BundleMgrProxy> GetBundleMgrProxy();
     int GetFromProxyData();
     int32_t GetUserByToken(uint32_t tokenId);
-    std::pair<bool, AppExecFwk::BundleInfo> GetBundleInfoFromBMS(int32_t userId);
+    std::pair<bool, BundleInfo> GetBundleInfoFromBMS(int32_t userId);
     std::mutex mutex_;
     ProviderInfo providerInfo_;
     sptr<IRemoteObject> proxy_;

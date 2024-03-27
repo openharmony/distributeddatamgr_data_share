@@ -19,6 +19,8 @@
 #include <string>
 #include <utility>
 
+#include "access_token.h"
+#include "accesstoken_kit.h"
 #include "datashare_errno.h"
 #include "datashare_log.h"
 #include "datashare_string_utils.h"
@@ -27,6 +29,7 @@
 #include "system_ability_definition.h"
 
 namespace OHOS::DataShare {
+using namespace OHOS::Security::AccessToken;
 DataShareCalledConfig::DataShareCalledConfig(const std::string &uri)
 {
     providerInfo_.uri = uri;
@@ -49,8 +52,8 @@ int32_t DataShareCalledConfig::GetUserByToken(uint32_t tokenId)
 
 int DataShareCalledConfig::GetFromProxyData()
 {
-    auto [errCode, bundleInfo] = GetBundleInfoFromBMS(providerInfo_.currentUserId);
-    if (!errCode) {
+    auto [success, bundleInfo] = GetBundleInfoFromBMS(providerInfo_.currentUserId);
+    if (!success) {
         LOG_ERROR("Get bundleInfo failed! bundleName:%{public}s, userId:%{public}d, uri:%{public}s",
             providerInfo_.bundleName.c_str(), providerInfo_.currentUserId,
             DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
@@ -103,11 +106,11 @@ std::pair<int, DataShareCalledConfig::ProviderInfo> DataShareCalledConfig::GetPr
     return std::make_pair(ret, providerInfo_);
 }
 
-sptr<AppExecFwk::BundleMgrProxy> DataShareCalledConfig::GetBundleMgrProxy()
+sptr<BundleMgrProxy> DataShareCalledConfig::GetBundleMgrProxy()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (proxy_ != nullptr) {
-        return iface_cast<AppExecFwk::BundleMgrProxy>(proxy_);
+        return iface_cast<BundleMgrProxy>(proxy_);
     }
     sptr<ISystemAbilityManager> systemAbilityManager =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -123,12 +126,12 @@ sptr<AppExecFwk::BundleMgrProxy> DataShareCalledConfig::GetBundleMgrProxy()
             DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
         return nullptr;
     }
-    return iface_cast<AppExecFwk::BundleMgrProxy>(proxy_);
+    return iface_cast<BundleMgrProxy>(proxy_);
 }
 
-std::pair<bool, AppExecFwk::BundleInfo> DataShareCalledConfig::GetBundleInfoFromBMS(int32_t userId)
+std::pair<bool, BundleInfo> DataShareCalledConfig::GetBundleInfoFromBMS(int32_t userId)
 {
-    AppExecFwk::BundleInfo bundleInfo;
+    BundleInfo bundleInfo;
     auto bmsClient = GetBundleMgrProxy();
     if (bmsClient == nullptr) {
         LOG_ERROR("Get BundleMgrProxy is nullptr!.uri: %{public}s",
@@ -136,7 +139,7 @@ std::pair<bool, AppExecFwk::BundleInfo> DataShareCalledConfig::GetBundleInfoFrom
         return std::make_pair(false, bundleInfo);
     }
     bool ret = bmsClient->GetBundleInfo(providerInfo_.bundleName,
-        AppExecFwk::BundleFlag::GET_BUNDLE_WITH_EXTENSION_INFO, bundleInfo, userId);
+        BundleFlag::GET_BUNDLE_WITH_EXTENSION_INFO, bundleInfo, userId);
     if (!ret) {
         LOG_ERROR("Get BundleInfo failed! bundleName:%{public}s, userId:%{public}d,uri:%{public}s",
             providerInfo_.bundleName.c_str(), userId, DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
