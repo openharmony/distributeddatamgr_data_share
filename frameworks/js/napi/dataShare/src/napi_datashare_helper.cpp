@@ -1053,7 +1053,7 @@ bool NapiDataShareHelper::HasRegisteredObserver(napi_env env, std::list<sptr<NAP
 }
 
 void NapiDataShareHelper::RegisteredObserver(napi_env env, const std::string &uri, napi_value callback,
-    std::shared_ptr<DataShareHelper> helper,  bool isNotifyDetails)
+    std::shared_ptr<DataShareHelper> helper, bool isNotifyDetails)
 {
     std::lock_guard<std::mutex> lck(listMutex_);
     observerMap_.try_emplace(uri);
@@ -1079,7 +1079,7 @@ void NapiDataShareHelper::RegisteredObserver(napi_env env, const std::string &ur
 }
 
 void NapiDataShareHelper::UnRegisteredObserver(napi_env env, const std::string &uri, napi_value callback,
-    std::shared_ptr<DataShareHelper> helper,  bool isNotifyDetails)
+    std::shared_ptr<DataShareHelper> helper, bool isNotifyDetails)
 {
     std::lock_guard<std::mutex> lck(listMutex_);
     auto obs = observerMap_.find(uri);
@@ -1110,7 +1110,7 @@ void NapiDataShareHelper::UnRegisteredObserver(napi_env env, const std::string &
 }
 
 void NapiDataShareHelper::UnRegisteredObserver(napi_env env, const std::string &uri,
-    std::shared_ptr<DataShareHelper> helper,  bool isNotifyDetails)
+    std::shared_ptr<DataShareHelper> helper, bool isNotifyDetails)
 {
     std::lock_guard<std::mutex> lck(listMutex_);
     auto obs = observerMap_.find(uri);
