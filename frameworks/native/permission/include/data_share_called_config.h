@@ -36,10 +36,7 @@ public:
     struct ProviderInfo {
         std::string uri;
         std::string bundleName;
-        std::string extensionName;
         std::string moduleName;
-        std::string storeName;
-        std::string tableName;
         std::string readPermission;
         std::string writePermission;
         int32_t currentUserId = -1;
