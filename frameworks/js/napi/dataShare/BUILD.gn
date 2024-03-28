@@ -34,7 +34,6 @@ ohos_shared_library("datashare_jscommon") {
   ]
 
   deps = [
-    "${datashare_base_path}/interfaces/inner_api:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
   ]
 
