@@ -644,8 +644,8 @@ napi_value NapiDataShareHelper::Napi_DenormalizeUri(napi_env env, napi_callback_
     return asyncCall.Call(env, exec);
 }
 
-void NapiDataShareHelper::Notify(const std::shared_ptr<NapiDataShareHelper::ContextInfo>& context,
-    std::shared_ptr<DataShareHelper>& helper)
+void NapiDataShareHelper::Notify(const std::shared_ptr<NapiDataShareHelper::ContextInfo> context,
+    std::shared_ptr<DataShareHelper> helper)
 {
     if (!context->isNotifyDetails) {
         if (!context->uri.empty()) {
@@ -654,18 +654,13 @@ void NapiDataShareHelper::Notify(const std::shared_ptr<NapiDataShareHelper::Cont
             context->status = napi_ok;
             return;
         }
-        LOG_ERROR("context->isNotifyDetails is false, but context->uri.empty() is %{public}d", context->uri.empty());
-        context->error = std::make_shared<ParametersTypeError>("Uri", "Not Empty");
+        LOG_ERROR("context->isNotifyDetails is false, but context->uri is empty");
+        context->error = std::make_shared<ParametersTypeError>("uri", "not Empty");
         return;
     }
-    if (context->changeInfo.changeType_ != DataShareObserver::INVAILD) {
-        helper->NotifyChangeExt(context->changeInfo);
-        context->status = napi_ok;
-        return;
-    }
-    LOG_ERROR("context->isNotifyDetails is true, but context->changeInfo.changeType_ is INVALID : %{public}d",
-        context->changeInfo.changeType_);
-    context->error = std::make_shared<ParametersTypeError>("ChangeType", "VALID");
+    helper->NotifyChangeExt(context->changeInfo);
+    context->status = napi_ok;
+    return;
 }
 
 napi_value NapiDataShareHelper::Napi_NotifyChange(napi_env env, napi_callback_info info)
@@ -879,11 +874,11 @@ napi_value NapiDataShareHelper::Napi_On(napi_env env, napi_callback_info info)
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, nullptr));
     std::shared_ptr<Error> error = nullptr;
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, argc == ARGS_THREE || argc == ARGS_FOUR,
-        error = std::make_shared<ParametersNumError>("3,4"), error, nullptr);
+        error = std::make_shared<ParametersNumError>("3 or 4"), error, nullptr);
     napi_valuetype valueType;
     NAPI_CALL(env, napi_typeof(env, argv[0], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
-        error = std::make_shared<ParametersTypeError>("event", "String"), error, nullptr);
+        error = std::make_shared<ParametersTypeError>("event", "string"), error, nullptr);
     std::string type = DataShareJSUtils::Convert2String(env, argv[0]);
     if (type == "rdbDataChange") {
         return Napi_SubscribeRdbObserver(env, argc, argv, self);
@@ -908,7 +903,7 @@ napi_value NapiDataShareHelper::Napi_RegisterObserver(napi_env env, size_t argc,
     if (argc == ARGS_THREE) {
         NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valueType));
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
-            error = std::make_shared<ParametersTypeError>("uri", "String"), error, nullptr);
+            error = std::make_shared<ParametersTypeError>("uri", "string"), error, nullptr);
         std::string uri = DataShareJSUtils::Convert2String(env, argv[PARAM1]);
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, !uri.empty(),
             error = std::make_shared<ParametersTypeError>("uri", "not empty"), error, nullptr);
@@ -921,12 +916,12 @@ napi_value NapiDataShareHelper::Napi_RegisterObserver(napi_env env, size_t argc,
     if (argc == ARGS_FOUR) {
         NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valueType));
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_number,
-            error = std::make_shared<ParametersTypeError>("SubscribeType", "number"), error, nullptr);
+            error = std::make_shared<ParametersTypeError>("SubscriptionType", "number"), error, nullptr);
         int32_t value;
         napi_get_value_int32(env, argv[PARAM1], &value);
         NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
-            error = std::make_shared<ParametersTypeError>("uri", "String"), error, nullptr);
+            error = std::make_shared<ParametersTypeError>("uri", "string"), error, nullptr);
         std::string uri = DataShareJSUtils::Convert2String(env, argv[PARAM2]);
         NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
@@ -944,11 +939,12 @@ napi_value NapiDataShareHelper::Napi_Off(napi_env env, napi_callback_info info)
     napi_value argv[MAX_ARGC] = { nullptr };
     std::shared_ptr<Error> error = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &self, nullptr));
+    NAPI_ASSERT(env, argc == ARGS_TWO || argc == ARGS_THREE || argc == ARGS_FOUR, "wrong count of args");
 
     napi_valuetype valueType;
     NAPI_CALL(env, napi_typeof(env, argv[0], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
-        error = std::make_shared<ParametersTypeError>("event", "String"), error, nullptr);
+        error = std::make_shared<ParametersTypeError>("event", "string"), error, nullptr);
     std::string type = DataShareJSUtils::Convert2String(env, argv[0]);
     if (type == "rdbDataChange") {
         return Napi_UnsubscribeRdbObserver(env, argc, argv, self);
@@ -973,13 +969,10 @@ napi_value NapiDataShareHelper::Napi_UnregisterObserver(napi_env env, size_t arg
 
     NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string || valueType == napi_number,
-        error = std::make_shared<ParametersTypeError>("argv[1]", "String or Number"), error, nullptr);
+        error = std::make_shared<ParametersTypeError>("argv[1]", "string or number"), error, nullptr);
     if (valueType == napi_string) {
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, argc == ARGS_TWO || argc == ARGS_THREE,
             error = std::make_shared<ParametersNumError>("2 or 3"), error, nullptr);
-        NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valueType));
-        NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
-            error = std::make_shared<ParametersTypeError>("uri", "String"), error, nullptr);
         std::string uri;
         DataShareJSUtils::Convert2Value(env, argv[PARAM1], uri);
         if (argc == ARGS_TWO) {
@@ -997,7 +990,7 @@ napi_value NapiDataShareHelper::Napi_UnregisterObserver(napi_env env, size_t arg
             error = std::make_shared<ParametersNumError>("3 or 4"), error, nullptr);
         NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
-            error = std::make_shared<ParametersTypeError>("uri", "String"), error, nullptr);
+            error = std::make_shared<ParametersTypeError>("uri", "string"), error, nullptr);
         std::string uriStr;
         DataShareJSUtils::Convert2Value(env, argv[PARAM2], uriStr);
         if (argc == ARGS_FOUR) {

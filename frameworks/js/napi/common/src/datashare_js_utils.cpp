@@ -305,7 +305,7 @@ std::string DataShareJSUtils::UnwrapStringFromJS(napi_env env, napi_value param,
 
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataShareValuesBucket &valueBucket)
 {
-    napi_value res = NewInstance(env, const_cast<DataShareValuesBucket&>(valueBucket));
+    napi_value res = NewInstance(env, valueBucket);
     if (res == nullptr) {
         LOG_ERROR("failed to make new instance of DataShareValueBucket.");
     }
@@ -747,14 +747,14 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, UpdateOp
 
 int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, std::string &str)
 {
-    size_t str_buffer_size = DEFAULT_BUF_SIZE;
-    napi_get_value_string_utf8(env, input, nullptr, 0, &str_buffer_size);
-    char *buf = new (std::nothrow) char[str_buffer_size + 1];
+    size_t strBufferSize = DEFAULT_BUF_SIZE;
+    napi_get_value_string_utf8(env, input, nullptr, 0, &strBufferSize);
+    char *buf = new (std::nothrow) char[strBufferSize + 1];
     if (buf == nullptr) {
         return napi_invalid_arg;
     }
     size_t len = 0;
-    napi_get_value_string_utf8(env, input, buf, str_buffer_size + 1, &len);
+    napi_get_value_string_utf8(env, input, buf, strBufferSize + 1, &len);
     buf[len] = 0;
     str = std::string(buf);
     delete[] buf;
@@ -801,6 +801,9 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataShareObserv
     napi_value napiValue = nullptr;
     napi_create_object(env, &napiValue);
     napi_value changeType = Convert2JSValue(env, changeInfo.changeType_);
+    if (changeType == nullptr) {
+        return nullptr;
+    }
     napi_value uri = Convert2JSValue(env, changeInfo.uris_.front().ToString());
     std::vector<DataShareValuesBucket> VBuckets =
         ValueProxy::Convert(CommonType::VBuckets(changeInfo.valueBuckets_));

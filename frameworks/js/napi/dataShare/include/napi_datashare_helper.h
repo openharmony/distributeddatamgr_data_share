@@ -141,8 +141,8 @@ private:
             return Context::operator()(env, result);
         }
     };
-    static void Notify(const std::shared_ptr<NapiDataShareHelper::ContextInfo>& context,
-        std::shared_ptr<DataShareHelper>& helper);
+    static void Notify(const std::shared_ptr<NapiDataShareHelper::ContextInfo> context,
+        std::shared_ptr<DataShareHelper> helper);
 };
 } // namespace DataShare
 } // namespace OHOS

@@ -22,7 +22,7 @@
 #include <variant>
 #include <vector>
 
-#include "datashare_helper.h"
+#include "datashare_observer.h"
 #include "datashare_operation_statement.h"
 #include "datashare_template.h"
 #include "datashare_value_object.h"
