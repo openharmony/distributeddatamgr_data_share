@@ -29,12 +29,10 @@ class DataShareObserver {
 public:
     DataShareObserver() = default;
     virtual ~DataShareObserver() = default;
-    enum SubscriptionType : uint32_t
-    {
+    enum SubscriptionType : uint32_t {
         SUBSCRIPTION_TYPE_EXACT_URI = 0,
     };
-    enum ChangeType : uint32_t
-    {
+    enum ChangeType : uint32_t {
         INSERT = 0,
         DELETE,
         UPDATE,
