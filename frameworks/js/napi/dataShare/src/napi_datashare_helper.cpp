@@ -910,6 +910,8 @@ napi_value NapiDataShareHelper::Napi_RegisterObserver(napi_env env, size_t argc,
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
             error = std::make_shared<ParametersTypeError>("uri", "String"), error, nullptr);
         std::string uri = DataShareJSUtils::Convert2String(env, argv[PARAM1]);
+        NAPI_ASSERT_CALL_ERRCODE_SYNC(env, !uri.empty(),
+            error = std::make_shared<ParametersTypeError>("uri", "not empty"), error, nullptr);
         NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
             error = std::make_shared<ParametersTypeError>("callback", "function"), error, nullptr);
