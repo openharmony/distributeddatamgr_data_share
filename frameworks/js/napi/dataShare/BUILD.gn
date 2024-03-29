@@ -33,9 +33,7 @@ ohos_shared_library("datashare_jscommon") {
     "${datashare_common_napi_path}/src/napi_datashare_values_bucket.cpp",
   ]
 
-  deps = [
-    "${datashare_innerapi_path}/common:datashare_common",
-  ]
+  deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
 
   version_script = "libdatashare_jscommon.map"
 
