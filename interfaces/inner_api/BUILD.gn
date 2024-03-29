@@ -93,6 +93,7 @@ config("permission_config") {
   include_dirs = [
     "common/include",
     "permission/include",
+    "${datashare_common_native_path}/include",
     "${datashare_native_permission_path}/include",
   ]
 
@@ -107,8 +108,6 @@ config("permission_public_config") {
   include_dirs = [
     "common/include",
     "permission/include",
-    "${datashare_common_native_path}/include",
-    "${datashare_native_permission_path}/include",
   ]
 }
 
@@ -162,13 +161,7 @@ ohos_shared_library("datashare_permission") {
   deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
 
   external_deps = [
-    "ability_base:want",
     "ability_base:zuri",
-    "ability_runtime:ability_context_native",
-    "ability_runtime:abilitykit_native",
-    "ability_runtime:app_context",
-    "ability_runtime:dataobs_manager",
-    "ability_runtime:runtime",
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
@@ -176,9 +169,7 @@ ohos_shared_library("datashare_permission") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
-    "ipc:ipc_napi",
     "ipc:ipc_single",
-    "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
 

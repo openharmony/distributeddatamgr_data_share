@@ -21,14 +21,12 @@
 #include <string>
 
 #include "bundle_info.h"
-#include "bundle_mgr_helper.h"
 #include "bundle_mgr_proxy.h"
 
 namespace OHOS {
 namespace DataShare {
 class DataShareCalledConfig {
 public:
-
     explicit DataShareCalledConfig(const std::string &uri);
     ~DataShareCalledConfig() = default;
 
@@ -46,9 +44,7 @@ private:
     int GetFromProxyData();
     int32_t GetUserByToken(uint32_t tokenId);
     std::pair<bool, OHOS::AppExecFwk::BundleInfo> GetBundleInfoFromBMS();
-    std::mutex mutex_;
     ProviderInfo providerInfo_;
-    sptr<IRemoteObject> proxy_;
     static constexpr const char *PROXY_URI_SCHEMA = "datashareproxy";
 };
 } // namespace DataShare

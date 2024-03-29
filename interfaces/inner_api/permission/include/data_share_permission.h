@@ -24,8 +24,8 @@
 
 namespace OHOS {
 namespace DataShare {
-using Uri = OHOS::Uri;
 class DataSharePermission {
+using Uri = OHOS::Uri;
 public:
     DataSharePermission() = default;
     ~DataSharePermission() = default;
@@ -39,8 +39,6 @@ public:
      * @return Returns the error code.
      */
     static int VerifyPermission(Security::AccessToken::AccessTokenID tokenId, const Uri &uri, bool isRead);
-private:
-    static bool VerifyParam(const Uri &uri);
 };
 } // namespace DataShare
 } // namespace OHOS

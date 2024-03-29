@@ -62,7 +62,7 @@ int DataShareCalledConfig::GetFromProxyData()
         return E_BUNDLE_NAME_NOT_EXIST;
     }
     std::string uriWithoutQuery = providerInfo_.uri;
-    DataShareStringUtils::RemoveUriQuery(uriWithoutQuery);
+    DataShareStringUtils::RemoveFromQuery(uriWithoutQuery);
     size_t schemePos = uriWithoutQuery.find(Constants::PARAM_URI_SEPARATOR);
     if (schemePos != uriWithoutQuery.npos) {
         uriWithoutQuery.replace(schemePos, Constants::PARAM_URI_SEPARATOR_LEN, Constants::URI_SEPARATOR);
@@ -96,7 +96,7 @@ std::pair<int, DataShareCalledConfig::ProviderInfo> DataShareCalledConfig::GetPr
     if (bundleName.empty()) {
         LOG_ERROR("BundleName not exist!, tokenId:0x%{public}x, uri:%{public}s",
             tokenId, DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
-        return std::make_pair(E_BUNDLE_NAME_NOT_EXIST, providerInfo_);
+        return std::make_pair(E_BUNDLE_NAME_NOT_EXIST, DataShareCalledConfig::ProviderInfo{});
     }
     providerInfo_.bundleName = bundleName;
     providerInfo_.currentUserId = GetUserByToken(tokenId);
@@ -110,10 +110,6 @@ std::pair<int, DataShareCalledConfig::ProviderInfo> DataShareCalledConfig::GetPr
 
 sptr<BundleMgrProxy> DataShareCalledConfig::GetBundleMgrProxy()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (proxy_ != nullptr) {
-        return iface_cast<BundleMgrProxy>(proxy_);
-    }
     sptr<ISystemAbilityManager> systemAbilityManager =
         SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityManager == nullptr) {
@@ -122,13 +118,13 @@ sptr<BundleMgrProxy> DataShareCalledConfig::GetBundleMgrProxy()
         return nullptr;
     }
 
-    proxy_ = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (proxy_ == nullptr) {
+    auto proxy = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (proxy == nullptr) {
         LOG_ERROR("Failed to get bundle manager proxy.uri: %{public}s",
             DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
         return nullptr;
     }
-    return iface_cast<BundleMgrProxy>(proxy_);
+    return iface_cast<BundleMgrProxy>(proxy);
 }
 
 std::pair<bool, BundleInfo> DataShareCalledConfig::GetBundleInfoFromBMS()

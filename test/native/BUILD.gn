@@ -35,6 +35,19 @@ group("unittest") {
   ]
 }
 
+config("permission_config") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "${datashare_common_native_path}/include",
+    "${datashare_native_permission_path}/include",
+  ]
+
+  cflags = []
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+}
+
 ohos_unittest("NativeDataShareTest") {
   module_out_path = "data_share/native_datashare"
 
@@ -95,6 +108,7 @@ ohos_unittest("PermissionTest") {
   ]
 
   sources = [ "./unittest/mediadatashare_test/src/permission_test.cpp" ]
+  configs = [ ":permission_config" ]
 
   deps = [
     "${datashare_innerapi_path}:datashare_permission",

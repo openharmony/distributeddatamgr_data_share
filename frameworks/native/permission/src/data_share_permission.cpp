@@ -16,7 +16,6 @@
 
 #include "data_share_permission.h"
 
-#include <regex>
 #include <string>
 
 #include "data_share_called_config.h"
@@ -29,23 +28,19 @@ namespace DataShare {
 using namespace AppExecFwk;
 int DataSharePermission::VerifyPermission(Security::AccessToken::AccessTokenID tokenID, const Uri &uri, bool isRead)
 {
-    if (!VerifyParam(uri)) {
-        LOG_ERROR("Param error, tokenId:0x%{public}x, uri:%{public}s", tokenID,
+    if (uri.ToString().empty()) {
+        LOG_ERROR("Uri empty, tokenId:0x%{public}x, uri:%{public}s", tokenID,
             DataShareStringUtils::Anonymous(uri.ToString()).c_str());
         return ERR_INVALID_VALUE;
     }
-    Uri uriTemp(uri);
     DataShareCalledConfig calledConfig(uri.ToString());
     auto [errCode, providerInfo] = calledConfig.GetProviderInfo(tokenID);
     if (errCode != E_OK) {
         LOG_ERROR("ProviderInfo failed! token:0x%{public}x, errCode:%{public}d,uri:%{public}s", tokenID,
-            errCode, DataShareStringUtils::Anonymous(providerInfo.uri).c_str());
+            errCode, DataShareStringUtils::Anonymous(uri.ToString()).c_str());
         return errCode;
     }
-    auto permission = providerInfo.readPermission;
-    if (!isRead) {
-        permission = providerInfo.writePermission;
-    }
+    auto permission = isRead ? providerInfo.readPermission : providerInfo.writePermission;
     if (permission.empty()) {
         LOG_ERROR("Reject, tokenId:0x%{public}x, uri:%{public}s", tokenID,
             DataShareStringUtils::Anonymous(providerInfo.uri).c_str());
@@ -59,23 +54,6 @@ int DataSharePermission::VerifyPermission(Security::AccessToken::AccessTokenID t
         return ERR_PERMISSION_DENIED;
     }
     return E_OK;
-}
-
-bool DataSharePermission::VerifyParam(const Uri &uri)
-{
-    if (uri.ToString().empty()) {
-        return false;
-    }
-    Uri uriTemp(uri);
-    std::regex proxyRegex("^datashareproxy://(?!/)([^/].*)");
-    if (std::regex_match(uriTemp.ToString(), proxyRegex)) {
-        return true;
-    }
-    std::regex datashareRegex("^datashare:///(?!/)([^/].*)");
-    if (std::regex_match(uriTemp.ToString(), datashareRegex)) {
-        return true;
-    }
-    return false;
 }
 } // namespace DataShare
 } // namespace OHOS

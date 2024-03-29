@@ -28,11 +28,7 @@ namespace DataShare {
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
 static int USER_100 = 100;
-std::string ERROR_SCHEME_URI = "https:///com.acts.datasharetest";
-std::string ERROR_SCHEME2_URI = "datashareproxy:///com.ohos.settingsdata";
-std::string ERROR_SCHEME3_URI = "datashareproxy:/com.ohos.settingsdata";
-std::string ERROR_SCHEME4_URI = "datashare://com.ohos.settingsdata";
-std::string ERROR_SCHEME5_URI = "datashare:////com.ohos.settingsdata";
+std::string EMPTY_URI = "";
 std::string PROXY_ERROR_BUNDLE_URI = "datashareproxy://com.acts.datasharetest.error/test";
 std::string URI_DIFF_PROXY_DATA = "datashareproxy://com.acts.datasharetest/test/error";
 std::string PROXY_URI_OK = "datashareproxy://com.acts.datasharetest/test";
@@ -105,54 +101,14 @@ void PermissionTest::TearDownTestCase(void)
 void PermissionTest::SetUp(void) {}
 void PermissionTest::TearDown(void) {}
 
-HWTEST_F(PermissionTest, PermissionTest_Uri_Scheme_Error_Test_001, TestSize.Level0)
+HWTEST_F(PermissionTest, PermissionTest_Uri_Empty_Test_001, TestSize.Level0)
 {
     LOG_INFO("PermissionTest_Uri_Scheme_Error_Test_001::Start");
     auto tokenId = AccessTokenKit::GetHapTokenIDEx(USER_100, "ohos.datashareclienttest.demo", 0);
-    Uri uri(ERROR_SCHEME_URI);
+    Uri uri(EMPTY_URI);
     auto ret = DataShare::DataSharePermission::VerifyPermission(tokenId.tokenIDEx, uri, true);
     EXPECT_EQ(ret, ERR_INVALID_VALUE);
     LOG_INFO("PermissionTest_Uri_Scheme_Error_Test_001::End");
-}
-
-HWTEST_F(PermissionTest, PermissionTest_Uri_Scheme_Error_Test_002, TestSize.Level0)
-{
-    LOG_INFO("PermissionTest_Uri_Scheme_Error_Test_002::Start");
-    auto tokenId = AccessTokenKit::GetHapTokenIDEx(USER_100, "ohos.datashareclienttest.demo", 0);
-    Uri uri(ERROR_SCHEME2_URI);
-    auto ret = DataShare::DataSharePermission::VerifyPermission(tokenId.tokenIDEx, uri, true);
-    EXPECT_EQ(ret, ERR_INVALID_VALUE);
-    LOG_INFO("PermissionTest_Uri_Scheme_Error_Test_002::End");
-}
-
-HWTEST_F(PermissionTest, PermissionTest_Uri_Scheme_Error_Test_003, TestSize.Level0)
-{
-    LOG_INFO("PermissionTest_Uri_Scheme_Error_Test_003::Start");
-    auto tokenId = AccessTokenKit::GetHapTokenIDEx(USER_100, "ohos.datashareclienttest.demo", 0);
-    Uri uri(ERROR_SCHEME3_URI);
-    auto ret = DataShare::DataSharePermission::VerifyPermission(tokenId.tokenIDEx, uri, true);
-    EXPECT_EQ(ret, ERR_INVALID_VALUE);
-    LOG_INFO("PermissionTest_Uri_Scheme_Error_Test_003::End");
-}
-
-HWTEST_F(PermissionTest, PermissionTest_Uri_Scheme_Error_Test_004, TestSize.Level0)
-{
-    LOG_INFO("PermissionTest_Uri_Scheme_Error_Test_004::Start");
-    auto tokenId = AccessTokenKit::GetHapTokenIDEx(USER_100, "ohos.datashareclienttest.demo", 0);
-    Uri uri(ERROR_SCHEME4_URI);
-    auto ret = DataShare::DataSharePermission::VerifyPermission(tokenId.tokenIDEx, uri, true);
-    EXPECT_EQ(ret, ERR_INVALID_VALUE);
-    LOG_INFO("PermissionTest_Uri_Scheme_Error_Test_004::End");
-}
-
-HWTEST_F(PermissionTest, PermissionTest_Uri_Scheme_Error_Test_005, TestSize.Level0)
-{
-    LOG_INFO("PermissionTest_Uri_Scheme_Error_Test_005::Start");
-    auto tokenId = AccessTokenKit::GetHapTokenIDEx(USER_100, "ohos.datashareclienttest.demo", 0);
-    Uri uri(ERROR_SCHEME5_URI);
-    auto ret = DataShare::DataSharePermission::VerifyPermission(tokenId.tokenIDEx, uri, true);
-    EXPECT_EQ(ret, ERR_INVALID_VALUE);
-    LOG_INFO("PermissionTest_Uri_Scheme_Error_Test_005::End");
 }
 
 HWTEST_F(PermissionTest, PermissionTest_Bundle_Name_Error_Test_001, TestSize.Level0)
