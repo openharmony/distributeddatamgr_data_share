@@ -676,12 +676,11 @@ napi_value NapiDataShareHelper::Napi_NotifyChange(napi_env env, napi_callback_in
         if (valueType != napi_string) {
             context->isNotifyDetails = true;
             if (DataShareJSUtils::Convert2Value(env, argv[0], context->changeInfo) != napi_ok) {
+                context->error = std::make_shared<ParametersTypeError>("ChangeInfo", "valid");
                 return napi_invalid_arg;
             }
         } else {
-            if (GetUri(env, argv[0], context->uri)!= napi_ok) {
-                return napi_invalid_arg;
-            }
+            GetUri(env, argv[0], context->uri);
         }
         return napi_ok;
     };
