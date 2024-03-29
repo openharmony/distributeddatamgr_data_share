@@ -975,10 +975,7 @@ napi_value NapiDataShareHelper::Napi_UnregisterObserver(napi_env env, size_t arg
     if (valueType == napi_string) {
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, argc == ARGS_TWO || argc == ARGS_THREE,
             error = std::make_shared<ParametersNumError>("2 or 3"), error, nullptr);
-        std::string uri;
-        if (DataShareJSUtils::Convert2Value(env, argv[PARAM1], uri) != napi_ok) {
-            return nullptr;
-        }
+        std::string uri = DataShareJSUtils::Convert2String(env, argv[PARAM1]);
         if (argc == ARGS_TWO) {
             proxy->UnRegisteredObserver(env, uri, std::move(helper));
             return nullptr;
@@ -995,10 +992,7 @@ napi_value NapiDataShareHelper::Napi_UnregisterObserver(napi_env env, size_t arg
         NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
             error = std::make_shared<ParametersTypeError>("uri", "string"), error, nullptr);
-        std::string uriStr;
-        if (DataShareJSUtils::Convert2Value(env, argv[PARAM2], uriStr) != napi_ok) {
-            return nullptr;
-        }
+        std::string uriStr = DataShareJSUtils::Convert2String(env, argv[PARAM2]);
         if (argc == ARGS_FOUR) {
             NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
             NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
