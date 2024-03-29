@@ -675,9 +675,13 @@ napi_value NapiDataShareHelper::Napi_NotifyChange(napi_env env, napi_callback_in
         napi_typeof(env, argv[0], &valueType);
         if (valueType != napi_string) {
             context->isNotifyDetails = true;
-            DataShareJSUtils::Convert2Value(env, argv[0], context->changeInfo);
+            if (DataShareJSUtils::Convert2Value(env, argv[0], context->changeInfo) != napi_ok) {
+                return napi_invalid_arg;
+            }
         } else {
-            GetUri(env, argv[0], context->uri);
+            if (GetUri(env, argv[0], context->uri)!= napi_ok) {
+                return napi_invalid_arg;
+            }
         }
         return napi_ok;
     };

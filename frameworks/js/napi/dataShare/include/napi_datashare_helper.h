@@ -17,13 +17,13 @@
 #define NAPI_DATASHARE_HELPER_H
 
 #include <memory>
+#include <shared_mutex>
 
-#include "napi_subscriber_manager.h"
 #include "async_call.h"
 #include "data_share_common.h"
 #include "datashare_helper.h"
 #include "napi_datashare_observer.h"
-#include <shared_mutex>
+#include "napi_subscriber_manager.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -122,6 +122,7 @@ private:
         std::vector<BatchUpdateResult> batchUpdateResult;
         DataShareObserver::ChangeInfo changeInfo;
         bool isNotifyDetails = false;
+
         ContextInfo() : Context(nullptr, nullptr) {};
         ContextInfo(InputAction input, OutputAction output) : Context(std::move(input), std::move(output)) {};
         virtual ~ContextInfo() {};

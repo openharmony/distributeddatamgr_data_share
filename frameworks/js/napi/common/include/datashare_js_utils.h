@@ -62,10 +62,10 @@ public:
     static constexpr int32_t SYNC_RESULT_ELEMNT_NUM = 2;
 
     template<typename T>
-    static int32_t Convert2Value(napi_env env,  napi_value input, T &output);
+    static int32_t Convert2Value(napi_env env, napi_value input, T &output);
 
     template<typename T>
-    static int32_t Convert2JSValue(napi_env env,  napi_value input, T &output);
+    static int32_t Convert2JSValue(napi_env env, napi_value input, T &output);
 
     template<typename T>
     static napi_value Convert2JSValue(napi_env env, const std::vector<T> &value);

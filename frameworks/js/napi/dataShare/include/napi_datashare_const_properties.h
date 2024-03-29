@@ -16,8 +16,8 @@
 #ifndef NAPI_DATASHARE_CONST_PROPERTIES_H
 #define NAPI_DATASHARE_CONST_PROPERTIES_H
 
-#include "napi/native_common.h"
 #include "napi/native_api.h"
+#include "napi/native_common.h"
 #include "napi/native_node_api.h"
 
 namespace OHOS::DataShare {

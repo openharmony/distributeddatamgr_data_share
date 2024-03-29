@@ -222,7 +222,7 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, int64_t value)
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, uint32_t value)
 {
     napi_value jsValue;
-    napi_status status =  napi_create_uint32(env, value, &jsValue);
+    napi_status status = napi_create_uint32(env, value, &jsValue);
     if (status != napi_ok) {
         return nullptr;
     }
@@ -762,7 +762,7 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, std::str
 }
 
 int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input,
-    OHOS::DataShare::DataShareObserver::ChangeType& changeType)
+    OHOS::DataShare::DataShareObserver::ChangeType &changeType)
 {
     uint32_t number = 0;
     napi_status status = napi_get_value_uint32(env, input, &number);
@@ -783,7 +783,7 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, DataShar
     if (Convert2Value(env, input, "type", changeInfo.changeType_) != napi_ok) {
         return napi_invalid_arg;
     }
-    if (Convert2Value(env, input, "uri", uriStr) != napi_ok)  {
+    if (Convert2Value(env, input, "uri", uriStr) != napi_ok) {
         return napi_invalid_arg;
     }
     if (Convert2Value(env, input, "values", valuebuckets) != napi_ok) {

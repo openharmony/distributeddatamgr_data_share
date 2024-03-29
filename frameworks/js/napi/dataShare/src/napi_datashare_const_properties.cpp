@@ -25,7 +25,7 @@
 
 namespace OHOS::DataShare {
 
-static napi_status SetNamedProperty(napi_env env, napi_value& obj, const std::string& name, int32_t value)
+static napi_status SetNamedProperty(napi_env env, napi_value &obj, const std::string &name, int32_t value)
 {
     napi_value property = nullptr;
     napi_status status = napi_create_int32(env, value, &property);
