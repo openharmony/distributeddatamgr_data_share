@@ -805,9 +805,15 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataShareObserv
         return nullptr;
     }
     napi_value uri = Convert2JSValue(env, changeInfo.uris_.front().ToString());
+    if (uri == nullptr) {
+        return nullptr;
+    }
     std::vector<DataShareValuesBucket> VBuckets =
         ValueProxy::Convert(CommonType::VBuckets(changeInfo.valueBuckets_));
     napi_value valueBuckets = Convert2JSValue(env, VBuckets);
+    if (valueBuckets == nullptr) {
+        return nullptr;
+    }
     napi_set_named_property(env, napiValue, "type", changeType);
     napi_set_named_property(env, napiValue, "uri", uri);
     napi_set_named_property(env, napiValue, "values", valueBuckets);
