@@ -969,7 +969,6 @@ napi_value NapiDataShareHelper::Napi_UnregisterObserver(napi_env env, size_t arg
     auto helper = proxy->GetHelper();
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, helper != nullptr, error = std::make_shared<HelperAlreadyClosedError>(), error,
         nullptr);
-
     NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string || valueType == napi_number,
         error = std::make_shared<ParametersTypeError>("argv[1]", "string or number"), error, nullptr);
