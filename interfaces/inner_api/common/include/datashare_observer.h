@@ -20,9 +20,7 @@
 #include <map>
 #include <string>
 
-#include "data_ability_observer_interface.h"
-
-using Uri = OHOS::Uri;
+#include "uri.h"
 
 namespace OHOS::DataShare {
 class DataShareObserver {
