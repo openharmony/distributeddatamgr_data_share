@@ -96,11 +96,6 @@ config("permission_config") {
     "${datashare_common_native_path}/include",
     "${datashare_native_permission_path}/include",
   ]
-
-  cflags = []
-  if (target_cpu == "arm") {
-    cflags += [ "-DBINDER_IPC_32BIT" ]
-  }
 }
 
 config("permission_public_config") {
