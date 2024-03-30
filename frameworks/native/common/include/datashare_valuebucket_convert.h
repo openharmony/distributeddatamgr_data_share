@@ -21,11 +21,10 @@
 #include "datashare_observer.h"
 #include "traits.h"
 
-namespace OHOS::DataShare{
+namespace OHOS::DataShare {
 using Value = DataShareObserver::ChangeInfo::Value;
 using VBucket = DataShareObserver::ChangeInfo::VBucket;
 using VBuckets = DataShareObserver::ChangeInfo::VBuckets;
-
 
 template<typename T, typename O>
 static bool GetItem(T&& input, O& output)
