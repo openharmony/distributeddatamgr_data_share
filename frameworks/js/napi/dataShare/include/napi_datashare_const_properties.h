@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,19 +13,14 @@
  * limitations under the License.
  */
 
-#ifndef NAPI_DATASHARE_VALUES_BUCKET_H
-#define NAPI_DATASHARE_VALUES_BUCKET_H
+#ifndef NAPI_DATASHARE_CONST_PROPERTIES_H
+#define NAPI_DATASHARE_CONST_PROPERTIES_H
 
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
-#include "datashare_values_bucket.h"
-#include "datashare_js_utils.h"
 
-namespace OHOS {
-namespace DataShare {
-napi_value NewInstance(napi_env env, const DataShareValuesBucket &valuesBucket);
-bool GetValueBucketObject(DataShareValuesBucket &valuesBucket, const napi_env &env, const napi_value &arg);
-} // namespace DataShare
-} // namespace OHOS
-#endif // NAPI_DATASHARE_VALUES_BUCKET_H
+namespace OHOS::DataShare {
+napi_status InitConstProperties(napi_env env, napi_value exports);
+}
+#endif // NAPI_DATASHARE_CONST_PROPERTIES_H

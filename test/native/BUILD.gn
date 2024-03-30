@@ -28,6 +28,7 @@ group("unittest") {
     ":ProxyDatasTest",
     ":SlientAccessTest",
     ":SlientSwitchTest",
+    ":ValueProxyTest",
     "resource/datashare_ext_bundle:datashare_ext",
     "resource/datashareproxy_bundle/proxydatas_with_permission:proxydatas_with_permission",
     "resource/errorcode_ext_bundle:errorcode_ext",
@@ -397,5 +398,24 @@ ohos_unittest("AbnormalBranchTest") {
     "relational_store:rdb_data_ability_adapter",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+  ]
+}
+
+ohos_unittest("ValueProxyTest") {
+  module_out_path = "data_share/native_datashare"
+
+  include_dirs = [
+    "${datashare_base_path}/frameworks/native/common/include/",
+    "${kvstore_base_path}/frameworks/common",
+  ]
+
+  sources = [ "./unittest/mediadatashare_test/src/valueproxy_test.cpp" ]
+
+  deps = [ "${datashare_innerapi_path}/common:datashare_common_static" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
   ]
 }

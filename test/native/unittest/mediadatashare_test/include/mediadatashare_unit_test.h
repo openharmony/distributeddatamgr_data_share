@@ -25,6 +25,9 @@
 namespace OHOS {
 namespace DataShare {
 using ChangeInfo = DataShareObserver::ChangeInfo;
+using Value = std::variant<std::monostate, int64_t, double, std::string, bool, std::vector<uint8_t>>;
+using VBucket = std::map<std::string, Value>;
+using VBuckets = std::vector<VBucket>;
 class MediaDataShareUnitTest : public testing::Test {
 public:
     /* SetUpTestCase:The preset action of the test suite is executed before the first TestCase */
@@ -39,6 +42,7 @@ public:
     /* TearDown:Execute after each test case */
     void TearDown();
     bool UrisEqual(std::list<Uri> uri1, std::list<Uri> uri2);
+    bool ValueBucketEqual(const VBuckets& vb1, const VBuckets& vb2);
     bool ChangeInfoEqual(const ChangeInfo &changeInfo, const ChangeInfo &expectChangeInfo);
 };
 

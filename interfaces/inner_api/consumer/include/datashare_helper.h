@@ -24,6 +24,7 @@
 
 #include "data_ability_observer_interface.h"
 #include "datashare_business_error.h"
+#include "datashare_observer.h"
 #include "datashare_operation_statement.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
@@ -41,28 +42,6 @@ class IDataAbilityObserver;
 
 namespace DataShare {
 using string = std::string;
-class DataShareObserver {
-public:
-    DataShareObserver() = default;
-    virtual ~DataShareObserver() = default;
-    enum ChangeType : uint32_t {
-        INSERT = 0,
-        DELETE,
-        UPDATE,
-        OTHER,
-        INVAILD,
-    };
-
-    struct ChangeInfo {
-        ChangeType changeType_ = INVAILD;
-        std::list<Uri> uris_ = {};
-        const void *data_ = nullptr;
-        uint32_t size_ = 0;
-    };
-
-    virtual void OnChange(const ChangeInfo &changeInfo) = 0;
-};
-
 class DataShareHelper : public std::enable_shared_from_this<DataShareHelper> {
 public:
     /**

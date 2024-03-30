@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
+#include "datashare_log.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-
-#include "datashare_log.h"
+#include "napi_datashare_const_properties.h"
 #include "napi_datashare_helper.h"
 
 namespace OHOS {
@@ -34,6 +34,8 @@ static napi_value Init(napi_env env, napi_value exports)
     };
     napi_status status = napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc);
     LOG_DEBUG("napi_define_properties status : %{public}d", status);
+    status = InitConstProperties(env, exports);
+    LOG_DEBUG("init Enumerate Constants %{public}d", status);
     return exports;
 }
 

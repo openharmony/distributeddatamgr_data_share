@@ -17,8 +17,9 @@
 
 #include "datashare_log.h"
 #include "datashare_predicates_proxy.h"
-#include "napi_datashare_values_bucket.h"
+#include "datashare_valuebucket_convert.h"
 #include "napi/native_common.h"
+#include "napi_datashare_values_bucket.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -218,6 +219,16 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, int64_t value)
     return jsValue;
 }
 
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, uint32_t value)
+{
+    napi_value jsValue;
+    napi_status status = napi_create_uint32(env, value, &jsValue);
+    if (status != napi_ok) {
+        return nullptr;
+    }
+    return jsValue;
+}
+
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, double value)
 {
     napi_value jsValue;
@@ -290,6 +301,15 @@ std::string DataShareJSUtils::UnwrapStringFromJS(napi_env env, napi_value param,
         buf = nullptr;
     }
     return value;
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataShareValuesBucket &valueBucket)
+{
+    napi_value res = NewInstance(env, valueBucket);
+    if (res == nullptr) {
+        LOG_ERROR("failed to make new instance of DataShareValueBucket.");
+    }
+    return res;
 }
 
 DataShareValueObject DataShareJSUtils::Convert2ValueObject(napi_env env, napi_value value, bool &status)
@@ -723,6 +743,81 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, UpdateOp
         return napi_invalid_arg;
     }
     return napi_ok;
+}
+
+int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, std::string &str)
+{
+    size_t strBufferSize = DEFAULT_BUF_SIZE;
+    napi_get_value_string_utf8(env, input, nullptr, 0, &strBufferSize);
+    char *buf = new (std::nothrow) char[strBufferSize + 1];
+    if (buf == nullptr) {
+        return napi_invalid_arg;
+    }
+    size_t len = 0;
+    napi_get_value_string_utf8(env, input, buf, strBufferSize + 1, &len);
+    buf[len] = 0;
+    str = std::string(buf);
+    delete[] buf;
+    return napi_ok;
+}
+
+int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input,
+    OHOS::DataShare::DataShareObserver::ChangeType &changeType)
+{
+    uint32_t number = 0;
+    napi_status status = napi_get_value_uint32(env, input, &number);
+    changeType = static_cast<OHOS::DataShare::DataShareObserver::ChangeType>(number);
+    return status;
+}
+
+int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, DataShareObserver::ChangeInfo &changeInfo)
+{
+    napi_valuetype type = napi_undefined;
+    napi_typeof(env, input, &type);
+    if (type != napi_object) {
+        LOG_ERROR("ChangeInfo is not object");
+        return napi_invalid_arg;
+    }
+    std::string uriStr;
+    std::vector<DataShareValuesBucket> valuebuckets = {};
+    if (Convert2Value(env, input, "type", changeInfo.changeType_) != napi_ok) {
+        return napi_invalid_arg;
+    }
+    if (Convert2Value(env, input, "uri", uriStr) != napi_ok) {
+        return napi_invalid_arg;
+    }
+    if (Convert2Value(env, input, "values", valuebuckets) != napi_ok) {
+        return napi_invalid_arg;
+    }
+
+    Uri uri(uriStr);
+    changeInfo.uris_.push_back(uri);
+    changeInfo.valueBuckets_ = ValueProxy::Convert(std::move(valuebuckets));
+    return napi_ok;
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataShareObserver::ChangeInfo &changeInfo)
+{
+    napi_value napiValue = nullptr;
+    napi_create_object(env, &napiValue);
+    napi_value changeType = Convert2JSValue(env, changeInfo.changeType_);
+    if (changeType == nullptr) {
+        return nullptr;
+    }
+    napi_value uri = Convert2JSValue(env, changeInfo.uris_.front().ToString());
+    if (uri == nullptr) {
+        return nullptr;
+    }
+    auto &valBucket = const_cast<DataShareObserver::ChangeInfo &>(changeInfo);
+    std::vector<DataShareValuesBucket> VBuckets = ValueProxy::Convert(std::move(valBucket.valueBuckets_));
+    napi_value valueBuckets = Convert2JSValue(env, VBuckets);
+    if (valueBuckets == nullptr) {
+        return nullptr;
+    }
+    napi_set_named_property(env, napiValue, "type", changeType);
+    napi_set_named_property(env, napiValue, "uri", uri);
+    napi_set_named_property(env, napiValue, "values", valueBuckets);
+    return napiValue;
 }
 
 bool DataShareJSUtils::UnwrapDataSharePredicates(napi_env env, napi_value value,
