@@ -17,16 +17,16 @@
 
 namespace OHOS::DataShare {
 
-CommonType::VBuckets ValueProxy::Convert(std::vector<DataShare::DataShareValuesBucket> &&dataShareValuesBuckets)
+VBuckets ValueProxy::Convert(std::vector<DataShare::DataShareValuesBucket> &&dataShareValuesBuckets)
 {
     size_t length = dataShareValuesBuckets.size();
-    CommonType::VBuckets res;
+    VBuckets res;
     res.reserve(length);
     for (auto &dataShareValuesBucket : dataShareValuesBuckets) {
-        CommonType::VBucket vBucket;
+        VBucket vBucket;
         for (auto &[k, v] : dataShareValuesBucket.valuesMap) {
-            CommonType::Value value;
-            CommonType::Convert<DataShareValueObject::Type>(std::move(v), value);
+            Value value;
+            DataShare::Convert<DataShareValueObject::Type>(std::move(v), value);
             vBucket.emplace(k, std::move(value));
         }
         res.emplace_back(std::move(vBucket));
@@ -34,7 +34,7 @@ CommonType::VBuckets ValueProxy::Convert(std::vector<DataShare::DataShareValuesB
     return res;
 }
 
-std::vector<DataShareValuesBucket> ValueProxy::Convert(CommonType::VBuckets &&vBuckets)
+std::vector<DataShareValuesBucket> ValueProxy::Convert(VBuckets &&vBuckets)
 {
     size_t length = vBuckets.size();
     std::vector<DataShareValuesBucket> res;
@@ -43,11 +43,11 @@ std::vector<DataShareValuesBucket> ValueProxy::Convert(CommonType::VBuckets &&vB
         DataShareValuesBucket dataShareValuesBucket;
         for (auto &[k, v] : vBucket) {
             DataShareValueObject::Type dataShareValueObject;
-            CommonType::Convert<CommonType::Value>(std::move(v), dataShareValueObject);
+            DataShare::Convert<Value>(std::move(v), dataShareValueObject);
             dataShareValuesBucket.valuesMap.emplace(k, std::move(dataShareValueObject));
         }
         res.emplace_back(std::move(dataShareValuesBucket));
     }
     return res;
 }
-} // namespace OHOS::DistributedData
+} // namespace OHOS::DataShare

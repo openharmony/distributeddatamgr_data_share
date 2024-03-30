@@ -18,16 +18,14 @@
 
 #include "datashare_value_object.h"
 #include "datashare_values_bucket.h"
+#include "datashare_observer.h"
 #include "traits.h"
 
-namespace OHOS::CommonType {
-using Value = std::variant<std::monostate, int64_t, double, std::string, bool, std::vector<uint8_t>>;
-using VBucket = std::map<std::string, Value>;
-using VBuckets = std::vector<VBucket>;
+namespace OHOS::DataShare{
+using Value = DataShareObserver::ChangeInfo::Value;
+using VBucket = DataShareObserver::ChangeInfo::VBucket;
+using VBuckets = DataShareObserver::ChangeInfo::VBuckets;
 
-template<typename T>
-static inline constexpr size_t TYPE_INDEX = Traits::variant_index_of_v<T, CommonType::Value>;
-static inline constexpr size_t TYPE_MAX = Traits::variant_size_of_v<CommonType::Value>;
 
 template<typename T, typename O>
 static bool GetItem(T&& input, O& output)
@@ -56,8 +54,8 @@ static bool Convert(T&& input, std::variant<Types...>& output)
 namespace OHOS::DataShare {
 class ValueProxy {
 public:
-    static CommonType::VBuckets Convert(std::vector<DataShare::DataShareValuesBucket> &&dataShareValuesBuckets);
-    static std::vector<DataShare::DataShareValuesBucket> Convert(CommonType::VBuckets &&vBuckets);
+    static VBuckets Convert(std::vector<DataShare::DataShareValuesBucket> &&dataShareValuesBuckets);
+    static std::vector<DataShare::DataShareValuesBucket> Convert(VBuckets &&vBuckets);
 };
 }
 #endif // DATASHARE_VALUEBUCKET_CONVERT_H

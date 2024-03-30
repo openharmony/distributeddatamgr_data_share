@@ -808,8 +808,8 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataShareObserv
     if (uri == nullptr) {
         return nullptr;
     }
-    std::vector<DataShareValuesBucket> VBuckets =
-        ValueProxy::Convert(CommonType::VBuckets(changeInfo.valueBuckets_));
+    auto &valBucket = const_cast<DataShareObserver::ChangeInfo &>(changeInfo);
+    std::vector<DataShareValuesBucket> VBuckets = ValueProxy::Convert(std::move(valBucket.valueBuckets_));
     napi_value valueBuckets = Convert2JSValue(env, VBuckets);
     if (valueBuckets == nullptr) {
         return nullptr;
