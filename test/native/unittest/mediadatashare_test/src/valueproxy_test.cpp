@@ -31,7 +31,7 @@ HWTEST_F(ValueProxyTest, VBucketsDataShare2Normal, TestSize.Level0)
     valuesBucket1.Put("name", "dataShareTest003");
     valuesBucket2.Put("age", 1001);
     std::vector<DataShareBucket> VBuckets = {valuesBucket1, valuesBucket2};
-    CommonType::VBuckets extends;
+    DataShareObserver::ChangeInfo::VBuckets extends;
     extends = ValueProxy::Convert(std::move(VBuckets));
     ASSERT_EQ(extends.size(), 2);
 }
@@ -39,7 +39,7 @@ HWTEST_F(ValueProxyTest, VBucketsNormal2DataShare, TestSize.Level0)
 {
     using DataShareBucket = OHOS::DataShare::DataShareValuesBucket;
     std::vector<DataShareBucket> VBuckets;
-    CommonType::VBuckets extends = {
+    DataShareObserver::ChangeInfo::VBuckets extends = {
         {{"phoneNumber", 20.07}, {"name", "dataShareTest003"}},
         {{"age", 1001}}
     };
