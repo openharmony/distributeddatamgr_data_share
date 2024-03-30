@@ -21,6 +21,7 @@
 
 #include "access_token.h"
 #include "accesstoken_kit.h"
+#include "bundle_mgr_helper.h"
 #include "datashare_errno.h"
 #include "datashare_log.h"
 #include "datashare_string_utils.h"
@@ -108,35 +109,16 @@ std::pair<int, DataShareCalledConfig::ProviderInfo> DataShareCalledConfig::GetPr
     return std::make_pair(ret, providerInfo_);
 }
 
-sptr<BundleMgrProxy> DataShareCalledConfig::GetBundleMgrProxy()
-{
-    sptr<ISystemAbilityManager> systemAbilityManager =
-        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (systemAbilityManager == nullptr) {
-        LOG_ERROR("Failed to get system ability mgr.uri: %{public}s",
-            DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
-        return nullptr;
-    }
-
-    auto proxy = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (proxy == nullptr) {
-        LOG_ERROR("Failed to get bundle manager proxy.uri: %{public}s",
-            DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
-        return nullptr;
-    }
-    return iface_cast<BundleMgrProxy>(proxy);
-}
-
 std::pair<bool, BundleInfo> DataShareCalledConfig::GetBundleInfoFromBMS()
 {
     BundleInfo bundleInfo;
-    auto bmsClient = GetBundleMgrProxy();
-    if (bmsClient == nullptr) {
-        LOG_ERROR("Get BundleMgrProxy is nullptr!.uri: %{public}s",
+    auto bmsHelper = DelayedSingleton<BundleMgrHelper>::GetInstance();
+    if (bmsHelper == nullptr) {
+        LOG_ERROR("BmsHelper is nullptr!.uri: %{public}s",
             DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
         return std::make_pair(false, bundleInfo);
     }
-    bool ret = bmsClient->GetBundleInfo(providerInfo_.bundleName,
+    bool ret = bmsHelper->GetBundleInfo(providerInfo_.bundleName,
         BundleFlag::GET_BUNDLE_WITH_EXTENSION_INFO, bundleInfo, providerInfo_.currentUserId);
     if (!ret) {
         LOG_ERROR("Get BundleInfo failed! bundleName:%{public}s, userId:%{public}d,uri:%{public}s",

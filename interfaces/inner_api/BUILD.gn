@@ -157,6 +157,8 @@ ohos_shared_library("datashare_permission") {
 
   external_deps = [
     "ability_base:zuri",
+    "ability_runtime:app_context",
+    "ability_runtime:runtime",
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",

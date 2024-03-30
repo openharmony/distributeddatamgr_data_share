@@ -40,7 +40,6 @@ public:
     };
     std::pair<int, ProviderInfo> GetProviderInfo(uint32_t tokenId);
 private:
-    sptr<OHOS::AppExecFwk::BundleMgrProxy> GetBundleMgrProxy();
     int GetFromProxyData();
     int32_t GetUserByToken(uint32_t tokenId);
     std::pair<bool, OHOS::AppExecFwk::BundleInfo> GetBundleInfoFromBMS();
