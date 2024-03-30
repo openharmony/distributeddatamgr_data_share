@@ -880,8 +880,10 @@ napi_value NapiDataShareHelper::Napi_On(napi_env env, napi_callback_info info)
         error = std::make_shared<ParametersNumError>("3 or 4"), error, nullptr);
     napi_valuetype valueType;
     NAPI_CALL(env, napi_typeof(env, argv[0], &valueType));
-    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
-        error = std::make_shared<ParametersTypeError>("event", "string"), error, nullptr);
+    if (valueType != napi_string) {
+        LOG_ERROR("type is not string");
+        return nullptr;
+    }
     std::string type = DataShareJSUtils::Convert2String(env, argv[0]);
     if (type == "rdbDataChange") {
         return Napi_SubscribeRdbObserver(env, argc, argv, self);
@@ -946,8 +948,10 @@ napi_value NapiDataShareHelper::Napi_Off(napi_env env, napi_callback_info info)
 
     napi_valuetype valueType;
     NAPI_CALL(env, napi_typeof(env, argv[0], &valueType));
-    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
-        error = std::make_shared<ParametersTypeError>("event", "string"), error, nullptr);
+    if (valueType != napi_string) {
+        LOG_ERROR("type is not string");
+        return nullptr;
+    }
     std::string type = DataShareJSUtils::Convert2String(env, argv[0]);
     if (type == "rdbDataChange") {
         return Napi_UnsubscribeRdbObserver(env, argc, argv, self);
