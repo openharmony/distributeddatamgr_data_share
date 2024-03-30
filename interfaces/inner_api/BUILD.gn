@@ -88,6 +88,24 @@ datashare_consumer_external_deps = [
   "samgr:samgr_proxy",
 ]
 
+config("permission_config") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "common/include",
+    "permission/include",
+    "${datashare_common_native_path}/include",
+    "${datashare_native_permission_path}/include",
+  ]
+}
+
+config("permission_public_config") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "common/include",
+    "permission/include",
+  ]
+}
+
 ohos_shared_library("datashare_consumer") {
   branch_protector_ret = "pac_ret"
   sanitize = {
@@ -112,6 +130,45 @@ ohos_shared_library("datashare_consumer") {
   deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
 
   external_deps = datashare_consumer_external_deps
+
+  subsystem_name = "distributeddatamgr"
+  part_name = "data_share"
+}
+
+ohos_shared_library("datashare_permission") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  include_dirs = []
+
+  sources = [
+    "${datashare_common_native_path}/src/datashare_string_utils.cpp",
+    "${datashare_native_permission_path}/src/data_share_called_config.cpp",
+    "${datashare_native_permission_path}/src/data_share_permission.cpp",
+  ]
+  configs = [ ":permission_config" ]
+  public_configs = [ ":permission_public_config" ]
+  version_script = "permission/libdatashare_permission.map"
+  innerapi_tags = [ "platformsdk" ]
+  deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
+
+  external_deps = [
+    "ability_base:zuri",
+    "ability_runtime:app_context",
+    "ability_runtime:runtime",
+    "access_token:libaccesstoken_sdk",
+    "bundle_framework:appexecfwk_base",
+    "bundle_framework:appexecfwk_core",
+    "bundle_framework:libappexecfwk_common",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
 
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"

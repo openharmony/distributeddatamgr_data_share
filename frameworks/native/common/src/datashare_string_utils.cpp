@@ -28,6 +28,15 @@ std::string DataShareStringUtils::Anonymous(const std::string &name)
     return (DEFAULT_ANONYMOUS + name.substr(name.length() - END_SIZE, END_SIZE));
 }
 
+void DataShareStringUtils::RemoveFromQuery(std::string &uri)
+{
+    auto pos = uri.find_last_of('?');
+    if (pos == std::string::npos) {
+        return;
+    }
+    uri.resize(pos);
+}
+
 DataShareStringUtils::DataShareStringUtils() {}
 DataShareStringUtils::~DataShareStringUtils() {}
 } // namespace DataShare
