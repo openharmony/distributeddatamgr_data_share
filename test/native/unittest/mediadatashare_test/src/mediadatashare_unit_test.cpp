@@ -1474,7 +1474,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_002, TestSize.Level0
     std::vector<DataShareValuesBucket> VBuckets = {valuesBucket1, valuesBucket2};
     int retVal = helper->BatchInsert(uri, VBuckets);
     EXPECT_EQ((retVal > 0), true);
-    CommonType::VBuckets extends;
+    DataShareObserver::ChangeInfo::VBuckets extends;
     extends = ValueProxy::Convert(std::move(VBuckets));
     ChangeInfo uriChanges = { DataShareObserver::ChangeType::INSERT, { uri }, nullptr, 0, extends};
     helper->NotifyChangeExt(uriChanges);
@@ -1502,7 +1502,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_003, TestSize.Level0
     predicates.EqualTo("name", "Datashare_Observer_Test002");
     int retVal = helper->Update(uri, predicates, valuesBucket);
     EXPECT_EQ((retVal > 0), true);
-    CommonType::VBuckets extends;
+    DataShareObserver::ChangeInfo::VBuckets extends;
     extends = ValueProxy::Convert(std::move(VBuckets));
     ChangeInfo uriChanges = { DataShareObserver::ChangeType::UPDATE, { uri }, nullptr, 0, extends};
     helper->NotifyChangeExt(uriChanges);
@@ -1530,7 +1530,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_004, TestSize.Level0
     predicates.EqualTo("name", "Datashare_Observer_Test003");
     int retVal = helper->Delete(uri, predicates);
     EXPECT_EQ((retVal > 0), true);
-    CommonType::VBuckets extends;
+    DataShareObserver::ChangeInfo::VBuckets extends;
     extends = ValueProxy::Convert(std::move(VBuckets));
     ChangeInfo uriChanges = { DataShareObserver::ChangeType::DELETE, { uri }, nullptr, 0, extends};
     helper->NotifyChangeExt(uriChanges);
@@ -1557,7 +1557,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_002, TestS
     int retVal = helper->Insert(uri, valuesBucket);
     EXPECT_EQ((retVal > 0), true);
     std::vector<DataShareValuesBucket> Buckets = {valuesBucket};
-    CommonType::VBuckets extends;
+    DataShareObserver::ChangeInfo::VBuckets extends;
     extends = ValueProxy::Convert(std::move(Buckets));
     ChangeInfo uriChanges = { DataShareObserver::ChangeType::INSERT, { uri }, nullptr, 0,  extends};
     helper->NotifyChangeExt(uriChanges);
