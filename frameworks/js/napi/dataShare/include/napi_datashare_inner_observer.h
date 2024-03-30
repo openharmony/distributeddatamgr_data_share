@@ -37,6 +37,7 @@ private:
     struct ObserverWorker {
         std::weak_ptr<NAPIInnerObserver> observer_;
         DataShareObserver::ChangeInfo result_;
+        bool isNotifyDetails_ = false;
         ObserverWorker(std::shared_ptr<NAPIInnerObserver> observerIn, DataShareObserver::ChangeInfo resultIn = {})
             : observer_(observerIn), result_(resultIn) {}
     };

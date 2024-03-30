@@ -53,7 +53,9 @@ void NAPIInnerObserver::OnComplete(uv_work_t *work, int status)
     napi_get_reference_value(observer->env_, observer->ref_, &callback);
     napi_get_global(observer->env_, &global);
     napi_get_undefined(observer->env_, &args[0]);
-    args[1] = DataShareJSUtils::Convert2JSValue(observer->env_, innerWorker->result_);
+    if(innerWorker->isNotifyDetails_) {
+        args[1] = DataShareJSUtils::Convert2JSValue(observer->env_, innerWorker->result_);
+    }
     napi_status callStatus = napi_call_function(observer->env_, global, callback, 2, args, nullptr);
     napi_close_handle_scope(observer->env_, scope);
     if (callStatus != napi_ok) {
@@ -81,13 +83,19 @@ void NAPIInnerObserver::OnChange(const DataShareObserver::ChangeInfo& changeInfo
     ObserverWorker* observerWorker = nullptr;
     if (isNotifyDetails) {
         observerWorker = new (std::nothrow) ObserverWorker(shared_from_this(), changeInfo);
+        if (observerWorker == nullptr) {
+            delete work;
+            LOG_ERROR("Failed to create observerWorker");
+            return;
+        }
+        observerWorker->isNotifyDetails_ = true;
     } else {
         observerWorker = new (std::nothrow) ObserverWorker(shared_from_this());
-    }
-    if (observerWorker == nullptr) {
-        delete work;
-        LOG_ERROR("Failed to create observerWorker");
-        return;
+        if (observerWorker == nullptr) {
+            delete work;
+            LOG_ERROR("Failed to create observerWorker");
+            return;
+        }
     }
 
     work->data = observerWorker;
