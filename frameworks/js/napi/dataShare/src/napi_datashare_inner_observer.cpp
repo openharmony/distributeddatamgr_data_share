@@ -62,7 +62,7 @@ void NAPIInnerObserver::OnComplete(uv_work_t *work, int status)
     delete work;
 }
 
-void NAPIInnerObserver::OnChange(const DataShareObserver::ChangeInfo &changeInfo)
+void NAPIInnerObserver::OnChange(const DataShareObserver::ChangeInfo& changeInfo, bool isNotifyDetails)
 {
     auto time =
         static_cast<uint64_t>(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
@@ -72,18 +72,24 @@ void NAPIInnerObserver::OnChange(const DataShareObserver::ChangeInfo &changeInfo
         return;
     }
 
-    ObserverWorker *observerWorker =
-        new (std::nothrow)ObserverWorker(shared_from_this(), changeInfo);
-    if (observerWorker == nullptr) {
-        LOG_ERROR("Failed to create observerWorker");
-        return;
-    }
-    uv_work_t *work = new (std::nothrow)uv_work_t();
+    uv_work_t* work = new (std::nothrow) uv_work_t();
     if (work == nullptr) {
-        delete observerWorker;
         LOG_ERROR("Failed to create uv work");
         return;
     }
+
+    ObserverWorker* observerWorker = nullptr;
+    if (isNotifyDetails) {
+        observerWorker = new (std::nothrow) ObserverWorker(shared_from_this(), changeInfo);
+    } else {
+        observerWorker = new (std::nothrow) ObserverWorker(shared_from_this());
+    }
+    if (observerWorker == nullptr) {
+        delete work;
+        LOG_ERROR("Failed to create observerWorker");
+        return;
+    }
+
     work->data = observerWorker;
     int ret = uv_queue_work_with_qos(loop_, work, [](uv_work_t *work) {},
         NAPIInnerObserver::OnComplete, uv_qos_user_initiated);

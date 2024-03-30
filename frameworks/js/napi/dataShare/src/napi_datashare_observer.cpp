@@ -33,7 +33,7 @@ void NAPIDataShareObserver::OnChange()
 void NAPIDataShareObserver::OnChange(const ChangeInfo &changeInfo)
 {
     LOG_DEBUG("NAPIDataShareObserver ChangeInfo Start");
-    observer_->OnChange(changeInfo);
+    observer_->OnChange(changeInfo, true);
 }
 }  // namespace DataShare
 }  // namespace OHOS

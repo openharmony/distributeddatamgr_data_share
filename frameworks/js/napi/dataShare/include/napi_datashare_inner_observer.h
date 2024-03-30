@@ -28,7 +28,7 @@ namespace DataShare {
 class NAPIInnerObserver : public std::enable_shared_from_this<NAPIInnerObserver> {
 public:
     NAPIInnerObserver(napi_env env, napi_value callback);
-    void OnChange(const DataShareObserver::ChangeInfo &changeInfo = {});
+    void OnChange(const DataShareObserver::ChangeInfo &changeInfo = {}, bool isNotifyDetails = false);
     void DeleteReference();
     napi_ref GetCallback();
 
