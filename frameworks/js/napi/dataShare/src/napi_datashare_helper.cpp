@@ -985,8 +985,7 @@ napi_value NapiDataShareHelper::Napi_UnregisterObserver(napi_env env, size_t arg
             return nullptr;
         }
         NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
-        NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
-            error = std::make_shared<ParametersTypeError>("callback", "function"), error, nullptr);
+        NAPI_ASSERT_BASE(env, valueType == napi_function, "callback is not a function", nullptr);
         proxy->UnRegisteredObserver(env, uri, argv[PARAM2], std::move(helper));
         return nullptr;
     }
@@ -999,8 +998,7 @@ napi_value NapiDataShareHelper::Napi_UnregisterObserver(napi_env env, size_t arg
         std::string uriStr = DataShareJSUtils::Convert2String(env, argv[PARAM2]);
         if (argc == ARGS_FOUR) {
             NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
-            NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
-                error = std::make_shared<ParametersTypeError>("callback", "function"), error, nullptr);
+            NAPI_ASSERT_BASE(env, valueType == napi_function, "callback is not a function", nullptr);
             proxy->UnRegisteredObserver(env, uriStr, argv[PARAM3], std::move(helper), true);
             return nullptr;
         }
