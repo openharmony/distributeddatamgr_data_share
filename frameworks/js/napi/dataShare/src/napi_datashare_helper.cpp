@@ -1204,10 +1204,12 @@ napi_value NapiDataShareHelper::Napi_UnsubscribeRdbObserver(napi_env env, size_t
         return jsResults;
     }
 
-    NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
-    if (argc == ARGS_FOUR && valueType == napi_function) {
-        results = proxy->jsRdbObsManager_->DelObservers(env, argv[PARAM3], uris, templateId);
-        return DataShareJSUtils::Convert2JSValue(env, results);
+    if (argc == ARGS_FOUR) {
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
+        if (valueType == napi_function) {
+            results = proxy->jsRdbObsManager_->DelObservers(env, argv[PARAM3], uris, templateId);
+            return DataShareJSUtils::Convert2JSValue(env, results);
+        }
     }
     results = proxy->jsRdbObsManager_->DelObservers(env, nullptr, uris, templateId);
     return DataShareJSUtils::Convert2JSValue(env, results);
@@ -1285,10 +1287,12 @@ napi_value NapiDataShareHelper::Napi_UnsubscribePublishedObserver(napi_env env, 
         return jsResults;
     }
 
-    NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
-    if (argc == ARGS_FOUR && valueType == napi_function) {
-        results = proxy->jsPublishedObsManager_->DelObservers(env, argv[PARAM3], uris, atoll(subscriberId.c_str()));
-        return DataShareJSUtils::Convert2JSValue(env, results);
+    if (argc == ARGS_FOUR) {
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
+        if (valueType == napi_function) {
+            results = proxy->jsPublishedObsManager_->DelObservers(env, argv[PARAM3], uris, atoll(subscriberId.c_str()));
+            return DataShareJSUtils::Convert2JSValue(env, results);
+        }
     }
     results = proxy->jsPublishedObsManager_->DelObservers(env, nullptr, uris, atoll(subscriberId.c_str()));
     return DataShareJSUtils::Convert2JSValue(env, results);
