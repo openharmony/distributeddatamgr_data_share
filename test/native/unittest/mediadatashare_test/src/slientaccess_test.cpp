@@ -14,6 +14,7 @@
  */
 #include <gtest/gtest.h>
 #include <unistd.h>
+#include <vector>
 
 #include "accesstoken_kit.h"
 #include "data_ability_observer_stub.h"
@@ -32,6 +33,10 @@ constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
 std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
 std::string SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB00/TBL00?Proxy=true";
 std::string SLIENT_REGISTER_URI = "datashare:///com.acts.datasharetest/entry/DB00/TBL02?Proxy=true";
+std::string SLIENT_ACCESS_PERMISSION1_URI = "datashare:///com.acts.datasharetest/entry/DB00/permission1?Proxy=true";
+std::string SLIENT_PROXY_PERMISSION1_URI = "datashareproxy://com.acts.datasharetest/entry/DB00/permission1?Proxy=true";
+std::string SLIENT_ACCESS_PERMISSION2_URI = "datashare:///com.acts.datasharetest/entry/DB00/permission2?Proxy=true";
+std::string SLIENT_PROXY_PERMISSION2_URI = "datashareproxy://com.acts.datasharetest/entry/DB00/permission2?Proxy=true";
 std::string TBL_STU_NAME = "name";
 std::string TBL_STU_AGE = "age";
 std::shared_ptr<DataShare::DataShareHelper> g_slientAccessHelper;
@@ -85,6 +90,41 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t system
     return DataShare::DataShareHelper::Creator(remoteObj, uri);
 }
 
+std::vector<PermissionStateFull> GetPermissionStateFulls()
+{
+    std::vector<PermissionStateFull> permissionStateFulls = {
+        {
+            .permissionName = "ohos.permission.WRITE_CONTACTS",
+            .isGeneral = true,
+            .resDeviceID = { "local" },
+            .grantStatus = { PermissionState::PERMISSION_GRANTED },
+            .grantFlags = { 1 }
+        },
+        {
+            .permissionName = "ohos.permission.WRITE_CALL_LOG",
+            .isGeneral = true,
+            .resDeviceID = { "local" },
+            .grantStatus = { PermissionState::PERMISSION_GRANTED },
+            .grantFlags = { 1 }
+        },
+        {
+            .permissionName = "ohos.permission.WRITE_TEST2",
+            .isGeneral = true,
+            .resDeviceID = { "local" },
+            .grantStatus = { PermissionState::PERMISSION_GRANTED },
+            .grantFlags = { 1 }
+        },
+        {
+            .permissionName = "ohos.permission.REDA_TEST2",
+            .isGeneral = true,
+            .resDeviceID = { "local" },
+            .grantStatus = { PermissionState::PERMISSION_GRANTED },
+            .grantFlags = { 1 }
+        }
+    };
+    return permissionStateFulls;
+}
+
 void SlientAccessTest::SetUpTestCase(void)
 {
     LOG_INFO("SetUpTestCase invoked");
@@ -99,6 +139,7 @@ void SlientAccessTest::SetUpTestCase(void)
         .instIndex = 0,
         .appIDDesc = "ohos.datashareclienttest.demo"
     };
+    auto permStateList = GetPermissionStateFulls();
     HapPolicyParams policy = {
         .apl = APL_NORMAL,
         .domain = "test.domain",
@@ -114,15 +155,7 @@ void SlientAccessTest::SetUpTestCase(void)
                 .descriptionId = 1
             }
         },
-        .permStateList = {
-            {
-                .permissionName = "ohos.permission.test",
-                .isGeneral = true,
-                .resDeviceID = { "local" },
-                .grantStatus = { PermissionState::PERMISSION_GRANTED },
-                .grantFlags = { 1 }
-            }
-        }
+        .permStateList = permStateList
     };
     AccessTokenKit::AllocHapToken(info, policy);
     auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(
@@ -309,6 +342,151 @@ HWTEST_F(SlientAccessTest, SlientAccess_NoRegister_Test_002, TestSize.Level0)
     retVal = helper->Delete(uri, deletePredicates);
     EXPECT_EQ((retVal >= 0), true);
     LOG_INFO("SlientAccess_NoRegister_Test_002::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Permission_Insert_Test_001::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "lisi";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
+    LOG_INFO("SlientAccess_Permission_Insert_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_002, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Permission_Insert_Test_002::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_PERMISSION1_URI);
+    DataShare::DataShareValuesBucket values;
+    values.Put("userId", 1);
+    values.Put("firstName", "Zhang");
+    values.Put("lastName", "San");
+    values.Put("age", 29);
+    values.Put("balance", 100.51);
+
+    int retVal = helper->Insert(uri, values);
+    EXPECT_EQ(retVal, -2);
+    LOG_INFO("SlientAccess_Permission_Insert_Test_002::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_003, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Permission_Insert_Test_003::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_PROXY_PERMISSION1_URI);
+    DataShare::DataShareValuesBucket values;
+    values.Put("userId", 2);
+    values.Put("firstName", "Zhang");
+    values.Put("lastName", "San");
+    values.Put("age", 29);
+    values.Put("balance", 100.61);
+
+    int retVal = helper->Insert(uri, values);
+    EXPECT_EQ((retVal > 0), true);
+    LOG_INFO("SlientAccess_Permission_Insert_Test_003::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Permission_Update_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Permission_Update_Test_001::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_PROXY_PERMISSION1_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    int value = 50;
+    valuesBucket.Put(TBL_STU_AGE, value);
+    DataShare::DataSharePredicates predicates;
+    std::string selections = TBL_STU_NAME + " = 'lisi'";
+    predicates.SetWhereClause(selections);
+    int retVal = helper->Update(uri, predicates, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
+    LOG_INFO("SlientAccess_Permission_Update_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Permission_Update_Test_002, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Permission_Update_Test_002::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_PROXY_PERMISSION1_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    int value = 50;
+    valuesBucket.Put(TBL_STU_AGE, value);
+    DataShare::DataSharePredicates predicates;
+    std::string selections = TBL_STU_NAME + " = 'lisi'";
+    predicates.SetWhereClause(selections);
+    int retVal = helper->Update(uri, predicates, valuesBucket);
+    EXPECT_EQ(retVal, -2);
+    LOG_INFO("SlientAccess_Permission_Update_Test_002::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Permission_Query_Test_001::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_PERMISSION2_URI);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_NAME, "lisi");
+    vector<string> columns;
+    DatashareBusinessError businessError;
+    auto resultSet = helper->Query(uri, predicates, columns, &businessError);
+    int result = 0;
+    if (resultSet != nullptr) {
+        resultSet->GetRowCount(result);
+    }
+    EXPECT_EQ(result, 0);
+    EXPECT_EQ(resultSet, nullptr);
+    EXPECT_EQ(businessError.GetCode(), -2);
+    LOG_INFO("SlientAccess_Permission_Query_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_002, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Permission_Query_Test_002::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_PROXY_PERMISSION2_URI);
+    DataShare::DataShareValuesBucket values;
+    values.Put("userId", 2);
+    values.Put("firstName", "Zhang");
+    values.Put("lastName", "San");
+    values.Put("age", 29);
+    values.Put("balance", 100.61);
+
+    int retVal = helper->Insert(uri, values);
+    EXPECT_EQ((retVal > 0), true);
+
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_NAME, "lisi");
+    vector<string> columns;
+    DatashareBusinessError businessError;
+    auto resultSet = helper->Query(uri, predicates, columns, &businessError);
+    int result = 0;
+    if (resultSet != nullptr) {
+        resultSet->GetRowCount(result);
+    }
+    EXPECT_EQ(result, 1);
+    EXPECT_EQ(businessError.GetCode(), 0);
+    LOG_INFO("SlientAccess_Permission_Query_Test_002::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Permission_Delete_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Permission_Delete_Test_001::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_PROXY_PERMISSION2_URI);
+    
+    DataShare::DataSharePredicates deletePredicates;
+    std::string selections = TBL_STU_NAME + " = 'lisi'";
+    deletePredicates.SetWhereClause(selections);
+    int retVal = helper->Delete(uri, deletePredicates);
+    EXPECT_EQ(retVal, 0);
+    LOG_INFO("SlientAccess_Permission_Delete_Test_001::End");
 }
 } // namespace DataShare
 } // namespace OHOS
