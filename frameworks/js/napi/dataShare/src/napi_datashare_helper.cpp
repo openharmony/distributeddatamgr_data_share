@@ -963,6 +963,7 @@ napi_value NapiDataShareHelper::Napi_Off(napi_env env, napi_callback_info info)
     LOG_ERROR("wrong register type : %{public}s", type.c_str());
     return nullptr;
 }
+
 napi_value NapiDataShareHelper::Napi_UnregisterObserver(napi_env env, size_t argc, napi_value *argv, napi_value self)
 {
     std::shared_ptr<Error> error = nullptr;
@@ -982,6 +983,9 @@ napi_value NapiDataShareHelper::Napi_UnregisterObserver(napi_env env, size_t arg
         std::string uri = DataShareJSUtils::Convert2String(env, argv[PARAM1]);
         if (argc == ARGS_THREE) {
             NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
+            NAPI_ASSERT_CALL_ERRCODE_SYNC(env,
+                valueType == napi_function || valueType == napi_undefined || valueType == napi_null,
+                error = std::make_shared<ParametersTypeError>("callback", "function"), error, nullptr);
             if (valueType == napi_function) {
                 proxy->UnRegisteredObserver(env, uri, argv[PARAM2], std::move(helper));
                 return nullptr;
@@ -999,6 +1003,9 @@ napi_value NapiDataShareHelper::Napi_UnregisterObserver(napi_env env, size_t arg
         std::string uriStr = DataShareJSUtils::Convert2String(env, argv[PARAM2]);
         if (argc == ARGS_FOUR) {
             NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
+            NAPI_ASSERT_CALL_ERRCODE_SYNC(env,
+                valueType == napi_function || valueType == napi_undefined || valueType == napi_null,
+                error = std::make_shared<ParametersTypeError>("callback", "function"), error, nullptr);
             if (valueType == napi_function) {
                 proxy->UnRegisteredObserver(env, uriStr, argv[PARAM3], std::move(helper), true);
                 return nullptr;
@@ -1206,6 +1213,9 @@ napi_value NapiDataShareHelper::Napi_UnsubscribeRdbObserver(napi_env env, size_t
 
     if (argc == ARGS_FOUR) {
         NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
+        NAPI_ASSERT_CALL_ERRCODE_SYNC(env,
+            valueType == napi_function || valueType == napi_undefined || valueType == napi_null,
+            error = std::make_shared<ParametersTypeError>("callback", "function"), error, nullptr);
         if (valueType == napi_function) {
             results = proxy->jsRdbObsManager_->DelObservers(env, argv[PARAM3], uris, templateId);
             return DataShareJSUtils::Convert2JSValue(env, results);
@@ -1289,6 +1299,9 @@ napi_value NapiDataShareHelper::Napi_UnsubscribePublishedObserver(napi_env env, 
 
     if (argc == ARGS_FOUR) {
         NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
+        NAPI_ASSERT_CALL_ERRCODE_SYNC(env,
+            valueType == napi_function || valueType == napi_undefined || valueType == napi_null,
+            error = std::make_shared<ParametersTypeError>("callback", "function"), error, nullptr);
         if (valueType == napi_function) {
             results = proxy->jsPublishedObsManager_->DelObservers(env, argv[PARAM3], uris, atoll(subscriberId.c_str()));
             return DataShareJSUtils::Convert2JSValue(env, results);
