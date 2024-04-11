@@ -1213,7 +1213,7 @@ napi_value NapiDataShareHelper::Napi_UnsubscribeRdbObserver(napi_env env, size_t
         NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env,
             valueType == napi_function || valueType == napi_undefined || valueType == napi_null,
-            error = std::make_shared<ParametersTypeError>("callback", "function"), error, nullptr);
+            error = std::make_shared<ParametersTypeError>("callback", "function"), error, jsResults);
         if (valueType == napi_function) {
             results = proxy->jsRdbObsManager_->DelObservers(env, argv[PARAM3], uris, templateId);
             return DataShareJSUtils::Convert2JSValue(env, results);
@@ -1299,7 +1299,7 @@ napi_value NapiDataShareHelper::Napi_UnsubscribePublishedObserver(napi_env env, 
         NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env,
             valueType == napi_function || valueType == napi_undefined || valueType == napi_null,
-            error = std::make_shared<ParametersTypeError>("callback", "function"), error, nullptr);
+            error = std::make_shared<ParametersTypeError>("callback", "function"), error, jsResults);
         if (valueType == napi_function) {
             results = proxy->jsPublishedObsManager_->DelObservers(env, argv[PARAM3], uris, atoll(subscriberId.c_str()));
             return DataShareJSUtils::Convert2JSValue(env, results);
