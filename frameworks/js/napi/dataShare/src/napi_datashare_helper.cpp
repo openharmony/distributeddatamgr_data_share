@@ -963,46 +963,51 @@ napi_value NapiDataShareHelper::Napi_Off(napi_env env, napi_callback_info info)
     LOG_ERROR("wrong register type : %{public}s", type.c_str());
     return nullptr;
 }
+
 napi_value NapiDataShareHelper::Napi_UnregisterObserver(napi_env env, size_t argc, napi_value *argv, napi_value self)
 {
     std::shared_ptr<Error> error = nullptr;
     NapiDataShareHelper* proxy = nullptr;
-    napi_valuetype valueType;
+    napi_valuetype type;
     NAPI_CALL_BASE(env, napi_unwrap(env, self, reinterpret_cast<void**>(&proxy)), nullptr);
     NAPI_ASSERT_BASE(env, proxy != nullptr, "there is no NapiDataShareHelper instance", nullptr);
     auto helper = proxy->GetHelper();
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, helper != nullptr, error = std::make_shared<HelperAlreadyClosedError>(), error,
         nullptr);
-    NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &valueType));
-    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string || valueType == napi_number,
+    NAPI_CALL(env, napi_typeof(env, argv[PARAM1], &type));
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, type == napi_string || type == napi_number,
         error = std::make_shared<ParametersTypeError>("argv[1]", "string or number"), error, nullptr);
-    if (valueType == napi_string) {
+    if (type == napi_string) {
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, argc == ARGS_TWO || argc == ARGS_THREE,
             error = std::make_shared<ParametersNumError>("2 or 3"), error, nullptr);
         std::string uri = DataShareJSUtils::Convert2String(env, argv[PARAM1]);
-        if (argc == ARGS_TWO) {
-            proxy->UnRegisteredObserver(env, uri, std::move(helper));
-            return nullptr;
+        if (argc == ARGS_THREE) {
+            NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &type));
+            NAPI_ASSERT_CALL_ERRCODE_SYNC(env, type == napi_function || type == napi_undefined || type == napi_null,
+                error = std::make_shared<ParametersTypeError>("callback", "function"), error, nullptr);
+            if (type == napi_function) {
+                proxy->UnRegisteredObserver(env, uri, argv[PARAM2], std::move(helper));
+                return nullptr;
+            }
         }
-        NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
-        NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
-            error = std::make_shared<ParametersTypeError>("callback", "function"), error, nullptr);
-        proxy->UnRegisteredObserver(env, uri, argv[PARAM2], std::move(helper));
+        proxy->UnRegisteredObserver(env, uri, std::move(helper));
         return nullptr;
     }
-    if (valueType == napi_number) {
+    if (type == napi_number) {
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, argc == ARGS_THREE || argc == ARGS_FOUR,
             error = std::make_shared<ParametersNumError>("3 or 4"), error, nullptr);
-        NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
-        NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
+        NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &type));
+        NAPI_ASSERT_CALL_ERRCODE_SYNC(env, type == napi_string,
             error = std::make_shared<ParametersTypeError>("uri", "string"), error, nullptr);
         std::string uriStr = DataShareJSUtils::Convert2String(env, argv[PARAM2]);
         if (argc == ARGS_FOUR) {
-            NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
-            NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
+            NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &type));
+            NAPI_ASSERT_CALL_ERRCODE_SYNC(env, type == napi_function || type == napi_undefined || type == napi_null,
                 error = std::make_shared<ParametersTypeError>("callback", "function"), error, nullptr);
-            proxy->UnRegisteredObserver(env, uriStr, argv[PARAM3], std::move(helper), true);
-            return nullptr;
+            if (type == napi_function) {
+                proxy->UnRegisteredObserver(env, uriStr, argv[PARAM3], std::move(helper), true);
+                return nullptr;
+            }
         }
         proxy->UnRegisteredObserver(env, uriStr, std::move(helper), true);
         return nullptr;
@@ -1206,10 +1211,13 @@ napi_value NapiDataShareHelper::Napi_UnsubscribeRdbObserver(napi_env env, size_t
 
     if (argc == ARGS_FOUR) {
         NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
-        NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
+        NAPI_ASSERT_CALL_ERRCODE_SYNC(env,
+            valueType == napi_function || valueType == napi_undefined || valueType == napi_null,
             error = std::make_shared<ParametersTypeError>("callback", "function"), error, jsResults);
-        results = proxy->jsRdbObsManager_->DelObservers(env, argv[PARAM3], uris, templateId);
-        return DataShareJSUtils::Convert2JSValue(env, results);
+        if (valueType == napi_function) {
+            results = proxy->jsRdbObsManager_->DelObservers(env, argv[PARAM3], uris, templateId);
+            return DataShareJSUtils::Convert2JSValue(env, results);
+        }
     }
     results = proxy->jsRdbObsManager_->DelObservers(env, nullptr, uris, templateId);
     return DataShareJSUtils::Convert2JSValue(env, results);
@@ -1289,10 +1297,13 @@ napi_value NapiDataShareHelper::Napi_UnsubscribePublishedObserver(napi_env env, 
 
     if (argc == ARGS_FOUR) {
         NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
-        NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
+        NAPI_ASSERT_CALL_ERRCODE_SYNC(env,
+            valueType == napi_function || valueType == napi_undefined || valueType == napi_null,
             error = std::make_shared<ParametersTypeError>("callback", "function"), error, jsResults);
-        results = proxy->jsPublishedObsManager_->DelObservers(env, argv[PARAM3], uris, atoll(subscriberId.c_str()));
-        return DataShareJSUtils::Convert2JSValue(env, results);
+        if (valueType == napi_function) {
+            results = proxy->jsPublishedObsManager_->DelObservers(env, argv[PARAM3], uris, atoll(subscriberId.c_str()));
+            return DataShareJSUtils::Convert2JSValue(env, results);
+        }
     }
     results = proxy->jsPublishedObsManager_->DelObservers(env, nullptr, uris, atoll(subscriberId.c_str()));
     return DataShareJSUtils::Convert2JSValue(env, results);
