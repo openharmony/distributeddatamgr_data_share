@@ -73,16 +73,8 @@
         }
       },
       {
-        "uri": "datashare://com.acts.datasharetest/entry/DB00/permission1",
-        "requiredReadPermission":"ohos.permission.GET_BUNDLE_INFO",
-        "requiredWritePermission":"ohos.permission.WRITE_TEST1",
-        "metadata": {
-          "name": "dataProperties",
-          "resource": "$profile:permission1"
-        }
-      },
-      {
         "uri": "datashareproxy://com.acts.datasharetest/entry/DB00/permission1",
+        "requiredReadPermission":"ohos.permission.GET_BUNDLE_INFO",
         "requiredWritePermission":"ohos.permission.WRITE_CALL_LOG",
         "metadata": {
           "name": "dataProperties",
@@ -90,17 +82,9 @@
         }
       },
       {
-        "uri": "datashare://com.acts.datasharetest/entry/DB00/permission2",
-        "requiredReadPermission":"ohos.permission.READ_CALL_LOG",
-        "metadata": {
-          "name": "dataProperties",
-          "resource": "$profile:permission2"
-        }
-      },
-      {
         "uri": "datashareproxy://com.acts.datasharetest/entry/DB00/permission2",
-        "requiredReadPermission":"ohos.permission.REDA_TEST2",
-        "requiredWritePermission":"ohos.permission.WRITE_TEST2",
+        "requiredReadPermission":"ohos.permission.GET_BUNDLE_INFO",
+        "requiredWritePermission":"ohos.permission.WRITE_CALL_LOG",
         "metadata": {
           "name": "dataProperties",
           "resource": "$profile:permission2"
