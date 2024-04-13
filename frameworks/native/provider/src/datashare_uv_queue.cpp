@@ -123,6 +123,9 @@ void DataShareUvQueue::CheckFuncAndExec(NapiBoolFunc retFunc)
             std::this_thread::sleep_for(std::chrono::milliseconds(SLEEP_TIME));
             tryTimes--;
         }
+        if (tryTimes <= 0) {
+            LOG_ERROR("function execute timeout.");
+        }
     }
 }
 } // namespace DataShare
