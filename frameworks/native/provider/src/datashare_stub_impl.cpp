@@ -311,7 +311,6 @@ int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareVa
 {
     CallingInfo info;
     GetCallingInfo(info);
-    auto value = std::make_shared<std::vector<DataShareValuesBucket>>(values);
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
     if (extension == nullptr) {
@@ -324,9 +323,9 @@ int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareVa
     }
 
     int ret = 0;
-    std::function<void()> syncTaskFunc = [extension, info, uri, value]() {
+    std::function<void()> syncTaskFunc = [extension, info, uri, values]() {
         extension->SetCallingInfo(info);
-        extension->BatchInsert(uri, *value);
+        extension->BatchInsert(uri, values);
     };
     std::function<bool()> getRetFunc = [extension, &ret]() -> bool {
         if (extension == nullptr) {
