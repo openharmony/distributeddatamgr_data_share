@@ -1,0 +1,19 @@
+{
+  "path": "DB00/permission2",
+  "type": "rdb",
+  "tableConfig":[
+      {
+          "uri":"*",
+          "crossUserMode":1
+      },
+      {
+          "uri":"datashare://com.acts.datasharetest/entry/DB00/permission1",
+          "crossUserMode":1
+      },
+      {
+          "uri":"datashareproxy://com.acts.datasharetest/entry/DB00/permission1",
+          "crossUserMode":1
+      }
+  ],
+  "isSilentProxyEnable":true
+}

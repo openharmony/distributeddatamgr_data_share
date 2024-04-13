@@ -71,6 +71,24 @@
           "name": "dataProperties",
           "resource": "$profile:test"
         }
+      },
+      {
+        "uri": "datashareproxy://com.acts.datasharetest/entry/DB00/permission1",
+        "requiredReadPermission":"ohos.permission.GET_BUNDLE_INFO",
+        "requiredWritePermission":"ohos.permission.WRITE_CALL_LOG",
+        "metadata": {
+          "name": "dataProperties",
+          "resource": "$profile:permission1"
+        }
+      },
+      {
+        "uri": "datashareproxy://com.acts.datasharetest/entry/DB00/permission2",
+        "requiredReadPermission":"ohos.permission.GET_BUNDLE_INFO",
+        "requiredWritePermission":"ohos.permission.WRITE_CALL_LOG",
+        "metadata": {
+          "name": "dataProperties",
+          "resource": "$profile:permission2"
+        }
       }
     ]
   }

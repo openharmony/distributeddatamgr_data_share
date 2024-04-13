@@ -24,6 +24,8 @@ let DDL_TBL_CREATE = "CREATE TABLE IF NOT EXISTS "
 + " (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER, phoneNumber DOUBLE, isStudent BOOLEAN, Binary BINARY, number INTEGER)";
 let DDL_TABLE_USER_SQL = "CREATE TABLE IF NOT EXISTS user (userId INTEGER PRIMARY KEY AUTOINCREMENT, firstName TEXT, lastName TEXT, age INTEGER , balance DOUBLE  NOT NULL)";
 let DDL_TABLE_BOOK_SQL = "CREATE TABLE IF NOT EXISTS book (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, userId INTEGER, FOREIGN KEY (userId) REFERENCES user (userId) ON UPDATE NO ACTION ON DELETE CASCADE)";
+let DDL_TABLE_PERMISSION1_SQL = "CREATE TABLE IF NOT EXISTS permission1 (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER, phoneNumber DOUBLE, isStudent BOOLEAN, Binary BINARY, number INTEGER)";
+let DDL_TABLE_PERMISSION2_SQL = "CREATE TABLE IF NOT EXISTS permission2 (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, age INTEGER, phoneNumber DOUBLE, isStudent BOOLEAN, Binary BINARY, number INTEGER)";
 
 let rdbStore;
 
@@ -38,6 +40,8 @@ extends Extension {
         await rdbStore.executeSql(DDL_TBL_CREATE, []);
         await rdbStore.executeSql(DDL_TABLE_USER_SQL, []);
         await rdbStore.executeSql(DDL_TABLE_BOOK_SQL, []);
+        await rdbStore.executeSql(DDL_TABLE_PERMISSION1_SQL, []);
+        await rdbStore.executeSql(DDL_TABLE_PERMISSION2_SQL, []);
         console.log('[ttt] [DataShareTest] DataShareExtAbility executeSql multiple tables done');
         let err = {"code":0};
         callback(err);
