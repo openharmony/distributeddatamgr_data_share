@@ -83,8 +83,8 @@ datashare_consumer_external_deps = [
   "hilog:libhilog",
   "hitrace:hitrace_meter",
   "hitrace:libhitracechain",
-  "ipc:ipc_js",
   "ipc:ipc_single",
+  "ipc:rpc",
   "samgr:samgr_proxy",
 ]
 
