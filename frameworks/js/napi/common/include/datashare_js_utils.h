@@ -198,7 +198,7 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, std::vec
 
     uint32_t arrLen = 0;
     napi_get_array_length(env, input, &arrLen);
-    if (arrLen <= 0) {
+    if (arrLen == 0) {
         return napi_invalid_arg;
     }
 
@@ -225,7 +225,7 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, std::map
         return napi_invalid_arg;
     }
     status = napi_get_array_length(env, map, &count);
-    if (status != napi_ok || count <= 0) {
+    if (status != napi_ok || count == 0) {
         return napi_invalid_arg;
     }
     napi_value jsKey = nullptr;
