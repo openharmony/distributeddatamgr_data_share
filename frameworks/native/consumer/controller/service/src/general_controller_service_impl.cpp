@@ -74,48 +74,27 @@ std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Ur
 void GeneralControllerServiceImpl::RegisterObserver(const Uri &uri,
     const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    SetRegisterCallback();
-    auto proxy = DataShareManagerImpl::GetServiceProxy();
-    if (proxy == nullptr) {
-        LOG_ERROR("Proxy is nullptr, uri: %{public}s", DataShareStringUtils::Anonymous(uri.ToString()).c_str());
-        observers_.Compute(dataObserver, [&uri](const auto &, auto &value) {
-            value.emplace_back(uri);
-            return true;
-        });
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
         return;
     }
-    auto ret = proxy->RegisterObserver(uri, dataObserver->AsObject());
+    ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
     LOG_INFO("Register observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
-    if (ret == E_OK || ret == AAFwk::OBS_EXIST) {
-        observers_.Compute(dataObserver, [&uri](const auto &, auto &value) {
-            value.emplace_back(uri);
-            return true;
-        });
-    }
-    return;
 }
 
 void GeneralControllerServiceImpl::UnregisterObserver(const Uri &uri,
     const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    auto proxy = DataShareManagerImpl::GetServiceProxy();
-    if (proxy == nullptr) {
-        LOG_ERROR("Proxy is nullptr");
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
         return;
     }
-    auto ret = proxy->UnRegisterObserver(uri, dataObserver->AsObject());
-    LOG_INFO("UnRegister observer ret: %{public}d, uri: %{public}s", ret,
+    ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver);
+    LOG_INFO("Unregister observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
-    if (ret == E_OK) {
-        observers_.Compute(dataObserver, [&uri](const auto &, auto &value) {
-            value.remove_if([&uri](const auto &val) {
-                return uri == val;
-            });
-            return !value.empty();
-        });
-    }
-    return;
 }
 
 void GeneralControllerServiceImpl::NotifyChange(const Uri &uri)
