@@ -30,7 +30,6 @@ namespace DataShare {
 class NapiDataShareHelper {
 public:
     static napi_value Napi_CreateDataShareHelper(napi_env env, napi_callback_info info);
-    static napi_value Napi_OpenFile(napi_env env, napi_callback_info info);
     static napi_value Napi_On(napi_env env, napi_callback_info info);
     static napi_value Napi_Off(napi_env env, napi_callback_info info);
     static napi_value Napi_Insert(napi_env env, napi_callback_info info);
@@ -39,8 +38,6 @@ public:
     static napi_value Napi_Update(napi_env env, napi_callback_info info);
     static napi_value Napi_BatchUpdate(napi_env env, napi_callback_info info);
     static napi_value Napi_BatchInsert(napi_env env, napi_callback_info info);
-    static napi_value Napi_GetType(napi_env env, napi_callback_info info);
-    static napi_value Napi_GetFileTypes(napi_env env, napi_callback_info info);
     static napi_value Napi_NormalizeUri(napi_env env, napi_callback_info info);
     static napi_value Napi_DenormalizeUri(napi_env env, napi_callback_info info);
     static napi_value Napi_NotifyChange(napi_env env, napi_callback_info info);
