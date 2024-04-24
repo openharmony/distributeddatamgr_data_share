@@ -525,6 +525,10 @@ napi_value NapiDataShareHelper::Napi_DenormalizeUri(napi_env env, napi_callback_
         }
         return napi_ok;
     };
+    auto output = [context](napi_env env, napi_value *result) -> napi_status {
+        napi_create_string_utf8(env, context->resultString.c_str(), NAPI_AUTO_LENGTH, result);
+        return napi_ok;
+    };
     auto exec = [context](AsyncCall::Context *ctx) {
         auto helper = context->proxy->GetHelper();
         if (helper != nullptr && !context->uri.empty()) {
