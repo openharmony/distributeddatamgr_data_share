@@ -190,45 +190,6 @@ napi_value NapiDataShareHelper::Initialize(napi_env env, napi_callback_info info
     return self;
 }
 
-napi_value NapiDataShareHelper::Napi_OpenFile(napi_env env, napi_callback_info info)
-{
-    auto context = std::make_shared<ContextInfo>();
-    auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
-        NAPI_ASSERT_BASE(env, argc == 2 || argc == 3, " should 2 or 3 parameters!", napi_invalid_arg);
-        LOG_DEBUG("argc : %{public}d", static_cast<int>(argc));
-
-        GetUri(env, argv[0], context->uri);
-
-        napi_valuetype valuetype = napi_undefined;
-        napi_typeof(env, argv[1], &valuetype);
-        if (valuetype == napi_string) {
-            context->mode = DataShareJSUtils::Convert2String(env, argv[1]);
-        } else {
-            LOG_ERROR("wrong type, should be napi_string");
-        }
-        return napi_ok;
-    };
-    auto output = [context](napi_env env, napi_value *result) -> napi_status {
-        napi_create_int32(env, context->resultNumber, result);
-        return napi_ok;
-    };
-    auto exec = [context](AsyncCall::Context *ctx) {
-        auto helper = context->proxy->GetHelper();
-        if (helper != nullptr && !context->uri.empty()) {
-            OHOS::Uri uri(context->uri);
-            context->resultNumber = helper->OpenFile(uri, context->mode);
-            context->status = napi_ok;
-        } else {
-            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
-                helper == nullptr, context->uri.empty());
-            context->error = std::make_shared<HelperAlreadyClosedError>();
-        }
-    };
-    context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, context);
-    return asyncCall.Call(env, exec);
-}
-
 napi_value NapiDataShareHelper::Napi_Insert(napi_env env, napi_callback_info info)
 {
     auto context = std::make_shared<ContextInfo>();
@@ -514,81 +475,18 @@ napi_value NapiDataShareHelper::Napi_BatchInsert(napi_env env, napi_callback_inf
     return asyncCall.Call(env, exec);
 }
 
-napi_value NapiDataShareHelper::Napi_GetType(napi_env env, napi_callback_info info)
-{
-    auto context = std::make_shared<ContextInfo>();
-    auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
-        NAPI_ASSERT_BASE(env, argc == 1 || argc == 2, " should 1 or 2 parameters!", napi_invalid_arg);
-
-        GetUri(env, argv[0], context->uri);
-        return napi_ok;
-    };
-    auto output = [context](napi_env env, napi_value *result) -> napi_status {
-        napi_create_string_utf8(env, context->resultString.c_str(), NAPI_AUTO_LENGTH, result);
-        return napi_ok;
-    };
-    auto exec = [context](AsyncCall::Context *ctx) {
-        auto helper = context->proxy->GetHelper();
-        if (helper != nullptr && !context->uri.empty()) {
-            OHOS::Uri uri(context->uri);
-            context->resultString = helper->GetType(uri);
-            context->status = napi_ok;
-        } else {
-            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
-                helper == nullptr, context->uri.empty());
-            context->error = std::make_shared<HelperAlreadyClosedError>();
-        }
-    };
-    context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, context);
-    return asyncCall.Call(env, exec);
-}
-
-napi_value NapiDataShareHelper::Napi_GetFileTypes(napi_env env, napi_callback_info info)
-{
-    auto context = std::make_shared<ContextInfo>();
-    auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
-        NAPI_ASSERT_BASE(env, argc == 2 || argc == 3, " should 2 or 3 parameters!", napi_invalid_arg);
-
-        GetUri(env, argv[0], context->uri);
-
-        napi_valuetype valuetype = napi_undefined;
-        napi_typeof(env, argv[1], &valuetype);
-        if (valuetype == napi_string) {
-            context->mimeTypeFilter = DataShareJSUtils::Convert2String(env, argv[1]);
-        } else {
-            LOG_ERROR("wrong type, should be napi_string");
-        }
-        return napi_ok;
-    };
-    auto output = [context](napi_env env, napi_value *result) -> napi_status {
-        *result = DataShareJSUtils::Convert2JSValue(env, context->resultStrArr);
-        return napi_ok;
-    };
-    auto exec = [context](AsyncCall::Context *ctx) {
-        auto helper = context->proxy->GetHelper();
-        if (helper != nullptr && !context->uri.empty()) {
-            OHOS::Uri uri(context->uri);
-            context->resultStrArr = helper->GetFileTypes(uri, context->mimeTypeFilter);
-            context->status = napi_ok;
-        } else {
-            LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
-                helper == nullptr, context->uri.empty());
-            context->error = std::make_shared<HelperAlreadyClosedError>();
-        }
-    };
-    context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, context);
-    return asyncCall.Call(env, exec);
-}
-
 napi_value NapiDataShareHelper::Napi_NormalizeUri(napi_env env, napi_callback_info info)
 {
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
-        NAPI_ASSERT_BASE(env, argc == 1 || argc == 2, " should 1 or 2 parameters!", napi_invalid_arg);
-
-        GetUri(env, argv[0], context->uri);
+        if (argc != 1 && argc != 2) {
+            context->error = std::make_shared<ParametersNumError>("1 or 2");
+            return napi_invalid_arg;
+        }
+        if (!GetUri(env, argv[0], context->uri)) {
+            context->error = std::make_shared<ParametersTypeError>("uri", "string");
+            return napi_invalid_arg;
+        }
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
@@ -617,13 +515,14 @@ napi_value NapiDataShareHelper::Napi_DenormalizeUri(napi_env env, napi_callback_
 {
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
-        NAPI_ASSERT_BASE(env, argc == 1 || argc == 2, " should 1 or 2 parameters!", napi_invalid_arg);
-
-        GetUri(env, argv[0], context->uri);
-        return napi_ok;
-    };
-    auto output = [context](napi_env env, napi_value *result) -> napi_status {
-        napi_create_string_utf8(env, context->resultString.c_str(), NAPI_AUTO_LENGTH, result);
+        if (argc != 1 && argc != 2) {
+            context->error = std::make_shared<ParametersNumError>("1 or 2");
+            return napi_invalid_arg;
+        }
+        if (!GetUri(env, argv[0], context->uri)) {
+            context->error = std::make_shared<ParametersTypeError>("uri", "string");
+            return napi_invalid_arg;
+        }
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
