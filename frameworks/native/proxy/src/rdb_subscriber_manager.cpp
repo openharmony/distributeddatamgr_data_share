@@ -15,8 +15,11 @@
 
 #include "rdb_subscriber_manager.h"
 
+#include <cinttypes>
+
 #include "data_proxy_observer_stub.h"
 #include "datashare_log.h"
+#include "datashare_string_utils.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -223,6 +226,8 @@ void RdbSubscriberManager::Emit(const RdbChangeNode &changeNode)
     auto callbacks = BaseCallbacks::GetEnabledObservers(key);
     for (auto &obs : callbacks) {
         if (obs != nullptr) {
+            LOG_INFO("Client send data to form, uri is %{public}s, subscriberId is %{public}" PRId64,
+                DataShareStringUtils::Anonymous(key.uri_).c_str(), key.templateId_.subscriberId_);
             obs->OnChange(changeNode);
         }
     }
