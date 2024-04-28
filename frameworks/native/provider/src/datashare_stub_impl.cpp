@@ -65,6 +65,7 @@ std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const s
         extension->GetResult(ret);
         return (ret.size() != 0);
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
@@ -90,6 +91,7 @@ int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
         extension->GetResult(ret);
         return (ret != DEFAULT_NUMBER);
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
@@ -107,6 +109,7 @@ int DataShareStubImpl::OpenRawFile(const Uri &uri, const std::string &mode)
         extension->SetCallingInfo(info);
         ret = extension->OpenRawFile(uri, mode);
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc);
     return ret;
 }
@@ -302,6 +305,7 @@ std::string DataShareStubImpl::GetType(const Uri &uri)
         extension->GetResult(ret);
         return (ret != "");
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
@@ -381,6 +385,7 @@ bool DataShareStubImpl::NotifyChange(const Uri &uri)
         }
         ret = extension->NotifyChange(uri);
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc);
     return ret;
 }
@@ -409,6 +414,7 @@ Uri DataShareStubImpl::NormalizeUri(const Uri &uri)
         urivalue = tmp;
         return (urivalue.ToString() != "");
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return urivalue;
 }
@@ -437,6 +443,7 @@ Uri DataShareStubImpl::DenormalizeUri(const Uri &uri)
         urivalue = tmp;
         return (urivalue.ToString() != "");
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return urivalue;
 }
