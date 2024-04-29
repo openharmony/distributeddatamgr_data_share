@@ -46,72 +46,17 @@ bool DataShareStubImpl::CheckCallingPermission(const std::string &permission)
 
 std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
 {
-    CallingInfo info;
-    GetCallingInfo(info);
-    std::vector<std::string> ret;
-    std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
-        auto extension = client->GetOwner();
-        if (extension == nullptr) {
-            return;
-        }
-        extension->SetCallingInfo(info);
-        ret = extension->GetFileTypes(uri, mimeTypeFilter);
-    };
-    std::function<bool()> getRetFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() -> bool {
-        auto extension = client->GetOwner();
-        if (extension == nullptr) {
-            return false;
-        }
-        extension->GetResult(ret);
-        return (ret.size() != 0);
-    };
-    std::lock_guard<std::mutex> lock(mutex_);
-    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
-    return ret;
+    return {};
 }
 
 int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
 {
-    CallingInfo info;
-    GetCallingInfo(info);
-    int ret = -1;
-    std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
-        auto extension = client->GetOwner();
-        if (extension == nullptr) {
-            return;
-        }
-        extension->SetCallingInfo(info);
-        ret = extension->OpenFile(uri, mode);
-    };
-    std::function<bool()> getRetFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() -> bool {
-        auto extension = client->GetOwner();
-        if (extension == nullptr) {
-            return false;
-        }
-        extension->GetResult(ret);
-        return (ret != DEFAULT_NUMBER);
-    };
-    std::lock_guard<std::mutex> lock(mutex_);
-    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
-    return ret;
+    return 0;
 }
 
 int DataShareStubImpl::OpenRawFile(const Uri &uri, const std::string &mode)
 {
-    CallingInfo info;
-    GetCallingInfo(info);
-    int ret = -1;
-    std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
-        auto extension = client->GetOwner();
-        if (extension == nullptr) {
-            return;
-        }
-        extension->SetCallingInfo(info);
-        ret = extension->OpenRawFile(uri, mode);
-    };
-    std::lock_guard<std::mutex> lock(mutex_);
-    uvQueue_->SyncCall(syncTaskFunc);
-    return ret;
+    return 0;
 }
 
 int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value)
@@ -286,28 +231,7 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
 
 std::string DataShareStubImpl::GetType(const Uri &uri)
 {
-    CallingInfo info;
-    GetCallingInfo(info);
-    std::string ret = "";
-    std::function<void()> syncTaskFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() {
-        auto extension = client->GetOwner();
-        if (extension == nullptr) {
-            return;
-        }
-        extension->SetCallingInfo(info);
-        ret = extension->GetType(uri);
-    };
-    std::function<bool()> getRetFunc = [=, &ret, client = sptr<DataShareStubImpl>(this)]() -> bool {
-        auto extension = client->GetOwner();
-        if (extension == nullptr) {
-            return false;
-        }
-        extension->GetResult(ret);
-        return (ret != "");
-    };
-    std::lock_guard<std::mutex> lock(mutex_);
-    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
-    return ret;
+    return "";
 }
 
 int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values)

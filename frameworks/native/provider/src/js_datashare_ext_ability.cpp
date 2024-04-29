@@ -449,95 +449,17 @@ void JsDataShareExtAbility::GetSrcPath(std::string &srcPath)
 
 std::vector<std::string> JsDataShareExtAbility::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
 {
-    auto ret = DataShareExtAbility::GetFileTypes(uri, mimeTypeFilter);
-    HandleScope handleScope(jsRuntime_);
-    napi_env env = jsRuntime_.GetNapiEnv();
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        return ret;
-    }
-    napi_value napiUri = nullptr;
-    napi_status status = napi_create_string_utf8(env, uri.ToString().c_str(), NAPI_AUTO_LENGTH, &napiUri);
-    if (status != napi_ok) {
-        LOG_ERROR("napi_create_string_utf8 status : %{public}d", status);
-        napi_close_handle_scope(env, scope);
-        return ret;
-    }
-    napi_value napiMimeTypeFilter = nullptr;
-    status = napi_create_string_utf8(env, mimeTypeFilter.c_str(), NAPI_AUTO_LENGTH, &napiMimeTypeFilter);
-    if (status != napi_ok) {
-        LOG_ERROR("napi_create_string_utf8 status : %{public}d", status);
-        napi_close_handle_scope(env, scope);
-        return ret;
-    }
-    napi_value argv[] = {napiUri, napiMimeTypeFilter};
-    //represents this function has 2 parameters
-    CallObjectMethod("getFileTypes", argv, 2);
-    napi_close_handle_scope(env, scope);
-    return ret;
+    return {};
 }
 
 int JsDataShareExtAbility::OpenFile(const Uri &uri, const std::string &mode)
 {
-    auto ret = DataShareExtAbility::OpenFile(uri, mode);
-    HandleScope handleScope(jsRuntime_);
-    napi_env env = jsRuntime_.GetNapiEnv();
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        return ret;
-    }
-    napi_value napiUri = nullptr;
-    napi_status status = napi_create_string_utf8(env, uri.ToString().c_str(), NAPI_AUTO_LENGTH, &napiUri);
-    if (status != napi_ok) {
-        LOG_ERROR("napi_create_string_utf8 status : %{public}d", status);
-        napi_close_handle_scope(env, scope);
-        return ret;
-    }
-    napi_value napiMode = nullptr;
-    status = napi_create_string_utf8(env, mode.c_str(), NAPI_AUTO_LENGTH, &napiMode);
-    if (status != napi_ok) {
-        LOG_ERROR("napi_create_string_utf8 status : %{public}d", status);
-        napi_close_handle_scope(env, scope);
-        return ret;
-    }
-    napi_value argv[] = {napiUri, napiMode};
-    //represents this function has 2 parameters
-    CallObjectMethod("openFile", argv, 2);
-    napi_close_handle_scope(env, scope);
-    return ret;
+    return 0;
 }
 
 int JsDataShareExtAbility::OpenRawFile(const Uri &uri, const std::string &mode)
 {
-    auto ret = DataShareExtAbility::OpenRawFile(uri, mode);
-    HandleScope handleScope(jsRuntime_);
-    napi_env env = jsRuntime_.GetNapiEnv();
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        return ret;
-    }
-    napi_value napiUri = nullptr;
-    napi_status status = napi_create_string_utf8(env, uri.ToString().c_str(), NAPI_AUTO_LENGTH, &napiUri);
-    if (status != napi_ok) {
-        LOG_ERROR("napi_create_string_utf8 status : %{public}d", status);
-        napi_close_handle_scope(env, scope);
-        return ret;
-    }
-    napi_value napiMode = nullptr;
-    status = napi_create_string_utf8(env, mode.c_str(), NAPI_AUTO_LENGTH, &napiMode);
-    if (status != napi_ok) {
-        LOG_ERROR("napi_create_string_utf8 status : %{public}d", status);
-        napi_close_handle_scope(env, scope);
-        return ret;
-    }
-    napi_value argv[] = {napiUri, napiMode};
-    //represents this function has 2 parameters
-    CallObjectMethod("openRawFile", argv, 2, false);
-    napi_close_handle_scope(env, scope);
-    return ret;
+    return 0;
 }
 
 int JsDataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &value)
@@ -730,26 +652,7 @@ std::shared_ptr<DataShareResultSet> JsDataShareExtAbility::Query(const Uri &uri,
 
 std::string JsDataShareExtAbility::GetType(const Uri &uri)
 {
-    auto ret = DataShareExtAbility::GetType(uri);
-    HandleScope handleScope(jsRuntime_);
-    napi_env env = jsRuntime_.GetNapiEnv();
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        return ret;
-    }
-    napi_value napiUri = nullptr;
-    napi_status status = napi_create_string_utf8(env, uri.ToString().c_str(), NAPI_AUTO_LENGTH, &napiUri);
-    if (status != napi_ok) {
-        LOG_ERROR("napi_create_string_utf8 status : %{public}d", status);
-        napi_close_handle_scope(env, scope);
-        return ret;
-    }
-    napi_value argv[] = {napiUri};
-    //represents this function has 1 parameter
-    CallObjectMethod("getType", argv, 1);
-    napi_close_handle_scope(env, scope);
-    return ret;
+    return "";
 }
 
 int JsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataShareValuesBucket> &values)
