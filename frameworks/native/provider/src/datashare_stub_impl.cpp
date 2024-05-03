@@ -65,6 +65,7 @@ std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const s
         extension->GetResult(ret);
         return extension->GetRecvReply();
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
@@ -90,6 +91,7 @@ int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
         extension->GetResult(ret);
         return extension->GetRecvReply();
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
@@ -109,6 +111,7 @@ int DataShareStubImpl::OpenRawFile(const Uri &uri, const std::string &mode)
         extension->SetCallingInfo(info);
         *ret = extension->OpenRawFile(uri, mode);
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc);
     return *ret;
 }
@@ -303,6 +306,7 @@ std::string DataShareStubImpl::GetType(const Uri &uri)
         extension->GetResult(ret);
         return extension->GetRecvReply();
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
@@ -379,6 +383,7 @@ bool DataShareStubImpl::NotifyChange(const Uri &uri)
     std::function<void()> syncTaskFunc = [extension, ret, uri]() {
         *ret = extension->NotifyChange(uri);
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc);
     return *ret;
 }
@@ -408,6 +413,7 @@ Uri DataShareStubImpl::NormalizeUri(const Uri &uri)
         normalizeUri = tmp;
         return extension->GetRecvReply();
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return normalizeUri;
 }
@@ -436,6 +442,7 @@ Uri DataShareStubImpl::DenormalizeUri(const Uri &uri)
         denormalizedUri = tmp;
         return extension->GetRecvReply();
     };
+    std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return denormalizedUri;
 }
