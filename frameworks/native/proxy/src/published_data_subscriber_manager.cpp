@@ -15,8 +15,11 @@
 
 #include "published_data_subscriber_manager.h"
 
+#include <cinttypes>
+
 #include "data_proxy_observer_stub.h"
 #include "datashare_log.h"
+#include "datashare_string_utils.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -262,14 +265,20 @@ void PublishedDataSubscriberManager::EmitOnEnable(std::map<Key, std::vector<Obse
         if (it == lastChangeNodeMap_.end()) {
             continue;
         }
+        uint32_t num = 0;
         for (auto &data : it->second.datas_) {
             PublishedObserverMapKey mapKey(data.key_, data.subscriberId_);
             for (auto &obs : obsVector) {
                 if (obs.isNotifyOnEnabled_) {
+                    num++;
                     results[obs.observer_].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
                     results[obs.observer_].ownerBundleName_ = it->second.ownerBundleName_;
                 }
             }
+        }
+        if (num > 0) {
+            LOG_INFO("%{public}u will refresh, total %{public}zu, uri %{public}s, subscribeId %{public}" PRId64,
+                num, obsVector.size(), DataShareStringUtils::Anonymous(key.uri_).c_str(), key.subscriberId_);
         }
     }
     for (auto &[callback, node] : results) {

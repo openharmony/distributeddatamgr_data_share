@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "datashare_errno.h"
+#include "datashare_log.h"
 #include "datashare_template.h"
 
 namespace OHOS::DataShare {
@@ -351,10 +352,15 @@ void CallbacksManager<Key, Observer>::SetObserversNotifiedOnEnabled(const Key &k
         return;
     }
     std::vector<ObserverNode> &callbacks = it->second;
+    uint32_t num = 0;
     for (auto &observerNode : callbacks) {
         if (!observerNode.enabled_) {
+            num++;
             observerNode.isNotifyOnEnabled_ = true;
         }
+    }
+    if (num > 0) {
+        LOG_INFO("total %{public}zu, not refreshed %{public}u", callbacks.size(), num);
     }
 }
 } // namespace OHOS::DataShare
