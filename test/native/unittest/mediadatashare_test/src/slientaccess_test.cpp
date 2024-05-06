@@ -42,6 +42,42 @@ std::string TBL_STU_NAME = "name";
 std::string TBL_STU_AGE = "age";
 std::shared_ptr<DataShare::DataShareHelper> g_slientAccessHelper;
 
+template <typename T>
+class ConditionLock {
+public:
+    explicit ConditionLock() {}
+    ~ConditionLock() {}
+public:
+    void Notify()
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        isSet_ = true;
+        cv_.notify_one();
+    }
+    
+    void Wait()
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        cv_.wait_for(lock, std::chrono::seconds(INTERVAL), [this]() { return isSet_; });
+        cv_.notify_one();
+        return;
+    }
+    
+    void Clear()
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        isSet_ = false;
+        cv_.notify_one();
+    }
+
+private:
+    bool isSet_ = false;
+    T data_;
+    std::mutex mutex_;
+    std::condition_variable cv_;
+    static constexpr int64_t INTERVAL = 2;
+};
+
 class SlientAccessTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -60,6 +96,7 @@ public:
     void OnChange()
     {
         name = "OnChangeName";
+        data.Notify();
     }
 
     std::string GetName()
@@ -71,6 +108,12 @@ public:
     {
         this->name = name;
     }
+	
+    void Clear()
+    {
+        data.Clear();
+    }
+    ConditionLock<std::string> data;
 private:
     std::string name;
 };
@@ -250,7 +293,9 @@ HWTEST_F(SlientAccessTest, SlientAccess_Register_Test_001, TestSize.Level0)
     valuesBucket.Put(TBL_STU_AGE, age);
     int retVal = helper->Insert(uri, valuesBucket);
     EXPECT_EQ((retVal > 0), true);
+    dataObserver->data.Wait();
     EXPECT_EQ(dataObserver->GetName(), "OnChangeName");
+    dataObserver->Clear();
 
     DataShare::DataSharePredicates deletePredicates;
     deletePredicates.EqualTo(TBL_STU_NAME, "lisi")->And()->EqualTo(TBL_STU_NAME, 25);
