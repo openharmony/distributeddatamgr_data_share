@@ -71,7 +71,7 @@ public:
 
     int SetSilentSwitch(const Uri &uri, bool enable) override;
 
-    bool IsSilentProxyEnable(const std::string &uri) override;
+    int IsSilentProxyEnable(const std::string &uri) override;
     
     int RegisterObserver(const Uri &uri,
         const sptr<OHOS::IRemoteObject> &dataObserver) override;

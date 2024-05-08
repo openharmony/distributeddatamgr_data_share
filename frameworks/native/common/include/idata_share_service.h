@@ -84,7 +84,7 @@ public:
 
     virtual int SetSilentSwitch(const Uri &uri, bool enable) = 0;
 
-    virtual bool IsSilentProxyEnable(const std::string &uri) = 0;
+    virtual int IsSilentProxyEnable(const std::string &uri) = 0;
 
     virtual int RegisterObserver(const Uri &uri,
         const sptr<OHOS::IRemoteObject> &dataObserver) = 0;

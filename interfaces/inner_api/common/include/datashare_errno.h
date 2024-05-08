@@ -89,6 +89,20 @@ constexpr int E_URI_NOT_EXIST = (E_BASE + 48);
 * @brief Cannot find the bundleName
 */
 constexpr int E_BUNDLE_NAME_NOT_EXIST = (E_BASE + 49);
+
+/**
+* @brief BMS not ready
+*/
+constexpr int E_BMS_NOT_READY = (E_BASE + 50);
+
+/**
+* @brief metaData not exists
+*/
+constexpr int E_METADATA_NOT_EXISTS = (E_BASE + 51);
+/**
+* @brief silent proxy is disable
+*/
+constexpr int E_SILENT_PROXY_DISABLE = (E_BASE + 52);
 } // namespace DataShare
 } // namespace OHOS
 

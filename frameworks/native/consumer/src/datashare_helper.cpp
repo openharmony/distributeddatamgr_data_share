@@ -22,6 +22,7 @@
 #include "data_ability_observer_interface.h"
 #include "data_ability_observer_stub.h"
 #include "dataobs_mgr_client.h"
+#include "datashare_errno.h"
 #include "datashare_log.h"
 #include "datashare_string_utils.h"
 
@@ -88,7 +89,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
 
     if (uri.GetQuery().find("Proxy=true") != std::string::npos) {
         auto result = CreateServiceHelper();
-        if (result != nullptr && IsSilentProxyEnable(strUri)) {
+        if (result != nullptr && IsSilentProxyEnable(strUri) == E_OK) {
             return result;
         }
         if (extUri.empty()) {
@@ -130,12 +131,12 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateServiceHelper(const std:
     return std::make_shared<DataShareHelperImpl>();
 }
 
-bool DataShareHelper::IsSilentProxyEnable(const std::string &uri)
+int DataShareHelper::IsSilentProxyEnable(const std::string &uri)
 {
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("Service proxy is nullptr.");
-        return false;
+        return E_ERROR;
     }
     return proxy->IsSilentProxyEnable(uri);
 }
