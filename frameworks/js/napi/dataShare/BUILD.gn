@@ -84,7 +84,6 @@ ohos_shared_library("datashare") {
     ":datashare_jscommon",
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
-    "//third_party/libuv:uv",
   ]
 
   external_deps = [
@@ -101,6 +100,7 @@ ohos_shared_library("datashare") {
     "hitrace:hitrace_meter",
     "hitrace:libhitracechain",
     "ipc:ipc_single",
+    "libuv:uv",
     "napi:ace_napi",
   ]
 

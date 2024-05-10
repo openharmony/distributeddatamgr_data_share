@@ -13,7 +13,6 @@
 
 import("//build/ohos.gni")
 import("//foundation/distributeddatamgr/data_share/datashare.gni")
-import("//foundation/distributeddatamgr/relational_store/relational_store.gni")
 
 config("ability_config") {
   visibility = [ ":*" ]
@@ -21,11 +20,9 @@ config("ability_config") {
     "common/include",
     "consumer/include",
     "provider/include",
-    "${ability_runtime_services_path}/common/include",
     "${datashare_native_consumer_path}/include",
     "${datashare_native_provider_path}/include",
     "${datashare_native_proxy_path}/include",
-    "${ability_runtime_napi_path}/inner/napi_common",
   ]
 
   cflags = []
@@ -48,7 +45,6 @@ config("datashare_public_config") {
     "${datashare_native_provider_path}/include",
     "${datashare_native_proxy_path}/include",
     "${kvstore_common_path}",
-    "${ability_runtime_inner_api_path}/dataobs_manager/include",
   ]
 }
 
@@ -78,6 +74,7 @@ datashare_consumer_external_deps = [
   "ability_runtime:app_context",
   "ability_runtime:dataobs_manager",
   "ability_runtime:extension_manager",
+  "ability_runtime:napi_common",
   "c_utils:utils",
   "common_event_service:cesfwk_innerkits",
   "hilog:libhilog",
@@ -85,6 +82,7 @@ datashare_consumer_external_deps = [
   "hitrace:libhitracechain",
   "ipc:ipc_single",
   "ipc:rpc",
+  "kv_store:distributeddata_inner",
   "samgr:samgr_proxy",
 ]
 
@@ -116,7 +114,6 @@ ohos_shared_library("datashare_consumer") {
   include_dirs = [
     "${datashare_common_native_path}/include",
     "${kvstore_base_path}/frameworks/common",
-    "${kvstore_base_path}/interfaces/innerkits/distributeddata/include",
   ]
 
   sources = datashare_consumer_sources
@@ -213,6 +210,7 @@ ohos_shared_library("datashare_provider") {
     "ability_runtime:app_context",
     "ability_runtime:dataobs_manager",
     "ability_runtime:runtime",
+    "ability_runtime:napi_common",
     "access_token:libaccesstoken_sdk",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
@@ -247,6 +245,7 @@ ohos_shared_library("datashare_ext_ability_module") {
     "ability_base:want",
     "ability_runtime:abilitykit_native",
     "ability_runtime:runtime",
+    "ability_runtime:napi_common",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
@@ -268,7 +267,6 @@ ohos_static_library("datashare_consumer_static") {
   include_dirs = [
     "${datashare_common_native_path}/include",
     "${kvstore_base_path}/frameworks/common",
-    "${kvstore_base_path}/interfaces/innerkits/distributeddata/include",
   ]
 
   sources = datashare_consumer_sources
