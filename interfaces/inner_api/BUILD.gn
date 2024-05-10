@@ -72,7 +72,6 @@ datashare_consumer_external_deps = [
   "ability_base:want",
   "ability_base:zuri",
   "ability_runtime:app_context",
-  "ability_runtime:dataobs_manager",
   "ability_runtime:extension_manager",
   "ability_runtime:napi_common",
   "c_utils:utils",
@@ -127,6 +126,10 @@ ohos_shared_library("datashare_consumer") {
   deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
 
   external_deps = datashare_consumer_external_deps
+
+  public_external_deps = [
+    "ability_runtime:dataobs_manager",
+  ]
 
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
@@ -208,7 +211,6 @@ ohos_shared_library("datashare_provider") {
     "ability_runtime:ability_context_native",
     "ability_runtime:abilitykit_native",
     "ability_runtime:app_context",
-    "ability_runtime:dataobs_manager",
     "ability_runtime:napi_common",
     "ability_runtime:runtime",
     "access_token:libaccesstoken_sdk",
@@ -219,6 +221,10 @@ ohos_shared_library("datashare_provider") {
     "ipc:ipc_single",
     "napi:ace_napi",
     "samgr:samgr_proxy",
+  ]
+
+  public_external_deps = [
+    "ability_runtime:dataobs_manager",
   ]
 
   subsystem_name = "distributeddatamgr"
