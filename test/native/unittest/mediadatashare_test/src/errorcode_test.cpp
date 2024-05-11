@@ -20,6 +20,7 @@
 #include "datashare_log.h"
 #include "hap_token_info.h"
 #include "iservice_registry.h"
+#include "rdb_errno.h"
 #include "system_ability_definition.h"
 #include "token_setproc.h"
 
@@ -156,8 +157,7 @@ HWTEST_F(ErrorCodeTest, ErrorCodeTest_QUERY_Test_001, TestSize.Level0)
     Uri uriErr(ERR_SLIENT_ACCESS_URI);
     DatashareBusinessError error;
     resultSet = helper->Query(uriErr, predicates, columns, &error);
-    int errDbNotExists = 27394093;
-    EXPECT_EQ(error.GetCode(), errDbNotExists);
+    EXPECT_EQ(error.GetCode(), NativeRdb::E_DB_NOT_EXIST);
     EXPECT_EQ(resultSet, nullptr);
     LOG_INFO("ErrorCodeTest_QUERY_Test_001::End");
 }
