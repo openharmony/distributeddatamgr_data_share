@@ -156,7 +156,7 @@ HWTEST_F(ErrorCodeTest, ErrorCodeTest_QUERY_Test_001, TestSize.Level0)
     Uri uriErr(ERR_SLIENT_ACCESS_URI);
     DatashareBusinessError error;
     resultSet = helper->Query(uriErr, predicates, columns, &error);
-    int errDbNotExists = 14800045;
+    int errDbNotExists = 27394093;
     EXPECT_EQ(error.GetCode(), errDbNotExists);
     EXPECT_EQ(resultSet, nullptr);
     LOG_INFO("ErrorCodeTest_QUERY_Test_001::End");
