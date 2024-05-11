@@ -127,9 +127,7 @@ ohos_shared_library("datashare_consumer") {
 
   external_deps = datashare_consumer_external_deps
 
-  public_external_deps = [
-    "ability_runtime:dataobs_manager",
-  ]
+  public_external_deps = [ "ability_runtime:dataobs_manager" ]
 
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
@@ -223,9 +221,7 @@ ohos_shared_library("datashare_provider") {
     "samgr:samgr_proxy",
   ]
 
-  public_external_deps = [
-    "ability_runtime:dataobs_manager",
-  ]
+  public_external_deps = [ "ability_runtime:dataobs_manager" ]
 
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
