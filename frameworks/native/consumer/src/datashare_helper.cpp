@@ -23,6 +23,7 @@
 #include "data_ability_observer_stub.h"
 #include "dataobs_mgr_client.h"
 #include "datashare_log.h"
+#include "datashare_radar_reporter.h"
 #include "datashare_string_utils.h"
 
 namespace OHOS {
@@ -85,19 +86,36 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
 
     std::string replacedUriStr = TransferUriPrefix(FILE_PREFIX, DATA_SHARE_PREFIX, strUri);
     Uri uri(replacedUriStr);
-
+    RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::START);
+    std::shared_ptr<DataShareHelper> helper;
     if (uri.GetQuery().find("Proxy=true") != std::string::npos) {
         auto result = CreateServiceHelper();
         if (result != nullptr && IsSilentProxyEnable(strUri)) {
+            RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::SUCCESS,
+                RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
             return result;
         }
         if (extUri.empty()) {
+            RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::FAILED,
+                RadarReporter::BIZ_STATE, RadarReporter::FINISHED,
+                RadarReporter::ERROR_CODE, RadarReporter::DISTRIBUTEDDATA_NOT_START);
             return nullptr;
         }
         Uri ext(extUri);
-        return CreateExtHelper(ext, token);
+        helper = CreateExtHelper(ext, token);
+    } else {
+        helper = CreateExtHelper(uri, token);
     }
-    return CreateExtHelper(uri, token);
+    if (helper == nullptr) {
+        RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::FAILED,
+            RadarReporter::BIZ_STATE, RadarReporter::FINISHED,
+            RadarReporter::ERROR_CODE, RadarReporter::CREATE_HELPER_ERROR);
+        return helper;
+    }
+    RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
+    return helper;
 }
 
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, const CreateOptions &options,

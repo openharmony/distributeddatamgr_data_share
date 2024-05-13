@@ -15,9 +15,12 @@
 
 #include "datashare_stub.h"
 
+#include <cinttypes>
+
 #include "data_ability_observer_interface.h"
 #include "datashare_itypes_utils.h"
 #include "datashare_log.h"
+#include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "ishared_result_set.h"
 #include "datashare_operation_statement.h"
@@ -72,7 +75,17 @@ int DataShareStub::OnRemoteRequest(uint32_t code, MessageParcel& data, MessagePa
 
     const auto &itFunc = stubFuncMap_.find(code);
     if (itFunc != stubFuncMap_.end()) {
-        return (this->*(itFunc->second))(data, reply);
+        auto start = std::chrono::steady_clock::now();
+        auto ret = (this->*(itFunc->second))(data, reply);
+        auto finish = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
+        if (duration >= TIME_THRESHOLD) {
+            auto callingPid = IPCSkeleton::GetCallingPid();
+            int64_t milliseconds = duration.count();
+            LOG_ERROR("extension time over, code:%{public}u callingPid:%{public}d, cost:%{public}" PRIi64 "ms",
+                code, callingPid, milliseconds);
+        }
+        return ret;
     }
 
     LOG_DEBUG("remote request unhandled: %{public}d", code);

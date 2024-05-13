@@ -20,6 +20,7 @@
 #include "data_proxy_observer_stub.h"
 #include "datashare_log.h"
 #include "datashare_string_utils.h"
+#include "datashare_radar_reporter.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -324,6 +325,7 @@ PublishedDataObserver::PublishedDataObserver(const PublishedDataCallback &callba
 void PublishedDataObserver::OnChange(PublishedDataChangeNode &changeNode)
 {
     callback_(changeNode);
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::PUBLISHED_DATA_CHANGE, RadarReporter::SUCCESS);
 }
 
 bool PublishedDataObserver::operator==(const PublishedDataObserver &rhs) const

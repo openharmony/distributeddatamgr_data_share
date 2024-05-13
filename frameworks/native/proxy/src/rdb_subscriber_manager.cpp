@@ -19,6 +19,7 @@
 
 #include "data_proxy_observer_stub.h"
 #include "datashare_log.h"
+#include "datashare_radar_reporter.h"
 #include "datashare_string_utils.h"
 
 namespace OHOS {
@@ -286,6 +287,7 @@ RdbObserver::RdbObserver(const RdbCallback &callback) : callback_(callback) {}
 void RdbObserver::OnChange(const RdbChangeNode &changeNode)
 {
     callback_(changeNode);
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::RDB_DATA_CHANGE, RadarReporter::SUCCESS);
 }
 
 bool RdbObserver::operator==(const RdbObserver &rhs) const

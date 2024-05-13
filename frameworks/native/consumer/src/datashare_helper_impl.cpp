@@ -21,6 +21,7 @@
 #include "data_ability_observer_interface.h"
 #include "dataobs_mgr_client.h"
 #include "datashare_log.h"
+#include "datashare_radar_reporter.h"
 #include "datashare_result_set.h"
 
 #include "general_controller_provider_impl.h"
@@ -195,30 +196,52 @@ int DataShareHelperImpl::ExecuteBatch(const std::vector<OperationStatement> &sta
 
 void DataShareHelperImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
+    RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::REGISTER_OBSERVER, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::START);
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
+        RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::REGISTER_OBSERVER, RadarReporter::FAILED,
+            RadarReporter::BIZ_STATE, RadarReporter::FINISHED,
+            RadarReporter::ERROR_CODE, RadarReporter::REGISTER_ERROR);
         return;
     }
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
+        RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::REGISTER_OBSERVER, RadarReporter::FAILED,
+            RadarReporter::BIZ_STATE, RadarReporter::FINISHED,
+            RadarReporter::ERROR_CODE, RadarReporter::REGISTER_ERROR);
         return;
     }
-    return generalCtl->RegisterObserver(uri, dataObserver);
+    generalCtl->RegisterObserver(uri, dataObserver);
+    RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::REGISTER_OBSERVER, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
+    return;
 }
 
 void DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
+    RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::UNREGISTER_OBSERVER, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::START);
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
+        RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::UNREGISTER_OBSERVER, RadarReporter::FAILED,
+            RadarReporter::BIZ_STATE, RadarReporter::FINISHED,
+            RadarReporter::ERROR_CODE, RadarReporter::UNREGISTER_ERROR);
         return;
     }
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
+        RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::UNREGISTER_OBSERVER, RadarReporter::FAILED,
+            RadarReporter::BIZ_STATE, RadarReporter::FINISHED,
+            RadarReporter::ERROR_CODE, RadarReporter::UNREGISTER_ERROR);
         return;
     }
-    return generalCtl->UnregisterObserver(uri, dataObserver);
+    generalCtl->UnregisterObserver(uri, dataObserver);
+    RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::UNREGISTER_OBSERVER, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
+    return;
 }
 
 void DataShareHelperImpl::NotifyChange(const Uri &uri)
