@@ -22,7 +22,7 @@ namespace OHOS {
 namespace DataShare {
 namespace RadarReporter {
 using namespace OHOS::HiviewDFX;
-enum BizSence {
+enum BizScene {
     CREATE_DATASHARE_HELPER = 1,
     HANDLE_DATASHARE_OPERATIONS = 2,
     REGISTER_DATA_CHANGE = 3,
@@ -37,11 +37,12 @@ enum CreateDataShareHelperStage {
 enum HandleDataShareOperationsStage {
     EXT_REQUEST = 1,
     GET_BMS = 2,
-    PROXY_GET_SUPPLIER = 3,
-    PROXY_PERMISSION = 4,
-    PROXY_MATEDATA_EXISTS = 5,
-    PROXY_CALL_RDB = 6,
-    PROXY_CONNECT_EXT = 7,
+    PROXY_QUERY = 3,
+    PROXY_GET_SUPPLIER = 4,
+    PROXY_PERMISSION = 5,
+    PROXY_MATEDATA_EXISTS = 6,
+    PROXY_CALL_RDB = 7,
+    PROXY_CONNECT_EXT = 8,
 };
 
 enum RegisterDataChangeStage {
@@ -72,42 +73,43 @@ enum BizState {
 };
 
 enum ErrorCode {
-    CONNECT_EXTENSION_ERROR = 0,
-    CREATE_HELPER_ERROR = 1,
-    CREATE_SHARE_BLOCK_ERROR = 2,
-    SHARE_BLOCK_FULL = 3,
-    DISTRIBUTEDDATA_NOT_START = 4,
-    GET_BMS_FAILED = 5,
-    SUPPLIER_ERROR = 6,
-    URI_ERROR = 7,
-    PERMISSION_DENIED_ERROR = 8,
-    GET_RDB_STORE_ERROR = 9,
-    META_DATA_NOT_EXISTS = 10,
-    REGISTER_ERROR = 11,
-    UNREGISTER_ERROR = 12,
-    NOTIFY_ERROR = 13,
-    SILENT_PROXY_DISABLE = 14,
-    ADD_TEMPLATE_ERROR = 15,
-    NOT_SUBCRIBE_ERROR = 16,
-    CREATE_DELEGATE_ERROR = 17,
-    INSERT_RDB_ERROR = 18,
-    QUERY_RDB_ERROR = 19,
-    DELETE_RDB_ERROR = 20,
-    UPDATE_RDB_ERROR = 21,
-    GET_BUNDLE_INFP_FAILED = 22,
+    CONNECT_EXTENSION_ERROR = 27590656,
+    CREATE_HELPER_ERROR = 27590657,
+    CREATE_SHARE_BLOCK_ERROR = 27590658,
+    SHARE_BLOCK_FULL = 27590659,
+    DISTRIBUTEDDATA_NOT_START = 27590660,
+    GET_BMS_FAILED = 27590661,
+    SUPPLIER_ERROR = 27590662,
+    URI_ERROR = 27590663,
+    PERMISSION_DENIED_ERROR = 27590664,
+    GET_RDB_STORE_ERROR = 27590665,
+    META_DATA_NOT_EXISTS = 27590666,
+    REGISTER_ERROR = 27590667,
+    UNREGISTER_ERROR = 27590668,
+    NOTIFY_ERROR = 27590669,
+    SILENT_PROXY_DISABLE = 27590670,
+    ADD_TEMPLATE_ERROR = 27590671,
+    NOT_SUBCRIBE_ERROR = 27590672,
+    CREATE_DELEGATE_ERROR = 27590673,
+    INSERT_RDB_ERROR = 27590674,
+    QUERY_RDB_ERROR = 27590675,
+    DELETE_RDB_ERROR = 27590676,
+    UPDATE_RDB_ERROR = 27590677,
+    GET_BUNDLE_INFP_FAILED = 27590678,
+    QUERY_ERROR = 27590679,
 };
-static constexpr char DOMAIN[] = "DATA_SHARE";
-const std::string EVENT_NAME = "DISTDATAMGR_DATA_SHARE_BEHAVIOR";
-const std::string ORG_PKG = "data_share";
+static constexpr char DOMAIN[] = "DISTDATAMGR";
+const std::string EVENT_NAME = "DISTRIBUTED_DATA_SHARE_BEHAVIOR";
+const std::string ORG_PKG = "distributeddata";
 const std::string BIZ_STATE = "BIZ_STATE";
 const std::string ERROR_CODE = "ERROR_CODE";
 static constexpr HiviewDFX::HiSysEvent::EventType TYPE = HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
 
-#define RADAR_REPORT(bizSence, bizStage, stageRes, ...)                                    \
+#define RADAR_REPORT(bizScene, bizStage, stageRes, ...)                                    \
 ({                                                                                         \
     HiSysEventWrite(RadarReporter::DOMAIN, RadarReporter::EVENT_NAME, RadarReporter::TYPE, \
         "ORG_PKG", RadarReporter::ORG_PKG, "FUNC", __FUNCTION__,                           \
-        "BIZ_SECNE", bizSence, "BIZ_STAGE", bizStage, "STAGE_RES", stageRes,               \
+        "BIZ_SCENE", bizScene, "BIZ_STAGE", bizStage, "STAGE_RES", stageRes,               \
         ##__VA_ARGS__);                                                                   \
 })
 } // namespace RadarReporter

@@ -328,7 +328,12 @@ std::vector<OperationResult> DataShareHelperImpl::SubscribeRdbData(const std::ve
         LOG_ERROR("persistentDataCtl is nullptr");
         return std::vector<OperationResult>();
     }
-    return persistentDataCtl->SubscribeRdbData(this, uris, templateId, callback);
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::SUBSCRIBE_RDB_DATA, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::START);
+    auto ret = persistentDataCtl->SubscribeRdbData(this, uris, templateId, callback);
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::SUBSCRIBE_RDB_DATA, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
+    return ret;
 }
 
 std::vector<OperationResult> DataShareHelperImpl::UnsubscribeRdbData(const std::vector<std::string> &uris,
@@ -340,7 +345,12 @@ std::vector<OperationResult> DataShareHelperImpl::UnsubscribeRdbData(const std::
         LOG_ERROR("persistentDataCtl is nullptr");
         return std::vector<OperationResult>();
     }
-    return persistentDataCtl->UnSubscribeRdbData(this, uris, templateId);
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::UNSUBSCRIBE_RDB_DATA, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::START);
+    auto ret = persistentDataCtl->UnSubscribeRdbData(this, uris, templateId);
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::UNSUBSCRIBE_RDB_DATA, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
+    return ret;
 }
 
 std::vector<OperationResult> DataShareHelperImpl::EnableRdbSubs(const std::vector<std::string> &uris,
@@ -376,7 +386,12 @@ std::vector<OperationResult> DataShareHelperImpl::SubscribePublishedData(const s
         LOG_ERROR("publishedDataCtl is nullptr");
         return std::vector<OperationResult>();
     }
-    return publishedDataCtl->SubscribePublishedData(this, uris, subscriberId, callback);
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::SUBSCRIBE_PUBLISHED_DATA, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::START);
+    auto ret = publishedDataCtl->SubscribePublishedData(this, uris, subscriberId, callback);
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::SUBSCRIBE_PUBLISHED_DATA, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
+    return ret;
 }
 
 std::vector<OperationResult> DataShareHelperImpl::UnsubscribePublishedData(const std::vector<std::string> &uris,
@@ -388,7 +403,12 @@ std::vector<OperationResult> DataShareHelperImpl::UnsubscribePublishedData(const
         LOG_ERROR("publishedDataCtl is nullptr");
         return std::vector<OperationResult>();
     }
-    return publishedDataCtl->UnSubscribePublishedData(this, uris, subscriberId);
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::UNSUBSCRIBE_PUBLISHED_DATA, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::START);
+    auto ret = publishedDataCtl->UnSubscribePublishedData(this, uris, subscriberId);
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::UNSUBSCRIBE_PUBLISHED_DATA, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
+    return ret;
 }
 
 std::vector<OperationResult> DataShareHelperImpl::EnablePubSubs(const std::vector<std::string> &uris,
