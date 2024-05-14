@@ -81,7 +81,7 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
                 system_clock::now().time_since_epoch()).count());
             LOG_INFO("function ended successfully. times %{public}" PRIu64 ".", time);
         }
-        if (!uvEntry->done && !uv_cancel((uv_req_t*)&work)) {
+        if (!uvEntry->done && uv_cancel((uv_req_t*)work) != napi_ok) {
             LOG_ERROR("uv_cancel failed.");
             uvEntry->purge = true;
             noNeedPurge = true;
