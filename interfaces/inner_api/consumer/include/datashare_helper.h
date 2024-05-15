@@ -403,7 +403,7 @@ public:
 private:
     static std::shared_ptr<DataShareHelper> CreateServiceHelper(const std::string &bundleName = "");
 
-    static bool IsSilentProxyEnable(const std::string &uri);
+    static int GetSilentProxyStatus(const std::string &uri);
 
     static std::shared_ptr<DataShareHelper> CreateExtHelper(Uri &uri, const sptr<IRemoteObject> &token);
 
