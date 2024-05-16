@@ -69,7 +69,7 @@ std::string BusinessError::GetMessage() const
 
 std::string UriNotExistError::GetMessage() const
 {
-    return "The uri is not exist.";
+    return "The URI is not exist.";
 }
 
 int UriNotExistError::GetCode() const
