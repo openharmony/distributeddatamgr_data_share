@@ -25,8 +25,10 @@ using namespace OHOS::HiviewDFX;
 enum BizScene {
     CREATE_DATASHARE_HELPER = 1,
     HANDLE_DATASHARE_OPERATIONS = 2,
-    REGISTER_DATA_CHANGE = 3,
-    TEMPLATE_DATA_CHANGE = 4,
+    OBSERVER_MANAGER = 3,
+    NOTIFY_OBSERVER_DATA_CHANGE = 4,
+    TEMPLATE_DATA_MANAGER = 5,
+    TEMPLATE_DATA_CHANGE = 6,
 };
 
 enum CreateDataShareHelperStage {
@@ -37,27 +39,32 @@ enum CreateDataShareHelperStage {
 enum HandleDataShareOperationsStage {
     EXT_REQUEST = 1,
     GET_BMS = 2,
-    PROXY_QUERY = 3,
-    PROXY_GET_SUPPLIER = 4,
-    PROXY_PERMISSION = 5,
-    PROXY_MATEDATA_EXISTS = 6,
+    PROXY_GET_SUPPLIER = 3,
+    PROXY_PERMISSION = 4,
+    PROXY_MATEDATA_EXISTS = 5,
+    PROXY_CONNECT_EXT = 6,
     PROXY_CALL_RDB = 7,
-    PROXY_CONNECT_EXT = 8,
 };
 
-enum RegisterDataChangeStage {
+enum ObserverManagerStage {
     REGISTER_OBSERVER = 1,
     UNREGISTER_OBSERVER = 2,
-    NOTIFY_DATA_CHANGE = 3,
 };
 
-enum TemplateDataChangeStage {
+enum NotifyObserverDataChangeStage {
+    NOTIFY_DATA_CHANGE = 1,
+};
+
+enum TemplateDataManagerStage {
     SUBSCRIBE_PUBLISHED_DATA = 1,
     SUBSCRIBE_RDB_DATA = 2,
     UNSUBSCRIBE_PUBLISHED_DATA = 3,
     UNSUBSCRIBE_RDB_DATA = 4,
-    PUBLISHED_DATA_CHANGE = 5,
-    RDB_DATA_CHANGE = 6,
+};
+
+enum TemplateDataChangeStage {
+    PUBLISHED_DATA_CHANGE = 1,
+    RDB_DATA_CHANGE = 2,
 };
 
 enum StageRes {

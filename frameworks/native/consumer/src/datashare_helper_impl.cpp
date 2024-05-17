@@ -196,11 +196,11 @@ int DataShareHelperImpl::ExecuteBatch(const std::vector<OperationStatement> &sta
 
 void DataShareHelperImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::REGISTER_OBSERVER, RadarReporter::SUCCESS,
+    RADAR_REPORT(RadarReporter::OBSERVER_MANAGER, RadarReporter::REGISTER_OBSERVER, RadarReporter::SUCCESS,
         RadarReporter::BIZ_STATE, RadarReporter::START);
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
-        RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::REGISTER_OBSERVER, RadarReporter::FAILED,
+        RADAR_REPORT(RadarReporter::OBSERVER_MANAGER, RadarReporter::REGISTER_OBSERVER, RadarReporter::FAILED,
             RadarReporter::BIZ_STATE, RadarReporter::FINISHED,
             RadarReporter::ERROR_CODE, RadarReporter::REGISTER_ERROR);
         return;
@@ -208,24 +208,24 @@ void DataShareHelperImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDa
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
-        RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::REGISTER_OBSERVER, RadarReporter::FAILED,
+        RADAR_REPORT(RadarReporter::OBSERVER_MANAGER, RadarReporter::REGISTER_OBSERVER, RadarReporter::FAILED,
             RadarReporter::BIZ_STATE, RadarReporter::FINISHED,
             RadarReporter::ERROR_CODE, RadarReporter::REGISTER_ERROR);
         return;
     }
     generalCtl->RegisterObserver(uri, dataObserver);
-    RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::REGISTER_OBSERVER, RadarReporter::SUCCESS,
+    RADAR_REPORT(RadarReporter::OBSERVER_MANAGER, RadarReporter::REGISTER_OBSERVER, RadarReporter::SUCCESS,
         RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
     return;
 }
 
 void DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::UNREGISTER_OBSERVER, RadarReporter::SUCCESS,
+    RADAR_REPORT(RadarReporter::OBSERVER_MANAGER, RadarReporter::UNREGISTER_OBSERVER, RadarReporter::SUCCESS,
         RadarReporter::BIZ_STATE, RadarReporter::START);
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
-        RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::UNREGISTER_OBSERVER, RadarReporter::FAILED,
+        RADAR_REPORT(RadarReporter::OBSERVER_MANAGER, RadarReporter::UNREGISTER_OBSERVER, RadarReporter::FAILED,
             RadarReporter::BIZ_STATE, RadarReporter::FINISHED,
             RadarReporter::ERROR_CODE, RadarReporter::UNREGISTER_ERROR);
         return;
@@ -233,13 +233,13 @@ void DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::I
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
-        RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::UNREGISTER_OBSERVER, RadarReporter::FAILED,
+        RADAR_REPORT(RadarReporter::OBSERVER_MANAGER, RadarReporter::UNREGISTER_OBSERVER, RadarReporter::FAILED,
             RadarReporter::BIZ_STATE, RadarReporter::FINISHED,
             RadarReporter::ERROR_CODE, RadarReporter::UNREGISTER_ERROR);
         return;
     }
     generalCtl->UnregisterObserver(uri, dataObserver);
-    RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::UNREGISTER_OBSERVER, RadarReporter::SUCCESS,
+    RADAR_REPORT(RadarReporter::OBSERVER_MANAGER, RadarReporter::UNREGISTER_OBSERVER, RadarReporter::SUCCESS,
         RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
     return;
 }
@@ -328,10 +328,10 @@ std::vector<OperationResult> DataShareHelperImpl::SubscribeRdbData(const std::ve
         LOG_ERROR("persistentDataCtl is nullptr");
         return std::vector<OperationResult>();
     }
-    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::SUBSCRIBE_RDB_DATA, RadarReporter::SUCCESS,
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_MANAGER, RadarReporter::SUBSCRIBE_RDB_DATA, RadarReporter::SUCCESS,
         RadarReporter::BIZ_STATE, RadarReporter::START);
     auto ret = persistentDataCtl->SubscribeRdbData(this, uris, templateId, callback);
-    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::SUBSCRIBE_RDB_DATA, RadarReporter::SUCCESS,
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_MANAGER, RadarReporter::SUBSCRIBE_RDB_DATA, RadarReporter::SUCCESS,
         RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
     return ret;
 }
@@ -345,10 +345,10 @@ std::vector<OperationResult> DataShareHelperImpl::UnsubscribeRdbData(const std::
         LOG_ERROR("persistentDataCtl is nullptr");
         return std::vector<OperationResult>();
     }
-    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::UNSUBSCRIBE_RDB_DATA, RadarReporter::SUCCESS,
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_MANAGER, RadarReporter::UNSUBSCRIBE_RDB_DATA, RadarReporter::SUCCESS,
         RadarReporter::BIZ_STATE, RadarReporter::START);
     auto ret = persistentDataCtl->UnSubscribeRdbData(this, uris, templateId);
-    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::UNSUBSCRIBE_RDB_DATA, RadarReporter::SUCCESS,
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_MANAGER, RadarReporter::UNSUBSCRIBE_RDB_DATA, RadarReporter::SUCCESS,
         RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
     return ret;
 }
@@ -386,10 +386,10 @@ std::vector<OperationResult> DataShareHelperImpl::SubscribePublishedData(const s
         LOG_ERROR("publishedDataCtl is nullptr");
         return std::vector<OperationResult>();
     }
-    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::SUBSCRIBE_PUBLISHED_DATA, RadarReporter::SUCCESS,
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_MANAGER, RadarReporter::SUBSCRIBE_PUBLISHED_DATA, RadarReporter::SUCCESS,
         RadarReporter::BIZ_STATE, RadarReporter::START);
     auto ret = publishedDataCtl->SubscribePublishedData(this, uris, subscriberId, callback);
-    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::SUBSCRIBE_PUBLISHED_DATA, RadarReporter::SUCCESS,
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_MANAGER, RadarReporter::SUBSCRIBE_PUBLISHED_DATA, RadarReporter::SUCCESS,
         RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
     return ret;
 }
@@ -403,11 +403,11 @@ std::vector<OperationResult> DataShareHelperImpl::UnsubscribePublishedData(const
         LOG_ERROR("publishedDataCtl is nullptr");
         return std::vector<OperationResult>();
     }
-    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::UNSUBSCRIBE_PUBLISHED_DATA, RadarReporter::SUCCESS,
-        RadarReporter::BIZ_STATE, RadarReporter::START);
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_MANAGER, RadarReporter::UNSUBSCRIBE_PUBLISHED_DATA,
+        RadarReporter::SUCCESS, RadarReporter::BIZ_STATE, RadarReporter::START);
     auto ret = publishedDataCtl->UnSubscribePublishedData(this, uris, subscriberId);
-    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::UNSUBSCRIBE_PUBLISHED_DATA, RadarReporter::SUCCESS,
-        RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_MANAGER, RadarReporter::UNSUBSCRIBE_PUBLISHED_DATA,
+        RadarReporter::SUCCESS, RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
     return ret;
 }
 

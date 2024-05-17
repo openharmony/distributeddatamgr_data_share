@@ -128,10 +128,23 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, 
         LOG_ERROR("token is nullptr");
         return nullptr;
     }
+    std::shared_ptr<DataShareHelper> helper;
+    RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::START);
     if (options.isProxy_) {
-        return CreateServiceHelper(bundleName);
+        helper = CreateServiceHelper(bundleName);
+    } else {
+        helper = CreateExtHelper(uri, options.token_);
     }
-    return CreateExtHelper(uri, options.token_);
+    if (helper == nullptr) {
+        RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::FAILED,
+            RadarReporter::BIZ_STATE, RadarReporter::FINISHED,
+            RadarReporter::ERROR_CODE, RadarReporter::CREATE_HELPER_ERROR);
+        return helper;
+    }
+    RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
+    return helper;
 }
 
 std::shared_ptr<DataShareHelper> DataShareHelper::CreateServiceHelper(const std::string &bundleName)

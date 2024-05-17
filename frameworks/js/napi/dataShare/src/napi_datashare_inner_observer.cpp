@@ -19,7 +19,6 @@
 #include <chrono>
 #include <cinttypes>
 #include "datashare_log.h"
-#include "datashare_radar_reporter.h"
 #include "napi_datashare_values_bucket.h"
 
 namespace OHOS {
@@ -97,7 +96,6 @@ void NAPIInnerObserver::OnChange(const DataShareObserver::ChangeInfo& changeInfo
         delete observerWorker;
         delete work;
     }
-    RADAR_REPORT(RadarReporter::REGISTER_DATA_CHANGE, RadarReporter::NOTIFY_DATA_CHANGE, RadarReporter::SUCCESS);
 }
 
 void NAPIInnerObserver::DeleteReference()

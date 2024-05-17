@@ -286,8 +286,11 @@ RdbObserver::RdbObserver(const RdbCallback &callback) : callback_(callback) {}
 
 void RdbObserver::OnChange(const RdbChangeNode &changeNode)
 {
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::RDB_DATA_CHANGE, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::START);
     callback_(changeNode);
-    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::RDB_DATA_CHANGE, RadarReporter::SUCCESS);
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::RDB_DATA_CHANGE, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
 }
 
 bool RdbObserver::operator==(const RdbObserver &rhs) const

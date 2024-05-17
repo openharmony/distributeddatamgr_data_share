@@ -324,8 +324,11 @@ PublishedDataObserver::PublishedDataObserver(const PublishedDataCallback &callba
 
 void PublishedDataObserver::OnChange(PublishedDataChangeNode &changeNode)
 {
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::PUBLISHED_DATA_CHANGE, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::START);
     callback_(changeNode);
-    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::PUBLISHED_DATA_CHANGE, RadarReporter::SUCCESS);
+    RADAR_REPORT(RadarReporter::TEMPLATE_DATA_CHANGE, RadarReporter::PUBLISHED_DATA_CHANGE, RadarReporter::SUCCESS,
+        RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
 }
 
 bool PublishedDataObserver::operator==(const PublishedDataObserver &rhs) const

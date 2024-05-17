@@ -18,6 +18,7 @@
 #include <thread>
 
 #include "datashare_log.h"
+#include "datashare_radar_reporter.h"
 #include "ikvstore_data_service.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
