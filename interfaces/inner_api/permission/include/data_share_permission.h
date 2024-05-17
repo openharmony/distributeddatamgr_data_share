@@ -30,15 +30,15 @@ public:
     DataSharePermission() = default;
     ~DataSharePermission() = default;
     /**
-     * @brief Verify if tokenId has access perimission to uri.
+     * @brief Verify if token has access perimission to uri.
 
-     * @param tokenId Unique identification of application.
+     * @param token Unique identification of application.
      * @param uri, Indicates the path of data to verify perimission.
      * @param isRead, Obtain read permission for true and write permission for false.
 
      * @return Returns the error code.
      */
-    static int VerifyPermission(Security::AccessToken::AccessTokenID tokenId, const Uri &uri, bool isRead);
+    static int VerifyPermission(Security::AccessToken::AccessTokenID token, const Uri &uri, bool isRead);
 };
 } // namespace DataShare
 } // namespace OHOS
