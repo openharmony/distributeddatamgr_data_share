@@ -196,7 +196,8 @@ int DataShareHelperImpl::ExecuteBatch(const std::vector<OperationStatement> &sta
 
 void DataShareHelperImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    RadarReporter::RadarReport report(RadarReporter::OBSERVER_MANAGER, RadarReporter::REGISTER_OBSERVER);
+    RadarReporter::RadarReport report(RadarReporter::OBSERVER_MANAGER,
+        RadarReporter::REGISTER_OBSERVER, __FUNCTION__);
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         report.SetError(RadarReporter::EMPTY_OBSERVER_ERROR);
@@ -208,13 +209,13 @@ void DataShareHelperImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDa
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
         return;
     }
-    generalCtl->RegisterObserver(uri, dataObserver);
-    return;
+    return generalCtl->RegisterObserver(uri, dataObserver);
 }
 
 void DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    RadarReporter::RadarReport report(RadarReporter::OBSERVER_MANAGER, RadarReporter::UNREGISTER_OBSERVER);
+    RadarReporter::RadarReport report(RadarReporter::OBSERVER_MANAGER,
+        RadarReporter::UNREGISTER_OBSERVER, __FUNCTION__);
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         report.SetError(RadarReporter::EMPTY_OBSERVER_ERROR);
@@ -226,8 +227,7 @@ void DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::I
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
         return;
     }
-    generalCtl->UnregisterObserver(uri, dataObserver);
-    return;
+    return generalCtl->UnregisterObserver(uri, dataObserver);
 }
 
 void DataShareHelperImpl::NotifyChange(const Uri &uri)
@@ -265,9 +265,12 @@ Uri DataShareHelperImpl::DenormalizeUri(Uri &uri)
 
 int DataShareHelperImpl::AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl)
 {
+    RadarReporter::RadarReport report(RadarReporter::TEMPLATE_DATA_MANAGER,
+        RadarReporter::ADD_TEMPLATE, __FUNCTION__);
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
+        report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
         return INVALID_VALUE;
     }
     return persistentDataCtl->AddQueryTemplate(uri, subscriberId, tpl);
@@ -275,9 +278,12 @@ int DataShareHelperImpl::AddQueryTemplate(const std::string &uri, int64_t subscr
 
 int DataShareHelperImpl::DelQueryTemplate(const std::string &uri, int64_t subscriberId)
 {
+    RadarReporter::RadarReport report(RadarReporter::TEMPLATE_DATA_MANAGER,
+        RadarReporter::DELETE_TEMPLATE, __FUNCTION__);
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
+        report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
         return INVALID_VALUE;
     }
     return persistentDataCtl->DelQueryTemplate(uri, subscriberId);
@@ -310,7 +316,7 @@ std::vector<OperationResult> DataShareHelperImpl::SubscribeRdbData(const std::ve
 {
     LOG_DEBUG("Start SubscribeRdbData");
     RadarReporter::RadarReport report(RadarReporter::TEMPLATE_DATA_MANAGER,
-        RadarReporter::SUBSCRIBE_RDB_DATA);
+        RadarReporter::SUBSCRIBE_RDB_DATA, __FUNCTION__);
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
@@ -325,7 +331,7 @@ std::vector<OperationResult> DataShareHelperImpl::UnsubscribeRdbData(const std::
 {
     LOG_DEBUG("Start UnsubscribeRdbData");
     RadarReporter::RadarReport report(RadarReporter::TEMPLATE_DATA_MANAGER,
-        RadarReporter::UNSUBSCRIBE_RDB_DATA);
+        RadarReporter::UNSUBSCRIBE_RDB_DATA, __FUNCTION__);
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
@@ -364,7 +370,7 @@ std::vector<OperationResult> DataShareHelperImpl::SubscribePublishedData(const s
 {
     LOG_DEBUG("Start SubscribePublishedData");
     RadarReporter::RadarReport report(RadarReporter::TEMPLATE_DATA_MANAGER,
-        RadarReporter::SUBSCRIBE_PUBLISHED_DATA);
+        RadarReporter::SUBSCRIBE_PUBLISHED_DATA, __FUNCTION__);
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
@@ -379,7 +385,7 @@ std::vector<OperationResult> DataShareHelperImpl::UnsubscribePublishedData(const
 {
     LOG_DEBUG("Start UnSubscribePublishedData");
     RadarReporter::RadarReport report(RadarReporter::TEMPLATE_DATA_MANAGER,
-        RadarReporter::UNSUBSCRIBE_PUBLISHED_DATA);
+        RadarReporter::UNSUBSCRIBE_PUBLISHED_DATA, __FUNCTION__);
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");

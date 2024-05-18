@@ -98,8 +98,9 @@ sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
     }
     if (dataMgrService_ == nullptr) {
         LOG_ERROR("Get distributed data manager failed!");
-        RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::DISTRIBUTEDDATA_START,
-            RadarReporter::FAILED, RadarReporter::ERROR_CODE, RadarReporter::DISTRIBUTEDDATA_NOT_START);
+        RADAR_REPORT(__FUNCTION__, RadarReporter::CREATE_DATASHARE_HELPER,
+            RadarReporter::DISTRIBUTEDDATA_START, RadarReporter::FAILED,
+            RadarReporter::ERROR_CODE, RadarReporter::DISTRIBUTEDDATA_NOT_START);
         return nullptr;
     }
     auto remote = dataMgrService_->GetFeatureInterface("data_share");

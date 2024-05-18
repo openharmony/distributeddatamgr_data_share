@@ -80,14 +80,16 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
     const sptr<IRemoteObject> &token, const std::string &strUri, const std::string &extUri)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
+    RadarReporter::RadarReport report(RadarReporter::CREATE_DATASHARE_HELPER,
+        RadarReporter::CREATE_HELPER, __FUNCTION__);
     if (token == nullptr) {
+        report.SetError(RadarReporter::INVALID_PARAM_ERROR);
         LOG_ERROR("token == nullptr");
         return nullptr;
     }
 
     std::string replacedUriStr = TransferUriPrefix(FILE_PREFIX, DATA_SHARE_PREFIX, strUri);
     Uri uri(replacedUriStr);
-    RadarReporter::RadarReport report(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER);
     std::shared_ptr<DataShareHelper> helper;
     if (uri.GetQuery().find("Proxy=true") != std::string::npos) {
         auto result = CreateServiceHelper();
@@ -95,7 +97,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
             return result;
         }
         if (extUri.empty()) {
-            report.SetError(RadarReporter::EMPTY_PARAM_ERROR);
+            report.SetError(RadarReporter::INVALID_PARAM_ERROR);
             return nullptr;
         }
         Uri ext(extUri);
@@ -105,7 +107,6 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
     }
     if (helper == nullptr) {
         report.SetError(RadarReporter::CREATE_HELPER_ERROR);
-        return helper;
     }
     return helper;
 }
@@ -113,23 +114,19 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, const CreateOptions &options,
     const std::string &bundleName)
 {
+    RadarReporter::RadarReport report(RadarReporter::CREATE_DATASHARE_HELPER,
+        RadarReporter::CREATE_HELPER, __FUNCTION__);
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     Uri uri(strUri);
     if (!options.isProxy_ && options.token_ == nullptr) {
         LOG_ERROR("token is nullptr");
+        report.SetError(RadarReporter::INVALID_PARAM_ERROR);
         return nullptr;
     }
     std::shared_ptr<DataShareHelper> helper;
-    RadarReporter::RadarReport report(RadarReporter::CREATE_DATASHARE_HELPER,
-        RadarReporter::CREATE_HELPER);
-    if (options.isProxy_) {
-        helper = CreateServiceHelper(bundleName);
-    } else {
-        helper = CreateExtHelper(uri, options.token_);
-    }
+    helper = options.isProxy_ ? CreateServiceHelper(bundleName) : CreateExtHelper(uri, options.token_);
     if (helper == nullptr) {
         report.SetError(RadarReporter::CREATE_HELPER_ERROR);
-        return helper;
     }
     return helper;
 }

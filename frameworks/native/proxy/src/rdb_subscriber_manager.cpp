@@ -287,7 +287,7 @@ RdbObserver::RdbObserver(const RdbCallback &callback) : callback_(callback) {}
 void RdbObserver::OnChange(const RdbChangeNode &changeNode)
 {
     RadarReporter::RadarReport report(RadarReporter::TEMPLATE_DATA_CHANGE,
-        RadarReporter::RDB_DATA_CHANGE);
+        RadarReporter::RDB_DATA_CHANGE, __FUNCTION__);
     callback_(changeNode);
 }
 

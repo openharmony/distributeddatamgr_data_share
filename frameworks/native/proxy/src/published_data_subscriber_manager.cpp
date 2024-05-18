@@ -325,7 +325,7 @@ PublishedDataObserver::PublishedDataObserver(const PublishedDataCallback &callba
 void PublishedDataObserver::OnChange(PublishedDataChangeNode &changeNode)
 {
     RadarReporter::RadarReport report(RadarReporter::TEMPLATE_DATA_CHANGE,
-        RadarReporter::PUBLISHED_DATA_CHANGE);
+        RadarReporter::PUBLISHED_DATA_CHANGE, __FUNCTION__);
     callback_(changeNode);
 }
 

@@ -22,11 +22,11 @@ namespace OHOS {
 namespace DataShare {
 namespace RadarReporter {
 using namespace OHOS::HiviewDFX;
-static constexpr int DDMS_ID = 0xd;
+static constexpr int DISTRIBUTEDDATA_ID = 0xd;
 static constexpr int DATA_SHARE_ID = 5;
 enum BizScene {
     CREATE_DATASHARE_HELPER = 1,
-    HANDLE_DATASHARE_OPERATIONS = 2,
+    SILENT_ACCESS = 2,
     OBSERVER_MANAGER = 3,
     NOTIFY_OBSERVER_DATA_CHANGE = 4,
     TEMPLATE_DATA_MANAGER = 5,
@@ -62,6 +62,8 @@ enum TemplateDataManagerStage {
     SUBSCRIBE_RDB_DATA = 2,
     UNSUBSCRIBE_PUBLISHED_DATA = 3,
     UNSUBSCRIBE_RDB_DATA = 4,
+    ADD_TEMPLATE = 5,
+    DELETE_TEMPLATE = 6,
 };
 
 enum TemplateDataChangeStage {
@@ -82,7 +84,7 @@ enum BizState {
 };
 
 enum ErrorCode {
-    CONNECT_EXTENSION_ERROR = (DDMS_ID << 21) | (DATA_SHARE_ID << 16),
+    CONNECT_EXTENSION_ERROR = (DISTRIBUTEDDATA_ID << 21) | (DATA_SHARE_ID << 16),
     CREATE_HELPER_ERROR,
     CREATE_SHARE_BLOCK_ERROR,
     SHARE_BLOCK_FULL,
@@ -105,7 +107,6 @@ enum ErrorCode {
     DELETE_RDB_ERROR,
     UPDATE_RDB_ERROR,
     GET_BUNDLE_INFP_FAILED,
-    QUERY_ERROR,
     EMPTY_PARAM_ERROR,
     INVALID_PARAM_ERROR,
     DATA_SHARE_DIED_ERROR,
@@ -118,44 +119,45 @@ constexpr const char* BIZ_STATE = "BIZ_STATE";
 constexpr const char* ERROR_CODE = "ERROR_CODE";
 static constexpr HiviewDFX::HiSysEvent::EventType TYPE = HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
 
-#define RADAR_REPORT(bizScene, bizStage, stageRes, ...)                                    \
+#define RADAR_REPORT(funcName, bizScene, bizStage, stageRes, ...)                          \
 ({                                                                                         \
     HiSysEventWrite(RadarReporter::DOMAIN, RadarReporter::EVENT_NAME, RadarReporter::TYPE, \
-        "ORG_PKG", RadarReporter::ORG_PKG, "FUNC", __FUNCTION__,                           \
+        "ORG_PKG", RadarReporter::ORG_PKG, "FUNC", funcName,                               \
         "BIZ_SCENE", bizScene, "BIZ_STAGE", bizStage, "STAGE_RES", stageRes,               \
         ##__VA_ARGS__);                                                                    \
 })
 
 class RadarReport final {
 public:
-    RadarReport(int32_t bizScene, int32_t bizStage)
+    RadarReport(int32_t bizScene, int32_t bizStage, const std::string funcName)
     {
-        RADAR_REPORT(bizScene, bizStage,
-            RadarReporter::SUCCESS, RadarReporter::BIZ_STATE, RadarReporter::START);
+        RADAR_REPORT(funcName, bizScene, bizStage, RadarReporter::SUCCESS,
+            RadarReporter::BIZ_STATE, RadarReporter::START);
         bizScene_ = bizScene;
         bizStage_ = bizStage;
+        funcName_ = funcName;
     }
 
     ~RadarReport()
     {
         if (errorCode_ != 0) {
-            RADAR_REPORT(bizScene_, bizStage_, RadarReporter::FAILED, RadarReporter::BIZ_STATE,
+            RADAR_REPORT(funcName_, bizScene_, bizStage_, RadarReporter::FAILED, RadarReporter::BIZ_STATE,
                 RadarReporter::FINISHED, RadarReporter::ERROR_CODE, errorCode_);
         } else {
-            RADAR_REPORT(bizScene_, bizStage_,
-                RadarReporter::SUCCESS, RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
+            RADAR_REPORT(funcName_, bizScene_, bizStage_, RadarReporter::SUCCESS,
+                RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
         }
     }
 
     void SetError(int32_t errorCode)
     {
         errorCode_ = errorCode;
-
     }
 private:
     int32_t bizScene_;
     int32_t bizStage_;
-    int32_t errorCode_;
+    int32_t errorCode_ = 0;
+    std::string funcName_;
 };
 } // namespace RadarReporter
 } // namespace DataShare
