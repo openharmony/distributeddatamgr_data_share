@@ -22,6 +22,8 @@ namespace OHOS {
 namespace DataShare {
 namespace RadarReporter {
 using namespace OHOS::HiviewDFX;
+static constexpr int DDMS_ID = 0xd;
+static constexpr int DATA_SHARE_ID = 5;
 enum BizScene {
     CREATE_DATASHARE_HELPER = 1,
     HANDLE_DATASHARE_OPERATIONS = 2,
@@ -80,36 +82,40 @@ enum BizState {
 };
 
 enum ErrorCode {
-    CONNECT_EXTENSION_ERROR = 27590656,
-    CREATE_HELPER_ERROR = 27590657,
-    CREATE_SHARE_BLOCK_ERROR = 27590658,
-    SHARE_BLOCK_FULL = 27590659,
-    DISTRIBUTEDDATA_NOT_START = 27590660,
-    GET_BMS_FAILED = 27590661,
-    SUPPLIER_ERROR = 27590662,
-    URI_ERROR = 27590663,
-    PERMISSION_DENIED_ERROR = 27590664,
-    GET_RDB_STORE_ERROR = 27590665,
-    META_DATA_NOT_EXISTS = 27590666,
-    REGISTER_ERROR = 27590667,
-    UNREGISTER_ERROR = 27590668,
-    NOTIFY_ERROR = 27590669,
-    SILENT_PROXY_DISABLE = 27590670,
-    ADD_TEMPLATE_ERROR = 27590671,
-    NOT_SUBCRIBE_ERROR = 27590672,
-    CREATE_DELEGATE_ERROR = 27590673,
-    INSERT_RDB_ERROR = 27590674,
-    QUERY_RDB_ERROR = 27590675,
-    DELETE_RDB_ERROR = 27590676,
-    UPDATE_RDB_ERROR = 27590677,
-    GET_BUNDLE_INFP_FAILED = 27590678,
-    QUERY_ERROR = 27590679,
+    CONNECT_EXTENSION_ERROR = (DDMS_ID << 21) | (DATA_SHARE_ID << 16),
+    CREATE_HELPER_ERROR,
+    CREATE_SHARE_BLOCK_ERROR,
+    SHARE_BLOCK_FULL,
+    DISTRIBUTEDDATA_NOT_START,
+    GET_BMS_FAILED,
+    SUPPLIER_ERROR,
+    URI_ERROR,
+    PERMISSION_DENIED_ERROR,
+    GET_RDB_STORE_ERROR,
+    META_DATA_NOT_EXISTS,
+    EMPTY_OBSERVER_ERROR,
+    NOTIFY_ERROR,
+    DATA_OBS_EMPTY_ERROR,
+    SILENT_PROXY_DISABLE,
+    ADD_TEMPLATE_ERROR,
+    NOT_SUBCRIBE_ERROR,
+    CREATE_DELEGATE_ERROR,
+    INSERT_RDB_ERROR,
+    QUERY_RDB_ERROR,
+    DELETE_RDB_ERROR,
+    UPDATE_RDB_ERROR,
+    GET_BUNDLE_INFP_FAILED,
+    QUERY_ERROR,
+    EMPTY_PARAM_ERROR,
+    INVALID_PARAM_ERROR,
+    DATA_SHARE_DIED_ERROR,
 };
+
 static constexpr char DOMAIN[] = "DISTDATAMGR";
-const std::string EVENT_NAME = "DISTRIBUTED_DATA_SHARE_BEHAVIOR";
-const std::string ORG_PKG = "distributeddata";
-const std::string BIZ_STATE = "BIZ_STATE";
-const std::string ERROR_CODE = "ERROR_CODE";
+constexpr const char* EVENT_NAME = "DISTRIBUTED_DATA_SHARE_BEHAVIOR";
+constexpr const char* ORG_PKG = "distributeddata";
+constexpr const char* BIZ_STATE = "BIZ_STATE";
+constexpr const char* ERROR_CODE = "ERROR_CODE";
 static constexpr HiviewDFX::HiSysEvent::EventType TYPE = HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
 
 #define RADAR_REPORT(bizScene, bizStage, stageRes, ...)                                    \
@@ -117,8 +123,40 @@ static constexpr HiviewDFX::HiSysEvent::EventType TYPE = HiviewDFX::HiSysEvent::
     HiSysEventWrite(RadarReporter::DOMAIN, RadarReporter::EVENT_NAME, RadarReporter::TYPE, \
         "ORG_PKG", RadarReporter::ORG_PKG, "FUNC", __FUNCTION__,                           \
         "BIZ_SCENE", bizScene, "BIZ_STAGE", bizStage, "STAGE_RES", stageRes,               \
-        ##__VA_ARGS__);                                                                   \
+        ##__VA_ARGS__);                                                                    \
 })
+
+class RadarReport final {
+public:
+    RadarReport(int32_t bizScene, int32_t bizStage)
+    {
+        RADAR_REPORT(bizScene, bizStage,
+            RadarReporter::SUCCESS, RadarReporter::BIZ_STATE, RadarReporter::START);
+        bizScene_ = bizScene;
+        bizStage_ = bizStage;
+    }
+
+    ~RadarReport()
+    {
+        if (errorCode_ != 0) {
+            RADAR_REPORT(bizScene_, bizStage_, RadarReporter::FAILED, RadarReporter::BIZ_STATE,
+                RadarReporter::FINISHED, RadarReporter::ERROR_CODE, errorCode_);
+        } else {
+            RADAR_REPORT(bizScene_, bizStage_,
+                RadarReporter::SUCCESS, RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
+        }
+    }
+
+    void SetError(int32_t errorCode)
+    {
+        errorCode_ = errorCode;
+
+    }
+private:
+    int32_t bizScene_;
+    int32_t bizStage_;
+    int32_t errorCode_;
+};
 } // namespace RadarReporter
 } // namespace DataShare
 } // namespace OHOS

@@ -87,20 +87,15 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
 
     std::string replacedUriStr = TransferUriPrefix(FILE_PREFIX, DATA_SHARE_PREFIX, strUri);
     Uri uri(replacedUriStr);
-    RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::SUCCESS,
-        RadarReporter::BIZ_STATE, RadarReporter::START);
+    RadarReporter::RadarReport report(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER);
     std::shared_ptr<DataShareHelper> helper;
     if (uri.GetQuery().find("Proxy=true") != std::string::npos) {
         auto result = CreateServiceHelper();
         if (result != nullptr && GetSilentProxyStatus(strUri) == E_OK) {
-            RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::SUCCESS,
-                RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
             return result;
         }
         if (extUri.empty()) {
-            RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::FAILED,
-                RadarReporter::BIZ_STATE, RadarReporter::FINISHED,
-                RadarReporter::ERROR_CODE, RadarReporter::DISTRIBUTEDDATA_NOT_START);
+            report.SetError(RadarReporter::EMPTY_PARAM_ERROR);
             return nullptr;
         }
         Uri ext(extUri);
@@ -109,13 +104,9 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
         helper = CreateExtHelper(uri, token);
     }
     if (helper == nullptr) {
-        RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::FAILED,
-            RadarReporter::BIZ_STATE, RadarReporter::FINISHED,
-            RadarReporter::ERROR_CODE, RadarReporter::CREATE_HELPER_ERROR);
+        report.SetError(RadarReporter::CREATE_HELPER_ERROR);
         return helper;
     }
-    RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::SUCCESS,
-        RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
     return helper;
 }
 
@@ -129,21 +120,17 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, 
         return nullptr;
     }
     std::shared_ptr<DataShareHelper> helper;
-    RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::SUCCESS,
-        RadarReporter::BIZ_STATE, RadarReporter::START);
+    RadarReporter::RadarReport report(RadarReporter::CREATE_DATASHARE_HELPER,
+        RadarReporter::CREATE_HELPER);
     if (options.isProxy_) {
         helper = CreateServiceHelper(bundleName);
     } else {
         helper = CreateExtHelper(uri, options.token_);
     }
     if (helper == nullptr) {
-        RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::FAILED,
-            RadarReporter::BIZ_STATE, RadarReporter::FINISHED,
-            RadarReporter::ERROR_CODE, RadarReporter::CREATE_HELPER_ERROR);
+        report.SetError(RadarReporter::CREATE_HELPER_ERROR);
         return helper;
     }
-    RADAR_REPORT(RadarReporter::CREATE_DATASHARE_HELPER, RadarReporter::CREATE_HELPER, RadarReporter::SUCCESS,
-        RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
     return helper;
 }
 
