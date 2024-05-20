@@ -26,17 +26,16 @@ config("ability_config") {
 config("datashare_public_config") {
   visibility = [ ":*" ]
 
-  include_dirs =
-      [ "${datashare_base_path}/interfaces/inner_api/common/include" ]
+  include_dirs = [
+    "${datashare_base_path}/interfaces/inner_api/common/include",
+    "${datashare_base_path}/interfaces/inner_api/consumer/include",
+    "${datashare_common_native_path}/include",
+  ]
 }
 
 datashare_common_include_dirs = [
-  "${datashare_common_native_path}/include",
-  "${datashare_base_path}/interfaces/inner_api/common/include",
-  "${datashare_base_path}/interfaces/inner_api/consumer/include",
   "${datashare_base_path}/interfaces/inner_api/provider/include",
   "${datashare_native_proxy_path}/include",
-  "${kvstore_base_path}/frameworks/common",
 ]
 
 datashare_common_sources = [
@@ -61,6 +60,7 @@ datashare_common_external_deps = [
   "hitrace:hitrace_meter",
   "hitrace:libhitracechain",
   "ipc:ipc_single",
+  "kv_store:distributeddata_inner",
 ]
 
 ohos_shared_library("datashare_common") {

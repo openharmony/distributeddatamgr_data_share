@@ -399,7 +399,6 @@ ohos_unittest("ValueProxyTest") {
 
   include_dirs = [
     "${datashare_base_path}/frameworks/native/common/include/",
-    "${kvstore_base_path}/frameworks/common",
   ]
 
   sources = [ "./unittest/mediadatashare_test/src/valueproxy_test.cpp" ]
@@ -410,5 +409,6 @@ ohos_unittest("ValueProxyTest") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
   ]
 }

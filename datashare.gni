@@ -34,10 +34,6 @@ datashare_native_proxy_path = "${datashare_base_path}/frameworks/native/proxy"
 
 foundation_path = "//foundation"
 
-kvstore_base_path = "//foundation/distributeddatamgr/kv_store"
-
-kvstore_common_path = "${kvstore_base_path}/frameworks/common"
-
 access_token_path = "//base/security/access_token"
 
 base_hiviewdfx_hilog_path = "//base/hiviewdfx/hilog"

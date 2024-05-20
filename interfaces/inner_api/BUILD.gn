@@ -44,7 +44,6 @@ config("datashare_public_config") {
     "${datashare_native_consumer_path}/include",
     "${datashare_native_provider_path}/include",
     "${datashare_native_proxy_path}/include",
-    "${kvstore_common_path}",
   ]
 }
 
@@ -81,7 +80,6 @@ datashare_consumer_external_deps = [
   "hitrace:libhitracechain",
   "ipc:ipc_single",
   "ipc:rpc",
-  "kv_store:distributeddata_inner",
   "samgr:samgr_proxy",
 ]
 
@@ -112,7 +110,6 @@ ohos_shared_library("datashare_consumer") {
   }
   include_dirs = [
     "${datashare_common_native_path}/include",
-    "${kvstore_base_path}/frameworks/common",
   ]
 
   sources = datashare_consumer_sources
@@ -127,7 +124,9 @@ ohos_shared_library("datashare_consumer") {
 
   external_deps = datashare_consumer_external_deps
 
-  public_external_deps = [ "ability_runtime:dataobs_manager" ]
+  public_external_deps = [
+    "ability_runtime:dataobs_manager",
+    "kv_store:distributeddata_inner", ]
 
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
@@ -181,7 +180,6 @@ ohos_shared_library("datashare_provider") {
   }
   include_dirs = [
     "${datashare_common_napi_path}/include",
-    "${kvstore_common_path}",
   ]
 
   sources = [
@@ -217,6 +215,7 @@ ohos_shared_library("datashare_provider") {
     "hilog:libhilog",
     "ipc:ipc_napi",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
@@ -268,7 +267,6 @@ ohos_static_library("datashare_consumer_static") {
   }
   include_dirs = [
     "${datashare_common_native_path}/include",
-    "${kvstore_base_path}/frameworks/common",
   ]
 
   sources = datashare_consumer_sources
@@ -277,6 +275,8 @@ ohos_static_library("datashare_consumer_static") {
   deps = [ "${datashare_innerapi_path}/common:datashare_common_static" ]
 
   external_deps = datashare_consumer_external_deps
+
+  public_external_deps = ["kv_store:distributeddata_inner"]
 
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
