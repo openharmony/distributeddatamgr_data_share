@@ -18,6 +18,7 @@
 namespace OHOS {
 namespace DataShare {
 constexpr int32_t END_SIZE = 10;
+constexpr int32_t ANONYMOUS_SIZE = 12;
 constexpr const char *DEFAULT_ANONYMOUS = "******";
 std::string DataShareStringUtils::Anonymous(const std::string &name)
 {
@@ -37,6 +38,13 @@ void DataShareStringUtils::RemoveFromQuery(std::string &uri)
     uri.resize(pos);
 }
 
+std::string DataShareStringUtils::Change(const std::string &name)
+{
+    if (name.length() <= ANONYMOUS_SIZE) {
+        return name;
+    }
+    return DEFAULT_ANONYMOUS + name.substr(ANONYMOUS_SIZE);
+}
 DataShareStringUtils::DataShareStringUtils() {}
 DataShareStringUtils::~DataShareStringUtils() {}
 } // namespace DataShare

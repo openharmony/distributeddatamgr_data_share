@@ -16,8 +16,9 @@
 #include "datashare_connection.h"
 
 #include "ams_mgr_proxy.h"
-#include "datashare_proxy.h"
 #include "datashare_log.h"
+#include "datashare_proxy.h"
+#include "datashare_string_utils.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -35,8 +36,9 @@ constexpr int WAIT_TIME = 2;
 void DataShareConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    LOG_INFO("on connect done, req ext:%{public}s, rev ext:%{public}s, ret=%{public}d", uri_.ToString().c_str(),
-             element.GetURI().c_str(), resultCode);
+    LOG_INFO("on connect done, req uri:%{public}s, rev uri:%{public}s, ret=%{public}d",
+        DataShareStringUtils::Change(uri_.ToString()).c_str(),
+        DataShareStringUtils::Change(element.GetURI()).c_str(), resultCode);
     if (remoteObject == nullptr) {
         LOG_ERROR("remote is nullptr");
         condition_.condition.notify_all();
@@ -59,8 +61,9 @@ void DataShareConnection::OnAbilityConnectDone(
  */
 void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    LOG_INFO("on disconnect done, req ext:%{public}s, rev ext:%{public}s, ret=%{public}d", uri_.ToString().c_str(),
-             element.GetURI().c_str(), resultCode);
+    LOG_INFO("on disconnect done, req uri:%{public}s, rev uri:%{public}s, ret=%{public}d",
+        DataShareStringUtils::Change(uri_.ToString()).c_str(),
+        DataShareStringUtils::Change(element.GetURI()).c_str(), resultCode);
     std::string uri;
     {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -72,11 +75,12 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
     }
     AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
     if (instance == nullptr) {
-        LOG_ERROR("get proxy failed ext:%{public}s", uri.c_str());
+        LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri_.ToString()).c_str());
         return;
     }
     ErrCode ret = instance->Connect(uri, this, token_);
-    LOG_INFO("reconnect ability, ext:%{public}s, ret = %{public}d", uri.c_str(), ret);
+    LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d",
+        DataShareStringUtils::Change(uri_.ToString()).c_str(), ret);
 }
 
 /**
@@ -96,20 +100,20 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
 
     AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
     if (instance == nullptr) {
-        LOG_ERROR("get proxy failed ext:%{public}s", reqUri.c_str());
+        LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(reqUri).c_str());
         return nullptr;
     }
     ErrCode ret = instance->Connect(reqUri, this, token);
-    LOG_INFO("connect ability, ext = %{public}s. ret = %{public}d", reqUri.c_str(), ret);
+    LOG_INFO("connect ability, uri = %{public}s. ret = %{public}d", DataShareStringUtils::Change(reqUri).c_str(), ret);
     if (ret != ERR_OK) {
         return nullptr;
     }
     std::unique_lock<std::mutex> condLock(condition_.mutex);
     if (condition_.condition.wait_for(condLock, std::chrono::seconds(WAIT_TIME),
         [this] { return dataShareProxy_ != nullptr; })) {
-        LOG_DEBUG("connect ability ended successfully ext:%{public}s", reqUri.c_str());
+        LOG_DEBUG("connect ability ended successfully uri:%{public}s", DataShareStringUtils::Change(reqUri).c_str());
     } else {
-        LOG_WARN("connect timeout ext:%{public}s", reqUri.c_str());
+        LOG_WARN("connect timeout uri:%{public}s", DataShareStringUtils::Change(reqUri).c_str());
     }
     return dataShareProxy_;
 }
@@ -131,12 +135,12 @@ void DataShareConnection::DisconnectDataShareExtAbility()
 
     AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
     if (instance == nullptr) {
-        LOG_ERROR("get proxy failed ext:%{public}s", uri.c_str());
+        LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri).c_str());
         return;
     }
 
     ErrCode ret = instance->DisConnect(this);
-    LOG_INFO("disconnect ext:%{public}s, ret = %{public}d", uri.c_str(), ret);
+    LOG_INFO("disconnect uri:%{public}s, ret = %{public}d", DataShareStringUtils::Change(uri).c_str(), ret);
 }
 
 DataShareConnection::~DataShareConnection()

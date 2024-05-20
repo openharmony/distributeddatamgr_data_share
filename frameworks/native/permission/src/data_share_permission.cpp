@@ -26,30 +26,30 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-int DataSharePermission::VerifyPermission(Security::AccessToken::AccessTokenID token, const Uri &uri, bool isRead)
+int DataSharePermission::VerifyPermission(Security::AccessToken::AccessTokenID tokenID, const Uri &uri, bool isRead)
 {
     if (uri.ToString().empty()) {
-        LOG_ERROR("Uri empty, token:0x%{public}x", token);
+        LOG_ERROR("Uri empty, tokenId:0x%{public}x", tokenID);
         return ERR_INVALID_VALUE;
     }
     DataShareCalledConfig calledConfig(uri.ToString());
-    auto [errCode, providerInfo] = calledConfig.GetProviderInfo(token);
+    auto [errCode, providerInfo] = calledConfig.GetProviderInfo(tokenID);
     if (errCode != E_OK) {
-        LOG_ERROR("ProviderInfo failed! token:0x%{public}x, errCode:%{public}d,uri:%{public}s", token,
+        LOG_ERROR("ProviderInfo failed! token:0x%{public}x, errCode:%{public}d,uri:%{public}s", tokenID,
             errCode, DataShareStringUtils::Anonymous(uri.ToString()).c_str());
         return errCode;
     }
     auto permission = isRead ? providerInfo.readPermission : providerInfo.writePermission;
     if (permission.empty()) {
-        LOG_ERROR("Reject, token:0x%{public}x, uri:%{public}s", token,
+        LOG_ERROR("Reject, tokenId:0x%{public}x, uri:%{public}s", tokenID,
             DataShareStringUtils::Anonymous(providerInfo.uri).c_str());
         return ERR_PERMISSION_DENIED;
     }
     int status =
-        Security::AccessToken::AccessTokenKit::VerifyAccessToken(token, permission);
+        Security::AccessToken::AccessTokenKit::VerifyAccessToken(tokenID, permission);
     if (status != Security::AccessToken::PermissionState::PERMISSION_GRANTED) {
         LOG_ERROR("Permission denied! token:0x%{public}x,permission:%{public}s,uri:%{public}s",
-            token, permission.c_str(), DataShareStringUtils::Anonymous(providerInfo.uri).c_str());
+            tokenID, permission.c_str(), DataShareStringUtils::Anonymous(providerInfo.uri).c_str());
         return ERR_PERMISSION_DENIED;
     }
     return E_OK;
