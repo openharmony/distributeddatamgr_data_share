@@ -108,9 +108,7 @@ ohos_shared_library("datashare_consumer") {
     cfi_cross_dso = true
     debug = false
   }
-  include_dirs = [
-    "${datashare_common_native_path}/include",
-  ]
+  include_dirs = [ "${datashare_common_native_path}/include" ]
 
   sources = datashare_consumer_sources
   configs = [ ":ability_config" ]
@@ -126,7 +124,8 @@ ohos_shared_library("datashare_consumer") {
 
   public_external_deps = [
     "ability_runtime:dataobs_manager",
-    "kv_store:distributeddata_inner", ]
+    "kv_store:distributeddata_inner",
+  ]
 
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
@@ -178,9 +177,7 @@ ohos_shared_library("datashare_provider") {
     cfi_cross_dso = true
     debug = false
   }
-  include_dirs = [
-    "${datashare_common_napi_path}/include",
-  ]
+  include_dirs = [ "${datashare_common_napi_path}/include" ]
 
   sources = [
     "${datashare_common_native_path}/src/datashare_string_utils.cpp",
@@ -265,9 +262,7 @@ ohos_static_library("datashare_consumer_static") {
     cfi_cross_dso = true
     debug = false
   }
-  include_dirs = [
-    "${datashare_common_native_path}/include",
-  ]
+  include_dirs = [ "${datashare_common_native_path}/include" ]
 
   sources = datashare_consumer_sources
   configs = [ ":ability_config" ]
@@ -276,7 +271,7 @@ ohos_static_library("datashare_consumer_static") {
 
   external_deps = datashare_consumer_external_deps
 
-  public_external_deps = ["kv_store:distributeddata_inner"]
+  public_external_deps = [ "kv_store:distributeddata_inner" ]
 
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"

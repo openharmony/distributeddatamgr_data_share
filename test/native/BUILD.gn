@@ -397,9 +397,7 @@ ohos_unittest("AbnormalBranchTest") {
 ohos_unittest("ValueProxyTest") {
   module_out_path = "data_share/native_datashare"
 
-  include_dirs = [
-    "${datashare_base_path}/frameworks/native/common/include/",
-  ]
+  include_dirs = [ "${datashare_base_path}/frameworks/native/common/include/" ]
 
   sources = [ "./unittest/mediadatashare_test/src/valueproxy_test.cpp" ]
 
