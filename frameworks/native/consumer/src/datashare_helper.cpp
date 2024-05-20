@@ -89,7 +89,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
 
     if (uri.GetQuery().find("Proxy=true") != std::string::npos) {
         auto result = CreateServiceHelper();
-        if (result != nullptr && GetSilentProxyStatus(strUri) == E_OK) {
+        if (result != nullptr) {
             return result;
         }
         if (extUri.empty()) {
