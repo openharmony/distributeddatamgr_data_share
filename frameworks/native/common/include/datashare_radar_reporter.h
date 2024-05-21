@@ -38,7 +38,7 @@ enum CreateDataShareHelperStage {
     DISTRIBUTEDDATA_START = 2,
 };
 
-enum HandleDataShareOperationsStage {
+enum SilentAccessStage {
     EXT_REQUEST = 1,
     GET_BMS = 2,
     PROXY_GET_SUPPLIER = 3,

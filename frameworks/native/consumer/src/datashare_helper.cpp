@@ -90,7 +90,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
 
     std::string replacedUriStr = TransferUriPrefix(FILE_PREFIX, DATA_SHARE_PREFIX, strUri);
     Uri uri(replacedUriStr);
-    std::shared_ptr<DataShareHelper> helper;
+    std::shared_ptr<DataShareHelper> helper = nullptr;
     if (uri.GetQuery().find("Proxy=true") != std::string::npos) {
         auto result = CreateServiceHelper();
         if (result != nullptr && GetSilentProxyStatus(strUri) == E_OK) {
@@ -123,8 +123,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, 
         report.SetError(RadarReporter::INVALID_PARAM_ERROR);
         return nullptr;
     }
-    std::shared_ptr<DataShareHelper> helper;
-    helper = options.isProxy_ ? CreateServiceHelper(bundleName) : CreateExtHelper(uri, options.token_);
+    auto helper = options.isProxy_ ? CreateServiceHelper(bundleName) : CreateExtHelper(uri, options.token_);
     if (helper == nullptr) {
         report.SetError(RadarReporter::CREATE_HELPER_ERROR);
     }
