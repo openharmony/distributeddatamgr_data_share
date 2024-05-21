@@ -26,14 +26,14 @@ config("ability_config") {
 config("datashare_public_config") {
   visibility = [ ":*" ]
 
-  include_dirs = [
-    "${datashare_base_path}/interfaces/inner_api/common/include",
-    "${datashare_base_path}/interfaces/inner_api/consumer/include",
-    "${datashare_common_native_path}/include",
-  ]
+  include_dirs =
+      [ "${datashare_base_path}/interfaces/inner_api/common/include" ]
 }
 
 datashare_common_include_dirs = [
+  "${datashare_common_native_path}/include",
+  "${datashare_base_path}/interfaces/inner_api/common/include",
+  "${datashare_base_path}/interfaces/inner_api/consumer/include",
   "${datashare_base_path}/interfaces/inner_api/provider/include",
   "${datashare_native_proxy_path}/include",
 ]
