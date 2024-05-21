@@ -85,6 +85,9 @@ public:
     void RemoveRegisterCallback(GeneralControllerServiceImpl* ptr);
 
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId);
+        
+    static bool CheckBMSReady();
+
 private:
     DataShareManagerImpl();
 

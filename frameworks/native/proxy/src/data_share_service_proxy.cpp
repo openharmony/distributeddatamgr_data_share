@@ -48,7 +48,7 @@ int32_t DataShareServiceProxy::Insert(const Uri &uri, const DataShareValuesBucke
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_INSERT), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Insert fail to SendRequest. uri: %{public}s, err: %{public}d",
+        LOG_ERROR("Insert fail to sendRequest. uri: %{public}s, err: %{public}d",
             DataShareStringUtils::Anonymous(uriStr).c_str(), err);
         return DATA_SHARE_ERROR;
     }
@@ -74,7 +74,7 @@ int32_t DataShareServiceProxy::Update(const Uri &uri,
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_UPDATE), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Update fail to SendRequest. uri: %{public}s, err: %{public}d",
+        LOG_ERROR("Update fail to sendRequest. uri: %{public}s, err: %{public}d",
             DataShareStringUtils::Anonymous(uriStr).c_str(), err);
         return DATA_SHARE_ERROR;
     }
@@ -99,7 +99,7 @@ int32_t DataShareServiceProxy::Delete(const Uri &uri, const DataSharePredicates 
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_DELETE), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Delete fail to SendRequest. uri: %{public}s, err: %{public}d",
+        LOG_ERROR("Delete fail to sendRequest. uri: %{public}s, err: %{public}d",
             DataShareStringUtils::Anonymous(uriStr).c_str(), err);
         return DATA_SHARE_ERROR;
     }
@@ -129,7 +129,7 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri,
     auto result = ISharedResultSet::ReadFromParcel(reply);
     businessError.SetCode(reply.ReadInt32());
     if (err != NO_ERROR) {
-        LOG_ERROR("Query fail to SendRequest. uri: %{public}s, err: %{public}d",
+        LOG_ERROR("Query fail to sendRequest. uri: %{public}s, err: %{public}d",
             DataShareStringUtils::Anonymous(uriStr).c_str(), err);
         return nullptr;
     }
@@ -153,7 +153,7 @@ int DataShareServiceProxy::AddQueryTemplate(const std::string &uri, int64_t subs
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_ADD_TEMPLATE), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("AddTemplate fail to SendRequest. uri: %{public}s, err: %{public}d",
+        LOG_ERROR("AddTemplate fail to sendRequest. uri: %{public}s, err: %{public}d",
             DataShareStringUtils::Anonymous(uri).c_str(), err);
         return DATA_SHARE_ERROR;
     }
@@ -177,7 +177,7 @@ int DataShareServiceProxy::DelQueryTemplate(const std::string &uri, int64_t subs
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_DEL_TEMPLATE), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("AddTemplate fail to SendRequest. uri: %{public}s, err: %{public}d",
+        LOG_ERROR("Delete template fail to sendRequest. uri: %{public}s, err: %{public}d",
             DataShareStringUtils::Anonymous(uri).c_str(), err);
         return DATA_SHARE_ERROR;
     }
@@ -202,7 +202,7 @@ std::vector<OperationResult> DataShareServiceProxy::Publish(const Data &data, co
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_PUBLISH), parcel, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Publish fail to SendRequest. err: %{public}d", err);
+        LOG_ERROR("Publish fail to sendRequest. err: %{public}d", err);
         return results;
     }
 
@@ -228,7 +228,7 @@ Data DataShareServiceProxy::GetPublishedData(const std::string &bundleName, int 
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_GET_DATA), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("AddTemplate fail to SendRequest, err: %{public}d", err);
+        LOG_ERROR("Get published data fail to sendRequest, err: %{public}d", err);
         return results;
     }
     ITypesUtil::Unmarshal(reply, results.datas_, resultCode);
@@ -250,7 +250,7 @@ std::vector<OperationResult> DataShareServiceProxy::SubscribeRdbData(const std::
         return results;
     }
     if (!data.WriteRemoteObject(observer->AsObject())) {
-        LOG_ERROR("failed to WriteParcelable dataObserver ");
+        LOG_ERROR("Failed to write parcelable dataObserver ");
         return results;
     }
 
@@ -259,7 +259,7 @@ std::vector<OperationResult> DataShareServiceProxy::SubscribeRdbData(const std::
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_SUBSCRIBE_RDB), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("SubscribeRdbData fail to SendRequest. err: %{public}d", err);
+        LOG_ERROR("SubscribeRdbData fail to sendRequest. err: %{public}d", err);
         return results;
     }
     ITypesUtil::Unmarshal(reply, results);
@@ -286,7 +286,7 @@ std::vector<OperationResult> DataShareServiceProxy::UnSubscribeRdbData(
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_UNSUBSCRIBE_RDB), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("fail to SendRequest. err: %{public}d", err);
+        LOG_ERROR("Fail to sendRequest. err: %{public}d", err);
         return results;
     }
     ITypesUtil::Unmarshal(reply, results);
@@ -313,7 +313,7 @@ std::vector<OperationResult> DataShareServiceProxy::EnableSubscribeRdbData(
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_ENABLE_SUBSCRIBE_RDB), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("fail to SendRequest. err: %{public}d", err);
+        LOG_ERROR("Fail to sendRequest. err: %{public}d", err);
         return results;
     }
     ITypesUtil::Unmarshal(reply, results);
@@ -340,7 +340,7 @@ std::vector<OperationResult> DataShareServiceProxy::DisableSubscribeRdbData(
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_DISABLE_SUBSCRIBE_RDB), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
+        LOG_ERROR("Disable subscribe RdbData fail to sendRequest. err: %{public}d", err);
         return results;
     }
     ITypesUtil::Unmarshal(reply, results);
@@ -361,7 +361,7 @@ std::vector<OperationResult> DataShareServiceProxy::SubscribePublishedData(
         return results;
     }
     if (!data.WriteRemoteObject(observer->AsObject())) {
-        LOG_ERROR("failed to WriteRemoteObject dataObserver ");
+        LOG_ERROR("Failed to write remote object dataObserver ");
         return results;
     }
 
@@ -370,7 +370,7 @@ std::vector<OperationResult> DataShareServiceProxy::SubscribePublishedData(
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_SUBSCRIBE_PUBLISHED), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
+        LOG_ERROR("Subscribe published data fail to sendRequest. err: %{public}d", err);
         return results;
     }
     ITypesUtil::Unmarshal(reply, results);
@@ -396,7 +396,7 @@ std::vector<OperationResult> DataShareServiceProxy::UnSubscribePublishedData(
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_UNSUBSCRIBE_PUBLISHED), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
+        LOG_ERROR("UnSubscribe published data fail to sendRequest. err: %{public}d", err);
         return results;
     }
     ITypesUtil::Unmarshal(reply, results);
@@ -422,7 +422,7 @@ std::vector<OperationResult> DataShareServiceProxy::EnableSubscribePublishedData
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_ENABLE_SUBSCRIBE_PUBLISHED), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
+        LOG_ERROR("Enable subscribe published data fail to sendRequest. err: %{public}d", err);
         return results;
     }
     ITypesUtil::Unmarshal(reply, results);
@@ -448,7 +448,7 @@ std::vector<OperationResult> DataShareServiceProxy::DisableSubscribePublishedDat
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_DISABLE_SUBSCRIBE_PUBLISHED), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("AddTemplate fail to SendRequest. err: %{public}d", err);
+        LOG_ERROR("Disable subscribe published data fail to sendRequest. err: %{public}d", err);
         return results;
     }
     ITypesUtil::Unmarshal(reply, results);
@@ -472,7 +472,7 @@ void DataShareServiceProxy::Notify(const std::string &uri)
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_NOTIFY_OBSERVERS), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Notify fail to SendRequest. err: %{public}d", err);
+        LOG_ERROR("Notify fail to sendRequest. err: %{public}d", err);
         return;
     }
 }
@@ -495,7 +495,7 @@ int DataShareServiceProxy::SetSilentSwitch(const Uri &uri, bool enable)
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_SET_SILENT_SWITCH), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("SetSilentSwitch fail to SendRequest. uri: %{public}s, err: %{public}d",
+        LOG_ERROR("SetSilentSwitch fail to sendRequest. uri: %{public}s, err: %{public}d",
             DataShareStringUtils::Anonymous(uriStr).c_str(), err);
         return DATA_SHARE_ERROR;
     }
@@ -519,7 +519,7 @@ int DataShareServiceProxy::GetSilentProxyStatus(const std::string &uri)
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_GET_SILENT_PROXY_STATUS), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Is silent proxy enable fail to SendRequest. uri: %{public}s, err: %{public}d",
+        LOG_ERROR("Is silent proxy enable fail to sendRequest. uri: %{public}s, err: %{public}d",
             DataShareStringUtils::Anonymous(uri).c_str(), err);
         return DATA_SHARE_ERROR;
     }
