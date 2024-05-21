@@ -103,6 +103,18 @@ constexpr int E_METADATA_NOT_EXISTS = (E_BASE + 51);
 * @brief silent proxy is disable
 */
 constexpr int E_SILENT_PROXY_DISABLE = (E_BASE + 52);
+/**
+* @brief token is empty
+*/
+constexpr int E_TOKEN_EMPTY = (E_BASE + 53);
+/**
+* @brief ext uri is empty
+*/
+constexpr int E_EXT_URI_INVALID = (E_BASE + 54);
+/**
+* @brief DataShare not ready
+*/
+constexpr int E_DATA_SHARE_NOT_READY = (E_BASE + 55);
 } // namespace DataShare
 } // namespace OHOS
 
