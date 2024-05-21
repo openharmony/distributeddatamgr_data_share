@@ -17,6 +17,7 @@
 
 #include <thread>
 
+#include "datashare_errno.h"
 #include "datashare_log.h"
 #include "ikvstore_data_service.h"
 #include "ipc_skeleton.h"
@@ -54,7 +55,6 @@ DataShareManagerImpl* DataShareManagerImpl::GetInstance()
     saManager->SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, callback);
     return manager_;
 }
-
 
 sptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
 {
@@ -232,6 +232,15 @@ void DataShareManagerImpl::OnAddSystemAbility(int32_t systemAbilityId, const std
         callback();
         return false;
     });
+}
+
+bool DataShareManagerImpl::CheckBMSReady()
+{
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        return false;
+    }
+    return saManager->CheckSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID) != nullptr;
 }
 }
 }
