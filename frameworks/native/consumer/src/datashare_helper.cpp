@@ -138,10 +138,6 @@ int DataShareHelper::GetSilentProxyStatus(const std::string &uri)
         LOG_ERROR("Service proxy is nullptr.");
         return E_ERROR;
     }
-    if (!DataShareManagerImpl::CheckBMSReady()) {
-        LOG_ERROR("BMS is not ready, uri:%{public}s", DataShareStringUtils::Anonymous(uri).c_str());
-        return E_BMS_NOT_READY;
-    }
     return proxy->GetSilentProxyStatus(uri);
 }
 
