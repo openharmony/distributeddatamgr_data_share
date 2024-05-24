@@ -36,6 +36,8 @@ enum BizScene {
 enum CreateDataShareHelperStage {
     CREATE_HELPER = 1,
     DISTRIBUTEDDATA_START = 2,
+    CONNECT_EXT = 3,
+    DIS_CONNECT_EXT = 4,
 };
 
 enum SilentAccessStage {
@@ -89,6 +91,8 @@ enum ErrorCode {
     CREATE_SHARE_BLOCK_ERROR,
     SHARE_BLOCK_FULL,
     DISTRIBUTEDDATA_NOT_START,
+    EXT_CONNECT_TIMEOUT_ERROR,
+    EXT_DIS_CONNECT_ERROR,
     GET_BMS_FAILED,
     SUPPLIER_ERROR,
     URI_ERROR,
@@ -117,6 +121,9 @@ constexpr const char* EVENT_NAME = "DISTRIBUTED_DATA_SHARE_BEHAVIOR";
 constexpr const char* ORG_PKG = "distributeddata";
 constexpr const char* BIZ_STATE = "BIZ_STATE";
 constexpr const char* ERROR_CODE = "ERROR_CODE";
+constexpr const char* LOCAL_SESS_NAME = "LOCAL_SESS_NAME";
+constexpr const char* PEER_SESS_NAME = "PEER_SESS_NAME";
+
 static constexpr HiviewDFX::HiSysEvent::EventType TYPE = HiviewDFX::HiSysEvent::EventType::BEHAVIOR;
 
 #define RADAR_REPORT(funcName, bizScene, bizStage, stageRes, ...)                          \
