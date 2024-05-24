@@ -28,6 +28,8 @@ public:
 
     static void RemoveFromQuery(std::string &uri);
 
+    static std::string Change(const std::string &name);
+
 private:
     DataShareStringUtils();
     ~DataShareStringUtils();

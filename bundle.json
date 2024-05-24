@@ -60,13 +60,13 @@
                 "hitrace",
                 "hilog",
                 "ipc",
+                "kv_store",
+                "libuv",
                 "napi",
                 "relational_store",
                 "samgr"
             ],
-            "third_party": [
-                "libuv"
-            ]
+            "third_party": []
         },
         "build": {
             "group_type": {

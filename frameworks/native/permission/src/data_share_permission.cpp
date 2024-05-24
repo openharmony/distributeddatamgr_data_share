@@ -29,8 +29,7 @@ using namespace AppExecFwk;
 int DataSharePermission::VerifyPermission(Security::AccessToken::AccessTokenID tokenID, const Uri &uri, bool isRead)
 {
     if (uri.ToString().empty()) {
-        LOG_ERROR("Uri empty, tokenId:0x%{public}x, uri:%{public}s", tokenID,
-            DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+        LOG_ERROR("Uri empty, tokenId:0x%{public}x", tokenID);
         return ERR_INVALID_VALUE;
     }
     DataShareCalledConfig calledConfig(uri.ToString());

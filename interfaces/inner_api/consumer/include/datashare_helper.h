@@ -74,6 +74,19 @@ public:
         const std::string &bundleName = "");
 
     /**
+     * @brief Creates a DataShareHelper instance, priority silent access, use non-silent access when silent is not
+     * available, at this time, it is necessary to apply for communication permission with the extension.
+     *
+     * @param token Indicates the System token.
+     * @param strUri Indicates the database table or disk file to operate for silent access.
+     * @param extUri Indicates the database table or disk file to operate for non silent access.
+     *
+     * @return Returns the created DataShareHelper instance with a specified Uri.
+     */
+    static std::pair<int, std::shared_ptr<DataShareHelper>> Create(const sptr<IRemoteObject> &token,
+        const std::string &strUri, const std::string &extUri);
+
+    /**
      * @brief Releases the client resource of the Data share.
      * You should call this method to releases client resource after the data operations are complete.
      *
@@ -409,6 +422,10 @@ private:
 
     static std::string TransferUriPrefix(const std::string &originPrefix, const std::string &replacedPrefix,
         const std::string &originUriStr);
+
+    static bool IsProxy(Uri &uri);
+
+    static std::pair<int, std::shared_ptr<DataShareHelper>> CreateProxyHelper(const std::string &strUri);
 };
 } // namespace DataShare
 } // namespace OHOS

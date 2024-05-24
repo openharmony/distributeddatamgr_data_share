@@ -11,16 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ability_runtime_path = "//foundation/ability/ability_runtime"
-
-ability_runtime_inner_api_path = "${ability_runtime_path}/interfaces/inner_api"
-
-ability_runtime_kits_path = "${ability_runtime_path}/frameworks/kits"
-
-ability_runtime_services_path = "${ability_runtime_path}/services"
-
-ability_runtime_napi_path = "${ability_runtime_path}/frameworks/js/napi"
-
 datashare_base_path = "//foundation/distributeddatamgr/data_share"
 
 datashare_common_native_path = "${datashare_base_path}/frameworks/native/common"
@@ -43,10 +33,6 @@ datashare_native_permission_path =
 datashare_native_proxy_path = "${datashare_base_path}/frameworks/native/proxy"
 
 foundation_path = "//foundation"
-
-kvstore_base_path = "//foundation/distributeddatamgr/kv_store"
-
-kvstore_common_path = "${kvstore_base_path}/frameworks/common"
 
 access_token_path = "//base/security/access_token"
 

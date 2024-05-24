@@ -56,7 +56,6 @@ DataShareManagerImpl* DataShareManagerImpl::GetInstance()
     return manager_;
 }
 
-
 sptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
 {
     auto manager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();

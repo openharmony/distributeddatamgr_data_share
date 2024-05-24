@@ -24,7 +24,6 @@ ohos_shared_library("datashare_jscommon") {
   include_dirs = [
     "${datashare_common_native_path}/include",
     "${datashare_common_napi_path}/include",
-    "${kvstore_common_path}",
   ]
 
   sources = [
@@ -46,6 +45,7 @@ ohos_shared_library("datashare_jscommon") {
     "hitrace:libhitracechain",
     "ipc:ipc_napi",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "napi:ace_napi",
   ]
 
@@ -84,7 +84,6 @@ ohos_shared_library("datashare") {
     ":datashare_jscommon",
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
-    "//third_party/libuv:uv",
   ]
 
   external_deps = [
@@ -101,6 +100,8 @@ ohos_shared_library("datashare") {
     "hitrace:hitrace_meter",
     "hitrace:libhitracechain",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
+    "libuv:uv",
     "napi:ace_napi",
   ]
 
@@ -134,6 +135,7 @@ ohos_shared_library("datasharepredicates") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "napi:ace_napi",
   ]
 
