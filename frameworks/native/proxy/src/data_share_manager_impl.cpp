@@ -18,6 +18,7 @@
 #include <thread>
 
 #include "datashare_log.h"
+#include "datashare_radar_reporter.h"
 #include "ikvstore_data_service.h"
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
@@ -96,6 +97,9 @@ sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
     }
     if (dataMgrService_ == nullptr) {
         LOG_ERROR("Get distributed data manager failed!");
+        RADAR_REPORT(__FUNCTION__, RadarReporter::CREATE_DATASHARE_HELPER,
+            RadarReporter::DISTRIBUTEDDATA_START, RadarReporter::FAILED,
+            RadarReporter::ERROR_CODE, RadarReporter::DISTRIBUTEDDATA_NOT_START);
         return nullptr;
     }
     auto remote = dataMgrService_->GetFeatureInterface("data_share");
