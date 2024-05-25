@@ -133,9 +133,12 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, 
 std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::Create(const sptr<IRemoteObject> &token,
     const std::string &strUri, const std::string &extUri)
 {
+    RadarReporter::RadarReport report(RadarReporter::CREATE_DATASHARE_HELPER,
+        RadarReporter::CREATE_HELPER, __FUNCTION__);
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     if (token == nullptr) {
         LOG_ERROR("Create helper failed, err: %{public}d", E_TOKEN_EMPTY);
+        report.SetError(RadarReporter::INVALID_PARAM_ERROR);
         return std::make_pair(E_TOKEN_EMPTY, nullptr);
     }
     Uri uri(strUri);
@@ -145,10 +148,12 @@ std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::Create(const s
             return std::make_pair(E_OK, helper);
         }
         if (ret == E_BMS_NOT_READY) {
+            report.SetError(RadarReporter::GET_BMS_FAILED);
             LOG_ERROR("BMS not ready, err: %{public}d", E_BMS_NOT_READY);
             return std::make_pair(E_DATA_SHARE_NOT_READY, nullptr);
         }
         if (extUri.empty()) {
+            report.SetError(RadarReporter::INVALID_PARAM_ERROR);
             LOG_ERROR("Ext uri empty, err: %{public}d", E_EXT_URI_INVALID);
             return std::make_pair(E_EXT_URI_INVALID, nullptr);
         }
@@ -158,6 +163,7 @@ std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::Create(const s
     if (helper != nullptr) {
         return std::make_pair(E_OK, helper);
     }
+    report.SetError(RadarReporter::CREATE_HELPER_ERROR);
     return std::make_pair(E_ERROR, nullptr);
 }
 
