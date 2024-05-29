@@ -48,7 +48,8 @@ int32_t DataShareServiceProxy::Insert(const Uri &uri, const DataShareValuesBucke
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_INSERT), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Insert fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
+        LOG_ERROR("Insert fail to SendRequest. uri: %{public}s, err: %{public}d",
+            DataShareStringUtils::Anonymous(uriStr).c_str(), err);
         return DATA_SHARE_ERROR;
     }
     return reply.ReadInt32();
@@ -73,7 +74,8 @@ int32_t DataShareServiceProxy::Update(const Uri &uri,
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_UPDATE), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Update fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
+        LOG_ERROR("Update fail to SendRequest. uri: %{public}s, err: %{public}d",
+            DataShareStringUtils::Anonymous(uriStr).c_str(), err);
         return DATA_SHARE_ERROR;
     }
     return reply.ReadInt32();
@@ -97,7 +99,8 @@ int32_t DataShareServiceProxy::Delete(const Uri &uri, const DataSharePredicates 
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_DELETE), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Delete fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
+        LOG_ERROR("Delete fail to SendRequest. uri: %{public}s, err: %{public}d",
+            DataShareStringUtils::Anonymous(uriStr).c_str(), err);
         return DATA_SHARE_ERROR;
     }
     return reply.ReadInt32();
@@ -126,7 +129,8 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri,
     auto result = ISharedResultSet::ReadFromParcel(reply);
     businessError.SetCode(reply.ReadInt32());
     if (err != NO_ERROR) {
-        LOG_ERROR("Query fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
+        LOG_ERROR("Query fail to SendRequest. uri: %{public}s, err: %{public}d",
+            DataShareStringUtils::Anonymous(uriStr).c_str(), err);
         return nullptr;
     }
     return result;
@@ -149,7 +153,8 @@ int DataShareServiceProxy::AddQueryTemplate(const std::string &uri, int64_t subs
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_ADD_TEMPLATE), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("AddTemplate fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
+        LOG_ERROR("AddTemplate fail to SendRequest. uri: %{public}s, err: %{public}d",
+            DataShareStringUtils::Anonymous(uri).c_str(), err);
         return DATA_SHARE_ERROR;
     }
     return reply.ReadInt32();
@@ -172,7 +177,8 @@ int DataShareServiceProxy::DelQueryTemplate(const std::string &uri, int64_t subs
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_DEL_TEMPLATE), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("AddTemplate fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
+        LOG_ERROR("AddTemplate fail to SendRequest. uri: %{public}s, err: %{public}d",
+            DataShareStringUtils::Anonymous(uri).c_str(), err);
         return DATA_SHARE_ERROR;
     }
     return reply.ReadInt32();
@@ -489,7 +495,8 @@ int DataShareServiceProxy::SetSilentSwitch(const Uri &uri, bool enable)
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_SET_SILENT_SWITCH), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("SetSilentSwitch fail to SendRequest. uri: %{public}s, err: %{public}d", uriStr.c_str(), err);
+        LOG_ERROR("SetSilentSwitch fail to SendRequest. uri: %{public}s, err: %{public}d",
+            DataShareStringUtils::Anonymous(uriStr).c_str(), err);
         return DATA_SHARE_ERROR;
     }
     return reply.ReadInt32();
@@ -512,7 +519,8 @@ bool DataShareServiceProxy::IsSilentProxyEnable(const std::string &uri)
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_IS_SILENT_PROXY_ENABLE), data, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("Is silent proxy enable fail to SendRequest. uri: %{public}s, err: %{public}d", uri.c_str(), err);
+        LOG_ERROR("Is silent proxy enable fail to SendRequest. uri: %{public}s, err: %{public}d",
+            DataShareStringUtils::Anonymous(uri).c_str(), err);
         return false;
     }
     bool enable = false;
