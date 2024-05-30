@@ -15,6 +15,7 @@
 #include "ams_mgr_proxy.h"
 
 #include "datashare_log.h"
+#include "datashare_string_utils.h"
 #include "extension_ability_info.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
@@ -66,7 +67,7 @@ __attribute__ ((no_sanitize("cfi"))) int AmsMgrProxy::Connect(
     want.SetUri(uri);
     std::lock_guard<std::mutex> lock(mutex_);
     if (ConnectSA()) {
-        LOG_INFO("connect start, uri = %{public}s", uri.c_str());
+        LOG_INFO("connect start, uri = %{public}s", DataShareStringUtils::Change(uri).c_str());
         return proxy_->ConnectAbilityCommon(want, connect, callerToken, AppExecFwk::ExtensionAbilityType::DATASHARE);
     }
     return -1;
