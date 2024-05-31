@@ -17,6 +17,8 @@ import("//foundation/distributeddatamgr/data_share/datashare.gni")
 ohos_shared_library("datashare_jscommon") {
   branch_protector_ret = "pac_ret"
   sanitize = {
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
@@ -56,6 +58,8 @@ ohos_shared_library("datashare_jscommon") {
 ohos_shared_library("datashare") {
   branch_protector_ret = "pac_ret"
   sanitize = {
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
@@ -114,6 +118,8 @@ ohos_shared_library("datashare") {
 ohos_shared_library("datasharepredicates") {
   branch_protector_ret = "pac_ret"
   sanitize = {
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false

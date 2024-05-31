@@ -66,6 +66,8 @@ datashare_common_external_deps = [
 ohos_shared_library("datashare_common") {
   branch_protector_ret = "pac_ret"
   sanitize = {
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
@@ -95,6 +97,8 @@ ohos_shared_library("datashare_common") {
 ohos_static_library("datashare_common_static") {
   branch_protector_ret = "pac_ret"
   sanitize = {
+    ubsan = true
+    boundary_sanitize = true
     cfi = true
     cfi_cross_dso = true
     debug = false
