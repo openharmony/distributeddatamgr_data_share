@@ -28,15 +28,19 @@ AsyncCall::AsyncCall(napi_env env, napi_callback_info info, std::shared_ptr<Cont
     napi_value argv[ARGS_MAX_COUNT] = {nullptr};
     NAPI_CALL_RETURN_VOID(env, napi_get_cb_info(env, info, &argc, argv, &self, nullptr));
     napi_valuetype valueType = napi_undefined;
-    napi_typeof(env, argv[argc - 1], &valueType);
-    if (valueType == napi_function) {
-        napi_create_reference(env, argv[argc - 1], 1, &context_->callback);
-        argc = argc - 1;
+    if (argc > 0) {
+        napi_typeof(env, argv[argc - 1], &valueType);
+        if (valueType == napi_function) {
+            napi_create_reference(env, argv[argc - 1], 1, &context_->callback);
+            argc = argc - 1;
+        }
+        napi_status status = (*context)(env, argc, argv, self);
+        NAPI_ASSERT_ERRCODE(env, status == napi_ok, context->error);
+        context_->ctx = std::move(context);
+        napi_create_reference(env, self, 1, &context_->self);
+    } else {
+        LOG_DEBUG("get argc value less than zero");
     }
-    napi_status status = (*context)(env, argc, argv, self);
-    NAPI_ASSERT_ERRCODE(env, status == napi_ok, context->error);
-    context_->ctx = std::move(context);
-    napi_create_reference(env, self, 1, &context_->self);
 }
 
 AsyncCall::~AsyncCall()
