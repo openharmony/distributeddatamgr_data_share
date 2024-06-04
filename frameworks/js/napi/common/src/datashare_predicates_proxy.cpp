@@ -70,6 +70,9 @@ napi_value DataSharePredicatesProxy::GetConstructor(napi_env env)
 
 void DataSharePredicatesProxy::Init(napi_env env, napi_value exports)
 {
+    // In asan version, the thread underline maybe reused and thread-local may not be cleared, this will
+    // cause use-after-free.
+    constructor_ = nullptr;
     napi_value cons = GetConstructor(env);
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, exports, "DataSharePredicates", cons));
 }
