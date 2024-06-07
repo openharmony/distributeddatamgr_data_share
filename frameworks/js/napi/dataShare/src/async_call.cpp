@@ -34,13 +34,13 @@ AsyncCall::AsyncCall(napi_env env, napi_callback_info info, std::shared_ptr<Cont
             napi_create_reference(env, argv[argc - 1], 1, &context_->callback);
             argc = argc - 1;
         }
-        napi_status status = (*context)(env, argc, argv, self);
-        NAPI_ASSERT_ERRCODE(env, status == napi_ok, context->error);
-        context_->ctx = std::move(context);
-        napi_create_reference(env, self, 1, &context_->self);
     } else {
         LOG_DEBUG("get argc value less than zero");
     }
+    napi_status status = (*context)(env, argc, argv, self);
+    NAPI_ASSERT_ERRCODE(env, status == napi_ok, context->error);
+    context_->ctx = std::move(context);
+    napi_create_reference(env, self, 1, &context_->self);
 }
 
 AsyncCall::~AsyncCall()
