@@ -58,8 +58,8 @@ public:
 
     std::vector<std::shared_ptr<Observer>> GetEnabledObservers(const Key &);
 
-    int GetEnabledSubscriberSize();
-    int GetEnabledSubscriberSize(const Key &key);
+    int GetAllSubscriberSize();
+    int GetAllSubscriberSize(const Key &key);
     std::vector<Key> GetKeys();
     void SetObserversNotifiedOnEnabled(const Key &key);
 
@@ -315,32 +315,25 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::DisableObservers(c
 }
 
 template<class Key, class Observer>
-int CallbacksManager<Key, Observer>::GetEnabledSubscriberSize()
+int CallbacksManager<Key, Observer>::GetAllSubscriberSize()
 {
     int count = 0;
     std::lock_guard<decltype(mutex_)> lck(mutex_);
     for (auto &[key, value] : callbacks_) {
-        count += GetEnabledSubscriberSize(key);
+        count += GetAllSubscriberSize(key);
     }
     return count;
 }
 
 template<class Key, class Observer>
-int CallbacksManager<Key, Observer>::GetEnabledSubscriberSize(const Key &key)
+int CallbacksManager<Key, Observer>::GetAllSubscriberSize(const Key &key)
 {
     std::lock_guard<decltype(mutex_)> lck(mutex_);
-    int count = 0;
     auto it = callbacks_.find(key);
     if (it == callbacks_.end()) {
-        return count;
+        return 0;
     }
-    std::vector<ObserverNode> &callbacks = it->second;
-    for (const auto &callback : callbacks) {
-        if (callback.enabled_) {
-            count++;
-        }
-    }
-    return count;
+    return it->second.size();
 }
 
 template<class Key, class Observer>

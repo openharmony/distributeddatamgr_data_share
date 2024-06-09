@@ -15,6 +15,7 @@
 
 #include "data_share_service_proxy.h"
 
+#include <cinttypes>
 #include "data_ability_observer_interface.h"
 #include "datashare_itypes_utils.h"
 #include "datashare_log.h"
@@ -239,6 +240,10 @@ std::vector<OperationResult> DataShareServiceProxy::SubscribeRdbData(const std::
     const TemplateId &templateId, const sptr<IDataProxyRdbObserver> &observer)
 {
     std::vector<OperationResult> results;
+    if (observer == nullptr) {
+        LOG_ERROR("Observer is nullptr, subscriberId: %{public}" PRId64, templateId.subscriberId_);
+        return results;
+    }
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed!");
@@ -351,6 +356,10 @@ std::vector<OperationResult> DataShareServiceProxy::SubscribePublishedData(
     const std::vector<std::string> &uris, int64_t subscriberId, const sptr<IDataProxyPublishedDataObserver> &observer)
 {
     std::vector<OperationResult> results;
+    if (observer == nullptr) {
+        LOG_ERROR("Observer is nullptr, subscriberId: %{public}" PRId64, subscriberId);
+        return results;
+    }
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("Write descriptor failed!");
