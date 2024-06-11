@@ -104,10 +104,6 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
                 return;
             }
             auto unsubResult = proxy->UnSubscribeRdbData(lastDelUris, templateId);
-            if (BaseCallbacks::GetAllSubscriberSize() == 0) {
-                LOG_INFO("no valid subscriber, delete callback");
-                serviceCallback_ = nullptr;
-            }
             opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
             Destroy();
         });
