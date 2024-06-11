@@ -116,10 +116,6 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
                 return;
             }
             auto unsubResult = proxy->UnSubscribePublishedData(lastDelUris, subscriberId);
-            if (BaseCallbacks::GetEnabledSubscriberSize() == 0) {
-                LOG_INFO("no valid subscriber, delete callback");
-                serviceCallback_ = nullptr;
-            }
             opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
             Destroy();
         });
@@ -299,7 +295,7 @@ bool PublishedDataSubscriberManager::Init()
 
 void PublishedDataSubscriberManager::Destroy()
 {
-    if (BaseCallbacks::GetEnabledSubscriberSize() == 0) {
+    if (BaseCallbacks::GetAllSubscriberSize() == 0) {
         if (serviceCallback_ != nullptr) {
             serviceCallback_->ClearCallback();
         }
