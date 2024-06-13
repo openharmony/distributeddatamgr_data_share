@@ -16,6 +16,7 @@
 #include "general_controller_provider_impl.h"
 
 #include "datashare_log.h"
+#include "datashare_string_utils.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -95,7 +96,9 @@ void GeneralControllerProviderImpl::RegisterObserver(const Uri &uri,
         LOG_ERROR("proxy is nullptr");
         return;
     }
-    proxy->RegisterObserver(uri, dataObserver);
+    bool ret = proxy->RegisterObserver(uri, dataObserver);
+    LOG_INFO("Register non-silent observer ret: %{public}d, uri: %{public}s", ret,
+        DataShareStringUtils::Anonymous(uri.ToString()).c_str());
 }
 
 void GeneralControllerProviderImpl::UnregisterObserver(const Uri &uri,
@@ -111,7 +114,9 @@ void GeneralControllerProviderImpl::UnregisterObserver(const Uri &uri,
         LOG_ERROR("proxy is nullptr");
         return;
     }
-    proxy->UnregisterObserver(uri, dataObserver);
+    bool ret = proxy->UnregisterObserver(uri, dataObserver);
+    LOG_INFO("Unregister non-silent observer ret: %{public}d, uri: %{public}s", ret,
+        DataShareStringUtils::Anonymous(uri.ToString()).c_str());
 }
 
 void GeneralControllerProviderImpl::NotifyChange(const Uri &uri)

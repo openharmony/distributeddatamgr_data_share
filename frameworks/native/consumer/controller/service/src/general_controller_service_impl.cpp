@@ -80,7 +80,7 @@ void GeneralControllerServiceImpl::RegisterObserver(const Uri &uri,
         return;
     }
     ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
-    LOG_INFO("Register observer ret: %{public}d, uri: %{public}s", ret,
+    LOG_INFO("Register silent observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
 }
 
@@ -93,7 +93,7 @@ void GeneralControllerServiceImpl::UnregisterObserver(const Uri &uri,
         return;
     }
     ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver);
-    LOG_INFO("Unregister observer ret: %{public}d, uri: %{public}s", ret,
+    LOG_INFO("Unregister silent observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
 }
 
