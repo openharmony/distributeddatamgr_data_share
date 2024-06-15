@@ -16,6 +16,7 @@
 #include "datashare_connection.h"
 
 #include "ams_mgr_proxy.h"
+#include "data_share_manager_impl.h"
 #include "datashare_errno.h"
 #include "datashare_log.h"
 #include "datashare_proxy.h"
@@ -99,7 +100,12 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
         }
         reqUri = uri_.ToString().empty() ? uri.ToString() : uri_.ToString();
     }
-
+    auto manager = DataShareManagerImpl::GetInstance();
+    if (manager == nullptr) {
+        LOG_ERROR("Manager is nullptr");
+        return nullptr;
+    }
+    manager->SetCallCount(__FUNCTION__);
     AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
     if (instance == nullptr) {
         LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(reqUri).c_str());

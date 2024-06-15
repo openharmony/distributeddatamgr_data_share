@@ -15,6 +15,7 @@
 
 #include "data_share_manager_impl.h"
 
+#include <cinttypes>
 #include <thread>
 
 #include "datashare_log.h"
@@ -235,6 +236,27 @@ void DataShareManagerImpl::OnAddSystemAbility(int32_t systemAbilityId, const std
         callback();
         return false;
     });
+}
+
+void DataShareManagerImpl::SetCallCount(const std::string &funcName)
+{
+    auto callCount = 0;
+    auto iter = funcCounts.find(funcName);
+    if (iter != funcCounts.end()) {
+        callCount = iter->second;
+    }
+    if (callCount == 0) {
+        funcTime[funcName] = std::chrono::steady_clock::now();
+    }
+    if (callCount++ % RESET_COUNT_THRESHOLD == 0) {
+        auto firstCallTime = funcTime[funcName];
+        auto first = std::chrono::duration_cast<std::chrono::milliseconds>(firstCallTime.time_since_epoch()).count();
+        auto now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+        LOG_WARN("Calls %{public}s the threshold, first:%{public}" PRIi64 "ms, now:%{public}" PRIi64 "ms", funcName.c_str(), first, now);
+        callCount = 0;
+        funcTime.erase(funcName);
+    }
+    funcCounts.insert_or_assign(funcName, callCount);
 }
 }
 }
