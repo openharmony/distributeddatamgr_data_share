@@ -149,8 +149,7 @@ std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::Create(const s
         }
         if (ret == E_BMS_NOT_READY) {
             report.SetError(RadarReporter::GET_BMS_FAILED);
-            LOG_ERROR("BMS not ready, err: %{public}d, uri:%{publish}s", E_BMS_NOT_READY,
-                DataShareStringUtils::Change(strUri).c_str());
+            LOG_ERROR("BMS not ready, uri:%{publish}s", DataShareStringUtils::Change(strUri).c_str());
             return std::make_pair(E_DATA_SHARE_NOT_READY, nullptr);
         }
         if (ret == E_BUNDLE_NAME_NOT_EXIST) {
