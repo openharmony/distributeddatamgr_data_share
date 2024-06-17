@@ -46,10 +46,18 @@ void DataShareConnection::OnAbilityConnectDone(
         condition_.condition.notify_all();
         return;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
-    sptr<DataShareProxy> proxy = new (std::nothrow) DataShareProxy(remoteObject);
-    dataShareProxy_ = std::shared_ptr<DataShareProxy>(proxy.GetRefPtr(), [holder = proxy](const auto *) {});
-    condition_.condition.notify_all();
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        sptr<DataShareProxy> proxy = new (std::nothrow) DataShareProxy(remoteObject);
+        dataShareProxy_ = std::shared_ptr<DataShareProxy>(proxy.GetRefPtr(), [holder = proxy](const auto *) {});
+        condition_.condition.notify_all();
+    }
+    if (isInvalid_.load()) {
+        LOG_ERROR("connect is invalid, req uri:%{public}s, rev uri:%{public}s, ret=%{public}d",
+            DataShareStringUtils::Change(uri_.ToString()).c_str(),
+            DataShareStringUtils::Change(element.GetURI()).c_str(), resultCode);
+        Disconnect();
+    }
 }
 
 /**
@@ -144,13 +152,7 @@ void DataShareConnection::DisconnectDataShareExtAbility()
         }
     }
 
-    AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
-    if (instance == nullptr) {
-        LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri).c_str());
-        return;
-    }
-
-    ErrCode ret = instance->DisConnect(this);
+    ErrCode ret = Disconnect();
     LOG_INFO("disconnect uri:%{public}s, ret = %{public}d", DataShareStringUtils::Change(uri).c_str(), ret);
     if (ret == E_OK) {
         RADAR_REPORT(__FUNCTION__, RadarReporter::CREATE_DATASHARE_HELPER,
@@ -174,6 +176,20 @@ std::shared_ptr<DataShareProxy> DataShareConnection::GetDataShareProxy(const Uri
     const sptr<IRemoteObject> &token)
 {
     return ConnectDataShareExtAbility(uri, token);
+}
+
+void DataShareConnection::SetConnectInvalid()
+{
+    isInvalid_.store(true);
+}
+
+ErrCode DataShareConnection::Disconnect()
+{
+    AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
+    if (instance == nullptr) {
+        return -1;
+    }
+    return instance->DisConnect(this);
 }
 }  // namespace DataShare
 }  // namespace OHOS

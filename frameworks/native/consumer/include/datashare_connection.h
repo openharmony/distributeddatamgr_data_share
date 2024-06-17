@@ -68,17 +68,21 @@ public:
      */
     std::shared_ptr<DataShareProxy> GetDataShareProxy(const Uri &uri, const sptr<IRemoteObject> &token);
 
+    void SetConnectInvalid();
+
 private:
     struct ConnectCondition {
         std::condition_variable condition;
         std::mutex mutex;
     };
     std::shared_ptr<DataShareProxy> ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
+    ErrCode Disconnect();
     std::mutex mutex_{};
     std::shared_ptr<DataShareProxy> dataShareProxy_;
     ConnectCondition condition_;
     Uri uri_;
     sptr<IRemoteObject> token_ = {};
+    std::atomic<bool> isInvalid_ = false;
 };
 }  // namespace DataShare
 }  // namespace OHOS
