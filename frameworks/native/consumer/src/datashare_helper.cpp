@@ -201,6 +201,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
     }
     auto dataShareConnection =
         std::shared_ptr<DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
+            holder->SetConnectInvalid();
             holder->DisconnectDataShareExtAbility();
         });
     if (dataShareConnection->GetDataShareProxy(uri, token) == nullptr) {
