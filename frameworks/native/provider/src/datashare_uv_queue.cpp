@@ -32,7 +32,7 @@ DataShareUvQueue::DataShareUvQueue(napi_env env)
 
 void DataShareUvQueue::LambdaForWork(uv_work_t *work, int uvstatus)
 {
-    if (work == nullptr || work->data == nullptr) {
+    if (UV_ECANCELED == uvstatus || work == nullptr || work->data == nullptr) {
         LOG_ERROR("invalid work or work->data.");
         return;
     }
