@@ -236,5 +236,10 @@ void DataShareManagerImpl::OnAddSystemAbility(int32_t systemAbilityId, const std
         return false;
     });
 }
+
+void DataShareManagerImpl::SetCallCount(const std::string &funcName, const std::string &uri)
+{
+    dataShareCallReporter_.Count(funcName, uri);
+}
 }
 }
