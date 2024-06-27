@@ -24,16 +24,21 @@ namespace DataShare {
 void DataShareCallReporter::Count(const std::string &funcName, const std::string &uri)
 {
     auto callCount = 0;
-    auto iter = callCounts.find(funcName);
-    if (iter != callCounts.end()) {
-        callCount = iter->second;
+    auto iter = callCounts.Find(funcName);
+    if (iter.first) {
+        callCount = iter.second;
     }
     if (callCount == 0) {
-        callFirstTime[funcName] = std::chrono::system_clock::now();
+        callFirstTime.Insert(funcName, std::chrono::system_clock::now());
     }
     if (++callCount % RESET_COUNT_THRESHOLD == 0) {
+        auto iterTime = callFirstTime.Find(funcName);
+        if (!iterTime.first) {
+            callFirstTime.Insert(funcName, std::chrono::system_clock::now());
+            return;
+        }
         int64_t first = std::chrono::duration_cast<std::chrono::milliseconds>(
-            callFirstTime[funcName].time_since_epoch()).count();
+            iterTime.second.time_since_epoch()).count();
         int64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(
             std::chrono::system_clock::now().time_since_epoch()).count();
         LOG_WARN("Call the threshold, func: %{public}s, first:%{public}" PRIi64 "ms, now:%{public}" PRIi64
@@ -43,9 +48,9 @@ void DataShareCallReporter::Count(const std::string &funcName, const std::string
                 "ms, uri:%{public}s", funcName.c_str(), first, now, DataShareStringUtils::Anonymous(uri).c_str());
         }
         callCount = 0;
-        callFirstTime.erase(funcName);
+        callFirstTime.Erase(funcName);
     }
-    callCounts[funcName] = callCount;
+    callCounts.Insert(funcName, callCount);
 }
 } // namespace DataShare
 } // namespace OHOS

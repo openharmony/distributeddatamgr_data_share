@@ -16,9 +16,8 @@
 #ifndef DATASHARE_CALL_REPORTER_H
 #define DATASHARE_CALL_REPORTER_H
 
-
+#include <concurrent_map.h>
 #include <string>
-#include <map>
 
 namespace OHOS {
 namespace DataShare {
@@ -27,8 +26,8 @@ public:
     DataShareCallReporter() = default;
     void Count(const std::string &funcName, const std::string &uri);
 private:
-    std::map<std::string, int> callCounts;
-    std::map<std::string, std::chrono::system_clock::time_point> callFirstTime;
+    ConcurrentMap<std::string, int> callCounts;
+    ConcurrentMap<std::string, std::chrono::system_clock::time_point> callFirstTime;
     static constexpr int RESET_COUNT_THRESHOLD = 100;
     static constexpr std::chrono::milliseconds TIME_THRESHOLD = std::chrono::milliseconds(30000);
 };
