@@ -31,6 +31,12 @@ GeneralControllerServiceImpl::~GeneralControllerServiceImpl()
 
 int GeneralControllerServiceImpl::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
+    auto manager = DataShareManagerImpl::GetInstance();
+    if (manager == nullptr) {
+        LOG_ERROR("Manager is nullptr");
+        return INVALID_VALUE;
+    }
+    manager->SetCallCount(__FUNCTION__, uri.ToString());
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -58,6 +64,12 @@ int GeneralControllerServiceImpl::Update(const Uri &uri, const DataSharePredicat
 
 int GeneralControllerServiceImpl::Delete(const Uri &uri, const DataSharePredicates &predicates)
 {
+    auto manager = DataShareManagerImpl::GetInstance();
+    if (manager == nullptr) {
+        LOG_ERROR("Manager is nullptr");
+        return INVALID_VALUE;
+    }
+    manager->SetCallCount(__FUNCTION__, uri.ToString());
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");

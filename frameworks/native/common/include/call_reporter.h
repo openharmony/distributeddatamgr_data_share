@@ -24,10 +24,13 @@ namespace DataShare {
 class DataShareCallReporter {
 public:
     DataShareCallReporter() = default;
+    struct CallInfo {
+        int count = 0;
+        std::chrono::system_clock::time_point firstTime;
+    };
     void Count(const std::string &funcName, const std::string &uri);
 private:
-    ConcurrentMap<std::string, int> callCounts;
-    ConcurrentMap<std::string, std::chrono::system_clock::time_point> callFirstTime;
+    ConcurrentMap<std::string, CallInfo> callCounts;
     static constexpr int RESET_COUNT_THRESHOLD = 100;
     static constexpr std::chrono::milliseconds TIME_THRESHOLD = std::chrono::milliseconds(30000);
 };
