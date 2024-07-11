@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-#include <cinttypes>
-
 #include "datashare_log.h"
 #include "datashare_predicates_proxy.h"
 #include "napi/native_api.h"
@@ -22,7 +20,6 @@
 
 namespace OHOS {
 namespace DataShare {
-static constexpr std::chrono::milliseconds TIME_THRESHOLD = std::chrono::milliseconds(500);
 EXTERN_C_START
 /*
  * The module initialization.
@@ -30,14 +27,7 @@ EXTERN_C_START
 static napi_value Init(napi_env env, napi_value exports)
 {
     LOG_DEBUG("Init DataSharePredicates");
-    auto start = std::chrono::steady_clock::now();
     DataSharePredicatesProxy::Init(env, exports);
-    auto finish = std::chrono::steady_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
-    if (duration >= TIME_THRESHOLD) {
-        int64_t milliseconds = duration.count();
-        LOG_WARN("Init is too slow, cost:%{public}" PRIi64 "ms", milliseconds);
-    }
     return exports;
 }
 EXTERN_C_END

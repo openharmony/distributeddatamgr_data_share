@@ -29,7 +29,8 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-class DataShareConnection : public AAFwk::AbilityConnectionStub {
+class DataShareConnection : public AAFwk::AbilityConnectionStub,
+    public std::enable_shared_from_this<DataShareConnection> {
 public:
     DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token) : uri_(uri), token_(token) {}
     virtual ~DataShareConnection();
@@ -94,8 +95,8 @@ private:
     static constexpr int MAX_THREADS = 2;
     static constexpr int MIN_THREADS = 0;
     static constexpr int MAX_RECONNECT = 6;
-    static constexpr std::chrono::seconds RECONNECT_TIME_INTERVAL = std::chrono::seconds(10);
-    static constexpr std::chrono::seconds MAX_RECONNECT_TIME_INTERVAL = std::chrono::seconds(70);
+    static constexpr std::chrono::milliseconds RECONNECT_TIME_INTERVAL = std::chrono::milliseconds(10000);
+    static constexpr std::chrono::milliseconds MAX_RECONNECT_TIME_INTERVAL = std::chrono::milliseconds(70000);
     std::shared_ptr<ExecutorPool> pool_;
     DataShareConnectionInfo reConnects_;
 };

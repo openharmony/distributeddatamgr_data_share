@@ -116,11 +116,6 @@ void DataShareConnection::ReconnectExtAbility(const std::string &uri)
 
 void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
 {
-    AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
-    if (instance == nullptr) {
-        LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri_.ToString()).c_str());
-        return;
-    }
     int64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch()).count();
     if (now - reConnects_.prevTime >= MAX_RECONNECT_TIME_INTERVAL.count()) {
@@ -135,14 +130,23 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
     if (now - reConnects_.prevTime >= RECONNECT_TIME_INTERVAL.count()) {
         delay = std::chrono::seconds(0);
     }
-    auto taskid = pool_->Schedule(delay, [instance, uri, this]() {
-        ErrCode ret = instance->Connect(uri, this, token_);
-        LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d",
-            DataShareStringUtils::Change(uri_.ToString()).c_str(), ret);
-        if (ret == E_OK) {
-            reConnects_.count++;
-            reConnects_.prevTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::system_clock::now().time_since_epoch()).count();
+    std::weak_ptr<DataShareConnection> self = weak_from_this();
+    auto taskid = pool_->Schedule(delay, [uri, self]() {
+        auto selfSharedPtr = self.lock();
+        if (selfSharedPtr) {
+            AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
+            if (instance == nullptr) {
+                LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri).c_str());
+                return;
+            }
+            ErrCode ret = instance->Connect(uri, selfSharedPtr.get(), selfSharedPtr->token_);
+            LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d",
+                DataShareStringUtils::Change(uri).c_str(), ret);
+            if (ret == E_OK) {
+                selfSharedPtr->reConnects_.count++;
+                selfSharedPtr->reConnects_.prevTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::system_clock::now().time_since_epoch()).count();
+            }
         }
     });
     if (taskid == ExecutorPool::INVALID_TASK_ID) {
