@@ -83,14 +83,78 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
     if (uri.empty()) {
         return;
     }
-    AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
-    if (instance == nullptr) {
-        LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri_.ToString()).c_str());
+    if (pool_ == nullptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (pool_ == nullptr) {
+            pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS);
+        }
+    }
+    ReconnectExtAbility(uri);
+}
+
+void DataShareConnection::ReconnectExtAbility(const std::string &uri)
+{
+    if (reConnects_.count == 0) {
+        AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
+        if (instance == nullptr) {
+            LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri_.ToString()).c_str());
+            return;
+        }
+        ErrCode ret = instance->Connect(uri, this, token_);
+        LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d",
+            DataShareStringUtils::Change(uri).c_str(), ret);
+        if (ret == E_OK) {
+            auto curr = std::chrono::system_clock::now().time_since_epoch();
+            reConnects_.count = 1;
+            reConnects_.firstTime = std::chrono::duration_cast<std::chrono::milliseconds>(curr).count();
+            reConnects_.prevTime = std::chrono::duration_cast<std::chrono::milliseconds>(curr).count();
+        }
         return;
     }
-    ErrCode ret = instance->Connect(uri, this, token_);
-    LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d",
-        DataShareStringUtils::Change(uri_.ToString()).c_str(), ret);
+    return DelayConnectExtAbility(uri);
+}
+
+void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
+{
+    int64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+    if (now - reConnects_.prevTime >= MAX_RECONNECT_TIME_INTERVAL.count()) {
+        reConnects_.count = 0;
+        reConnects_.firstTime = now;
+        reConnects_.prevTime = now;
+    }
+    if (reConnects_.count >= MAX_RECONNECT) {
+        return;
+    }
+    auto delay = RECONNECT_TIME_INTERVAL;
+    if (now - reConnects_.prevTime >= RECONNECT_TIME_INTERVAL.count()) {
+        delay = std::chrono::seconds(0);
+    }
+    std::weak_ptr<DataShareConnection> self = weak_from_this();
+    auto taskid = pool_->Schedule(delay, [uri, self]() {
+        auto selfSharedPtr = self.lock();
+        if (selfSharedPtr) {
+            AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
+            if (instance == nullptr) {
+                LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri).c_str());
+                return;
+            }
+            ErrCode ret = instance->Connect(uri, selfSharedPtr.get(), selfSharedPtr->token_);
+            LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d",
+                DataShareStringUtils::Change(uri).c_str(), ret);
+            if (ret == E_OK) {
+                selfSharedPtr->reConnects_.count++;
+                selfSharedPtr->reConnects_.prevTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::system_clock::now().time_since_epoch()).count();
+            }
+        }
+    });
+    if (taskid == ExecutorPool::INVALID_TASK_ID) {
+        LOG_ERROR("create scheduler failed, over the max capacity");
+        return;
+    }
+    LOG_DEBUG("create scheduler success");
+    return;
 }
 
 /**

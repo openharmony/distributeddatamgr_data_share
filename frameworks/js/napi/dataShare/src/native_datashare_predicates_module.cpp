@@ -13,11 +13,10 @@
  * limitations under the License.
  */
 
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
-
 #include "datashare_log.h"
 #include "datashare_predicates_proxy.h"
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
 
 namespace OHOS {
 namespace DataShare {
