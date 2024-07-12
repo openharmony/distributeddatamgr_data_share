@@ -32,6 +32,12 @@ napi_value DataSharePredicatesProxy::GetConstructor(napi_env env)
         NAPI_CALL(env, napi_get_reference_value(env, constructor_, &cons));
         return cons;
     }
+    return CreateConstructor(env);
+}
+
+napi_value DataSharePredicatesProxy::CreateConstructor(napi_env env)
+{
+    napi_value cons;
     napi_property_descriptor descriptors[] = {
         DECLARE_NAPI_FUNCTION("equalTo", EqualTo),
         DECLARE_NAPI_FUNCTION("notEqualTo", NotEqualTo),
@@ -64,15 +70,17 @@ napi_value DataSharePredicatesProxy::GetConstructor(napi_env env)
         DECLARE_NAPI_FUNCTION("prefixKey", PrefixKey),
         DECLARE_NAPI_FUNCTION("inKeys", InKeys),
     };
-    auto start = std::chrono::duration_cast<std::chrono::milliseconds>(
+    int64_t start = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch()).count();
     NAPI_CALL(env, napi_define_class(env, "DataSharePredicates", NAPI_AUTO_LENGTH, New, nullptr,
         sizeof(descriptors) / sizeof(napi_property_descriptor), descriptors, &cons));
-    auto firstEnd = std::chrono::duration_cast<std::chrono::milliseconds>(
+    int64_t middle = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch()).count();
     NAPI_CALL(env, napi_create_reference(env, cons, 1, &constructor_));
-    LOG_INFO("Init predicates create reference, start:%{public}" PRIi64 "ms , firstEnd:%{public}" PRIi64 "ms",
-        start, firstEnd);
+    int64_t finish = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+    LOG_INFO("Init predicates create reference, cost time: %{public}" PRIi64
+        "ms , cost time:%{public}" PRIi64 "ms", middle - start, finish - middle);
     return cons;
 }
 
@@ -82,10 +90,12 @@ void DataSharePredicatesProxy::Init(napi_env env, napi_value exports)
     // cause use-after-free.
     constructor_ = nullptr;
     napi_value cons = GetConstructor(env);
-    auto start = std::chrono::duration_cast<std::chrono::milliseconds>(
+    int64_t start = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch()).count();
     NAPI_CALL_RETURN_VOID(env, napi_set_named_property(env, exports, "DataSharePredicates", cons));
-    LOG_INFO("Init predicates set named property, start:%{public}" PRIi64 "ms", start);
+    int64_t end = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+    LOG_INFO("Init predicates set named property, cost time:%{public}" PRIi64 "ms", end - start);
 }
 
 napi_value DataSharePredicatesProxy::New(napi_env env, napi_callback_info info)

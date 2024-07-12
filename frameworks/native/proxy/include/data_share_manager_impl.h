@@ -19,7 +19,9 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <string>
 
+#include "call_reporter.h"
 #include "concurrent_map.h"
 #include "data_share_service_proxy.h"
 #include "data_share_errno.h"
@@ -85,6 +87,8 @@ public:
     void RemoveRegisterCallback(GeneralControllerServiceImpl* ptr);
 
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId);
+
+    void SetCallCount(const std::string &funcName, const std::string &uri);
         
 private:
     DataShareManagerImpl();
@@ -115,6 +119,7 @@ private:
     std::function<void(std::shared_ptr<DataShareServiceProxy>)> deathCallback_ = {};
     sptr<IRemoteObject> clientDeathObserverPtr_;
     ConcurrentMap<GeneralControllerServiceImpl*, std::function<void()>> observers_;
+    DataShareCallReporter dataShareCallReporter_;
 };
 }
 } // namespace OHOS::DataShare

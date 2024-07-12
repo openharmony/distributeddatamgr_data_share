@@ -204,6 +204,12 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
             holder->SetConnectInvalid();
             holder->DisconnectDataShareExtAbility();
         });
+    auto manager = DataShareManagerImpl::GetInstance();
+    if (manager == nullptr) {
+        LOG_ERROR("Manager is nullptr");
+        return nullptr;
+    }
+    manager->SetCallCount(__FUNCTION__, uri.ToString());
     if (dataShareConnection->GetDataShareProxy(uri, token) == nullptr) {
         LOG_ERROR("connect failed");
         return nullptr;
