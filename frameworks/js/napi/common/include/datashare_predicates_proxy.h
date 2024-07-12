@@ -72,6 +72,7 @@ private:
     static napi_value NotIn(napi_env env, napi_callback_info info);
     static napi_value PrefixKey(napi_env env, napi_callback_info info);
     static napi_value InKeys(napi_env env, napi_callback_info info);
+    static napi_value CreateConstructor(napi_env env);
 };
 } // namespace DataShare
 } // namespace OHOS
