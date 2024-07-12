@@ -23,12 +23,14 @@
 #include "ability_connect_callback_stub.h"
 #include "datashare_proxy.h"
 #include "event_handler.h"
+#include "executor_pool.h"
 #include "want.h"
 
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-class DataShareConnection : public AAFwk::AbilityConnectionStub {
+class DataShareConnection : public AAFwk::AbilityConnectionStub,
+    public std::enable_shared_from_this<DataShareConnection> {
 public:
     DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token) : uri_(uri), token_(token) {}
     virtual ~DataShareConnection();
@@ -71,18 +73,32 @@ public:
     void SetConnectInvalid();
 
 private:
+    struct DataShareConnectionInfo {
+        int count = 0;
+        int64_t firstTime;
+        int64_t prevTime;
+    };
     struct ConnectCondition {
         std::condition_variable condition;
         std::mutex mutex;
     };
     std::shared_ptr<DataShareProxy> ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
     ErrCode Disconnect();
+    void ReconnectExtAbility(const std::string &uri);
+    void DelayConnectExtAbility(const std::string &uri);
     std::mutex mutex_{};
     std::shared_ptr<DataShareProxy> dataShareProxy_;
     ConnectCondition condition_;
     Uri uri_;
     sptr<IRemoteObject> token_ = {};
     std::atomic<bool> isInvalid_ = false;
+    static constexpr int MAX_THREADS = 2;
+    static constexpr int MIN_THREADS = 0;
+    static constexpr int MAX_RECONNECT = 6;
+    static constexpr std::chrono::milliseconds RECONNECT_TIME_INTERVAL = std::chrono::milliseconds(10000);
+    static constexpr std::chrono::milliseconds MAX_RECONNECT_TIME_INTERVAL = std::chrono::milliseconds(70000);
+    std::shared_ptr<ExecutorPool> pool_;
+    DataShareConnectionInfo reConnects_;
 };
 }  // namespace DataShare
 }  // namespace OHOS

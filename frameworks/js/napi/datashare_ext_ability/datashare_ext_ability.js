@@ -16,6 +16,7 @@
 class DataShareExtensionAbility {
   onCreate(want, callback) {
     console.log('onCreate, want:' + want.abilityName);
+    callback(undefined);
   }
 
   getFileTypes(uri, mimeTypeFilter, callback) {
