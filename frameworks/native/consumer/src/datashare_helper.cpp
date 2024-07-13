@@ -149,8 +149,13 @@ std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::Create(const s
         }
         if (ret == E_BMS_NOT_READY) {
             report.SetError(RadarReporter::GET_BMS_FAILED);
-            LOG_ERROR("BMS not ready, err: %{public}d", E_BMS_NOT_READY);
+            LOG_ERROR("BMS not ready, uri:%{publish}s", DataShareStringUtils::Change(strUri).c_str());
             return std::make_pair(E_DATA_SHARE_NOT_READY, nullptr);
+        }
+        if (ret == E_BUNDLE_NAME_NOT_EXIST) {
+            report.SetError(RadarReporter::GET_BUNDLE_INFP_FAILED);
+            LOG_ERROR("BundleName not exist, uri:%{publish}s", DataShareStringUtils::Change(strUri).c_str());
+            return std::make_pair(E_BUNDLE_NAME_NOT_EXIST, nullptr);
         }
         if (extUri.empty()) {
             report.SetError(RadarReporter::INVALID_PARAM_ERROR);
