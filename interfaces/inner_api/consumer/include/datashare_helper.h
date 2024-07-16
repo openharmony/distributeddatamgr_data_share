@@ -59,6 +59,7 @@ public:
      *
      * @return Returns the created DataShareHelper instance.
      */
+    [[deprecated("Use Create(const sptr<IRemoteObject> &, const std::string &, const std::string &) instead.")]]
     static std::shared_ptr<DataShareHelper> Creator(
         const sptr<IRemoteObject> &token, const std::string &strUri, const std::string &extUri = "");
 
@@ -70,6 +71,7 @@ public:
      *
      * @return Returns the created DataShareHelper instance with a specified Uri.
      */
+    [[deprecated("Use Create(const sptr<IRemoteObject> &, const std::string &, const std::string &) instead.")]]
     static std::shared_ptr<DataShareHelper> Creator(const std::string &strUri, const CreateOptions &options,
         const std::string &bundleName = "");
 
