@@ -75,8 +75,8 @@ public:
 private:
     struct DataShareConnectionInfo {
         int count = 0;
-        int64_t firstTime;
-        int64_t prevTime;
+        int64_t firstTime = 0;
+        int64_t prevTime = 0;
     };
     struct ConnectCondition {
         std::condition_variable condition;
