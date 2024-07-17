@@ -112,10 +112,6 @@ private:
     sptr<DataShareKvServiceProxy> dataMgrService_;
     std::shared_ptr<DataShareServiceProxy> dataShareService_;
     std::string bundleName_;
-    static constexpr int WAIT_TIME = 2;
-    static constexpr int MAX_THREADS = 2;
-    static constexpr int MIN_THREADS = 0;
-    std::shared_ptr<ExecutorPool> pool_;
     std::function<void(std::shared_ptr<DataShareServiceProxy>)> deathCallback_ = {};
     sptr<IRemoteObject> clientDeathObserverPtr_;
     ConcurrentMap<GeneralControllerServiceImpl*, std::function<void()>> observers_;

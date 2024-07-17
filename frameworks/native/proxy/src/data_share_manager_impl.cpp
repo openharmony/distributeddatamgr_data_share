@@ -23,7 +23,6 @@
 #include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
-#include "executor_pool.h"
 #include "rdb_subscriber_manager.h"
 #include "published_data_subscriber_manager.h"
 
@@ -133,7 +132,6 @@ void DataShareManagerImpl::RegisterClientDeathObserver()
 
 DataShareManagerImpl::DataShareManagerImpl()
 {
-    pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS);
     SetDeathCallback([](std::shared_ptr<DataShareServiceProxy> proxy) {
         LOG_INFO("RecoverObs start");
         RdbSubscriberManager::GetInstance().RecoverObservers(proxy);
@@ -199,16 +197,6 @@ void DataShareManagerImpl::OnRemoteDied()
 {
     LOG_INFO("#######datashare service has dead");
     ResetServiceHandle();
-    auto taskid = pool_->Schedule(std::chrono::seconds(WAIT_TIME), [this]() {
-        if (GetServiceProxy() != nullptr) {
-            deathCallback_(dataShareService_);
-        }
-    });
-    if (taskid == ExecutorPool::INVALID_TASK_ID) {
-        LOG_ERROR("create scheduler failed, over the max capacity");
-        return;
-    }
-    LOG_DEBUG("create scheduler success");
 }
 
 void DataShareManagerImpl::SetRegisterCallback(GeneralControllerServiceImpl* ptr,
@@ -235,6 +223,9 @@ void DataShareManagerImpl::OnAddSystemAbility(int32_t systemAbilityId, const std
         callback();
         return false;
     });
+    if (GetServiceProxy() != nullptr) {
+        deathCallback_(dataShareService_);
+    }
 }
 
 void DataShareManagerImpl::SetCallCount(const std::string &funcName, const std::string &uri)
