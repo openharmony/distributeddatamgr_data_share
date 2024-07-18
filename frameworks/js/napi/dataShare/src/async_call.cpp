@@ -19,8 +19,8 @@
 #include "napi_common_data.h"
 
 namespace OHOS::DataShare {
-AsyncCall::AsyncCall(napi_env env, napi_callback_info info, std::shared_ptr<Context> context)
-    : env_(env)
+__attribute__((no_sanitize("undefined"))) AsyncCall::AsyncCall(napi_env env, napi_callback_info info,
+    std::shared_ptr<Context> context) : env_(env)
 {
     context_ = new AsyncContext();
     size_t argc = ARGS_MAX_COUNT;
