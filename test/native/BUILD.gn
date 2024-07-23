@@ -404,6 +404,7 @@ ohos_unittest("ValueProxyTest") {
   deps = [ "${datashare_innerapi_path}/common:datashare_common_static" ]
 
   external_deps = [
+    "ability_base:zuri",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
