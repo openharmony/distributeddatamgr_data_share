@@ -33,7 +33,6 @@ namespace {
 static constexpr const char *DATA_SHARE_PREFIX = "datashare:///";
 static constexpr const char *FILE_PREFIX = "file://";
 } // namespace
-constexpr int INVALID_VALUE = -1;
 class ObserverImpl : public AAFwk::DataAbilityObserverStub {
 public:
     explicit ObserverImpl(const std::shared_ptr<DataShareObserver> dataShareObserver)
@@ -363,7 +362,7 @@ int DataShareHelper::SetSilentSwitch(Uri &uri, bool enable)
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return proxy->SetSilentSwitch(uri, enable);
 }
@@ -379,5 +378,22 @@ std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::CreateProxyHel
     auto helper = ret == E_OK ? CreateServiceHelper() : nullptr;
     return std::make_pair(ret, helper);
 }
+
+std::pair<int32_t, int32_t> DataShareHelper::InsertEx(Uri &uri, const DataShareValuesBucket &value)
+{
+    return std::make_pair(0, 0);
+}
+
+std::pair<int32_t, int32_t> DataShareHelper::DeleteEx(Uri &uri, const DataSharePredicates &predicates)
+{
+    return std::make_pair(0, 0);
+}
+
+std::pair<int32_t, int32_t> DataShareHelper::UpdateEx(Uri &uri, const DataSharePredicates &predicates,
+    const DataShareValuesBucket &value)
+{
+    return std::make_pair(0, 0);
+}
+
 } // namespace DataShare
 } // namespace OHOS

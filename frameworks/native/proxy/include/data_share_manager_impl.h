@@ -16,15 +16,17 @@
 #ifndef DATASHARESERVICE_DATA_SHARE_MANAGER_IMPL_H
 #define DATASHARESERVICE_DATA_SHARE_MANAGER_IMPL_H
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <vector>
 
 #include "call_reporter.h"
 #include "concurrent_map.h"
 #include "data_share_service_proxy.h"
-#include "data_share_errno.h"
+#include "datashare_errno.h"
 #include "idata_share_client_death_observer.h"
 #include "iremote_object.h"
 #include "refbase.h"

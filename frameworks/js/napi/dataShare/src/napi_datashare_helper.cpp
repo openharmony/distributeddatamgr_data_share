@@ -16,6 +16,7 @@
 #include "napi_datashare_helper.h"
 
 #include "data_proxy_observer_stub.h"
+#include "datashare_errno.h"
 #include "datashare_helper.h"
 #include "datashare_log.h"
 #include "datashare_predicates_proxy.h"
@@ -225,7 +226,8 @@ napi_value NapiDataShareHelper::Napi_Insert(napi_env env, napi_callback_info inf
         auto helper = context->proxy->GetHelper();
         if (helper != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
-            context->resultNumber = helper->Insert(uri, context->valueBucket);
+            auto [errCode, retVal] = helper->InsertEx(uri, context->valueBucket);
+            context->resultNumber = errCode == 0 ? retVal : DATA_SHARE_ERROR;
             context->status = napi_ok;
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
@@ -270,7 +272,8 @@ napi_value NapiDataShareHelper::Napi_Delete(napi_env env, napi_callback_info inf
         auto helper = context->proxy->GetHelper();
         if (helper != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
-            context->resultNumber = helper->Delete(uri, context->predicates);
+            auto [errCode, retVal] = helper->DeleteEx(uri, context->predicates);
+            context->resultNumber = errCode == 0 ? retVal : DATA_SHARE_ERROR;
             context->status = napi_ok;
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
@@ -378,7 +381,8 @@ napi_value NapiDataShareHelper::Napi_Update(napi_env env, napi_callback_info inf
         auto helper = context->proxy->GetHelper();
         if (helper != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
-            context->resultNumber = helper->Update(uri, context->predicates, context->valueBucket);
+            auto [errCode, retVal] = helper->UpdateEx(uri, context->predicates, context->valueBucket);
+            context->resultNumber = errCode == 0 ? retVal : DATA_SHARE_ERROR;
             context->status = napi_ok;
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",

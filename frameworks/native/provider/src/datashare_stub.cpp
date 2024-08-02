@@ -55,6 +55,9 @@ DataShareStub::DataShareStub()
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_EXECUTE_BATCH)] = &DataShareStub::CmdExecuteBatch;
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERT_EXT)] = &DataShareStub::CmdInsertExt;
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_BATCH_UPDATE)] = &DataShareStub::CmdBatchUpdate;
+    stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERT_EX)] = &DataShareStub::CmdInsertEx;
+    stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_UPDATE_EX)] = &DataShareStub::CmdUpdateEx;
+    stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_DELETE_EX)] = &DataShareStub::CmdDeleteEx;
 }
 
 DataShareStub::~DataShareStub()
@@ -109,7 +112,7 @@ ErrCode DataShareStub::CmdGetFileTypes(MessageParcel &data, MessageParcel &reply
         LOG_ERROR("Marshal value is nullptr");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
@@ -134,7 +137,7 @@ ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
         return ERR_INVALID_VALUE;
     }
     close(fd);
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdOpenRawFile(MessageParcel &data, MessageParcel &reply)
@@ -150,7 +153,7 @@ ErrCode DataShareStub::CmdOpenRawFile(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("Marshal value is nullptr");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdInsert(MessageParcel &data, MessageParcel &reply)
@@ -173,7 +176,7 @@ ErrCode DataShareStub::CmdInsert(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to WriteInt32 index");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdUpdate(MessageParcel &data, MessageParcel &reply)
@@ -197,7 +200,7 @@ ErrCode DataShareStub::CmdUpdate(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to WriteInt32 index");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdBatchUpdate(OHOS::MessageParcel &data, OHOS::MessageParcel &reply)
@@ -217,7 +220,7 @@ ErrCode DataShareStub::CmdBatchUpdate(OHOS::MessageParcel &data, OHOS::MessagePa
         LOG_ERROR("marshalling updateOperations is failed");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdDelete(MessageParcel &data, MessageParcel &reply)
@@ -240,7 +243,81 @@ ErrCode DataShareStub::CmdDelete(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to WriteInt32 index");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
+}
+
+ErrCode DataShareStub::CmdInsertEx(MessageParcel &data, MessageParcel &reply)
+{
+    Uri uri("");
+    DataShareValuesBucket value;
+    if (!ITypesUtil::Unmarshal(data, uri, value)) {
+        LOG_ERROR("Unmarshalling value is nullptr");
+        return E_UNMARSHAL_ERROR;
+    }
+
+    auto [errCode, result] = InsertEx(uri, value);
+    if (errCode == DEFAULT_NUMBER) {
+        LOG_ERROR("Insert inner error");
+        return ERR_INVALID_VALUE;
+    } else if (errCode == PERMISSION_ERROR_NUMBER) {
+        LOG_ERROR("Insert permission error");
+        return ERR_PERMISSION_DENIED;
+    }
+
+    if (!ITypesUtil::Marshal(reply, errCode, result)) {
+        LOG_ERROR("Marshal value is nullptr");
+        return E_MARSHAL_ERROR;
+    }
+    return E_OK;
+}
+
+ErrCode DataShareStub::CmdUpdateEx(MessageParcel &data, MessageParcel &reply)
+{
+    Uri uri("");
+    DataSharePredicates predicates;
+    DataShareValuesBucket value;
+    if (!ITypesUtil::Unmarshal(data, uri, predicates, value)) {
+        LOG_ERROR("Unmarshalling predicates is nullptr");
+        return E_UNMARSHAL_ERROR;
+    }
+
+    auto [errCode, result] = UpdateEx(uri, predicates, value);
+    if (errCode == DEFAULT_NUMBER) {
+        LOG_ERROR("Update inner error");
+        return ERR_INVALID_VALUE;
+    } else if (errCode == PERMISSION_ERROR_NUMBER) {
+        LOG_ERROR("Update permission error");
+        return ERR_PERMISSION_DENIED;
+    }
+
+    if (!ITypesUtil::Marshal(reply, errCode, result)) {
+        LOG_ERROR("Marshal value is nullptr");
+        return E_MARSHAL_ERROR;
+    }
+    return E_OK;
+}
+
+ErrCode DataShareStub::CmdDeleteEx(MessageParcel &data, MessageParcel &reply)
+{
+    Uri uri("");
+    DataSharePredicates predicates;
+    if (!ITypesUtil::Unmarshal(data, uri, predicates)) {
+        LOG_ERROR("Unmarshalling predicates is nullptr");
+        return E_UNMARSHAL_ERROR;
+    }
+    auto [errCode, result] = DeleteEx(uri, predicates);
+    if (errCode == DEFAULT_NUMBER) {
+        LOG_ERROR("Delete inner error");
+        return ERR_INVALID_VALUE;
+    } else if (errCode == PERMISSION_ERROR_NUMBER) {
+        LOG_ERROR("Delete permission error");
+        return ERR_PERMISSION_DENIED;
+    }
+    if (!ITypesUtil::Marshal(reply, errCode, result)) {
+        LOG_ERROR("Marshal value is nullptr");
+        return E_MARSHAL_ERROR;
+    }
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdQuery(MessageParcel &data, MessageParcel &reply)
@@ -261,7 +338,7 @@ ErrCode DataShareStub::CmdQuery(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("!resultSet->Marshalling(reply)");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdGetType(MessageParcel &data, MessageParcel &reply)
@@ -276,7 +353,7 @@ ErrCode DataShareStub::CmdGetType(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to WriteString type");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
@@ -300,7 +377,7 @@ ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdRegisterObserver(MessageParcel &data, MessageParcel &reply)
@@ -322,7 +399,7 @@ ErrCode DataShareStub::CmdRegisterObserver(MessageParcel &data, MessageParcel &r
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdUnregisterObserver(MessageParcel &data, MessageParcel &reply)
@@ -344,7 +421,7 @@ ErrCode DataShareStub::CmdUnregisterObserver(MessageParcel &data, MessageParcel 
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdNotifyChange(MessageParcel &data, MessageParcel &reply)
@@ -360,7 +437,7 @@ ErrCode DataShareStub::CmdNotifyChange(MessageParcel &data, MessageParcel &reply
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdNormalizeUri(MessageParcel &data, MessageParcel &reply)
@@ -375,7 +452,7 @@ ErrCode DataShareStub::CmdNormalizeUri(MessageParcel &data, MessageParcel &reply
         LOG_ERROR("Write to message parcel failed!");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdDenormalizeUri(MessageParcel &data, MessageParcel &reply)
@@ -391,7 +468,7 @@ ErrCode DataShareStub::CmdDenormalizeUri(MessageParcel &data, MessageParcel &rep
         LOG_ERROR("Write to message parcel failed!");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdExecuteBatch(MessageParcel &data, MessageParcel &reply)
@@ -411,7 +488,7 @@ ErrCode DataShareStub::CmdExecuteBatch(MessageParcel &data, MessageParcel &reply
         LOG_ERROR("fail to write result");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 ErrCode DataShareStub::CmdInsertExt(MessageParcel &data, MessageParcel &reply)
@@ -432,7 +509,7 @@ ErrCode DataShareStub::CmdInsertExt(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("fail to write result");
         return ERR_INVALID_VALUE;
     }
-    return DATA_SHARE_NO_ERROR;
+    return E_OK;
 }
 
 int DataShareStub::ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result)
@@ -449,5 +526,19 @@ int DataShareStub::BatchUpdate(const UpdateOperations &operations, std::vector<B
 {
     return 0;
 }
+std::pair<int32_t, int32_t> DataShareStub::InsertEx(const Uri &uri, const DataShareValuesBucket &value)
+{
+    return std::make_pair(0, 0);
+}
+std::pair<int32_t, int32_t> DataShareStub::UpdateEx(const Uri &uri, const DataSharePredicates &predicates,
+    const DataShareValuesBucket &value)
+{
+    return std::make_pair(0, 0);
+}
+std::pair<int32_t, int32_t> DataShareStub::DeleteEx(const Uri &uri, const DataSharePredicates &predicates)
+{
+    return std::make_pair(0, 0);
+}
+
 } // namespace DataShare
 } // namespace OHOS
