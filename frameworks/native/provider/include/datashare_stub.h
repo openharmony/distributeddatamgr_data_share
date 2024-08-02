@@ -20,6 +20,7 @@
 #include <map>
 
 #include "datashare_business_error.h"
+#include "datashare_errno.h"
 #include "idatashare.h"
 
 namespace OHOS {
@@ -48,10 +49,17 @@ private:
     ErrCode CmdExecuteBatch(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdInsertExt(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdBatchUpdate(MessageParcel &data, MessageParcel &reply);
+    ErrCode CmdInsertEx(MessageParcel &data, MessageParcel &reply);
+    ErrCode CmdUpdateEx(MessageParcel &data, MessageParcel &reply);
+    ErrCode CmdDeleteEx(MessageParcel &data, MessageParcel &reply);
 
     virtual int ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result) override;
     virtual int InsertExt(const Uri &uri, const DataShareValuesBucket &value, std::string &result) override;
     virtual int BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results) override;
+    virtual std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &value) override;
+    virtual std::pair<int32_t, int32_t> UpdateEx(const Uri &uri, const DataSharePredicates &predicates,
+        const DataShareValuesBucket &value) override;
+    virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) override;
 
     using RequestFuncType = int (DataShareStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, RequestFuncType> stubFuncMap_;

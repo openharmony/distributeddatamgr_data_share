@@ -107,6 +107,100 @@ int32_t DataShareServiceProxy::Delete(const Uri &uri, const DataSharePredicates 
     return reply.ReadInt32();
 }
 
+std::pair<int32_t, int32_t> DataShareServiceProxy::InsertEx(const Uri &uri, const DataShareValuesBucket &value)
+{
+    const std::string &uriStr = uri.ToString();
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return std::make_pair(E_WRITE_TO_PARCE_ERROR, 0);
+    }
+    if (!ITypesUtil::Marshal(data, uriStr, value)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return std::make_pair(E_MARSHAL_ERROR, 0);
+    }
+
+    int32_t result = -1;
+    int32_t errCode = -1;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_INSERTEX), data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("InsertEx fail to sendRequest. uri: %{public}s, err: %{public}d",
+            DataShareStringUtils::Anonymous(uriStr).c_str(), err);
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    if (!ITypesUtil::Unmarshal(reply, errCode, result)) {
+        LOG_ERROR("fail to Unmarshal");
+        return std::make_pair(E_UNMARSHAL_ERROR, 0);
+    }
+    return std::make_pair(errCode, result);
+}
+
+std::pair<int32_t, int32_t> DataShareServiceProxy::UpdateEx(const Uri &uri,
+    const DataSharePredicates &predicate, const DataShareValuesBucket &valuesBucket)
+{
+    const std::string &uriStr = uri.ToString();
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return std::make_pair(E_WRITE_TO_PARCE_ERROR, 0);
+    }
+    if (!ITypesUtil::Marshal(data, uriStr, predicate, valuesBucket)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return std::make_pair(E_MARSHAL_ERROR, 0);
+    }
+
+    int32_t result = -1;
+    int32_t errCode = -1;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_UPDATEEX), data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("UpdateEx fail to sendRequest. uri: %{public}s, err: %{public}d",
+            DataShareStringUtils::Anonymous(uriStr).c_str(), err);
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    if (!ITypesUtil::Unmarshal(reply, errCode, result)) {
+        LOG_ERROR("fail to Unmarshal");
+        return std::make_pair(E_UNMARSHAL_ERROR, 0);
+    }
+    return std::make_pair(errCode, result);
+}
+
+std::pair<int32_t, int32_t> DataShareServiceProxy::DeleteEx(const Uri &uri, const DataSharePredicates &predicate)
+{
+    const std::string &uriStr = uri.ToString();
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return std::make_pair(E_WRITE_TO_PARCE_ERROR, 0);
+    }
+    if (!ITypesUtil::Marshal(data, uriStr, predicate)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return std::make_pair(E_MARSHAL_ERROR, 0);
+    }
+
+    int32_t result = -1;
+    int32_t errCode = -1;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_DELETEEX), data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("DeleteEx fail to sendRequest. uri: %{public}s, err: %{public}d",
+            DataShareStringUtils::Anonymous(uriStr).c_str(), err);
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    if (!ITypesUtil::Unmarshal(reply, errCode, result)) {
+        LOG_ERROR("fail to Unmarshal");
+        return std::make_pair(E_UNMARSHAL_ERROR, 0);
+    }
+    return std::make_pair(errCode, result);
+}
+
 std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri, const DataSharePredicates &predicates,
     std::vector<std::string> &columns, DatashareBusinessError &businessError)
 {

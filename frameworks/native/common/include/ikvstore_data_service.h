@@ -19,17 +19,13 @@
 
 #include "iremote_broker.h"
 #include "iremote_proxy.h"
+#include "datashare_errno.h"
 #include "distributeddata_data_share_ipc_interface_code.h"
 
 namespace OHOS {
 namespace DataShare {
 class IKvStoreDataService : public IRemoteBroker {
 public:
-    enum {
-        DATA_SHARE_ERROR = -1,
-        DATA_SHARE_OK = 0,
-    };
-
     virtual sptr<IRemoteObject> GetFeatureInterface(const std::string &name) = 0;
 
     virtual uint32_t RegisterClientDeathObserver(const std::string &appId, sptr<IRemoteObject> observer) = 0;

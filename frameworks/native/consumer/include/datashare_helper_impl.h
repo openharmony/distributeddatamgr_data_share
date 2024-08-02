@@ -49,6 +49,13 @@ public:
 
     int Delete(Uri &uri, const DataSharePredicates &predicates) override;
 
+    std::pair<int32_t, int32_t> InsertEx(Uri &uri, const DataShareValuesBucket &value) override;
+
+    std::pair<int32_t, int32_t> UpdateEx(
+        Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) override;
+
+    std::pair<int32_t, int32_t> DeleteEx(Uri &uri, const DataSharePredicates &predicates) override;
+
     std::shared_ptr<DataShareResultSet> Query(Uri &uri, const DataSharePredicates &predicates,
         std::vector<std::string> &columns, DatashareBusinessError *businessError) override;
 
