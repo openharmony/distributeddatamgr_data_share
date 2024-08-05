@@ -56,7 +56,7 @@ std::vector<std::string> DataShareProxy::GetFileTypes(const Uri &uri, const std:
 
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_GET_FILE_TYPES), data, reply, option);
-    if (err != DATA_SHARE_NO_ERROR) {
+    if (err != E_OK) {
         LOG_ERROR("GetFileTypes fail to SendRequest. err: %{public}d", err);
     }
 
@@ -90,7 +90,7 @@ int DataShareProxy::OpenFile(const Uri &uri, const std::string &mode)
     MessageOption option;
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_OPEN_FILE), data, reply, option);
-    if (err != DATA_SHARE_NO_ERROR) {
+    if (err != E_OK) {
         LOG_ERROR("OpenFile fail to SendRequest. err: %{public}d", err);
         return fd;
     }
@@ -127,7 +127,7 @@ int DataShareProxy::OpenRawFile(const Uri &uri, const std::string &mode)
     MessageOption option;
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_OPEN_RAW_FILE), data, reply, option);
-    if (err != DATA_SHARE_NO_ERROR) {
+    if (err != E_OK) {
         LOG_ERROR("OpenRawFile fail to SendRequest. err: %{public}d", err);
         return fd;
     }
@@ -157,7 +157,7 @@ int DataShareProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
     MessageOption option;
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERT), data, reply, option);
-    if (err != DATA_SHARE_NO_ERROR) {
+    if (err != E_OK) {
         LOG_ERROR("Insert fail to SendRequest. err: %{public}d", err);
         return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : index;
     }
@@ -186,7 +186,7 @@ int DataShareProxy::InsertExt(const Uri &uri, const DataShareValuesBucket &value
     MessageOption option;
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERT_EXT), data, reply, option);
-    if (err != DATA_SHARE_NO_ERROR) {
+    if (err != E_OK) {
         LOG_ERROR("Insert fail to SendRequest. err: %{public}d", err);
         return index;
     }
@@ -214,7 +214,7 @@ int DataShareProxy::Update(const Uri &uri, const DataSharePredicates &predicates
     MessageOption option;
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_UPDATE), data, reply, option);
-    if (err != DATA_SHARE_NO_ERROR) {
+    if (err != E_OK) {
         LOG_ERROR("Update fail to SendRequest. err: %{public}d", err);
         return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : index;
     }
@@ -245,7 +245,7 @@ int DataShareProxy::BatchUpdate(const UpdateOperations &operations, std::vector<
     MessageOption option;
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_BATCH_UPDATE), data, reply, option);
-    if (err != DATA_SHARE_NO_ERROR) {
+    if (err != E_OK) {
         LOG_ERROR("fail to SendRequest. err: %{public}d", err);
         return err;
     }
@@ -274,7 +274,7 @@ int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates
     MessageOption option;
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_DELETE), data, reply, option);
-    if (err != DATA_SHARE_NO_ERROR) {
+    if (err != E_OK) {
         LOG_ERROR("Delete fail to SendRequest. err: %{public}d", err);
         return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : index;
     }
@@ -283,6 +283,100 @@ int DataShareProxy::Delete(const Uri &uri, const DataSharePredicates &predicates
         return index;
     }
     return index;
+}
+
+std::pair<int32_t, int32_t> DataShareProxy::InsertEx(const Uri &uri, const DataShareValuesBucket &value)
+{
+    MessageParcel data;
+    data.SetMaxCapacity(MTU_SIZE);
+    if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
+        LOG_ERROR("WriteInterfaceToken failed");
+        return std::make_pair(E_WRITE_TO_PARCE_ERROR, 0);
+    }
+    if (!ITypesUtil::Marshal(data, uri, value)) {
+        LOG_ERROR("fail to Marshal value");
+        return std::make_pair(E_MARSHAL_ERROR, 0);
+    }
+
+    int32_t errCode = -1;
+    int32_t result = -1;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERT_EX), data, reply, option);
+    if (err != E_OK) {
+        LOG_ERROR("InsertEx fail to SendRequest. err: %{public}d", err);
+        return std::make_pair((err == PERMISSION_ERR ? PERMISSION_ERR_CODE : errCode), 0);
+    }
+
+    if (!ITypesUtil::Unmarshal(reply, errCode, result)) {
+        LOG_ERROR("fail to Unmarshal");
+        return std::make_pair(E_UNMARSHAL_ERROR, 0);
+    }
+    return std::make_pair(errCode, result);
+}
+
+std::pair<int32_t, int32_t> DataShareProxy::UpdateEx(const Uri &uri, const DataSharePredicates &predicates,
+    const DataShareValuesBucket &value)
+{
+    MessageParcel data;
+    data.SetMaxCapacity(MTU_SIZE);
+    if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
+        LOG_ERROR("WriteInterfaceToken failed");
+        return std::make_pair(E_WRITE_TO_PARCE_ERROR, 0);
+    }
+    if (!ITypesUtil::Marshal(data, uri, predicates, value)) {
+        LOG_ERROR("fail to Marshal value");
+        return std::make_pair(E_MARSHAL_ERROR, 0);
+    }
+
+    int32_t errCode = -1;
+    int32_t result = -1;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_UPDATE_EX), data, reply, option);
+    if (err != E_OK) {
+        LOG_ERROR("UpdateEx fail to SendRequest. err: %{public}d", err);
+        return std::make_pair((err == PERMISSION_ERR ? PERMISSION_ERR_CODE : errCode), 0);
+    }
+
+    if (!ITypesUtil::Unmarshal(reply, errCode, result)) {
+        LOG_ERROR("fail to Unmarshal");
+        return std::make_pair(E_UNMARSHAL_ERROR, 0);
+    }
+    return std::make_pair(errCode, result);
+}
+
+std::pair<int32_t, int32_t> DataShareProxy::DeleteEx(const Uri &uri, const DataSharePredicates &predicates)
+{
+    MessageParcel data;
+    data.SetMaxCapacity(MTU_SIZE);
+    if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
+        LOG_ERROR("WriteInterfaceToken failed");
+        return std::make_pair(E_WRITE_TO_PARCE_ERROR, 0);
+    }
+    if (!ITypesUtil::Marshal(data, uri, predicates)) {
+        LOG_ERROR("fail to Marshalling predicates");
+        return std::make_pair(E_MARSHAL_ERROR, 0);
+    }
+
+    int32_t errCode = -1;
+    int32_t result = -1;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_DELETE_EX), data, reply, option);
+    if (err != E_OK) {
+        LOG_ERROR("DeleteEx fail to SendRequest. err: %{public}d", err);
+        return std::make_pair((err == PERMISSION_ERR ? PERMISSION_ERR_CODE : errCode), 0);
+    }
+
+    if (!ITypesUtil::Unmarshal(reply, errCode, result)) {
+        LOG_ERROR("fail to Unmarshal");
+        return std::make_pair(E_UNMARSHAL_ERROR, 0);
+    }
+    return std::make_pair(errCode, result);
 }
 
 std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri, const DataSharePredicates &predicates,
@@ -304,7 +398,7 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri, const 
     auto result = ISharedResultSet::ReadFromParcel(reply);
     businessError.SetCode(reply.ReadInt32());
     businessError.SetMessage(reply.ReadString());
-    if (err != DATA_SHARE_NO_ERROR) {
+    if (err != E_OK) {
         LOG_ERROR("Query fail to SendRequest. err: %{public}d", err);
         return nullptr;
     }
@@ -329,7 +423,7 @@ std::string DataShareProxy::GetType(const Uri &uri)
     MessageOption option;
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_GET_TYPE), data, reply, option);
-    if (err != DATA_SHARE_NO_ERROR) {
+    if (err != E_OK) {
         LOG_ERROR("GetFileTypes fail to SendRequest. err: %{public}d", err);
         return type;
     }
@@ -363,7 +457,7 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
     MessageOption option;
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_BATCH_INSERT), data, reply, option);
-    if (err != DATA_SHARE_NO_ERROR) {
+    if (err != E_OK) {
         LOG_ERROR("fail to SendRequest. err: %{public}d", err);
         return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : ret;
     }
@@ -391,7 +485,7 @@ int DataShareProxy::ExecuteBatch(const std::vector<OperationStatement> &statemen
     MessageOption option;
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_EXECUTE_BATCH), data, reply, option);
-    if (err != DATA_SHARE_NO_ERROR) {
+    if (err != E_OK) {
         LOG_ERROR("fail to SendRequest. err: %{public}d", err);
         return -1;
     }
@@ -488,7 +582,7 @@ Uri DataShareProxy::NormalizeUri(const Uri &uri)
     MessageOption option;
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_NORMALIZE_URI), data, reply, option);
-    if (err != DATA_SHARE_NO_ERROR) {
+    if (err != E_OK) {
         LOG_ERROR("NormalizeUri fail to SendRequest. err: %{public}d", err);
         return Uri("");
     }
@@ -517,7 +611,7 @@ Uri DataShareProxy::DenormalizeUri(const Uri &uri)
     MessageOption option;
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_DENORMALIZE_URI), data, reply, option);
-    if (err != DATA_SHARE_NO_ERROR) {
+    if (err != E_OK) {
         LOG_ERROR("DenormalizeUri fail to SendRequest. err: %{public}d", err);
         return Uri("");
     }
