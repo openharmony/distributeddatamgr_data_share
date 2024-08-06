@@ -33,6 +33,7 @@ constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
 static int USER_100 = 100;
 std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
 std::string SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB00/TBL00?Proxy=true";
+std::string SLIENT_ERROR_URI = "datashare:///com.acts.datashare/entry/DB00/TBL00?Proxy=true";
 std::string SLIENT_REGISTER_URI = "datashare:///com.acts.datasharetest/entry/DB00/TBL02?Proxy=true";
 std::string SLIENT_ACCESS_PERMISSION1_URI = "datashare:///com.acts.datasharetest/entry/DB00/permission1?Proxy=true";
 std::string SLIENT_PROXY_PERMISSION1_URI = "datashareproxy://com.acts.datasharetest/entry/DB00/permission1";
@@ -213,6 +214,77 @@ void SlientAccessTest::TearDownTestCase(void)
 
 void SlientAccessTest::SetUp(void) {}
 void SlientAccessTest::TearDown(void) {}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Creator_Errorcode_Test_001::Start");
+    std::string uriStr1(SLIENT_ACCESS_URI);
+    std::string uriStr2 (DATA_SHARE_URI);
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        LOG_ERROR("GetSystemAbilityManager get samgr failed.");
+    }
+    auto remoteObj = saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID);
+    if (remoteObj == nullptr) {
+        LOG_ERROR("GetSystemAbility service failed.");
+    }
+    auto [ret, helper] = DataShare::DataShareHelper::Create(remoteObj, uriStr1, uriStr2);
+    EXPECT_EQ(ret, DataShare::E_OK);
+    EXPECT_NE(helper, nullptr);
+    helper = nullptr;
+    LOG_INFO("SlientAccess_Creator_Errorcode_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_002, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Creator_Errorcode_Test_002::Start");
+    std::string uriStr1(SLIENT_ACCESS_URI);
+    std::string uriStr2 (DATA_SHARE_URI);
+    auto [ret, helper] = DataShare::DataShareHelper::Create(nullptr, uriStr1, uriStr2);
+    EXPECT_EQ(ret, DataShare::E_TOKEN_EMPTY);
+    EXPECT_EQ(helper, nullptr);
+    LOG_INFO("SlientAccess_Creator_Errorcode_Test_002::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_003, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Creator_Errorcode_Test_003::Start");
+    std::string uriStr1(SLIENT_ERROR_URI);
+    std::string uriStr2 (DATA_SHARE_URI);
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        LOG_ERROR("GetSystemAbilityManager get samgr failed.");
+    }
+    auto remoteObj = saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID);
+    if (remoteObj == nullptr) {
+        LOG_ERROR("GetSystemAbility service failed.");
+    }
+    auto [ret, helper] = DataShare::DataShareHelper::Create(remoteObj, uriStr1, uriStr2);
+    EXPECT_EQ(ret, DataShare::E_BUNDLE_NAME_NOT_EXIST);
+    EXPECT_EQ(helper, nullptr);
+    helper = nullptr;
+    LOG_INFO("SlientAccess_Creator_Errorcode_Test_003::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_004, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Creator_Errorcode_Test_004::Start");
+    std::string uriStr1(DATA_SHARE_URI);
+    std::string uriStr2 (DATA_SHARE_URI);
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        LOG_ERROR("GetSystemAbilityManager get samgr failed.");
+    }
+    auto remoteObj = saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID);
+    if (remoteObj == nullptr) {
+        LOG_ERROR("GetSystemAbility service failed.");
+    }
+    auto [ret, helper] = DataShare::DataShareHelper::Create(remoteObj, uriStr1, uriStr2);
+    EXPECT_EQ(ret, DataShare::E_OK);
+    EXPECT_NE(helper, nullptr);
+    helper = nullptr;
+    LOG_INFO("SlientAccess_Creator_Errorcode_Test_004::End");
+}
 
 HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_001, TestSize.Level0)
 {

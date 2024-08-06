@@ -1611,5 +1611,68 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_002, TestS
     dataObserver->Clear();
     LOG_INFO("MediaDataShare_UnregisterObserverExt_002 end");
 }
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_BatchUpdate_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_BatchUpdate_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_TRUE(helper != nullptr);
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "batchUpdateTest");
+    int ret = helper->Insert(uri, valuesBucket);
+    EXPECT_GT(ret, 0);
+
+    DataShare::UpdateOperations operations;
+    std::vector<DataShare::UpdateOperation> updateOperations1;
+    DataShare::UpdateOperation updateOperation1;
+    updateOperation1.valuesBucket.Put("name", "batchUpdateTested");
+    updateOperation1.predicates.EqualTo("name", "batchUpdateTest");
+    updateOperations1.push_back(updateOperation1);
+
+    std::vector<DataShare::UpdateOperation> updateOperations2;
+    DataShare::UpdateOperation updateOperation2;
+    updateOperation2.valuesBucket.Put("name", "undefined1");
+    updateOperation2.predicates.EqualTo("name", "undefined");
+    updateOperations1.push_back(updateOperation2);
+    updateOperations2.push_back(updateOperation2);
+
+    operations.emplace("uri1", updateOperations1);
+    operations.emplace("uri2", updateOperations2);
+    std::vector<BatchUpdateResult> results;
+    ret = helper->BatchUpdate(operations, results);
+    EXPECT_EQ(results.size(), 2);
+    EXPECT_EQ(results[0].codes[0], 1);
+    EXPECT_EQ(results[0].codes[1], 0);
+    EXPECT_EQ(results[1].codes[0], 0);
+    DataShare::DataSharePredicates predicates3;
+    predicates3.EqualTo("name", "batchUpdateTested");
+    ret = helper->Delete(uri, predicates3);
+    EXPECT_GT(ret, 0);
+    LOG_INFO("MediaDataShare_BatchUpdate_Test_001 End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_BatchUpdateThanLimit_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_BatchUpdateThanLimit_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_TRUE(helper != nullptr);
+    Uri uri(MEDIALIBRARY_DATA_URI);
+
+    DataShare::UpdateOperations operations;
+    std::vector<DataShare::UpdateOperation> updateOperations1;
+    DataShare::UpdateOperation updateOperation1;
+    updateOperation1.valuesBucket.Put("name", "batchUpdateTested");
+    updateOperation1.predicates.EqualTo("name", "batchUpdateTest");
+    for (int i = 0; i < 4001; i++) {
+        updateOperations1.push_back(updateOperation1);
+    }
+    operations.emplace("uri1", updateOperations1);
+    std::vector<BatchUpdateResult> results;
+    int ret = helper->BatchUpdate(operations, results);
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(results.size(), 0);
+    LOG_INFO("MediaDataShare_BatchUpdateThanLimit_Test_001 End");
+}
 } // namespace DataShare
 } // namespace OHOS
