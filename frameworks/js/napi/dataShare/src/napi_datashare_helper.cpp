@@ -226,8 +226,7 @@ napi_value NapiDataShareHelper::Napi_Insert(napi_env env, napi_callback_info inf
         auto helper = context->proxy->GetHelper();
         if (helper != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
-            auto [errCode, retVal] = helper->InsertEx(uri, context->valueBucket);
-            context->resultNumber = errCode == 0 ? retVal : DATA_SHARE_ERROR;
+            context->resultNumber = helper->Insert(uri, context->valueBucket);
             context->status = napi_ok;
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
@@ -272,8 +271,7 @@ napi_value NapiDataShareHelper::Napi_Delete(napi_env env, napi_callback_info inf
         auto helper = context->proxy->GetHelper();
         if (helper != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
-            auto [errCode, retVal] = helper->DeleteEx(uri, context->predicates);
-            context->resultNumber = errCode == 0 ? retVal : DATA_SHARE_ERROR;
+            context->resultNumber = helper->Delete(uri, context->predicates);
             context->status = napi_ok;
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
@@ -381,8 +379,7 @@ napi_value NapiDataShareHelper::Napi_Update(napi_env env, napi_callback_info inf
         auto helper = context->proxy->GetHelper();
         if (helper != nullptr && !context->uri.empty()) {
             OHOS::Uri uri(context->uri);
-            auto [errCode, retVal] = helper->UpdateEx(uri, context->predicates, context->valueBucket);
-            context->resultNumber = errCode == 0 ? retVal : DATA_SHARE_ERROR;
+            context->resultNumber = helper->Update(uri, context->predicates, context->valueBucket);
             context->status = napi_ok;
         } else {
             LOG_ERROR("dataShareHelper_ is nullptr : %{public}d, context->uri is empty : %{public}d",
