@@ -1670,7 +1670,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_BatchUpdateThanLimit_Test_001, T
     operations.emplace("uri1", updateOperations1);
     std::vector<BatchUpdateResult> results;
     int ret = helper->BatchUpdate(operations, results);
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(ret, -1);
     EXPECT_EQ(results.size(), 0);
     LOG_INFO("MediaDataShare_BatchUpdateThanLimit_Test_001 End");
 }
