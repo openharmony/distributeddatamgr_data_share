@@ -371,8 +371,8 @@ std::vector<OperationResult> DataShareHelperImpl::SubscribeRdbData(const std::ve
     return persistentDataCtl->SubscribeRdbData(this, uris, templateId, callback);
 }
 
-std::vector<OperationResult> DataShareHelperImpl::UnsubscribeRdbData(const std::vector<std::string> &uris,
-    const TemplateId &templateId)
+__attribute__((no_sanitize("cfi"))) std::vector<OperationResult> DataShareHelperImpl::UnsubscribeRdbData(
+    const std::vector<std::string> &uris, const TemplateId &templateId)
 {
     LOG_DEBUG("Start UnsubscribeRdbData");
     RadarReporter::RadarReport report(RadarReporter::TEMPLATE_DATA_MANAGER,
