@@ -25,7 +25,6 @@
 namespace OHOS {
 namespace DataShare {
 using InterfaceCode = OHOS::DistributedShare::DataShare::DataShareServiceInterfaceCode;
-
 DataShareServiceProxy::DataShareServiceProxy(const sptr<IRemoteObject> &object)
     : IRemoteProxy<IDataShareService>(object)
 {
@@ -33,78 +32,39 @@ DataShareServiceProxy::DataShareServiceProxy(const sptr<IRemoteObject> &object)
 
 int32_t DataShareServiceProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
-    const std::string &uriStr = uri.ToString();
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
-        LOG_ERROR("Write descriptor failed!");
-        return DATA_SHARE_ERROR;
+    auto [errCode, status] = InsertEx(uri, value);
+    if (errCode == NO_ERROR) {
+        return status;
+    } else if (errCode < NO_ERROR) {
+        return errCode;
     }
-    if (!ITypesUtil::Marshal(data, uriStr, value)) {
-        LOG_ERROR("Write to message parcel failed!");
-        return DATA_SHARE_ERROR;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int32_t err = Remote()->SendRequest(
-        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_INSERT), data, reply, option);
-    if (err != NO_ERROR) {
-        LOG_ERROR("Insert fail to sendRequest. uri: %{public}s, err: %{public}d",
-            DataShareStringUtils::Anonymous(uriStr).c_str(), err);
-        return DATA_SHARE_ERROR;
-    }
-    return reply.ReadInt32();
+    LOG_ERROR("DataShareServiceProxy insert failed, errCode = %{public}d", errCode);
+    return DATA_SHARE_ERROR;
 }
 
 int32_t DataShareServiceProxy::Update(const Uri &uri,
     const DataSharePredicates &predicate, const DataShareValuesBucket &valuesBucket)
 {
-    const std::string &uriStr = uri.ToString();
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
-        LOG_ERROR("Write descriptor failed!");
-        return DATA_SHARE_ERROR;
+    auto [errCode, status] = UpdateEx(uri, predicate, valuesBucket);
+    if (errCode == NO_ERROR) {
+        return status;
+    } else if (errCode < NO_ERROR) {
+        return errCode;
     }
-    if (!ITypesUtil::Marshal(data, uriStr, predicate, valuesBucket)) {
-        LOG_ERROR("Write to message parcel failed!");
-        return DATA_SHARE_ERROR;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int32_t err = Remote()->SendRequest(
-        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_UPDATE), data, reply, option);
-    if (err != NO_ERROR) {
-        LOG_ERROR("Update fail to sendRequest. uri: %{public}s, err: %{public}d",
-            DataShareStringUtils::Anonymous(uriStr).c_str(), err);
-        return DATA_SHARE_ERROR;
-    }
-    return reply.ReadInt32();
+    LOG_ERROR("DataShareServiceProxy update failed, errCode = %{public}d", errCode);
+    return DATA_SHARE_ERROR;
 }
 
 int32_t DataShareServiceProxy::Delete(const Uri &uri, const DataSharePredicates &predicate)
 {
-    const std::string &uriStr = uri.ToString();
-    MessageParcel data;
-    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
-        LOG_ERROR("Write descriptor failed!");
-        return DATA_SHARE_ERROR;
+    auto [errCode, status] = DeleteEx(uri, predicate);
+    if (errCode == NO_ERROR) {
+        return status;
+    } else if (errCode < NO_ERROR) {
+        return errCode;
     }
-    if (!ITypesUtil::Marshal(data, uriStr, predicate)) {
-        LOG_ERROR("Write to message parcel failed!");
-        return DATA_SHARE_ERROR;
-    }
-
-    MessageParcel reply;
-    MessageOption option;
-    int32_t err = Remote()->SendRequest(
-        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_DELETE), data, reply, option);
-    if (err != NO_ERROR) {
-        LOG_ERROR("Delete fail to sendRequest. uri: %{public}s, err: %{public}d",
-            DataShareStringUtils::Anonymous(uriStr).c_str(), err);
-        return DATA_SHARE_ERROR;
-    }
-    return reply.ReadInt32();
+    LOG_ERROR("DataShareServiceProxy delete failed, errCode = %{public}d", errCode);
+    return DATA_SHARE_ERROR;
 }
 
 std::pair<int32_t, int32_t> DataShareServiceProxy::InsertEx(const Uri &uri, const DataShareValuesBucket &value)
