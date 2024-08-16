@@ -34,7 +34,6 @@ public:
         INSERT = 0,
         DELETE,
         UPDATE,
-        PHOTO_TIME_UPDATE,
         OTHER,
         INVAILD,
     };
