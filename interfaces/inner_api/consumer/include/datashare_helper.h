@@ -457,7 +457,8 @@ public:
     virtual std::pair<int32_t, int32_t> DeleteEx(Uri &uri, const DataSharePredicates &predicates);
 
 private:
-    static std::shared_ptr<DataShareHelper> CreateServiceHelper(const std::string &bundleName = "");
+    static std::shared_ptr<DataShareHelper> CreateServiceHelper(const std::string &extUri = "",
+        const std::string &bundleName = "");
 
     static int GetSilentProxyStatus(const std::string &uri);
 
@@ -469,7 +470,8 @@ private:
 
     static bool IsProxy(Uri &uri);
 
-    static std::pair<int, std::shared_ptr<DataShareHelper>> CreateProxyHelper(const std::string &strUri);
+    static std::pair<int, std::shared_ptr<DataShareHelper>> CreateProxyHelper(const std::string &strUri,
+        const std::string &extUri);
 };
 } // namespace DataShare
 } // namespace OHOS

@@ -27,7 +27,7 @@ class DataShareHelperImpl : public DataShareHelper {
 public:
     DataShareHelperImpl(const Uri &uri, const sptr<IRemoteObject> &token,
         std::shared_ptr<DataShareConnection> connection);
-    DataShareHelperImpl();
+    DataShareHelperImpl(std::string extUri = "");
 
     ~DataShareHelperImpl() override;
 

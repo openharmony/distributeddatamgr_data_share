@@ -23,6 +23,11 @@
 
 namespace OHOS {
 namespace DataShare {
+GeneralControllerServiceImpl::GeneralControllerServiceImpl(const std::string &ext)
+{
+    extUri_ = ext;
+}
+
 GeneralControllerServiceImpl::~GeneralControllerServiceImpl()
 {
     auto manager = DataShareManagerImpl::GetInstance();
@@ -42,7 +47,7 @@ int GeneralControllerServiceImpl::Insert(const Uri &uri, const DataShareValuesBu
         LOG_ERROR("proxy is nullptr");
         return DATA_SHARE_ERROR;
     }
-    return proxy->Insert(uri, value);
+    return proxy->Insert(uri, Uri(extUri_), value);
 }
 
 int GeneralControllerServiceImpl::Update(const Uri &uri, const DataSharePredicates &predicates,
@@ -59,7 +64,7 @@ int GeneralControllerServiceImpl::Update(const Uri &uri, const DataSharePredicat
         LOG_ERROR("proxy is nullptr");
         return DATA_SHARE_ERROR;
     }
-    return proxy->Update(uri, predicates, value);
+    return proxy->Update(uri, Uri(extUri_), predicates, value);
 }
 
 int GeneralControllerServiceImpl::Delete(const Uri &uri, const DataSharePredicates &predicates)
@@ -75,7 +80,7 @@ int GeneralControllerServiceImpl::Delete(const Uri &uri, const DataSharePredicat
         LOG_ERROR("proxy is nullptr");
         return DATA_SHARE_ERROR;
     }
-    return proxy->Delete(uri, predicates);
+    return proxy->Delete(uri, Uri(extUri_), predicates);
 }
 
 std::pair<int32_t, int32_t> GeneralControllerServiceImpl::InsertEx(const Uri &uri, const DataShareValuesBucket &value)
@@ -91,7 +96,7 @@ std::pair<int32_t, int32_t> GeneralControllerServiceImpl::InsertEx(const Uri &ur
         LOG_ERROR("proxy is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
-    return proxy->InsertEx(uri, value);
+    return proxy->InsertEx(uri, Uri(extUri_), value);
 }
 
 std::pair<int32_t, int32_t> GeneralControllerServiceImpl::UpdateEx(
@@ -108,7 +113,7 @@ std::pair<int32_t, int32_t> GeneralControllerServiceImpl::UpdateEx(
         LOG_ERROR("proxy is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
-    return proxy->UpdateEx(uri, predicates, value);
+    return proxy->UpdateEx(uri, Uri(extUri_), predicates, value);
 }
 
 std::pair<int32_t, int32_t> GeneralControllerServiceImpl::DeleteEx(const Uri &uri,
@@ -125,7 +130,7 @@ std::pair<int32_t, int32_t> GeneralControllerServiceImpl::DeleteEx(const Uri &ur
         LOG_ERROR("proxy is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
-    return proxy->DeleteEx(uri, predicates);
+    return proxy->DeleteEx(uri, Uri(extUri_), predicates);
 }
 
 std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Uri &uri,
@@ -142,13 +147,13 @@ std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Ur
         LOG_ERROR("proxy is nullptr");
         return nullptr;
     }
-    auto resultSet = proxy->Query(uri, predicates, columns, businessError);
+    auto resultSet = proxy->Query(uri, Uri(extUri_), predicates, columns, businessError);
     int retryCount = 0;
     while (resultSet == nullptr && businessError.GetCode() == E_RESULTSET_BUSY && retryCount++ < MAX_RETRY_COUNT) {
         LOG_ERROR("resultSet busy retry, uri: %{public}s", DataShareStringUtils::Anonymous(uri.ToString()).c_str());
         std::this_thread::sleep_for(std::chrono::milliseconds(
             DataShareStringUtils::GetRandomNumber(RANDOM_MIN, RANDOM_MAX)));
-        resultSet = proxy->Query(uri, predicates, columns, businessError);
+        resultSet = proxy->Query(uri, Uri(extUri_), predicates, columns, businessError);
     }
     return resultSet;
 }
