@@ -32,6 +32,7 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 namespace DataShare {
 static constexpr int MAX_ARGC = 6;
+static __thread napi_ref constructor_ = nullptr;
 static bool GetSilentUri(napi_env env, napi_value jsValue, std::string &uri)
 {
     napi_valuetype valuetype = napi_undefined;
@@ -142,6 +143,10 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
 napi_value NapiDataShareHelper::GetConstructor(napi_env env)
 {
     napi_value cons = nullptr;
+    if (constructor_ != nullptr) {
+        napi_get_reference_value(env, constructor_, &cons);
+        return cons;
+    }
     napi_property_descriptor clzDes[] = {
         DECLARE_NAPI_FUNCTION("on", Napi_On),
         DECLARE_NAPI_FUNCTION("off", Napi_Off),
@@ -162,6 +167,7 @@ napi_value NapiDataShareHelper::GetConstructor(napi_env env)
     };
     NAPI_CALL(env, napi_define_class(env, "DataShareHelper", NAPI_AUTO_LENGTH, Initialize, nullptr,
         sizeof(clzDes) / sizeof(napi_property_descriptor), clzDes, &cons));
+    napi_create_reference(env, cons, 1, &constructor_);
     return cons;
 }
 
