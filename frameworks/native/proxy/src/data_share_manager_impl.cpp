@@ -223,8 +223,9 @@ void DataShareManagerImpl::OnAddSystemAbility(int32_t systemAbilityId, const std
         callback();
         return false;
     });
-    if (GetServiceProxy() != nullptr) {
-        deathCallback_(dataShareService_);
+    auto serviceProxy = GetServiceProxy();
+    if (serviceProxy != nullptr) {
+        deathCallback_(serviceProxy);
     }
 }
 
