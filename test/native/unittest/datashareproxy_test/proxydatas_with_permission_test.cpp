@@ -21,7 +21,6 @@
 #include "datashare_template.h"
 #include "hap_token_info.h"
 #include "iservice_registry.h"
-#include "out/rk3568/obj/third_party/musl/intermidiates/linux/musl_src_ported/include/unistd.h"
 #include "system_ability_definition.h"
 #include "token_setproc.h"
 #include "datashare_errno.h"

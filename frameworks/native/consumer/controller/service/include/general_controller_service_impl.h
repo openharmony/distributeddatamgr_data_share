@@ -17,7 +17,6 @@
 #define GENERAL_CONTROLLER_SERVICE_IMPL_H
 
 #include <memory>
-#include <string>
 
 #include "concurrent_map.h"
 #include "data_share_manager_impl.h"

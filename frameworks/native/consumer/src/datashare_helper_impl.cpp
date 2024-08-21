@@ -12,8 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <shared_mutex>
-#include <string>
 #define LOG_TAG "DataShareHelperImpl"
 
 #include "datashare_helper_impl.h"

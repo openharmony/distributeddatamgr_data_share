@@ -377,7 +377,7 @@ std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::CreateProxyHel
     const std::string &extUri)
 {
     int ret = GetSilentProxyStatus(strUri);
-    auto helper = ret == E_OK ? CreateServiceHelper(extUri) : nullptr; // 这里继续往里透传extUri，构造helperImpl
+    auto helper = ret == E_OK ? CreateServiceHelper(extUri) : nullptr;
     return std::make_pair(ret, helper);
 }
 
