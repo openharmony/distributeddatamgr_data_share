@@ -31,7 +31,7 @@ class IDataAbilityObserver;
 namespace DataShare {
 class GeneralControllerServiceImpl : public GeneralController {
 public:
-    GeneralControllerServiceImpl() = default;
+    GeneralControllerServiceImpl(const std::string &ext);
 
     virtual ~GeneralControllerServiceImpl();
 
@@ -62,6 +62,8 @@ private:
     void SetRegisterCallback();
 
     ConcurrentMap<sptr<AAFwk::IDataAbilityObserver>, std::list<Uri>> observers_;
+
+    std::string extUri_;
 };
 } // namespace DataShare
 } // namespace OHOS

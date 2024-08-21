@@ -38,10 +38,10 @@ DataShareHelperImpl::DataShareHelperImpl(const Uri &uri, const sptr<IRemoteObjec
     extSpCtl_ = std::make_shared<ExtSpecialController>(connection, uri, token);
 }
 
-DataShareHelperImpl::DataShareHelperImpl()
+DataShareHelperImpl::DataShareHelperImpl(std::string extUri)
 {
     LOG_DEBUG("starts");
-    generalCtl_ = std::make_shared<GeneralControllerServiceImpl>();
+    generalCtl_ = std::make_shared<GeneralControllerServiceImpl>(extUri);
     persistentDataCtl_ = std::make_shared<PersistentDataController>();
     publishedDataCtl_ = std::make_shared<PublishedDataController>();
 }
