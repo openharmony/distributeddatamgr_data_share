@@ -113,6 +113,11 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
 
 void JsDataShareExtAbility::OnStart(const AAFwk::Want &want)
 {
+    auto bundleName = want.GetStringParam("BundleName");
+    auto storeName = want.GetStringParam("StoreName");
+    auto storeStatus = want.GetStringParam("StoreStatus");
+    LOG_ERROR("wjq OnStart ----------- want, bundleName:%{public}s, storeName:%{public}s, storeStatus:%{public}s",
+        bundleName.c_str(), storeName.c_str(), storeStatus.c_str());
     Extension::OnStart(want);
     HandleScope handleScope(jsRuntime_);
     napi_env env = jsRuntime_.GetNapiEnv();
@@ -131,6 +136,11 @@ void JsDataShareExtAbility::OnStart(const AAFwk::Want &want)
 
 sptr<IRemoteObject> JsDataShareExtAbility::OnConnect(const AAFwk::Want &want)
 {
+    auto bundleName = want.GetStringParam("BundleName");
+    auto storeName = want.GetStringParam("StoreName");
+    auto storeStatus = want.GetStringParam("StoreStatus");
+    LOG_ERROR("wjq OnConnect ----------- want, bundleName:%{public}s, storeName:%{public}s, storeStatus:%{public}s",
+        bundleName.c_str(), storeName.c_str(), storeStatus.c_str());
     Extension::OnConnect(want);
     sptr<DataShareStubImpl> remoteObject = new (std::nothrow) DataShareStubImpl(
         std::static_pointer_cast<JsDataShareExtAbility>(shared_from_this()),

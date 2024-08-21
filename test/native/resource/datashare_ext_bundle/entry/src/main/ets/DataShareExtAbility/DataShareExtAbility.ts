@@ -15,7 +15,8 @@
 
 import Extension from '@ohos.application.DataShareExtensionAbility';
 import { UpdateOperation } from '@ohos.application.DataShareExtensionAbility';
-import rdb from '@ohos.data.relationalStore';
+//import rdb from '@ohos.data.relationalStore';
+import relationalStore from '@ohos.data.relationalStore';
 import rpc from '@ohos.rpc';
 
 let DB_NAME = "DB00.db";
@@ -36,7 +37,10 @@ extends Extension {
         console.log('[ttt] [DataShareTest] DataShareExtAbility onCreate, want:' + want.abilityName);
         console.log("[ttt] [DataShareTest] DataShareExtAbility onCreate this.context.databaseDir:" + this.context.databaseDir);
         // @ts-ignore
-        rdbStore = await rdb.getRdbStore(this.context, { name: DB_NAME, securityLevel: rdb.SecurityLevel.S1 });
+        //rdbStore = await rdb.getRdbStore(this.context, { name: DB_NAME, securityLevel: rdb.SecurityLevel.S1 });
+        rdbStore = await relationalStore.getRdbStore(this.context, { name: DB_NAME, 
+            securityLevel: relationalStore.SecurityLevel.S1,
+            haMode: relationalStore.HAMode.MAIN_REPLICA });
         console.log('[ttt] [DataShareTest] DataShareExtAbility getRdbStore done');
         await rdbStore.executeSql(DDL_TBL_CREATE, []);
         await rdbStore.executeSql(DDL_TABLE_USER_SQL, []);

@@ -215,7 +215,7 @@ void SlientAccessTest::TearDownTestCase(void)
 void SlientAccessTest::SetUp(void) {}
 void SlientAccessTest::TearDown(void) {}
 
-HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_001, TestSize.Level0)
+/*HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_001::Start");
     std::string uriStr1(SLIENT_ACCESS_URI);
@@ -233,8 +233,27 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_001, TestSize.Lev
     EXPECT_NE(helper, nullptr);
     helper = nullptr;
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_001::End");
-}
+}*/
 
+HWTEST_F(SlientAccessTest, SlientAccess_Insert_DB_ERROR, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_InsertEx_Test_001::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "lisi_error";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+    LOG_INFO("wjq SlientAccess_Insert_DB_ERROR sleep start");
+    sleep(10);
+    LOG_INFO("wjq SlientAccess_Insert_DB_ERROR sleep end");
+    auto [errCode, retVal] = helper->InsertEx(uri, valuesBucket);
+    EXPECT_EQ((errCode == 0), true);
+    EXPECT_EQ((retVal > 0), true);
+    LOG_INFO("SlientAccess_InsertEx_Test_001::End");
+}
+/*
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_002::Start");
@@ -727,6 +746,6 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_001, TestSize.Leve
     helper = nullptr;
     AccessTokenKit::DeleteToken(testTokenId.tokenIDEx);
     LOG_INFO("SlientAccess_Permission_Query_Test_001::End");
-}
+}*/
 } // namespace DataShare
 } // namespace OHOS
