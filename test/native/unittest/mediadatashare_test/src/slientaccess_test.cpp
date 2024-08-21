@@ -30,7 +30,7 @@ namespace DataShare {
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
 constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
-//static int USER_100 = 100;
+static int USER_100 = 100;
 std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
 std::string SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB00/TBL00?Proxy=true";
 std::string SLIENT_ERROR_URI = "datashare:///com.acts.datashare/entry/DB00/TBL00?Proxy=true";
@@ -215,7 +215,7 @@ void SlientAccessTest::TearDownTestCase(void)
 void SlientAccessTest::SetUp(void) {}
 void SlientAccessTest::TearDown(void) {}
 
-/*HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_001, TestSize.Level0)
+HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_001::Start");
     std::string uriStr1(SLIENT_ACCESS_URI);
@@ -233,7 +233,7 @@ void SlientAccessTest::TearDown(void) {}
     EXPECT_NE(helper, nullptr);
     helper = nullptr;
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_001::End");
-}*/
+}
 
 HWTEST_F(SlientAccessTest, SlientAccess_Insert_DB_ERROR, TestSize.Level0)
 {
@@ -253,7 +253,7 @@ HWTEST_F(SlientAccessTest, SlientAccess_Insert_DB_ERROR, TestSize.Level0)
     EXPECT_EQ((retVal > 0), true);
     LOG_INFO("SlientAccess_InsertEx_Test_001::End");
 }
-/*
+
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_002::Start");
@@ -746,6 +746,6 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_001, TestSize.Leve
     helper = nullptr;
     AccessTokenKit::DeleteToken(testTokenId.tokenIDEx);
     LOG_INFO("SlientAccess_Permission_Query_Test_001::End");
-}*/
+}
 } // namespace DataShare
 } // namespace OHOS
