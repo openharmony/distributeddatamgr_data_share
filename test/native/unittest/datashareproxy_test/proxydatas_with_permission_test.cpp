@@ -21,6 +21,7 @@
 #include "datashare_template.h"
 #include "hap_token_info.h"
 #include "iservice_registry.h"
+#include "out/rk3568/obj/third_party/musl/intermidiates/linux/musl_src_ported/include/unistd.h"
 #include "system_ability_definition.h"
 #include "token_setproc.h"
 #include "datashare_errno.h"
@@ -411,5 +412,26 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_002, TestSize.Level0)
     EXPECT_EQ(uriResult, uri);
     LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_002::End");
 }
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Insert_CORRUPT, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_Insert_Test_001::Start");
+    auto helper = dataShareHelper;
+    Uri uri(DATA_SHARE_PROXY_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string name0 = "wang";
+    valuesBucket.Put(TBL_NAME0, name0);
+    std::string name1 = "wu";
+    valuesBucket.Put(TBL_NAME1, name1);
+
+    LOG_ERROR("ProxyDatasTest_Insert_CORRUPT sleep begin");
+    sleep(10);
+    LOG_ERROR("ProxyDatasTest_Insert_CORRUPT sleep end");
+
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
+    LOG_INFO("ProxyDatasTest_Insert_Test_001::End");
+}
+
 } // namespace DataShare
 } // namespace OHOS
