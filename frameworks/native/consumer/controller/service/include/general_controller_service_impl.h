@@ -63,7 +63,7 @@ private:
 
     ConcurrentMap<sptr<AAFwk::IDataAbilityObserver>, std::list<Uri>> observers_;
 
-    std::string extUri;
+    std::string extUri_;
 };
 } // namespace DataShare
 } // namespace OHOS
