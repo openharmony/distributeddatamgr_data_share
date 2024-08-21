@@ -14,7 +14,6 @@
  */
 
 #include "general_controller_service_impl.h"
-#include <string>
 
 #include "dataobs_mgr_client.h"
 #include "dataobs_mgr_errors.h"
