@@ -168,9 +168,9 @@ std::shared_ptr<DataShareAbsPredicates> DataSharePredicatesProxy::GetNativePredi
         return nullptr;
     }
     DataSharePredicatesProxy *proxy = nullptr;
-    napi_status status = napi_unwrap(env, arg, reinterpret_cast<void **>(&proxy));
-    if (status != napi_ok) {
-        LOG_ERROR("Native Predicates is nullptr! napi_status:%{public}d!", status);
+    napi_unwrap(env, arg, reinterpret_cast<void **>(&proxy));
+    if (proxy == nullptr) {
+        LOG_ERROR("Native Predicates is nullptr!");
         return nullptr;
     }
     return proxy->GetInstance();
