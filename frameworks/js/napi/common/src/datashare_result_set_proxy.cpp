@@ -160,7 +160,11 @@ std::shared_ptr<DataShareResultSet> DataShareResultSetProxy::GetInnerResultSet(n
     DataShareResultSetProxy *resultSet = nullptr;
     napi_value self = nullptr;
     napi_get_cb_info(env, info, nullptr, nullptr, &self, nullptr);
-    napi_unwrap(env, self, reinterpret_cast<void **>(&resultSet));
+    napi_status status = napi_unwrap(env, self, reinterpret_cast<void **>(&resultSet));
+    if (status != napi_ok) {
+        LOG_ERROR("Inner ResultSet is nullptr! napi_status:%{public}d!", status);
+        return nullptr;
+    }
     return resultSet->GetInstance();
 }
 
