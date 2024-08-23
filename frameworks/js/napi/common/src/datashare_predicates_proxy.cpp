@@ -198,6 +198,10 @@ std::shared_ptr<DataShareAbsPredicates> DataSharePredicatesProxy::GetNativePredi
     napi_value thiz;
     napi_get_cb_info(env, info, nullptr, nullptr, &thiz, nullptr);
     napi_unwrap(env, thiz, reinterpret_cast<void **>(&predicatesProxy));
+    if (predicatesProxy == nullptr) {
+        LOG_ERROR("predicatesProxy is nullptr!");
+        return nullptr;
+    }
     return predicatesProxy->GetInstance();
 }
 
