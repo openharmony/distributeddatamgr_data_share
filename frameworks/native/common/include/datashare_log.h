@@ -25,15 +25,13 @@ static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
 }
 } // namespace OHOS::DataShare
 
-#define FILENAME (__builtin_strrchr(__FILE_NAME__, '/') ? __builtin_strrchr(__FILE_NAME__, '/') + 1 : __FILE_NAME__)
-
 #define LOG_DEBUG(fmt, ...)                                                               \
     do {                                                                                  \
         auto lable = LogLabel();                                                          \
         if (HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_DEBUG)) {              \
             ((void)HILOG_IMPL(lable.type, LogLevel::LOG_DEBUG, lable.domain, lable.tag,   \
                               "[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, \
-                              FILENAME, __LINE__, ##__VA_ARGS__));                        \
+                              __FILE_NAME__, __LINE__, ##__VA_ARGS__));                   \
         }                                                                                 \
     } while (0)
 
@@ -43,7 +41,7 @@ static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
         if (HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_INFO)) {               \
             ((void)HILOG_IMPL(lable.type, LogLevel::LOG_INFO, lable.domain, lable.tag,    \
                               "[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, \
-                              FILENAME, __LINE__, ##__VA_ARGS__));                        \
+                              __FILE_NAME__, __LINE__, ##__VA_ARGS__));                   \
         }                                                                                 \
     } while (0)
 
@@ -53,7 +51,7 @@ static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
         if (HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_WARN)) {               \
             ((void)HILOG_IMPL(lable.type, LogLevel::LOG_WARN, lable.domain, lable.tag,    \
                               "[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, \
-                              FILENAME, __LINE__, ##__VA_ARGS__));                        \
+                              __FILE_NAME__, __LINE__, ##__VA_ARGS__));                   \
         }                                                                                 \
     } while (0)
 
@@ -63,7 +61,7 @@ static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
         if (HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_ERROR)) {              \
             ((void)HILOG_IMPL(lable.type, LogLevel::LOG_ERROR, lable.domain, lable.tag,   \
                               "[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, \
-                              FILENAME, __LINE__, ##__VA_ARGS__));                        \
+                              __FILE_NAME__, __LINE__, ##__VA_ARGS__));                   \
         }                                                                                 \
     } while (0)
 
@@ -73,7 +71,7 @@ static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
         if (HiLogIsLoggable(lable.domain, lable.tag, LogLevel::LOG_FATAL)) {              \
             ((void)HILOG_IMPL(lable.type, LogLevel::LOG_FATAL, lable.domain, lable.tag,   \
                               "[%{public}s()-%{public}s:%{public}d]: " fmt, __FUNCTION__, \
-                              FILENAME, __LINE__, ##__VA_ARGS__));                        \
+                              __FILE_NAME__, __LINE__, ##__VA_ARGS__));                   \
         }                                                                                 \
     } while (0)
 
