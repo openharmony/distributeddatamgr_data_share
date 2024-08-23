@@ -141,11 +141,9 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_001, TestSize.Level0)
     resultSet->GetRowCount(result);
     EXPECT_EQ(result, 1);
 
-    AppDataFwk::SharedBlock *block = nullptr;
     bool hasBlock = resultSet->HasBlock();
     EXPECT_EQ(hasBlock, true);
-    block = resultSet->GetBlock();
-    EXPECT_NE(block, nullptr);
+    EXPECT_NE(resultSet->GetBlock(), nullptr);
 
     std::vector<uint8_t> blob;
     int err = resultSet->GetBlob(-1, blob);

@@ -899,13 +899,12 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_003, TestSize.Lev
 
     bool hasBlock = resultSet->HasBlock();
     EXPECT_EQ(hasBlock, true);
-    block = resultSet->GetBlock();
-    EXPECT_NE(block, nullptr);
-
+    EXPECT_NE(resultSet->GetBlock(), nullptr);
+    block = (resultSet->GetBlock()).get();
     resultSet->SetBlock(block);
-    EXPECT_EQ(block, resultSet->GetBlock());
+    EXPECT_EQ(block, (resultSet->GetBlock()).get());
     resultSet->FillBlock(0, block);
-    EXPECT_EQ(block, resultSet->GetBlock());
+    EXPECT_EQ(block, (resultSet->GetBlock()).get());
     LOG_INFO("MediaDataShare_ResultSet_Test_003, End");
 }
 

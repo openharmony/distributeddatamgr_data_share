@@ -17,6 +17,7 @@
 #define DATASHARE_RESULT_SET_H
 
 #include <memory>
+#include <shared_mutex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -134,7 +135,7 @@ public:
     /**
      * Obtains a block from the SharedResultSet.
      */
-    AppDataFwk::SharedBlock *GetBlock() const override;
+    std::shared_ptr<AppDataFwk::SharedBlock> GetBlock() override;
 
     /**
      * Called when the position of the result set changes.
@@ -159,11 +160,12 @@ public:
     /**
      * Checks whether an DataShareResultSet object contains shared blocks.
      */
-    bool HasBlock() const;
+    bool HasBlock();
 
+    std::shared_ptr<ResultSetBridge> GetBridge();
 protected:
     int CheckState(int columnIndex);
-    void ClosedBlock();
+    void ClosedBlockAndBridge();
     virtual void Finalize();
 
     friend class ISharedResultSetStub;
@@ -178,7 +180,8 @@ private:
     // The actual position of the last row of data in the shareblock
     int endRowPos_ = -1;
     // The SharedBlock owned by this DataShareResultSet
-    AppDataFwk::SharedBlock *sharedBlock_  = nullptr;
+    std::shared_mutex mutex_;
+    std::shared_ptr<AppDataFwk::SharedBlock> sharedBlock_  = nullptr;
     std::shared_ptr<DataShareBlockWriterImpl> blockWriter_ = nullptr;
     std::shared_ptr<ResultSetBridge> bridge_ = nullptr;
 };
