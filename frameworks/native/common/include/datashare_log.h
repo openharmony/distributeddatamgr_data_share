@@ -25,7 +25,7 @@ static inline OHOS::HiviewDFX::HiLogLabel LogLabel()
 }
 } // namespace OHOS::DataShare
 
-#define FILENAME (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
+#define FILENAME (__builtin_strrchr(__FILE_NAME__, '/') ? __builtin_strrchr(__FILE_NAME__, '/') + 1 : __FILE_NAME__)
 
 #define LOG_DEBUG(fmt, ...)                                                               \
     do {                                                                                  \
