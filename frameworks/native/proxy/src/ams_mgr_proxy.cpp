@@ -46,9 +46,6 @@ AmsMgrProxy::~AmsMgrProxy()
 AmsMgrProxy* AmsMgrProxy::GetInstance()
 {
     static AmsMgrProxy* proxy = nullptr;
-    if (proxy != nullptr) {
-        return proxy;
-    }
     std::lock_guard<std::mutex> lock(pmutex_);
     if (proxy != nullptr) {
         return proxy;
