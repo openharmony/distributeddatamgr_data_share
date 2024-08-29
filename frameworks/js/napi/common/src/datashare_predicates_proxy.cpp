@@ -156,6 +156,10 @@ napi_value DataSharePredicatesProxy::NewInstance(napi_env env, std::shared_ptr<D
         LOG_ERROR("native instance is nullptr! napi_status:%{public}d!", status);
         return instance;
     }
+    if (proxy == nullptr) {
+        LOG_ERROR("Native Predicates is nullptr!");
+        return nullptr;
+    }
     proxy->SetInstance(value);
     return instance;
 }
