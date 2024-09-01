@@ -34,9 +34,6 @@ DataShareManagerImpl* DataShareManagerImpl::manager_ = nullptr;
 
 DataShareManagerImpl* DataShareManagerImpl::GetInstance()
 {
-    if (manager_ != nullptr) {
-        return manager_;
-    }
     std::lock_guard<std::mutex> lock(pmutex_);
     if (manager_ != nullptr) {
         return manager_;
@@ -145,10 +142,6 @@ DataShareManagerImpl::~DataShareManagerImpl()
 
 std::shared_ptr<DataShareServiceProxy> DataShareManagerImpl::GetProxy()
 {
-    if (dataShareService_ != nullptr) {
-        return dataShareService_;
-    }
-
     std::lock_guard<std::mutex> lock(mutex_);
     if (dataShareService_ != nullptr) {
         return dataShareService_;
