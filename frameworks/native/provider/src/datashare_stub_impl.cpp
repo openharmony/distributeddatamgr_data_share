@@ -373,9 +373,10 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
         if (extension == nullptr) {
             return false;
         }
+        auto isRecvReply = extension->GetRecvReply();
         extension->GetResultSet(resultSet);
         extension->GetBusinessError(businessError);
-        return extension->GetRecvReply();
+        return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
