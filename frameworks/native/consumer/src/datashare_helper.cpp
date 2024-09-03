@@ -75,7 +75,7 @@ std::string DataShareHelper::TransferUriPrefix(const std::string &originPrefix, 
  * @return Returns the created DataShareHelper instance.
  */
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
-    const sptr<IRemoteObject> &token, const std::string &strUri, const std::string &extUri)
+    const sptr<IRemoteObject> &token, const std::string &strUri, const std::string &extUri, const int waitTime)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     if (token == nullptr) {
@@ -103,7 +103,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
 }
 
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, const CreateOptions &options,
-    const std::string &bundleName)
+    const std::string &bundleName, const int waitTime)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     Uri uri(strUri);
@@ -115,7 +115,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, 
 }
 
 std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::Create(const sptr<IRemoteObject> &token,
-    const std::string &strUri, const std::string &extUri)
+    const std::string &strUri, const std::string &extUri, const int waitTime)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     if (token == nullptr) {
@@ -175,9 +175,10 @@ int DataShareHelper::GetSilentProxyStatus(const std::string &uri)
     return proxy->GetSilentProxyStatus(uri);
 }
 
-std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, const sptr<IRemoteObject> &token)
+std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, const sptr<IRemoteObject> &token,
+    const int waitTime)
 {
-    sptr<DataShareConnection> connection = new (std::nothrow) DataShareConnection(uri, token);
+    sptr<DataShareConnection> connection = new (std::nothrow) DataShareConnection(uri, token, waitTime);
     if (connection == nullptr) {
         LOG_ERROR("Create DataShareConnection failed.");
         return nullptr;
