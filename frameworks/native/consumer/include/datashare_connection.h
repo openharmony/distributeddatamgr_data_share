@@ -32,7 +32,8 @@ using namespace AppExecFwk;
 class DataShareConnection : public AAFwk::AbilityConnectionStub,
     public std::enable_shared_from_this<DataShareConnection> {
 public:
-    DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token) : uri_(uri), token_(token) {}
+    DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime = 2) : uri_(uri),
+        token_(token), waitTime_(waitTime) {}
     virtual ~DataShareConnection();
 
     /**
@@ -83,6 +84,7 @@ private:
         std::mutex mutex;
     };
     std::shared_ptr<DataShareProxy> ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
+    std::shared_ptr<DataShareProxy> GetDataShareProxy();
     ErrCode Disconnect();
     void ReconnectExtAbility(const std::string &uri);
     void DelayConnectExtAbility(const std::string &uri);
@@ -99,6 +101,7 @@ private:
     static constexpr std::chrono::milliseconds MAX_RECONNECT_TIME_INTERVAL = std::chrono::milliseconds(70000);
     std::shared_ptr<ExecutorPool> pool_;
     DataShareConnectionInfo reConnects_;
+    int32_t waitTime_ = 0;
 };
 }  // namespace DataShare
 }  // namespace OHOS
