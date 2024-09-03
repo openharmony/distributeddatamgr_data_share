@@ -50,13 +50,6 @@ public:
 
     int Delete(const Uri &uri, const DataSharePredicates &predicates) override;
 
-    std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &value) override;
-
-    std::pair<int32_t, int32_t> UpdateEx(const Uri &uri, const DataSharePredicates &predicates,
-        const DataShareValuesBucket &value) override;
-
-    std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) override;
-
     std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
         std::vector<std::string> &columns, DatashareBusinessError &businessError) override;
 
@@ -73,6 +66,13 @@ public:
     Uri NormalizeUri(const Uri &uri) override;
 
     Uri DenormalizeUri(const Uri &uri) override;
+
+    std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &value) override;
+
+    std::pair<int32_t, int32_t> UpdateEx(const Uri &uri, const DataSharePredicates &predicates,
+        const DataShareValuesBucket &value) override;
+
+    std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) override;
 
 private:
     std::shared_ptr<JsDataShareExtAbility> GetOwner();
