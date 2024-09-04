@@ -34,6 +34,7 @@ void DataShareUvQueue::LambdaForWork(uv_work_t *work, int uvstatus)
 {
     if (UV_ECANCELED == uvstatus || work == nullptr || work->data == nullptr) {
         LOG_ERROR("invalid work or work->data.");
+        DataShareUvQueue::Purge(work);
         return;
     }
     auto *entry = static_cast<UvEntry*>(work->data);
@@ -43,10 +44,7 @@ void DataShareUvQueue::LambdaForWork(uv_work_t *work, int uvstatus)
             entry->func();
         }
         entry->done = true;
-        if (!entry->purge) {
-            entry->condition.notify_all();
-            return;
-        }
+        entry->condition.notify_all();
     }
     DataShareUvQueue::Purge(work);
 }
@@ -58,17 +56,17 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
         LOG_ERROR("invalid work.");
         return;
     }
-    work->data = new UvEntry {env_, std::move(func), false, false, {}, {}, std::move(retFunc)};
+    work->data = new UvEntry {env_, std::move(func), false, {}, {}, std::atomic<int>(1)};
     if (work->data == nullptr) {
         delete work;
         LOG_ERROR("invalid uvEntry.");
         return;
     }
 
-    bool noNeedPurge = false;
     auto *uvEntry = static_cast<UvEntry*>(work->data);
     {
         std::unique_lock<std::mutex> lock(uvEntry->mutex);
+        uvEntry->count.fetch_add(1);
         auto status = uv_queue_work(
             loop_, work, [](uv_work_t *work) {}, LambdaForWork);
         if (status != napi_ok) {
@@ -83,15 +81,11 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
         }
         if (!uvEntry->done && uv_cancel((uv_req_t*)work) != napi_ok) {
             LOG_ERROR("uv_cancel failed.");
-            uvEntry->purge = true;
-            noNeedPurge = true;
         }
     }
 
-    CheckFuncAndExec(uvEntry->retFunc);
-    if (!noNeedPurge) {
-        DataShareUvQueue::Purge(work);
-    }
+    CheckFuncAndExec(retFunc);
+    DataShareUvQueue::Purge(work);
 }
 
 void DataShareUvQueue::Purge(uv_work_t* work)
@@ -107,6 +101,10 @@ void DataShareUvQueue::Purge(uv_work_t* work)
     }
 
     auto *entry = static_cast<UvEntry*>(work->data);
+    auto count = entry->count.fetch_sub(1);
+    if (count != 1) {
+        return;
+    }
 
     delete entry;
     entry = nullptr;
