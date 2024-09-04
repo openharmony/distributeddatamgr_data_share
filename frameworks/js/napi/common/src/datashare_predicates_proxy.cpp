@@ -156,6 +156,10 @@ napi_value DataSharePredicatesProxy::NewInstance(napi_env env, std::shared_ptr<D
         LOG_ERROR("native instance is nullptr! napi_status:%{public}d!", status);
         return instance;
     }
+    if (proxy == nullptr) {
+        LOG_ERROR("Native Predicates is nullptr!");
+        return nullptr;
+    }
     proxy->SetInstance(value);
     return instance;
 }
@@ -169,6 +173,10 @@ std::shared_ptr<DataShareAbsPredicates> DataSharePredicatesProxy::GetNativePredi
     }
     DataSharePredicatesProxy *proxy = nullptr;
     napi_unwrap(env, arg, reinterpret_cast<void **>(&proxy));
+    if (proxy == nullptr) {
+        LOG_ERROR("Native Predicates is nullptr!");
+        return nullptr;
+    }
     return proxy->GetInstance();
 }
 
@@ -194,6 +202,10 @@ std::shared_ptr<DataShareAbsPredicates> DataSharePredicatesProxy::GetNativePredi
     napi_value thiz;
     napi_get_cb_info(env, info, nullptr, nullptr, &thiz, nullptr);
     napi_unwrap(env, thiz, reinterpret_cast<void **>(&predicatesProxy));
+    if (predicatesProxy == nullptr) {
+        LOG_ERROR("predicatesProxy is nullptr!");
+        return nullptr;
+    }
     return predicatesProxy->GetInstance();
 }
 
