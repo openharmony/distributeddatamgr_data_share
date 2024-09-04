@@ -57,24 +57,28 @@ public:
      *
      * @param token Indicates the System token.
      * @param strUri Indicates the database table or disk file to operate.
+     * @param waitTime connect extension waiting time.
      *
      * @return Returns the created DataShareHelper instance.
      */
-    [[deprecated("Use Create(const sptr<IRemoteObject> &, const std::string &, const std::string &) instead.")]]
-    static std::shared_ptr<DataShareHelper> Creator(
-        const sptr<IRemoteObject> &token, const std::string &strUri, const std::string &extUri = "");
+    [[deprecated(
+        "Use Create(const sptr<IRemoteObject> &, const std::string &, const std::string &, const int &) instead.")]]
+    static std::shared_ptr<DataShareHelper> Creator(const sptr<IRemoteObject> &token,
+        const std::string &strUri, const std::string &extUri = "", const int waitTime = 2);
 
     /**
      * @brief Creates a DataShareHelper instance with the Uri and {@link #CreateOptions} .
      *
      * @param strUri Indicates the database table or disk file to operate.
      * @param options Indicates the optional config.
+     * @param waitTime connect extension waiting time.
      *
      * @return Returns the created DataShareHelper instance with a specified Uri.
      */
-    [[deprecated("Use Create(const sptr<IRemoteObject> &, const std::string &, const std::string &) instead.")]]
+    [[deprecated(
+        "Use Create(const sptr<IRemoteObject> &, const std::string &,const std::string &, const int &) instead.")]]
     static std::shared_ptr<DataShareHelper> Creator(const std::string &strUri, const CreateOptions &options,
-        const std::string &bundleName = "");
+        const std::string &bundleName = "", const int waitTime = 2);
 
     /**
      * @brief Creates a DataShareHelper instance, priority silent access, use non-silent access when silent is not
@@ -83,11 +87,12 @@ public:
      * @param token Indicates the System token.
      * @param strUri Indicates the database table or disk file to operate for silent access.
      * @param extUri Indicates the database table or disk file to operate for non silent access.
+     * @param waitTime connect extension waiting time.
      *
      * @return Returns the created DataShareHelper instance with a specified Uri.
      */
     static std::pair<int, std::shared_ptr<DataShareHelper>> Create(const sptr<IRemoteObject> &token,
-        const std::string &strUri, const std::string &extUri);
+        const std::string &strUri, const std::string &extUri, const int waitTime = 2);
 
     /**
      * @brief Releases the client resource of the Data share.
@@ -457,7 +462,8 @@ private:
 
     static int GetSilentProxyStatus(const std::string &uri);
 
-    static std::shared_ptr<DataShareHelper> CreateExtHelper(Uri &uri, const sptr<IRemoteObject> &token);
+    static std::shared_ptr<DataShareHelper> CreateExtHelper(Uri &uri, const sptr<IRemoteObject> &token,
+        const int waitTime = 2);
 
     static std::string TransferUriPrefix(const std::string &originPrefix, const std::string &replacedPrefix,
         const std::string &originUriStr);
