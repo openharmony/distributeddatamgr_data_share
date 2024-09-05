@@ -44,10 +44,9 @@ private:
         napi_env env;
         NapiVoidFunc func;
         bool done;
-        bool purge;
         std::condition_variable condition;
         std::mutex mutex;
-        NapiBoolFunc retFunc;
+        std::atomic_int32_t count;
     };
 
     static void LambdaForWork(uv_work_t* work, int uvstatus);
