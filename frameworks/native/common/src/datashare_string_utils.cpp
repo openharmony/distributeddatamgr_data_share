@@ -14,6 +14,8 @@
  */
 
 #include "datashare_string_utils.h"
+#include <cstdint>
+#include <random>
 
 namespace OHOS {
 namespace DataShare {
@@ -44,6 +46,14 @@ std::string DataShareStringUtils::Change(const std::string &name)
         return name;
     }
     return DEFAULT_ANONYMOUS + name.substr(ANONYMOUS_SIZE);
+}
+
+int32_t DataShareStringUtils::GetRandomNumber(const int32_t min, const int32_t max)
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(min, max);
+    return dis(gen);
 }
 DataShareStringUtils::DataShareStringUtils() {}
 DataShareStringUtils::~DataShareStringUtils() {}

@@ -115,6 +115,11 @@ constexpr int E_EXT_URI_INVALID = (E_BASE + 54);
 * @brief DataShare not ready
 */
 constexpr int E_DATA_SHARE_NOT_READY = (E_BASE + 55);
+
+/**
+* @brief The error code for resultSet busy error.
+*/
+constexpr int E_RESULTSET_BUSY = (E_BASE + 61);
 } // namespace DataShare
 } // namespace OHOS
 
