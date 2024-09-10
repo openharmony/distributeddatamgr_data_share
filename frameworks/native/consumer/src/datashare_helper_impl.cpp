@@ -30,7 +30,6 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-constexpr int INVALID_VALUE = -1;
 DataShareHelperImpl::DataShareHelperImpl(const Uri &uri, const sptr<IRemoteObject> &token,
     std::shared_ptr<DataShareConnection> connection)
 {
@@ -77,7 +76,7 @@ int DataShareHelperImpl::OpenFile(Uri &uri, const std::string &mode)
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return extSpCtl->OpenFile(uri, mode);
 }
@@ -87,7 +86,7 @@ int DataShareHelperImpl::OpenRawFile(Uri &uri, const std::string &mode)
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return extSpCtl->OpenRawFile(uri, mode);
 }
@@ -98,7 +97,7 @@ int DataShareHelperImpl::Insert(Uri &uri, const DataShareValuesBucket &value)
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl_ is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return generalCtl->Insert(uri, value);
 }
@@ -109,7 +108,7 @@ int DataShareHelperImpl::InsertExt(Uri &uri, const DataShareValuesBucket &value,
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("providerSpCtl is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return extSpCtl->InsertExt(uri, value, result);
 }
@@ -120,7 +119,7 @@ int DataShareHelperImpl::Update(Uri &uri, const DataSharePredicates &predicates,
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return generalCtl->Update(uri, predicates, value);
 }
@@ -130,7 +129,7 @@ int DataShareHelperImpl::BatchUpdate(const UpdateOperations &operations, std::ve
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return extSpCtl->BatchUpdate(operations, results);
 }
@@ -141,9 +140,55 @@ int DataShareHelperImpl::Delete(Uri &uri, const DataSharePredicates &predicates)
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return generalCtl->Delete(uri, predicates);
+}
+
+std::pair<int32_t, int32_t> DataShareHelperImpl::InsertEx(Uri &uri, const DataShareValuesBucket &value)
+{
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
+    auto generalCtl = generalCtl_;
+    if (generalCtl == nullptr) {
+        LOG_ERROR("generalCtl_ is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    auto [errCode, status] = generalCtl->InsertEx(uri, value);
+    if (errCode != E_OK) {
+        LOG_ERROR("generalCtl insert failed, errCode = %{public}d", errCode);
+    }
+    return std::make_pair(errCode, status);
+}
+
+std::pair<int32_t, int32_t> DataShareHelperImpl::UpdateEx(
+    Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
+{
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
+    auto generalCtl = generalCtl_;
+    if (generalCtl == nullptr) {
+        LOG_ERROR("generalCtl is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    auto [errCode, status] = generalCtl->UpdateEx(uri, predicates, value);
+    if (errCode != E_OK) {
+        LOG_ERROR("generalCtl update failed, errCode = %{public}d", errCode);
+    }
+    return std::make_pair(errCode, status);
+}
+
+std::pair<int32_t, int32_t> DataShareHelperImpl::DeleteEx(Uri &uri, const DataSharePredicates &predicates)
+{
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
+    auto generalCtl = generalCtl_;
+    if (generalCtl == nullptr) {
+        LOG_ERROR("generalCtl is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    auto [errCode, status] = generalCtl->DeleteEx(uri, predicates);
+    if (errCode != E_OK) {
+        LOG_ERROR("generalCtl delete failed, errCode = %{public}d", errCode);
+    }
+    return std::make_pair(errCode, status);
 }
 
 std::shared_ptr<DataShareResultSet> DataShareHelperImpl::Query(Uri &uri, const DataSharePredicates &predicates,
@@ -179,7 +224,7 @@ int DataShareHelperImpl::BatchInsert(Uri &uri, const std::vector<DataShareValues
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("providerSepOperator is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return extSpCtl->BatchInsert(uri, values);
 }
@@ -189,7 +234,7 @@ int DataShareHelperImpl::ExecuteBatch(const std::vector<OperationStatement> &sta
     auto extSpCtl = extSpCtl_;
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return extSpCtl->ExecuteBatch(statements, result);
 }
@@ -271,7 +316,7 @@ int DataShareHelperImpl::AddQueryTemplate(const std::string &uri, int64_t subscr
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return persistentDataCtl->AddQueryTemplate(uri, subscriberId, tpl);
 }
@@ -284,7 +329,7 @@ int DataShareHelperImpl::DelQueryTemplate(const std::string &uri, int64_t subscr
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return persistentDataCtl->DelQueryTemplate(uri, subscriberId);
 }

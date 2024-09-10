@@ -24,6 +24,7 @@
 
 #include "data_ability_observer_interface.h"
 #include "datashare_business_error.h"
+#include "datashare_errno.h"
 #include "datashare_observer.h"
 #include "datashare_operation_statement.h"
 #include "datashare_predicates.h"
@@ -141,6 +142,7 @@ public:
      *
      * @return Returns the index of the inserted data record.
      */
+    [[deprecated("Use InsertEx(Uri &, const DataShareValuesBucket &) instead.")]]
     virtual int Insert(Uri &uri, const DataShareValuesBucket &value) = 0;
 
     /**
@@ -163,6 +165,7 @@ public:
      *
      * @return Returns the number of data records updated.
      */
+    [[deprecated("Use UpdateEx(Uri &, const DataSharePredicates &, const DataShareValuesBucket &) instead.")]]
     virtual int Update(Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) = 0;
 
     /**
@@ -183,6 +186,7 @@ public:
      *
      * @return Returns the number of data records deleted.
      */
+    [[deprecated("Use DeleteEx(Uri &, const DataSharePredicates &) instead.")]]
     virtual int Delete(Uri &uri, const DataSharePredicates &predicates) = 0;
 
     /**
@@ -414,6 +418,37 @@ public:
      * @return Returns the error code.
      */
     static int SetSilentSwitch(Uri &uri, bool enable);
+
+    /**
+     * @brief Inserts a single data record into the database.
+     *
+     * @param uri Indicates the path of the data to operate.
+     * @param value  Indicates the data record to insert. If this parameter is null, a blank row will be inserted.
+     *
+     * @return Returns pair<int32_t errCode, int32_t index>, the errCode and the index of the inserted data record.
+     */
+    virtual std::pair<int32_t, int32_t> InsertEx(Uri &uri, const DataShareValuesBucket &value);
+
+    /**
+     * @brief Updates data records in the database.
+     *
+     * @param uri Indicates the path of data to update.
+     * @param predicates Indicates filter criteria. You should define the processing logic when this parameter is null.
+     * @param value Indicates the data to update. This parameter can be null.
+     *
+     * @return Returns pair<int32_t errCode, int32_t index>, the errCode and the index of data records updated.
+     */
+    virtual std::pair<int32_t, int32_t> UpdateEx(
+        Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value);
+    /**
+     * @brief Deletes one or more data records from the database.
+     *
+     * @param uri Indicates the path of the data to operate.
+     * @param predicates Indicates filter criteria. You should define the processing logic when this parameter is null.
+     *
+     * @return Returns pair<int32_t errCode, int32_t index>, the errCode and the index of data records deleted.
+     */
+    virtual std::pair<int32_t, int32_t> DeleteEx(Uri &uri, const DataSharePredicates &predicates);
 
 private:
     static std::shared_ptr<DataShareHelper> CreateServiceHelper(const std::string &bundleName = "");

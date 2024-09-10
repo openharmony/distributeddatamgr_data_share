@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace DataShare {
-constexpr int INVALID_VALUE = -1;
 GeneralControllerServiceImpl::~GeneralControllerServiceImpl()
 {
     auto manager = DataShareManagerImpl::GetInstance();
@@ -34,13 +33,13 @@ int GeneralControllerServiceImpl::Insert(const Uri &uri, const DataShareValuesBu
     auto manager = DataShareManagerImpl::GetInstance();
     if (manager == nullptr) {
         LOG_ERROR("Manager is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     manager->SetCallCount(__FUNCTION__, uri.ToString());
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return proxy->Insert(uri, value);
 }
@@ -51,13 +50,13 @@ int GeneralControllerServiceImpl::Update(const Uri &uri, const DataSharePredicat
     auto manager = DataShareManagerImpl::GetInstance();
     if (manager == nullptr) {
         LOG_ERROR("Manager is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     manager->SetCallCount(__FUNCTION__, uri.ToString());
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return proxy->Update(uri, predicates, value);
 }
@@ -67,15 +66,65 @@ int GeneralControllerServiceImpl::Delete(const Uri &uri, const DataSharePredicat
     auto manager = DataShareManagerImpl::GetInstance();
     if (manager == nullptr) {
         LOG_ERROR("Manager is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     manager->SetCallCount(__FUNCTION__, uri.ToString());
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return proxy->Delete(uri, predicates);
+}
+
+std::pair<int32_t, int32_t> GeneralControllerServiceImpl::InsertEx(const Uri &uri, const DataShareValuesBucket &value)
+{
+    auto manager = DataShareManagerImpl::GetInstance();
+    if (manager == nullptr) {
+        LOG_ERROR("Manager is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    manager->SetCallCount(__FUNCTION__, uri.ToString());
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    return proxy->InsertEx(uri, value);
+}
+
+std::pair<int32_t, int32_t> GeneralControllerServiceImpl::UpdateEx(
+    const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
+{
+    auto manager = DataShareManagerImpl::GetInstance();
+    if (manager == nullptr) {
+        LOG_ERROR("Manager is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    manager->SetCallCount(__FUNCTION__, uri.ToString());
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    return proxy->UpdateEx(uri, predicates, value);
+}
+
+std::pair<int32_t, int32_t> GeneralControllerServiceImpl::DeleteEx(const Uri &uri,
+    const DataSharePredicates &predicates)
+{
+    auto manager = DataShareManagerImpl::GetInstance();
+    if (manager == nullptr) {
+        LOG_ERROR("Manager is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    manager->SetCallCount(__FUNCTION__, uri.ToString());
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    return proxy->DeleteEx(uri, predicates);
 }
 
 std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Uri &uri,

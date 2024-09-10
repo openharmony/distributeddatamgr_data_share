@@ -19,7 +19,7 @@
 #include <string>
 
 #include "iremote_broker.h"
-
+#include "datashare_errno.h"
 #include "data_proxy_observer.h"
 #include "datashare_business_error.h"
 #include "datashare_predicates.h"
@@ -34,16 +34,18 @@ class IDataShareService : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DataShare.IDataShareService");
 
-    enum {
-        DATA_SHARE_ERROR = -1,
-        DATA_SHARE_OK = 0,
-    };
-
     virtual int Insert(const Uri &uri, const DataShareValuesBucket &value) = 0;
 
     virtual int Update(const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) = 0;
 
     virtual int Delete(const Uri &uri, const DataSharePredicates &predicates) = 0;
+
+    virtual std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &value) = 0;
+
+    virtual std::pair<int32_t, int32_t> UpdateEx(
+        const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) = 0;
+
+    virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) = 0;
 
     virtual std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
         std::vector<std::string> &columns, DatashareBusinessError &businessError) = 0;
