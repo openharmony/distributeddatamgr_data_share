@@ -46,13 +46,6 @@ public:
 
     virtual int Delete(const Uri &uri, const DataSharePredicates &predicates) override;
 
-    virtual std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &value) override;
-
-    virtual std::pair<int32_t, int32_t> UpdateEx(const Uri &uri, const DataSharePredicates &predicates,
-        const DataShareValuesBucket &value) override;
-
-    virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) override;
-
     virtual std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
         std::vector<std::string> &columns, DatashareBusinessError &businessError) override;
 
@@ -71,6 +64,13 @@ public:
     virtual Uri NormalizeUri(const Uri &uri) override;
 
     virtual Uri DenormalizeUri(const Uri &uri) override;
+
+    virtual std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &value) override;
+
+    virtual std::pair<int32_t, int32_t> UpdateEx(const Uri &uri, const DataSharePredicates &predicates,
+        const DataShareValuesBucket &value) override;
+
+    virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) override;
 
 private:
     bool CheckSize(const UpdateOperations &operations);

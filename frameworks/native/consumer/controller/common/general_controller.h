@@ -42,13 +42,6 @@ public:
 
     virtual int Delete(const Uri &uri, const DataSharePredicates &predicates) = 0;
 
-    virtual std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &value) = 0;
-
-    virtual std::pair<int32_t, int32_t> UpdateEx(
-        const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) = 0;
-
-    virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) = 0;
-
     virtual std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
         std::vector<std::string> &columns, DatashareBusinessError &businessError) = 0;
 
@@ -57,6 +50,13 @@ public:
     virtual void UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 
     virtual void NotifyChange(const Uri &uri) = 0;
+
+    virtual std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &value) = 0;
+
+    virtual std::pair<int32_t, int32_t> UpdateEx(
+        const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) = 0;
+
+    virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) = 0;
 };
 } // namespace DataShare
 } // namespace OHOS

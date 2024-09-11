@@ -440,6 +440,7 @@ public:
      */
     virtual std::pair<int32_t, int32_t> UpdateEx(
         Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value);
+
     /**
      * @brief Deletes one or more data records from the database.
      *
