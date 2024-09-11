@@ -33,13 +33,6 @@ public:
 
     int Delete(const Uri &uri, const DataSharePredicates &predicate) override;
 
-    std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &valuesBucket) override;
-
-    std::pair<int32_t, int32_t> UpdateEx(const Uri &uri, const DataSharePredicates &predicate,
-        const DataShareValuesBucket &valuesBucket) override;
-
-    std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicate) override;
-
     std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
         std::vector<std::string> &columns, DatashareBusinessError &businessError) override;
 
@@ -85,6 +78,13 @@ public:
 
     int UnRegisterObserver(const Uri &uri,
         const sptr<OHOS::IRemoteObject> &dataObserver) override;
+
+    std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &valuesBucket) override;
+
+    std::pair<int32_t, int32_t> UpdateEx(const Uri &uri, const DataSharePredicates &predicate,
+        const DataShareValuesBucket &valuesBucket) override;
+
+    std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicate) override;
 
 private:
     static inline BrokerDelegator<DataShareServiceProxy> delegator_;
