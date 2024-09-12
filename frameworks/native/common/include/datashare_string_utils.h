@@ -30,6 +30,8 @@ public:
 
     static std::string Change(const std::string &name);
 
+    static int32_t GetRandomNumber(const int32_t min, const int32_t max);
+
 private:
     DataShareStringUtils();
     ~DataShareStringUtils();

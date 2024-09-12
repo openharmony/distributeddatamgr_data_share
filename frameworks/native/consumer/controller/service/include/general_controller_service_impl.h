@@ -63,6 +63,12 @@ private:
     void SetRegisterCallback();
 
     ConcurrentMap<sptr<AAFwk::IDataAbilityObserver>, std::list<Uri>> observers_;
+
+    static constexpr int MAX_RETRY_COUNT = 3;
+
+    static constexpr int RANDOM_MIN = 50;
+
+    static constexpr int RANDOM_MAX = 150;
 };
 } // namespace DataShare
 } // namespace OHOS

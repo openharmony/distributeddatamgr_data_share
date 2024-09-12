@@ -148,6 +148,11 @@ constexpr int E_UNMARSHAL_ERROR = (E_BASE + 59);
 * @brief The error code for write interface token to data error.
 */
 constexpr int E_WRITE_TO_PARCE_ERROR = (E_BASE + 60);
+
+/**
+* @brief The error code for resultSet busy error.
+*/
+constexpr int E_RESULTSET_BUSY = (E_BASE + 61);
 } // namespace DataShare
 } // namespace OHOS
 

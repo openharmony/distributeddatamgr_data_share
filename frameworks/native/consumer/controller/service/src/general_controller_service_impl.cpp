@@ -14,6 +14,7 @@
  */
 
 #include "general_controller_service_impl.h"
+#include <thread>
 
 #include "dataobs_mgr_client.h"
 #include "dataobs_mgr_errors.h"
@@ -141,7 +142,15 @@ std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Ur
         LOG_ERROR("proxy is nullptr");
         return nullptr;
     }
-    return proxy->Query(uri, predicates, columns, businessError);
+    auto resultSet = proxy->Query(uri, predicates, columns, businessError);
+    int retryCount = 0;
+    while (resultSet == nullptr && businessError.GetCode() == E_RESULTSET_BUSY && retryCount++ < MAX_RETRY_COUNT) {
+        LOG_ERROR("resultSet busy retry, uri: %{public}s", DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+        std::this_thread::sleep_for(std::chrono::milliseconds(
+            DataShareStringUtils::GetRandomNumber(RANDOM_MIN, RANDOM_MAX)));
+        resultSet = proxy->Query(uri, predicates, columns, businessError);
+    }
+    return resultSet;
 }
 
 void GeneralControllerServiceImpl::RegisterObserver(const Uri &uri,
