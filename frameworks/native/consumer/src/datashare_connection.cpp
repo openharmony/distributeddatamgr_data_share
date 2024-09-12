@@ -25,7 +25,6 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-constexpr int WAIT_TIME = 2;
 /**
  * @brief This method is called back to receive the connection result after an ability calls the
  * ConnectAbility method to connect it to an extension ability.
@@ -183,7 +182,7 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
         return nullptr;
     }
     std::unique_lock<std::mutex> condLock(condition_.mutex);
-    if (condition_.condition.wait_for(condLock, std::chrono::seconds(WAIT_TIME),
+    if (condition_.condition.wait_for(condLock, std::chrono::seconds(waitTime_),
         [this] { return dataShareProxy_ != nullptr; })) {
         LOG_DEBUG("connect ability ended successfully uri:%{public}s", DataShareStringUtils::Change(reqUri).c_str());
         RADAR_REPORT(__FUNCTION__, RadarReporter::CREATE_DATASHARE_HELPER,
@@ -198,7 +197,7 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
             RadarReporter::LOCAL_SESS_NAME, Str16ToStr8(token->GetObjectDescriptor()),
             RadarReporter::PEER_SESS_NAME, reqUri);
     }
-    return dataShareProxy_;
+    return GetDataShareProxy();
 }
 
 /**
@@ -254,6 +253,12 @@ ErrCode DataShareConnection::Disconnect()
         return -1;
     }
     return instance->DisConnect(this);
+}
+
+std::shared_ptr<DataShareProxy> DataShareConnection::GetDataShareProxy()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return dataShareProxy_;
 }
 }  // namespace DataShare
 }  // namespace OHOS
