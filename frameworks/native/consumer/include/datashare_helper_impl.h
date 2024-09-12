@@ -98,6 +98,13 @@ public:
 
     std::vector<OperationResult> DisablePubSubs(const std::vector<std::string> &uris, int64_t subscriberId) override;
 
+    std::pair<int32_t, int32_t> InsertEx(Uri &uri, const DataShareValuesBucket &value) override;
+
+    std::pair<int32_t, int32_t> UpdateEx(
+        Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) override;
+
+    std::pair<int32_t, int32_t> DeleteEx(Uri &uri, const DataSharePredicates &predicates) override;
+
 private:
     std::shared_ptr<ExtSpecialController> extSpCtl_ = nullptr;
     std::shared_ptr<GeneralController> generalCtl_ = nullptr;

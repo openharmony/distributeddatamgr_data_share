@@ -247,6 +247,106 @@ int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predica
     return ret;
 }
 
+std::pair<int32_t, int32_t> DataShareStubImpl::InsertEx(const Uri &uri, const DataShareValuesBucket &value)
+{
+    CallingInfo info;
+    GetCallingInfo(info);
+
+    auto client = sptr<DataShareStubImpl>(this);
+    auto extension = client->GetOwner();
+    if (extension == nullptr) {
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+
+    if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
+        LOG_ERROR("Check calling permission failed.");
+        return std::make_pair(PERMISSION_ERROR_NUMBER, 0);
+    }
+
+    int ret = 0;
+    std::function<void()> syncTaskFunc = [extension, info, uri, value]() {
+        extension->SetCallingInfo(info);
+        extension->Insert(uri, value);
+    };
+    std::function<bool()> getRetFunc = [extension, &ret]() -> bool {
+        if (extension == nullptr) {
+            return false;
+        }
+        extension->GetResult(ret);
+        return extension->GetRecvReply();
+    };
+    std::lock_guard<std::mutex> lock(mutex_);
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
+    return std::make_pair(E_OK, ret);
+}
+
+std::pair<int32_t, int32_t> DataShareStubImpl::UpdateEx(const Uri &uri, const DataSharePredicates &predicates,
+    const DataShareValuesBucket &value)
+{
+    CallingInfo info;
+    GetCallingInfo(info);
+
+    auto client = sptr<DataShareStubImpl>(this);
+    auto extension = client->GetOwner();
+    if (extension == nullptr) {
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+
+    if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
+        LOG_ERROR("Check calling permission failed.");
+        return std::make_pair(PERMISSION_ERROR_NUMBER, 0);
+    }
+
+    int ret = 0;
+    std::function<void()> syncTaskFunc = [extension, info, uri, predicates, value]() {
+        extension->SetCallingInfo(info);
+        extension->Update(uri, predicates, value);
+    };
+    std::function<bool()> getRetFunc = [extension, &ret]() -> bool {
+        if (extension == nullptr) {
+            return false;
+        }
+        extension->GetResult(ret);
+        return extension->GetRecvReply();
+    };
+    std::lock_guard<std::mutex> lock(mutex_);
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
+    return std::make_pair(E_OK, ret);
+}
+
+std::pair<int32_t, int32_t> DataShareStubImpl::DeleteEx(const Uri &uri, const DataSharePredicates &predicates)
+{
+    CallingInfo info;
+    GetCallingInfo(info);
+
+    auto client = sptr<DataShareStubImpl>(this);
+    auto extension = client->GetOwner();
+    if (extension == nullptr) {
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+
+    if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
+        LOG_ERROR("Check calling permission failed.");
+        return std::make_pair(PERMISSION_ERROR_NUMBER, 0);
+    }
+
+    int ret = 0;
+    std::function<void()> syncTaskFunc = [extension, info, uri, predicates]() {
+        extension->SetCallingInfo(info);
+        extension->Delete(uri, predicates);
+    };
+    std::function<bool()> getRetFunc = [extension, &ret]() -> bool {
+        if (extension == nullptr) {
+            return false;
+        }
+        extension->GetResult(ret);
+        return extension->GetRecvReply();
+    };
+    std::lock_guard<std::mutex> lock(mutex_);
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
+    return std::make_pair(E_OK, ret);
+}
+
 std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
     const DataSharePredicates &predicates, std::vector<std::string> &columns, DatashareBusinessError &businessError)
 {

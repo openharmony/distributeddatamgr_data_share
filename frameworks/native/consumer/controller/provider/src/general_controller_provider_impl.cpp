@@ -20,18 +20,17 @@
 
 namespace OHOS {
 namespace DataShare {
-constexpr int INVALID_VALUE = -1;
 int GeneralControllerProviderImpl::Insert(const Uri &uri, const DataShareValuesBucket &value)
 {
     auto connection = connection_;
     if (connection == nullptr) {
         LOG_ERROR("connection is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     auto proxy = connection->GetDataShareProxy(uri_, token_);
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return proxy->Insert(uri, value);
 }
@@ -42,12 +41,12 @@ int GeneralControllerProviderImpl::Update(const Uri &uri, const DataSharePredica
     auto connection = connection_;
     if (connection == nullptr) {
         LOG_ERROR("connection is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     auto proxy = connection->GetDataShareProxy(uri_, token_);
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return proxy->Update(uri, predicates, value);
 }
@@ -57,14 +56,62 @@ int GeneralControllerProviderImpl::Delete(const Uri &uri, const DataSharePredica
     auto connection = connection_;
     if (connection == nullptr) {
         LOG_ERROR("connection is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     auto proxy = connection->GetDataShareProxy(uri_, token_);
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return INVALID_VALUE;
+        return DATA_SHARE_ERROR;
     }
     return proxy->Delete(uri, predicates);
+}
+
+std::pair<int32_t, int32_t> GeneralControllerProviderImpl::InsertEx(const Uri &uri,
+    const DataShareValuesBucket &value)
+{
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("connection is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    auto proxy = connection->GetDataShareProxy(uri_, token_);
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    return proxy->InsertEx(uri, value);
+}
+
+std::pair<int32_t, int32_t> GeneralControllerProviderImpl::UpdateEx(
+    const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
+{
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("connection is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    auto proxy = connection->GetDataShareProxy(uri_, token_);
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    return proxy->UpdateEx(uri, predicates, value);
+}
+
+std::pair<int32_t, int32_t> GeneralControllerProviderImpl::DeleteEx(const Uri &uri,
+    const DataSharePredicates &predicates)
+{
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("connection is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    auto proxy = connection->GetDataShareProxy(uri_, token_);
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    return proxy->DeleteEx(uri, predicates);
 }
 
 std::shared_ptr<DataShareResultSet> GeneralControllerProviderImpl::Query(const Uri &uri,

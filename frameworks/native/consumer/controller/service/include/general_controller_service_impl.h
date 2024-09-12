@@ -49,6 +49,14 @@ public:
     void UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
 
     void NotifyChange(const Uri &uri) override;
+
+    std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &value) override;
+
+    std::pair<int32_t, int32_t> UpdateEx(
+        const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) override;
+
+    std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) override;
+
 private:
     void ReRegisterObserver();
 

@@ -18,6 +18,10 @@
 
 namespace OHOS {
 namespace DataShare {
+/**
+* @brief The error code in the data share error case.
+*/
+constexpr int DATA_SHARE_ERROR = -1;
 
 /**
 * @brief The error code in the correct case.
@@ -99,22 +103,51 @@ constexpr int E_BMS_NOT_READY = (E_BASE + 50);
 * @brief metaData not exists
 */
 constexpr int E_METADATA_NOT_EXISTS = (E_BASE + 51);
+
 /**
 * @brief silent proxy is disable
 */
 constexpr int E_SILENT_PROXY_DISABLE = (E_BASE + 52);
+
 /**
 * @brief token is empty
 */
 constexpr int E_TOKEN_EMPTY = (E_BASE + 53);
+
 /**
 * @brief ext uri is empty
 */
 constexpr int E_EXT_URI_INVALID = (E_BASE + 54);
+
 /**
 * @brief DataShare not ready
 */
 constexpr int E_DATA_SHARE_NOT_READY = (E_BASE + 55);
+
+/**
+* @brief The error code for db error.
+*/
+constexpr int E_DB_ERROR = (E_BASE + 56);
+
+/**
+* @brief The error code for data supplier error
+*/
+constexpr int E_DATA_SUPPLIER_ERROR = (E_BASE + 57);
+
+/**
+* @brief The error code for marshal error.
+*/
+constexpr int E_MARSHAL_ERROR = (E_BASE + 58);
+
+/**
+* @brief The error code for unmarshal error.
+*/
+constexpr int E_UNMARSHAL_ERROR = (E_BASE + 59);
+
+/**
+* @brief The error code for write interface token to data error.
+*/
+constexpr int E_WRITE_TO_PARCE_ERROR = (E_BASE + 60);
 
 /**
 * @brief The error code for resultSet busy error.

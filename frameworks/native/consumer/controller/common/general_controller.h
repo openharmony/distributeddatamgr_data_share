@@ -20,6 +20,7 @@
 #include <string_ex.h>
 
 #include "datashare_business_error.h"
+#include "datashare_errno.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
 #include "datashare_values_bucket.h"
@@ -49,6 +50,13 @@ public:
     virtual void UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 
     virtual void NotifyChange(const Uri &uri) = 0;
+
+    virtual std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &value) = 0;
+
+    virtual std::pair<int32_t, int32_t> UpdateEx(
+        const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) = 0;
+
+    virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) = 0;
 };
 } // namespace DataShare
 } // namespace OHOS

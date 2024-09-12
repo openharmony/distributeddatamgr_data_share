@@ -1073,7 +1073,44 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUD_Test_001, TestSize.Level0)
     LOG_INFO("MediaDataShare_CRUD_Test_001, End");
 }
 
-HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotImplPredicates_Test_zyp, TestSize.Level0)
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUDEX_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_CRUDEX_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_TRUE(helper != nullptr);
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "Datashare_CRUDEX_Test001");
+    auto [errCode, retVal] = helper->InsertEx(uri, valuesBucket);
+    EXPECT_EQ((errCode == 0), true);
+    EXPECT_EQ((retVal >= 0), true);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo("name", "Datashare_CRUDEX_Test001");
+
+    valuesBucket.Clear();
+    valuesBucket.Put("name", "Datashare_CRUDEX_Test002");
+    auto [errCode1, retVal1] = helper->UpdateEx(uri, predicates, valuesBucket);
+    EXPECT_EQ((errCode1 == 0), true);
+    EXPECT_EQ((retVal1 >= 0), true);
+    DataShare::DataSharePredicates queryPredicates;
+    queryPredicates.EqualTo("name", "Datashare_CRUDEX_Test002");
+    vector<string> columns;
+    auto resultSet = helper->Query(uri, queryPredicates, columns);
+    int result = 0;
+    if (resultSet != nullptr) {
+        resultSet->GetRowCount(result);
+    }
+    EXPECT_EQ(result, 1);
+
+    DataShare::DataSharePredicates deletePredicates;
+    deletePredicates.EqualTo("name", "Datashare_CRUDEX_Test002'");
+    auto [errCode2, retVal2] = helper->DeleteEx(uri, deletePredicates);
+    EXPECT_EQ((errCode2 == 0), true);
+    EXPECT_EQ((retVal2 >= 0), true);
+    LOG_INFO("MediaDataShare_CRUDEX_Test_001, End");
+}
+
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ImplPredicates_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ImplPredicates_Test_001::Start");
     DataShare::DataSharePredicates predicates;
