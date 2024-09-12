@@ -30,9 +30,9 @@ DataShareServiceProxy::DataShareServiceProxy(const sptr<IRemoteObject> &object)
 {
 }
 
-int32_t DataShareServiceProxy::Insert(const Uri &uri, const DataShareValuesBucket &value)
+int32_t DataShareServiceProxy::Insert(const Uri &uri, const Uri &extUri, const DataShareValuesBucket &value)
 {
-    auto [errCode, status] = InsertEx(uri, value);
+    auto [errCode, status] = InsertEx(uri, extUri, value);
     if (errCode == NO_ERROR) {
         return status;
     } else if (errCode < NO_ERROR) {
@@ -42,10 +42,10 @@ int32_t DataShareServiceProxy::Insert(const Uri &uri, const DataShareValuesBucke
     return DATA_SHARE_ERROR;
 }
 
-int32_t DataShareServiceProxy::Update(const Uri &uri,
+int32_t DataShareServiceProxy::Update(const Uri &uri, const Uri &extUri,
     const DataSharePredicates &predicate, const DataShareValuesBucket &valuesBucket)
 {
-    auto [errCode, status] = UpdateEx(uri, predicate, valuesBucket);
+    auto [errCode, status] = UpdateEx(uri, extUri, predicate, valuesBucket);
     if (errCode == NO_ERROR) {
         return status;
     } else if (errCode < NO_ERROR) {
@@ -55,9 +55,9 @@ int32_t DataShareServiceProxy::Update(const Uri &uri,
     return DATA_SHARE_ERROR;
 }
 
-int32_t DataShareServiceProxy::Delete(const Uri &uri, const DataSharePredicates &predicate)
+int32_t DataShareServiceProxy::Delete(const Uri &uri, const Uri &extUri, const DataSharePredicates &predicate)
 {
-    auto [errCode, status] = DeleteEx(uri, predicate);
+    auto [errCode, status] = DeleteEx(uri, extUri, predicate);
     if (errCode == NO_ERROR) {
         return status;
     } else if (errCode < NO_ERROR) {
@@ -67,7 +67,8 @@ int32_t DataShareServiceProxy::Delete(const Uri &uri, const DataSharePredicates 
     return DATA_SHARE_ERROR;
 }
 
-std::pair<int32_t, int32_t> DataShareServiceProxy::InsertEx(const Uri &uri, const DataShareValuesBucket &value)
+std::pair<int32_t, int32_t> DataShareServiceProxy::InsertEx(const Uri &uri, const Uri &extUri,
+    const DataShareValuesBucket &value)
 {
     const std::string &uriStr = uri.ToString();
     MessageParcel data;
@@ -75,7 +76,7 @@ std::pair<int32_t, int32_t> DataShareServiceProxy::InsertEx(const Uri &uri, cons
         LOG_ERROR("Write descriptor failed!");
         return std::make_pair(E_WRITE_TO_PARCE_ERROR, 0);
     }
-    if (!ITypesUtil::Marshal(data, uriStr, value)) {
+    if (!ITypesUtil::Marshal(data, uriStr, extUri.ToString(), value)) {
         LOG_ERROR("Write to message parcel failed!");
         return std::make_pair(E_MARSHAL_ERROR, 0);
     }
@@ -98,7 +99,7 @@ std::pair<int32_t, int32_t> DataShareServiceProxy::InsertEx(const Uri &uri, cons
     return std::make_pair(errCode, result);
 }
 
-std::pair<int32_t, int32_t> DataShareServiceProxy::UpdateEx(const Uri &uri,
+std::pair<int32_t, int32_t> DataShareServiceProxy::UpdateEx(const Uri &uri, const Uri &extUri,
     const DataSharePredicates &predicate, const DataShareValuesBucket &valuesBucket)
 {
     const std::string &uriStr = uri.ToString();
@@ -107,7 +108,7 @@ std::pair<int32_t, int32_t> DataShareServiceProxy::UpdateEx(const Uri &uri,
         LOG_ERROR("Write descriptor failed!");
         return std::make_pair(E_WRITE_TO_PARCE_ERROR, 0);
     }
-    if (!ITypesUtil::Marshal(data, uriStr, predicate, valuesBucket)) {
+    if (!ITypesUtil::Marshal(data, uriStr, extUri.ToString(), predicate, valuesBucket)) {
         LOG_ERROR("Write to message parcel failed!");
         return std::make_pair(E_MARSHAL_ERROR, 0);
     }
@@ -130,7 +131,8 @@ std::pair<int32_t, int32_t> DataShareServiceProxy::UpdateEx(const Uri &uri,
     return std::make_pair(errCode, result);
 }
 
-std::pair<int32_t, int32_t> DataShareServiceProxy::DeleteEx(const Uri &uri, const DataSharePredicates &predicate)
+std::pair<int32_t, int32_t> DataShareServiceProxy::DeleteEx(const Uri &uri, const Uri &extUri,
+    const DataSharePredicates &predicate)
 {
     const std::string &uriStr = uri.ToString();
     MessageParcel data;
@@ -138,7 +140,7 @@ std::pair<int32_t, int32_t> DataShareServiceProxy::DeleteEx(const Uri &uri, cons
         LOG_ERROR("Write descriptor failed!");
         return std::make_pair(E_WRITE_TO_PARCE_ERROR, 0);
     }
-    if (!ITypesUtil::Marshal(data, uriStr, predicate)) {
+    if (!ITypesUtil::Marshal(data, uriStr, extUri.ToString(), predicate)) {
         LOG_ERROR("Write to message parcel failed!");
         return std::make_pair(E_MARSHAL_ERROR, 0);
     }
@@ -161,8 +163,8 @@ std::pair<int32_t, int32_t> DataShareServiceProxy::DeleteEx(const Uri &uri, cons
     return std::make_pair(errCode, result);
 }
 
-std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri, const DataSharePredicates &predicates,
-    std::vector<std::string> &columns, DatashareBusinessError &businessError)
+std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri, const Uri &extUri,
+    const DataSharePredicates &predicates, std::vector<std::string> &columns, DatashareBusinessError &businessError)
 {
     const std::string &uriStr = uri.ToString();
     MessageParcel data;
@@ -171,7 +173,7 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri,
         return nullptr;
     }
 
-    if (!ITypesUtil::Marshal(data, uriStr, predicates, columns)) {
+    if (!ITypesUtil::Marshal(data, uriStr, extUri.ToString(), predicates, columns)) {
         LOG_ERROR("Write to message parcel failed!");
         return nullptr;
     }

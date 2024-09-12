@@ -34,14 +34,25 @@ class IDataShareService : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DataShare.IDataShareService");
 
-    virtual int Insert(const Uri &uri, const DataShareValuesBucket &value) = 0;
+    virtual int Insert(const Uri &uri, const Uri &extUri, const DataShareValuesBucket &value) = 0;
 
-    virtual int Update(const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) = 0;
+    virtual int Update(const Uri &uri, const Uri &extUri, const DataSharePredicates &predicates,
+        const DataShareValuesBucket &value) = 0;
 
-    virtual int Delete(const Uri &uri, const DataSharePredicates &predicates) = 0;
+    virtual int Delete(const Uri &uri, const Uri &extUri, const DataSharePredicates &predicates) = 0;
 
-    virtual std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
-        std::vector<std::string> &columns, DatashareBusinessError &businessError) = 0;
+    virtual std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const Uri &extUri,
+        const DataShareValuesBucket &value) = 0;
+
+    virtual std::pair<int32_t, int32_t> UpdateEx(const Uri &uri, const Uri &extUri,
+        const DataSharePredicates &predicates, const DataShareValuesBucket &value) = 0;
+
+    virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const Uri &extUri,
+        const DataSharePredicates &predicates) = 0;
+
+    virtual std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const Uri &extUri,
+        const DataSharePredicates &predicates, std::vector<std::string> &columns,
+        DatashareBusinessError &businessError) = 0;
 
     virtual int AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl) = 0;
 
@@ -86,13 +97,6 @@ public:
 
     virtual int UnRegisterObserver(const Uri &uri,
         const sptr<OHOS::IRemoteObject> &dataObserver) = 0;
-
-    virtual std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &value) = 0;
-
-    virtual std::pair<int32_t, int32_t> UpdateEx(
-        const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) = 0;
-
-    virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) = 0;
 };
 } // namespace OHOS::DataShare
 #endif
