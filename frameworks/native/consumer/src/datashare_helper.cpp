@@ -95,9 +95,9 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
             return nullptr;
         }
         Uri ext(extUri);
-        helper = CreateExtHelper(ext, token);
+        helper = CreateExtHelper(ext, token, waitTime);
     } else {
-        helper = CreateExtHelper(uri, token);
+        helper = CreateExtHelper(uri, token, waitTime);
     }
     return helper;
 }
@@ -111,7 +111,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, 
         LOG_ERROR("token is nullptr");
         return nullptr;
     }
-    return options.isProxy_ ? CreateServiceHelper("", bundleName) : CreateExtHelper(uri, options.token_);
+    return options.isProxy_ ? CreateServiceHelper("", bundleName) : CreateExtHelper(uri, options.token_, waitTime);
 }
 
 std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::Create(const sptr<IRemoteObject> &token,
@@ -142,7 +142,7 @@ std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::Create(const s
         }
         uri = Uri(extUri);
     }
-    auto helper = CreateExtHelper(uri, token);
+    auto helper = CreateExtHelper(uri, token, waitTime);
     if (helper != nullptr) {
         return std::make_pair(E_OK, helper);
     }
