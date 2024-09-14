@@ -151,7 +151,7 @@ void AsyncCall::OnComplete(napi_env env, napi_status status, void *data)
 
 void AsyncCall::DeleteContext(napi_env env, AsyncContext *context)
 {
-    if (env != nullptr) {
+    if (env != nullptr && context != nullptr) {
         napi_delete_reference(env, context->callback);
         napi_delete_reference(env, context->self);
         napi_delete_async_work(env, context->work);
