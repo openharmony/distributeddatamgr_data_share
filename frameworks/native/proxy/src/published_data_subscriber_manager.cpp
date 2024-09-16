@@ -79,7 +79,7 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
             // delete all obs by subscriber
             std::map<int64_t, std::vector<std::string>> keysMap;
             for (auto const &key : lastDelKeys) {
-                lastChangeNodeMap_.erase(key);
+                lastChangeNodeMap_.Erase(key);
                 keysMap[key.subscriberId_].emplace_back(key.uri_);
             }
             for (auto const &[subscriberId, uris] : keysMap) {
@@ -109,7 +109,7 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
         [&proxy, &subscriberId, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
-                lastChangeNodeMap_.erase(result);
+                lastChangeNodeMap_.Erase(result);
                 lastDelUris.emplace_back(result);
             });
             if (lastDelUris.empty()) {
@@ -214,7 +214,10 @@ void PublishedDataSubscriberManager::Emit(PublishedDataChangeNode &changeNode)
 {
     for (auto &data : changeNode.datas_) {
         Key key(data.key_, data.subscriberId_);
-        lastChangeNodeMap_[key].datas_.clear();
+        lastChangeNodeMap_.Compute(key, [](const Key &, PublishedDataChangeNode &value) {
+            value.datas_.clear();
+            return true;
+        });
     }
     std::map<std::shared_ptr<Observer>, PublishedDataChangeNode> results;
     for (auto &data : changeNode.datas_) {
@@ -224,8 +227,11 @@ void PublishedDataSubscriberManager::Emit(PublishedDataChangeNode &changeNode)
             LOG_WARN("%{private}s nobody subscribe, but still notify", data.key_.c_str());
             continue;
         }
-        lastChangeNodeMap_[key].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
-        lastChangeNodeMap_[key].ownerBundleName_ = changeNode.ownerBundleName_;
+        lastChangeNodeMap_.Compute(key, [&data, &changeNode](const Key &, PublishedDataChangeNode &value) {
+            value.datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
+            value.ownerBundleName_ = changeNode.ownerBundleName_;
+            return true;
+        });
         for (auto const &obs : callbacks) {
             results[obs].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
         }
@@ -241,14 +247,13 @@ void PublishedDataSubscriberManager::Emit(const std::vector<Key> &keys, const st
 {
     PublishedDataChangeNode node;
     for (auto &key : keys) {
-        auto it = lastChangeNodeMap_.find(key);
-        if (it == lastChangeNodeMap_.end()) {
-            continue;
-        }
-        for (auto &data : it->second.datas_) {
-            node.datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
-        }
-        node.ownerBundleName_ = it->second.ownerBundleName_;
+        lastChangeNodeMap_.ComputeIfPresent(key, [&node](const Key &, PublishedDataChangeNode &value) {
+            for (auto &data : value.datas_) {
+                node.datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
+            }
+            node.ownerBundleName_ = value.ownerBundleName_;
+            return true;
+        });
     }
     observer->OnChange(node);
 }
@@ -257,21 +262,21 @@ void PublishedDataSubscriberManager::EmitOnEnable(std::map<Key, std::vector<Obse
 {
     std::map<std::shared_ptr<Observer>, PublishedDataChangeNode> results;
     for (auto &[key, obsVector] : obsMap) {
-        auto it = lastChangeNodeMap_.find(key);
-        if (it == lastChangeNodeMap_.end()) {
-            continue;
-        }
         uint32_t num = 0;
-        for (auto &data : it->second.datas_) {
-            PublishedObserverMapKey mapKey(data.key_, data.subscriberId_);
-            for (auto &obs : obsVector) {
-                if (obs.isNotifyOnEnabled_) {
-                    num++;
-                    results[obs.observer_].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
-                    results[obs.observer_].ownerBundleName_ = it->second.ownerBundleName_;
+        lastChangeNodeMap_.ComputeIfPresent(key, [obsVector = obsVector, &results, &num](const Key &,
+            PublishedDataChangeNode &value) {
+            for (auto &data : value.datas_) {
+                PublishedObserverMapKey mapKey(data.key_, data.subscriberId_);
+                for (auto &obs : obsVector) {
+                    if (obs.isNotifyOnEnabled_) {
+                        num++;
+                        results[obs.observer_].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
+                        results[obs.observer_].ownerBundleName_ = value.ownerBundleName_;
+                    }
                 }
             }
-        }
+            return true;
+        });
         if (num > 0) {
             LOG_INFO("%{public}u will refresh, total %{public}zu, uri %{public}s, subscribeId %{public}" PRId64,
                 num, obsVector.size(), DataShareStringUtils::Anonymous(key.uri_).c_str(), key.subscriberId_);
