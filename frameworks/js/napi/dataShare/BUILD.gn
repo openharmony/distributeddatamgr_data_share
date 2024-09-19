@@ -96,7 +96,6 @@ ohos_shared_library("datashare") {
     "ability_base:zuri",
     "ability_runtime:abilitykit_native",
     "ability_runtime:dataobs_manager",
-    "ability_runtime:extensionkit_native",
     "ability_runtime:napi_base_context",
     "ability_runtime:napi_common",
     "c_utils:utils",
