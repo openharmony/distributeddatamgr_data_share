@@ -16,7 +16,6 @@
 #include "napi_datashare_helper.h"
 
 #include "data_proxy_observer_stub.h"
-#include "datashare_errno.h"
 #include "datashare_helper.h"
 #include "datashare_log.h"
 #include "datashare_predicates_proxy.h"
