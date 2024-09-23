@@ -18,6 +18,7 @@
 #include <memory>
 
 #include "callbacks_manager.h"
+#include "concurrent_map.h"
 #include "data_proxy_observer.h"
 #include "data_proxy_observer_stub.h"
 #include "datashare_template.h"
@@ -98,7 +99,7 @@ private:
     bool Init();
     void Destroy();
     sptr<PublishedDataObserverStub> serviceCallback_;
-    std::map<Key, PublishedDataChangeNode> lastChangeNodeMap_;
+    ConcurrentMap<Key, PublishedDataChangeNode> lastChangeNodeMap_;
 };
 } // namespace DataShare
 } // namespace OHOS
