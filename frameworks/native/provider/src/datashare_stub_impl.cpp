@@ -62,8 +62,9 @@ std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const s
         if (extension == nullptr) {
             return false;
         }
+        bool isRecvReply = extension->GetRecvReply();
         extension->GetResult(ret);
-        return extension->GetRecvReply();
+        return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
@@ -88,8 +89,9 @@ int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
         if (extension == nullptr) {
             return false;
         }
+        bool isRecvReply = extension->GetRecvReply();
         extension->GetResult(ret);
-        return extension->GetRecvReply();
+        return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
@@ -141,8 +143,9 @@ int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value
         if (extension == nullptr) {
             return false;
         }
+        bool isRecvReply = extension->GetRecvReply();
         extension->GetResult(ret);
-        return extension->GetRecvReply();
+        return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
@@ -175,8 +178,9 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
         if (extension == nullptr) {
             return false;
         }
+        bool isRecvReply = extension->GetRecvReply();
         extension->GetResult(ret);
-        return extension->GetRecvReply();
+        return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
@@ -206,8 +210,9 @@ int DataShareStubImpl::BatchUpdate(const UpdateOperations &operations, std::vect
         if (extension == nullptr) {
             return false;
         }
+        bool isRecvReply = extension->GetRecvReply();
         extension->GetResult(results);
-        return extension->GetRecvReply();
+        return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
@@ -239,8 +244,9 @@ int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predica
         if (extension == nullptr) {
             return false;
         }
+        bool isRecvReply = extension->GetRecvReply();
         extension->GetResult(ret);
-        return extension->GetRecvReply();
+        return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
@@ -272,8 +278,9 @@ std::pair<int32_t, int32_t> DataShareStubImpl::InsertEx(const Uri &uri, const Da
         if (extension == nullptr) {
             return false;
         }
+        bool isRecvReply = extension->GetRecvReply();
         extension->GetResult(ret);
-        return extension->GetRecvReply();
+        return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
@@ -306,8 +313,9 @@ std::pair<int32_t, int32_t> DataShareStubImpl::UpdateEx(const Uri &uri, const Da
         if (extension == nullptr) {
             return false;
         }
+        bool isRecvReply = extension->GetRecvReply();
         extension->GetResult(ret);
-        return extension->GetRecvReply();
+        return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
@@ -339,8 +347,9 @@ std::pair<int32_t, int32_t> DataShareStubImpl::DeleteEx(const Uri &uri, const Da
         if (extension == nullptr) {
             return false;
         }
+        bool isRecvReply = extension->GetRecvReply();
         extension->GetResult(ret);
-        return extension->GetRecvReply();
+        return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
@@ -404,8 +413,9 @@ std::string DataShareStubImpl::GetType(const Uri &uri)
         if (extension == nullptr) {
             return false;
         }
+        bool isRecvReply = extension->GetRecvReply();
         extension->GetResult(ret);
-        return extension->GetRecvReply();
+        return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
@@ -436,8 +446,9 @@ int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareVa
         if (extension == nullptr) {
             return false;
         }
+        bool isRecvReply = extension->GetRecvReply();
         extension->GetResult(ret);
-        return extension->GetRecvReply();
+        return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
@@ -508,11 +519,12 @@ Uri DataShareStubImpl::NormalizeUri(const Uri &uri)
         if (extension == nullptr) {
             return false;
         }
+        bool isRecvReply = extension->GetRecvReply();
         std::string ret;
         extension->GetResult(ret);
         Uri tmp(ret);
         normalizeUri = tmp;
-        return extension->GetRecvReply();
+        return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
@@ -537,11 +549,12 @@ Uri DataShareStubImpl::DenormalizeUri(const Uri &uri)
         if (extension == nullptr) {
             return false;
         }
+        bool isRecvReply = extension->GetRecvReply();
         std::string ret;
         extension->GetResult(ret);
         Uri tmp(ret);
         denormalizedUri = tmp;
-        return extension->GetRecvReply();
+        return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);

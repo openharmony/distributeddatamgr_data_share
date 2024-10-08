@@ -940,7 +940,8 @@ std::string JsDataShareExtAbility::UnWrapProperty(napi_env env, napi_value info,
         UnwrapStringByPropertyName(env, info, key.c_str(), value);
         return value;
     } else {
-        LOG_ERROR("ValueType should be napi_number or napi_string, property is %{public}s", key.c_str());
+        LOG_ERROR("ValueType should be napi_number or napi_string, property is %{public}s, ValueType: %{public}d",
+            key.c_str(), type);
         return "";
     }
 }
