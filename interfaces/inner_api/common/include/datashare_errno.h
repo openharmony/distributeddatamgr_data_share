@@ -153,6 +153,11 @@ constexpr int E_WRITE_TO_PARCE_ERROR = (E_BASE + 60);
 * @brief The error code for resultSet busy error.
 */
 constexpr int E_RESULTSET_BUSY = (E_BASE + 61);
+
+/**
+* @brief The error code for resultSet busy error.
+*/
+constexpr int E_APPINDEX_INVALID = (E_BASE + 62);
 } // namespace DataShare
 } // namespace OHOS
 
