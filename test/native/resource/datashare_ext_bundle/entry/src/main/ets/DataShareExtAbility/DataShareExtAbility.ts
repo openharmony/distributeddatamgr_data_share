@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 
-import Extension from '@ohos.application.DataShareExtensionAbility'
+import Extension from '@ohos.application.DataShareExtensionAbility';
+import { UpdateOperation } from '@ohos.application.DataShareExtensionAbility';
 import rdb from '@ohos.data.relationalStore';
 import rpc from '@ohos.rpc';
 
@@ -66,6 +67,25 @@ extends Extension {
             }
         });
         console.info('[ttt] [DataShareTest] [insert] leave');
+    }
+
+    async batchUpdate(operations, callback) {
+        let recordOps : Record<string, Array<UpdateOperation>> = operations;
+        let results : Record<string, Array<number>> = {};
+        for (const [key, values] of Object.entries(recordOps)) {
+            let result : number[] = [];
+            for (const value of values) {
+                await rdbStore.update(TBL_NAME, value.values, value.predicates).then(async (rows) => {
+                    console.info('[ttt] [DataShareTest] [batchUpdate] row count is ' + rows);
+                    result.push(rows);
+                }).catch((err) => {
+                    console.info("[ttt] [DataShareTest] [batchUpdate] failed, err is " + err);
+                    result.push(-1)
+                })
+            }
+            results[key] = result;
+        }
+        callback(null, results);
     }
 
     async update(uri, predicates, value, callback) {

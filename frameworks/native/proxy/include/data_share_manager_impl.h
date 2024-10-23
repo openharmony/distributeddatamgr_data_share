@@ -91,7 +91,7 @@ public:
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string& deviceId);
 
     void SetCallCount(const std::string &funcName, const std::string &uri);
-        
+
 private:
     DataShareManagerImpl();
 

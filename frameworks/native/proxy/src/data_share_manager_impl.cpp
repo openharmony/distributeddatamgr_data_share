@@ -17,6 +17,7 @@
 
 #include <thread>
 
+#include "datashare_errno.h"
 #include "datashare_log.h"
 #include "datashare_radar_reporter.h"
 #include "ikvstore_data_service.h"
@@ -34,6 +35,9 @@ DataShareManagerImpl* DataShareManagerImpl::manager_ = nullptr;
 
 DataShareManagerImpl* DataShareManagerImpl::GetInstance()
 {
+    if (manager_ != nullptr) {
+        return manager_;
+    }
     std::lock_guard<std::mutex> lock(pmutex_);
     if (manager_ != nullptr) {
         return manager_;
@@ -142,6 +146,10 @@ DataShareManagerImpl::~DataShareManagerImpl()
 
 std::shared_ptr<DataShareServiceProxy> DataShareManagerImpl::GetProxy()
 {
+    if (dataShareService_ != nullptr) {
+        return dataShareService_;
+    }
+
     std::lock_guard<std::mutex> lock(mutex_);
     if (dataShareService_ != nullptr) {
         return dataShareService_;

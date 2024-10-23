@@ -30,7 +30,7 @@ public:
     /**
      * Obtains a block from the {@link SharedResultSet}
      */
-    virtual AppDataFwk::SharedBlock *GetBlock() const = 0;
+    virtual std::shared_ptr<AppDataFwk::SharedBlock> GetBlock() = 0;
     /**
      * Adds the data of a {@code SharedResultSet} to a {@link SharedBlock}
      */
