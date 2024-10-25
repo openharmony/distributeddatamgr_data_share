@@ -76,7 +76,7 @@ public:
     /**
      * Get Block
      */
-    AppDataFwk::SharedBlock *GetBlock() const;
+    std::shared_ptr<AppDataFwk::SharedBlock> GetBlock();
 
 private:
     /**
@@ -93,7 +93,7 @@ private:
     }
 
 private:
-    AppDataFwk::SharedBlock *shareBlock_;
+    std::shared_ptr<AppDataFwk::SharedBlock> shareBlock_;
 };
 } // namespace DataShare
 } // namespace OHOS

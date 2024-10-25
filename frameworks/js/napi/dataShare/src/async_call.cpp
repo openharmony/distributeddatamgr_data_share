@@ -19,7 +19,7 @@
 #include "napi_common_data.h"
 
 namespace OHOS::DataShare {
-__attribute__((no_sanitize("undefined"))) AsyncCall::AsyncCall(napi_env env, napi_callback_info info,
+__attribute__ ((no_sanitize("undefined"))) AsyncCall::AsyncCall(napi_env env, napi_callback_info info,
     std::shared_ptr<Context> context) : env_(env)
 {
     context_ = new AsyncContext();
@@ -34,8 +34,6 @@ __attribute__((no_sanitize("undefined"))) AsyncCall::AsyncCall(napi_env env, nap
             napi_create_reference(env, argv[argc - 1], 1, &context_->callback);
             argc = argc - 1;
         }
-    } else {
-        LOG_DEBUG("get argc value less than zero");
     }
     napi_status status = (*context)(env, argc, argv, self);
     NAPI_ASSERT_ERRCODE(env, status == napi_ok, context->error);
@@ -151,7 +149,7 @@ void AsyncCall::OnComplete(napi_env env, napi_status status, void *data)
 
 void AsyncCall::DeleteContext(napi_env env, AsyncContext *context)
 {
-    if (env != nullptr) {
+    if (env != nullptr && context != nullptr) {
         napi_delete_reference(env, context->callback);
         napi_delete_reference(env, context->self);
         napi_delete_async_work(env, context->work);

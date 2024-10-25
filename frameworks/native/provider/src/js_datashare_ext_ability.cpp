@@ -101,6 +101,10 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
     }
     napi_value contextObj = CreateJsDataShareExtAbilityContext(env, context);
     auto contextRef = jsRuntime_.LoadSystemModule("application.DataShareExtensionAbilityContext", &contextObj, 1);
+    if (contextRef == nullptr) {
+        LOG_ERROR("Failed to get contextRef");
+        return;
+    }
     contextObj = contextRef->GetNapiValue();
     context->Bind(jsRuntime_, contextRef.release());
     napi_set_named_property(env, obj, "context", contextObj);

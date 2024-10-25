@@ -46,9 +46,6 @@ DataShareResultSet::DataShareResultSet(std::shared_ptr<ResultSetBridge> &bridge)
         return;
     }
     sharedBlock_ = blockWriter_->GetBlock();
-    if (sharedBlock_ == nullptr) {
-        return;
-    }
 }
 
 DataShareResultSet::~DataShareResultSet()
@@ -58,33 +55,37 @@ DataShareResultSet::~DataShareResultSet()
 
 int DataShareResultSet::GetAllColumnNames(std::vector<std::string> &columnNames)
 {
-    if (bridge_ == nullptr) {
+    auto bridge = GetBridge();
+    if (bridge == nullptr) {
         LOG_ERROR("bridge_ is null!");
         return E_ERROR;
     }
-    return bridge_->GetAllColumnNames(columnNames);
+    return bridge->GetAllColumnNames(columnNames);
 }
 
 int DataShareResultSet::GetRowCount(int &count)
 {
-    if (bridge_ == nullptr) {
+    auto bridge = GetBridge();
+    if (bridge == nullptr) {
         LOG_ERROR("bridge_ is null!");
         return E_ERROR;
     }
-    return bridge_->GetRowCount(count);
+    return bridge->GetRowCount(count);
 }
 
 bool DataShareResultSet::OnGo(int startRowIndex, int targetRowIndex, int *cachedIndex)
 {
-    if (bridge_ == nullptr || blockWriter_ == nullptr || sharedBlock_ == nullptr) {
+    auto block = GetBlock();
+    auto bridge = GetBridge();
+    if (bridge == nullptr || blockWriter_ == nullptr || block == nullptr) {
         LOG_ERROR("bridge_ or blockWriter_ or sharedBlock_ is null!");
         return false;
     }
     std::vector<std::string> columnNames;
     GetAllColumnNames(columnNames);
-    sharedBlock_->Clear();
-    sharedBlock_->SetColumnNum(columnNames.size());
-    int result = bridge_->OnGo(startRowIndex, targetRowIndex, *blockWriter_);
+    block->Clear();
+    block->SetColumnNum(columnNames.size());
+    int result = bridge->OnGo(startRowIndex, targetRowIndex, *blockWriter_);
     if (cachedIndex != nullptr) {
         *cachedIndex = result;
     }
@@ -100,19 +101,34 @@ void DataShareResultSet::FillBlock(int startRowIndex, AppDataFwk::SharedBlock *b
 }
 
 /**
+ * Get current bridge
+ */
+std::shared_ptr<ResultSetBridge> DataShareResultSet::GetBridge()
+{
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    return bridge_;
+}
+
+/**
  * Get current shared block
  */
-AppDataFwk::SharedBlock *DataShareResultSet::GetBlock() const
+std::shared_ptr<AppDataFwk::SharedBlock> DataShareResultSet::GetBlock()
 {
+    std::shared_lock<std::shared_mutex> lock(mutex_);
     return sharedBlock_;
 }
 
 int DataShareResultSet::GetDataType(int columnIndex, DataType &dataType)
 {
+    auto block = GetBlock();
+    if (block == nullptr) {
+        LOG_ERROR("sharedBlock is null!");
+        return E_ERROR;
+    }
     int rowCount = 0;
     GetRowCount(rowCount);
     AppDataFwk::SharedBlock::CellUnit *cellUnit =
-        sharedBlock_->GetCellUnit(static_cast<uint32_t>(rowPos_) - startRowPos_, static_cast<uint32_t>(columnIndex));
+        block->GetCellUnit(static_cast<uint32_t>(rowPos_) - startRowPos_, static_cast<uint32_t>(columnIndex));
     if (!cellUnit) {
         return E_ERROR;
     }
@@ -122,8 +138,9 @@ int DataShareResultSet::GetDataType(int columnIndex, DataType &dataType)
 
 int DataShareResultSet::GoToRow(int position)
 {
-    if (sharedBlock_ == nullptr) {
-        LOG_ERROR("sharedBlock_ is null!");
+    auto block = GetBlock();
+    if (block == nullptr) {
+        LOG_ERROR("sharedBlock is null!");
         return E_ERROR;
     }
     int rowCnt = 0;
@@ -162,12 +179,17 @@ int DataShareResultSet::GoToRow(int position)
 
 int DataShareResultSet::GetBlob(int columnIndex, std::vector<uint8_t> &value)
 {
+    auto block = GetBlock();
+    if (block == nullptr) {
+        LOG_ERROR("sharedBlock is null!");
+        return E_ERROR;
+    }
     int errorCode = CheckState(columnIndex);
     if (errorCode != E_OK) {
         return errorCode;
     }
 
-    AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
+    AppDataFwk::SharedBlock::CellUnit *cellUnit = block->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
         return E_ERROR;
     }
@@ -177,7 +199,7 @@ int DataShareResultSet::GetBlob(int columnIndex, std::vector<uint8_t> &value)
     if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_BLOB
         || type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_STRING) {
         size_t size;
-        const auto *blob = static_cast<const uint8_t *>(sharedBlock_->GetCellUnitValueBlob(cellUnit, &size));
+        const auto *blob = static_cast<const uint8_t *>(block->GetCellUnitValueBlob(cellUnit, &size));
         if (size == 0 || blob == nullptr) {
             LOG_WARN("blob data is empty!");
         } else {
@@ -199,18 +221,19 @@ int DataShareResultSet::GetBlob(int columnIndex, std::vector<uint8_t> &value)
 
 int DataShareResultSet::GetString(int columnIndex, std::string &value)
 {
-    if (sharedBlock_ == nullptr) {
+    auto block = GetBlock();
+    if (block == nullptr) {
         LOG_ERROR("sharedBlock is null!");
         return E_ERROR;
     }
-    AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
+    AppDataFwk::SharedBlock::CellUnit *cellUnit = block->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
         return E_ERROR;
     }
     int type = cellUnit->type;
     if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_STRING) {
         size_t sizeIncludingNull;
-        value = std::string(sharedBlock_->GetCellUnitValueString(cellUnit, &sizeIncludingNull));
+        value = std::string(block->GetCellUnitValueString(cellUnit, &sizeIncludingNull));
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
         return E_OK;
@@ -235,11 +258,12 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
 
 int DataShareResultSet::GetInt(int columnIndex, int &value)
 {
-    if (sharedBlock_ == nullptr) {
+    auto block = GetBlock();
+    if (block == nullptr) {
         LOG_ERROR("sharedBlock is null!");
         return E_ERROR;
     }
-    AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
+    AppDataFwk::SharedBlock::CellUnit *cellUnit = block->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
         return E_ERROR;
     }
@@ -249,11 +273,12 @@ int DataShareResultSet::GetInt(int columnIndex, int &value)
 
 int DataShareResultSet::GetLong(int columnIndex, int64_t &value)
 {
-    if (sharedBlock_ == nullptr) {
+    auto block = GetBlock();
+    if (block == nullptr) {
         LOG_ERROR("sharedBlock is null!");
         return E_ERROR;
     }
-    AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
+    AppDataFwk::SharedBlock::CellUnit *cellUnit = block->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
         return E_ERROR;
     }
@@ -265,7 +290,7 @@ int DataShareResultSet::GetLong(int columnIndex, int64_t &value)
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_STRING) {
         size_t sizeIncludingNull;
-        const char *tempValue = sharedBlock_->GetCellUnitValueString(cellUnit, &sizeIncludingNull);
+        const char *tempValue = block->GetCellUnitValueString(cellUnit, &sizeIncludingNull);
         value = ((sizeIncludingNull > 1) && (tempValue != nullptr)) ? long(strtoll(tempValue, nullptr, 0)) : 0L;
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_FLOAT) {
@@ -285,11 +310,16 @@ int DataShareResultSet::GetLong(int columnIndex, int64_t &value)
 
 int DataShareResultSet::GetDouble(int columnIndex, double &value)
 {
+    auto block = GetBlock();
+    if (block == nullptr) {
+        LOG_ERROR("sharedBlock is null!");
+        return E_ERROR;
+    }
     int errorCode = CheckState(columnIndex);
     if (errorCode != E_OK) {
         return errorCode;
     }
-    AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
+    AppDataFwk::SharedBlock::CellUnit *cellUnit = block->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
         return E_ERROR;
     }
@@ -299,7 +329,7 @@ int DataShareResultSet::GetDouble(int columnIndex, double &value)
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_STRING) {
         size_t sizeIncludingNull;
-        const char *tempValue = sharedBlock_->GetCellUnitValueString(cellUnit, &sizeIncludingNull);
+        const char *tempValue = block->GetCellUnitValueString(cellUnit, &sizeIncludingNull);
         value = ((sizeIncludingNull > 1) && (tempValue != nullptr)) ? strtod(tempValue, nullptr) : 0.0;
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_INTEGER) {
@@ -320,11 +350,16 @@ int DataShareResultSet::GetDouble(int columnIndex, double &value)
 
 int DataShareResultSet::IsColumnNull(int columnIndex, bool &isNull)
 {
+    auto block = GetBlock();
+    if (block == nullptr) {
+        LOG_ERROR("sharedBlock is null!");
+        return E_ERROR;
+    }
     int errorCode = CheckState(columnIndex);
     if (errorCode != E_OK) {
         return errorCode;
     }
-    AppDataFwk::SharedBlock::CellUnit *cellUnit = sharedBlock_->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
+    AppDataFwk::SharedBlock::CellUnit *cellUnit = block->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
     if (!cellUnit) {
         return E_ERROR;
     }
@@ -340,8 +375,7 @@ int DataShareResultSet::Close()
 {
     DISTRIBUTED_DATA_HITRACE(std::string(__FUNCTION__));
     DataShareAbsResultSet::Close();
-    ClosedBlock();
-    bridge_ = nullptr;
+    ClosedBlockAndBridge();
     return E_OK;
 }
 
@@ -350,29 +384,34 @@ int DataShareResultSet::Close()
  */
 void DataShareResultSet::SetBlock(AppDataFwk::SharedBlock *block)
 {
-    if (sharedBlock_ != block) {
-        ClosedBlock();
-        sharedBlock_ = block;
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    if (sharedBlock_ != nullptr) {
+        if (sharedBlock_.get() != block) {
+            sharedBlock_ = std::shared_ptr<AppDataFwk::SharedBlock>(block);
+        }
+    } else {
+        if (block != nullptr) {
+            sharedBlock_ = std::shared_ptr<AppDataFwk::SharedBlock>(block);
+        }
     }
 }
 
 /**
  * Checks whether an {@code DataShareResultSet} object contains shared blocks
  */
-bool DataShareResultSet::HasBlock() const
+bool DataShareResultSet::HasBlock()
 {
-    return sharedBlock_ != nullptr;
+    return GetBlock() != nullptr;
 }
 
 /**
  * Closes a shared block that is not empty in this {@code DataShareResultSet} object
  */
-void DataShareResultSet::ClosedBlock()
+void DataShareResultSet::ClosedBlockAndBridge()
 {
-    if (sharedBlock_ != nullptr) {
-        delete sharedBlock_;
-        sharedBlock_ = nullptr;
-    }
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    sharedBlock_ = nullptr;
+    bridge_ = nullptr;
 }
 
 void DataShareResultSet::Finalize()
@@ -385,10 +424,6 @@ void DataShareResultSet::Finalize()
  */
 int DataShareResultSet::CheckState(int columnIndex)
 {
-    if (sharedBlock_ == nullptr) {
-        LOG_ERROR("sharedBlock is null!");
-        return E_ERROR;
-    }
     int cnt = 0;
     GetColumnCount(cnt);
     if (columnIndex >= cnt || columnIndex < 0) {
@@ -402,19 +437,24 @@ int DataShareResultSet::CheckState(int columnIndex)
 
 bool DataShareResultSet::Marshalling(MessageParcel &parcel)
 {
-    if (sharedBlock_ == nullptr) {
+    auto block = GetBlock();
+    if (block == nullptr) {
         LOG_ERROR("sharedBlock is null.");
         return false;
     }
-    return sharedBlock_->WriteMessageParcel(parcel);
+    return block->WriteMessageParcel(parcel);
 }
 
 bool DataShareResultSet::Unmarshalling(MessageParcel &parcel)
 {
-    if (sharedBlock_ != nullptr) {
+    auto block = GetBlock();
+    if (block != nullptr) {
+        LOG_ERROR("sharedBlock is not null.");
         return false;
     }
-    int result = AppDataFwk::SharedBlock::ReadMessageParcel(parcel, sharedBlock_);
+    AppDataFwk::SharedBlock *sharedBlock = nullptr;
+    int result = AppDataFwk::SharedBlock::ReadMessageParcel(parcel, sharedBlock);
+    SetBlock(sharedBlock);
     if (result < 0) {
         LOG_ERROR("create from parcel error is %{public}d.", result);
     }
