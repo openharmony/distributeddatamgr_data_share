@@ -24,6 +24,19 @@
 namespace OHOS {
 namespace DataShare {
 /**
+ *  Specifies the upper limit of size of data that RdbChangeNode will transfer by IPC. Currently it's 200k.
+ */
+constexpr int32_t DATA_SIZE_IPC_TRANSFER_LIMIT = 200 << 10;
+/**
+ *  Specifies the upper limit of size of data that RdbChangeNode will transfer by the shared memory. Currently it's 10M.
+ */
+constexpr int32_t DATA_SIZE_ASHMEM_TRANSFER_LIMIT = (10 << 10) << 10;
+/**
+ *  Specifies the name of the shared memory that RdbChangeNode will transfer.
+ */
+constexpr const char* ASHMEM_NAME = "DataShareRdbChangeNode";
+
+/**
  *  Specifies the predicates structure of the template.
  */
 struct PredicateTemplateNode {
@@ -147,6 +160,16 @@ struct RdbChangeNode {
     TemplateId templateId_;
     /** Specifies the datas of the callback. */
     std::vector<std::string> data_;
+    /** Specifies whether to use the shared meomry to transfer data. This will be set to be true when the size of
+     *  the data is more than 200k, but no more than 10M. Usually the data will not be as large as 10M.
+     */
+    bool isSharedMemory_ = false;
+    /** Specifies the address of the shared memory, wrapped by `OHOS::sptr<Ashmem>`.
+     *  (De)serialization: [vec_size(int32); str1_len(int32), str1; str2_len(int32), str2; ...]
+     */
+    OHOS::sptr<Ashmem> memory_;
+    /** Specifies the data size transferred the shared memory */
+    int32_t size_;
 };
 
 /**

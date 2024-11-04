@@ -42,9 +42,91 @@ int RdbObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
     return ERR_OK;
 }
 
-void RdbObserverStub::OnChangeFromRdb(const RdbChangeNode &changeNode)
+int RdbObserverStub::ReadAshmem(RdbChangeNode &changeNode, const void **data, int size, int &offset)
+{
+    // Only called in DeserializeDataFromAshmem. memory_ has been checked before
+    const void *read = changeNode.memory_->ReadFromAshmem(size, offset);
+    if (read == nullptr) {
+        LOG_ERROR("failed to read from ashmem.");
+        changeNode.memory_->CloseAshmem();
+        changeNode.memory_ = nullptr;
+        return E_ERROR;
+    }
+    *data = read;
+    offset += size;
+    return E_OK;
+}
+
+int RdbObserverStub::DeserializeDataFromAshmem(RdbChangeNode &changeNode)
+{
+    if (changeNode.memory_ == nullptr) {
+        LOG_ERROR("changeNode.memory_ is null.");
+        return E_ERROR;
+    }
+    bool mapRet = changeNode.memory_->MapReadAndWriteAshmem();
+    if (!mapRet) {
+        LOG_ERROR("failed to map read and write ashmem, ret=%{public}d", mapRet);
+        changeNode.memory_->CloseAshmem();
+        return E_ERROR;
+    }
+    LOG_DEBUG("receive data size: %{public}d", changeNode.size_);
+    // Read data size
+    int intLen = 4;
+    int offset = 0;
+    const int *vecLenRead;
+    if (ReadAshmem(changeNode, (const void **)&vecLenRead, intLen, offset) != E_OK) {
+        LOG_ERROR("failed to read data with len %{public}d, offset %{public}d.", intLen, offset);
+        return E_ERROR;
+    }
+    int vecLen = *vecLenRead;
+
+    // Read data
+    for (int i = 0; i < vecLen; i++) {
+        const int *dataLenRead;
+        if (ReadAshmem(changeNode, (const void **)&dataLenRead, intLen, offset) != E_OK) {
+            LOG_ERROR(
+                "failed to read data with index %{public}d, len %{public}d, offset %{public}d.", i, intLen, offset);
+            return E_ERROR;
+        }
+        int dataLen = *dataLenRead;
+        const char *dataRead;
+        if (ReadAshmem(changeNode, (const void **)&dataRead, dataLen, offset) != E_OK) {
+            LOG_ERROR(
+                "failed to read data with index %{public}d, len %{public}d, offset %{public}d.", i, dataLen, offset);
+            return E_ERROR;
+        }
+        std::string data(dataRead, dataLen);
+        changeNode.data_.push_back(data);
+    }
+    return E_OK;
+}
+
+int RdbObserverStub::RecoverRdbChangeNodeData(RdbChangeNode &changeNode)
+{
+    int ret = E_OK;
+    if (changeNode.isSharedMemory_) {
+        // Recover form Ashmem
+        if (DeserializeDataFromAshmem(changeNode) != E_OK) {
+            LOG_ERROR("failed to deserialize data from ashmem.");
+            ret = E_ERROR;
+        }
+        if (changeNode.memory_ != nullptr) {
+            changeNode.memory_->CloseAshmem();
+            changeNode.memory_ = nullptr;
+        }
+        changeNode.isSharedMemory_ = false;
+        changeNode.size_ = 0;
+    }
+    return ret;
+}
+
+void RdbObserverStub::OnChangeFromRdb(RdbChangeNode &changeNode)
 {
     std::lock_guard<decltype(mutex_)> lock(mutex_);
+    if (RecoverRdbChangeNodeData(changeNode) != E_OK) {
+        LOG_ERROR("failed to recover RdbChangeNode data.");
+        return;
+    }
     if (callback_) {
         callback_(changeNode);
     }

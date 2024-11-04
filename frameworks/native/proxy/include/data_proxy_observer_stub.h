@@ -28,9 +28,12 @@ public:
     RdbObserverStub(RdbCallback callback);
     virtual ~RdbObserverStub();
     int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
-    void OnChangeFromRdb(const RdbChangeNode &changeNode);
+    void OnChangeFromRdb(RdbChangeNode &changeNode);
     void ClearCallback();
 private:
+    int RecoverRdbChangeNodeData(RdbChangeNode &changeNode);
+    int DeserializeDataFromAshmem(RdbChangeNode &changeNode);
+    int ReadAshmem(RdbChangeNode &changeNode, const void **data, int size, int &offset);
     std::mutex mutex_;
     RdbCallback callback_;
 };
