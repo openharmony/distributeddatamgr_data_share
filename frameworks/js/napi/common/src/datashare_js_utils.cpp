@@ -539,6 +539,12 @@ Template DataShareJSUtils::Convert2Template(napi_env env, napi_value value)
         LOG_ERROR("Convert2Template error, value is not object");
         return {};
     }
+    std::string update;
+    if (!UnwrapStringByPropertyName(env, value, "update", update)) {
+        LOG_ERROR("Convert update failed");
+        return {};
+    }
+
     napi_value jsPredicates;
     auto status =  napi_get_named_property(env, value, "predicates", &jsPredicates);
     if (status != napi_ok) {
@@ -556,7 +562,7 @@ Template DataShareJSUtils::Convert2Template(napi_env env, napi_value value)
         LOG_ERROR("Convert scheduler failed");
         return {};
     }
-    Template tpl(predicates, scheduler);
+    Template tpl(update, predicates, scheduler);
     return tpl;
 }
 
@@ -684,7 +690,7 @@ bool DataShareJSUtils::UnwrapStringByPropertyName(
 {
     napi_value jsResult = nullptr;
     auto status = napi_get_named_property(env, jsObject, propertyName, &jsResult);
-    if ((status != napi_ok) || (jsResult == nullptr)) {
+    if ((status != napi_ok) || ((jsResult == nullptr) && std::string(propertyName).compare("update"))) {
         LOG_ERROR("Convert bundleNameOfOwner failed");
         return false;
     }

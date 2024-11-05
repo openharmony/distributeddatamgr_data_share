@@ -42,6 +42,11 @@ struct Template {
     Template() = default;
     Template(const std::vector<PredicateTemplateNode> &predicates,
         const std::string &scheduler) : predicates_(predicates), scheduler_(scheduler) {}
+    Template(const std::string &update,
+        const std::vector<PredicateTemplateNode> &predicates,
+        const std::string &scheduler) : update_(update), predicates_(predicates), scheduler_(scheduler) {}
+    /** Specifies the update sql of the template. */
+    std::string update_;
     /** Specifies the predicates of the template. {@link #PredicateTemplateNode} */
     std::vector<PredicateTemplateNode> predicates_;
     /** Specifies the scheduler sql of the template. */

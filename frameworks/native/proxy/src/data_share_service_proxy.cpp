@@ -200,7 +200,7 @@ int DataShareServiceProxy::AddQueryTemplate(const std::string &uri, int64_t subs
         LOG_ERROR("Write descriptor failed!");
         return DATA_SHARE_ERROR;
     }
-    if (!ITypesUtil::Marshal(data, uri, subscriberId, tpl.predicates_, tpl.scheduler_)) {
+    if (!ITypesUtil::Marshal(data, uri, subscriberId, tpl.update_, tpl.predicates_, tpl.scheduler_)) {
         LOG_ERROR("Write to message parcel failed!");
         return DATA_SHARE_ERROR;
     }
