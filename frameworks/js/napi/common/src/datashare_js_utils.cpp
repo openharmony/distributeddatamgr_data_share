@@ -695,7 +695,7 @@ bool DataShareJSUtils::UnwrapStringByPropertyName(
         return false;
     } else if ((jsResult == nullptr) && !std::string(propertyName).compare("update")) {
         value = "";
-        reutrn true;
+        return true;
     }
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, jsResult, &valueType);
