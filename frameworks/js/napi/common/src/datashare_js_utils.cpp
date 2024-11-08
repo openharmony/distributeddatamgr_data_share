@@ -693,6 +693,9 @@ bool DataShareJSUtils::UnwrapStringByPropertyName(
     if ((status != napi_ok) || ((jsResult == nullptr) && std::string(propertyName).compare("update"))) {
         LOG_ERROR("Convert bundleNameOfOwner failed");
         return false;
+    } else if ((jsResult == nullptr) && !std::string(propertyName).compare("update")) {
+        value = "";
+        reutrn true;
     }
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, jsResult, &valueType);
