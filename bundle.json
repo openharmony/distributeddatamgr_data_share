@@ -78,12 +78,24 @@
                     "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_provider",
                     "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common",
                     "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_ext_ability_module",
-                    "//foundation/distributeddatamgr/data_share/frameworks/js/napi:datashare_napi_packages"
+                    "//foundation/distributeddatamgr/data_share/frameworks/js/napi:datashare_napi_packages",
+                    "//foundation/distributeddatamgr/data_share/frameworks/cj/ffi:datashare_cj_ffi_packages"
                 ],
                 "service_group": [
                 ]
             },
             "inner_api": [
+                {
+                    "name": "//foundation/distributeddatamgr/data_share/frameworks/cj/ffi/data_share_predicates:cj_data_share_predicates_ffi",
+                    "header": {
+                        "header_files": [
+                            "data_share_predicates_ffi.h",
+                            "data_share_predicates_impl.h",
+                            "data_share_predicates_utils.h"
+                        ],
+                        "header_base":  "//foundation/distributeddatamgr/data_share/frameworks/cj/ffi/data_share_predicates/include"
+                    }
+                },
                 {
                     "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_consumer",
                     "header": {
