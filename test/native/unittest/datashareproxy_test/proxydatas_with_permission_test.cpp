@@ -196,6 +196,47 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_002, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_Template_Test_002::End");
 }
 
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0){
+    LOG_INFO("ProxyDatasTest_Template_Test_003::Start");
+    auto helper = dataShareHelper;
+    PredicateTemplateNode node1("p1", "select name1 as name from TBL00");
+    std::vector<PredicateTemplateNode> nodes;
+    nodes.emplace_back(node1);
+    Template tpl(nodes, "select name1 as name from TBL00");
+    tpl.update_ = "insert into TBL00 (name0) values ('test003')";
+    auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBCRIBER_ID, tpl);
+    EXPECT_EQ(result, 0);
+    std::vector<std::string> uris;
+    uris.emplace_back(DATA_SHARE_PROXY_URI);
+    TemplateId tplId;
+    tplId.subscriberId_ = SUBSCRIBER_ID;
+    tplId.bundleName_ = "ohos.datashareproxyclienttest.demo";
+    std::string data1;
+    std::vector<OperationResult> results1 =
+        helper->SubscribeRdbData(uris, tplId, [&data1](const RdbChangeNode &changeNode) {
+            data1 = changeNode.data_[0];
+        });
+    for (auto const &operationResult : results1) {
+        EXPECT_EQ(operationResult.errCode_, 0);
+    }
+    std::vector<OperationResult> results2 = helper->UnsubscribeRdbData(uris, tplId);
+    EXPECT_EQ(results2.size(), uris.size());
+    for (auto const &operationResult : results2) {
+        EXPECT_EQ(operationResult.errCode_, 0);
+    }
+    std::string data2;
+    std::vector<OperationResult> results3 =
+        helper->SubscribeRdbData(uris, tplId, [&data2](const RdbChangeNode &changeNode) {
+            data2 = changeNode.data_[0];
+        });
+    for (auto const &operationResult : results3) {
+        EXPECT_EQ(operationResult.errCode_, 0);
+    }
+    EXPECT_NE(data1, data2);
+    helper->UnsubscribeRdbData(uris, tplId);
+    LOG_INFO("ProxyDatasTest_Template_Test_003::End");
+}
+
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level0)
 {
     LOG_INFO("ProxyDatasTest_Publish_Test_001::Start");
