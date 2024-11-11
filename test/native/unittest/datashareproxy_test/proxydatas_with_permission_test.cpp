@@ -196,7 +196,8 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_002, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_Template_Test_002::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0){
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
+{
     LOG_INFO("ProxyDatasTest_Template_Test_003::Start");
     auto helper = dataShareHelper;
     PredicateTemplateNode node1("p1", "select name1 as name from TBL00");
@@ -204,7 +205,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0){
     nodes.emplace_back(node1);
     Template tpl(nodes, "select name1 as name from TBL00");
     tpl.update_ = "insert into TBL00 (name0) values ('test003')";
-    auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBCRIBER_ID, tpl);
+    auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
     EXPECT_EQ(result, 0);
     std::vector<std::string> uris;
     uris.emplace_back(DATA_SHARE_PROXY_URI);

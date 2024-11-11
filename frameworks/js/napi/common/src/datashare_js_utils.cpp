@@ -541,8 +541,7 @@ Template DataShareJSUtils::Convert2Template(napi_env env, napi_value value)
     }
     std::string update;
     if (!UnwrapStringByPropertyName(env, value, "update", update)) {
-        LOG_ERROR("Convert update failed");
-        return {};
+        update = "";
     }
 
     napi_value jsPredicates;
@@ -690,12 +689,9 @@ bool DataShareJSUtils::UnwrapStringByPropertyName(
 {
     napi_value jsResult = nullptr;
     auto status = napi_get_named_property(env, jsObject, propertyName, &jsResult);
-    if ((status != napi_ok) || ((jsResult == nullptr) && std::string(propertyName).compare("update"))) {
+    if ((status != napi_ok) || (jsResult == nullptr)) {
         LOG_ERROR("Convert bundleNameOfOwner failed");
         return false;
-    } else if ((jsResult == nullptr) && !std::string(propertyName).compare("update")) {
-        value = "";
-        return true;
     }
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, jsResult, &valueType);
