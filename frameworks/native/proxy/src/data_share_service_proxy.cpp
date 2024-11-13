@@ -203,7 +203,7 @@ int DataShareServiceProxy::AddQueryTemplate(const std::string &uri, int64_t subs
     std::string updateSqlPrefix = "update";
     if (tpl.update_.compare(0, updateSqlPrefix.size(), updateSqlPrefix) != 0) {
         LOG_ERROR("Parameter update only support update SQL");
-        return {};
+        return DATA_SHARE_ERROR;
     }
     if (!ITypesUtil::Marshal(data, uri, subscriberId, tpl.update_, tpl.predicates_, tpl.scheduler_)) {
         LOG_ERROR("Write to message parcel failed!");
