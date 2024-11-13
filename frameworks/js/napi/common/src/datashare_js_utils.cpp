@@ -541,6 +541,7 @@ Template DataShareJSUtils::Convert2Template(napi_env env, napi_value value)
     }
     std::string update;
     if (!UnwrapStringByPropertyName(env, value, "update", update)) {
+        LOG_INFO("Parameter update undefined");
         update = "";
     }
 
