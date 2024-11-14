@@ -308,7 +308,7 @@ HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_002, TestSize.Level0)
     LOG_INFO("SlientAccess_InsertEx_Test_002::Start");
     auto helper = g_slientAccessHelper;
     Uri uri(SLIENT_ACCESS_URI);
-     DataShare::DataShareValuesBucket valuesBucket;
+    DataShare::DataShareValuesBucket valuesBucket;
     std::string value = "lisi";
     valuesBucket.Put(TBL_STU_NAME, value);
     int age = 25;
