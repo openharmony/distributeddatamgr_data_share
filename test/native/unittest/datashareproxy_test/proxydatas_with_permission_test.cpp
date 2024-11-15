@@ -205,6 +205,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
     std::string name0 = "name00";
     valuesBucket.Put(TBL_NAME0, name0);
     helper->Insert(uri, valuesBucket);
+
     PredicateTemplateNode node1("p1", "select name0 as name from TBL00");
     std::vector<PredicateTemplateNode> nodes;
     nodes.emplace_back(node1);
@@ -212,6 +213,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
     tpl.update_ = "update TBL00 set name0 = 'updatetest' where name0 = 'name00'";
     auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
     EXPECT_EQ(result, 0);
+
     std::vector<std::string> uris;
     uris.emplace_back(DATA_SHARE_PROXY_URI);
     TemplateId tplId;
