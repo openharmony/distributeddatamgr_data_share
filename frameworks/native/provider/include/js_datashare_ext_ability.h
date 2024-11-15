@@ -273,53 +273,61 @@ public:
 
     void GetResult(std::string &value)
     {
+        std::lock_guard<std::mutex> lock(asyncLock_);
         value = callbackResultString_;
     }
 
     void SetResult(const std::string value)
     {
+        std::lock_guard<std::mutex> lock(asyncLock_);
         callbackResultString_ = value;
     }
 
     void GetResult(std::vector<std::string> &value)
     {
+        std::lock_guard<std::mutex> lock(asyncLock_);
         value = callbackResultStringArr_;
     }
 
     void SetResult(const std::vector<BatchUpdateResult> &results)
     {
+        std::lock_guard<std::mutex> lock(asyncLock_);
         updateResults_ = results;
     }
 
     void GetResult(std::vector<BatchUpdateResult> &results)
     {
+        std::lock_guard<std::mutex> lock(asyncLock_);
         results = updateResults_;
     }
 
     void SetResult(const std::vector<std::string> value)
     {
+        std::lock_guard<std::mutex> lock(asyncLock_);
         callbackResultStringArr_ = value;
     }
 
     void GetResultSet(std::shared_ptr<DataShareResultSet> &value)
     {
-        std::lock_guard<std::mutex> lock(resultSetLock_);
+        std::lock_guard<std::mutex> lock(asyncLock_);
         value = callbackResultObject_;
     }
 
     void SetResultSet(const std::shared_ptr<DataShareResultSet> value)
     {
-        std::lock_guard<std::mutex> lock(resultSetLock_);
+        std::lock_guard<std::mutex> lock(asyncLock_);
         callbackResultObject_ = value;
     }
 
     void GetBusinessError(DatashareBusinessError &businessError)
     {
+        std::lock_guard<std::mutex> lock(asyncLock_);
         businessError = businessError_;
     }
 	
     void SetBusinessError(DatashareBusinessError &businessError)
     {
+        std::lock_guard<std::mutex> lock(asyncLock_);
         businessError_ = businessError;
     }
     struct AsyncContext {
@@ -359,7 +367,7 @@ private:
     int callbackResultNumber_ = -1;
     std::string callbackResultString_ = "";
     std::vector<std::string> callbackResultStringArr_ = {};
-    std::mutex resultSetLock_;
+    std::mutex asyncLock_;
     std::shared_ptr<DataShareResultSet> callbackResultObject_ = nullptr;
     DatashareBusinessError businessError_;
     std::vector<BatchUpdateResult> updateResults_ = {};
