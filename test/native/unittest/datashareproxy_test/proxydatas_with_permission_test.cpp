@@ -209,7 +209,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
     std::vector<PredicateTemplateNode> nodes;
     nodes.emplace_back(node1);
     Template tpl(nodes, "select name0 as name from TBL00");
-    tpl.update_ = "update TBL00 set name0 = 'updatetest' where name0 = 'name00";
+    tpl.update_ = "update TBL00 set name0 = 'updatetest' where name0 = 'name00'";
     auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
     EXPECT_EQ(result, 0);
     std::vector<std::string> uris;
@@ -238,7 +238,6 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
     for (auto const &operationResult : results3) {
         EXPECT_EQ(operationResult.errCode_, 0);
     }
-
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(TBL_NAME0, "updatetest");
     std::vector<string> columns;
