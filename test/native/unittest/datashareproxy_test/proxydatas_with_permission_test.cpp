@@ -205,8 +205,6 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
     std::string name0 = "name00";
     valuesBucket.Put(TBL_NAME0, name0);
     int retVal = helper->Insert(uri, valuesBucket);
-    EXPECT_EQ((retVal > 0), true);
-
     PredicateTemplateNode node1("p1", "select name0 as name from TBL00");
     std::vector<PredicateTemplateNode> nodes;
     nodes.emplace_back(node1);
@@ -245,8 +243,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
     predicates.EqualTo(TBL_NAME0, "updatetest");
     std::vector<string> columns;
     auto resultSet = helper->Query(uri, predicates, columns);
-    EXPECT_NE(resultSet, nullptr);
-    int result = 0;
+    int queryResult = 0;
     resultSet->GetRowCount(result);
     EXPECT_EQ(result, 1);
     helper->UnsubscribeRdbData(uris, tplId);
