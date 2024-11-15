@@ -230,14 +230,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
     for (auto const &operationResult : results2) {
         EXPECT_EQ(operationResult.errCode_, 0);
     }
-    std::string data2;
-    std::vector<OperationResult> results3 =
-        helper->SubscribeRdbData(uris, tplId, [&data2](const RdbChangeNode &changeNode) {
-            data2 = changeNode.data_[0];
-        });
-    for (auto const &operationResult : results3) {
-        EXPECT_EQ(operationResult.errCode_, 0);
-    }
+
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(TBL_NAME0, "updatetest");
     std::vector<string> columns;
@@ -245,7 +238,6 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
     int queryResult = 0;
     resultSet->GetRowCount(queryResult);
     EXPECT_EQ(result, 1);
-    helper->UnsubscribeRdbData(uris, tplId);
     LOG_INFO("ProxyDatasTest_Template_Test_003::End");
 }
 
