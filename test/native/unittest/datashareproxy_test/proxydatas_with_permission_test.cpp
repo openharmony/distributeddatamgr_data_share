@@ -204,7 +204,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
     DataShare::DataShareValuesBucket valuesBucket;
     std::string name0 = "name00";
     valuesBucket.Put(TBL_NAME0, name0);
-    int retVal = helper->Insert(uri, valuesBucket);
+    helper->Insert(uri, valuesBucket);
     PredicateTemplateNode node1("p1", "select name0 as name from TBL00");
     std::vector<PredicateTemplateNode> nodes;
     nodes.emplace_back(node1);
@@ -244,7 +244,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
     std::vector<string> columns;
     auto resultSet = helper->Query(uri, predicates, columns);
     int queryResult = 0;
-    resultSet->GetRowCount(result);
+    resultSet->GetRowCount(queryResult);
     EXPECT_EQ(result, 1);
     helper->UnsubscribeRdbData(uris, tplId);
     LOG_INFO("ProxyDatasTest_Template_Test_003::End");
