@@ -44,10 +44,14 @@ int RdbObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Message
 
 int RdbObserverStub::ReadAshmem(RdbChangeNode &changeNode, const void **data, int size, int &offset)
 {
-    // Only called in DeserializeDataFromAshmem. memory_ has been checked before
+    if (changeNode.memory_ == nullptr) {
+        LOG_ERROR("changeNode memory is nullptr.");
+        return E_ERROR;
+    }
     const void *read = changeNode.memory_->ReadFromAshmem(size, offset);
     if (read == nullptr) {
         LOG_ERROR("failed to read from ashmem.");
+        changeNode.memory_->UnmapAshmem();
         changeNode.memory_->CloseAshmem();
         changeNode.memory_ = nullptr;
         return E_ERROR;
@@ -67,6 +71,7 @@ int RdbObserverStub::DeserializeDataFromAshmem(RdbChangeNode &changeNode)
     if (!mapRet) {
         LOG_ERROR("failed to map read and write ashmem, ret=%{public}d", mapRet);
         changeNode.memory_->CloseAshmem();
+        changeNode.memory_ = nullptr;
         return E_ERROR;
     }
     LOG_DEBUG("receive data size: %{public}d", changeNode.size_);
@@ -111,6 +116,7 @@ int RdbObserverStub::RecoverRdbChangeNodeData(RdbChangeNode &changeNode)
             ret = E_ERROR;
         }
         if (changeNode.memory_ != nullptr) {
+            changeNode.memory_->UnmapAshmem();
             changeNode.memory_->CloseAshmem();
             changeNode.memory_ = nullptr;
         }
