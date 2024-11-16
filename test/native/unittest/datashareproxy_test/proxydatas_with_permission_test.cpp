@@ -196,6 +196,53 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_002, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_Template_Test_002::End");
 }
 
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_Template_Test_003::Start");
+    auto helper = dataShareHelper;
+    Uri uri(DATA_SHARE_PROXY_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string name0 = "name00";
+    valuesBucket.Put(TBL_NAME0, name0);
+    helper->Insert(uri, valuesBucket);
+
+    PredicateTemplateNode node1("p1", "select name0 as name from TBL00");
+    std::vector<PredicateTemplateNode> nodes;
+    nodes.emplace_back(node1);
+    Template tpl(nodes, "select name0 as name from TBL00");
+    tpl.update_ = "update TBL00 set name0 = 'updatetest' where name0 = 'name00'";
+    auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
+    EXPECT_EQ(result, 0);
+
+    std::vector<std::string> uris;
+    uris.emplace_back(DATA_SHARE_PROXY_URI);
+    TemplateId tplId;
+    tplId.subscriberId_ = SUBSCRIBER_ID;
+    tplId.bundleName_ = "ohos.datashareproxyclienttest.demo";
+    std::string data1;
+    std::vector<OperationResult> results1 =
+        helper->SubscribeRdbData(uris, tplId, [&data1](const RdbChangeNode &changeNode) {
+            data1 = changeNode.data_[0];
+        });
+    for (auto const &operationResult : results1) {
+        EXPECT_EQ(operationResult.errCode_, 0);
+    }
+    std::vector<OperationResult> results2 = helper->UnsubscribeRdbData(uris, tplId);
+    EXPECT_EQ(results2.size(), uris.size());
+    for (auto const &operationResult : results2) {
+        EXPECT_EQ(operationResult.errCode_, 0);
+    }
+
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_NAME0, "updatetest");
+    std::vector<string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    int queryResult = 0;
+    resultSet->GetRowCount(queryResult);
+    EXPECT_EQ(result, 1);
+    LOG_INFO("ProxyDatasTest_Template_Test_003::End");
+}
+
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level0)
 {
     LOG_INFO("ProxyDatasTest_Publish_Test_001::Start");
