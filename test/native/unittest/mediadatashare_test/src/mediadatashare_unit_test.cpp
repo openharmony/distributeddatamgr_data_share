@@ -23,6 +23,7 @@
 #include "dataobs_mgr_changeinfo.h"
 #include "datashare_log.h"
 #include "datashare_valuebucket_convert.h"
+#include "data_proxy_observer_stub.h"
 #include "hap_token_info.h"
 #include "iservice_registry.h"
 #include "rdb_data_ability_utils.h"
@@ -1672,6 +1673,275 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_BatchUpdateThanLimit_Test_001, T
     EXPECT_EQ(ret, -1);
     EXPECT_EQ(results.size(), 0);
     LOG_INFO("MediaDataShare_BatchUpdateThanLimit_Test_001 End");
+}
+
+void OnChangeCallback(const RdbChangeNode &changeNode)
+{
+    // In test, put 2 uris into the data vec
+    int vecLen = 2;
+    EXPECT_EQ(changeNode.data_.size(), vecLen);
+    for (int i = 0; i < vecLen; i++) {
+        EXPECT_EQ(changeNode.data_[i], DATA_SHARE_URI);
+    }
+}
+
+void PrepareNodeContent(RdbChangeNode &node)
+{
+    OHOS::sptr<Ashmem> memory = Ashmem::CreateAshmem("PrepareNodeContent", DATA_SIZE_ASHMEM_TRANSFER_LIMIT);
+    EXPECT_NE(memory, nullptr);
+    bool mapRet = memory->MapReadAndWriteAshmem();
+    ASSERT_TRUE(mapRet);
+    // write 2 uris
+    int vecLen = 2;
+    int intByteLen = 4;
+    int offset = 0;
+    bool writeRet = memory->WriteToAshmem((void*)&vecLen, intByteLen, offset);
+    ASSERT_TRUE(writeRet);
+    offset += intByteLen;
+    int len = DATA_SHARE_URI.length();
+    const char *str = DATA_SHARE_URI.c_str();
+    for (int i = 0; i < vecLen; i++) {
+        writeRet = memory->WriteToAshmem((void*)&len, intByteLen, offset);
+        ASSERT_TRUE(writeRet);
+        offset += intByteLen;
+        writeRet = memory->WriteToAshmem((void*)str, len, offset);
+        ASSERT_TRUE(writeRet);
+        offset += len;
+    }
+    node.memory_ = memory;
+    node.size_ = offset;
+    node.isSharedMemory_ = true;
+}
+
+/**
+* @tc.name: ReadAshmem
+* @tc.desc: test ReadAshmem function.
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(MediaDataShareUnitTest, ReadAshmem, TestSize.Level1)
+{
+    LOG_INFO("ReadAshmem starts");
+    RdbChangeNode node;
+
+    OHOS::sptr<Ashmem> memory = Ashmem::CreateAshmem("ReadAshmem", DATA_SIZE_ASHMEM_TRANSFER_LIMIT);
+    EXPECT_NE(memory, nullptr);
+    bool mapRet = memory->MapReadAndWriteAshmem();
+    ASSERT_TRUE(mapRet);
+    int len = DATA_SHARE_URI.length();
+    bool writeRet = memory->WriteToAshmem((void*)&len, 4, 0);
+    ASSERT_TRUE(writeRet);
+    const char *str = DATA_SHARE_URI.c_str();
+    writeRet = memory->WriteToAshmem((void*)str, len, 4);
+    ASSERT_TRUE(writeRet);
+    node.memory_ = memory;
+
+    RdbObserverStub stub(OnChangeCallback);
+    // Read an int
+    const int *lenRead;
+    int offset = 0;
+    int readRet = stub.ReadAshmem(node, (const void**)&lenRead, 4, offset);
+    EXPECT_EQ(readRet, E_OK);
+    EXPECT_EQ(offset, 4);
+    int lenFromAshmem = *lenRead;
+    EXPECT_EQ(lenFromAshmem, len);
+    // Read a string
+    readRet = stub.ReadAshmem(node, (const void**)&str, lenFromAshmem, offset);
+    EXPECT_EQ(readRet, E_OK);
+    EXPECT_EQ(offset, 4 + len);
+    std::string strRead(str, lenFromAshmem);
+    EXPECT_EQ(strRead, DATA_SHARE_URI);
+
+    // Error path test
+    readRet = stub.ReadAshmem(node, (const void**)&str, DATA_SIZE_ASHMEM_TRANSFER_LIMIT, offset);
+    EXPECT_EQ(readRet, E_ERROR);
+    LOG_INFO("ReadAshmem ends");
+}
+
+/**
+* @tc.name: DeserializeDataFromAshmem001
+* @tc.desc: test DeserializeDataFromAshmem function.
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(MediaDataShareUnitTest, DeserializeDataFromAshmem001, TestSize.Level1)
+{
+    LOG_INFO("DeserializeDataFromAshmem001::Start");
+    RdbChangeNode node;
+    PrepareNodeContent(node);
+
+    RdbObserverStub stub(OnChangeCallback);
+    int readRet = stub.DeserializeDataFromAshmem(node);
+    EXPECT_EQ(readRet, E_OK);
+    EXPECT_EQ(node.data_.size(), 2);
+    for (int i = 0; i < 2; i++) {
+        EXPECT_EQ(node.data_[i], DATA_SHARE_URI);
+    }
+    LOG_INFO("DeserializeDataFromAshmem001::End");
+}
+
+/**
+* @tc.name: DeserializeDataFromAshmem002
+* @tc.desc: test DeserializeDataFromAshmem function, error tests.
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(MediaDataShareUnitTest, DeserializeDataFromAshmem002, TestSize.Level1)
+{
+    LOG_INFO("DeserializeDataFromAshmem002::Start");
+    RdbChangeNode node;
+    RdbObserverStub stub(OnChangeCallback);
+    // memory_ is null.
+    int ret = stub.DeserializeDataFromAshmem(node);
+    EXPECT_EQ(ret, E_ERROR);
+
+    // Error in read from Ashmem with error string length.
+    OHOS::sptr<Ashmem> memory = Ashmem::CreateAshmem("DeserializeDataFromAshmem002", DATA_SIZE_ASHMEM_TRANSFER_LIMIT);
+    EXPECT_NE(memory, nullptr);
+    bool mapRet = memory->MapReadAndWriteAshmem();
+    ASSERT_TRUE(mapRet);
+    int vecLen = 1;
+    int offset = 0;
+    bool writeRet = memory->WriteToAshmem((void*)&vecLen, 4, offset);
+    ASSERT_TRUE(writeRet);
+    offset += 4;
+    int len = DATA_SHARE_URI.length();
+    int errorLen = DATA_SIZE_ASHMEM_TRANSFER_LIMIT;
+    const char *str = DATA_SHARE_URI.c_str();
+    writeRet = memory->WriteToAshmem((void*)&errorLen, 4, offset);
+    ASSERT_TRUE(writeRet);
+    offset += 4;
+    writeRet = memory->WriteToAshmem((void*)str, len, offset);
+    ASSERT_TRUE(writeRet);
+    node.memory_ = memory;
+
+    ret = stub.DeserializeDataFromAshmem(node);
+    EXPECT_EQ(ret, E_ERROR);
+
+    // Error in read from Ashmem with vec size
+    OHOS::sptr<Ashmem> memory2 = Ashmem::CreateAshmem("DeserializeDataFromAshmem002", 2);
+    EXPECT_NE(memory2, nullptr);
+    mapRet = memory2->MapReadAndWriteAshmem();
+    ASSERT_TRUE(mapRet);
+    node.memory_ = memory2;
+    ret = stub.DeserializeDataFromAshmem(node);
+    EXPECT_EQ(ret, E_ERROR);
+
+    // Error in read from Ashmem with str size
+    OHOS::sptr<Ashmem> memory3 = Ashmem::CreateAshmem("DeserializeDataFromAshmem002", 5);
+    EXPECT_NE(memory3, nullptr);
+    mapRet = memory3->MapReadAndWriteAshmem();
+    ASSERT_TRUE(mapRet);
+    writeRet = memory3->WriteToAshmem((void*)&vecLen, 4, 0);
+    ASSERT_TRUE(writeRet);
+    node.memory_ = memory3;
+    ret = stub.DeserializeDataFromAshmem(node);
+    EXPECT_EQ(ret, E_ERROR);
+    LOG_INFO("DeserializeDataFromAshmem002::End");
+}
+
+/**
+* @tc.name: RecoverRdbChangeNodeData001
+* @tc.desc: test RecoverRdbChangeNodeData function
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(MediaDataShareUnitTest, RecoverRdbChangeNodeData001, TestSize.Level0)
+{
+    LOG_INFO("RecoverRdbChangeNodeData::Start");
+    
+    // Recover
+    RdbChangeNode node;
+    PrepareNodeContent(node);
+    RdbObserverStub stub(OnChangeCallback);
+    int ret = stub.RecoverRdbChangeNodeData(node);
+    EXPECT_EQ(ret, E_OK);
+    EXPECT_EQ(node.data_.size(), 2);
+    for (int i = 0; i < 2; i++) {
+        EXPECT_EQ(node.data_[i], DATA_SHARE_URI);
+    }
+    EXPECT_EQ(node.memory_, nullptr);
+    EXPECT_EQ(node.size_, 0);
+    ASSERT_FALSE(node.isSharedMemory_);
+
+    // Not recover
+    RdbChangeNode node2;
+    PrepareNodeContent(node2);
+    node2.isSharedMemory_ = false;
+    ret = stub.RecoverRdbChangeNodeData(node2);
+    EXPECT_EQ(ret, E_OK);
+    EXPECT_EQ(node2.data_.size(), 0);
+    EXPECT_NE(node2.memory_, nullptr);
+    EXPECT_EQ(node2.size_, 82);
+    ASSERT_FALSE(node2.isSharedMemory_);
+
+    LOG_INFO("RecoverRdbChangeNodeData End");
+}
+
+/**
+* @tc.name: RecoverRdbChangeNodeData002
+* @tc.desc: test RecoverRdbChangeNodeData function with error
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(MediaDataShareUnitTest, RecoverRdbChangeNodeData002, TestSize.Level0)
+{
+    LOG_INFO("RecoverRdbChangeNodeData002::Start");
+    
+    RdbChangeNode node;
+    node.isSharedMemory_ = true;
+    RdbObserverStub stub(OnChangeCallback);
+    int ret = stub.RecoverRdbChangeNodeData(node);
+    EXPECT_EQ(ret, E_ERROR);
+    EXPECT_EQ(node.data_.size(), 0);
+    EXPECT_EQ(node.memory_, nullptr);
+    EXPECT_EQ(node.size_, 0);
+    ASSERT_FALSE(node.isSharedMemory_);
+    LOG_INFO("RecoverRdbChangeNodeData002::End");
+}
+
+/**
+* @tc.name: OnChangeFromRdb001
+* @tc.desc: test OnChangeFromRdb function
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb001, TestSize.Level0)
+{
+    LOG_INFO("OnChangeFromRdb001::Start");
+    
+    RdbChangeNode node;
+    PrepareNodeContent(node);
+    RdbObserverStub stub(OnChangeCallback);
+    stub.OnChangeFromRdb(node);
+    EXPECT_EQ(node.data_.size(), 2);
+    for (int i = 0; i < 2; i++) {
+        EXPECT_EQ(node.data_[i], DATA_SHARE_URI);
+    }
+    EXPECT_EQ(node.memory_, nullptr);
+    EXPECT_EQ(node.size_, 0);
+    ASSERT_FALSE(node.isSharedMemory_);
+    LOG_INFO("OnChangeFromRdb001::End");
+}
+
+/**
+* @tc.name: OnChangeFromRdb002
+* @tc.desc: test OnChangeFromRdb function with error
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb002, TestSize.Level0)
+{
+    LOG_INFO("OnChangeFromRdb002::Start");
+    RdbChangeNode node;
+    node.isSharedMemory_ = true;
+    RdbObserverStub stub(OnChangeCallback);
+    stub.OnChangeFromRdb(node);
+    EXPECT_EQ(node.data_.size(), 0);
+    EXPECT_EQ(node.memory_, nullptr);
+    EXPECT_EQ(node.size_, 0);
+    ASSERT_FALSE(node.isSharedMemory_);
+    LOG_INFO("OnChangeFromRdb002::End");
 }
 } // namespace DataShare
 } // namespace OHOS

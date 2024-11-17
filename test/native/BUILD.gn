@@ -52,6 +52,8 @@ config("permission_config") {
 ohos_unittest("NativeDataShareTest") {
   module_out_path = "data_share/native_datashare"
 
+  visibility = [ ":*" ]
+
   include_dirs = [
     "//foundation/ability/ability_runtime/interfaces/inner_api/ability_manager/include",
     "//foundation/ability/ability_runtime/interfaces/inner_api/app_manager/include/appmgr",
@@ -65,10 +67,13 @@ ohos_unittest("NativeDataShareTest") {
     "//utils/system/safwk/native/include",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//third_party/json/include",
+    "${datashare_native_proxy_path}/include",
   ]
 
-  sources =
-      [ "./unittest/mediadatashare_test/src/mediadatashare_unit_test.cpp" ]
+  sources = [
+    "${datashare_native_proxy_path}/src/data_proxy_observer_stub.cpp",
+    "./unittest/mediadatashare_test/src/mediadatashare_unit_test.cpp",
+  ]
 
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
@@ -92,6 +97,12 @@ ohos_unittest("NativeDataShareTest") {
     "relational_store:rdb_data_ability_adapter",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+  ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 }
 
