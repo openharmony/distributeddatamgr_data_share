@@ -201,7 +201,7 @@ int DataShareServiceProxy::AddQueryTemplate(const std::string &uri, int64_t subs
         return DATA_SHARE_ERROR;
     }
     std::string updateSqlPrefix = "update";
-    if (tpl.update_.compare(0, updateSqlPrefix.size(), updateSqlPrefix) != 0) {
+    if (!tpl.update_.empty() && tpl.update_.compare(0, updateSqlPrefix.size(), updateSqlPrefix) != 0) {
         LOG_ERROR("Parameter update only support update SQL");
         return DATA_SHARE_ERROR;
     }
