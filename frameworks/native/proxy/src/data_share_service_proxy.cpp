@@ -200,10 +200,16 @@ int DataShareServiceProxy::AddQueryTemplate(const std::string &uri, int64_t subs
         LOG_ERROR("Write descriptor failed!");
         return DATA_SHARE_ERROR;
     }
-    std::string updateSqlPrefix = "update";
-    if (!tpl.update_.empty() && tpl.update_.compare(0, updateSqlPrefix.size(), updateSqlPrefix) != 0) {
-        LOG_ERROR("Parameter update only support update SQL");
-        return DATA_SHARE_ERROR;
+    if (!tpl.update_.empty()) {
+        std::string updateSqlPrefix = "UPDATE";
+        std::string checkPrefix = tpl.update_.substr(0, updateSqlPrefix.size());
+        std::for_each(std::begin(checkPrefix), std::end(checkPrefix), [](auto &c) {
+            c = std::toupper(c);
+        });
+        if (checkPrefix != updateSqlPrefix) {
+            LOG_ERROR("Parameter update only support update SQL, Parameter: %{public}s", checkPrefix.c_str());
+            return DATA_SHARE_ERROR;
+        }
     }
     if (!ITypesUtil::Marshal(data, uri, subscriberId, tpl.update_, tpl.predicates_, tpl.scheduler_)) {
         LOG_ERROR("Write to message parcel failed!");

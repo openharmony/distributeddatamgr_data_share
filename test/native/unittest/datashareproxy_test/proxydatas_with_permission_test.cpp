@@ -196,6 +196,12 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_002, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_Template_Test_002::End");
 }
 
+/**
+* @tc.name: ProxyDatasTest_Template_Test_003
+* @tc.desc: test Template update function
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
 {
     LOG_INFO("ProxyDatasTest_Template_Test_003::Start");
@@ -204,7 +210,8 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
     DataShare::DataShareValuesBucket valuesBucket;
     std::string name0 = "name00";
     valuesBucket.Put(TBL_NAME0, name0);
-    helper->Insert(uri, valuesBucket);
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal > 0), true);
 
     PredicateTemplateNode node1("p1", "select name0 as name from TBL00");
     std::vector<PredicateTemplateNode> nodes;
@@ -239,8 +246,62 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
     auto resultSet = helper->Query(uri, predicates, columns);
     int queryResult = 0;
     resultSet->GetRowCount(queryResult);
-    EXPECT_EQ(result, 1);
+    EXPECT_EQ(queryResult, 1);
     LOG_INFO("ProxyDatasTest_Template_Test_003::End");
+}
+
+/**
+* @tc.name: ProxyDatasTest_Template_Test_004
+* @tc.desc: test add template with parameter update function
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_004, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_Template_Test_004::Start");
+    auto helper = dataShareHelper;
+    PredicateTemplateNode node1("p1", "select name0 as name from TBL00");
+    PredicateTemplateNode node2("p2", "select name1 as name from TBL00");
+    std::vector<PredicateTemplateNode> nodes;
+    nodes.emplace_back(node1);
+    nodes.emplace_back(node2);
+    Template tpl(nodes, "select name1 as name from TBL00");
+
+    auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
+    EXPECT_EQ(result, 0);
+    result = helper->DelQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID);
+    EXPECT_EQ(result, 0);
+
+    Template tpl2("update TBL00 set name0 = 'update'", nodes, "select name1 as name from TBL00");
+    result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl2);
+    EXPECT_EQ(result, 0);
+    result = helper->DelQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID);
+    EXPECT_EQ(result, 0);
+    LOG_INFO("ProxyDatasTest_Template_Test_004::End");
+}
+
+/**
+* @tc.name: ProxyDatasTest_Template_Test_005
+* @tc.desc: test add template with wrong parameter update function
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_005, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_Template_Test_005::Start");
+    auto helper = dataShareHelper;
+    PredicateTemplateNode node1("p1", "select name0 as name from TBL00");
+    PredicateTemplateNode node2("p2", "select name1 as name from TBL00");
+    std::vector<PredicateTemplateNode> nodes;
+    nodes.emplace_back(node1);
+    nodes.emplace_back(node2);
+    Template tpl2("insert into TBL00 (name0) values ('test')", nodes, "select name1 as name from TBL00");
+
+    auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl2);
+    EXPECT_EQ(result, -1);
+    result = helper->DelQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID);
+    EXPECT_EQ(result, 0);
+    LOG_INFO("ProxyDatasTest_Template_Test_005::End");
 }
 
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level0)
