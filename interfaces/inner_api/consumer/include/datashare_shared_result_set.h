@@ -26,7 +26,7 @@ namespace DataShare {
 class DataShareSharedResultSet {
 public:
     DataShareSharedResultSet() {}
-    ~DataShareSharedResultSet() {}
+    virtual ~DataShareSharedResultSet() {}
     /**
      * Obtains a block from the {@link SharedResultSet}
      */
