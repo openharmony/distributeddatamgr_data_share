@@ -305,7 +305,7 @@ HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_001, TestSize.Level0)
 
 HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_002, TestSize.Level0)
 {
-    LOG_INFO("SlientAccess_InsertEx_Test_002::Start");
+    LOG_INFO("SilentAccess_InsertEx_Test_002::Start");
     auto helper = g_slientAccessHelper;
     Uri uri(SLIENT_ACCESS_URI);
     DataShare::DataShareValuesBucket valuesBucket;
@@ -315,7 +315,7 @@ HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_002, TestSize.Level0)
     valuesBucket.Put(TBL_STU_AGE, age);
 
     EXPECT_EQ(helper->DataShareHelper::InsertEx(uri, valuesBucket), std::make_pair(0, 0));
-    LOG_INFO("SlientAccess_InsertEx_Test_002::End");
+    LOG_INFO("SilentAccess_InsertEx_Test_002::End");
 }
 
 HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_001, TestSize.Level0)
@@ -337,7 +337,7 @@ HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_001, TestSize.Level0)
 
 HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_002, TestSize.Level0)
 {
-    LOG_INFO("SlientAccess_UpdateEx_Test_002::Start");
+    LOG_INFO("SilentAccess_UpdateEx_Test_002::Start");
     auto helper = g_slientAccessHelper;
     Uri uri(SLIENT_ACCESS_URI);
     DataShare::DataShareValuesBucket valuesBucket;
@@ -348,7 +348,7 @@ HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_002, TestSize.Level0)
     predicates.SetWhereClause(selections);
 
     EXPECT_EQ(helper->DataShareHelper::UpdateEx(uri, predicates, valuesBucket), std::make_pair(0, 0));
-    LOG_INFO("SlientAccess_UpdateEx_Test_002::End");
+    LOG_INFO("SilentAccess_UpdateEx_Test_002::End");
 }
 
 HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_001, TestSize.Level0)
@@ -368,7 +368,7 @@ HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_001, TestSize.Level0)
 
 HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_002, TestSize.Level0)
 {
-    LOG_INFO("SlientAccess_DeleteEx_Test_002::Start");
+    LOG_INFO("SilentAccess_DeleteEx_Test_002::Start");
     auto helper = g_slientAccessHelper;
     Uri uri(SLIENT_ACCESS_URI);
     DataShare::DataSharePredicates deletePredicates;
@@ -376,7 +376,7 @@ HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_002, TestSize.Level0)
     deletePredicates.SetWhereClause(selections);
 
     EXPECT_EQ(helper->DataShareHelper::DeleteEx(uri, deletePredicates), std::make_pair(0, 0));
-    LOG_INFO("SlientAccess_DeleteEx_Test_002::End");
+    LOG_INFO("SilentAccess_DeleteEx_Test_002::End");
 }
 
 HWTEST_F(SlientAccessTest, SlientAccess_Insert_Test_001, TestSize.Level0)
