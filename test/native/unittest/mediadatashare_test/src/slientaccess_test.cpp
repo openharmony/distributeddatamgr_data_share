@@ -303,6 +303,21 @@ HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_001, TestSize.Level0)
     LOG_INFO("SlientAccess_InsertEx_Test_001::End");
 }
 
+HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_002, TestSize.Level0)
+{
+    LOG_INFO("SilentAccess_InsertEx_Test_002::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "lisi";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+
+    EXPECT_EQ(helper->DataShareHelper::InsertEx(uri, valuesBucket), std::make_pair(0, 0));
+    LOG_INFO("SilentAccess_InsertEx_Test_002::End");
+}
+
 HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_UpdateEx_Test_001::Start");
@@ -320,6 +335,22 @@ HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_001, TestSize.Level0)
     LOG_INFO("SlientAccess_UpdateEx_Test_001::End");
 }
 
+HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_002, TestSize.Level0)
+{
+    LOG_INFO("SilentAccess_UpdateEx_Test_002::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    int value = 50;
+    valuesBucket.Put(TBL_STU_AGE, value);
+    DataShare::DataSharePredicates predicates;
+    std::string selections = TBL_STU_NAME + " = 'lisi'";
+    predicates.SetWhereClause(selections);
+
+    EXPECT_EQ(helper->DataShareHelper::UpdateEx(uri, predicates, valuesBucket), std::make_pair(0, 0));
+    LOG_INFO("SilentAccess_UpdateEx_Test_002::End");
+}
+
 HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_DeleteEx_Test_001::Start");
@@ -333,6 +364,19 @@ HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_001, TestSize.Level0)
     EXPECT_EQ((errCode == 0), true);
     EXPECT_EQ((retVal > 0), true);
     LOG_INFO("SlientAccess_DeleteEx_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_002, TestSize.Level0)
+{
+    LOG_INFO("SilentAccess_DeleteEx_Test_002::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_URI);
+    DataShare::DataSharePredicates deletePredicates;
+    std::string selections = TBL_STU_NAME + " = 'lisi'";
+    deletePredicates.SetWhereClause(selections);
+
+    EXPECT_EQ(helper->DataShareHelper::DeleteEx(uri, deletePredicates), std::make_pair(0, 0));
+    LOG_INFO("SilentAccess_DeleteEx_Test_002::End");
 }
 
 HWTEST_F(SlientAccessTest, SlientAccess_Insert_Test_001, TestSize.Level0)
