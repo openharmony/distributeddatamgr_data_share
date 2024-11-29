@@ -101,6 +101,8 @@ struct CreateOptions {
     sptr<IRemoteObject> token_;
     /** Specifies whether use options to create DataShareHelper. */
     bool enabled_ = false;
+    /** Specifies the time to wait for connecting extension. */
+    int waitTime_;
 };
 
 struct AshmemNode {
