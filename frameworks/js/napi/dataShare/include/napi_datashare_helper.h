@@ -67,7 +67,7 @@ private:
         std::shared_ptr<DataShareHelper> helper, bool isNotifyDetails = false);
     void UnRegisteredObserver(napi_env env, const std::string& uri, std::shared_ptr<DataShareHelper> helper,
         bool isNotifyDetails = false);
-    static bool GetOptions(napi_env env, napi_value jsValue, CreateOptions &options);
+    static bool GetOptions(napi_env env, napi_value jsValue, CreateOptions &options, Uri &uri);
     void SetHelper(std::shared_ptr<DataShareHelper> dataShareHelper);
     std::shared_ptr<DataShareHelper> GetHelper();
     std::shared_ptr<DataShareHelper> datashareHelper_ = nullptr;

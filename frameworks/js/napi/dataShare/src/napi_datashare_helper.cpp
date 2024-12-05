@@ -31,7 +31,6 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 namespace DataShare {
 static constexpr int MAX_ARGC = 6;
-static constexpr int DEFAULT_WAITTIME = 2;
 static __thread napi_ref constructor_ = nullptr;
 static bool GetSilentUri(napi_env env, napi_value jsValue, std::string &uri)
 {
@@ -102,7 +101,7 @@ static bool GetWaitTime(napi_env env, napi_value jsValue, CreateOptions &options
     return true;
 }
 
-bool NapiDataShareHelper::GetOptions(napi_env env, napi_value jsValue, CreateOptions &options)
+bool NapiDataShareHelper::GetOptions(napi_env env, napi_value jsValue, CreateOptions &options, Uri &uri)
 {
     napi_valuetype type = napi_undefined;
     napi_typeof(env, jsValue, &type);
@@ -110,15 +109,15 @@ bool NapiDataShareHelper::GetOptions(napi_env env, napi_value jsValue, CreateOpt
         LOG_ERROR("CreateOptions is not object");
         return false;
     }
-    if (!GetIsProxy(env, jsValue, options)) {
-        LOG_INFO("CreateOptions.isProxy is not defined");
-        options.isProxy_ = false;
+    if (uri.GetScheme() == "datashareproxy") {
+        if (!GetIsProxy(env, jsValue, options)) {
+            return false;
+        }
+        options.enabled_ = true;
     }
     if (!GetWaitTime(env, jsValue, options)) {
         LOG_INFO("CreateOptions.waitTime is not defined");
-        options.waitTime_ = DEFAULT_WAITTIME;
     }
-    options.enabled_ = true;
     return true;
 }
 
@@ -135,7 +134,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             ctxInfo->error = std::make_shared<ParametersTypeError>("uri", "string"), napi_invalid_arg);
         Uri uri(ctxInfo->strUri);
         if (argc != 2) {
-            NAPI_ASSERT_CALL_ERRCODE(env, GetOptions(env, argv[2], ctxInfo->options),
+            NAPI_ASSERT_CALL_ERRCODE(env, GetOptions(env, argv[2], ctxInfo->options, uri),
                 ctxInfo->error = std::make_shared<ParametersTypeError>("option", "CreateOption"), napi_invalid_arg);
         }
         napi_value helperProxy = nullptr;
