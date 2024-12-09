@@ -158,36 +158,38 @@ std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Ur
     return resultSet;
 }
 
-void GeneralControllerServiceImpl::RegisterObserver(const Uri &uri,
+int GeneralControllerServiceImpl::RegisterObserver(const Uri &uri,
     const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     auto manager = DataShareManagerImpl::GetInstance();
     if (manager == nullptr) {
         LOG_ERROR("Manager is nullptr");
-        return;
+        return E_DATA_SHARE_NOT_READY;
     }
     manager->SetCallCount(__FUNCTION__, uri.ToString());
     auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
         LOG_ERROR("get DataObsMgrClient failed");
-        return;
+        return E_DATA_OBS_NOT_READY;
     }
     ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
     LOG_INFO("Register silent observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+    return ret;
 }
 
-void GeneralControllerServiceImpl::UnregisterObserver(const Uri &uri,
+int GeneralControllerServiceImpl::UnregisterObserver(const Uri &uri,
     const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
         LOG_ERROR("get DataObsMgrClient failed");
-        return;
+        return E_DATA_OBS_NOT_READY;
     }
     ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver);
     LOG_INFO("Unregister silent observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+    return ret;
 }
 
 void GeneralControllerServiceImpl::NotifyChange(const Uri &uri)
