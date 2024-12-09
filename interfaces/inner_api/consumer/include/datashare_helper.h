@@ -242,16 +242,22 @@ public:
      *
      * @param uri, Indicates the path of the data to operate.
      * @param dataObserver, Indicates the IDataAbilityObserver object.
+     *
+     * @return Returns the result. Error codes are listed in DataShare datashare_errno.h and
+     * DataObs dataobs_mgr_errors.h.
      */
-    virtual void RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
+    virtual int RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 
     /**
      * @brief Deregisters an observer used for DataObsMgr specified by the given Uri.
      *
      * @param uri, Indicates the path of the data to operate.
      * @param dataObserver, Indicates the IDataAbilityObserver object.
+     *
+     * @return Returns the result. Error codes are listed in DataShare datashare_errno.h and
+     * DataObs dataobs_mgr_errors.h.
      */
-    virtual void UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
+    virtual int UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 
     /**
      * @brief Notifies the registered observers of a change to the data resource specified by Uri.

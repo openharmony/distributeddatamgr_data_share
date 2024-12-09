@@ -59,6 +59,7 @@ public:
 
     virtual int ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result) = 0;
 
+    // Remain bool because applications have used these two (register and unregister) methods.
     virtual bool RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 
     virtual bool UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;

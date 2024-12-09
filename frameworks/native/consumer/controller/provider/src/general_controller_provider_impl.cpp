@@ -130,40 +130,42 @@ std::shared_ptr<DataShareResultSet> GeneralControllerProviderImpl::Query(const U
     return proxy->Query(uri, predicates, columns, businessError);
 }
 
-void GeneralControllerProviderImpl::RegisterObserver(const Uri &uri,
+int GeneralControllerProviderImpl::RegisterObserver(const Uri &uri,
     const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     auto connection = connection_;
     if (connection == nullptr) {
         LOG_ERROR("connection is nullptr");
-        return;
+        return E_PROVIDER_CONN_NULL;
     }
     auto proxy = connection->GetDataShareProxy(uri_, token_);
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return;
+        return E_PROVIDER_NOT_CONNECTED;
     }
-    bool ret = proxy->RegisterObserver(uri, dataObserver);
+    int ret = proxy->RegisterObserver(uri, dataObserver);
     LOG_INFO("Register non-silent observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+    return ret;
 }
 
-void GeneralControllerProviderImpl::UnregisterObserver(const Uri &uri,
+int GeneralControllerProviderImpl::UnregisterObserver(const Uri &uri,
     const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     auto connection = connection_;
     if (connection == nullptr) {
         LOG_ERROR("connection is nullptr");
-        return;
+        return E_PROVIDER_CONN_NULL;
     }
     auto proxy = connection->GetDataShareProxy(uri_, token_);
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
-        return;
+        return E_PROVIDER_NOT_CONNECTED;
     }
-    bool ret = proxy->UnregisterObserver(uri, dataObserver);
+    int ret = proxy->UnregisterObserver(uri, dataObserver);
     LOG_INFO("Unregister non-silent observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+    return ret;
 }
 
 void GeneralControllerProviderImpl::NotifyChange(const Uri &uri)
