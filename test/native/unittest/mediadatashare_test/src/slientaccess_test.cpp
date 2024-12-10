@@ -32,8 +32,10 @@ using namespace OHOS::Security::AccessToken;
 constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
 static int USER_100 = 100;
 std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
+std::string DATA_SHARE_ERROR_URI = "datashare:///com.acts.datasharetest000";
 std::string SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB00/TBL00?Proxy=true";
 std::string SLIENT_ERROR_URI = "datashare:///com.acts.datashare/entry/DB00/TBL00?Proxy=true";
+std::string SLIENT_ERROR_DATABASE_URI = "datashare:///com.acts.datasharetest/entry/DB6666/TBL00?Proxy=true";
 std::string SLIENT_REGISTER_URI = "datashare:///com.acts.datasharetest/entry/DB00/TBL02?Proxy=true";
 std::string SLIENT_ACCESS_PERMISSION1_URI = "datashare:///com.acts.datasharetest/entry/DB00/permission1?Proxy=true";
 std::string SLIENT_PROXY_PERMISSION1_URI = "datashareproxy://com.acts.datasharetest/entry/DB00/permission1";
@@ -771,6 +773,72 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_001, TestSize.Leve
     helper = nullptr;
     AccessTokenKit::DeleteToken(testTokenId.tokenIDEx);
     LOG_INFO("SlientAccess_Permission_Query_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Access_When_Uri_Error_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Permission_Access_When_URI_ERROR_Test_001::Begin");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ERROR_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "lisi";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal < 0), true);
+    LOG_INFO("SlientAccess_Permission_Access_When_URI_ERROR_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Access_With_Uncreated_DataBase_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Access_With_Uncreated_DataBase_Test_001::Begin");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ERROR_DATABASE_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "lisi";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ((retVal < 0), true);
+    LOG_INFO("SlientAccess_Access_With_Uncreated_DataBase_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Creator_With_Uri_Error_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Creator_With_Uri_Error_Test_001::Begin");
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        LOG_ERROR("GetSystemAbilityManager get samgr failed.");
+    }
+    auto remoteObj = saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID);
+    if (remoteObj == nullptr) {
+        LOG_ERROR("GetSystemAbility service failed.");
+    }
+    std::string uriStr(DATA_SHARE_ERROR_URI);
+    auto helper = DataShare::DataShareHelper::Creator(remoteObj, uriStr, uriStr, 2);
+    EXPECT_EQ(helper, nullptr);
+    LOG_INFO("SlientAccess_Creator_With_Uri_Error_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Creator_When_TimeOut_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Creator_With_Uri_Error_Test_001::Begin");
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        LOG_ERROR("GetSystemAbilityManager get samgr failed.");
+    }
+    auto remoteObj = saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID);
+    if (remoteObj == nullptr) {
+        LOG_ERROR("GetSystemAbility service failed.");
+    }
+    std::string uriStr(DATA_SHARE_URI);
+    auto helper = DataShare::DataShareHelper::Creator(remoteObj, uriStr, uriStr, 0);
+    EXPECT_EQ(helper, nullptr);
+    LOG_INFO("SlientAccess_Creator_With_Uri_Error_Test_001::End");
 }
 } // namespace DataShare
 } // namespace OHOS
