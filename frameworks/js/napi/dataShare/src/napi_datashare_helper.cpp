@@ -57,14 +57,9 @@ static bool GetUri(napi_env env, napi_value jsValue, std::string &uri)
     return true;
 }
 
-bool NapiDataShareHelper::GetOptions(napi_env env, napi_value jsValue, CreateOptions &options)
+static bool GetIsProxy(napi_env env, napi_value jsValue, CreateOptions &options)
 {
     napi_valuetype type = napi_undefined;
-    napi_typeof(env, jsValue, &type);
-    if (type != napi_object) {
-        LOG_ERROR("CreateOptions is not object");
-        return false;
-    }
     napi_value isProxyJs = nullptr;
     napi_status status = napi_get_named_property(env, jsValue, "isProxy", &isProxyJs);
     if (status != napi_ok) {
@@ -81,7 +76,48 @@ bool NapiDataShareHelper::GetOptions(napi_env env, napi_value jsValue, CreateOpt
         LOG_ERROR("napi_get_value_bool failed %{public}d", status);
         return false;
     }
-    options.enabled_ = true;
+    return true;
+}
+
+static bool GetWaitTime(napi_env env, napi_value jsValue, CreateOptions &options)
+{
+    napi_valuetype type = napi_undefined;
+    napi_value waitTimeJs;
+    napi_status status = napi_get_named_property(env, jsValue, "waitTime", &waitTimeJs);
+    if (status != napi_ok) {
+        LOG_ERROR("napi_get_named_property (waitTime) failed %{public}d", status);
+        return false;
+    }
+    napi_typeof(env, waitTimeJs, &type);
+    if (type != napi_number) {
+        LOG_ERROR("CreateOptions.waitTime is not number");
+        return false;
+    }
+    status = napi_get_value_int32(env, waitTimeJs, &options.waitTime_);
+    if (status != napi_ok) {
+        LOG_ERROR("napi_get_value_int32 failed %{public}d", status);
+        return false;
+    }
+    return true;
+}
+
+bool NapiDataShareHelper::GetOptions(napi_env env, napi_value jsValue, CreateOptions &options, Uri &uri)
+{
+    napi_valuetype type = napi_undefined;
+    napi_typeof(env, jsValue, &type);
+    if (type != napi_object) {
+        LOG_ERROR("CreateOptions is not object");
+        return false;
+    }
+    if (uri.GetScheme() == "datashareproxy") {
+        if (!GetIsProxy(env, jsValue, options)) {
+            return false;
+        }
+        options.enabled_ = true;
+    }
+    if (!GetWaitTime(env, jsValue, options)) {
+        LOG_INFO("CreateOptions.waitTime is not defined");
+    }
     return true;
 }
 
@@ -97,10 +133,8 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         NAPI_ASSERT_CALL_ERRCODE(env, GetUri(env, argv[1], ctxInfo->strUri),
             ctxInfo->error = std::make_shared<ParametersTypeError>("uri", "string"), napi_invalid_arg);
         Uri uri(ctxInfo->strUri);
-        if (uri.GetScheme() == "datashareproxy") {
-            NAPI_ASSERT_CALL_ERRCODE(env, argc == 3 || argc == 4,
-                ctxInfo->error = std::make_shared<ParametersNumError>("3 or 4"), napi_invalid_arg);
-            NAPI_ASSERT_CALL_ERRCODE(env, GetOptions(env, argv[2], ctxInfo->options),
+        if (argc != 2) {
+            NAPI_ASSERT_CALL_ERRCODE(env, GetOptions(env, argv[2], ctxInfo->options, uri),
                 ctxInfo->error = std::make_shared<ParametersTypeError>("option", "CreateOption"), napi_invalid_arg);
         }
         napi_value helperProxy = nullptr;
@@ -129,9 +163,11 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
     auto exec = [ctxInfo](AsyncCall::Context *ctx) {
         if (ctxInfo->options.enabled_) {
             ctxInfo->options.token_ = ctxInfo->contextS->GetToken();
-            ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->strUri, ctxInfo->options);
+            ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->strUri, ctxInfo->options, "",
+                ctxInfo->options.waitTime_);
         } else {
-            ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextS->GetToken(), ctxInfo->strUri);
+            ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextS->GetToken(), ctxInfo->strUri, "",
+                ctxInfo->options.waitTime_);
         }
     };
     ctxInfo->SetAction(std::move(input), std::move(output));

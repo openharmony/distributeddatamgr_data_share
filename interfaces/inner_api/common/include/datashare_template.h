@@ -35,6 +35,10 @@ constexpr int32_t DATA_SIZE_ASHMEM_TRANSFER_LIMIT = (10 << 10) << 10;
  *  Specifies the name of the shared memory that RdbChangeNode will transfer.
  */
 constexpr const char* ASHMEM_NAME = "DataShareRdbChangeNode";
+/**
+ *  Specifies the default wait time for connecting extension
+ */
+static constexpr int DEFAULT_WAITTIME = 2;
 
 /**
  *  Specifies the predicates structure of the template.
@@ -101,6 +105,8 @@ struct CreateOptions {
     sptr<IRemoteObject> token_;
     /** Specifies whether use options to create DataShareHelper. */
     bool enabled_ = false;
+    /** Specifies the time to wait for connecting extension. */
+    int waitTime_ = DEFAULT_WAITTIME;
 };
 
 struct AshmemNode {
