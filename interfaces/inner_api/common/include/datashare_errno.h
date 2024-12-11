@@ -158,6 +158,31 @@ constexpr int E_RESULTSET_BUSY = (E_BASE + 61);
 * @brief The error code for invalid appIndex error.
 */
 constexpr int E_APPINDEX_INVALID = (E_BASE + 62);
+
+/**
+* @brief The error code for nullptr observer.
+*/
+constexpr int E_NULL_OBSERVER = (E_BASE + 63);
+
+/**
+* @brief The error code for reusing helper instance released before.
+*/
+constexpr int E_HELPER_DIED = (E_BASE + 64);
+
+/**
+* @brief The error code for failure to get dataobs client.
+*/
+constexpr int E_DATA_OBS_NOT_READY = (E_BASE + 65);
+
+/**
+* @brief The error code for failure to connect the provider.
+*/
+constexpr int E_PROVIDER_NOT_CONNECTED = (E_BASE + 66);
+
+/**
+* @brief The error code for failure to null connection.
+*/
+constexpr int E_PROVIDER_CONN_NULL = (E_BASE + 67);
 } // namespace DataShare
 } // namespace OHOS
 
