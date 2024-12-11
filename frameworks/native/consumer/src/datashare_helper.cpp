@@ -178,6 +178,11 @@ int DataShareHelper::GetSilentProxyStatus(const std::string &uri)
 std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, const sptr<IRemoteObject> &token,
     const int waitTime)
 {
+    if (uri.GetQuery().find("appIndex=") != std::string::npos) {
+        LOG_ERROR("ExtHelper do not support appIndex. Uri:%{public}s",
+            DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+        return nullptr;
+    }
     sptr<DataShareConnection> connection = new (std::nothrow) DataShareConnection(uri, token, waitTime);
     if (connection == nullptr) {
         LOG_ERROR("Create DataShareConnection failed.");
