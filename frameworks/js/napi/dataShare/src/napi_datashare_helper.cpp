@@ -67,6 +67,9 @@ static bool GetIsProxy(napi_env env, napi_value jsValue, CreateOptions &options)
         return false;
     }
     napi_typeof(env, isProxyJs, &type);
+    if (type == napi_undefined) {
+        return true;
+    }
     if (type != napi_boolean) {
         LOG_ERROR("CreateOptions.isProxy is not bool");
         return false;
@@ -89,6 +92,9 @@ static bool GetWaitTime(napi_env env, napi_value jsValue, CreateOptions &options
         return false;
     }
     napi_typeof(env, waitTimeJs, &type);
+    if (type == napi_undefined) {
+        return true;
+    }
     if (type != napi_number) {
         LOG_ERROR("CreateOptions.waitTime is not number");
         return false;
@@ -105,6 +111,9 @@ bool NapiDataShareHelper::GetOptions(napi_env env, napi_value jsValue, CreateOpt
 {
     napi_valuetype type = napi_undefined;
     napi_typeof(env, jsValue, &type);
+    if (type == napi_undefined) {
+        return true;
+    }
     if (type != napi_object) {
         LOG_ERROR("CreateOptions is not object");
         return false;
