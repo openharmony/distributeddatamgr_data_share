@@ -539,11 +539,8 @@ Template DataShareJSUtils::Convert2Template(napi_env env, napi_value value)
         LOG_ERROR("Convert2Template error, value is not object");
         return {};
     }
-    std::string update;
-    if (!UnwrapStringByPropertyName(env, value, "update", update)) {
-        LOG_INFO("Parameter update undefined");
-        update = "";
-    }
+    std::string update = "";
+    UnwrapStringByPropertyName(env, value, "update", update);
 
     napi_value jsPredicates;
     auto status =  napi_get_named_property(env, value, "predicates", &jsPredicates);
