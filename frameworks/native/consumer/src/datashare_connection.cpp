@@ -185,17 +185,8 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
     if (condition_.condition.wait_for(condLock, std::chrono::seconds(waitTime_),
         [this] { return dataShareProxy_ != nullptr; })) {
         LOG_DEBUG("connect ability ended successfully uri:%{public}s", DataShareStringUtils::Change(reqUri).c_str());
-        RADAR_REPORT(__FUNCTION__, RadarReporter::CREATE_DATASHARE_HELPER,
-            RadarReporter::CONNECT_EXT, RadarReporter::SUCCESS,
-            RadarReporter::LOCAL_SESS_NAME, Str16ToStr8(token->GetObjectDescriptor()),
-            RadarReporter::PEER_SESS_NAME, DataShareStringUtils::Change(reqUri));
     } else {
         LOG_WARN("connect timeout uri:%{public}s", DataShareStringUtils::Change(reqUri).c_str());
-        RADAR_REPORT(__FUNCTION__, RadarReporter::CREATE_DATASHARE_HELPER,
-            RadarReporter::CONNECT_EXT, RadarReporter::FAILED,
-            RadarReporter::ERROR_CODE, RadarReporter::EXT_CONNECT_TIMEOUT_ERROR,
-            RadarReporter::LOCAL_SESS_NAME, Str16ToStr8(token->GetObjectDescriptor()),
-            RadarReporter::PEER_SESS_NAME, DataShareStringUtils::Change(reqUri));
     }
     return GetDataShareProxy();
 }
@@ -218,17 +209,8 @@ void DataShareConnection::DisconnectDataShareExtAbility()
     ErrCode ret = Disconnect();
     LOG_INFO("disconnect uri:%{public}s, ret = %{public}d", DataShareStringUtils::Change(uri).c_str(), ret);
     if (ret == E_OK) {
-        RADAR_REPORT(__FUNCTION__, RadarReporter::CREATE_DATASHARE_HELPER,
-            RadarReporter::DIS_CONNECT_EXT, RadarReporter::SUCCESS,
-            RadarReporter::LOCAL_SESS_NAME, Str16ToStr8(token_->GetObjectDescriptor()),
-            RadarReporter::PEER_SESS_NAME, DataShareStringUtils::Change(uri));
         return;
     }
-    RADAR_REPORT(__FUNCTION__, RadarReporter::CREATE_DATASHARE_HELPER,
-        RadarReporter::DIS_CONNECT_EXT, RadarReporter::FAILED,
-        RadarReporter::ERROR_CODE, RadarReporter::EXT_DIS_CONNECT_ERROR,
-        RadarReporter::LOCAL_SESS_NAME, Str16ToStr8(token_->GetObjectDescriptor()),
-        RadarReporter::PEER_SESS_NAME, DataShareStringUtils::Change(uri));
 }
 
 DataShareConnection::~DataShareConnection()
