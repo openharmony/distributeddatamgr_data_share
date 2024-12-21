@@ -14,7 +14,11 @@
  */
 #include <gtest/gtest.h>
 #include <unistd.h>
+#include <memory>
 #include "accesstoken_kit.h"
+#include "ams_mgr_proxy.h"
+#include "data_share_manager_impl.h"
+#include "data_share_service_proxy.h"
 #include "datashare_helper.h"
 #include "datashare_log.h"
 #include "datashare_template.h"
@@ -251,6 +255,180 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_DisableObserversProxyNull_Test_0
         uris, templateId);
     EXPECT_EQ(results.size(), uris.size());
     LOG_INFO("AbnormalBranchTest_DisableObserversProxyNull_Test_002::End");
+}
+
+HWTEST_F(AbnormalBranchTest, PublishDelObserversTest001, TestSize.Level0)
+{
+    LOG_INFO("PublishDelObserversTest001::Start");
+    void *subscriber = nullptr;
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    std::vector<std::string> uris = {};
+    std::string uri = "datashare:///com.test/db0/tbl0";
+    uris.push_back(uri);
+    int64_t subscriberId = 0;
+    std::vector<OperationResult> results = PublishedDataSubscriberManager::GetInstance().DisableObservers(subscriber,
+        nullptr, uris, subscriberId);
+    EXPECT_EQ(results.size(), 0);
+    results = PublishedDataSubscriberManager::GetInstance().DelObservers(subscriber,
+        proxy, uris, subscriberId);
+    EXPECT_EQ(results.size(), uris.size());
+    proxy = nullptr;
+    PublishedDataSubscriberManager::GetInstance().RecoverObservers(proxy);
+    LOG_INFO("PublishDelObserversTest001::End");
+}
+
+HWTEST_F(AbnormalBranchTest, PublishedDataSubscriberManagerInitTest001, TestSize.Level0)
+{
+    LOG_INFO("PublishedDataSubscriberManagerInitTest001::Start");
+    PublishedDataSubscriberManager::GetInstance().serviceCallback_ = sptr<PublishedDataObserverStub>(nullptr);
+    PublishedDataSubscriberManager::GetInstance().Destroy();
+    EXPECT_EQ(PublishedDataSubscriberManager::GetInstance().serviceCallback_, nullptr);
+    bool result = PublishedDataSubscriberManager::GetInstance().Init();
+    EXPECT_NE(PublishedDataSubscriberManager::GetInstance().serviceCallback_, nullptr);
+    EXPECT_TRUE(result);
+    LOG_INFO("PublishedDataSubscriberManagerInitTest001::End");
+}
+
+HWTEST_F(AbnormalBranchTest, PublishedDataSubscriberManagerOperatorTest001, TestSize.Level0)
+{
+    LOG_INFO("PublishedDataSubscriberManagerOperatorTest001::Start");
+    const PublishedDataCallback callback = [](const PublishedDataChangeNode &changeNode){};
+    PublishedDataObserver ob(callback);
+    PublishedDataObserver obCompare(callback);
+    EXPECT_TRUE(ob != obCompare);
+    EXPECT_FALSE(ob == obCompare);
+    LOG_INFO("PublishedDataSubscriberManagerOperatorTest001::End");
+}
+
+HWTEST_F(AbnormalBranchTest, RdbDelObserversTest001, TestSize.Level0)
+{
+    LOG_INFO("RdbDelObserversTest001::Start");
+    void *subscriber = nullptr;
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    std::vector<std::string> uris = {};
+    std::string uri = "datashare:///com.test/db0/tbl0";
+    uris.push_back(uri);
+    TemplateId templateId;
+    std::vector<OperationResult> results = RdbSubscriberManager::GetInstance().DelObservers(subscriber,
+        proxy, uris, templateId);
+    EXPECT_EQ(results.size(), uris.size());
+    proxy = nullptr;
+    PublishedDataSubscriberManager::GetInstance().RecoverObservers(proxy);
+    LOG_INFO("RdbDelObserversTest001::End");
+}
+
+HWTEST_F(AbnormalBranchTest, RdbDisableObserversTest001, TestSize.Level0)
+{
+    LOG_INFO("RdbDisableObserversTest001::Start");
+    void *subscriber = nullptr;
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    std::vector<std::string> uris = {};
+    std::string uri = "datashare:///com.test/db0/tbl0";
+    uris.push_back(uri);
+    TemplateId templateId;
+    std::vector<OperationResult> results = RdbSubscriberManager::GetInstance().DisableObservers(subscriber,
+        nullptr, uris, templateId);
+    EXPECT_EQ(results.size(), 0);
+    results = RdbSubscriberManager::GetInstance().DisableObservers(subscriber,
+        proxy, uris, templateId);
+    EXPECT_EQ(results.size(), uris.size());
+    proxy = nullptr;
+    RdbSubscriberManager::GetInstance().RecoverObservers(proxy);
+    LOG_INFO("RdbDisableObserversTest001::End");
+}
+
+HWTEST_F(AbnormalBranchTest, RdbSubscriberManagerOperatorTest001, TestSize.Level0)
+{
+    LOG_INFO("RdbSubscriberManagerOperatorTest001::Start");
+    const RdbCallback callback = [](const RdbChangeNode &changeNode){};
+    RdbObserver ob(callback);
+    RdbObserver obCompare(callback);
+    EXPECT_TRUE(ob != obCompare);
+    EXPECT_FALSE(ob == obCompare);
+    LOG_INFO("RdbSubscriberManagerOperatorTest001::End");
+}
+
+HWTEST_F(AbnormalBranchTest, RegisterClientDeathObserverTest001, TestSize.Level0)
+{
+    LOG_INFO("RegisterClientDeathObserverTest001::Start");\
+    auto datashareManager = new DataShareManagerImpl();
+    datashareManager->dataMgrService_ = nullptr;
+    datashareManager->bundleName_ = "";
+    datashareManager->clientDeathObserverPtr_ = nullptr;
+    datashareManager->RegisterClientDeathObserver();
+    datashareManager->dataMgrService_ = datashareManager->GetDistributedDataManager();
+    EXPECT_NE(datashareManager->dataMgrService_, nullptr);
+    datashareManager->RegisterClientDeathObserver();
+    EXPECT_EQ(datashareManager->clientDeathObserverPtr_, nullptr);
+    datashareManager->bundleName_ = "com.testbundlename";
+    datashareManager->RegisterClientDeathObserver();
+    EXPECT_NE(datashareManager->clientDeathObserverPtr_, nullptr);
+    datashareManager->RegisterClientDeathObserver();
+    LOG_INFO("RegisterClientDeathObserverTest001::End");
+}
+
+HWTEST_F(AbnormalBranchTest, AmsMgrProxyOnProxyDiedTest001, TestSize.Level0)
+{
+    LOG_INFO("AmsMgrProxyOnProxyDiedTest001::Start");\
+    AmsMgrProxy* proxy = new AmsMgrProxy();
+    proxy->sa_ = nullptr;
+    proxy->proxy_ = nullptr;
+    proxy->OnProxyDied();
+    delete proxy;
+    proxy = new AmsMgrProxy();
+    proxy->sa_ = nullptr;
+    proxy->proxy_ = nullptr;
+    proxy->ConnectSA();
+    EXPECT_NE(proxy->sa_, nullptr);
+    EXPECT_NE(proxy->proxy_, nullptr);
+    EXPECT_NE(proxy->deathRecipient_, nullptr);
+    proxy->OnProxyDied();
+    delete proxy;
+    LOG_INFO("AmsMgrProxyOnProxyDiedTest001::End");
+}
+
+HWTEST_F(AbnormalBranchTest, DataShareServiceProxySubscribeRdbDataTest001, TestSize.Level0)
+{
+    LOG_INFO("DataShareServiceProxySubscribeRdbDataTest001::Start");\
+    AmsMgrProxy* proxy = new AmsMgrProxy();
+    proxy->sa_ = nullptr;
+    proxy->proxy_ = nullptr;
+    proxy->OnProxyDied();
+    delete proxy;
+    proxy = new AmsMgrProxy();
+    proxy->sa_ = nullptr;
+    proxy->proxy_ = nullptr;
+    proxy->ConnectSA();
+    EXPECT_NE(proxy->sa_, nullptr);
+    EXPECT_NE(proxy->proxy_, nullptr);
+    EXPECT_NE(proxy->deathRecipient_, nullptr);
+    proxy->OnProxyDied();
+    delete proxy;
+    LOG_INFO("DataShareServiceProxySubscribeRdbDataTest001::End");
+}
+
+HWTEST_F(AbnormalBranchTest, SubscribeRdbDataTest001, TestSize.Level0)
+{
+    LOG_INFO("EnableSubscribePublishedDataTest001::Start");
+    std::vector<std::string> uris = {};
+    TemplateId templateId;
+    sptr<IDataProxyRdbObserver> observer = OHOS::sptr<IDataProxyRdbObserver>(nullptr);
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    auto resultset = proxy->SubscribeRdbData(uris, templateId, observer);
+    EXPECT_EQ(resultset.size(), 0);
+    LOG_INFO("EnableSubscribePublishedDataTest001::End");
+}
+
+HWTEST_F(AbnormalBranchTest, SubscribePublishedDataTest001, TestSize.Level0)
+{
+    LOG_INFO("SubscribePublishedDataTest001::Start");
+    std::vector<std::string> uris = {};
+    int64_t subscriberId = 1;
+    sptr<IDataProxyPublishedDataObserver> observer = OHOS::sptr<IDataProxyPublishedDataObserver>(nullptr);
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    auto resultset = proxy->SubscribePublishedData(uris, subscriberId, observer);
+    EXPECT_EQ(resultset.size(), 0);
+    LOG_INFO("SubscribePublishedDataTest001::End");
 }
 } // namespace DataShare
 } // namespace OHOS

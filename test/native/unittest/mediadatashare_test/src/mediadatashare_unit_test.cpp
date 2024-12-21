@@ -1943,5 +1943,53 @@ HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb002, TestSize.Level0)
     ASSERT_FALSE(node.isSharedMemory_);
     LOG_INFO("OnChangeFromRdb002::End");
 }
+
+/**
+* @tc.name: OnremoteRequestTest001
+* @tc.desc: test OnRemoteRequest function
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(MediaDataShareUnitTest, OnremoteRequestTest001, TestSize.Level0)
+{
+    LOG_INFO("OnremoteRequestTest001::Start");
+    RdbObserverStub stub(OnChangeCallback);
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    std::u16string descriptorError = u"ERROR";
+    std::u16string descriptorCorrect = RdbObserverStub::GetDescriptor();
+    data.WriteInterfaceToken(descriptorError);
+    std::u16string descriptor;
+    int ret = stub.OnRemoteRequest(0, data, reply, option);
+    EXPECT_EQ(ret, ERR_INVALID_STATE);
+    data.WriteInterfaceToken(descriptorCorrect);
+    ret = stub.OnRemoteRequest(1, data, reply, option);
+    EXPECT_EQ(ret, ERR_INVALID_STATE);
+    data.WriteInterfaceToken(descriptorCorrect);
+    ret = stub.OnRemoteRequest(0, data, reply, option);
+    EXPECT_EQ(ret, ERR_INVALID_VALUE);
+    LOG_INFO("OnremoteRequestTest001::End");
+}
+
+/**
+* @tc.name: ReadAshmemTest001
+* @tc.desc: test ReadAshmem function
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(MediaDataShareUnitTest, ReadAshmemTest001, TestSize.Level0)
+{
+    LOG_INFO("ReadAshmemTest001::Start");
+    RdbObserverStub stub(OnChangeCallback);
+    RdbChangeNode changeNode;
+    changeNode.memory_ = OHOS::sptr<Ashmem>(nullptr);
+    const void *data = nullptr;
+    int size = 0;
+    int offset;
+    int ret = stub.ReadAshmem(changeNode, &data, size, offset);
+    EXPECT_EQ(ret, E_ERROR);
+    LOG_INFO("ReadAshmemTest001::End");
+}
 } // namespace DataShare
 } // namespace OHOS
