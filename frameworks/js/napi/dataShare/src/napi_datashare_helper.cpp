@@ -67,9 +67,6 @@ static bool GetIsProxy(napi_env env, napi_value jsValue, CreateOptions &options)
         return false;
     }
     napi_typeof(env, isProxyJs, &type);
-    if (type == napi_undefined) {
-        return true;
-    }
     if (type != napi_boolean) {
         LOG_ERROR("CreateOptions.isProxy is not bool");
         return false;
@@ -96,7 +93,7 @@ static bool GetWaitTime(napi_env env, napi_value jsValue, CreateOptions &options
         return true;
     }
     if (type != napi_number) {
-        LOG_ERROR("CreateOptions.waitTime is not number");
+        LOG_ERROR("CreateOptions.waitTime is not number or undefined");
         return false;
     }
     status = napi_get_value_int32(env, waitTimeJs, &options.waitTime_);
@@ -111,21 +108,26 @@ bool NapiDataShareHelper::GetOptions(napi_env env, napi_value jsValue, CreateOpt
 {
     napi_valuetype type = napi_undefined;
     napi_typeof(env, jsValue, &type);
-    if (type == napi_undefined) {
-        return true;
-    }
-    if (type != napi_object) {
-        LOG_ERROR("CreateOptions is not object");
-        return false;
-    }
     if (uri.GetScheme() == "datashareproxy") {
+        if (type != napi_object) {
+            LOG_ERROR("CreateOptions is not object");
+            return false;
+        }
         if (!GetIsProxy(env, jsValue, options)) {
             return false;
         }
         options.enabled_ = true;
+    } else {
+        if (type == napi_undefined) {
+            return true;
+        }
+        if (type != napi_object) {
+            LOG_ERROR("CreateOptions is not object or undefined");
+            return false;
+        }
     }
     if (!GetWaitTime(env, jsValue, options)) {
-        LOG_INFO("CreateOptions.waitTime is not defined");
+        return false;
     }
     return true;
 }
