@@ -435,6 +435,13 @@ ohos_unittest("ValueProxyTest") {
 
 ohos_unittest("DataShareHelperImplTest") {
   module_out_path = "data_share/native_datashare"
+  sanitize = {
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
 
   include_dirs = [ "${datashare_native_consumer_path}/include" ]
 
