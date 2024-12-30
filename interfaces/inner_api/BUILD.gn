@@ -50,6 +50,7 @@ config("datashare_public_config") {
 datashare_consumer_sources = [
   "${datashare_common_native_path}/src/call_reporter.cpp",
   "${datashare_common_native_path}/src/datashare_string_utils.cpp",
+  "${datashare_common_native_path}/src/datashare_uri_utils.cpp",
   "${datashare_native_consumer_path}/controller/provider/src/ext_special_controller.cpp",
   "${datashare_native_consumer_path}/controller/provider/src/general_controller_provider_impl.cpp",
   "${datashare_native_consumer_path}/controller/service/src/general_controller_service_impl.cpp",
