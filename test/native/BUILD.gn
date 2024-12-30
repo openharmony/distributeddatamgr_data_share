@@ -28,6 +28,7 @@ group("unittest") {
     ":ProxyDatasTest",
     ":SlientAccessTest",
     ":SlientSwitchTest",
+    ":URIUtilsTest",
     ":ValueProxyTest",
     "resource/datashare_ext_bundle:datashare_ext",
     "resource/datashareproxy_bundle/proxydatas_with_permission:proxydatas_with_permission",
@@ -404,6 +405,27 @@ ohos_unittest("ValueProxyTest") {
   deps = [ "${datashare_innerapi_path}/common:datashare_common_static" ]
 
   external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
+  ]
+}
+
+ohos_unittest("URIUtilsTest") {
+  module_out_path = "data_share/native_datashare"
+
+  include_dirs = [ "${datashare_base_path}/frameworks/native/common/include/" ]
+
+  sources = [ "./unittest/mediadatashare_test/src/uri_utils_test.cpp" ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+
+  external_deps = [
+    "ability_base:zuri",
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
