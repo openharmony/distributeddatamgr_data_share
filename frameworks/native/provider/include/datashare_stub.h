@@ -52,6 +52,7 @@ private:
     ErrCode CmdInsertEx(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdUpdateEx(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdDeleteEx(MessageParcel &data, MessageParcel &reply);
+    ErrCode CmdUserDefineFunc(MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
     virtual int ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result) override;
     virtual int InsertExt(const Uri &uri, const DataShareValuesBucket &value, std::string &result) override;
@@ -60,6 +61,8 @@ private:
     virtual std::pair<int32_t, int32_t> UpdateEx(const Uri &uri, const DataSharePredicates &predicates,
         const DataShareValuesBucket &value) override;
     virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) override;
+    virtual int32_t UserDefineFunc(
+        MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
     using RequestFuncType = int (DataShareStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, RequestFuncType> stubFuncMap_;

@@ -49,6 +49,7 @@ public:
 
     std::vector<std::string> GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter);
 
+    int32_t UserDefineFunc(MessageParcel &data, MessageParcel &reply, MessageOption &option);
 private:
     std::shared_ptr<DataShareConnection> connection_ = nullptr;
     sptr<IRemoteObject> token_ = {};

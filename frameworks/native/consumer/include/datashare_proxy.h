@@ -72,6 +72,9 @@ public:
 
     virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) override;
 
+    virtual int32_t UserDefineFunc(
+        MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+
 private:
     bool CheckSize(const UpdateOperations &operations);
     static inline BrokerDelegator<DataShareProxy> delegator_;

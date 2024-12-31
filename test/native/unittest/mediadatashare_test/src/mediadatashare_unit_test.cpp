@@ -1991,5 +1991,40 @@ HWTEST_F(MediaDataShareUnitTest, ReadAshmemTest001, TestSize.Level0)
     EXPECT_EQ(ret, E_ERROR);
     LOG_INFO("ReadAshmemTest001::End");
 }
+
+/*
+* @tc.desc: test UserDefineFunc with no descriptor
+* @tc.require: Null
+*/
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_User_Define_Func_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_User_Define_Func_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    auto errCode = helper->UserDefineFunc(data, reply, option);
+    EXPECT_EQ(errCode, -1);
+    LOG_INFO("MediaDataShare_User_Define_Func_Test_001 End");
+}
+
+/*
+* @tc.desc: test UserDefineFunc with descriptor
+* @tc.require: Null
+*/
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_User_Define_Func_Test_002, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_User_Define_Func_Test_002::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    MessageParcel data;
+    std::u16string descriptor = u"OHOS.DataShare.IDataShare";
+    MessageParcel reply;
+    MessageOption option;
+    if (data.WriteInterfaceToken(descriptor)) {
+        auto errCode = helper->UserDefineFunc(data, reply, option);
+        EXPECT_EQ(errCode, 0);
+    }
+    LOG_INFO("MediaDataShare_User_Define_Func_Test_002 End");
+}
 } // namespace DataShare
 } // namespace OHOS

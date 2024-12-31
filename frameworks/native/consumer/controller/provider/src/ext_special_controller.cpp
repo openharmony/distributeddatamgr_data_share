@@ -170,8 +170,24 @@ std::vector<std::string> ExtSpecialController::GetFileTypes(const Uri &uri, cons
     return proxy->GetFileTypes(uri, mimeTypeFilter);
 }
 
-ExtSpecialController::ExtSpecialController(std::shared_ptr<DataShareConnection> connection, const Uri &uri,
-    const sptr<IRemoteObject> &token)
+int32_t ExtSpecialController::UserDefineFunc(
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("connection is nullptr");
+        return INVALID_VALUE;
+    }
+    auto proxy = connection->GetDataShareProxy(uri_, token_);
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return INVALID_VALUE;
+    }
+    return proxy->UserDefineFunc(data, reply, option);
+}
+
+ExtSpecialController::ExtSpecialController(
+    std::shared_ptr<DataShareConnection> connection, const Uri &uri, const sptr<IRemoteObject> &token)
     : connection_(connection), token_(token), uri_(uri)
 {
 }

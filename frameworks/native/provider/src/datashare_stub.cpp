@@ -77,9 +77,17 @@ int DataShareStub::OnRemoteRequest(uint32_t code, MessageParcel& data, MessagePa
     }
 
     const auto &itFunc = stubFuncMap_.find(code);
+    auto start = std::chrono::steady_clock::now();
+    int32_t ret = 0;
+    bool isCodeValid = false;
     if (itFunc != stubFuncMap_.end()) {
-        auto start = std::chrono::steady_clock::now();
-        auto ret = (this->*(itFunc->second))(data, reply);
+        isCodeValid = true;
+        ret = (this->*(itFunc->second))(data, reply);
+    } else if (code == static_cast<uint32_t>(IDataShareInterfaceCode::CMD_USER_DEFINE_FUNC)) {
+        isCodeValid = true;
+        ret = CmdUserDefineFunc(data, reply, option);
+    }
+    if (isCodeValid) {
         auto finish = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
         if (duration >= TIME_THRESHOLD) {
@@ -90,7 +98,6 @@ int DataShareStub::OnRemoteRequest(uint32_t code, MessageParcel& data, MessagePa
         }
         return ret;
     }
-
     LOG_DEBUG("remote request unhandled: %{public}d", code);
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
 }
@@ -356,6 +363,12 @@ ErrCode DataShareStub::CmdGetType(MessageParcel &data, MessageParcel &reply)
     return E_OK;
 }
 
+ErrCode DataShareStub::CmdUserDefineFunc(MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    UserDefineFunc(data, reply, option);
+    return E_OK;
+}
+
 ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
 {
     Uri uri("");
@@ -540,5 +553,11 @@ std::pair<int32_t, int32_t> DataShareStub::DeleteEx(const Uri &uri, const DataSh
     return std::make_pair(0, 0);
 }
 
+int32_t DataShareStub::UserDefineFunc(
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    LOG_ERROR("UserDefineFunc excuted.");
+    return 0;
+}
 } // namespace DataShare
 } // namespace OHOS

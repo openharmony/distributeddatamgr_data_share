@@ -271,5 +271,21 @@ HWTEST_F(DataShareHelperImplTest, DisablePubSubsTest001, TestSize.Level0)
     EXPECT_EQ(result.size(), 0);
     LOG_INFO("DisablePubSubsTest001::End");
 }
+
+/*
+* @tc.desc: test UserDefineFunc with no extSpCtl_
+* @tc.require: Null
+*/
+HWTEST_F(DataShareHelperImplTest, User_Define_func_No_ExtSpCtl_Test001, TestSize.Level0)
+{
+    LOG_INFO("User_Define_func_No_ExtSpCtl_Test001::Start");
+    DataShareHelperImplTest::GetInstance()->extSpCtl_ = nullptr;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    auto result = DataShareHelperImplTest::GetInstance()->UserDefineFunc(data, reply, option);
+    EXPECT_EQ(result, DATA_SHARE_ERROR);
+    LOG_INFO("User_Define_func_No_ExtSpCtl_Test001::End");
+}
 } // namespace DataShare
 } // namespace OHOS

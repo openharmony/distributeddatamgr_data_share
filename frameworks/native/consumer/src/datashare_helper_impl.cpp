@@ -463,5 +463,17 @@ std::vector<OperationResult> DataShareHelperImpl::DisablePubSubs(const std::vect
     }
     return publishedDataCtl->DisableSubscribePublishedData(this, uris, subscriberId);
 }
+
+int32_t DataShareHelperImpl::UserDefineFunc(
+    MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
+    auto extSpCtl = extSpCtl_;
+    if (extSpCtl == nullptr) {
+        LOG_ERROR("providerSpCtl is nullptr");
+        return DATA_SHARE_ERROR;
+    }
+    return extSpCtl->UserDefineFunc(data, reply, option);
+}
 } // namespace DataShare
 } // namespace OHOS
