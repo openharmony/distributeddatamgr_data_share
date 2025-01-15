@@ -31,7 +31,9 @@ RdbSubscriberManager &RdbSubscriberManager::GetInstance()
 
 RdbSubscriberManager::RdbSubscriberManager()
 {
-    serviceCallback_ = nullptr;
+    serviceCallback_ = new RdbObserverStub([this](const RdbChangeNode &changeNode) {
+        Emit(changeNode);
+    });
 }
 
 std::vector<OperationResult> RdbSubscriberManager::AddObservers(void *subscriber,
@@ -61,7 +63,6 @@ std::vector<OperationResult> RdbSubscriberManager::AddObservers(void *subscriber
                 return;
             }
 
-            Init();
             auto subResults = proxy->SubscribeRdbData(firstAddUris, templateId, serviceCallback_);
             std::vector<Key> failedKeys;
             for (auto &subResult : subResults) {
@@ -74,7 +75,6 @@ std::vector<OperationResult> RdbSubscriberManager::AddObservers(void *subscriber
             if (!failedKeys.empty()) {
                 BaseCallbacks::DelObservers(failedKeys, subscriber);
             }
-            Destroy();
         });
 }
 
@@ -105,7 +105,6 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
             }
             auto unsubResult = proxy->UnSubscribeRdbData(lastDelUris, templateId);
             opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
-            Destroy();
         });
 }
 
@@ -124,7 +123,6 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
                 auto unsubResult = proxy->UnSubscribeRdbData(std::vector<std::string>(1, key.uri_), key.templateId_);
                 opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
             }
-            Destroy();
         });
 }
 
@@ -252,28 +250,6 @@ void RdbSubscriberManager::EmitOnEnable(std::map<Key, std::vector<ObserverNodeOn
                 obs.observer_->OnChange(it->second);
             }
         }
-    }
-}
-
-bool RdbSubscriberManager::Init()
-{
-    if (serviceCallback_ == nullptr) {
-        LOG_INFO("callback init");
-        serviceCallback_ = new RdbObserverStub([this](const RdbChangeNode &changeNode) {
-            Emit(changeNode);
-        });
-    }
-    return true;
-}
-
-void RdbSubscriberManager::Destroy()
-{
-    if (BaseCallbacks::GetAllSubscriberSize() == 0) {
-        if (serviceCallback_ != nullptr) {
-            serviceCallback_->ClearCallback();
-        }
-        LOG_INFO("no valid subscriber, delete callback");
-        serviceCallback_ = nullptr;
     }
 }
 
