@@ -96,8 +96,6 @@ private:
     void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
     void EmitOnEnable(std::map<Key, std::vector<ObserverNodeOnEnabled>> &obsMap);
     RdbSubscriberManager();
-    bool Init();
-    void Destroy();
     sptr<RdbObserverStub> serviceCallback_;
     std::map<Key, RdbChangeNode> lastChangeNodeMap_;
 };
