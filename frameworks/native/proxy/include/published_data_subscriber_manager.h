@@ -96,8 +96,6 @@ private:
     void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
     void EmitOnEnable(std::map<Key, std::vector<ObserverNodeOnEnabled>> &obsMap);
     PublishedDataSubscriberManager();
-    bool Init();
-    void Destroy();
     sptr<PublishedDataObserverStub> serviceCallback_;
     ConcurrentMap<Key, PublishedDataChangeNode> lastChangeNodeMap_;
 };
