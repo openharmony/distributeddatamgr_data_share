@@ -31,7 +31,7 @@ using namespace OHOS::AppExecFwk;
 namespace OHOS {
 namespace DataShare {
 static constexpr int MAX_ARGC = 6;
-static __thread napi_ref constructor_ = nullptr;
+static thread_local napi_ref constructor_ = nullptr;
 static bool GetSilentUri(napi_env env, napi_value jsValue, std::string &uri)
 {
     napi_valuetype valuetype = napi_undefined;
