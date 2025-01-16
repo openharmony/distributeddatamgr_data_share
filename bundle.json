@@ -5,17 +5,12 @@
     "license": "Apache License 2.0",
     "repository": "https://gitee.com/openharmony/distributeddatamgr_data_share",
     "description": "allows an application to manage its own data and share data with other applications",
-    "domain": "ohos",
     "language": "",
     "publishAs": "code-segment",
     "private": false,
     "scripts": {},
     "tags": [
         "foundation"
-    ],
-    "keywords": [
-        "distributeddatamgr",
-        "data_share"
     ],
     "envs": [],
     "dirs": {},
