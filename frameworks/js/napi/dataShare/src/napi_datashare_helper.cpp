@@ -89,11 +89,11 @@ static bool GetWaitTime(napi_env env, napi_value jsValue, CreateOptions &options
         return false;
     }
     napi_typeof(env, waitTimeJs, &type);
-    if (type == napi_undefined) {
+    if (type == napi_undefined || type == napi_null) {
         return true;
     }
     if (type != napi_number) {
-        LOG_ERROR("CreateOptions.waitTime is not number or undefined");
+        LOG_ERROR("CreateOptions.waitTime is not number or undefined or null");
         return false;
     }
     status = napi_get_value_int32(env, waitTimeJs, &options.waitTime_);
@@ -118,11 +118,11 @@ bool NapiDataShareHelper::GetOptions(napi_env env, napi_value jsValue, CreateOpt
         }
         options.enabled_ = true;
     } else {
-        if (type == napi_undefined) {
+        if (type == napi_undefined || type == napi_null) {
             return true;
         }
         if (type != napi_object) {
-            LOG_ERROR("CreateOptions is not object or undefined");
+            LOG_ERROR("CreateOptions is not object or undefined or null");
             return false;
         }
     }
@@ -130,6 +130,18 @@ bool NapiDataShareHelper::GetOptions(napi_env env, napi_value jsValue, CreateOpt
         return false;
     }
     return true;
+}
+
+void NapiDataShareHelper::ExecuteCreator(std::shared_ptr<CreateContextInfo> ctxInfo)
+{
+    if (ctxInfo->options.enabled_) {
+        ctxInfo->options.token_ = ctxInfo->contextS->GetToken();
+        ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->strUri, ctxInfo->options, "",
+            ctxInfo->options.waitTime_);
+    } else {
+        ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextS->GetToken(), ctxInfo->strUri, "",
+            ctxInfo->options.waitTime_);
+    }
 }
 
 napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_callback_info info)
@@ -147,6 +159,9 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         if (argc != 2) {
             NAPI_ASSERT_CALL_ERRCODE(env, GetOptions(env, argv[2], ctxInfo->options, uri),
                 ctxInfo->error = std::make_shared<ParametersTypeError>("option", "CreateOption"), napi_invalid_arg);
+        } else {
+            NAPI_ASSERT_CALL_ERRCODE(env, uri.GetScheme() != "datashareproxy",
+                ctxInfo->error = std::make_shared<ParametersNumError>("3 or 4"), napi_invalid_arg);
         }
         napi_value helperProxy = nullptr;
         napi_status status = napi_new_instance(env, GetConstructor(env), argc, argv, &helperProxy);
@@ -172,14 +187,7 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         return status;
     };
     auto exec = [ctxInfo](AsyncCall::Context *ctx) {
-        if (ctxInfo->options.enabled_) {
-            ctxInfo->options.token_ = ctxInfo->contextS->GetToken();
-            ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->strUri, ctxInfo->options, "",
-                ctxInfo->options.waitTime_);
-        } else {
-            ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextS->GetToken(), ctxInfo->strUri, "",
-                ctxInfo->options.waitTime_);
-        }
+        ExecuteCreator(ctxInfo);
     };
     ctxInfo->SetAction(std::move(input), std::move(output));
     AsyncCall asyncCall(env, info, ctxInfo);

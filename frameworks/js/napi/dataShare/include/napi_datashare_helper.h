@@ -141,6 +141,7 @@ private:
     };
     static void Notify(const std::shared_ptr<NapiDataShareHelper::ContextInfo> context,
         std::shared_ptr<DataShareHelper> helper);
+    static void ExecuteCreator(std::shared_ptr<CreateContextInfo> ctxInfo);
 };
 } // namespace DataShare
 } // namespace OHOS
