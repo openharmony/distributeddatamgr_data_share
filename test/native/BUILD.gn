@@ -457,32 +457,68 @@ ohos_unittest("URIUtilsTest") {
 
 ohos_unittest("DataShareHelperImplTest") {
   module_out_path = "data_share/native_datashare"
-  sanitize = {
-    ubsan = true
-    boundary_sanitize = true
-    cfi = true
-    cfi_cross_dso = true
-    debug = false
-  }
 
-  include_dirs = [ "${datashare_native_consumer_path}/include" ]
+  include_dirs = [
+    "${datashare_native_consumer_path}/include",
+    "${datashare_common_native_path}/include",
+    "${datashare_innerapi_path}/consumer/include",
+    "${datashare_innerapi_path}/common/include",
+    "${datashare_innerapi_path}/provider/include",
+    "${datashare_native_consumer_path}/controller/provider/include",
+    "${datashare_native_consumer_path}/controller/common",
+    "${datashare_native_consumer_path}/controller/service/include",
+    "${datashare_native_proxy_path}/include",
+  ]
 
-  sources =
-      [ "./unittest/mediadatashare_test/src/datashare_helper_impl_test.cpp" ]
-
-  deps = [
-    "${datashare_innerapi_path}:datashare_consumer_static",
-    "${datashare_innerapi_path}/common:datashare_common_static",
+  sources = [
+    "${datashare_common_native_path}/src/call_reporter.cpp",
+    "${datashare_common_native_path}/src/datashare_abs_result_set.cpp",
+    "${datashare_common_native_path}/src/datashare_itypes_utils.cpp",
+    "${datashare_common_native_path}/src/datashare_result_set.cpp",
+    "${datashare_common_native_path}/src/datashare_string_utils.cpp",
+    "${datashare_common_native_path}/src/datashare_template.cpp",
+    "${datashare_common_native_path}/src/datashare_uri_utils.cpp",
+    "${datashare_common_native_path}/src/ikvstore_data_service.cpp",
+    "${datashare_common_native_path}/src/ishared_result_set.cpp",
+    "${datashare_common_native_path}/src/ishared_result_set_proxy.cpp",
+    "${datashare_native_consumer_path}/controller/provider/src/ext_special_controller.cpp",
+    "${datashare_native_consumer_path}/controller/service/src/general_controller_service_impl.cpp",
+    "${datashare_native_consumer_path}/controller/service/src/persistent_data_controller.cpp",
+    "${datashare_native_consumer_path}/controller/service/src/published_data_controller.cpp",
+    "${datashare_native_consumer_path}/src/datashare_connection.cpp",
+    "${datashare_native_consumer_path}/src/datashare_helper.cpp",
+    "${datashare_native_consumer_path}/src/datashare_helper_impl.cpp",
+    "${datashare_native_consumer_path}/src/datashare_proxy.cpp",
+    "${datashare_native_proxy_path}/src/ams_mgr_proxy.cpp",
+    "${datashare_native_proxy_path}/src/data_proxy_observer_stub.cpp",
+    "${datashare_native_proxy_path}/src/data_share_manager_impl.cpp",
+    "${datashare_native_proxy_path}/src/data_share_service_proxy.cpp",
+    "${datashare_native_proxy_path}/src/idata_share_client_death_observer.cpp",
+    "${datashare_native_proxy_path}/src/published_data_subscriber_manager.cpp",
+    "${datashare_native_proxy_path}/src/rdb_subscriber_manager.cpp",
+    "./unittest/mediadatashare_test/src/datashare_helper_impl_test.cpp",
   ]
 
   external_deps = [
+    "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_manager",
+    "ability_runtime:app_context",
     "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
     "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "hitrace:libhitracechain",
+    "ipc:ipc_single",
+    "ipc:rpc",
+    "samgr:samgr_proxy",
   ]
+
+  public_external_deps = [ "kv_store:distributeddata_inner" ]
 
   cflags = [
     "-fvisibility=hidden",
