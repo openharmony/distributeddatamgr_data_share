@@ -46,10 +46,10 @@ class MutliValue {
 public:
 
     /**
-     * @brief Use Type replace variant namespace.
+     * @brief Use Type replace variant namespace. The index order must be consistent with the enum.
      */
     using Type = std::variant<std::monostate, std::vector<int>, std::vector<int64_t>,
-        std::vector<std::string>, std::vector<double>>;
+        std::vector<double>, std::vector<std::string>>;
     Type value;
 
     /**

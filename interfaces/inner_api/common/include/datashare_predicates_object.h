@@ -52,9 +52,9 @@ class SingleValue {
 public:
 
     /**
-     * @brief Use Type replace variant namespace.
+     * @brief Use Type replace variant namespace. The index order must be consistent with the enum.
      */
-    using Type = std::variant<std::monostate, int, int64_t, double, std::string, bool>;
+    using Type = std::variant<std::monostate, int, double, std::string, bool, int64_t>;
     Type value;
 
     /**
