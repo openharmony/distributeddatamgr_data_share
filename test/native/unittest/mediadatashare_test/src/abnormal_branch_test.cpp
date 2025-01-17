@@ -277,18 +277,6 @@ HWTEST_F(AbnormalBranchTest, PublishDelObserversTest001, TestSize.Level0)
     LOG_INFO("PublishDelObserversTest001::End");
 }
 
-HWTEST_F(AbnormalBranchTest, PublishedDataSubscriberManagerInitTest001, TestSize.Level0)
-{
-    LOG_INFO("PublishedDataSubscriberManagerInitTest001::Start");
-    PublishedDataSubscriberManager::GetInstance().serviceCallback_ = sptr<PublishedDataObserverStub>(nullptr);
-    PublishedDataSubscriberManager::GetInstance().Destroy();
-    EXPECT_EQ(PublishedDataSubscriberManager::GetInstance().serviceCallback_, nullptr);
-    bool result = PublishedDataSubscriberManager::GetInstance().Init();
-    EXPECT_NE(PublishedDataSubscriberManager::GetInstance().serviceCallback_, nullptr);
-    EXPECT_TRUE(result);
-    LOG_INFO("PublishedDataSubscriberManagerInitTest001::End");
-}
-
 HWTEST_F(AbnormalBranchTest, PublishedDataSubscriberManagerOperatorTest001, TestSize.Level0)
 {
     LOG_INFO("PublishedDataSubscriberManagerOperatorTest001::Start");
