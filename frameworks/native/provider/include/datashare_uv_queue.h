@@ -40,7 +40,7 @@ public:
     void CheckFuncAndExec(NapiBoolFunc retFunc);
 
 private:
-    struct UvEntry {
+    struct TaskEntry {
         napi_env env;
         NapiVoidFunc func;
         bool done;
@@ -49,9 +49,7 @@ private:
         std::atomic_int32_t count;
     };
 
-    static void LambdaForWork(uv_work_t* work, int uvstatus);
-
-    static void Purge(uv_work_t* work);
+    static void LambdaForWork(TaskEntry* taskEntry);
 
     napi_env env_ = nullptr;
     uv_loop_s* loop_ = nullptr;

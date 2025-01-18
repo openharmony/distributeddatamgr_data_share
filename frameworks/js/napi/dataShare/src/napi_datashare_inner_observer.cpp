@@ -31,20 +31,20 @@ NAPIInnerObserver::NAPIInnerObserver(napi_env env, napi_value callback)
     napi_get_uv_event_loop(env, &loop_);
 }
 
-void NAPIInnerObserver::OnComplete(uv_work_t *work, int status)
+void NAPIInnerObserver::OnComplete(ObserverWorker* observerWorker)
 {
-    LOG_DEBUG("uv_queue_work start");
-    std::shared_ptr<ObserverWorker> innerWorker(reinterpret_cast<ObserverWorker *>(work->data));
-    auto observer = innerWorker->observer_.lock();
+    LOG_DEBUG("napi_send_event start");
+    auto observer = observerWorker->observer_.lock();
     if (observer == nullptr || observer->ref_ == nullptr) {
-        delete work;
         LOG_ERROR("innerWorker->observer_->ref_ is nullptr");
+        delete observerWorker;
         return;
     }
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(observer->env_, &scope);
     if (scope == nullptr) {
-        delete work;
+        LOG_ERROR("scope is nullptr");
+        delete observerWorker;
         return;
     }
     napi_value callback = nullptr;
@@ -53,15 +53,16 @@ void NAPIInnerObserver::OnComplete(uv_work_t *work, int status)
     napi_get_reference_value(observer->env_, observer->ref_, &callback);
     napi_get_global(observer->env_, &global);
     napi_get_undefined(observer->env_, &args[0]);
-    if (innerWorker->isNotifyDetails_) {
-        args[1] = DataShareJSUtils::Convert2JSValue(observer->env_, innerWorker->result_);
+    if (observerWorker->isNotifyDetails_) {
+        args[1] = DataShareJSUtils::Convert2JSValue(observer->env_, observerWorker->result_);
     }
     napi_status callStatus = napi_call_function(observer->env_, global, callback, 2, args, nullptr);
     napi_close_handle_scope(observer->env_, scope);
     if (callStatus != napi_ok) {
         LOG_ERROR("napi_call_function failed status : %{public}d", callStatus);
     }
-    delete work;
+    LOG_DEBUG("napi_call_function succeed status : %{public}d", callStatus);
+    delete observerWorker;
 }
 
 void NAPIInnerObserver::OnChange(const DataShareObserver::ChangeInfo& changeInfo, bool isNotifyDetails)
@@ -73,29 +74,21 @@ void NAPIInnerObserver::OnChange(const DataShareObserver::ChangeInfo& changeInfo
         LOG_ERROR("ref_ is nullptr");
         return;
     }
-
-    uv_work_t* work = new (std::nothrow) uv_work_t();
-    if (work == nullptr) {
-        LOG_ERROR("Failed to create uv work");
-        return;
-    }
-
-    ObserverWorker* observerWorker = nullptr;
-    observerWorker = new (std::nothrow) ObserverWorker(shared_from_this(), changeInfo);
+    ObserverWorker* observerWorker = new (std::nothrow) ObserverWorker(shared_from_this(), changeInfo);
     if (observerWorker == nullptr) {
-        delete work;
         LOG_ERROR("Failed to create observerWorker");
         return;
     }
     observerWorker->isNotifyDetails_ = isNotifyDetails;
-    work->data = observerWorker;
-    int ret = uv_queue_work_with_qos(loop_, work, [](uv_work_t *work) {},
-        NAPIInnerObserver::OnComplete, uv_qos_user_initiated);
+    auto task = [observerWorker]() {
+        NAPIInnerObserver::OnComplete(observerWorker);
+    };
+    int ret = napi_send_event(env_, task, napi_eprio_immediate);
     if (ret != 0) {
-        LOG_ERROR("uv_queue_work failed");
+        LOG_ERROR("napi_send_event failed: %{public}d", ret);
         delete observerWorker;
-        delete work;
     }
+    LOG_INFO("NAPIInnerObserver datashare callback end, times %{public}" PRIu64 ".", time);
 }
 
 void NAPIInnerObserver::DeleteReference()
