@@ -33,7 +33,12 @@ public:
     virtual bool operator!=(const NapiObserver &rhs) const;
     NapiObserver& operator=(NapiObserver &&rhs) = default;
 protected:
-    static void CallbackFunc(uv_work_t *work, int status);
+    struct ObserverWorker {
+        std::weak_ptr<NapiObserver> observer_;
+        std::function<napi_value(napi_env)> getParam;
+        explicit ObserverWorker(std::shared_ptr<NapiObserver> observerIn) : observer_(observerIn) {}
+    };
+    static void CallbackFunc(ObserverWorker *observerWorker);
     napi_env env_ = nullptr;
     napi_ref ref_ = nullptr;
     uv_loop_s *loop_ = nullptr;
@@ -49,12 +54,6 @@ class NapiPublishedObserver final: public NapiObserver, public std::enable_share
 public:
     NapiPublishedObserver(napi_env env, napi_value callback) : NapiObserver(env, callback) {};
     void OnChange(PublishedDataChangeNode &changeNode);
-};
-
-struct ObserverWorker {
-    std::weak_ptr<NapiObserver> observer_;
-    std::function<napi_value(napi_env)> getParam;
-    explicit ObserverWorker(std::shared_ptr<NapiObserver> observerIn) : observer_(observerIn) {}
 };
 } // namespace DataShare
 } // namespace OHOS

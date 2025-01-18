@@ -30,87 +30,53 @@ DataShareUvQueue::DataShareUvQueue(napi_env env)
     napi_get_uv_event_loop(env, &loop_);
 }
 
-void DataShareUvQueue::LambdaForWork(uv_work_t *work, int uvstatus)
+void DataShareUvQueue::LambdaForWork(TaskEntry* taskEntry)
 {
-    if (UV_ECANCELED == uvstatus || work == nullptr || work->data == nullptr) {
-        LOG_ERROR("invalid work or work->data.");
-        DataShareUvQueue::Purge(work);
+    if (taskEntry == nullptr) {
+        LOG_ERROR("invalid taskEntry.");
         return;
     }
-    auto *entry = static_cast<UvEntry*>(work->data);
     {
-        std::unique_lock<std::mutex> lock(entry->mutex);
-        if (entry->func) {
-            entry->func();
+        std::unique_lock<std::mutex> lock(taskEntry->mutex);
+        if (taskEntry->func) {
+            taskEntry->func();
         }
-        entry->done = true;
-        entry->condition.notify_all();
+        taskEntry->done = true;
+        taskEntry->condition.notify_all();
     }
-    DataShareUvQueue::Purge(work);
+    if (taskEntry->count.fetch_sub(1) == 1) {
+        delete taskEntry;
+        taskEntry = nullptr;
+    }
 }
 
 void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
 {
-    uv_work_t* work = new (std::nothrow) uv_work_t;
-    if (work == nullptr) {
-        LOG_ERROR("invalid work.");
-        return;
-    }
-    work->data = new UvEntry {env_, std::move(func), false, {}, {}, std::atomic<int>(1)};
-    if (work->data == nullptr) {
-        delete work;
-        LOG_ERROR("invalid uvEntry.");
-        return;
-    }
-
-    auto *uvEntry = static_cast<UvEntry*>(work->data);
+    auto *taskEntry = new TaskEntry {env_, std::move(func), false, {}, {}, std::atomic<int>(1)};
     {
-        std::unique_lock<std::mutex> lock(uvEntry->mutex);
-        uvEntry->count.fetch_add(1);
-        auto status = uv_queue_work(
-            loop_, work, [](uv_work_t *work) {}, LambdaForWork);
-        if (status != napi_ok) {
-            LOG_ERROR("queue work failed");
-            DataShareUvQueue::Purge(work);
+        std::unique_lock<std::mutex> lock(taskEntry->mutex);
+        taskEntry->count.fetch_add(1);
+        auto task = [taskEntry]() {
+            DataShareUvQueue::LambdaForWork(taskEntry);
+        };
+        if (napi_status::napi_ok != napi_send_event(env_, task, napi_eprio_immediate)) {
+            LOG_ERROR("napi_send_event task failed");
+            delete taskEntry;
+            taskEntry = nullptr;
             return;
         }
-        if (uvEntry->condition.wait_for(lock, std::chrono::seconds(WAIT_TIME), [uvEntry] { return uvEntry->done; })) {
+        if (taskEntry->condition.wait_for(lock, std::chrono::seconds(WAIT_TIME),
+            [taskEntry] { return taskEntry->done; })) {
             auto time = static_cast<uint64_t>(duration_cast<milliseconds>(
                 system_clock::now().time_since_epoch()).count());
             LOG_INFO("function ended successfully. times %{public}" PRIu64 ".", time);
         }
-        if (!uvEntry->done && uv_cancel((uv_req_t*)work) != napi_ok) {
-            LOG_ERROR("uv_cancel failed.");
-        }
     }
-
     CheckFuncAndExec(retFunc);
-    DataShareUvQueue::Purge(work);
-}
-
-void DataShareUvQueue::Purge(uv_work_t* work)
-{
-    if (work == nullptr) {
-        LOG_ERROR("invalid work");
-        return;
+    if (taskEntry->count.fetch_sub(1) == 1) {
+        delete taskEntry;
+        taskEntry = nullptr;
     }
-    if (work->data == nullptr) {
-        LOG_ERROR("invalid work->data");
-        delete work;
-        return;
-    }
-
-    auto *entry = static_cast<UvEntry*>(work->data);
-    auto count = entry->count.fetch_sub(1);
-    if (count != 1) {
-        return;
-    }
-
-    delete entry;
-    entry = nullptr;
-
-    delete work;
-    work = nullptr;
 }
 
 void DataShareUvQueue::CheckFuncAndExec(NapiBoolFunc retFunc)
