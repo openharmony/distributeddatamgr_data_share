@@ -206,13 +206,6 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
 {
     LOG_INFO("ProxyDatasTest_Template_Test_003::Start");
     auto helper = dataShareHelper;
-    Uri uri(DATA_SHARE_PROXY_URI);
-    DataShare::DataShareValuesBucket valuesBucket;
-    std::string name0 = "name00";
-    valuesBucket.Put(TBL_NAME0, name0);
-    int retVal = helper->Insert(uri, valuesBucket);
-    EXPECT_EQ((retVal > 0), true);
-
     PredicateTemplateNode node1("p1", "select name0 as name from TBL00");
     std::vector<PredicateTemplateNode> nodes;
     nodes.emplace_back(node1);
@@ -234,19 +227,28 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
     for (auto const &operationResult : results1) {
         EXPECT_EQ(operationResult.errCode_, 0);
     }
-    std::vector<OperationResult> results2 = helper->UnsubscribeRdbData(uris, tplId);
-    EXPECT_EQ(results2.size(), uris.size());
-    for (auto const &operationResult : results2) {
-        EXPECT_EQ(operationResult.errCode_, 0);
-    }
+
+    Uri uri(DATA_SHARE_PROXY_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string name0 = "name00";
+    valuesBucket.Put(TBL_NAME0, name0);
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_GT(retVal, 0);
 
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(TBL_NAME0, "updatetest");
     std::vector<string> columns;
     auto resultSet = helper->Query(uri, predicates, columns);
+    EXPECT_NE(resultSet, nullptr);
     int queryResult = 0;
     resultSet->GetRowCount(queryResult);
     EXPECT_EQ(queryResult, 1);
+
+    std::vector<OperationResult> results2 = helper->UnsubscribeRdbData(uris, tplId);
+    EXPECT_EQ(results2.size(), uris.size());
+    for (auto const &operationResult : results2) {
+        EXPECT_EQ(operationResult.errCode_, 0);
+    }
     LOG_INFO("ProxyDatasTest_Template_Test_003::End");
 }
 
