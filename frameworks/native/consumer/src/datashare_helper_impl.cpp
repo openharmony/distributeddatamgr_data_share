@@ -239,38 +239,38 @@ int DataShareHelperImpl::ExecuteBatch(const std::vector<OperationStatement> &sta
     return extSpCtl->ExecuteBatch(statements, result);
 }
 
-void DataShareHelperImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+int DataShareHelperImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     RadarReporter::RadarReport report(RadarReporter::OBSERVER_MANAGER,
         RadarReporter::REGISTER_OBSERVER, __FUNCTION__);
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         report.SetError(RadarReporter::EMPTY_OBSERVER_ERROR);
-        return;
+        return E_NULL_OBSERVER;
     }
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
-        return;
+        return E_HELPER_DIED;
     }
     return generalCtl->RegisterObserver(uri, dataObserver);
 }
 
-void DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+int DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     RadarReporter::RadarReport report(RadarReporter::OBSERVER_MANAGER,
         RadarReporter::UNREGISTER_OBSERVER, __FUNCTION__);
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
         report.SetError(RadarReporter::EMPTY_OBSERVER_ERROR);
-        return;
+        return E_NULL_OBSERVER;
     }
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
-        return;
+        return E_HELPER_DIED;
     }
     return generalCtl->UnregisterObserver(uri, dataObserver);
 }
