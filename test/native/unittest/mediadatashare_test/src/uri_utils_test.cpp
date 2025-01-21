@@ -36,9 +36,8 @@ HWTEST_F(URIUtilsTest, GetUserFromUri_001, TestSize.Level0)
 {
     ZLOGI("GetUserFromUri_001 starts");
     std::string uri =  "datashare:///com.acts.datasharetest";
-    int32_t user = -1;
-    bool res = DataShareURIUtils::GetUserFromUri(uri, user);
-    EXPECT_EQ(res, false);
+    auto [res, user] = DataShareURIUtils::GetUserFromUri(uri);
+    EXPECT_EQ(res, true);
     EXPECT_EQ(user, -1);
     ZLOGI("GetUserFromUri_001 ends");
 }
@@ -47,8 +46,7 @@ HWTEST_F(URIUtilsTest, GetUserFromUri_002, TestSize.Level0)
 {
     ZLOGI("GetUserFromUri_002 starts");
     std::string uri =  "datashare:///com.acts.datasharetest?user=100";
-    int32_t user = -1;
-    bool res = DataShareURIUtils::GetUserFromUri(uri, user);
+    auto [res, user] = DataShareURIUtils::GetUserFromUri(uri);
     EXPECT_EQ(res, true);
     EXPECT_EQ(user, 100);
     ZLOGI("GetUserFromUri_002 ends");
@@ -58,11 +56,60 @@ HWTEST_F(URIUtilsTest, GetUserFromUri_003, TestSize.Level0)
 {
     ZLOGI("GetUserFromUri_003 starts");
     std::string uri =  "datashare:///com.acts.datasharetest?user=f";
-    int32_t user = -1;
-    bool res = DataShareURIUtils::GetUserFromUri(uri, user);
+    auto [res, user] = DataShareURIUtils::GetUserFromUri(uri);
     EXPECT_EQ(res, false);
     EXPECT_EQ(user, -1);
     ZLOGI("GetUserFromUri_003 ends");
+}
+
+HWTEST_F(URIUtilsTest, GetUserFromUri_004, TestSize.Level0)
+{
+    ZLOGI("GetUserFromUri_004 starts");
+    std::string uri =  "datashare:///com.acts.datasharetest?user=-1";
+    auto [res, user] = DataShareURIUtils::GetUserFromUri(uri);
+    EXPECT_EQ(res, false);
+    EXPECT_EQ(user, -1);
+    ZLOGI("GetUserFromUri_004 ends");
+}
+
+HWTEST_F(URIUtilsTest, GetUserFromUri_005, TestSize.Level0)
+{
+    ZLOGI("GetUserFromUri_005 starts");
+    std::string uri =  "datashare:///com.acts.datasharetest?user=";
+    auto [res, user] = DataShareURIUtils::GetUserFromUri(uri);
+    EXPECT_EQ(res, true);
+    EXPECT_EQ(user, -1);
+    ZLOGI("GetUserFromUri_005 ends");
+}
+
+HWTEST_F(URIUtilsTest, GetUserFromUri_006, TestSize.Level0)
+{
+    ZLOGI("GetUserFromUri_006 starts");
+    std::string uri =  "datashare:///com.acts.datasharetest?user= ";
+    auto [res, user] = DataShareURIUtils::GetUserFromUri(uri);
+    EXPECT_EQ(res, false);
+    EXPECT_EQ(user, -1);
+    ZLOGI("GetUserFromUri_006 ends");
+}
+
+HWTEST_F(URIUtilsTest, GetUserFromUri_007, TestSize.Level0)
+{
+    ZLOGI("GetUserFromUri_007 starts");
+    std::string uri =  "datashare:///com.acts.datasharetest?user=2147483648";
+    auto [res, user] = DataShareURIUtils::GetUserFromUri(uri);
+    EXPECT_EQ(res, false);
+    EXPECT_EQ(user, -1);
+    ZLOGI("GetUserFromUri_007 ends");
+}
+
+HWTEST_F(URIUtilsTest, GetUserFromUri_008, TestSize.Level0)
+{
+    ZLOGI("GetUserFromUri_008 starts");
+    std::string uri =  "datashare:///com.acts.datasharetest?user=100&user=111";
+    auto [res, user] = DataShareURIUtils::GetUserFromUri(uri);
+    EXPECT_EQ(res, true);
+    EXPECT_EQ(user, 111);
+    ZLOGI("GetUserFromUri_008 ends");
 }
 
 HWTEST_F(URIUtilsTest, GetQueryParams_001, TestSize.Level0)

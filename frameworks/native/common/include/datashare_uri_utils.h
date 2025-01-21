@@ -25,7 +25,7 @@ public:
     static std::string FormatUri(const std::string &uri);
     static std::map<std::string, std::string> GetQueryParams(const std::string& uri);
     static std::pair<bool, uint32_t> Strtoul(const std::string &str);
-    static bool GetUserFromUri(const std::string &uri, int32_t &user);
+    static std::pair<bool, int32_t> GetUserFromUri(const std::string &uri);
 
 private:
     static constexpr const char USER_PARAM[] = "user";

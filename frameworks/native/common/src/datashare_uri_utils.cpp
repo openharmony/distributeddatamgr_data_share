@@ -75,18 +75,20 @@ std::map<std::string, std::string> DataShareURIUtils::GetQueryParams(const std::
     return params;
 }
 
-bool DataShareURIUtils::GetUserFromUri(const std::string &uri, int32_t &user)
+std::pair<bool, int32_t> DataShareURIUtils::GetUserFromUri(const std::string &uri)
 {
     auto queryParams = GetQueryParams(uri);
-    if (!queryParams[USER_PARAM].empty()) {
-        auto [success, data] = Strtoul(queryParams[USER_PARAM]);
-        if (!success) {
-            ZLOGE("user is invalid! user: %{public}s", queryParams[USER_PARAM].c_str());
-            return false;
-        }
-        user = static_cast<int32_t>(std::move(data));
-        return true;
+    if (queryParams[USER_PARAM].empty()) {
+        // -1 is placeholder for visit provider's user
+        return std::make_pair(true, -1);
     }
-    return false;
+    auto [success, data] = Strtoul(queryParams[USER_PARAM]);
+    if (!success) {
+        return std::make_pair(false, -1);
+    }
+    if (data < 0 || data > INT32_MAX) {
+        return std::make_pair(false, -1);
+    }
+    return std::make_pair(true, data);
 }
 } // namespace OHOS::DataShare
