@@ -1124,7 +1124,8 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ImplPredicates_Test_001, TestSiz
     std::string str = std::get<string>(operationItems[0].singleParams[0]);
     std::vector<int> ret = std::get<std::vector<int>>(operationItems[0].multiParams[0]);
     EXPECT_EQ(operationItems.size(), 1);
-    EXPECT_EQ(operationItems[0].singleParams[0].index(), 4);
+    // index of variant, 3 is string
+    EXPECT_EQ(operationItems[0].singleParams[0].index(), 3);
     EXPECT_EQ(str, "name");
     EXPECT_EQ(operationItems[0].multiParams[0].index(), 1);
     for (int i = 0; i < ret.size(); i++) {

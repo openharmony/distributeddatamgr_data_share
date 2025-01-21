@@ -332,8 +332,12 @@ ErrCode DataShareStub::CmdQuery(MessageParcel &data, MessageParcel &reply)
     Uri uri("");
     DataSharePredicates predicates;
     std::vector<std::string> columns;
-    if (!ITypesUtil::Unmarshal(data, uri, predicates, columns)) {
-        LOG_ERROR("Unmarshalling predicates is nullptr");
+    if (!ITypesUtil::Unmarshal(data, uri, columns)) {
+        LOG_ERROR("Unmarshalling uri and columns to data failed");
+        return ERR_INVALID_VALUE;
+    }
+    if (!ITypesUtil::UnmarshalPredicates(predicates, data)) {
+        LOG_ERROR("Unmarshalling predicates to shared-memory failed");
         return ERR_INVALID_VALUE;
     }
     DatashareBusinessError businessError;
@@ -373,11 +377,14 @@ ErrCode DataShareStub::CmdBatchInsert(MessageParcel &data, MessageParcel &reply)
 {
     Uri uri("");
     std::vector<DataShareValuesBucket> values;
-    if (!ITypesUtil::Unmarshal(data, uri, values)) {
-        LOG_ERROR("Unmarshalling predicates is nullptr");
+    if (!ITypesUtil::Unmarshal(data, uri)) {
+        LOG_ERROR("Unmarshalling uri from data failed");
         return ERR_INVALID_VALUE;
     }
-
+    if (!ITypesUtil::UnmarshalValuesBucketVec(values, data)) {
+        LOG_ERROR("Unmarshalling DataShareValuesBucket from shared-memory failed");
+        return ERR_INVALID_VALUE;
+    }
     int ret = BatchInsert(uri, values);
     if (ret == DEFAULT_NUMBER) {
         LOG_ERROR("BatchInsert inner error");

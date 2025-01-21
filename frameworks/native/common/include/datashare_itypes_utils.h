@@ -145,5 +145,19 @@ bool Marshalling(const ExecResultSet &execResultSet, MessageParcel &parcel);
 
 template<>
 bool Unmarshalling(ExecResultSet &execResultSet, MessageParcel &parcel);
+
+/**
+ * @brief The following four functions are used for serializing and deserializing objects
+ * to and from shared memory during Query and BatchInsert operations,
+ * which has a 128M upper limit. The upper limit of other method is 200k.
+ * Other methods remain unchanged.
+ */
+bool MarshalPredicates(const Predicates &predicates, MessageParcel &parcel);
+
+bool UnmarshalPredicates(Predicates &predicates, MessageParcel &parcel);
+
+bool MarshalValuesBucketVec(const std::vector<DataShareValuesBucket> &values, MessageParcel &parcel);
+
+bool UnmarshalValuesBucketVec(std::vector<DataShareValuesBucket> &values, MessageParcel &parcel);
 }
 #endif

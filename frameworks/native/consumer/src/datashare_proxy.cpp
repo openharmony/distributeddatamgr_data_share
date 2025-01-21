@@ -387,8 +387,12 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri, const 
         LOG_ERROR("WriteInterfaceToken failed");
         return nullptr;
     }
-    if (!ITypesUtil::Marshal(data, uri, predicates, columns)) {
-        LOG_ERROR("fail to Marshalling");
+    if (!ITypesUtil::Marshal(data, uri, columns)) {
+        LOG_ERROR("Marshalling uri and columns to data failed");
+        return nullptr;
+    }
+    if (!ITypesUtil::MarshalPredicates(predicates, data)) {
+        LOG_ERROR("Marshalling predicates to shared-memory failed");
         return nullptr;
     }
     MessageParcel reply;
@@ -448,11 +452,14 @@ int DataShareProxy::BatchInsert(const Uri &uri, const std::vector<DataShareValue
         LOG_ERROR("WriteInterfaceToken failed");
         return ret;
     }
-    if (!ITypesUtil::Marshal(data, uri, values)) {
-        LOG_ERROR("fail to Marshalling");
+    if (!ITypesUtil::Marshal(data, uri)) {
+        LOG_ERROR("Marshalling uri to data failed");
         return ret;
     }
-
+    if (!ITypesUtil::MarshalValuesBucketVec(values, data)) {
+        LOG_ERROR("Marshalling DataShareValuesBucket to shared-memory failed");
+        return ret;
+    }
     MessageParcel reply;
     MessageOption option;
     int32_t err = Remote()->SendRequest(

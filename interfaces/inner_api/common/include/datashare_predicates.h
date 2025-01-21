@@ -458,6 +458,21 @@ public:
     }
 
     /**
+     * @brief Used in the deserialization function to assign values to operations,
+     * Directly assignsing values to operations with Different usage from private methods.
+     * reference to the SetWhereClause, SetWhereArgs, SetOrder.
+     */
+    int SetOperationList(std::vector<OperationItem> operations)
+    {
+        if ((settingMode_ != PREDICATES_METHOD) && (!operations.empty())) {
+            this->operations_ = operations;
+            settingMode_ = QUERY_LANGUAGE;
+            return E_OK;
+        }
+        return E_ERROR;
+    }
+
+    /**
      * @brief The GetWhereClause of the predicate.
      */
     std::string GetWhereClause() const
