@@ -403,5 +403,9 @@ std::pair<int32_t, int32_t> DataShareHelper::UpdateEx(Uri &uri, const DataShareP
     return std::make_pair(0, 0);
 }
 
+int32_t DataShareHelper::UserDefineFunc(MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    return 0;
+}
 } // namespace DataShare
 } // namespace OHOS

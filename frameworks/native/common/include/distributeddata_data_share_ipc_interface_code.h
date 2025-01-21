@@ -41,6 +41,7 @@ enum class IDataShareInterfaceCode {
     CMD_INSERT_EX,
     CMD_UPDATE_EX,
     CMD_DELETE_EX,
+    CMD_USER_DEFINE_FUNC
 };
 
 enum class ISharedResultInterfaceCode {

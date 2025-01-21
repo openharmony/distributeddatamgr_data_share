@@ -78,6 +78,8 @@ public:
         const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) = 0;
 
     virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) = 0;
+
+    virtual int32_t UserDefineFunc(MessageParcel &data, MessageParcel &reply, MessageOption &option) = 0;
 };
 } // namespace DataShare
 } // namespace OHOS

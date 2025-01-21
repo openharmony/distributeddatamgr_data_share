@@ -105,6 +105,9 @@ public:
 
     std::pair<int32_t, int32_t> DeleteEx(Uri &uri, const DataSharePredicates &predicates) override;
 
+    int32_t UserDefineFunc(
+        MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+
 private:
     std::shared_ptr<ExtSpecialController> extSpCtl_ = nullptr;
     std::shared_ptr<GeneralController> generalCtl_ = nullptr;

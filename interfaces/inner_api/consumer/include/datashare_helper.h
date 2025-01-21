@@ -462,6 +462,19 @@ public:
      */
     virtual std::pair<int32_t, int32_t> DeleteEx(Uri &uri, const DataSharePredicates &predicates);
 
+    /**
+     * @brief UserDefineFunc supports user-defined serialization of data and deserialization of reply.
+     * It directly passes IPC parameters without any processing.
+     * Through this interface, users can implement their own business logic.
+     *
+     * @param data Data sent from the consumer to the provider
+     * @param reply Data returned from the provider to the consumer, including errCode
+     * @param option The options of IPC call
+     *
+     * @return Returns int32_t, the errCode of IPC call.
+     */
+    virtual int32_t UserDefineFunc(MessageParcel &data, MessageParcel &reply, MessageOption &option);
+
 private:
     static std::shared_ptr<DataShareHelper> CreateServiceHelper(const std::string &extUri = "",
         const std::string &bundleName = "");
