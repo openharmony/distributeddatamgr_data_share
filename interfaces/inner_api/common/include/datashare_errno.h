@@ -183,6 +183,11 @@ constexpr int E_PROVIDER_NOT_CONNECTED = (E_BASE + 66);
 * @brief The error code for failure to null connection.
 */
 constexpr int E_PROVIDER_CONN_NULL = (E_BASE + 67);
+
+/**
+* @brief The error code for passing invalid form of user id.
+*/
+constexpr int E_INVALID_USER_ID = (E_BASE + 68);
 } // namespace DataShare
 } // namespace OHOS
 
