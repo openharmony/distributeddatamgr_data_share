@@ -925,12 +925,12 @@ bool MarshalPredicates(const Predicates &predicates, MessageParcel &parcel)
 
 bool UnmarshalPredicates(Predicates &predicates, MessageParcel &parcel)
 {
-    size_t length = parcel.ReadInt32();
+    int32_t length = parcel.ReadInt32();
     if (length < 1) {
         LOG_ERROR("Length of predicates is invalid.");
         return false;
     }
-    const char *buffer = reinterpret_cast<const char *>(parcel.ReadRawData((size_t)length));
+    const char *buffer = reinterpret_cast<const char *>(parcel.ReadRawData(static_cast<size_t>(length)));
     if (buffer == nullptr) {
         LOG_ERROR("ReadRawData failed.");
         return false;
@@ -961,12 +961,12 @@ bool MarshalValuesBucketVec(const std::vector<DataShareValuesBucket> &values, Me
 
 bool UnmarshalValuesBucketVec(std::vector<DataShareValuesBucket> &values, MessageParcel &parcel)
 {
-    size_t length = parcel.ReadInt32();
+    int32_t length = parcel.ReadInt32();
     if (length < 1) {
         LOG_ERROR("Length of ValuesBucketVec is invalid.");
         return false;
     }
-    const char *buffer = reinterpret_cast<const char *>(parcel.ReadRawData((size_t)length));
+    const char *buffer = reinterpret_cast<const char *>(parcel.ReadRawData(static_cast<size_t>(length)));
     if (buffer == nullptr) {
         LOG_ERROR("ReadRawData failed.");
         return false;
