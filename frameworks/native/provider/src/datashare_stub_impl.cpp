@@ -464,7 +464,7 @@ bool DataShareStubImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IData
     if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {
         LOG_ERROR("Register observer check permission failed. uri: %{public}s",
             DataShareStringUtils::Anonymous(uri.ToString()).c_str());
-        return PERMISSION_ERROR_NUMBER;
+        return false;
     }
     return extension->RegisterObserver(uri, dataObserver);
 }
@@ -478,7 +478,7 @@ bool DataShareStubImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDa
     if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {
         LOG_ERROR("UnRegister observer check permission failed. uri: %{public}s",
             DataShareStringUtils::Anonymous(uri.ToString()).c_str());
-        return PERMISSION_ERROR_NUMBER;
+        return false;
     }
     return extension->UnregisterObserver(uri, dataObserver);
 }
