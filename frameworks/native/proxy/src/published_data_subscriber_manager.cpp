@@ -50,7 +50,6 @@ std::vector<OperationResult> PublishedDataSubscriberManager::AddObservers(void *
                 return;
             }
 
-            Init();
             auto subResults = proxy->SubscribePublishedData(firstAddUris, subscriberId, serviceCallback_);
             std::vector<Key> failedKeys;
             for (auto &subResult : subResults) {
@@ -63,7 +62,6 @@ std::vector<OperationResult> PublishedDataSubscriberManager::AddObservers(void *
             if (failedKeys.size() > 0) {
                 BaseCallbacks::DelObservers(failedKeys, subscriber);
             }
-            Destroy();
         });
 }
 
@@ -86,7 +84,6 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
                 auto results = proxy->UnSubscribePublishedData(uris, subscriberId);
                 opResult.insert(opResult.end(), results.begin(), results.end());
             }
-            Destroy();
         });
 }
 
@@ -117,7 +114,6 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
             }
             auto unsubResult = proxy->UnSubscribePublishedData(lastDelUris, subscriberId);
             opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
-            Destroy();
         });
 }
 
@@ -287,28 +283,6 @@ void PublishedDataSubscriberManager::EmitOnEnable(std::map<Key, std::vector<Obse
     }
 }
 
-bool PublishedDataSubscriberManager::Init()
-{
-    if (serviceCallback_ == nullptr) {
-        LOG_DEBUG("callback init");
-        serviceCallback_ = new PublishedDataObserverStub([this](PublishedDataChangeNode &changeNode) {
-            Emit(changeNode);
-        });
-    }
-    return true;
-}
-
-void PublishedDataSubscriberManager::Destroy()
-{
-    if (BaseCallbacks::GetAllSubscriberSize() == 0) {
-        if (serviceCallback_ != nullptr) {
-            serviceCallback_->ClearCallback();
-        }
-        LOG_INFO("no valid subscriber, delete callback");
-        serviceCallback_ = nullptr;
-    }
-}
-
 PublishedDataSubscriberManager &PublishedDataSubscriberManager::GetInstance()
 {
     static PublishedDataSubscriberManager manager;
@@ -317,7 +291,9 @@ PublishedDataSubscriberManager &PublishedDataSubscriberManager::GetInstance()
 
 PublishedDataSubscriberManager::PublishedDataSubscriberManager()
 {
-    serviceCallback_ = nullptr;
+    serviceCallback_ = new PublishedDataObserverStub([this](PublishedDataChangeNode &changeNode) {
+        Emit(changeNode);
+    });
 }
 
 PublishedDataObserver::PublishedDataObserver(const PublishedDataCallback &callback) : callback_(callback) {}
