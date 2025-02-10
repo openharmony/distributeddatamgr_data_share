@@ -21,6 +21,8 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "want.h"
+#include "datashare_uri_utils.h"
+#include "datashare_errno.h"
 
 namespace OHOS::DataShare {
 std::mutex AmsMgrProxy::pmutex_;
@@ -61,11 +63,16 @@ __attribute__ ((no_sanitize("cfi"))) int AmsMgrProxy::Connect(
     const std::string &uri, const sptr<IRemoteObject> &connect, const sptr<IRemoteObject> &callerToken)
 {
     AAFwk::Want want;
-    want.SetUri(uri);
+    auto [success, userId] = DataShareURIUtils::GetUserFromUri(uri);
+    if (!success) {
+        return E_INVALID_USER_ID;
+    }
+    want.SetUri(DataShareURIUtils::FormatUri(uri));
     std::lock_guard<std::mutex> lock(mutex_);
     if (ConnectSA()) {
         LOG_INFO("connect start, uri = %{public}s", DataShareStringUtils::Change(uri).c_str());
-        return proxy_->ConnectAbilityCommon(want, connect, callerToken, AppExecFwk::ExtensionAbilityType::DATASHARE);
+        return proxy_->ConnectAbilityCommon(want, connect, callerToken, AppExecFwk::ExtensionAbilityType::DATASHARE,
+            userId);
     }
     return -1;
 }
