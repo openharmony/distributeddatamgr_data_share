@@ -259,7 +259,7 @@ void PublishedDataSubscriberManager::EmitOnEnable(std::map<Key, std::vector<Obse
     std::map<std::shared_ptr<Observer>, PublishedDataChangeNode> results;
     for (auto &[key, obsVector] : obsMap) {
         uint32_t num = 0;
-        lastChangeNodeMap_.ComputeIfPresent(key, [obsVector = obsVector, &results, &num](const Key &,
+        lastChangeNodeMap_.ComputeIfPresent(key, [&obsVector = obsVector, &results, &num](const Key &,
             PublishedDataChangeNode &value) {
             for (auto &data : value.datas_) {
                 PublishedObserverMapKey mapKey(data.key_, data.subscriberId_);
@@ -268,6 +268,7 @@ void PublishedDataSubscriberManager::EmitOnEnable(std::map<Key, std::vector<Obse
                         num++;
                         results[obs.observer_].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
                         results[obs.observer_].ownerBundleName_ = value.ownerBundleName_;
+                        obs.isNotifyOnEnabled_ = false;
                     }
                 }
             }
