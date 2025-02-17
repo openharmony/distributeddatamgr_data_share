@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "callbacks_manager.h"
+#include "concurrent_map.h"
 #include "data_proxy_observer.h"
 #include "data_proxy_observer_stub.h"
 #include "datashare_template.h"
@@ -97,7 +98,7 @@ private:
     void EmitOnEnable(std::map<Key, std::vector<ObserverNodeOnEnabled>> &obsMap);
     RdbSubscriberManager();
     sptr<RdbObserverStub> serviceCallback_;
-    std::map<Key, RdbChangeNode> lastChangeNodeMap_;
+    ConcurrentMap<Key, RdbChangeNode> lastChangeNodeMap_;
 };
 } // namespace DataShare
 } // namespace OHOS
