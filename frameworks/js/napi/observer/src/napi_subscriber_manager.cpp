@@ -81,7 +81,7 @@ std::vector<OperationResult> NapiRdbSubscriberManager::DelObservers(napi_env env
             const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
-                lastChangeNodeMap_.erase(result);
+                lastChangeNodeMap_.Erase(result);
                 lastDelUris.emplace_back(result);
             });
             if (lastDelUris.empty()) {
@@ -95,7 +95,7 @@ std::vector<OperationResult> NapiRdbSubscriberManager::DelObservers(napi_env env
 void NapiRdbSubscriberManager::Emit(const RdbChangeNode &changeNode)
 {
     Key key(changeNode.uri_, changeNode.templateId_);
-    lastChangeNodeMap_[key] = changeNode;
+    lastChangeNodeMap_.InsertOrAssign(key, changeNode);
     auto callbacks = BaseCallbacks::GetEnabledObservers(key);
     for (auto &obs : callbacks) {
         if (obs != nullptr) {
@@ -107,9 +107,15 @@ void NapiRdbSubscriberManager::Emit(const RdbChangeNode &changeNode)
 void NapiRdbSubscriberManager::Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer)
 {
     for (auto const &key : keys) {
-        auto it = lastChangeNodeMap_.find(key);
-        if (it != lastChangeNodeMap_.end()) {
-            observer->OnChange(it->second);
+        bool isExist = false;
+        RdbChangeNode node;
+        lastChangeNodeMap_.ComputeIfPresent(key, [&node, &isExist](const Key &, const RdbChangeNode &value) {
+            node = value;
+            isExist = true;
+            return true;
+        });
+        if (isExist) {
+            observer->OnChange(node);
         }
     }
 }
@@ -176,7 +182,7 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::DelObservers(napi_e
             const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
-                lastChangeNodeMap_.erase(result);
+                lastChangeNodeMap_.Erase(result);
                 lastDelUris.emplace_back(result);
             });
             if (lastDelUris.empty()) {
@@ -191,7 +197,10 @@ void NapiPublishedSubscriberManager::Emit(const PublishedDataChangeNode &changeN
 {
     for (auto &data : changeNode.datas_) {
         Key key(data.key_, data.subscriberId_);
-        lastChangeNodeMap_[key].datas_.clear();
+        lastChangeNodeMap_.Compute(key, [](const Key &, PublishedDataChangeNode &value) {
+            value.datas_.clear();
+            return true;
+        });
     }
     std::map<std::shared_ptr<Observer>, PublishedDataChangeNode> results;
     for (auto &data : changeNode.datas_) {
@@ -201,8 +210,11 @@ void NapiPublishedSubscriberManager::Emit(const PublishedDataChangeNode &changeN
             LOG_WARN("%{private}s nobody subscribe, but still notify", data.key_.c_str());
             continue;
         }
-        lastChangeNodeMap_[key].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
-        lastChangeNodeMap_[key].ownerBundleName_ = changeNode.ownerBundleName_;
+        lastChangeNodeMap_.Compute(key, [&data, &changeNode](const Key &, PublishedDataChangeNode &value) {
+            value.datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
+            value.ownerBundleName_ = changeNode.ownerBundleName_;
+            return true;
+        });
         for (auto const &obs : callbacks) {
             results[obs].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
         }
@@ -217,14 +229,13 @@ void NapiPublishedSubscriberManager::Emit(const std::vector<Key> &keys, const st
 {
     PublishedDataChangeNode node;
     for (auto &key : keys) {
-        auto it = lastChangeNodeMap_.find(key);
-        if (it == lastChangeNodeMap_.end()) {
-            continue;
-        }
-        for (auto &data : it->second.datas_) {
-            node.datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
-        }
-        node.ownerBundleName_ = it->second.ownerBundleName_;
+        lastChangeNodeMap_.ComputeIfPresent(key, [&node](const Key &, PublishedDataChangeNode &value) {
+            for (auto &data : value.datas_) {
+                node.datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
+            }
+            node.ownerBundleName_ = value.ownerBundleName_;
+            return true;
+        });
     }
     observer->OnChange(node);
 }
