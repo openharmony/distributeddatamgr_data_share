@@ -31,6 +31,7 @@ using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
 std::string DATA_SHARE_PROXY_URI = "datashareproxy://com.acts.ohos.data.datasharetest/test";
 std::shared_ptr<DataShare::DataShareHelper> dataShareHelper;
+std::shared_ptr<DataShare::DataShareHelper> dataShareHelper2;  // for another subscriber
 std::string TBL_NAME0 = "name0";
 std::string TBL_NAME1 = "name1";
 constexpr int SUBSCRIBER_ID = 100;
@@ -78,6 +79,8 @@ void ProxyDatasTest::SetUpTestCase(void)
     options.enabled_ = true;
     dataShareHelper = DataShare::DataShareHelper::Creator(DATA_SHARE_PROXY_URI, options);
     ASSERT_TRUE(dataShareHelper != nullptr);
+    dataShareHelper2 = DataShare::DataShareHelper::Creator(DATA_SHARE_PROXY_URI, options);
+    ASSERT_TRUE(dataShareHelper2 != nullptr);
     LOG_INFO("SetUpTestCase end");
 }
 
@@ -86,6 +89,7 @@ void ProxyDatasTest::TearDownTestCase(void)
     auto tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.datashareclienttest.demo", 0);
     AccessTokenKit::DeleteToken(tokenId);
     dataShareHelper = nullptr;
+    dataShareHelper2 = nullptr;
 }
 
 void ProxyDatasTest::SetUp(void)
@@ -430,6 +434,128 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Le
     EXPECT_EQ((retVal2 > 0), true);
     EXPECT_EQ(g_callbackTimes, 2);
     LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_001::End");
+}
+
+/**
+* @tc.name: ProxyDatasTest_CombinationRdbData_Test_002
+* @tc.desc: combination test for persistent data updated between two constant disable
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_002, TestSize.Level0)
+{
+    auto helper = dataShareHelper;
+    auto helper2 = dataShareHelper2;
+    std::vector<PredicateTemplateNode> nodes;
+    Template tpl(nodes, "select name1 as name from TBL00");
+    auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
+    EXPECT_EQ(result, 0);
+
+    std::vector<std::string> uris = {DATA_SHARE_PROXY_URI};
+    TemplateId tplId;
+    tplId.subscriberId_ = SUBSCRIBER_ID;
+    tplId.bundleName_ = "ohos.datashareproxyclienttest.demo";
+    std::atomic_int callbackTimes = 0;
+    std::mutex mutex;
+    std::condition_variable cv;
+    auto timeout = std::chrono::seconds(3);
+    std::vector<OperationResult> allResults;
+    std::vector<OperationResult> results =
+        helper->SubscribeRdbData(uris, tplId, [&callbackTimes, &mutex, &cv](const RdbChangeNode &changeNode) {
+            std::lock_guard<std::mutex> lock(mutex);
+            callbackTimes++;
+            cv.notify_all();
+        });
+    EXPECT_EQ(results.size(), uris.size());
+    allResults.insert(allResults.end(), results.begin(), results.end());
+    // if there is only one subscriber in a key, the subscriber can't be disabled twice
+    results = helper2->SubscribeRdbData(uris, tplId, [](const RdbChangeNode &changeNode) {
+        });
+
+    std::unique_lock<std::mutex> lock(mutex);
+    cv.wait_for(lock, timeout);
+    EXPECT_EQ(callbackTimes, 1);
+    lock.unlock();
+    results = helper->DisableRdbSubs(uris, tplId);
+    EXPECT_EQ(results.size(), uris.size());
+    allResults.insert(allResults.end(), results.begin(), results.end());
+
+    Uri uri(DATA_SHARE_PROXY_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put(TBL_NAME1, 1);
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_GT(retVal, 0);
+
+    results = helper->DisableRdbSubs(uris, tplId);
+    EXPECT_EQ(results.size(), uris.size());
+    allResults.insert(allResults.end(), results.begin(), results.end());
+    results = helper->EnableRdbSubs(uris, tplId);
+    allResults.insert(allResults.end(), results.begin(), results.end());
+    for (auto const &operationResult : allResults) {
+        EXPECT_EQ(operationResult.errCode_, 0);
+    }
+    EXPECT_EQ(callbackTimes, 2);
+    helper->UnsubscribeRdbData(uris, tplId);
+    helper2->UnsubscribeRdbData(uris, tplId);
+}
+
+/**
+* @tc.name: ProxyDatasTest_CombinationPublishedData_Test_001
+* @tc.desc: combination test for published data updated between two constant disable
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationPublishedData_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_CombinationPublishedData_Test_001::Start");
+    auto helper = dataShareHelper;
+    auto helper2 = dataShareHelper2;
+    std::vector<std::string> uris;
+    uris.emplace_back(DATA_SHARE_PROXY_URI);
+    std::atomic_int callbackTimes = 0;
+    std::vector<OperationResult> results =
+        helper->SubscribePublishedData(uris, SUBSCRIBER_ID,
+            [&callbackTimes](const PublishedDataChangeNode &changeNode) {
+            callbackTimes++;
+        });
+    EXPECT_EQ(results.size(), uris.size());
+    for (auto const &operationResult : results) {
+        EXPECT_EQ(operationResult.errCode_, 0);
+    }
+    // if there is only one subscriber in a key, the subscriber can't be disabled twice
+    results = helper2->SubscribePublishedData(uris, SUBSCRIBER_ID, [](const PublishedDataChangeNode &changeNode) {
+        });
+    EXPECT_EQ(results.size(), uris.size());
+    for (auto const &operationResult : results) {
+        EXPECT_EQ(operationResult.errCode_, 0);
+    }
+    results = helper->DisablePubSubs(uris, SUBSCRIBER_ID);
+    EXPECT_EQ(results.size(), uris.size());
+    for (auto const &operationResult : results) {
+        EXPECT_EQ(operationResult.errCode_, 0);
+    }
+
+    std::string bundleName = "com.acts.ohos.data.datasharetest";
+    Data data;
+    data.datas_.emplace_back("datashareproxy://com.acts.ohos.data.datasharetest/test", SUBSCRIBER_ID, "value1");
+    results = helper->Publish(data, bundleName);
+    EXPECT_EQ(results.size(), data.datas_.size());
+    for (auto const &result : results) {
+        EXPECT_EQ(result.errCode_, 0);
+    }
+    results = helper->DisablePubSubs(uris, SUBSCRIBER_ID);
+    for (auto const &operationResult : results) {
+        EXPECT_EQ(operationResult.errCode_, 0);
+    }
+    results = helper->EnablePubSubs(uris, SUBSCRIBER_ID);
+    for (auto const &operationResult : results) {
+        EXPECT_EQ(operationResult.errCode_, 0);
+    }
+    EXPECT_EQ(callbackTimes, 1);
+
+    helper->UnsubscribePublishedData(uris, SUBSCRIBER_ID);
+    helper2->UnsubscribePublishedData(uris, SUBSCRIBER_ID);
+    LOG_INFO("ProxyDatasTest_CombinationPublishedData_Test_001::End");
 }
 
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribePublishedData_Test_001, TestSize.Level0)

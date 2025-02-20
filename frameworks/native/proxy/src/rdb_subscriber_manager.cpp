@@ -259,6 +259,7 @@ void RdbSubscriberManager::EmitOnEnable(std::map<Key, std::vector<ObserverNodeOn
         }
         for (auto &obs : obsVector) {
             if (obs.isNotifyOnEnabled_) {
+                obs.isNotifyOnEnabled_ = false;
                 obs.observer_->OnChange(node);
             }
         }
