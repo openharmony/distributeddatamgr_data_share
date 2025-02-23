@@ -458,7 +458,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_002, TestSize.Le
     std::atomic_int callbackTimes = 0;
     std::mutex mutex;
     std::condition_variable cv;
-    auto timeout = std::chrono::seconds(3);
+    auto timeout = std::chrono::seconds(2);
     std::vector<OperationResult> allResults;
     std::vector<OperationResult> results =
         helper->SubscribeRdbData(uris, tplId, [&callbackTimes, &mutex, &cv](const RdbChangeNode &changeNode) {
@@ -510,49 +510,44 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationPublishedData_Test_001, TestS
     LOG_INFO("ProxyDatasTest_CombinationPublishedData_Test_001::Start");
     auto helper = dataShareHelper;
     auto helper2 = dataShareHelper2;
-    std::vector<std::string> uris;
-    uris.emplace_back(DATA_SHARE_PROXY_URI);
+    std::vector<std::string> uris = {DATA_SHARE_PROXY_URI};
     std::atomic_int callbackTimes = 0;
+    std::mutex mutex;
+    std::condition_variable cv;
+    auto timeout = std::chrono::seconds(2);
     std::vector<OperationResult> results =
         helper->SubscribePublishedData(uris, SUBSCRIBER_ID,
-            [&callbackTimes](const PublishedDataChangeNode &changeNode) {
+            [&callbackTimes, &mutex, &cv](const PublishedDataChangeNode &changeNode) {
+            std::lock_guard<std::mutex> lock(mutex);
             callbackTimes++;
+            cv.notify_all();
         });
     EXPECT_EQ(results.size(), uris.size());
-    for (auto const &operationResult : results) {
-        EXPECT_EQ(operationResult.errCode_, 0);
-    }
+    for (auto const &operationResult : results) EXPECT_EQ(operationResult.errCode_, 0);
     // if there is only one subscriber in a key, the subscriber can't be disabled twice
-    results = helper2->SubscribePublishedData(uris, SUBSCRIBER_ID, [](const PublishedDataChangeNode &changeNode) {
-        });
+    results = helper2->SubscribePublishedData(uris, SUBSCRIBER_ID, [](const PublishedDataChangeNode &changeNode) {});
     EXPECT_EQ(results.size(), uris.size());
     for (auto const &operationResult : results) {
         EXPECT_EQ(operationResult.errCode_, 0);
     }
+    std::unique_lock<std::mutex> lock(mutex);
+    cv.wait_for(lock, timeout);
+    EXPECT_EQ(callbackTimes, 1);
+    lock.unlock();
     results = helper->DisablePubSubs(uris, SUBSCRIBER_ID);
     EXPECT_EQ(results.size(), uris.size());
-    for (auto const &operationResult : results) {
-        EXPECT_EQ(operationResult.errCode_, 0);
-    }
-
+    for (auto const &operationResult : results) EXPECT_EQ(operationResult.errCode_, 0);
     std::string bundleName = "com.acts.ohos.data.datasharetest";
     Data data;
     data.datas_.emplace_back("datashareproxy://com.acts.ohos.data.datasharetest/test", SUBSCRIBER_ID, "value1");
     results = helper->Publish(data, bundleName);
     EXPECT_EQ(results.size(), data.datas_.size());
-    for (auto const &result : results) {
-        EXPECT_EQ(result.errCode_, 0);
-    }
+    for (auto const &result : results) EXPECT_EQ(result.errCode_, 0);
     results = helper->DisablePubSubs(uris, SUBSCRIBER_ID);
-    for (auto const &operationResult : results) {
-        EXPECT_EQ(operationResult.errCode_, 0);
-    }
+    for (auto const &operationResult : results) EXPECT_EQ(operationResult.errCode_, 0);
     results = helper->EnablePubSubs(uris, SUBSCRIBER_ID);
-    for (auto const &operationResult : results) {
-        EXPECT_EQ(operationResult.errCode_, 0);
-    }
-    EXPECT_EQ(callbackTimes, 1);
-
+    for (auto const &operationResult : results) EXPECT_EQ(operationResult.errCode_, 0);
+    EXPECT_EQ(callbackTimes, 2);
     helper->UnsubscribePublishedData(uris, SUBSCRIBER_ID);
     helper2->UnsubscribePublishedData(uris, SUBSCRIBER_ID);
     LOG_INFO("ProxyDatasTest_CombinationPublishedData_Test_001::End");
