@@ -98,7 +98,7 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
                 lastDelUris.emplace_back(result);
-                lastChangeNodeMap_.erase(result);
+                lastChangeNodeMap_.Erase(result);
             });
             if (lastDelUris.empty()) {
                 return;
@@ -120,7 +120,7 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
         [&proxy, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             // delete all obs by subscriber
             for (const auto &key : lastDelKeys) {
-                lastChangeNodeMap_.erase(key);
+                lastChangeNodeMap_.Erase(key);
                 auto unsubResult = proxy->UnSubscribeRdbData(std::vector<std::string>(1, key.uri_), key.templateId_);
                 opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
             }
@@ -218,7 +218,7 @@ void RdbSubscriberManager::RecoverObservers(std::shared_ptr<DataShareServiceProx
 void RdbSubscriberManager::Emit(const RdbChangeNode &changeNode)
 {
     RdbObserverMapKey key(changeNode.uri_, changeNode.templateId_);
-    lastChangeNodeMap_[key] = changeNode;
+    lastChangeNodeMap_.InsertOrAssign(key, changeNode);
     auto callbacks = BaseCallbacks::GetEnabledObservers(key);
     for (auto &obs : callbacks) {
         if (obs != nullptr) {
@@ -233,9 +233,15 @@ void RdbSubscriberManager::Emit(const RdbChangeNode &changeNode)
 void RdbSubscriberManager::Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer)
 {
     for (auto const &key : keys) {
-        auto it = lastChangeNodeMap_.find(key);
-        if (it != lastChangeNodeMap_.end()) {
-            observer->OnChange(it->second);
+        bool isExist = false;
+        RdbChangeNode node;
+        lastChangeNodeMap_.ComputeIfPresent(key, [&node, &isExist](const Key &, const RdbChangeNode &value) {
+            node = value;
+            isExist = true;
+            return true;
+        });
+        if (isExist) {
+            observer->OnChange(node);
         }
     }
 }
@@ -243,13 +249,19 @@ void RdbSubscriberManager::Emit(const std::vector<Key> &keys, const std::shared_
 void RdbSubscriberManager::EmitOnEnable(std::map<Key, std::vector<ObserverNodeOnEnabled>> &obsMap)
 {
     for (auto &[key, obsVector] : obsMap) {
-        auto it = lastChangeNodeMap_.find(key);
-        if (it == lastChangeNodeMap_.end()) {
+        bool isExist = false;
+        RdbChangeNode node;
+        lastChangeNodeMap_.ComputeIfPresent(key, [&node, &isExist](const Key &, const RdbChangeNode &value) {
+            node = value;
+            isExist = true;
+            return true;
+        });
+        if (!isExist) {
             continue;
         }
         for (auto &obs : obsVector) {
             if (obs.isNotifyOnEnabled_) {
-                obs.observer_->OnChange(it->second);
+                obs.observer_->OnChange(node);
             }
         }
     }

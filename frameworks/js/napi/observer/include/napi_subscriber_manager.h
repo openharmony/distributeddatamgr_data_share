@@ -19,6 +19,7 @@
 #include <memory>
 #include <uv.h>
 
+#include "concurrent_map.h"
 #include "napi_callbacks_manager.h"
 #include "datashare_helper.h"
 #include "napi/native_api.h"
@@ -69,7 +70,7 @@ public:
 private:
     void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
     std::weak_ptr<DataShareHelper> dataShareHelper_;
-    std::map<Key, RdbChangeNode> lastChangeNodeMap_;
+    ConcurrentMap<Key, RdbChangeNode> lastChangeNodeMap_;
 };
 
 struct NapiPublishedObserverMapKey {
@@ -114,7 +115,7 @@ public:
 private:
     void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
     std::weak_ptr<DataShareHelper> dataShareHelper_;
-    std::map<Key, PublishedDataChangeNode> lastChangeNodeMap_;
+    ConcurrentMap<Key, PublishedDataChangeNode> lastChangeNodeMap_;
 };
 } // namespace DataShare
 } // namespace OHOS
