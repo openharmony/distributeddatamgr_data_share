@@ -24,14 +24,24 @@
 #include "napi_base_context.h"
 #include "napi_common_util.h"
 #include "napi_datashare_values_bucket.h"
+#include "tokenid_kit.h"
 
 using namespace OHOS::AAFwk;
 using namespace OHOS::AppExecFwk;
+using namespace OHOS::Security::AccessToken;
 
 namespace OHOS {
 namespace DataShare {
 static constexpr int MAX_ARGC = 6;
+static constexpr int EXCEPTION_SYSTEMAPP_CHECK = 202;
 static thread_local napi_ref constructor_ = nullptr;
+
+static bool IsSystemApp()
+{
+    uint64_t tokenId = IPCSkeleton::GetSelfTokenID();
+    return TokenIdKit::IsSystemAppByFullTokenID(tokenId);
+}
+
 static bool GetSilentUri(napi_env env, napi_value jsValue, std::string &uri)
 {
     napi_valuetype valuetype = napi_undefined;
@@ -148,6 +158,9 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
 {
     auto ctxInfo = std::make_shared<CreateContextInfo>();
     auto input = [ctxInfo](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
+        NAPI_ASSERT_CALL_ERRCODE(env, IsSystemApp(),
+            ctxInfo->error = std::make_shared<BusinessError>(EXCEPTION_SYSTEMAPP_CHECK, "not system app"),
+            napi_generic_failure);
         NAPI_ASSERT_CALL_ERRCODE(env, argc == 2 || argc == 3 || argc == 4,
             ctxInfo->error = std::make_shared<ParametersNumError>("2 or 3 or 4"), napi_invalid_arg);
         ctxInfo->contextS = OHOS::AbilityRuntime::GetStageModeContext(env, argv[0]);
