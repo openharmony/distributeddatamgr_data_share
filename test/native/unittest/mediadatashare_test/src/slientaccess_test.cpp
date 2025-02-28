@@ -840,5 +840,21 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_When_TimeOut_Test_001, TestSize.
     EXPECT_EQ(helper, nullptr);
     LOG_INFO("SlientAccess_Creator_With_Uri_Error_Test_001::End");
 }
+
+/*
+* @tc.desc: test UserDefineFunc
+* @tc.require: Null
+*/
+HWTEST_F(SlientAccessTest, SlientAccess_UserDefineFunc_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SilentAccess_UserDefineFunc_Test_001::Start");
+    auto helper = g_slientAccessHelper;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    auto result = helper->DataShareHelper::UserDefineFunc(data, reply, option);
+    EXPECT_EQ(result, 0);
+    LOG_INFO("SilentAccess_UserDefineFunc_Test_001::End");
+}
 } // namespace DataShare
 } // namespace OHOS
