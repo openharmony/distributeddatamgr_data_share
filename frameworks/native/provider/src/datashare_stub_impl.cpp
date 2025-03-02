@@ -14,6 +14,7 @@
  */
 
 #include "datashare_stub_impl.h"
+#include <memory>
 
 #include "accesstoken_kit.h"
 #include "datashare_log.h"
@@ -54,16 +55,18 @@ std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const s
     if (extension == nullptr) {
         return ret;
     }
-    std::function<void()> syncTaskFunc = [extension, info, uri, mimeTypeFilter]() {
+    auto result = std::make_shared<JsResult>();
+    std::function<void()> syncTaskFunc = [extension, info, uri, mimeTypeFilter, result]() {
         extension->SetCallingInfo(info);
+        extension->InitResult(result);
         extension->GetFileTypes(uri, mimeTypeFilter);
     };
-    std::function<bool()> getRetFunc = [extension, &ret]() -> bool {
-        if (extension == nullptr) {
+    std::function<bool()> getRetFunc = [result, &ret]() -> bool {
+        if (result == nullptr) {
             return false;
         }
-        bool isRecvReply = extension->GetRecvReply();
-        extension->GetResult(ret);
+        bool isRecvReply = result->GetRecvReply();
+        result->GetResult(ret);
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
@@ -80,17 +83,19 @@ int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
     if (extension == nullptr) {
         return DEFAULT_NUMBER;
     }
+    auto result = std::make_shared<JsResult>();
     int ret = -1;
-    std::function<void()> syncTaskFunc = [extension, info, uri, mode]() {
+    std::function<void()> syncTaskFunc = [extension, info, uri, mode, result]() {
         extension->SetCallingInfo(info);
+        extension->InitResult(result);
         extension->OpenFile(uri, mode);
     };
-    std::function<bool()> getRetFunc = [extension, &ret]() -> bool {
-        if (extension == nullptr) {
+    std::function<bool()> getRetFunc = [result, &ret]() -> bool {
+        if (result == nullptr) {
             return false;
         }
-        bool isRecvReply = extension->GetRecvReply();
-        extension->GetResult(ret);
+        bool isRecvReply = result->GetRecvReply();
+        result->GetResult(ret);
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
@@ -134,17 +139,19 @@ int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value
         return PERMISSION_ERROR_NUMBER;
     }
 
+    auto result = std::make_shared<JsResult>();
     int ret = 0;
-    std::function<void()> syncTaskFunc = [extension, info, uri, value]() {
+    std::function<void()> syncTaskFunc = [extension, info, uri, value, result]() {
         extension->SetCallingInfo(info);
+        extension->InitResult(result);
         extension->Insert(uri, value);
     };
-    std::function<bool()> getRetFunc = [extension, &ret]() -> bool {
-        if (extension == nullptr) {
+    std::function<bool()> getRetFunc = [result, &ret]() -> bool {
+        if (result == nullptr) {
             return false;
         }
-        bool isRecvReply = extension->GetRecvReply();
-        extension->GetResult(ret);
+        bool isRecvReply = result->GetRecvReply();
+        result->GetResult(ret);
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
@@ -169,17 +176,19 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
         return PERMISSION_ERROR_NUMBER;
     }
 
+    auto result = std::make_shared<JsResult>();
     int ret = 0;
-    std::function<void()> syncTaskFunc = [extension, info, uri, predicates, value]() {
+    std::function<void()> syncTaskFunc = [extension, info, uri, predicates, value, result]() {
         extension->SetCallingInfo(info);
+        extension->InitResult(result);
         extension->Update(uri, predicates, value);
     };
-    std::function<bool()> getRetFunc = [extension, &ret]() -> bool {
-        if (extension == nullptr) {
+    std::function<bool()> getRetFunc = [result, &ret]() -> bool {
+        if (result == nullptr) {
             return false;
         }
-        bool isRecvReply = extension->GetRecvReply();
-        extension->GetResult(ret);
+        bool isRecvReply = result->GetRecvReply();
+        result->GetResult(ret);
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
@@ -200,18 +209,20 @@ int DataShareStubImpl::BatchUpdate(const UpdateOperations &operations, std::vect
         LOG_ERROR("Check calling permission failed.");
         return PERMISSION_ERROR_NUMBER;
     }
+    auto result = std::make_shared<JsResult>();
     std::shared_ptr<int> ret = std::make_shared<int>(0);
-    std::function<void()> syncTaskFunc = [extension, ret, operations, info]() {
+    std::function<void()> syncTaskFunc = [extension, ret, operations, info, result]() {
         extension->SetCallingInfo(info);
+        extension->InitResult(result);
         std::vector<BatchUpdateResult> tmp;
         *ret = extension->BatchUpdate(operations, tmp);
     };
-    std::function<bool()> getRetFunc = [&results, extension]() -> bool {
-        if (extension == nullptr) {
+    std::function<bool()> getRetFunc = [&results, result]() -> bool {
+        if (result == nullptr) {
             return false;
         }
-        bool isRecvReply = extension->GetRecvReply();
-        extension->GetResult(results);
+        bool isRecvReply = result->GetRecvReply();
+        result->GetResult(results);
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
@@ -235,17 +246,19 @@ int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predica
         return PERMISSION_ERROR_NUMBER;
     }
 
+    auto result = std::make_shared<JsResult>();
     int ret = 0;
-    std::function<void()> syncTaskFunc = [extension, info, uri, predicates]() {
+    std::function<void()> syncTaskFunc = [extension, info, uri, predicates, result]() {
         extension->SetCallingInfo(info);
+        extension->InitResult(result);
         extension->Delete(uri, predicates);
     };
-    std::function<bool()> getRetFunc = [extension, &ret]() -> bool {
-        if (extension == nullptr) {
+    std::function<bool()> getRetFunc = [result, &ret]() -> bool {
+        if (result == nullptr) {
             return false;
         }
-        bool isRecvReply = extension->GetRecvReply();
-        extension->GetResult(ret);
+        bool isRecvReply = result->GetRecvReply();
+        result->GetResult(ret);
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
@@ -269,17 +282,19 @@ std::pair<int32_t, int32_t> DataShareStubImpl::InsertEx(const Uri &uri, const Da
         return std::make_pair(PERMISSION_ERROR_NUMBER, 0);
     }
 
+    auto result = std::make_shared<JsResult>();
     int ret = 0;
-    std::function<void()> syncTaskFunc = [extension, info, uri, value]() {
+    std::function<void()> syncTaskFunc = [extension, info, uri, value, result]() {
         extension->SetCallingInfo(info);
+        extension->InitResult(result);
         extension->Insert(uri, value);
     };
-    std::function<bool()> getRetFunc = [extension, &ret]() -> bool {
-        if (extension == nullptr) {
+    std::function<bool()> getRetFunc = [result, &ret]() -> bool {
+        if (result == nullptr) {
             return false;
         }
-        bool isRecvReply = extension->GetRecvReply();
-        extension->GetResult(ret);
+        bool isRecvReply = result->GetRecvReply();
+        result->GetResult(ret);
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
@@ -304,17 +319,19 @@ std::pair<int32_t, int32_t> DataShareStubImpl::UpdateEx(const Uri &uri, const Da
         return std::make_pair(PERMISSION_ERROR_NUMBER, 0);
     }
 
+    auto result = std::make_shared<JsResult>();
     int ret = 0;
-    std::function<void()> syncTaskFunc = [extension, info, uri, predicates, value]() {
+    std::function<void()> syncTaskFunc = [extension, info, uri, predicates, value, result]() {
         extension->SetCallingInfo(info);
+        extension->InitResult(result);
         extension->Update(uri, predicates, value);
     };
-    std::function<bool()> getRetFunc = [extension, &ret]() -> bool {
-        if (extension == nullptr) {
+    std::function<bool()> getRetFunc = [result, &ret]() -> bool {
+        if (result == nullptr) {
             return false;
         }
-        bool isRecvReply = extension->GetRecvReply();
-        extension->GetResult(ret);
+        bool isRecvReply = result->GetRecvReply();
+        result->GetResult(ret);
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
@@ -339,16 +356,18 @@ std::pair<int32_t, int32_t> DataShareStubImpl::DeleteEx(const Uri &uri, const Da
     }
 
     int ret = 0;
-    std::function<void()> syncTaskFunc = [extension, info, uri, predicates]() {
+    auto result = std::make_shared<JsResult>();
+    std::function<void()> syncTaskFunc = [extension, info, uri, predicates, result]() {
         extension->SetCallingInfo(info);
+        extension->InitResult(result);
         extension->Delete(uri, predicates);
     };
-    std::function<bool()> getRetFunc = [extension, &ret]() -> bool {
-        if (extension == nullptr) {
+    std::function<bool()> getRetFunc = [result, &ret]() -> bool {
+        if (result == nullptr) {
             return false;
         }
-        bool isRecvReply = extension->GetRecvReply();
-        extension->GetResult(ret);
+        bool isRecvReply = result->GetRecvReply();
+        result->GetResult(ret);
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
@@ -372,19 +391,20 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
         LOG_ERROR("Check calling permission failed.");
         return resultSet;
     }
-    
-    std::function<void()> syncTaskFunc = [extension, info, uri, predicates, columns]() mutable {
+    auto result = std::make_shared<JsResult>();
+    std::function<void()> syncTaskFunc = [extension, info, uri, predicates, columns, result]() mutable {
         extension->SetCallingInfo(info);
+        extension->InitResult(result);
         DatashareBusinessError businessErr;
         extension->Query(uri, predicates, columns, businessErr);
     };
-    std::function<bool()> getRetFunc = [extension, &resultSet, &businessError]() -> bool {
-        if (extension == nullptr) {
+    std::function<bool()> getRetFunc = [result, &resultSet, &businessError]() -> bool {
+        if (result == nullptr) {
             return false;
         }
-        auto isRecvReply = extension->GetRecvReply();
-        extension->GetResultSet(resultSet);
-        extension->GetBusinessError(businessError);
+        auto isRecvReply = result->GetRecvReply();
+        result->GetResultSet(resultSet);
+        result->GetBusinessError(businessError);
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
@@ -402,19 +422,21 @@ std::string DataShareStubImpl::GetType(const Uri &uri)
     if (extension == nullptr) {
         return ret;
     }
-    std::function<void()> syncTaskFunc = [extension, info, uri]() {
+    auto result = std::make_shared<JsResult>();
+    std::function<void()> syncTaskFunc = [extension, info, uri, result]() {
         if (extension == nullptr) {
             return;
         }
         extension->SetCallingInfo(info);
+        extension->InitResult(result);
         extension->GetType(uri);
     };
-    std::function<bool()> getRetFunc = [extension, &ret]() -> bool {
-        if (extension == nullptr) {
+    std::function<bool()> getRetFunc = [result, &ret]() -> bool {
+        if (result == nullptr) {
             return false;
         }
-        bool isRecvReply = extension->GetRecvReply();
-        extension->GetResult(ret);
+        bool isRecvReply = result->GetRecvReply();
+        result->GetResult(ret);
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
@@ -437,17 +459,19 @@ int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareVa
         return PERMISSION_ERROR_NUMBER;
     }
 
+    auto result = std::make_shared<JsResult>();
     int ret = 0;
-    std::function<void()> syncTaskFunc = [extension, info, uri, values]() {
+    std::function<void()> syncTaskFunc = [extension, info, uri, values, result]() {
         extension->SetCallingInfo(info);
+        extension->InitResult(result);
         extension->BatchInsert(uri, values);
     };
-    std::function<bool()> getRetFunc = [extension, &ret]() -> bool {
-        if (extension == nullptr) {
+    std::function<bool()> getRetFunc = [result, &ret]() -> bool {
+        if (result == nullptr) {
             return false;
         }
-        bool isRecvReply = extension->GetRecvReply();
-        extension->GetResult(ret);
+        bool isRecvReply = result->GetRecvReply();
+        result->GetResult(ret);
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
@@ -511,17 +535,19 @@ Uri DataShareStubImpl::NormalizeUri(const Uri &uri)
         return normalizeUri;
     }
 
-    std::function<void()> syncTaskFunc = [extension, info, uri]() {
+    auto result = std::make_shared<JsResult>();
+    std::function<void()> syncTaskFunc = [extension, info, uri, result]() {
         extension->SetCallingInfo(info);
+        extension->InitResult(result);
         extension->NormalizeUri(uri);
     };
-    std::function<bool()> getRetFunc = [extension, &normalizeUri]() -> bool {
-        if (extension == nullptr) {
+    std::function<bool()> getRetFunc = [result, &normalizeUri]() -> bool {
+        if (result == nullptr) {
             return false;
         }
-        bool isRecvReply = extension->GetRecvReply();
+        bool isRecvReply = result->GetRecvReply();
         std::string ret;
-        extension->GetResult(ret);
+        result->GetResult(ret);
         Uri tmp(ret);
         normalizeUri = tmp;
         return isRecvReply;
@@ -541,17 +567,19 @@ Uri DataShareStubImpl::DenormalizeUri(const Uri &uri)
     if (extension == nullptr) {
         return denormalizedUri;
     }
-    std::function<void()> syncTaskFunc = [extension, info, uri]() {
+    auto result = std::make_shared<JsResult>();
+    std::function<void()> syncTaskFunc = [extension, info, uri, result]() {
         extension->SetCallingInfo(info);
+        extension->InitResult(result);
         extension->DenormalizeUri(uri);
     };
-    std::function<bool()> getRetFunc = [extension, &denormalizedUri]() -> bool {
-        if (extension == nullptr) {
+    std::function<bool()> getRetFunc = [result, &denormalizedUri]() -> bool {
+        if (result == nullptr) {
             return false;
         }
-        bool isRecvReply = extension->GetRecvReply();
+        bool isRecvReply = result->GetRecvReply();
         std::string ret;
-        extension->GetResult(ret);
+        result->GetResult(ret);
         Uri tmp(ret);
         denormalizedUri = tmp;
         return isRecvReply;

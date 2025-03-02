@@ -14,6 +14,7 @@
  */
 
 #include "js_datashare_ext_ability.h"
+#include <utility>
 
 #include "ability_info.h"
 #include "dataobs_mgr_client.h"
@@ -44,6 +45,71 @@ static constexpr int32_t MAX_ARGC = 6;
 static constexpr int32_t MIN_ARGC = 2;
 constexpr const char ASYNC_CALLBACK_NAME[] = "AsyncCallback";
 constexpr int CALLBACK_LENGTH = sizeof(ASYNC_CALLBACK_NAME) - 1;
+}
+
+
+void JsResult::SetAsyncResult(napi_env env, DatashareBusinessError &businessError, napi_value result)
+{
+    std::lock_guard<std::mutex> lock(asyncLock_);
+    isRecvReply_ = true;
+    napi_valuetype type = napi_undefined;
+    napi_typeof(env, result, &type);
+    if (type == napi_valuetype::napi_number) {
+        int32_t value = OHOS::AppExecFwk::UnwrapInt32FromJS(env, result);
+        callbackResultNumber_ = value;
+    } else if (type == napi_valuetype::napi_string) {
+        std::string value = OHOS::AppExecFwk::UnwrapStringFromJS(env, result);
+        callbackResultString_ = std::move(value);
+    } else if (type == napi_valuetype::napi_object) {
+        JSProxy::JSCreator<ResultSetBridge> *proxy = nullptr;
+        napi_unwrap(env, result, reinterpret_cast<void **>(&proxy));
+        if (proxy == nullptr) {
+            if (UnwrapBatchUpdateResult(env, result, updateResults_)) {
+                return;
+            }
+            OHOS::AppExecFwk::UnwrapArrayStringFromJS(env, result, callbackResultStringArr_);
+        } else {
+            std::shared_ptr<ResultSetBridge> value = proxy->Create();
+            callbackResultObject_ = std::make_shared<DataShareResultSet>(value);
+        }
+    }
+    businessError_= businessError;
+}
+
+bool JsResult::UnwrapBatchUpdateResult(napi_env env, napi_value &info,
+    std::vector<BatchUpdateResult> &results)
+{
+    napi_value keys = 0;
+    if (napi_get_property_names(env, info, &keys) != napi_ok) {
+        LOG_ERROR("napi_get_property_names failed");
+        return false;
+    }
+
+    uint32_t arrLen = 0;
+    if (napi_get_array_length(env, keys, &arrLen) != napi_ok) {
+        LOG_ERROR("napi_get_array_length failed");
+        return false;
+    }
+    for (size_t i = 0; i < arrLen; i++) {
+        napi_value key = 0;
+        if (napi_get_element(env, keys, i, &key) != napi_ok) {
+            LOG_ERROR("napi_get_element failed");
+            return false;
+        }
+        BatchUpdateResult batchUpdateResult;
+        batchUpdateResult.uri = DataShareJSUtils::UnwrapStringFromJS(env, key);
+        napi_value value = 0;
+        if (napi_get_property(env, info, key, &value) != napi_ok) {
+            LOG_ERROR("napi_get_property failed");
+            return false;
+        }
+        if (!UnwrapArrayInt32FromJS(env, value, batchUpdateResult.codes)) {
+            LOG_ERROR("UnwrapArrayInt32FromJS failed");
+            return false;
+        }
+        results.push_back(std::move(batchUpdateResult));
+    }
+    return true;
 }
 
 bool MakeNapiColumn(napi_env env, napi_value &napiColumns, const std::vector<std::string> &columns);
@@ -146,78 +212,6 @@ sptr<IRemoteObject> JsDataShareExtAbility::OnConnect(const AAFwk::Want &want)
     return remoteObject->AsObject();
 }
 
-bool JsDataShareExtAbility::UnwrapBatchUpdateResult(napi_env env, napi_value &info,
-    std::vector<BatchUpdateResult> &results)
-{
-    napi_value keys = 0;
-    if (napi_get_property_names(env, info, &keys) != napi_ok) {
-        LOG_ERROR("napi_get_property_names failed");
-        return false;
-    }
-
-    uint32_t arrLen = 0;
-    if (napi_get_array_length(env, keys, &arrLen) != napi_ok) {
-        LOG_ERROR("napi_get_array_length failed");
-        return false;
-    }
-    for (size_t i = 0; i < arrLen; i++) {
-        napi_value key = 0;
-        if (napi_get_element(env, keys, i, &key) != napi_ok) {
-            LOG_ERROR("napi_get_element failed");
-            return false;
-        }
-        BatchUpdateResult batchUpdateResult;
-        batchUpdateResult.uri = DataShareJSUtils::UnwrapStringFromJS(env, key);
-        napi_value value = 0;
-        if (napi_get_property(env, info, key, &value) != napi_ok) {
-            LOG_ERROR("napi_get_property failed");
-            return false;
-        }
-        if (!UnwrapArrayInt32FromJS(env, value, batchUpdateResult.codes)) {
-            LOG_ERROR("UnwrapArrayInt32FromJS failed");
-            return false;
-        }
-        results.push_back(std::move(batchUpdateResult));
-    }
-    return true;
-}
-
-void JsDataShareExtAbility::CheckAndSetAsyncResult(napi_env env)
-{
-    napi_valuetype type = napi_undefined;
-    auto result = GetAsyncResult();
-    napi_typeof(env, result, &type);
-    if (type == napi_valuetype::napi_number) {
-        int32_t value = OHOS::AppExecFwk::UnwrapInt32FromJS(env, result);
-        SetResult(value);
-    } else if (type == napi_valuetype::napi_string) {
-        std::string value = OHOS::AppExecFwk::UnwrapStringFromJS(env, result);
-        SetResult(value);
-    } else if (type == napi_valuetype::napi_object) {
-        JSProxy::JSCreator<ResultSetBridge> *proxy = nullptr;
-        napi_unwrap(env, result, reinterpret_cast<void **>(&proxy));
-        if (proxy == nullptr) {
-            std::vector<BatchUpdateResult> results;
-            if (UnwrapBatchUpdateResult(env, result, results)) {
-                SetResult(results);
-                return;
-            }
-            std::vector<std::string> value;
-            OHOS::AppExecFwk::UnwrapArrayStringFromJS(env, result, value);
-            SetResult(value);
-        } else {
-            std::shared_ptr<ResultSetBridge> value = proxy->Create();
-            std::shared_ptr<DataShareResultSet> resultSet = std::make_shared<DataShareResultSet>(value);
-            SetResultSet(resultSet);
-        }
-    } else {
-        callbackResultNumber_ = -1;
-        callbackResultString_ = "";
-        callbackResultStringArr_ = {};
-        SetResultSet(nullptr);
-    }
-}
-
 napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info info)
 {
     if (env == nullptr || info == nullptr) {
@@ -239,8 +233,8 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
     }
 
     AsyncCallBackPoint* point = static_cast<AsyncCallBackPoint*>(data);
-    auto instance = point->extAbility.lock();
-    if (!instance) {
+    auto result = point->result;
+    if (!result) {
         LOG_ERROR("extension ability has been destroyed.");
         return CreateJsUndefined(env);
     }
@@ -251,11 +245,8 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
         LOG_INFO("Error in callback");
         UnWrapBusinessError(env, argv[0], businessError);
     }
-    if (instance != nullptr) {
-        instance->SetBusinessError(businessError);
-        instance->SetAsyncResult(argv[1]);
-        instance->CheckAndSetAsyncResult(env);
-        instance->SetRecvReply(true);
+    if (result != nullptr) {
+        result->SetAsyncResult(env, businessError, argv[1]);
     }
     return CreateJsUndefined(env);
 }
@@ -393,6 +384,11 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
     return handleEscape.Escape(remoteNapi);
 }
 
+void JsDataShareExtAbility::InitResult(std::shared_ptr<JsResult> result)
+{
+    result_ = result;
+}
+
 void JsDataShareExtAbility::SaveNewCallingInfo(napi_env &env)
 {
     auto newCallingInfo = GetCallingInfo();
@@ -415,12 +411,8 @@ int32_t JsDataShareExtAbility::InitAsyncCallParams(size_t argc, napi_env &env, n
     if (point == nullptr) {
         return E_ERROR;
     }
-    callbackResultNumber_ = -1;
-    callbackResultString_ = "";
-    callbackResultStringArr_ = {};
-    SetResultSet(nullptr);
-    SetRecvReply(false);
-    point->extAbility = std::static_pointer_cast<JsDataShareExtAbility>(shared_from_this());
+
+    point->result = std::move(result_);
     napi_create_function(env, ASYNC_CALLBACK_NAME, CALLBACK_LENGTH,
         JsDataShareExtAbility::AsyncCallback, point, &args[argc]);
     napi_add_finalizer(env, args[argc], point,
