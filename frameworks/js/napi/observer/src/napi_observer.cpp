@@ -62,7 +62,13 @@ void NapiObserver::CallbackFunc(ObserverWorker *observerWorker)
 NapiObserver::~NapiObserver()
 {
     if (ref_ != nullptr) {
-        napi_delete_reference(env_, ref_);
+        auto task = [env = env_, ref = ref_]() {
+            napi_delete_reference(env, ref);
+        };
+        int ret = napi_send_event(env_, task, napi_eprio_immediate);
+        if (ret != 0) {
+            LOG_ERROR("napi_send_event failed: %{public}d", ret);
+        }
         ref_ = nullptr;
     }
 }
