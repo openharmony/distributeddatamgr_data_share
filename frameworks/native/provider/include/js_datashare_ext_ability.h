@@ -29,7 +29,62 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AbilityRuntime;
+class JsResult {
+public:
+    JsResult() = default;
+    bool GetRecvReply() const
+    {
+        return isRecvReply_;
+    }
 
+    void GetResult(int &value)
+    {
+        value = callbackResultNumber_;
+    }
+
+    void GetResult(std::string &value)
+    {
+        std::lock_guard<std::mutex> lock(asyncLock_);
+        value = callbackResultString_;
+    }
+
+    void GetResult(std::vector<std::string> &value)
+    {
+        std::lock_guard<std::mutex> lock(asyncLock_);
+        value = callbackResultStringArr_;
+    }
+
+    void GetResult(std::vector<BatchUpdateResult> &results)
+    {
+        std::lock_guard<std::mutex> lock(asyncLock_);
+        results = updateResults_;
+    }
+
+    void GetResultSet(std::shared_ptr<DataShareResultSet> &value)
+    {
+        std::lock_guard<std::mutex> lock(asyncLock_);
+        value = callbackResultObject_;
+    }
+
+    void GetBusinessError(DatashareBusinessError &businessError)
+    {
+        std::lock_guard<std::mutex> lock(asyncLock_);
+        businessError = businessError_;
+    }
+
+    void SetAsyncResult(napi_env env, DatashareBusinessError &businessError, napi_value result);
+    void CheckAndSetAsyncResult(napi_env env);
+private:
+    bool UnwrapBatchUpdateResult(napi_env env, napi_value &info, std::vector<BatchUpdateResult> &results);
+    bool isRecvReply_ = false;
+    int callbackResultNumber_ = -1;
+    std::string callbackResultString_ = "";
+    std::vector<std::string> callbackResultStringArr_ = {};
+    std::mutex asyncLock_;
+    std::shared_ptr<DataShareResultSet> callbackResultObject_ = nullptr;
+    DatashareBusinessError businessError_;
+    std::vector<BatchUpdateResult> updateResults_ = {};
+};
 /**
  * @brief Basic datashare extension ability components.
  */
@@ -242,94 +297,7 @@ public:
      */
     Uri DenormalizeUri(const Uri &uri) override;
 
-    bool GetRecvReply() const
-    {
-        return isRecvReply_;
-    }
-    void SetRecvReply(bool recvReply)
-    {
-        isRecvReply_ = recvReply;
-    }
-
-    napi_value GetAsyncResult() const
-    {
-        return callbackData_;
-    }
-
-    void SetAsyncResult(napi_value asyncResult)
-    {
-        callbackData_ = asyncResult;
-    }
-
-    void GetResult(int &value)
-    {
-        value = callbackResultNumber_;
-    }
-
-    void SetResult(const int value)
-    {
-        callbackResultNumber_ = value;
-    }
-
-    void GetResult(std::string &value)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        value = callbackResultString_;
-    }
-
-    void SetResult(const std::string value)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        callbackResultString_ = value;
-    }
-
-    void GetResult(std::vector<std::string> &value)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        value = callbackResultStringArr_;
-    }
-
-    void SetResult(const std::vector<BatchUpdateResult> &results)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        updateResults_ = results;
-    }
-
-    void GetResult(std::vector<BatchUpdateResult> &results)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        results = updateResults_;
-    }
-
-    void SetResult(const std::vector<std::string> value)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        callbackResultStringArr_ = value;
-    }
-
-    void GetResultSet(std::shared_ptr<DataShareResultSet> &value)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        value = callbackResultObject_;
-    }
-
-    void SetResultSet(const std::shared_ptr<DataShareResultSet> value)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        callbackResultObject_ = value;
-    }
-
-    void GetBusinessError(DatashareBusinessError &businessError)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        businessError = businessError_;
-    }
-	
-    void SetBusinessError(DatashareBusinessError &businessError)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        businessError_ = businessError;
-    }
+    void InitResult(std::shared_ptr<JsResult> result);
     struct AsyncContext {
         bool isNeedNotify_ = false;
     };
@@ -338,7 +306,7 @@ private:
         std::shared_ptr<AsyncContext> context;
     };
     struct AsyncCallBackPoint {
-        std::weak_ptr<JsDataShareExtAbility> extAbility;
+        std::shared_ptr<JsResult> result;
     };
     napi_value CallObjectMethod(const char *name, napi_value const *argv = nullptr, size_t argc = 0,
         bool isAsync = true);
@@ -355,22 +323,14 @@ private:
     static void UnWrapBusinessError(napi_env env, napi_value info, DatashareBusinessError &businessError);
     static napi_valuetype UnWrapPropertyType(napi_env env, napi_value info,
         const std::string &key);
-    static bool UnwrapBatchUpdateResult(napi_env env, napi_value &info, std::vector<BatchUpdateResult> &results);
+
     static std::string UnWrapProperty(napi_env env, napi_value info, const std::string &key);
     int32_t InitAsyncCallParams(size_t argc, napi_env &env, napi_value *args);
 
     static constexpr int ACTIVE_INVOKER = 1;
     JsRuntime& jsRuntime_;
     std::unique_ptr<NativeReference> jsObj_;
-    bool isRecvReply_ = false;
-    napi_value callbackData_ = nullptr;
-    int callbackResultNumber_ = -1;
-    std::string callbackResultString_ = "";
-    std::vector<std::string> callbackResultStringArr_ = {};
-    std::mutex asyncLock_;
-    std::shared_ptr<DataShareResultSet> callbackResultObject_ = nullptr;
-    DatashareBusinessError businessError_;
-    std::vector<BatchUpdateResult> updateResults_ = {};
+    std::shared_ptr<JsResult> result_;
 };
 } // namespace DataShare
 } // namespace OHOS
