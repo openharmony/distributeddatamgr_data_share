@@ -18,9 +18,9 @@
 #include "accesstoken_kit.h"
 #include "datashare_helper.h"
 #include "datashare_log.h"
+#include "errors.h"
 #include "hap_token_info.h"
 #include "iservice_registry.h"
-#include "rdb_errno.h"
 #include "system_ability_definition.h"
 #include "token_setproc.h"
 
@@ -30,7 +30,7 @@ using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
 constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
 std::string DATA_SHARE_URI = "datashare:///com.acts.errorcodetest";
-std::string SLIENT_ACCESS_URI = "datashare:///com.acts.errorcodetest/entry/DB00/TBL00?Proxy=true";
+std::string SLIENT_ACCESS_URI = "datashareproxy://com.acts.errorcodetest/test?Proxy=true";
 std::string TBL_STU_NAME = "name";
 std::string TBL_STU_AGE = "age";
 std::shared_ptr<DataShare::DataShareHelper> g_slientAccessHelper;
@@ -60,20 +60,8 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t system
     return DataShare::DataShareHelper::Creator(remoteObj, uri);
 }
 
-void ErrorCodeTest::SetUpTestCase(void)
+HapPolicyParams GetPolicy()
 {
-    LOG_INFO("SetUpTestCase invoked");
-    dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
-    ASSERT_TRUE(dataShareHelper != nullptr);
-    int sleepTime = 3;
-    sleep(sleepTime);
-
-    HapInfoParams info = {
-        .userID = 100,
-        .bundleName = "ohos.datashareclienttest.demo",
-        .instIndex = 0,
-        .appIDDesc = "ohos.datashareclienttest.demo"
-    };
     HapPolicyParams policy = {
         .apl = APL_NORMAL,
         .domain = "test.domain",
@@ -96,9 +84,34 @@ void ErrorCodeTest::SetUpTestCase(void)
                 .resDeviceID = { "local" },
                 .grantStatus = { PermissionState::PERMISSION_GRANTED },
                 .grantFlags = { 1 }
+            },
+            {
+                .permissionName = "ohos.permission.GET_BUNDLE_INFO",
+                .isGeneral = true,
+                .resDeviceID = { "local" },
+                .grantStatus = { PermissionState::PERMISSION_GRANTED },
+                .grantFlags = { 1 }
             }
         }
     };
+    return policy;
+}
+
+void ErrorCodeTest::SetUpTestCase(void)
+{
+    LOG_INFO("SetUpTestCase invoked");
+    dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
+    ASSERT_TRUE(dataShareHelper != nullptr);
+    int sleepTime = 3;
+    sleep(sleepTime);
+
+    HapInfoParams info = {
+        .userID = 100,
+        .bundleName = "ohos.datashareclienttest.demo",
+        .instIndex = 0,
+        .appIDDesc = "ohos.datashareclienttest.demo"
+    };
+    auto policy = GetPolicy();
     AccessTokenKit::AllocHapToken(info, policy);
     auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(
         info.userID, info.bundleName, info.instIndex);
@@ -121,6 +134,22 @@ void ErrorCodeTest::SetUp(void) {}
 void ErrorCodeTest::TearDown(void) {}
 
 HWTEST_F(ErrorCodeTest, ErrorCodeTest_Insert_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ErrorCodeTest_Insert_Test_001::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri("datashare:///com.acts.errorcodetest/entry/DB00/TBL00?Proxy=true");
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "lisi";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+ 
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_EQ(retVal, -1);
+    LOG_INFO("ErrorCodeTest_Insert_Test_001::End");
+}
+ 
+HWTEST_F(ErrorCodeTest, ErrorCodeTest_Insert_Test_002, TestSize.Level0)
 {
     LOG_INFO("ErrorCodeTest_Insert_Test_001::Start");
     auto helper = g_slientAccessHelper;
@@ -157,7 +186,7 @@ HWTEST_F(ErrorCodeTest, ErrorCodeTest_QUERY_Test_001, TestSize.Level0)
     Uri uriErr(ERR_SLIENT_ACCESS_URI);
     DatashareBusinessError error;
     resultSet = helper->Query(uriErr, predicates, columns, &error);
-    EXPECT_EQ(error.GetCode(), NativeRdb::E_DB_NOT_EXIST);
+    EXPECT_EQ(error.GetCode(), E_URI_NOT_EXIST);
     EXPECT_EQ(resultSet, nullptr);
     LOG_INFO("ErrorCodeTest_QUERY_Test_001::End");
 }

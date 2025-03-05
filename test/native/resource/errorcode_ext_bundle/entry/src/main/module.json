@@ -46,6 +46,17 @@
         "uri": "datashare://com.acts.errorcodetest",
         "visible": true
       }
+    ],
+    "proxyData":[
+      {
+        "uri": "datashareproxy://com.acts.errorcodetest/test",
+        "requiredReadPermission":"ohos.permission.GET_BUNDLE_INFO",
+        "requiredWritePermission":"ohos.permission.GET_BUNDLE_INFO",
+        "metadata": {
+          "name": "dataProperties",
+          "resource": "$profile:test"
+        }
+      }
     ]
   }
 }
