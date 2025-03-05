@@ -51,7 +51,6 @@ constexpr int CALLBACK_LENGTH = sizeof(ASYNC_CALLBACK_NAME) - 1;
 void JsResult::SetAsyncResult(napi_env env, DatashareBusinessError &businessError, napi_value result)
 {
     std::lock_guard<std::mutex> lock(asyncLock_);
-    isRecvReply_ = true;
     napi_valuetype type = napi_undefined;
     napi_typeof(env, result, &type);
     if (type == napi_valuetype::napi_number) {
@@ -65,6 +64,7 @@ void JsResult::SetAsyncResult(napi_env env, DatashareBusinessError &businessErro
         napi_unwrap(env, result, reinterpret_cast<void **>(&proxy));
         if (proxy == nullptr) {
             if (UnwrapBatchUpdateResult(env, result, updateResults_)) {
+                isRecvReply_ = true;
                 return;
             }
             OHOS::AppExecFwk::UnwrapArrayStringFromJS(env, result, callbackResultStringArr_);
@@ -74,6 +74,7 @@ void JsResult::SetAsyncResult(napi_env env, DatashareBusinessError &businessErro
         }
     }
     businessError_= businessError;
+    isRecvReply_ = true;
 }
 
 bool JsResult::UnwrapBatchUpdateResult(napi_env env, napi_value &info,
