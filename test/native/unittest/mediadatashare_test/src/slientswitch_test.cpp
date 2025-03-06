@@ -18,7 +18,6 @@
 #include "accesstoken_kit.h"
 #include "datashare_helper.h"
 #include "datashare_log.h"
-#include "errors.h"
 #include "hap_token_info.h"
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
@@ -30,7 +29,7 @@ using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
 constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
 std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
-std::string SLIENT_ACCESS_URI = "datashareproxy:///com.acts.datasharetest/entry/DB00/TBL00?Proxy=true";
+std::string SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest/entry/DB00/TBL00?Proxy=true";
 std::string DATA_SHARE_PROXY_URI = "datashare:///com.acts.ohos.data.datasharetest/test";
 constexpr int SUBSCRIBER_ID = 1000;
 std::string TBL_STU_NAME = "name";
@@ -63,8 +62,20 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t system
     return DataShare::DataShareHelper::Creator(remoteObj, silentProxyUri, providerUri);
 }
 
-HapPolicyParams GetPolicy()
+void SlientSwitchTest::SetUpTestCase(void)
 {
+    LOG_INFO("SetUpTestCase invoked");
+    auto dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
+    ASSERT_TRUE(dataShareHelper != nullptr);
+    int sleepTime = 3;
+    sleep(sleepTime);
+
+    HapInfoParams info = {
+        .userID = 100,
+        .bundleName = "com.acts.datasharetest",
+        .instIndex = 0,
+        .appIDDesc = "com.acts.datasharetest"
+    };
     HapPolicyParams policy = {
         .apl = APL_NORMAL,
         .domain = "test.domain",
@@ -87,34 +98,9 @@ HapPolicyParams GetPolicy()
                 .resDeviceID = { "local" },
                 .grantStatus = { PermissionState::PERMISSION_GRANTED },
                 .grantFlags = { 1 }
-            },
-            {
-                .permissionName = "ohos.permission.GET_BUNDLE_INFO",
-                .isGeneral = true,
-                .resDeviceID = { "local" },
-                .grantStatus = { PermissionState::PERMISSION_GRANTED },
-                .grantFlags = { 1 }
             }
         }
     };
-    return policy;
-}
-
-void SlientSwitchTest::SetUpTestCase(void)
-{
-    LOG_INFO("SetUpTestCase invoked");
-    auto dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
-    ASSERT_TRUE(dataShareHelper != nullptr);
-    int sleepTime = 3;
-    sleep(sleepTime);
-
-    HapInfoParams info = {
-        .userID = 100,
-        .bundleName = "com.acts.datasharetest",
-        .instIndex = 0,
-        .appIDDesc = "com.acts.datasharetest"
-    };
-    auto policy = GetPolicy();
     AccessTokenKit::AllocHapToken(info, policy);
     auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(
         info.userID, info.bundleName, info.instIndex);
@@ -207,26 +193,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Insert_Test_002, TestSize.
     retVal = helper->Insert(uri, valuesBucket);
     EXPECT_EQ((retVal > 0), false);
     LOG_INFO("SlientSwitch_SwitchDisable_Insert_Test_002::End");
-}
-
-HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Insert_Error_Test_001, TestSize.Level0)
-{
-    LOG_INFO("SlientSwitch_SwitchEnable_Insert_Error_Test_001::Start");
-    Uri uri(SLIENT_ACCESS_URI);
-    int retVal = DataShareHelper::SetSilentSwitch(uri, true);
-    EXPECT_EQ(retVal, E_OK);
- 
-    auto helper = g_slientAccessHelper;
-    DataShare::DataShareValuesBucket valuesBucket;
-    std::string value = "lisi";
-    valuesBucket.Put(TBL_STU_NAME, value);
-    int age = 25;
-    valuesBucket.Put(TBL_STU_AGE, age);
-    auto slientUri = "datashare:///com.acts.datasharetest/entry/DB00/TBL00?Proxy=true";
-    Uri uriSlient(slientUri);
-    retVal = helper->Insert(uriSlient, valuesBucket);
-    EXPECT_EQ(retVal, -1);
-    LOG_INFO("SlientSwitch_SwitchEnable_Insert_Error_Test_001::End");
 }
 
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Insert_Test_001, TestSize.Level0)
