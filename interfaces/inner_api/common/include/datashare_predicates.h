@@ -17,6 +17,7 @@
 #define DATASHARE_PREDICATES_H
 
 #include <string>
+#include<iostream>
 
 #include "datashare_abs_predicates.h"
 #include "datashare_errno.h"

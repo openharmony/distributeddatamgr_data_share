@@ -64,6 +64,7 @@
                 "libuv",
                 "napi",
                 "relational_store",
+                "runtime_core",
                 "samgr"
             ],
             "third_party": []
@@ -78,7 +79,8 @@
                     "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_provider",
                     "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common",
                     "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_ext_ability_module",
-                    "//foundation/distributeddatamgr/data_share/frameworks/js/napi:datashare_napi_packages"
+                    "//foundation/distributeddatamgr/data_share/frameworks/js/napi:datashare_napi_packages",
+                    "//foundation/distributeddatamgr/data_share/frameworks/js/ani:ani_data_share_predicates"
                 ],
                 "service_group": [
                 ]
