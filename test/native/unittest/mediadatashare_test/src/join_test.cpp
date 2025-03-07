@@ -31,8 +31,8 @@ using namespace OHOS::Security::AccessToken;
 constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
 std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
 std::string SLIENT_ACCESS_URI = "datashare:///com.acts.datasharetest?Proxy=true";
-std::string USER_URI = "datashareproxy://com.acts.datasharetest/entry/DB00/user";
-std::string BOOK_URI = "datashareproxy://com.acts.datasharetest/entry/DB00/book";
+std::string USER_URI = "datashare:///com.acts.datasharetest/entry/DB00/user?Proxy=true";
+std::string BOOK_URI = "datashare:///com.acts.datasharetest/entry/DB00/book?Proxy=true";
 std::string TBL_STU_NAME = "name";
 std::string TBL_STU_AGE = "age";
 std::shared_ptr<DataShare::DataShareHelper> g_slientAccessHelper;
@@ -91,13 +91,6 @@ void JoinTest::SetUpTestCase(void)
         .permStateList = {
             {
                 .permissionName = "ohos.permission.test",
-                .isGeneral = true,
-                .resDeviceID = { "local" },
-                .grantStatus = { PermissionState::PERMISSION_GRANTED },
-                .grantFlags = { 1 }
-            },
-            {
-                .permissionName = "ohos.permission.GET_BUNDLE_INFO",
                 .isGeneral = true,
                 .resDeviceID = { "local" },
                 .grantStatus = { PermissionState::PERMISSION_GRANTED },
