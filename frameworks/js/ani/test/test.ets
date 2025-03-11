@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 
-import { dataSharePredicates } from "../ets/data_share_predicates.ets"
+import { dataSharePredicates } from "../ets/@ohos.data.dataSharePredicates.d.ets"
+import { ValueType } from "../ets/@ohos.data.ValuesBucket.d.ets"
 
 function main(){
     console.println("hello DataSharePredicates")
@@ -54,4 +55,11 @@ function main(){
         .greaterThanOrEqualTo("age3", true);
     let fruits: Array<string> = new Array<string>("apple", "banana", "cherry");
     datashare.groupBy(fruits);
+    console.println("--------------in or notin----------------------------")
+    let numbersArr = new Array<ValueType>(255, 11.6, 13.0);
+    let boolArr = new Array<ValueType>(true, false, true, false, true);
+    let stringArr = new Array<ValueType>("cat", "dog", "pig");
+
+
+    datashare.in("fz", numbersArr).in("fz", boolArr).in("fz", stringArr).notIn("fz", numbersArr).notIn("fz", boolArr).notIn("fz", stringArr);
 }

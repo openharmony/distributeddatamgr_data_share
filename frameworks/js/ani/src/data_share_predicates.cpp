@@ -290,6 +290,54 @@ static ani_object GroupBy([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_ob
     return obj;
 }
 
+static ani_object In([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object obj, ani_string fieldStr,
+    ani_object arrayObj)
+{
+    std::cout << "function In start:" << std::endl;
+    UnionAccessor unionAccessor(env, arrayObj);
+    auto dataSharePredicates = unwrapp(env, obj);
+    auto stringContent = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(fieldStr));
+    std::vector<double> arrayDoubleValues = {};
+    if (unionAccessor.TryConvertArray(arrayDoubleValues) && arrayDoubleValues.size() > 0) {
+        std::vector<std::string> values = convertVector(arrayDoubleValues);
+        dataSharePredicates->In(stringContent, values);
+    }
+    std::vector<std::string> arrayStringValues = {};
+    if (unionAccessor.TryConvertArray(arrayStringValues) && arrayStringValues.size() > 0) {
+        dataSharePredicates->In(stringContent, arrayStringValues);
+    }
+    std::vector<bool> arrayBoolValues = {};
+    if (unionAccessor.TryConvertArray(arrayBoolValues) && arrayBoolValues.size() > 0) {
+        std::vector<std::string> values = convertVector(arrayBoolValues);
+        dataSharePredicates->In(stringContent, values);
+    }
+    std::cout << "function In end:" << std::endl;
+    return obj;
+}
+
+static ani_object NotIn([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object obj, ani_string fieldStr,
+    ani_object arrayObj)
+{
+    UnionAccessor unionAccessor(env, arrayObj);
+    auto dataSharePredicates = unwrapp(env, obj);
+    auto stringContent = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(fieldStr));
+    std::vector<double> arrayDoubleValues = {};
+    if (unionAccessor.TryConvertArray(arrayDoubleValues) && arrayDoubleValues.size() > 0) {
+        std::vector<std::string> values = convertVector(arrayDoubleValues);
+        dataSharePredicates->NotIn(stringContent, values);
+    }
+    std::vector<std::string> arrayStringValues = {};
+    if (unionAccessor.TryConvertArray(arrayStringValues) && arrayStringValues.size() > 0) {
+        dataSharePredicates->NotIn(stringContent, arrayStringValues);
+    }
+    std::vector<bool> arrayBoolValues = {};
+    if (unionAccessor.TryConvertArray(arrayBoolValues) && arrayBoolValues.size() > 0) {
+        std::vector<std::string> values = convertVector(arrayBoolValues);
+        dataSharePredicates->NotIn(stringContent, values);
+    }
+    return obj;
+}
+
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 {
     std::cout << "ANI_Constructor enter " << std::endl;
@@ -299,7 +347,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_ERROR;
     }
     ani_namespace ns;
-    if (env->FindNamespace("Ldata_share_predicates/dataSharePredicates;", &ns) != ANI_OK) {
+    if (env->FindNamespace("L@ohos/data/dataSharePredicates/dataSharePredicates;", &ns) != ANI_OK) {
         std::cerr << "Namespace not found" << std::endl;
         return ANI_ERROR;
     };
@@ -312,8 +360,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     }
 
     std::array methods = {
-        ani_native_function {"create", ":Ldata_share_predicates/dataSharePredicates/DataSharePredicates;",
-            reinterpret_cast<void *>(Create) },
+        ani_native_function {"create", nullptr, reinterpret_cast<void *>(Create) },
         ani_native_function {"equalTo", nullptr, reinterpret_cast<void *>(EqualTo)},
         ani_native_function {"notEqualTo", nullptr, reinterpret_cast<void *>(NotEqualTo)},
         ani_native_function {"orderByDesc", nullptr, reinterpret_cast<void *>(OrderByDesc)},
@@ -329,6 +376,8 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         ani_native_function {"beginWrap", nullptr, reinterpret_cast<void *>(BeginWrap)},
         ani_native_function {"greaterThan", nullptr, reinterpret_cast<void *>(GreaterThan)},
         ani_native_function {"groupBy", nullptr, reinterpret_cast<void *>(GroupBy)},
+        ani_native_function {"in", nullptr, reinterpret_cast<void *>(In)},
+        ani_native_function {"notIn", nullptr, reinterpret_cast<void *>(NotIn)},
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
