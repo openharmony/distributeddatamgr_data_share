@@ -370,6 +370,7 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
 
     if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {
         LOG_ERROR("Check calling permission failed.");
+        businessError.SetCode(PERMISSION_ERROR_NUMBER);
         return resultSet;
     }
     
