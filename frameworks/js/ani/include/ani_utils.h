@@ -24,6 +24,8 @@
 #include <unordered_map>
 #include <vector>
 #include <iostream>
+#include <sstream>
+#include <type_traits>
 
 template<typename T>
 class NativeObjectWrapper {
@@ -150,6 +152,16 @@ public:
         return ret;
     }
 
+    bool IsInstanceOf(std::string&& cls_name, ani_object obj)
+    {
+        ani_class cls;
+        env_->FindClass(cls_name.c_str(), &cls);
+
+        ani_boolean ret;
+        env_->Object_InstanceOf(obj, cls, &ret);
+        return ret;
+    }
+
     template<typename T>
     bool TryConvert(T &value);
 
@@ -239,22 +251,26 @@ bool UnionAccessor::TryConvertArray<bool>(std::vector<bool> &value)
 {
     ani_double length;
     if (ANI_OK != env_->Object_GetPropertyByName_Double(obj_, "length", &length)) {
-        std::cerr << "Object_GetPropertyByName_Double length failed" << std::endl;
+        std::cerr << "Object_GetPropertyByName_Double length Failed" << std::endl;
         return false;
     }
     for (int i = 0; i < int(length); i++) {
         ani_ref arrayRef;
         if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &arrayRef, (ani_int)i)) {
-            std::cerr << "Object_GetPropertyByName_Ref failed" << std::endl;
+            std::cerr << "Object_GetPropertyByName_Ref Failed" << std::endl;
+            return false;
+        }
+        if (!IsInstanceOf("Lstd/core/Boolean;", static_cast<ani_object>(arrayRef))) {
+            std::cerr << "Not found 'Lstd/core/Boolean;'" << std::endl;
             return false;
         }
         ani_boolean boolValue;
         if (ANI_OK != env_->Object_CallMethodByName_Boolean(static_cast<ani_object>(arrayRef), "unboxed", nullptr,
             &boolValue)) {
-            std::cerr << "Object_CallMethodByName_Double unbox failed" << std::endl;
+            std::cerr << "Object_CallMethodByName_Boolean unbox Failed" << std::endl;
             return false;
         }
-        value.push_back(static_cast<bool>(boolValue));
+        value.push_back(static_cast<double>(boolValue));
     }
     return true;
 }
@@ -273,6 +289,10 @@ bool UnionAccessor::TryConvertArray<int>(std::vector<int> &value)
             std::cerr << "Object_GetPropertyByName_Ref failed" << std::endl;
             return false;
         }
+        if (!IsInstanceOf("Lstd/core/Int;", static_cast<ani_object>(arrayRef))) {
+            std::cerr << "Not found 'Lstd/core/Double;'" << std::endl;
+            return false;
+        }
         ani_int intValue;
         if (ANI_OK != env_->Object_CallMethodByName_Int(static_cast<ani_object>(arrayRef), "unboxed", nullptr,
             &intValue)) {
@@ -289,19 +309,23 @@ bool UnionAccessor::TryConvertArray<double>(std::vector<double> &value)
 {
     ani_double length;
     if (ANI_OK != env_->Object_GetPropertyByName_Double(obj_, "length", &length)) {
-        std::cerr << "Object_GetPropertyByName_Double length failed" << std::endl;
+        std::cerr << "Object_GetPropertyByName_Double length Failed" << std::endl;
         return false;
     }
     for (int i = 0; i < int(length); i++) {
         ani_ref arrayRef;
         if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &arrayRef, (ani_int)i)) {
-            std::cerr << "Object_GetPropertyByName_Ref failed" << std::endl;
+            std::cerr << "Object_GetPropertyByName_Ref Failed" << std::endl;
+            return false;
+        }
+        if (!IsInstanceOf("Lstd/core/Double;", static_cast<ani_object>(arrayRef))) {
+            std::cerr << "Not found 'Lstd/core/Double;'" << std::endl;
             return false;
         }
         ani_double doubleValue;
-        if (ANI_OK != env_->Object_CallMethodByName_Double(static_cast<ani_object>(arrayRef), "unboxed", nullptr,
-            &doubleValue)) {
-            std::cerr << "Object_CallMethodByName_Double unbox failed" << std::endl;
+        if (ANI_OK != env_->Object_CallMethodByName_Double(static_cast<ani_object>(arrayRef), "unboxed",
+            nullptr, &doubleValue)) {
+            std::cerr << "Object_CallMethodByName_Double unbox Failed" << std::endl;
             return false;
         }
         value.push_back(static_cast<double>(doubleValue));
@@ -325,9 +349,39 @@ bool UnionAccessor::TryConvertArray<std::string>(std::vector<std::string> &value
             std::cerr << "Object_GetPropertyByName_Double length failed" << std::endl;
             return false;
         }
+
+        if (!IsInstanceOf("Lstd/core/String;", static_cast<ani_object>(stringEntryRef))) {
+            std::cerr << "Not found 'Lstd/core/String;'" << std::endl;
+            return false;
+        }
         value.push_back(ANIUtils_ANIStringToStdString(env_, static_cast<ani_string>(stringEntryRef)));
     }
     return true;
 }
 
+template<typename T>
+std::vector<std::string> convertVector(const std::vector<T>& input)
+{
+    std::vector<std::string> result;
+    result.reserve(input.size());
+
+    for (const auto& elem : input) {
+        if constexpr (std::is_same_v<T, bool>) {
+            result.push_back(elem ? "true" : "false");
+            continue;
+        }
+        std::ostringstream oss;
+        if constexpr (std::is_same_v<T, double>) {
+            oss << elem;
+            std::string str = oss.str();
+            str.erase(str.find_last_not_of('0') + 1, std::string::npos);
+            if (str.back() == '.') str.pop_back();
+            result.push_back(str);
+        } else {
+            oss << elem;
+            result.push_back(oss.str());
+        }
+    }
+    return result;
+}
 #endif

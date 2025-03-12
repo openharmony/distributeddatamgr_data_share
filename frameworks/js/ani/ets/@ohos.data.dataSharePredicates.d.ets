@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ValueType } from "./@ohos.data.ValuesBucket.ets"
+import {ValueType} from "./@ohos.data.ValuesBucket.d.ets"
 
 export namespace dataSharePredicates{
 export class DataSharePredicates{
@@ -46,5 +46,7 @@ export class DataSharePredicates{
     native beginWrap(): DataSharePredicates;
     native greaterThan(field: string, value: ValueType): DataSharePredicates;
     native groupBy(fields:Array<string>): DataSharePredicates;
+    native in(field: string, value: Array<ValueType>): DataSharePredicates;
+    native notIn(field: string, value: Array<ValueType>): DataSharePredicates;
 }
 }
