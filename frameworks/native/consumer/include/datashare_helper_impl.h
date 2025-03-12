@@ -26,8 +26,8 @@ namespace OHOS::DataShare {
 class DataShareHelperImpl : public DataShareHelper {
 public:
     DataShareHelperImpl(const Uri &uri, const sptr<IRemoteObject> &token,
-        std::shared_ptr<DataShareConnection> connection);
-    DataShareHelperImpl(std::string extUri = "");
+        std::shared_ptr<DataShareConnection> connection, bool isSystem = false);
+    DataShareHelperImpl(std::string extUri = "", bool isSystem = false);
 
     ~DataShareHelperImpl() override;
 
@@ -113,6 +113,7 @@ private:
     std::shared_ptr<GeneralController> generalCtl_ = nullptr;
     std::shared_ptr<PersistentDataController> persistentDataCtl_ = nullptr;
     std::shared_ptr<PublishedDataController> publishedDataCtl_ = nullptr;
+    bool isSystem_;
 };
 } // namespace OHOS::DataShare
 #endif // DATA_SHARE_HELPER_IMPL_H
