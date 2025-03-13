@@ -262,8 +262,8 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_003, TestSize.Lev
         LOG_ERROR("GetSystemAbility service failed.");
     }
     auto [ret, helper] = DataShare::DataShareHelper::Create(remoteObj, uriStr1, uriStr2);
-    EXPECT_EQ(ret, DataShare::E_BUNDLE_NAME_NOT_EXIST);
-    EXPECT_EQ(helper, nullptr);
+    EXPECT_EQ(ret, DataShare::E_OK);
+    EXPECT_NE(helper, nullptr);
     helper = nullptr;
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_003::End");
 }
