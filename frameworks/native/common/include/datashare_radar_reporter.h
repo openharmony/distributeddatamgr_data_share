@@ -138,8 +138,6 @@ class RadarReport final {
 public:
     RadarReport(int32_t bizScene, int32_t bizStage, const std::string funcName)
     {
-        RADAR_REPORT(funcName, bizScene, bizStage, RadarReporter::SUCCESS,
-            RadarReporter::BIZ_STATE, RadarReporter::START);
         bizScene_ = bizScene;
         bizStage_ = bizStage;
         funcName_ = funcName;
@@ -150,9 +148,6 @@ public:
         if (errorCode_ != 0) {
             RADAR_REPORT(funcName_, bizScene_, bizStage_, RadarReporter::FAILED, RadarReporter::BIZ_STATE,
                 RadarReporter::FINISHED, RadarReporter::ERROR_CODE, errorCode_);
-        } else {
-            RADAR_REPORT(funcName_, bizScene_, bizStage_, RadarReporter::SUCCESS,
-                RadarReporter::BIZ_STATE, RadarReporter::FINISHED);
         }
     }
 
