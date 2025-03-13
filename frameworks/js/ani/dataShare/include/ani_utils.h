@@ -30,26 +30,10 @@
 template<typename T>
 class NativeObjectWrapper {
 public:
-    static ani_object Create([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_class clazz)
+    static ani_long Create([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_class clazz)
     {
         T* nativePtr = new T;
-        return Wrap(env, clazz, nativePtr);
-    }
-
-    static ani_object Wrap([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_class clazz, T* nativePtr)
-    {
-        ani_method ctor;
-        if (ANI_OK != env->Class_FindMethod(clazz, "<ctor>", "J:V", &ctor)) {
-            std::cerr << "Not found '<ctor>'" << std::endl;
-            ani_object nullobj = nullptr;
-            return nullobj;
-        }
-
-        ani_object obj;
-        if (ANI_OK != env->Object_New(clazz, ctor, &obj, reinterpret_cast<ani_long>(nativePtr))) {
-            std::cerr << "Object_New failed" << std::endl;
-        }
-        return obj;
+        return reinterpret_cast<ani_long>(nativePtr);
     }
 
     static T* Unwrap(ani_env *env, ani_object object, const char* propName = "nativePtr")

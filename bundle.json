@@ -80,7 +80,7 @@
                     "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common",
                     "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_ext_ability_module",
                     "//foundation/distributeddatamgr/data_share/frameworks/js/napi:datashare_napi_packages",
-                    "//foundation/distributeddatamgr/data_share/frameworks/js/ani:ani_data_share_predicates"
+                    "//foundation/distributeddatamgr/data_share/frameworks/js/ani:datashare_ani_packages"
                 ],
                 "service_group": [
                 ]
