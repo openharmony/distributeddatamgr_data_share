@@ -53,7 +53,7 @@ config("permission_config") {
 }
 
 ohos_unittest("NativeDataShareTest") {
-  module_out_path = "data_share/native_datashare"
+  module_out_path = "data_share/data_share/inner_tests"
 
   visibility = [ ":*" ]
 
@@ -110,7 +110,7 @@ ohos_unittest("NativeDataShareTest") {
 }
 
 ohos_unittest("PermissionTest") {
-  module_out_path = "data_share/native_datashare"
+  module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [
     "${access_token_path}/frameworks/common/include",
@@ -148,7 +148,7 @@ ohos_unittest("PermissionTest") {
 }
 
 ohos_unittest("SlientAccessTest") {
-  module_out_path = "data_share/native_datashare"
+  module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [
     "//base/security/access_token/frameworks/common/include",
@@ -185,7 +185,7 @@ ohos_unittest("SlientAccessTest") {
 }
 
 ohos_unittest("SlientSwitchTest") {
-  module_out_path = "data_share/native_datashare"
+  module_out_path = "data_share/data_share/inner_tests"
 
   sources = [ "./unittest/mediadatashare_test/src/slientswitch_test.cpp" ]
 
@@ -212,7 +212,7 @@ ohos_unittest("SlientSwitchTest") {
 }
 
 ohos_unittest("ErrorCodeTest") {
-  module_out_path = "data_share/native_datashare"
+  module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [
     "//base/security/access_token/frameworks/common/include",
@@ -248,7 +248,7 @@ ohos_unittest("ErrorCodeTest") {
 }
 
 ohos_unittest("JoinTest") {
-  module_out_path = "data_share/native_datashare"
+  module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [
     "//base/security/access_token/frameworks/common/include",
@@ -284,7 +284,7 @@ ohos_unittest("JoinTest") {
 }
 
 ohos_unittest("ProxyDatasTest") {
-  module_out_path = "data_share/native_datashare"
+  module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [
     "//base/security/access_token/frameworks/common/include",
@@ -320,7 +320,7 @@ ohos_unittest("ProxyDatasTest") {
 }
 
 ohos_unittest("ControllerTest") {
-  module_out_path = "data_share/native_datashare"
+  module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [
     "${access_token_path}/frameworks/common/include",
@@ -368,7 +368,7 @@ ohos_unittest("ControllerTest") {
 }
 
 ohos_unittest("AbnormalBranchTest") {
-  module_out_path = "data_share/native_datashare"
+  module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [
     "${access_token_path}/frameworks/common/include",
@@ -417,7 +417,7 @@ ohos_unittest("AbnormalBranchTest") {
 }
 
 ohos_unittest("ValueProxyTest") {
-  module_out_path = "data_share/native_datashare"
+  module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [ "${datashare_base_path}/frameworks/native/common/include/" ]
 
@@ -435,7 +435,7 @@ ohos_unittest("ValueProxyTest") {
 }
 
 ohos_unittest("URIUtilsTest") {
-  module_out_path = "data_share/native_datashare"
+  module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [ "${datashare_base_path}/frameworks/native/common/include/" ]
 
@@ -456,7 +456,7 @@ ohos_unittest("URIUtilsTest") {
 }
 
 ohos_unittest("DataShareHelperImplTest") {
-  module_out_path = "data_share/native_datashare"
+  module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [
     "${datashare_native_consumer_path}/include",
@@ -528,7 +528,7 @@ ohos_unittest("DataShareHelperImplTest") {
 }
 
 ohos_unittest("SharedBlockTest") {
-  module_out_path = "data_share/native_datashare"
+  module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [ "${datashare_common_native_path}/include" ]
 
