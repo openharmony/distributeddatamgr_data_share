@@ -252,7 +252,7 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_003, TestSize.Lev
 {
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_003::Start");
     std::string uriStr1(SLIENT_ERROR_URI);
-    std::string uriStr2 (DATA_SHARE_URI);
+    std::string uriStr2 ("");
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
         LOG_ERROR("GetSystemAbilityManager get samgr failed.");
@@ -261,9 +261,10 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_003, TestSize.Lev
     if (remoteObj == nullptr) {
         LOG_ERROR("GetSystemAbility service failed.");
     }
+    // slientUri is error bundle name, extUri is empty, slient access can't find the bundle name
     auto [ret, helper] = DataShare::DataShareHelper::Create(remoteObj, uriStr1, uriStr2);
-    EXPECT_EQ(ret, DataShare::E_OK);
-    EXPECT_NE(helper, nullptr);
+    EXPECT_EQ(ret, DataShare::E_EXT_URI_INVALID);
+    EXPECT_EQ(helper, nullptr);
     helper = nullptr;
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_003::End");
 }
@@ -855,6 +856,37 @@ HWTEST_F(SlientAccessTest, SlientAccess_UserDefineFunc_Test_001, TestSize.Level0
     auto result = helper->DataShareHelper::UserDefineFunc(data, reply, option);
     EXPECT_EQ(result, 0);
     LOG_INFO("SilentAccess_UserDefineFunc_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Creator_ErrorBundle_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Creator_ErrorBundle_Test_001::Start");
+    std::string uriStr1("datashareproxy://com.acts.error.bundleName/test");
+    // slientUri is error bundle name, slient access can't find the bundle name, return nullptr
+    auto helperSilent = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, uriStr1);
+    EXPECT_EQ(helperSilent, nullptr);
+    LOG_INFO("SlientAccess_Creator_ErrorBundle_Test_001::End");
+}
+
+HWTEST_F(SlientAccessTest, SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001::Start");
+    std::string uriStr1(SLIENT_ERROR_URI);
+    std::string uriStr2 (DATA_SHARE_URI);
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        LOG_ERROR("GetSystemAbilityManager get samgr failed.");
+    }
+    auto remoteObj = saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID);
+    if (remoteObj == nullptr) {
+        LOG_ERROR("GetSystemAbility service failed.");
+    }
+    // slientUri is error bundleName, extUri is effective, slient access can't find the bundleName, but ext success
+    auto [ret, helper] = DataShare::DataShareHelper::Create(remoteObj, uriStr1, uriStr2);
+    EXPECT_EQ(ret, DataShare::E_OK);
+    EXPECT_NE(helper, nullptr);
+    helper = nullptr;
+    LOG_INFO("SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001::End");
 }
 } // namespace DataShare
 } // namespace OHOS
