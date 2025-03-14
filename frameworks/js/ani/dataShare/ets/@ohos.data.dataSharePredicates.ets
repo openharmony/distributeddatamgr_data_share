@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-import {ValueType} from "./@ohos.data.ValuesBucket.d.ets"
+import { ValueType } from "@ohos.data.ValuesBucket"
 
-export namespace dataSharePredicates{
+export default namespace dataSharePredicates{
 export class DataSharePredicates{
-    static { loadLibrary("data_share_predicates") }
+    static { loadLibrary("datasharepredicates_ani") }
     private nativePtr:long = 0;
 
-    constructor(nativePtr:long) {
+    constructor() {
+        console.log("enter constructor")
         if (this.nativePtr == 0) {
-            this.nativePtr = nativePtr;
+            console.log("start create")
+            this.nativePtr = DataSharePredicates.create();
+            console.log("stop create")
         }
     }
+
     getNativePtr():long {
         return this.nativePtr;
     }
-    native static create():DataSharePredicates;
 
+    native static create(): long;
     native equalTo(field: string, value: ValueType):DataSharePredicates;
     native notEqualTo(field: string, value: ValueType):DataSharePredicates;
     native orderByDesc(field: string):DataSharePredicates;

@@ -18,6 +18,7 @@
 #include <iostream>
 #include "ani_utils.h"
 #include "datashare_predicates.h"
+#include "datashare_log.h"
 
 using namespace OHOS::DataShare;
 
@@ -26,7 +27,7 @@ static DataSharePredicates* unwrapp(ani_env *env, ani_object object)
     return NativeObjectWrapper<DataSharePredicates>::Unwrap(env, object);
 }
 
-static ani_object Create([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_class clazz)
+static ani_long Create([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_class clazz)
 {
     return NativeObjectWrapper<DataSharePredicates>::Create(env, clazz);
 }
@@ -34,11 +35,13 @@ static ani_object Create([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_cla
 static ani_object EqualTo([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object, ani_string field,
     ani_object value)
 {
-    std::cout << "EqualTo enter string" << std::endl;
-
     auto stringContentOne = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(field));
 
     auto dataSharePredicates = unwrapp(env, object);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     UnionAccessor unionAccessor(env, value);
     double aniValue = 0;
     if (unionAccessor.TryConvert(aniValue)) {
@@ -64,10 +67,13 @@ static ani_object EqualTo([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_ob
 static ani_object NotEqualTo([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object, ani_string field,
     ani_object value)
 {
-    std::cout << "NotEqualTo enter string" << std::endl;
     auto stringContentOne = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(field));
 
     auto dataSharePredicates = unwrapp(env, object);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     UnionAccessor unionAccessor(env, value);
     double aniValue = 0;
     if (unionAccessor.TryConvert(aniValue)) {
@@ -94,6 +100,10 @@ static ani_object OrderByDesc([[maybe_unused]] ani_env *env, [[maybe_unused]] an
     std::cout << "OrderByDesc enter string" << std::endl;
     auto stringContent = ANIUtils_ANIStringToStdString(env, field);
     auto dataSharePredicates = unwrapp(env, object);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     dataSharePredicates->OrderByDesc(stringContent);
     return object;
 }
@@ -103,6 +113,10 @@ static ani_object OrderByAsc([[maybe_unused]] ani_env *env, [[maybe_unused]] ani
     std::cout << "OrderByAsc enter string" << std::endl;
     auto stringContent = ANIUtils_ANIStringToStdString(env, field);
     auto dataSharePredicates = unwrapp(env, object);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     dataSharePredicates->OrderByAsc(stringContent);
     return object;
 }
@@ -111,6 +125,10 @@ static ani_object And([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object
 {
     std::cout << "And enter string" << std::endl;
     auto dataSharePredicates = unwrapp(env, object);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     dataSharePredicates->And();
     return object;
 }
@@ -120,6 +138,10 @@ static ani_object Limit([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_obje
 {
     std::cout << "enter Limit" << total << std::endl;
     auto dataSharePredicates = unwrapp(env, object);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     dataSharePredicates->Limit(total, offset);
     return object;
 }
@@ -132,6 +154,10 @@ static ani_object LessThan([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_o
 
     std::cout << "LessThan Get field: "<< fieldStr << std::endl;
     auto dataSharePredicates = unwrapp(env, obj);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     UnionAccessor unionAccessor(env, value);
     double aniValue = 0;
     if (unionAccessor.TryConvert(aniValue)) {
@@ -162,6 +188,10 @@ static ani_object Like([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_objec
     auto valueStr = ANIUtils_ANIStringToStdString(env, value);
     std::cout << "Like Get value: "<< valueStr << std::endl;
     auto dataSharePredicates = unwrapp(env, obj);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     dataSharePredicates->Like(fieldStr, valueStr);
     return obj;
 }
@@ -170,6 +200,10 @@ static ani_object EndWrap([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_ob
 {
     std::cout << "enter EndWrap func" << std::endl;
     auto dataSharePredicates = unwrapp(env, obj);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     dataSharePredicates->EndWrap();
     return obj;
 }
@@ -182,6 +216,10 @@ static ani_object GreaterThanOrEqualTo([[maybe_unused]] ani_env *env, [[maybe_un
     std::cout << "LessThan Get field: "<< fieldStr << std::endl;
 
     auto dataSharePredicates = unwrapp(env, obj);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     UnionAccessor unionAccessor(env, value);
     double aniValue = 0;
     if (unionAccessor.TryConvert(aniValue)) {
@@ -212,6 +250,10 @@ static ani_object Contains([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_o
     auto valueStr = ANIUtils_ANIStringToStdString(env, value);
     std::cout << "Contains Get value: "<< valueStr << std::endl;
     auto dataSharePredicates = unwrapp(env, obj);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     dataSharePredicates->Contains(fieldStr, valueStr);
     return obj;
 }
@@ -220,6 +262,10 @@ static ani_object Or([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object 
 {
     std::cout << "enter Or func" << std::endl;
     auto dataSharePredicates = unwrapp(env, obj);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     dataSharePredicates->Or();
     return obj;
 }
@@ -228,6 +274,10 @@ static ani_object BeginWrap([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_
 {
     std::cout << "enter BeginWrap func" << std::endl;
     auto dataSharePredicates = unwrapp(env, obj);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     dataSharePredicates->BeginWrap();
     return obj;
 }
@@ -235,10 +285,13 @@ static ani_object BeginWrap([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_
 static ani_object GreaterThan([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object obj, ani_string field,
     ani_object value)
 {
-    std::cout << "enter GreaterThan func" << std::endl;
     auto fieldStr = ANIUtils_ANIStringToStdString(env, field);
     std::cout << "LessThan Get field: "<< fieldStr << std::endl;
     auto dataSharePredicates = unwrapp(env, obj);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     UnionAccessor unionAccessor(env, value);
     ani_double valueD = 0.0;
     if (unionAccessor.TryConvert<ani_double>(valueD)) {
@@ -286,6 +339,10 @@ static ani_object GroupBy([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_ob
         std::cout << "Array String Content:" << s.c_str() << std::endl;
     }
     auto dataSharePredicates = unwrapp(env, obj);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     dataSharePredicates->GroupBy(strings);
     return obj;
 }
@@ -296,6 +353,10 @@ static ani_object In([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object 
     std::cout << "function In start:" << std::endl;
     UnionAccessor unionAccessor(env, arrayObj);
     auto dataSharePredicates = unwrapp(env, obj);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     auto stringContent = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(fieldStr));
     std::vector<double> arrayDoubleValues = {};
     if (unionAccessor.TryConvertArray(arrayDoubleValues) && arrayDoubleValues.size() > 0) {
@@ -320,6 +381,10 @@ static ani_object NotIn([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_obje
 {
     UnionAccessor unionAccessor(env, arrayObj);
     auto dataSharePredicates = unwrapp(env, obj);
+    if (dataSharePredicates == nullptr) {
+        LOG_ERROR("dataSharePredicates is nullptr");
+        return nullptr;
+    }
     auto stringContent = ANIUtils_ANIStringToStdString(env, static_cast<ani_string>(fieldStr));
     std::vector<double> arrayDoubleValues = {};
     if (unionAccessor.TryConvertArray(arrayDoubleValues) && arrayDoubleValues.size() > 0) {
