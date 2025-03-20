@@ -1,0 +1,51 @@
+# Copyright (C) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//foundation/distributeddatamgr/data_share/datashare.gni")
+
+ohos_unittest("ConcurrentTest") {
+  module_out_path = "data_share/native_datashare"
+
+  include_dirs = [
+    "${datashare_native_proxy_path}/include",
+    "${datashare_common_native_path}/include",
+  ]
+
+  sources = [
+    "${datashare_common_native_path}/src/datashare_itypes_utils.cpp",
+    "${datashare_common_native_path}/src/datashare_string_utils.cpp",
+    "${datashare_native_proxy_path}/src/data_proxy_observer_stub.cpp",
+    "${datashare_native_proxy_path}/src/data_share_service_proxy.cpp",
+    "${datashare_native_proxy_path}/src/published_data_subscriber_manager.cpp",
+    "${datashare_native_proxy_path}/src/rdb_subscriber_manager.cpp",
+    "concurrent_subscriber_test.cpp",
+  ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer",
+    "${datashare_innerapi_path}/common:datashare_common",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
