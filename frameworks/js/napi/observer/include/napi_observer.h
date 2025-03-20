@@ -28,7 +28,7 @@ namespace DataShare {
 class NapiObserver {
 public:
     NapiObserver(napi_env env, napi_value callback);
-    ~NapiObserver();
+    virtual ~NapiObserver();
     virtual bool operator==(const NapiObserver &rhs) const;
     virtual bool operator!=(const NapiObserver &rhs) const;
     NapiObserver& operator=(NapiObserver &&rhs) = default;
