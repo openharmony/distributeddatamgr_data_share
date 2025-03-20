@@ -147,10 +147,10 @@ void NapiDataShareHelper::ExecuteCreator(std::shared_ptr<CreateContextInfo> ctxI
     if (ctxInfo->options.enabled_) {
         ctxInfo->options.token_ = ctxInfo->contextS->GetToken();
         ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->strUri, ctxInfo->options, "",
-            ctxInfo->options.waitTime_);
+            ctxInfo->options.waitTime_, true);
     } else {
         ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextS->GetToken(), ctxInfo->strUri, "",
-            ctxInfo->options.waitTime_);
+            ctxInfo->options.waitTime_, true);
     }
 }
 
