@@ -13,15 +13,18 @@
  * limitations under the License.
  */
 
+#include <cinttypes>
 #include "ishared_result_set_stub.h"
 #include "datashare_log.h"
 #include "datashare_errno.h"
+#include "ipc_skeleton.h"
 #include "string_ex.h"
 
 namespace OHOS::DataShare {
 std::function<sptr<ISharedResultSet>(std::shared_ptr<DataShareResultSet>,
     MessageParcel &)> ISharedResultSet::providerCreator_ = ISharedResultSetStub::CreateStub;
 constexpr ISharedResultSetStub::Handler ISharedResultSetStub::handlers[static_cast<uint32_t>(ResultCode::FUNC_BUTT)];
+const std::chrono::milliseconds TIME_THRESHOLD = std::chrono::milliseconds(500);
 
 sptr<ISharedResultSet> ISharedResultSetStub::CreateStub(std::shared_ptr<DataShareResultSet> result,
     OHOS::MessageParcel &parcel)
@@ -60,16 +63,26 @@ int ISharedResultSetStub::OnRemoteRequest(uint32_t code, OHOS::MessageParcel &da
         return INVALID_FD;
     }
 
+    auto callingPid = IPCSkeleton::GetCallingPid();
     if (code >= static_cast<uint32_t>(ResultCode::FUNC_BUTT)) {
-        LOG_ERROR("method code(%{public}d) out of range", code);
+        LOG_ERROR("method code(%{public}d) out of range, callingPid:%{public}d", code, callingPid);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
     Handler handler = handlers[code];
     if (handler == nullptr) {
-        LOG_ERROR("method code(%{public}d) is not support", code);
+        LOG_ERROR("method code(%{public}d) is not support, callingPid:%{public}d", code, callingPid);
         return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
     }
-    return (this->*handler)(data, reply);
+    auto start = std::chrono::steady_clock::now();
+    int ret = (this->*handler)(data, reply);
+    auto finish = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
+    if (duration >= TIME_THRESHOLD) {
+        int64_t milliseconds = duration.count();
+        LOG_WARN("over time, code:%{public}u callingPid:%{public}d, cost:%{public}" PRIi64 "ms",
+            code, callingPid, milliseconds);
+    }
+    return ret;
 }
 
 int ISharedResultSetStub::HandleGetRowCountRequest(MessageParcel &data, MessageParcel &reply)
