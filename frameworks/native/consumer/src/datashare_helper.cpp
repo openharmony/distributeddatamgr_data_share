@@ -111,7 +111,12 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, 
         LOG_ERROR("token is nullptr");
         return nullptr;
     }
-    return options.isProxy_ ? CreateServiceHelper("", bundleName) : CreateExtHelper(uri, options.token_, waitTime);
+    if (options.isProxy_) {
+        int ret = GetSilentProxyStatus(strUri);
+        return ret == E_OK ? CreateServiceHelper("", bundleName) : nullptr;
+    } else {
+        return CreateExtHelper(uri, options.token_, waitTime);
+    }
 }
 
 std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::Create(const sptr<IRemoteObject> &token,
