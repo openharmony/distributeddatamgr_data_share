@@ -30,6 +30,7 @@ GeneralControllerServiceImpl::GeneralControllerServiceImpl(const std::string &ex
 
 GeneralControllerServiceImpl::~GeneralControllerServiceImpl()
 {
+    LOG_INFO("GeneralControllerServiceImpl Release");
     auto manager = DataShareManagerImpl::GetInstance();
     manager->RemoveRegisterCallback(this);
 }
