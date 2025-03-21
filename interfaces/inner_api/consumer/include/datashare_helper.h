@@ -426,9 +426,10 @@ public:
      * @brief Set default switch for silent access.
      * @param uri, the uri to disable/enable.
      * @param enable, the enable of silent switch.
+     * @param isSystem, is system app or not.
      * @return Returns the error code.
      */
-    static int SetSilentSwitch(Uri &uri, bool enable);
+    static int SetSilentSwitch(Uri &uri, bool enable, bool isSystem = false);
 
     /**
      * @brief Inserts a single data record into the database.

@@ -369,14 +369,17 @@ bool ObserverImpl::DeleteObserver(const Uri& uri, const std::shared_ptr<DataShar
     });
 }
 
-int DataShareHelper::SetSilentSwitch(Uri &uri, bool enable)
+int DataShareHelper::SetSilentSwitch(Uri &uri, bool enable, bool isSystem)
 {
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return DATA_SHARE_ERROR;
     }
-    return proxy->SetSilentSwitch(uri, enable);
+    DataShareServiceProxy::SetSystem(isSystem);
+    auto res = proxy->SetSilentSwitch(uri, enable);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 bool DataShareHelper::IsProxy(Uri &uri)
