@@ -1163,28 +1163,70 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotImplPredicates_Test_001, Test
     LOG_INFO("MediaDataShare_NotImplPredicates_Test_001, End");
 }
 
+/**
+* @tc.name: MediaDataShare_RegisterObserver_001
+* @tc.desc: normal test register non-silent observer function.
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Observer_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Observer_001 start");
     std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
     ASSERT_TRUE(helper != nullptr);
     Uri uri(MEDIALIBRARY_DATA_URI);
-    sptr<IDataAbilityObserverTest> dataObserver;
-    helper->RegisterObserver(uri, dataObserver);
+    sptr<IDataAbilityObserverTest> dataObserver = new (std::nothrow) IDataAbilityObserverTest();
+    int retVal = helper->RegisterObserver(uri, dataObserver);
+    EXPECT_EQ(retVal, 0);
 
     DataShare::DataShareValuesBucket valuesBucket;
     valuesBucket.Put("name", "Datashare_Observer_Test001");
-    int retVal = helper->Insert(uri, valuesBucket);
-    EXPECT_EQ((retVal > 0), true);
+    retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_GT(retVal, 0);
     helper->NotifyChange(uri);
 
     DataShare::DataSharePredicates deletePredicates;
     deletePredicates.EqualTo("name", "Datashare_Observer_Test001");
     retVal = helper->Delete(uri, deletePredicates);
-    EXPECT_EQ((retVal >= 0), true);
+    EXPECT_GT(retVal, 0);
     helper->NotifyChange(uri);
-    helper->UnregisterObserver(uri, dataObserver);
+    retVal = helper->UnregisterObserver(uri, dataObserver);
+    EXPECT_EQ(retVal, 0);
     LOG_INFO("MediaDataShare_Observer_001 end");
+}
+
+/**
+* @tc.name: MediaDataShare_ReregisterObserver_001
+* @tc.desc: abnormal test reregister non-silent observer function.
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ReregisterObserver_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_ReregisterObserver_001 start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    EXPECT_NE(helper, nullptr);
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    sptr<IDataAbilityObserverTest> dataObserver = new (std::nothrow) IDataAbilityObserverTest();
+    int retVal = helper->RegisterObserver(uri, dataObserver);
+    EXPECT_EQ(retVal, 0);
+    retVal = helper->RegisterObserver(uri, dataObserver);
+    EXPECT_EQ(retVal, E_REGISTER_ERROR);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "MediaDataShare_ReregisterObserver_001");
+    retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_GT(retVal, 0);
+    helper->NotifyChange(uri);
+
+    DataShare::DataSharePredicates deletePredicates;
+    deletePredicates.EqualTo("name", "MediaDataShare_ReregisterObserver_001");
+    retVal = helper->Delete(uri, deletePredicates);
+    EXPECT_GT(retVal, 0);
+    helper->NotifyChange(uri);
+    retVal = helper->UnregisterObserver(uri, dataObserver);
+    EXPECT_EQ(retVal, 0);
+    LOG_INFO("MediaDataShare_ReregisterObserver_001 end");
 }
 
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_001, TestSize.Level0)
@@ -1472,6 +1514,12 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperExecuteBatchControllerNull
     LOG_INFO("ControllerTest_HelperExecuteBatchControllerNullTest_001::End");
 }
 
+/**
+* @tc.name: ControllerTest_HelperRegisterObserverControllerNullTest_001
+* @tc.desc: abnormal test register non-silent observer function while controller is nullptr.
+* @tc.type: FUNC
+* @tc.require:
+*/
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperRegisterObserverControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperRegisterObserverControllerNullTest_001 start");
@@ -1479,12 +1527,13 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperRegisterObserverController
     ASSERT_TRUE(helper != nullptr);
     Uri uri(MEDIALIBRARY_DATA_URI);
     helper->Release();
-    sptr<IDataAbilityObserverTest> dataObserver;
-    helper->RegisterObserver(uri, dataObserver);
+    sptr<IDataAbilityObserverTest> dataObserver = new (std::nothrow) IDataAbilityObserverTest();
+    int retVal = helper->RegisterObserver(uri, dataObserver);
+    EXPECT_EQ(retVal, E_HELPER_DIED);
     
     DataShare::DataShareValuesBucket valuesBucket;
     valuesBucket.Put("name", "Datashare_Observer_Test001");
-    int retVal = helper->Insert(uri, valuesBucket);
+    retVal = helper->Insert(uri, valuesBucket);
     EXPECT_EQ((retVal < 0), true);
     helper->NotifyChange(uri);
     
@@ -1493,7 +1542,8 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperRegisterObserverController
     retVal = helper->Delete(uri, deletePredicates);
     EXPECT_EQ((retVal < 0), true);
     helper->NotifyChange(uri);
-    helper->UnregisterObserver(uri, dataObserver);
+    retVal = helper->UnregisterObserver(uri, dataObserver);
+    EXPECT_EQ(retVal, E_HELPER_DIED);
     LOG_INFO("ControllerTest_HelperRegisterObserverControllerNullTest_001 end");
 }
 

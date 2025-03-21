@@ -193,6 +193,11 @@ constexpr int E_INVALID_USER_ID = (E_BASE + 68);
 * @brief The error code for not system app.
 */
 constexpr int E_NOT_SYSTEM_APP = (E_BASE + 69);
+
+/**
+* @brief The error code for register observer inner error.
+*/
+constexpr int E_REGISTER_ERROR = (E_BASE + 70);
 } // namespace DataShare
 } // namespace OHOS
 
