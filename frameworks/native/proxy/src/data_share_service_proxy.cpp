@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include "data_ability_observer_interface.h"
+#include "datashare_errno.h"
 #include "datashare_itypes_utils.h"
 #include "datashare_log.h"
 #include "datashare_string_utils.h"
@@ -603,6 +604,9 @@ int DataShareServiceProxy::SetSilentSwitch(const Uri &uri, bool enable)
     if (err != NO_ERROR) {
         LOG_ERROR("SetSilentSwitch fail to sendRequest. uri: %{public}s, err: %{public}d",
             DataShareStringUtils::Anonymous(uriStr).c_str(), err);
+        if (err == E_NOT_SYSTEM_APP) {
+            return E_NOT_SYSTEM_APP;
+        }
         return DATA_SHARE_ERROR;
     }
     return reply.ReadInt32();
