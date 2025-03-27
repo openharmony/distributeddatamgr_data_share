@@ -13,5 +13,5 @@
 
 # any change to
 # frameworks/native/common/include/distributeddata_data_share_ipc_interface_code.h
-# needs to be reviewed by @leonchan5
-frameworks/native/common/include/distributeddata_data_share_ipc_interface_code.h @leonchan5
+# needs to be reviewed by @leonchan5 liubao6@huawei.com
+frameworks/native/common/include/distributeddata_data_share_ipc_interface_code.h @leonchan5 liubao6@huawei.com
