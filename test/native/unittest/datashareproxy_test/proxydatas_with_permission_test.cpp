@@ -54,7 +54,8 @@ void ProxyDatasTest::SetUpTestCase(void)
     HapInfoParams info = { .userID = 100,
         .bundleName = "ohos.datashareproxyclienttest.demo",
         .instIndex = 0,
-        .appIDDesc = "ohos.datashareproxyclienttest.demo" };
+        .appIDDesc = "ohos.datashareproxyclienttest.demo",
+        .isSystemApp = true };
     HapPolicyParams policy = { .apl = APL_SYSTEM_BASIC,
         .domain = "test.domain",
         .permList = { { .permissionName = "ohos.permission.GET_BUNDLE_INFO",
@@ -71,9 +72,9 @@ void ProxyDatasTest::SetUpTestCase(void)
             .grantStatus = { PermissionState::PERMISSION_GRANTED },
             .grantFlags = { 1 } } } };
     AccessTokenKit::AllocHapToken(info, policy);
-    auto testTokenId =
-        Security::AccessToken::AccessTokenKit::GetHapTokenID(info.userID, info.bundleName, info.instIndex);
-    SetSelfTokenID(testTokenId);
+    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenIDEx(
+        info.userID, info.bundleName, info.instIndex);
+    SetSelfTokenID(testTokenId.tokenIDEx);
 
     CreateOptions options;
     options.enabled_ = true;
