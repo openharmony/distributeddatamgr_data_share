@@ -35,11 +35,16 @@
 #include "shared_block.h"
 #include "datashare_block_writer_impl.h"
 #include "datashare_connection.h"
+#include "ikvstore_data_service_mock.h"
+#include "general_controller_service_impl.h"
+#include "persistent_data_controller.h"
+#include "published_data_controller.h"
 
 namespace OHOS {
 namespace DataShare {
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
+constexpr int INVALID_VALUE = -1;
 
 class AbnormalBranchTest : public testing::Test {
 public:
@@ -60,6 +65,22 @@ void AbnormalBranchTest::SetUp(void)
 }
 void AbnormalBranchTest::TearDown(void)
 {
+}
+
+// Used for mock DataShareKvServiceProxy in order to
+// cover the situation that DataShareManagerImpl::GetServiceProxy() == nullptr;
+void DataShareManagerImplHelper()
+{
+    auto helper = DataShareManagerImpl::GetInstance();
+    helper->dataShareService_ = nullptr;
+    auto manager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    auto remoteObject = manager->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+    sptr<MockDataShareKvServiceProxy> mockProxy = sptr<MockDataShareKvServiceProxy>
+        (new MockDataShareKvServiceProxy(remoteObject));
+    EXPECT_CALL(*mockProxy, GetFeatureInterface(testing::_))
+        .WillOnce(testing::Return(nullptr));
+    
+    helper->dataMgrService_ = (sptr<DataShareKvServiceProxy>)mockProxy;
 }
 
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_shareBlock_Null_Test_001, TestSize.Level0)
@@ -355,6 +376,76 @@ HWTEST_F(AbnormalBranchTest, RegisterClientDeathObserverTest001, TestSize.Level0
     LOG_INFO("RegisterClientDeathObserverTest001::End");
 }
 
+/**
+* @tc.name: RegisterClientDeathObserverTest002
+* @tc.desc: Check the main process of RegisterClientDeathObserver
+* @tc.type: FUNC
+* @tc.precon: None
+* @tc.expect: Successfully register client death observer
+* @tc.step:  1. Create a DataShareManagerImpl instance;
+             2. Try to use the instance to get datashare service proxy;
+             3. Check whether all member functions of the object are successfully constructed.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, RegisterClientDeathObserverTest002, TestSize.Level0)
+{
+    LOG_INFO("RegisterClientDeathObserverTest002::Start");
+    auto datashareManager = DataShareManagerImpl::GetInstance();
+    datashareManager->SetBundleName("com.testbundlename");
+    datashareManager->GetDataShareServiceProxy();
+    EXPECT_NE(datashareManager->dataMgrService_, nullptr);
+    EXPECT_NE(datashareManager->bundleName_, "");
+    EXPECT_NE(datashareManager->clientDeathObserverPtr_, nullptr);
+    LOG_INFO("RegisterClientDeathObserverTest002::End");
+}
+
+/**
+* @tc.name: OnRemoteDiedTest001
+* @tc.desc: Check the main process of OnRemoteDied and the reset process ResetServiceHandle
+* @tc.type: FUNC
+* @tc.precon: None
+* @tc.expect: Successfully process OnRemoteDied
+* @tc.step:  1. Create a DataShareManagerImpl instance;
+             2. Call the OnRemoteDied() function;
+             3. Check whether datashareManager is successfully deconstructed.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, OnRemoteDiedTest001, TestSize.Level0)
+{
+    LOG_INFO("OnRemoteDiedTest001::Start");
+    auto datashareManager = DataShareManagerImpl::GetInstance();
+    datashareManager->SetBundleName("com.testbundlename");
+    datashareManager->GetDataShareServiceProxy();
+    EXPECT_NE(datashareManager->dataMgrService_, nullptr);
+    EXPECT_NE(datashareManager->bundleName_, "");
+    EXPECT_NE(datashareManager->clientDeathObserverPtr_, nullptr);
+
+    datashareManager->OnRemoteDied();
+    EXPECT_EQ(datashareManager->dataMgrService_, nullptr);
+    EXPECT_EQ(datashareManager->dataShareService_, nullptr);
+    LOG_INFO("OnRemoteDiedTest001::End");
+}
+
+/**
+* @tc.name: SetRegisterCallbackTest001
+* @tc.desc: Check the main process of SetRegisterCallback
+* @tc.type: FUNC
+* @tc.precon: None
+* @tc.expect: Successfully process SetRegisterCallback
+* @tc.step:  1. Create a DataShareManagerImpl instance;
+             2. Call the SetRegisterCallback() function;
+             3. Check whether datashareManager is successfully deconstructed.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, SetRegisterCallbackTest001, TestSize.Level0)
+{
+    LOG_INFO("SetRegisterCallbackTest001::Start");
+    auto datashareManager = DataShareManagerImpl::GetInstance();
+    std::function<void()> callback = [](){};
+    datashareManager->SetRegisterCallback(nullptr, callback);
+    LOG_INFO("SetRegisterCallbackTest001::End");
+}
+
 HWTEST_F(AbnormalBranchTest, AmsMgrProxyOnProxyDiedTest001, TestSize.Level0)
 {
     LOG_INFO("AmsMgrProxyOnProxyDiedTest001::Start");\
@@ -373,6 +464,30 @@ HWTEST_F(AbnormalBranchTest, AmsMgrProxyOnProxyDiedTest001, TestSize.Level0)
     proxy->OnProxyDied();
     delete proxy;
     LOG_INFO("AmsMgrProxyOnProxyDiedTest001::End");
+}
+
+/**
+* @tc.name: AmsMgrProxyOnProxyDiedTest002
+* @tc.desc: Test sa_ with nullptr and destructor of AmsMgrProxy
+* @tc.type: FUNC
+* @tc.precon: None
+* @tc.expect: Successfully process SetRegisterCallback
+* @tc.step:  1. Create a AmsMgrProxy instance;
+             2. Clear the proxy;
+             3. After clear, try to connect SA;
+             4. Check if this proxy can be connected successfully.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, AmsMgrProxyOnProxyDiedTest002, TestSize.Level0)
+{
+    LOG_INFO("AmsMgrProxyOnProxyDiedTest002::Start");
+    AmsMgrProxy* proxy = AmsMgrProxy::GetInstance();
+    proxy->OnProxyDied();
+    proxy->ConnectSA();
+    EXPECT_NE(proxy->sa_, nullptr);
+    EXPECT_NE(proxy->proxy_, nullptr);
+    EXPECT_NE(proxy->deathRecipient_, nullptr);
+    LOG_INFO("AmsMgrProxyOnProxyDiedTest002::End");
 }
 
 HWTEST_F(AbnormalBranchTest, DataShareServiceProxySubscribeRdbDataTest001, TestSize.Level0)
@@ -417,6 +532,505 @@ HWTEST_F(AbnormalBranchTest, SubscribePublishedDataTest001, TestSize.Level0)
     auto resultset = proxy->SubscribePublishedData(uris, subscriberId, observer);
     EXPECT_EQ(resultset.size(), 0);
     LOG_INFO("SubscribePublishedDataTest001::End");
+}
+
+/**
+* @tc.name: GeneralControllerServiceImplInsertTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return an DATA_SHARE_ERROR.
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call Insert() in GeneralControllerServiceImpl;
+             3. Check if the function return DATA_SHARE_ERROR.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, GeneralControllerServiceImplInsertTest001, TestSize.Level1)
+{
+    LOG_INFO("GeneralControllerServiceImplInsertTest001::Start");
+    DataShareManagerImplHelper();
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    Uri uri(proxyUri);
+    auto generalCtl = std::make_shared<GeneralControllerServiceImpl>(proxyUri);
+    int ret = generalCtl->Insert(uri, valuesBucket);
+    EXPECT_EQ(ret, DATA_SHARE_ERROR);
+    LOG_INFO("GeneralControllerServiceImplInsertTest001::End");
+}
+
+/**
+* @tc.name: GeneralControllerServiceImplUpdateTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return an DATA_SHARE_ERROR.
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call Update() in GeneralControllerServiceImpl;
+             3. Check if the function return DATA_SHARE_ERROR.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, GeneralControllerServiceImplUpdateTest001, TestSize.Level1)
+{
+    LOG_INFO("GeneralControllerServiceImplUpdateTest001::Start");
+    DataShareManagerImplHelper();
+    DataShare::DataSharePredicates predicates;
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    Uri uri(proxyUri);
+    auto generalCtl = std::make_shared<GeneralControllerServiceImpl>(proxyUri);
+    int ret = generalCtl->Update(uri, predicates, valuesBucket);
+    EXPECT_EQ(ret, DATA_SHARE_ERROR);
+    LOG_INFO("GeneralControllerServiceImplUpdateTest001::End");
+}
+
+/**
+* @tc.name: GeneralControllerServiceImplDeleteTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return an DATA_SHARE_ERROR.
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call Update() in GeneralControllerServiceImpl;
+             3. Check if the function return DATA_SHARE_ERROR.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, GeneralControllerServiceImplDeleteTest001, TestSize.Level1)
+{
+    LOG_INFO("GeneralControllerServiceImplDeleteTest001::Start");
+    DataShareManagerImplHelper();
+    DataShare::DataSharePredicates predicates;
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    Uri uri(proxyUri);
+    auto generalCtl = std::make_shared<GeneralControllerServiceImpl>(proxyUri);
+    int ret = generalCtl->Delete(uri, predicates);
+    EXPECT_EQ(ret, DATA_SHARE_ERROR);
+    LOG_INFO("GeneralControllerServiceImplDeleteTest001::End");
+}
+
+/**
+* @tc.name: GeneralControllerServiceImplInsertExTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code
+              and return pair of DATA_SHARE_ERROR and 0.
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call InsertEx() in GeneralControllerServiceImpl;
+             3. Check if the function return pair of DATA_SHARE_ERROR and 0.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, GeneralControllerServiceImplInsertExTest001, TestSize.Level1)
+{
+    LOG_INFO("GeneralControllerServiceImplInsertExTest001::Start");
+    DataShareManagerImplHelper();
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    Uri uri(proxyUri);
+    auto generalCtl = std::make_shared<GeneralControllerServiceImpl>(proxyUri);
+    auto ret = generalCtl->InsertEx(uri, valuesBucket);
+    EXPECT_EQ(ret, std::make_pair(DATA_SHARE_ERROR, 0));
+    LOG_INFO("GeneralControllerServiceImplInsertExTest001::End");
+}
+
+/**
+* @tc.name: GeneralControllerServiceImplUpdateExTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code
+              and return pair of DATA_SHARE_ERROR and 0.
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call UpdateEx() in GeneralControllerServiceImpl;
+             3. Check if the function return pair of DATA_SHARE_ERROR and 0.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, GeneralControllerServiceImplUpdateExTest001, TestSize.Level1)
+{
+    LOG_INFO("GeneralControllerServiceImplUpdateExTest001::Start");
+    DataShareManagerImplHelper();
+    DataShare::DataSharePredicates predicates;
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    Uri uri(proxyUri);
+    auto generalCtl = std::make_shared<GeneralControllerServiceImpl>(proxyUri);
+    auto ret = generalCtl->UpdateEx(uri, predicates, valuesBucket);
+    EXPECT_EQ(ret, std::make_pair(DATA_SHARE_ERROR, 0));
+    LOG_INFO("GeneralControllerServiceImplUpdateExTest001::End");
+}
+
+/**
+* @tc.name: GeneralControllerServiceImplDeleteExTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code
+              and return pair of DATA_SHARE_ERROR and 0.
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call DeleteEx() in GeneralControllerServiceImpl;
+             3. Check if the function return pair of DATA_SHARE_ERROR and 0.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, GeneralControllerServiceImplDeleteExTest001, TestSize.Level1)
+{
+    LOG_INFO("GeneralControllerServiceImplDeleteExTest001::Start");
+    DataShareManagerImplHelper();
+    DataShare::DataSharePredicates predicates;
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    Uri uri(proxyUri);
+    auto generalCtl = std::make_shared<GeneralControllerServiceImpl>(proxyUri);
+    auto ret = generalCtl->DeleteEx(uri, predicates);
+    EXPECT_EQ(ret, std::make_pair(DATA_SHARE_ERROR, 0));
+    LOG_INFO("GeneralControllerServiceImplDeleteExTest001::End");
+}
+
+/**
+* @tc.name: GeneralControllerServiceImplQueryTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return a nullptr.
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call Query() in GeneralControllerServiceImpl;
+             3. Check if the function return nullptr.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, GeneralControllerServiceImplQueryTest001, TestSize.Level1)
+{
+    LOG_INFO("GeneralControllerServiceImplQueryTest001::Start");
+    DataShareManagerImplHelper();
+    DataShare::DataSharePredicates predicates;
+    std::vector<string> columns;
+    DatashareBusinessError error;
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    Uri uri(proxyUri);
+    auto generalCtl = std::make_shared<GeneralControllerServiceImpl>(proxyUri);
+    auto ret = generalCtl->Query(uri, predicates, columns, error);
+    EXPECT_EQ(ret, nullptr);
+    LOG_INFO("GeneralControllerServiceImplQueryTest001::End");
+}
+
+/**
+* @tc.name: GeneralControllerServiceImplNotifyChangeTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code.
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call NotifyChange() in GeneralControllerServiceImpl;
+             3. Check if the function return.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, GeneralControllerServiceImplNotifyChangeTest001, TestSize.Level1)
+{
+    LOG_INFO("GeneralControllerServiceImplNotifyChangeTest001::Start");
+    DataShareManagerImplHelper();
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    Uri uri(proxyUri);
+    auto generalCtl = std::make_shared<GeneralControllerServiceImpl>(proxyUri);
+    generalCtl->NotifyChange(uri);
+    LOG_INFO("GeneralControllerServiceImplNotifyChangeTest001::End");
+}
+
+/**
+* @tc.name: GeneralControllerServiceImplSetRegisterCallbackTest001
+* @tc.desc: Check the main process
+* @tc.type: FUNC
+* @tc.precon: None
+* @tc.expect: Enter the DataShareManagerImpl::GetInstance() branch in the code.
+* @tc.step:  1. Call SetRegisterCallback() in GeneralControllerServiceImpl;
+             2. Check if the function return.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, GeneralControllerServiceImplSetRegisterCallbackTest001, TestSize.Level1)
+{
+    LOG_INFO("GeneralControllerServiceImplSetRegisterCallbackTest001::Start");
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    auto generalCtl = std::make_shared<GeneralControllerServiceImpl>(proxyUri);
+    generalCtl->SetRegisterCallback();
+    LOG_INFO("GeneralControllerServiceImplSetRegisterCallbackTest001::End");
+}
+
+/**
+* @tc.name: PersistentDataControllerAddQueryTemplateTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return INVALID_VALUE
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call AddQueryTemplate() in PersistentDataController;
+             3. Check if the function return INVALID_VALUE.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, PersistentDataControllerAddQueryTemplateTest001, TestSize.Level1)
+{
+    LOG_INFO("PersistentDataControllerAddQueryTemplateTest001::Start");
+    DataShareManagerImplHelper();
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    std::vector<PredicateTemplateNode> nodes;
+    Template tpl(nodes, "select name1 as name from TBL00");
+    auto controller = PersistentDataController();
+    auto ret = controller.AddQueryTemplate(proxyUri, 0, tpl);
+    EXPECT_EQ(ret, INVALID_VALUE);
+    LOG_INFO("PersistentDataControllerAddQueryTemplateTest001::End");
+}
+
+/**
+* @tc.name: PersistentDataControllerDelQueryTemplateTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return INVALID_VALUE
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call DelQueryTemplate() in PersistentDataController;
+             3. Check if the function return INVALID_VALUE.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, PersistentDataControllerDelQueryTemplateTest001, TestSize.Level1)
+{
+    LOG_INFO("PersistentDataControllerDelQueryTemplateTest001::Start");
+    DataShareManagerImplHelper();
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    auto controller = PersistentDataController();
+    auto ret = controller.DelQueryTemplate(proxyUri, 0);
+    EXPECT_EQ(ret, INVALID_VALUE);
+    LOG_INFO("PersistentDataControllerDelQueryTemplateTest001::End");
+}
+
+/**
+* @tc.name: PersistentDataControllerSubscribeRdbDataTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return empty vector
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call SubscribeRdbData() in PersistentDataController;
+             3. Check if the function return empty vector.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, PersistentDataControllerSubscribeRdbDataTest001, TestSize.Level1)
+{
+    LOG_INFO("PersistentDataControllerSubscribeRdbDataTest001::Start");
+    DataShareManagerImplHelper();
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    std::vector<std::string> uris = {proxyUri};
+    TemplateId tplId;
+    auto callback = std::function<void(const RdbChangeNode &)>();
+    auto controller = PersistentDataController();
+    auto ret = controller.SubscribeRdbData(nullptr, uris, tplId, callback);
+    EXPECT_EQ(ret.size(), 0);
+    LOG_INFO("PersistentDataControllerSubscribeRdbDataTest001::End");
+}
+
+/**
+* @tc.name: PersistentDataControllerUnSubscribeRdbDataTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return empty vector
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call UnSubscribeRdbData() in PersistentDataController;
+             3. Check if the function return empty vector.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, PersistentDataControllerUnSubscribeRdbDataTest001, TestSize.Level1)
+{
+    LOG_INFO("PersistentDataControllerUnSubscribeRdbDataTest001::Start");
+    DataShareManagerImplHelper();
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    std::vector<std::string> uris = {proxyUri};
+    TemplateId tplId;
+    auto controller = PersistentDataController();
+    auto ret = controller.UnSubscribeRdbData(nullptr, uris, tplId);
+    EXPECT_EQ(ret.size(), 0);
+    LOG_INFO("PersistentDataControllerUnSubscribeRdbDataTest001::End");
+}
+
+/**
+* @tc.name: PersistentDataControllerEnableSubscribeRdbDataTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return empty vector
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call EnableSubscribeRdbData() in PersistentDataController;
+             3. Check if the function return empty vector.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, PersistentDataControllerEnableSubscribeRdbDataTest001, TestSize.Level1)
+{
+    LOG_INFO("PersistentDataControllerEnableSubscribeRdbDataTest001::Start");
+    DataShareManagerImplHelper();
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    std::vector<std::string> uris = {proxyUri};
+    TemplateId tplId;
+    auto controller = PersistentDataController();
+    auto ret = controller.EnableSubscribeRdbData(nullptr, uris, tplId);
+    EXPECT_EQ(ret.size(), 0);
+    LOG_INFO("PersistentDataControllerEnableSubscribeRdbDataTest001::End");
+}
+
+/**
+* @tc.name: PersistentDataControllerDisableSubscribeRdbDataTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return empty vector
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call DisableSubscribeRdbData() in PersistentDataController;
+             3. Check if the function return empty vector.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, PersistentDataControllerDisableSubscribeRdbDataTest001, TestSize.Level1)
+{
+    LOG_INFO("PersistentDataControllerDisableSubscribeRdbDataTest001::Start");
+    DataShareManagerImplHelper();
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    std::vector<std::string> uris = {proxyUri};
+    TemplateId tplId;
+    auto controller = PersistentDataController();
+    auto ret = controller.DisableSubscribeRdbData(nullptr, uris, tplId);
+    EXPECT_EQ(ret.size(), 0);
+    LOG_INFO("PersistentDataControllerDisableSubscribeRdbDataTest001::End");
+}
+
+/**
+* @tc.name: PublishedDataControllerPublishTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return empty vector
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call Publish() in PublishedDataController;
+             3. Check if the function return empty vector.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, PublishedDataControllerPublishTest001, TestSize.Level1)
+{
+    LOG_INFO("PublishedDataControllerPublishTest001::Start");
+    DataShareManagerImplHelper();
+    Data data;
+    std::string bundleName = "com.acts.ohos.data.datasharetest";
+    auto controller = PublishedDataController();
+    auto ret = controller.Publish(data, bundleName);
+    EXPECT_EQ(ret.size(), 0);
+    LOG_INFO("PublishedDataControllerPublishTest001::End");
+}
+
+/**
+* @tc.name: PublishedDataControllerGetPublishedDataTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code
+              and return empty datas_ vector in Data.
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call GetPublishedData() in PublishedDataController;
+             3. Check if the function return empty datas_ vector in Data.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, PublishedDataControllerGetPublishedDataTest001, TestSize.Level1)
+{
+    LOG_INFO("PublishedDataControllerGetPublishedDataTest001::Start");
+    DataShareManagerImplHelper();
+    std::string bundleName = "com.acts.ohos.data.datasharetest";
+    int errCode = 0;
+    auto controller = PublishedDataController();
+    auto ret = controller.GetPublishedData(bundleName, errCode);
+    EXPECT_EQ(ret.datas_.size(), 0);
+    LOG_INFO("PublishedDataControllerGetPublishedDataTest001::End");
+}
+
+/**
+* @tc.name: PublishedDataControllerSubscribePublishedDataTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return empty vector
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call SubscribePublishedData() in PublishedDataController;
+             3. Check if the function return empty vector.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, PublishedDataControllerSubscribePublishedDataTest001, TestSize.Level1)
+{
+    LOG_INFO("PublishedDataControllerSubscribePublishedDataTest001::Start");
+    DataShareManagerImplHelper();
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    std::vector<std::string> uris = {proxyUri};
+    auto callback = std::function<void(const PublishedDataChangeNode &changeNode)>();
+    auto controller = PublishedDataController();
+    auto ret = controller.SubscribePublishedData(nullptr, uris, 0, callback);
+    EXPECT_EQ(ret.size(), 0);
+    LOG_INFO("PublishedDataControllerSubscribePublishedDataTest001::End");
+}
+
+/**
+* @tc.name: PublishedDataControllerSubscribeUnSubscribePublishedDataTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return empty vector
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call UnSubscribePublishedData() in PublishedDataController;
+             3. Check if the function return empty vector.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, PublishedDataControllerSubscribeUnSubscribePublishedDataTest001, TestSize.Level1)
+{
+    LOG_INFO("PublishedDataControllerSubscribeUnSubscribePublishedDataTest001::Start");
+    DataShareManagerImplHelper();
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    std::vector<std::string> uris = {proxyUri};
+    auto controller = PublishedDataController();
+    auto ret = controller.UnSubscribePublishedData(nullptr, uris, 0);
+    EXPECT_EQ(ret.size(), 0);
+    LOG_INFO("PublishedDataControllerSubscribeUnSubscribePublishedDataTest001::End");
+}
+
+/**
+* @tc.name: PublishedDataControllerSubscribeEnableSubscribePublishedDataTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return empty vector
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call EnableSubscribePublishedData() in PublishedDataController;
+             3. Check if the function return empty vector.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, PublishedDataControllerSubscribeEnableSubscribePublishedDataTest001, TestSize.Level1)
+{
+    LOG_INFO("PublishedDataControllerSubscribeEnableSubscribePublishedDataTest001::Start");
+    DataShareManagerImplHelper();
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    std::vector<std::string> uris = {proxyUri};
+    auto controller = PublishedDataController();
+    auto ret = controller.EnableSubscribePublishedData(nullptr, uris, 0);
+    EXPECT_EQ(ret.size(), 0);
+    LOG_INFO("PublishedDataControllerSubscribeEnableSubscribePublishedDataTest001::End");
+}
+
+/**
+* @tc.name: PublishedDataControllerSubscribeDisableSubscribePublishedDataTest001
+* @tc.desc: Fill the branch DataShareManagerImpl::GetServiceProxy() == nullptr
+* @tc.type: FUNC
+* @tc.precon: Mock the DataShareManagerImpl::GetServiceProxy() return nullptr
+* @tc.expect: Enter the DataShareManagerImpl::GetServiceProxy() branch in the code and return empty vector
+* @tc.step:  1. Mock GetServiceProxy() to return nullptr;
+             2. Call DisableSubscribePublishedData() in PublishedDataController;
+             3. Check if the function return empty vector.
+* @tc.require: issueIBX9HL
+*/
+HWTEST_F(AbnormalBranchTest, PublishedDataControllerSubscribeDisableSubscribePublishedDataTest001, TestSize.Level1)
+{
+    LOG_INFO("PublishedDataControllerSubscribeDisableSubscribePublishedDataTest001::Start");
+    DataShareManagerImplHelper();
+    std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
+    std::vector<std::string> uris = {proxyUri};
+    auto controller = PublishedDataController();
+    auto ret = controller.DisableSubscribePublishedData(nullptr, uris, 0);
+    EXPECT_EQ(ret.size(), 0);
+    LOG_INFO("PublishedDataControllerSubscribeDisableSubscribePublishedDataTest001::End");
 }
 } // namespace DataShare
 } // namespace OHOS
