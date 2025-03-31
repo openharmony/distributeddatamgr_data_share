@@ -121,7 +121,7 @@ HWTEST_F(PermissionTest, PermissionTest_Bundle_Name_Error_Test_001, TestSize.Lev
     LOG_INFO("PermissionTest_Bundle_Name_Error_Test_001::End");
 }
 
-HWTEST_F(PermissionTest, PermissionTest_Uri_Diff_ProxyData_Test_001, TestSize.Level0)
+HWTEST_F(PermissionTest, PermissionTest_Uri_Diff_ProxyData_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_Uri_Diff_ProxyData_Test_001::Start");
     auto tokenId = AccessTokenKit::GetHapTokenIDEx(USER_100, "ohos.datashareclienttest.demo", 0);
@@ -131,7 +131,7 @@ HWTEST_F(PermissionTest, PermissionTest_Uri_Diff_ProxyData_Test_001, TestSize.Le
     LOG_INFO("PermissionTest_Uri_Diff_ProxyData_Test_001::End");
 }
 
-HWTEST_F(PermissionTest, PermissionTest_ProxyUri_OK_Test_001, TestSize.Level0)
+HWTEST_F(PermissionTest, PermissionTest_ProxyUri_OK_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_ProxyUri_OK_Test_001::Start");
     auto tokenId = AccessTokenKit::GetHapTokenIDEx(USER_100, "ohos.datashareclienttest.demo", 0);
@@ -141,7 +141,7 @@ HWTEST_F(PermissionTest, PermissionTest_ProxyUri_OK_Test_001, TestSize.Level0)
     LOG_INFO("PermissionTest_ProxyUri_OK_Test_001::End");
 }
 
-HWTEST_F(PermissionTest, PermissionTest_ProxyUri_OK_Write_Permission_Error_Test_001, TestSize.Level0)
+HWTEST_F(PermissionTest, PermissionTest_ProxyUri_OK_Write_Permission_Error_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_ProxyUri_OK_Write_Permission_Error_Test_001::Start");
     auto tokenId = AccessTokenKit::GetHapTokenIDEx(USER_100, "ohos.datashareclienttest.demo", 0);
@@ -162,7 +162,7 @@ HWTEST_F(PermissionTest, PermissionTest_Error_Bundle_Name_Test_001, TestSize.Lev
     LOG_INFO("PermissionTest_Error_Bundle_Name_Test_001::End");
 }
 
-HWTEST_F(PermissionTest, PermissionTest_No_Read_Permission_Test_001, TestSize.Level0)
+HWTEST_F(PermissionTest, PermissionTest_No_Read_Permission_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_No_Read_Permission_Test_001::Start");
     auto tokenId = AccessTokenKit::GetHapTokenIDEx(USER_100, "ohos.datashareclienttest.demo", 0);
@@ -173,7 +173,7 @@ HWTEST_F(PermissionTest, PermissionTest_No_Read_Permission_Test_001, TestSize.Le
     LOG_INFO("PermissionTest_No_Read_Permission_Test_001::End");
 }
 
-HWTEST_F(PermissionTest, PermissionTest_Have_Write_Permission_Test_001, TestSize.Level0)
+HWTEST_F(PermissionTest, PermissionTest_Have_Write_Permission_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_HAVA_WRITE_PERMISSION_Test_001::Start");
     auto tokenId = AccessTokenKit::GetHapTokenIDEx(USER_100, "ohos.datashareclienttest.demo", 0);
@@ -184,7 +184,7 @@ HWTEST_F(PermissionTest, PermissionTest_Have_Write_Permission_Test_001, TestSize
     LOG_INFO("PermissionTest_HAVA_WRITE_PERMISSION_Test_001::End");
 }
 
-HWTEST_F(PermissionTest, PermissionTest_Empty_Read_Permission_Test_001, TestSize.Level0)
+HWTEST_F(PermissionTest, PermissionTest_Empty_Read_Permission_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_Empty_Read_Permission_Test_001::Start");
     auto tokenId = AccessTokenKit::GetHapTokenIDEx(USER_100, "ohos.datashareclienttest.demo", 0);
@@ -195,7 +195,7 @@ HWTEST_F(PermissionTest, PermissionTest_Empty_Read_Permission_Test_001, TestSize
     LOG_INFO("PermissionTest_Empty_Read_Permission_Test_001::End");
 }
 
-HWTEST_F(PermissionTest, PermissionTest_Empty_Write_Permission_Test_001, TestSize.Level0)
+HWTEST_F(PermissionTest, PermissionTest_Empty_Write_Permission_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_Empty_Write_Permission_Test_001::Start");
     auto tokenId = AccessTokenKit::GetHapTokenIDEx(USER_100, "ohos.datashareclienttest.demo", 0);
@@ -206,7 +206,7 @@ HWTEST_F(PermissionTest, PermissionTest_Empty_Write_Permission_Test_001, TestSiz
     LOG_INFO("PermissionTest_Empty_Write_Permission_Test_001::End");
 }
 
-HWTEST_F(PermissionTest, PermissionTest_Have_Query_Param_001, TestSize.Level0)
+HWTEST_F(PermissionTest, PermissionTest_Have_Query_Param_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_Have_Query_Param_001::Start");
     auto tokenId = AccessTokenKit::GetHapTokenIDEx(USER_100, "ohos.datashareclienttest.demo", 0);
@@ -216,7 +216,7 @@ HWTEST_F(PermissionTest, PermissionTest_Have_Query_Param_001, TestSize.Level0)
     LOG_INFO("PermissionTest_Have_Query_Param_001::End");
 }
 
-HWTEST_F(PermissionTest, PermissionTest_Have_Write_Test_001, TestSize.Level0)
+HWTEST_F(PermissionTest, PermissionTest_Have_Write_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_Have_Write_Test_001::Start");
     HapInfoParams info = {
@@ -259,7 +259,7 @@ HWTEST_F(PermissionTest, PermissionTest_Have_Write_Test_001, TestSize.Level0)
     LOG_INFO("PermissionTest_Have_Write_Test_001::End");
 }
 
-HWTEST_F(PermissionTest, PermissionTest_Hava_Read_Permission_Test_001, TestSize.Level0)
+HWTEST_F(PermissionTest, PermissionTest_Hava_Read_Permission_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_Hava_Read_Permission_Test_001::Start");
     HapInfoParams info = {
