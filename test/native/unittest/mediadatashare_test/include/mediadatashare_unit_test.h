@@ -48,7 +48,7 @@ public:
 
 class IDataAbilityObserverTest : public AAFwk::DataAbilityObserverStub {
 public:
-    IDataAbilityObserverTest();
+    IDataAbilityObserverTest() {}
     ~IDataAbilityObserverTest()
     {}
 
