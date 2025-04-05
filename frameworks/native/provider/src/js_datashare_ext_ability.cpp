@@ -808,7 +808,8 @@ bool JsDataShareExtAbility::RegisterObserver(const Uri &uri, const sptr<AAFwk::I
         return false;
     }
 
-    ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
+    int32_t callingUserId = DataShareStubImpl::GetCallingUserId();
+    ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver, callingUserId);
     if (ret != ERR_OK) {
         LOG_ERROR("obsMgrClient->RegisterObserver error return %{public}d", ret);
         return false;
@@ -825,7 +826,8 @@ bool JsDataShareExtAbility::UnregisterObserver(const Uri &uri, const sptr<AAFwk:
         return false;
     }
 
-    ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver);
+    int32_t callingUserId = DataShareStubImpl::GetCallingUserId();
+    ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver, callingUserId);
     if (ret != ERR_OK) {
         LOG_ERROR("obsMgrClient->UnregisterObserver error return %{public}d", ret);
         return false;
@@ -843,6 +845,21 @@ bool JsDataShareExtAbility::NotifyChange(const Uri &uri)
     }
 
     ErrCode ret = obsMgrClient->NotifyChange(uri);
+    if (ret != ERR_OK) {
+        LOG_ERROR("obsMgrClient->NotifyChange error return %{public}d", ret);
+        return false;
+    }
+    return true;
+}
+
+bool JsDataShareExtAbility::NotifyChangeWithUser(const Uri &uri, int32_t userId)
+{
+    auto obsMgrClient = DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("obsMgrClient is nullptr");
+        return false;
+    }
+    ErrCode ret = obsMgrClient->NotifyChange(uri, userId);
     if (ret != ERR_OK) {
         LOG_ERROR("obsMgrClient->NotifyChange error return %{public}d", ret);
         return false;
