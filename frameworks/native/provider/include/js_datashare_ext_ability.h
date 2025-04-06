@@ -271,6 +271,15 @@ public:
     bool NotifyChange(const Uri &uri) override;
 
     /**
+     * @brief Notifies the registered observers of a change to the data resource specified by Uri.
+     *
+     * @param uri, Indicates the path of the data to operate.
+     *
+     * @return Return true if success. otherwise return false.
+     */
+    bool NotifyChangeWithUser(const Uri &uri, int32_t userId);
+
+    /**
      * @brief Converts the given uri that refer to the Data ability into a normalized URI. A normalized URI can be used
      * across devices, persisted, backed up, and restored. It can refer to the same item in the Data ability even if
      * the context has changed. If you implement URI normalization for a Data ability, you must also implement

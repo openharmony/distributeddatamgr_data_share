@@ -74,6 +74,8 @@ public:
 
     std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) override;
 
+    static int32_t GetCallingUserId();
+
 private:
     std::shared_ptr<JsDataShareExtAbility> GetOwner();
     bool CheckCallingPermission(const std::string &permission);
