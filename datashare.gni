@@ -20,6 +20,7 @@ datashare_common_napi_path = "${datashare_base_path}/frameworks/js/napi/common"
 datashare_napi_path = "${datashare_base_path}/frameworks/js/napi"
 
 datashare_cj_ffi_path = "${datashare_base_path}/frameworks/cj/ffi"
+datashare_ani_path = "${datashare_base_path}/frameworks/js/ani"
 
 datashare_innerapi_path = "${datashare_base_path}/interfaces/inner_api"
 
