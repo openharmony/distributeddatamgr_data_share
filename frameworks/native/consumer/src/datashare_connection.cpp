@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <cinttypes>
 #include "datashare_connection.h"
 
 #include "ams_mgr_proxy.h"
@@ -25,6 +26,7 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
+const std::chrono::milliseconds TIME_THRESHOLD = std::chrono::milliseconds(500);
 /**
  * @brief This method is called back to receive the connection result after an ability calls the
  * ConnectAbility method to connect it to an extension ability.
@@ -182,8 +184,16 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
         return nullptr;
     }
     std::unique_lock<std::mutex> condLock(condition_.mutex);
+    auto start = std::chrono::steady_clock::now();
     if (condition_.condition.wait_for(condLock, std::chrono::seconds(waitTime_),
         [this] { return dataShareProxy_ != nullptr; })) {
+        auto finish = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
+        if (duration >= TIME_THRESHOLD) {
+            int64_t milliseconds = duration.count();
+            LOG_WARN("over time connecting ability, uri:%{public}s, time:%{public}" PRIi64 "ms",
+                DataShareStringUtils::Change(reqUri).c_str(), milliseconds);
+        }
         LOG_DEBUG("connect ability ended successfully uri:%{public}s", DataShareStringUtils::Change(reqUri).c_str());
     } else {
         LOG_WARN("connect timeout uri:%{public}s", DataShareStringUtils::Change(reqUri).c_str());
