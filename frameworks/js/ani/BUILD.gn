@@ -17,6 +17,7 @@ import("//foundation/distributeddatamgr/data_share/datashare.gni")
 group("datashare_ani_packages") {
   deps = [
     "${datashare_ani_path}/dataShare:data_share",
+    "${datashare_ani_path}/dataShare:data_share_predicates",
     "${datashare_ani_path}/dataShareResultSet:datashareresultset",
   ]
 }
