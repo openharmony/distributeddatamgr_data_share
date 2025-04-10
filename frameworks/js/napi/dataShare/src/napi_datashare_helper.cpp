@@ -147,37 +147,54 @@ void NapiDataShareHelper::ExecuteCreator(std::shared_ptr<CreateContextInfo> ctxI
     if (ctxInfo->options.enabled_) {
         ctxInfo->options.token_ = ctxInfo->contextS->GetToken();
         ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->strUri, ctxInfo->options, "",
-            ctxInfo->options.waitTime_);
+            ctxInfo->options.waitTime_, true);
     } else {
         ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextS->GetToken(), ctxInfo->strUri, "",
-            ctxInfo->options.waitTime_);
+            ctxInfo->options.waitTime_, true);
     }
+}
+
+napi_status NapiDataShareHelper::ValidateCreateParam(napi_env env, size_t argc, napi_value *argv,
+    std::shared_ptr<CreateContextInfo> ctxInfo)
+{
+    NAPI_ASSERT_CALL_ERRCODE(env, IsSystemApp(),
+        ctxInfo->error = std::make_shared<BusinessError>(EXCEPTION_SYSTEMAPP_CHECK, "not system app"),
+        napi_generic_failure);
+    // 2 correspond to uri, 3 correspond to options and 4 correspond to dataShareHelper.
+    NAPI_ASSERT_CALL_ERRCODE(env, argc == 2 || argc == 3 || argc == 4,
+        ctxInfo->error = std::make_shared<ParametersNumError>("2 or 3 or 4"), napi_invalid_arg);
+    ctxInfo->contextS = OHOS::AbilityRuntime::GetStageModeContext(env, argv[0]);
+    NAPI_ASSERT_CALL_ERRCODE(env, ctxInfo->contextS != nullptr,
+        ctxInfo->error = std::make_shared<ParametersTypeError>("contextS", "not nullptr"), napi_invalid_arg);
+    NAPI_ASSERT_CALL_ERRCODE(env, GetUri(env, argv[1], ctxInfo->strUri),
+        ctxInfo->error = std::make_shared<ParametersTypeError>("uri", "string"), napi_invalid_arg);
+    Uri uri(ctxInfo->strUri);
+    // If there is more then 2 napi args, then the third arg options and uri format needs to be checked.
+    if (argc != 2) {
+        // The napi input argument at index 2 is optional config.
+        NAPI_ASSERT_CALL_ERRCODE(env, GetOptions(env, argv[2], ctxInfo->options, uri),
+            ctxInfo->error = std::make_shared<ParametersTypeError>("option", "CreateOption"), napi_invalid_arg);
+    } else {
+        NAPI_ASSERT_CALL_ERRCODE(env, uri.GetScheme() != "datashareproxy",
+            ctxInfo->error = std::make_shared<ParametersNumError>("3 or 4"), napi_invalid_arg);
+    }
+    return napi_ok;
 }
 
 napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_callback_info info)
 {
     auto ctxInfo = std::make_shared<CreateContextInfo>();
     auto input = [ctxInfo](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
-        NAPI_ASSERT_CALL_ERRCODE(env, IsSystemApp(),
-            ctxInfo->error = std::make_shared<BusinessError>(EXCEPTION_SYSTEMAPP_CHECK, "not system app"),
-            napi_generic_failure);
-        NAPI_ASSERT_CALL_ERRCODE(env, argc == 2 || argc == 3 || argc == 4,
-            ctxInfo->error = std::make_shared<ParametersNumError>("2 or 3 or 4"), napi_invalid_arg);
-        ctxInfo->contextS = OHOS::AbilityRuntime::GetStageModeContext(env, argv[0]);
-        NAPI_ASSERT_CALL_ERRCODE(env, ctxInfo->contextS != nullptr,
-            ctxInfo->error = std::make_shared<ParametersTypeError>("contextS", "not nullptr"), napi_invalid_arg);
-        NAPI_ASSERT_CALL_ERRCODE(env, GetUri(env, argv[1], ctxInfo->strUri),
-            ctxInfo->error = std::make_shared<ParametersTypeError>("uri", "string"), napi_invalid_arg);
-        Uri uri(ctxInfo->strUri);
-        if (argc != 2) {
-            NAPI_ASSERT_CALL_ERRCODE(env, GetOptions(env, argv[2], ctxInfo->options, uri),
-                ctxInfo->error = std::make_shared<ParametersTypeError>("option", "CreateOption"), napi_invalid_arg);
-        } else {
-            NAPI_ASSERT_CALL_ERRCODE(env, uri.GetScheme() != "datashareproxy",
-                ctxInfo->error = std::make_shared<ParametersNumError>("3 or 4"), napi_invalid_arg);
+        napi_status status = ValidateCreateParam(env, argc, argv, ctxInfo);
+        if (status != napi_ok) {
+            return status;
         }
         napi_value helperProxy = nullptr;
-        napi_status status = napi_new_instance(env, GetConstructor(env), argc, argv, &helperProxy);
+        status = napi_new_instance(env, GetConstructor(env), argc, argv, &helperProxy);
+        if (status != napi_ok) {
+            LOG_ERROR("napi new instance failed. napi_status: %{public}d uri: %{public}s",
+                status, ctxInfo->strUri.c_str());
+        }
         NAPI_ASSERT_CALL_ERRCODE(env, helperProxy != nullptr && status == napi_ok,
             ctxInfo->error = std::make_shared<DataShareHelperInitError>(), napi_generic_failure);
         napi_create_reference(env, helperProxy, 1, &(ctxInfo->ref));
@@ -211,7 +228,10 @@ napi_value NapiDataShareHelper::GetConstructor(napi_env env)
 {
     napi_value cons = nullptr;
     if (constructor_ != nullptr) {
-        napi_get_reference_value(env, constructor_, &cons);
+        napi_status status = napi_get_reference_value(env, constructor_, &cons);
+        if (status != napi_ok) {
+            LOG_ERROR("napi get reference value failed. napi_status: %{public}d", status);
+        }
         return cons;
     }
     napi_property_descriptor clzDes[] = {
@@ -234,7 +254,10 @@ napi_value NapiDataShareHelper::GetConstructor(napi_env env)
     };
     NAPI_CALL(env, napi_define_class(env, "DataShareHelper", NAPI_AUTO_LENGTH, Initialize, nullptr,
         sizeof(clzDes) / sizeof(napi_property_descriptor), clzDes, &cons));
-    napi_create_reference(env, cons, 1, &constructor_);
+    napi_status status = napi_create_reference(env, cons, 1, &constructor_);
+    if (status != napi_ok) {
+        LOG_ERROR("napi create reference failed. napi_status: %{public}d", status);
+    }
     return cons;
 }
 
@@ -1309,11 +1332,20 @@ napi_value NapiDataShareHelper::SetSilentSwitch(napi_env env, napi_callback_info
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
+        if (context->error == nullptr) {
+            return napi_ok;
+        }
+        NAPI_ASSERT_CALL_ERRCODE(env, context->error->GetCode() != EXCEPTION_SYSTEMAPP_CHECK,
+            context->error = std::make_shared<BusinessError>(EXCEPTION_SYSTEMAPP_CHECK, "not system app"),
+            napi_generic_failure);
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
         OHOS::Uri uri(context->strUri);
-        DataShareHelper::SetSilentSwitch(uri, context->silentSwitch);
+        int res = DataShareHelper::SetSilentSwitch(uri, context->silentSwitch, true);
+        if (res == E_NOT_SYSTEM_APP) {
+            context->error = std::make_shared<BusinessError>(EXCEPTION_SYSTEMAPP_CHECK, "not system app");
+        }
     };
     context->SetAction(std::move(input), std::move(output));
     AsyncCall asyncCall(env, info, context);

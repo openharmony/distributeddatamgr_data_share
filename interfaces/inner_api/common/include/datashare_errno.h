@@ -188,6 +188,16 @@ constexpr int E_PROVIDER_CONN_NULL = (E_BASE + 67);
 * @brief The error code for passing invalid form of user id.
 */
 constexpr int E_INVALID_USER_ID = (E_BASE + 68);
+
+/**
+* @brief The error code for not system app.
+*/
+constexpr int E_NOT_SYSTEM_APP = (E_BASE + 69);
+
+/**
+* @brief The error code for register observer inner error.
+*/
+constexpr int E_REGISTER_ERROR = (E_BASE + 70);
 } // namespace DataShare
 } // namespace OHOS
 

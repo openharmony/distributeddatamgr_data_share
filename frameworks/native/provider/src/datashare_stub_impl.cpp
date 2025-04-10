@@ -17,6 +17,7 @@
 #include <memory>
 
 #include "accesstoken_kit.h"
+#include "bundle_constants.h"
 #include "datashare_log.h"
 #include "datashare_string_utils.h"
 #include "ipc_skeleton.h"
@@ -480,6 +481,19 @@ int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareVa
     return ret;
 }
 
+int32_t DataShareStubImpl::GetCallingUserId()
+{
+    uint32_t tokenId = IPCSkeleton::GetCallingTokenID();
+    auto type = Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(tokenId);
+    if (type == Security::AccessToken::TOKEN_NATIVE || type == Security::AccessToken::TOKEN_SHELL) {
+        return 0;
+    } else {
+        uint32_t callingUid = IPCSkeleton::GetCallingUid();
+        int32_t userId = callingUid / Constants::BASE_USER_RANGE;
+        return userId;
+    }
+}
+
 bool DataShareStubImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     auto extension = GetOwner();
@@ -517,8 +531,9 @@ bool DataShareStubImpl::NotifyChange(const Uri &uri)
         return *ret;
     }
 
-    std::function<void()> syncTaskFunc = [extension, ret, uri]() {
-        *ret = extension->NotifyChange(uri);
+    int32_t callingUserId = GetCallingUserId();
+    std::function<void()> syncTaskFunc = [extension, ret, uri, callingUserId]() {
+        *ret = extension->NotifyChangeWithUser(uri, callingUserId);
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc);

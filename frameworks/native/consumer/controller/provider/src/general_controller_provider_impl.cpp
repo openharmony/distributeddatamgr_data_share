@@ -143,7 +143,8 @@ int GeneralControllerProviderImpl::RegisterObserver(const Uri &uri,
         LOG_ERROR("proxy is nullptr");
         return E_PROVIDER_NOT_CONNECTED;
     }
-    int ret = proxy->RegisterObserver(uri, dataObserver);
+    // the non-silent proxy's RegisterObserver returns bool while this function returns int and 0 means ok
+    int ret = proxy->RegisterObserver(uri, dataObserver) ? E_OK : E_REGISTER_ERROR;
     LOG_INFO("Register non-silent observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
     return ret;
@@ -162,7 +163,8 @@ int GeneralControllerProviderImpl::UnregisterObserver(const Uri &uri,
         LOG_ERROR("proxy is nullptr");
         return E_PROVIDER_NOT_CONNECTED;
     }
-    int ret = proxy->UnregisterObserver(uri, dataObserver);
+    // the non-silent proxy's UnregisterObserver returns bool while this function returns int and 0 means ok
+    int ret = proxy->UnregisterObserver(uri, dataObserver) ? E_OK : E_REGISTER_ERROR;
     LOG_INFO("Unregister non-silent observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
     return ret;

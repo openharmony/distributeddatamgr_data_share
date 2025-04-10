@@ -524,7 +524,8 @@ bool DataShareProxy::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbi
         LOG_ERROR("SendRequest error, result=%{public}d", result);
         return false;
     }
-    return true;
+    // the stub write bool value as int value to reply, 0 is false
+    return reply.ReadInt32() == 0 ? false : true;
 }
 
 bool DataShareProxy::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
@@ -547,7 +548,8 @@ bool DataShareProxy::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataA
         LOG_ERROR("SendRequest error, result=%{public}d", result);
         return false;
     }
-    return true;
+    // the stub write bool value as int value to reply, 0 is false
+    return reply.ReadInt32() == 0 ? false : true;
 }
 
 bool DataShareProxy::NotifyChange(const Uri &uri)
