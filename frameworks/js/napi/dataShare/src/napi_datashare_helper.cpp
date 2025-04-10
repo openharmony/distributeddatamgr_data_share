@@ -160,7 +160,7 @@ napi_status NapiDataShareHelper::ValidateCreateParam(napi_env env, size_t argc, 
     NAPI_ASSERT_CALL_ERRCODE(env, IsSystemApp(),
         ctxInfo->error = std::make_shared<BusinessError>(EXCEPTION_SYSTEMAPP_CHECK, "not system app"),
         napi_generic_failure);
-    // 2 correspond to uri, 3 correspond to options and 4 correspond to dataShareHelper.
+    // Check the number of arguments given to match CreateDataShareHelper founction with 2 or 3 or 4 args.
     NAPI_ASSERT_CALL_ERRCODE(env, argc == 2 || argc == 3 || argc == 4,
         ctxInfo->error = std::make_shared<ParametersNumError>("2 or 3 or 4"), napi_invalid_arg);
     ctxInfo->contextS = OHOS::AbilityRuntime::GetStageModeContext(env, argv[0]);
