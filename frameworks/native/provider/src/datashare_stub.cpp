@@ -219,9 +219,12 @@ ErrCode DataShareStub::CmdBatchUpdate(OHOS::MessageParcel &data, OHOS::MessagePa
     }
     std::vector<BatchUpdateResult> results;
     int ret = BatchUpdate(updateOperations, results);
-    if (ret != E_OK) {
+    if (ret == DEFAULT_NUMBER) {
         LOG_ERROR("BatchUpdate inner error, ret is %{public}d.", ret);
-        return ret;
+        return ERR_INVALID_VALUE;
+    } else if (ret == PERMISSION_ERROR_NUMBER) {
+        LOG_ERROR("BatchUpdate permission error");
+        return ERR_PERMISSION_DENIED;
     }
     if (!ITypesUtil::Marshal(reply, results)) {
         LOG_ERROR("marshalling updateOperations is failed");
