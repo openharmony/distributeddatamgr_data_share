@@ -385,14 +385,17 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri, const 
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
+        businessError.SetCode(E_WRITE_TO_PARCE_ERROR);
         return nullptr;
     }
     if (!ITypesUtil::Marshal(data, uri, columns)) {
         LOG_ERROR("Marshalling uri and columns to data failed");
+        businessError.SetCode(E_MARSHAL_ERROR);
         return nullptr;
     }
     if (!ITypesUtil::MarshalPredicates(predicates, data)) {
         LOG_ERROR("Marshalling predicates to shared-memory failed");
+        businessError.SetCode(E_MARSHAL_ERROR);
         return nullptr;
     }
     MessageParcel reply;
@@ -400,12 +403,13 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri, const 
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_QUERY), data, reply, option);
     auto result = ISharedResultSet::ReadFromParcel(reply);
-    businessError.SetCode(reply.ReadInt32());
-    businessError.SetMessage(reply.ReadString());
     if (err != E_OK) {
         LOG_ERROR("Query fail to SendRequest. err: %{public}d", err);
+        businessError.SetCode(err);
         return nullptr;
     }
+    businessError.SetCode(reply.ReadInt32());
+    businessError.SetMessage(reply.ReadString());
     return result;
 }
 

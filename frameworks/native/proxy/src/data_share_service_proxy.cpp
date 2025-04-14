@@ -201,11 +201,13 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri,
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed!");
+        businessError.SetCode(E_WRITE_TO_PARCE_ERROR);
         return nullptr;
     }
 
     if (!ITypesUtil::Marshal(data, uriStr, extUri.ToString(), predicates, columns)) {
         LOG_ERROR("Write to message parcel failed!");
+        businessError.SetCode(E_MARSHAL_ERROR);
         return nullptr;
     }
 
@@ -215,12 +217,13 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri,
         CastIPCCode(InterfaceCode::DATA_SHARE_SERVICE_CMD_QUERY), data, reply, option);
     
     auto result = ISharedResultSet::ReadFromParcel(reply);
-    businessError.SetCode(reply.ReadInt32());
     if (err != NO_ERROR) {
         LOG_ERROR("Query fail to sendRequest. uri: %{public}s, err: %{public}d",
             DataShareStringUtils::Anonymous(uriStr).c_str(), err);
+        businessError.SetCode(err);
         return nullptr;
     }
+    businessError.SetCode(reply.ReadInt32());
     return result;
 }
 
