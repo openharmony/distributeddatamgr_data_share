@@ -90,7 +90,7 @@ export namespace dataShare {
 
     export function createDataShareHelper(context: Context, uri: string, options?: DataShareHelperOptions): Promise<DataShareHelper> {
         console.println("createDataShareHelper enter")
-        return new Promise<DataShareHelper>((resolve: (v: DataShareHelper) => void, reject: (error: Object) => void) => {
+        return new Promise<DataShareHelper>((resolve: (v: DataShareHelper) => void, reject: (error: Error) => void) => {
             let p = taskpool.execute(native_create, context, uri, options)
             p.then((e: NullishType) => {
                 let r = e as DataShareHelper
@@ -158,7 +158,7 @@ export namespace dataShare {
         }
 
         query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>): Promise<DataShareResultSet> {
-            return new Promise<DataShareResultSet>((resolve: (v: DataShareResultSet) => void, reject: (error: Object) => void) => {
+            return new Promise<DataShareResultSet>((resolve: (v: DataShareResultSet) => void, reject: (error: Error) => void) => {
                 let p = taskpool.execute(native_query, this, uri, predicates, columns)
                 p.then((e: NullishType) => {
                     let r = e as DataShareResultSet
@@ -180,7 +180,7 @@ export namespace dataShare {
         }
 
         update(uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket): Promise<number> {
-            return new Promise<number>((resolve: (v: number) => void, reject: (error: Object) => void) => {
+            return new Promise<number>((resolve: (v: number) => void, reject: (error: Error) => void) => {
                 let p = taskpool.execute(native_update, this, uri, predicates, value)
                 p.then((e: NullishType) => {
                     let r = e as number
