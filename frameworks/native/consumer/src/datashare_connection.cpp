@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-const std::chrono::milliseconds TIME_THRESHOLD = std::chrono::milliseconds(500);
+const std::chrono::milliseconds TIME_THRESHOLD = std::chrono::milliseconds(200);
 /**
  * @brief This method is called back to receive the connection result after an ability calls the
  * ConnectAbility method to connect it to an extension ability.
