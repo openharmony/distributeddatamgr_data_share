@@ -22,7 +22,6 @@
 
 #include "ability_connect_callback_stub.h"
 #include "datashare_proxy.h"
-#include "event_handler.h"
 #include "executor_pool.h"
 #include "want.h"
 
