@@ -652,7 +652,7 @@ void NapiDataShareHelper::Notify(const std::shared_ptr<NapiDataShareHelper::Cont
         context->error = std::make_shared<ParametersTypeError>("uri", "not empty");
         return;
     }
-    helper->NotifyChangeExt(context->changeInfo);
+    helper->NotifyChangeExt(context->changeInfo, true);
     context->status = napi_ok;
     return;
 }
@@ -1071,7 +1071,8 @@ void NapiDataShareHelper::RegisteredObserver(napi_env env, const std::string &ur
         helper->RegisterObserver(Uri(uri), observer);
     } else {
         helper->RegisterObserverExt(Uri(uri),
-            std::shared_ptr<DataShareObserver>(observer.GetRefPtr(), [holder = observer](const auto*) {}), false);
+            std::shared_ptr<DataShareObserver>(observer.GetRefPtr(), [holder = observer](const auto*) {}),
+            false, true);
     }
     list.push_back(observer);
 }
@@ -1096,7 +1097,7 @@ void NapiDataShareHelper::UnRegisteredObserver(napi_env env, const std::string &
             helper->UnregisterObserver(Uri(uri), *it);
         } else {
             helper->UnregisterObserverExt(Uri(uri),
-                std::shared_ptr<DataShareObserver>((*it).GetRefPtr(), [holder = *it](const auto*) {}));
+                std::shared_ptr<DataShareObserver>((*it).GetRefPtr(), [holder = *it](const auto*) {}), true);
         }
         (*it)->observer_->DeleteReference();
         it = list.erase(it);
@@ -1123,7 +1124,7 @@ void NapiDataShareHelper::UnRegisteredObserver(napi_env env, const std::string &
             helper->UnregisterObserver(Uri(uri), *it);
         } else {
             helper->UnregisterObserverExt(Uri(uri),
-                std::shared_ptr<DataShareObserver>((*it).GetRefPtr(), [holder = *it](const auto*) {}));
+                std::shared_ptr<DataShareObserver>((*it).GetRefPtr(), [holder = *it](const auto*) {}), true);
         }
         (*it)->observer_->DeleteReference();
         it = list.erase(it);
