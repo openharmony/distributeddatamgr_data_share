@@ -522,6 +522,62 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_002, TestSize.Le
 }
 
 /**
+* @tc.name: ProxyDatasTest_CombinationRdbData_Test_003
+* @tc.desc: combination test for persistent data updated between two constant disable
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_003, TestSize.Level1)
+{
+    LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_003::Start");
+    auto helper = dataShareHelper;
+    std::vector<PredicateTemplateNode> nodes;
+    Template tpl(nodes, "select name1 as name from TBL00");
+    auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
+    EXPECT_EQ(result, E_OK);
+
+    std::vector<std::string> uris = {DATA_SHARE_PROXY_URI};
+    TemplateId tplId;
+    tplId.subscriberId_ = SUBSCRIBER_ID;
+    tplId.bundleName_ = "ohos.datashareproxyclienttest.demo";
+    std::atomic_int callbackTimes = 0;
+    std::mutex mutex;
+    std::condition_variable cv;
+    auto timeout = std::chrono::seconds(2);
+    std::vector<OperationResult> results =
+        helper->SubscribeRdbData(uris, tplId, [&callbackTimes, &mutex, &cv](const RdbChangeNode &changeNode) {
+            std::lock_guard<std::mutex> lock(mutex);
+            callbackTimes++;
+            cv.notify_all();
+        });
+    EXPECT_EQ(results.size(), uris.size());
+    for (auto const &result : results) {
+        EXPECT_EQ(result.errCode_, E_OK);
+    }
+
+    std::unique_lock<std::mutex> lock(mutex);
+    cv.wait_for(lock, timeout);
+    EXPECT_EQ(callbackTimes, 1);
+    lock.unlock();
+    results = helper->DisableRdbSubs(uris, tplId);
+    EXPECT_EQ(results.size(), uris.size());
+    for (auto const &result : results) {
+        EXPECT_EQ(result.errCode_, 0);
+    }
+    results = helper->EnableRdbSubs(uris, tplId);
+    for (auto const &result : results) {
+        EXPECT_EQ(result.errCode_, 0);
+    }
+    EXPECT_EQ(callbackTimes, 1);
+    results = helper->UnsubscribeRdbData(uris, tplId);
+    EXPECT_EQ(results.size(), uris.size());
+    for (auto const &result : results) {
+        EXPECT_EQ(result.errCode_, E_OK);
+    }
+    LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_003::End");
+}
+
+/**
 * @tc.name: ProxyDatasTest_CombinationPublishedData_Test_001
 * @tc.desc: combination test for published data updated between two constant disable
 * @tc.type: FUNC
