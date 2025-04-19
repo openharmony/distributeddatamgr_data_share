@@ -311,6 +311,31 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_005, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_Template_Test_005::End");
 }
 
+/**
+* @tc.name: ProxyDatasTest_Template_Test_006
+* @tc.desc: test use uri with userId to add template
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_006, TestSize.Level1)
+{
+    LOG_INFO("ProxyDatasTest_Template_Test_006::Start");
+    auto helper = dataShareHelper;
+    PredicateTemplateNode node1("p1", "select name0 as name from TBL00");
+    PredicateTemplateNode node2("p2", "select name1 as name from TBL00");
+    std::vector<PredicateTemplateNode> nodes;
+    nodes.emplace_back(node1);
+    nodes.emplace_back(node2);
+    Template tpl(nodes, "select name1 as name from TBL00");
+
+    std::string uri = DATA_SHARE_PROXY_URI + "?user=100";
+    auto result = helper->AddQueryTemplate(uri, SUBSCRIBER_ID, tpl);
+    EXPECT_EQ(result, E_OK);
+    result = helper->DelQueryTemplate(uri, SUBSCRIBER_ID);
+    EXPECT_EQ(result, E_OK);
+    LOG_INFO("ProxyDatasTest_Template_Test_006::End");
+}
+
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Publish_Test_001::Start");
