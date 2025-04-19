@@ -275,7 +275,10 @@ int DataShareHelperImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDat
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
         return E_HELPER_DIED;
     }
-    return generalCtl->RegisterObserver(uri, dataObserver);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    int ret = generalCtl->RegisterObserver(uri, dataObserver);
+    DataShareServiceProxy::CleanSystem();
+    return ret;
 }
 
 int DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
@@ -293,7 +296,10 @@ int DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::ID
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
         return E_HELPER_DIED;
     }
-    return generalCtl->UnregisterObserver(uri, dataObserver);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    int ret = generalCtl->UnregisterObserver(uri, dataObserver);
+    DataShareServiceProxy::CleanSystem();
+    return ret;
 }
 
 void DataShareHelperImpl::NotifyChange(const Uri &uri)

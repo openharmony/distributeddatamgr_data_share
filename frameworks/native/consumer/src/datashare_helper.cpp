@@ -219,7 +219,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
  * @param isDescendants, Indicates the Whether to note the change of descendants.
  */
 void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
-    bool isDescendants)
+    bool isDescendants, bool isSystem)
 {
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
@@ -235,7 +235,7 @@ void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataSh
         LOG_ERROR("new ObserverImpl failed");
         return;
     }
-    ErrCode ret = obsMgrClient->RegisterObserverExt(uri, obs, isDescendants);
+    ErrCode ret = obsMgrClient->RegisterObserverExt(uri, obs, isDescendants, AAFwk::DataObsOption(isSystem));
     if (ret != ERR_OK) {
         ObserverImpl::DeleteObserver(uri, dataObserver);
     }
@@ -249,7 +249,8 @@ void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataSh
  * @param uri, Indicates the path of the data to operate.
  * @param dataObserver, Indicates the DataShareObserver object.
  */
-void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver)
+void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+    bool isSystem)
 {
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
@@ -271,7 +272,7 @@ void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<Data
         LOG_ERROR("new ObserverImpl failed");
         return;
     }
-    ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, obs);
+    ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, obs, AAFwk::DataObsOption(isSystem));
     LOG_INFO("Unregister observerExt, ret:%{public}d, uri:%{public}s",
         ret, DataShareStringUtils::Anonymous(uri.ToString()).c_str());
     if (ret != ERR_OK) {
@@ -285,7 +286,7 @@ void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<Data
  *
  * @param changeInfo Indicates the info of the data to operate.
  */
-void DataShareHelper::NotifyChangeExt(const DataShareObserver::ChangeInfo &changeInfo)
+void DataShareHelper::NotifyChangeExt(const DataShareObserver::ChangeInfo &changeInfo, bool isSystem)
 {
     auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
@@ -293,7 +294,8 @@ void DataShareHelper::NotifyChangeExt(const DataShareObserver::ChangeInfo &chang
         return;
     }
 
-    ErrCode ret = obsMgrClient->NotifyChangeExt(ObserverImpl::ConvertInfo(changeInfo));
+    ErrCode ret = obsMgrClient->NotifyChangeExt(ObserverImpl::ConvertInfo(changeInfo),
+        AAFwk::DataObsOption(isSystem));
     LOG_INFO("Notify changeExt, ret:%{public}d", ret);
 }
 
