@@ -24,12 +24,59 @@
 #include "ani_base_context.h"
 #include "ani_datashare_helper.h"
 #include "datashare_business_error.h"
+#include "ipc_skeleton.h"
+#include "tokenid_kit.h"
 
 using namespace OHOS;
 using namespace OHOS::DataShare;
+using namespace OHOS::Security::AccessToken;
 using Uri = OHOS::Uri;
 
+static constexpr int EXCEPTION_SYSTEMAPP_CHECK = 202;
 static std::map<std::string, std::list<sptr<ANIDataShareObserver>>> observerMap_;
+
+static bool IsSystemApp()
+{
+    uint64_t tokenId = IPCSkeleton::GetSelfTokenID();
+    return TokenIdKit::IsSystemAppByFullTokenID(tokenId);
+}
+
+static void ThrowBusinessError(ani_env *env, int errCode, std::string&& errMsg)
+{
+    LOG_DEBUG("Begin ThrowBusinessError.");
+    static const char *errorClsName = "L@ohos/base/BusinessError;";
+    ani_class cls {};
+    if (ANI_OK != env->FindClass(errorClsName, &cls)) {
+        LOG_ERROR("find class BusinessError %{public}s failed", errorClsName);
+        return;
+    }
+    ani_method ctor;
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
+        LOG_ERROR("find method BusinessError.constructor failed");
+        return;
+    }
+    ani_object errorObject;
+    if (ANI_OK != env->Object_New(cls, ctor, &errorObject)) {
+        LOG_ERROR("create BusinessError object failed");
+        return;
+    }
+    ani_double aniErrCode = static_cast<ani_double>(errCode);
+    ani_string errMsgStr;
+    if (ANI_OK != env->String_NewUTF8(errMsg.c_str(), errMsg.size(), &errMsgStr)) {
+        LOG_ERROR("convert errMsg to ani_string failed");
+        return;
+    }
+    if (ANI_OK != env->Object_SetFieldByName_Double(errorObject, "code", aniErrCode)) {
+        LOG_ERROR("set error code failed");
+        return;
+    }
+    if (ANI_OK != env->Object_SetPropertyByName_Ref(errorObject, "message", errMsgStr)) {
+        LOG_ERROR("set error message failed");
+        return;
+    }
+    env->ThrowError(static_cast<ani_error>(errorObject));
+    return;
+}
 
 static bool getNameSpace(ani_env *env, ani_namespace &ns)
 {
@@ -114,12 +161,67 @@ static bool getDataShareHelper(ani_env *env, ani_object object, DataShareHelper 
     return true;
 }
 
+static ani_status GetIsProxy(ani_env *env, ani_object options, bool &isProxy)
+{
+    ani_ref proxyObj;
+    ani_status result = env->Object_GetPropertyByName_Ref(options, "isProxy", &proxyObj);
+    if (ANI_OK != result) {
+        LOG_ERROR("options Failed to get property named type: %{public}d", result);
+        return result;
+    }
+
+    ani_boolean isUndefined;
+    result = env->Reference_IsUndefined(static_cast<ani_object>(proxyObj), &isUndefined);
+    if (ANI_OK != result) {
+        LOG_ERROR("options Object_GetFieldByName_Ref isProxyField Failed");
+        return result;
+    }
+
+    if (isUndefined) {
+        LOG_ERROR("options isProxyField is Undefined Now");
+        isProxy = false;
+        return ANI_OK;
+    }
+
+    ani_boolean proxy;
+    result = env->Object_CallMethodByName_Boolean(static_cast<ani_object>(proxyObj), "unboxed", nullptr, &proxy);
+    if (ANI_OK != result) {
+        LOG_ERROR("options Failed to get property named isProxy: %{public}d", result);
+        return result;
+    }
+
+    isProxy = proxy;
+    return ANI_OK;
+}
+
+static std::shared_ptr<DataShareHelper> CreateDataShareHelper(ani_env *env, ani_object options, std::string &strUri,
+    std::shared_ptr<AbilityRuntime::Context> &ctx)
+{
+    bool isProxy = false;
+    if (GetIsProxy(env, options, isProxy) != ANI_OK) {
+        LOG_ERROR("Get isProxy Failed");
+        return nullptr;
+    }
+    CreateOptions opts = {
+        isProxy,
+        ctx->GetToken(),
+        Uri(strUri).GetScheme() == "datashareproxy",
+    };
+
+    return DataShareHelper::Creator(strUri, opts);
+}
+
 static ani_object ANI_Create([[maybe_unused]] ani_env *env, ani_object context, ani_string uri, ani_object options)
 {
     if (env == nullptr) {
         LOG_ERROR("env is nullptr %{public}s", __func__);
         return nullptr;
     }
+
+    if (!IsSystemApp()) {
+        ThrowBusinessError(env, EXCEPTION_SYSTEMAPP_CHECK, "not system app");
+    }
+
     std::string strUri;
     ani_class cls;
     if (!getUri(env, uri, strUri) || !getClass(env, cls)) {
@@ -141,13 +243,7 @@ static ani_object ANI_Create([[maybe_unused]] ani_env *env, ani_object context, 
     if (isUndefined) {
         dataShareHelper = DataShareHelper::Creator(ctx->GetToken(), strUri);
     } else {
-        CreateOptions opts = {
-            OptionalAccessor(env, options).Convert<bool>().value_or(false),
-            ctx->GetToken(),
-            Uri(strUri).GetScheme() == "datashareproxy",
-        };
-
-        dataShareHelper = DataShareHelper::Creator(strUri, opts);
+        dataShareHelper = CreateDataShareHelper(env, options, strUri, ctx);
     }
 
     if (dataShareHelper == nullptr) {
@@ -578,6 +674,10 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         LOG_ERROR("Cannot bind native methods to class");
         return ANI_ERROR;
     }
+
+    static const char *cleanerName = "LCleaner;";
+    auto cleanerCls = AniTypeFinder(env).FindClass(ns, cleanerName);
+    NativePtrCleaner(env).Bind(cleanerCls.value());
 
     *result = ANI_VERSION_1;
     return ANI_OK;

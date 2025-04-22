@@ -20,6 +20,8 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include "ani_util_class.h"
+#include "ani_util_native_ptr.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -81,29 +83,6 @@ private:
     ani_object obj_;
 };
 
-template<typename T>
-class SharedPtrHolder {
-public:
-    SharedPtrHolder(std::shared_ptr<T> &sptr) : sptr_(sptr)
-    {
-    }
-
-    std::shared_ptr<T> Get()
-    {
-        return sptr_;
-    }
-
-    std::shared_ptr<T> GetOrDefault()
-    {
-        if (!sptr_) {
-            sptr_ = std::make_shared<T>();
-        }
-        return sptr_;
-    }
-
-private:
-    std::shared_ptr<T> sptr_;
-};
 template<typename T>
 struct Converter {
     static std::string convert(const T& value)
