@@ -64,6 +64,7 @@ void JsResult::SetAsyncResult(napi_env env, DatashareBusinessError &businessErro
         napi_unwrap(env, result, reinterpret_cast<void **>(&proxy));
         if (proxy == nullptr) {
             if (UnwrapBatchUpdateResult(env, result, updateResults_)) {
+                callbackResultNumber_ = E_OK;
                 isRecvReply_ = true;
                 return;
             }

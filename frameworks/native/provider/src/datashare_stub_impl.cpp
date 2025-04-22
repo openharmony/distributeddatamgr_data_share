@@ -210,24 +210,25 @@ int DataShareStubImpl::BatchUpdate(const UpdateOperations &operations, std::vect
         return PERMISSION_ERROR_NUMBER;
     }
     auto result = std::make_shared<JsResult>();
-    std::shared_ptr<int> ret = std::make_shared<int>(0);
-    std::function<void()> syncTaskFunc = [extension, ret, operations, info, result]() {
+    int ret = 0;
+    std::function<void()> syncTaskFunc = [extension, operations, info, result]() {
         extension->SetCallingInfo(info);
         extension->InitResult(result);
         std::vector<BatchUpdateResult> tmp;
-        *ret = extension->BatchUpdate(operations, tmp);
+        extension->BatchUpdate(operations, tmp);
     };
-    std::function<bool()> getRetFunc = [&results, result]() -> bool {
+    std::function<bool()> getRetFunc = [&results, result, &ret]() -> bool {
         if (result == nullptr) {
             return false;
         }
         bool isRecvReply = result->GetRecvReply();
         result->GetResult(results);
+        result->GetResult(ret);
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
     uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
-    return *ret;
+    return ret;
 }
 
 int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predicates)

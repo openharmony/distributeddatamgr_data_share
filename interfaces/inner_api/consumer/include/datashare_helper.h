@@ -64,7 +64,7 @@ public:
     [[deprecated(
         "Use Create(const sptr<IRemoteObject> &, const std::string &, const std::string &, const int &) instead.")]]
     static std::shared_ptr<DataShareHelper> Creator(const sptr<IRemoteObject> &token,
-        const std::string &strUri, const std::string &extUri = "", const int waitTime = 2);
+        const std::string &strUri, const std::string &extUri = "", const int waitTime = 2, bool isSystem = false);
 
     /**
      * @brief Creates a DataShareHelper instance with the Uri and {@link #CreateOptions} .
@@ -78,7 +78,7 @@ public:
     [[deprecated(
         "Use Create(const sptr<IRemoteObject> &, const std::string &,const std::string &, const int &) instead.")]]
     static std::shared_ptr<DataShareHelper> Creator(const std::string &strUri, const CreateOptions &options,
-        const std::string &bundleName = "", const int waitTime = 2);
+        const std::string &bundleName = "", const int waitTime = 2, bool isSystem = false);
 
     /**
      * @brief Creates a DataShareHelper instance, priority silent access, use non-silent access when silent is not
@@ -426,9 +426,10 @@ public:
      * @brief Set default switch for silent access.
      * @param uri, the uri to disable/enable.
      * @param enable, the enable of silent switch.
+     * @param isSystem, is system app or not.
      * @return Returns the error code.
      */
-    static int SetSilentSwitch(Uri &uri, bool enable);
+    static int SetSilentSwitch(Uri &uri, bool enable, bool isSystem = false);
 
     /**
      * @brief Inserts a single data record into the database.
@@ -477,12 +478,12 @@ public:
 
 private:
     static std::shared_ptr<DataShareHelper> CreateServiceHelper(const std::string &extUri = "",
-        const std::string &bundleName = "");
+        const std::string &bundleName = "", bool isSystem = false);
 
-    static int GetSilentProxyStatus(const std::string &uri);
+    static int GetSilentProxyStatus(const std::string &uri, bool isSystem);
 
     static std::shared_ptr<DataShareHelper> CreateExtHelper(Uri &uri, const sptr<IRemoteObject> &token,
-        const int waitTime = 2);
+        const int waitTime = 2, bool isSystem = false);
 
     static std::string TransferUriPrefix(const std::string &originPrefix, const std::string &replacedPrefix,
         const std::string &originUriStr);

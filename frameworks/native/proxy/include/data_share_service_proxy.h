@@ -88,8 +88,18 @@ public:
     std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const Uri &extUri,
         const DataSharePredicates &predicate) override;
 
+    static void SetSystem(bool isSystem);
+
+    static bool IsSystem();
+
+    static bool& GetSystem();
+
+    static void CleanSystem();
+
 private:
     static inline BrokerDelegator<DataShareServiceProxy> delegator_;
+
+    uint32_t CastIPCCode(DistributedShare::DataShare::DataShareServiceInterfaceCode code);
 };
 } // namespace OHOS::DataShare
 #endif

@@ -147,10 +147,10 @@ void NapiDataShareHelper::ExecuteCreator(std::shared_ptr<CreateContextInfo> ctxI
     if (ctxInfo->options.enabled_) {
         ctxInfo->options.token_ = ctxInfo->contextS->GetToken();
         ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->strUri, ctxInfo->options, "",
-            ctxInfo->options.waitTime_);
+            ctxInfo->options.waitTime_, true);
     } else {
         ctxInfo->dataShareHelper = DataShareHelper::Creator(ctxInfo->contextS->GetToken(), ctxInfo->strUri, "",
-            ctxInfo->options.waitTime_);
+            ctxInfo->options.waitTime_, true);
     }
 }
 
@@ -1332,11 +1332,20 @@ napi_value NapiDataShareHelper::SetSilentSwitch(napi_env env, napi_callback_info
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
+        if (context->error == nullptr) {
+            return napi_ok;
+        }
+        NAPI_ASSERT_CALL_ERRCODE(env, context->error->GetCode() != EXCEPTION_SYSTEMAPP_CHECK,
+            context->error = std::make_shared<BusinessError>(EXCEPTION_SYSTEMAPP_CHECK, "not system app"),
+            napi_generic_failure);
         return napi_ok;
     };
     auto exec = [context](AsyncCall::Context *ctx) {
         OHOS::Uri uri(context->strUri);
-        DataShareHelper::SetSilentSwitch(uri, context->silentSwitch);
+        int res = DataShareHelper::SetSilentSwitch(uri, context->silentSwitch, true);
+        if (res == E_NOT_SYSTEM_APP) {
+            context->error = std::make_shared<BusinessError>(EXCEPTION_SYSTEMAPP_CHECK, "not system app");
+        }
     };
     context->SetAction(std::move(input), std::move(output));
     AsyncCall asyncCall(env, info, context);

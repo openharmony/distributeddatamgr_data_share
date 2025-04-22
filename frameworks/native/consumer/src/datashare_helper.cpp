@@ -74,8 +74,8 @@ std::string DataShareHelper::TransferUriPrefix(const std::string &originPrefix, 
  *
  * @return Returns the created DataShareHelper instance.
  */
-std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
-    const sptr<IRemoteObject> &token, const std::string &strUri, const std::string &extUri, const int waitTime)
+std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObject> &token, const std::string &strUri,
+    const std::string &extUri, const int waitTime, bool isSystem)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     if (token == nullptr) {
@@ -87,23 +87,23 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(
     Uri uri(replacedUriStr);
     std::shared_ptr<DataShareHelper> helper = nullptr;
     if (uri.GetQuery().find("Proxy=true") != std::string::npos) {
-        auto result = CreateServiceHelper(extUri, "");
-        if (result != nullptr && GetSilentProxyStatus(strUri) == E_OK) {
+        auto result = CreateServiceHelper(extUri, "", isSystem);
+        if (result != nullptr && GetSilentProxyStatus(strUri, isSystem) == E_OK) {
             return result;
         }
         if (extUri.empty()) {
             return nullptr;
         }
         Uri ext(extUri);
-        helper = CreateExtHelper(ext, token, waitTime);
+        helper = CreateExtHelper(ext, token, waitTime, isSystem);
     } else {
-        helper = CreateExtHelper(uri, token, waitTime);
+        helper = CreateExtHelper(uri, token, waitTime, isSystem);
     }
     return helper;
 }
 
 std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, const CreateOptions &options,
-    const std::string &bundleName, const int waitTime)
+    const std::string &bundleName, const int waitTime, bool isSystem)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
     Uri uri(strUri);
@@ -111,7 +111,8 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, 
         LOG_ERROR("token is nullptr");
         return nullptr;
     }
-    return options.isProxy_ ? CreateServiceHelper("", bundleName) : CreateExtHelper(uri, options.token_, waitTime);
+    return options.isProxy_ ? CreateServiceHelper("", bundleName, isSystem)
+        : CreateExtHelper(uri, options.token_, waitTime, isSystem);
 }
 
 std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::Create(const sptr<IRemoteObject> &token,
@@ -142,7 +143,8 @@ std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::Create(const s
         }
         uri = Uri(extUri);
     }
-    auto helper = CreateExtHelper(uri, token, waitTime);
+    // this create func is inner api, do not check system permission
+    auto helper = CreateExtHelper(uri, token, waitTime, false);
     if (helper != nullptr) {
         return std::make_pair(E_OK, helper);
     }
@@ -150,7 +152,7 @@ std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::Create(const s
 }
 
 std::shared_ptr<DataShareHelper> DataShareHelper::CreateServiceHelper(const std::string &extUri,
-    const std::string &bundleName)
+    const std::string &bundleName, bool isSystem)
 {
     auto manager = DataShareManagerImpl::GetInstance();
     if (manager == nullptr) {
@@ -162,21 +164,24 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateServiceHelper(const std:
         LOG_ERROR("Service proxy is nullptr.");
         return nullptr;
     }
-    return std::make_shared<DataShareHelperImpl>(extUri);
+    return std::make_shared<DataShareHelperImpl>(extUri, isSystem);
 }
 
-int DataShareHelper::GetSilentProxyStatus(const std::string &uri)
+int DataShareHelper::GetSilentProxyStatus(const std::string &uri, bool isSystem)
 {
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("Service proxy is nullptr.");
         return E_ERROR;
     }
-    return proxy->GetSilentProxyStatus(uri);
+    DataShareServiceProxy::SetSystem(isSystem);
+    auto res = proxy->GetSilentProxyStatus(uri);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, const sptr<IRemoteObject> &token,
-    const int waitTime)
+    const int waitTime, bool isSystem)
 {
     if (uri.GetQuery().find("appIndex=") != std::string::npos) {
         LOG_ERROR("ExtHelper do not support appIndex. Uri:%{public}s",
@@ -203,7 +208,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
         LOG_ERROR("connect failed");
         return nullptr;
     }
-    return std::make_shared<DataShareHelperImpl>(uri, token, dataShareConnection);
+    return std::make_shared<DataShareHelperImpl>(uri, token, dataShareConnection, isSystem);
 }
 
 /**
@@ -364,14 +369,17 @@ bool ObserverImpl::DeleteObserver(const Uri& uri, const std::shared_ptr<DataShar
     });
 }
 
-int DataShareHelper::SetSilentSwitch(Uri &uri, bool enable)
+int DataShareHelper::SetSilentSwitch(Uri &uri, bool enable, bool isSystem)
 {
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
         return DATA_SHARE_ERROR;
     }
-    return proxy->SetSilentSwitch(uri, enable);
+    DataShareServiceProxy::SetSystem(isSystem);
+    auto res = proxy->SetSilentSwitch(uri, enable);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 bool DataShareHelper::IsProxy(Uri &uri)
@@ -382,7 +390,7 @@ bool DataShareHelper::IsProxy(Uri &uri)
 std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::CreateProxyHelper(const std::string &strUri,
     const std::string &extUri)
 {
-    int ret = GetSilentProxyStatus(strUri);
+    int ret = GetSilentProxyStatus(strUri, false);
     auto helper = ret == E_OK ? CreateServiceHelper(extUri) : nullptr;
     return std::make_pair(ret, helper);
 }
