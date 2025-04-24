@@ -368,6 +368,16 @@ ohos_unittest("ControllerTest") {
 }
 
 ohos_unittest("AbnormalBranchTest") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "../../cfi_blocklist.txt"
+  }
+
   module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [
@@ -380,6 +390,7 @@ ohos_unittest("AbnormalBranchTest") {
     "//foundation/distributeddatamgr/data_share/frameworks/native/proxy/include/",
     "//foundation/distributeddatamgr/data_share/frameworks/native/common/include/",
     "${datashare_native_proxy_path}/include",
+    "${datashare_base_path}/test/native/unittest/mock",
   ]
 
   sources = [ "./unittest/mediadatashare_test/src/abnormal_branch_test.cpp" ]
@@ -401,6 +412,7 @@ ohos_unittest("AbnormalBranchTest") {
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "googletest:gmock_main",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
