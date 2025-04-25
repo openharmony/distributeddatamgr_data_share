@@ -273,7 +273,7 @@ public:
      * @param dataObserver, Indicates the IDataAbilityObserver object.
      * @param isDescendants, Indicates the Whether to note the change of descendants.
      */
-    void RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver, bool isDescendants, 
+    void RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver, bool isDescendants,
         bool isSystem = false);
 
     /**
