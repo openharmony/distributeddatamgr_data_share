@@ -64,7 +64,7 @@ public:
     [[deprecated(
         "Use Create(const sptr<IRemoteObject> &, const std::string &, const std::string &, const int &) instead.")]]
     static std::shared_ptr<DataShareHelper> Creator(const sptr<IRemoteObject> &token,
-        const std::string &strUri, const std::string &extUri = "", const int waitTime = 2);
+        const std::string &strUri, const std::string &extUri = "", const int waitTime = 2, bool isSystem = false);
 
     /**
      * @brief Creates a DataShareHelper instance with the Uri and {@link #CreateOptions} .
@@ -78,7 +78,7 @@ public:
     [[deprecated(
         "Use Create(const sptr<IRemoteObject> &, const std::string &,const std::string &, const int &) instead.")]]
     static std::shared_ptr<DataShareHelper> Creator(const std::string &strUri, const CreateOptions &options,
-        const std::string &bundleName = "", const int waitTime = 2);
+        const std::string &bundleName = "", const int waitTime = 2, bool isSystem = false);
 
     /**
      * @brief Creates a DataShareHelper instance, priority silent access, use non-silent access when silent is not
@@ -273,7 +273,8 @@ public:
      * @param dataObserver, Indicates the IDataAbilityObserver object.
      * @param isDescendants, Indicates the Whether to note the change of descendants.
      */
-    void RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver, bool isDescendants);
+    void RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver, bool isDescendants,
+        bool isSystem = false);
 
     /**
      * Deregisters an observer used for DataObsMgr specified by the given Uri.
@@ -281,14 +282,14 @@ public:
      * @param uri, Indicates the path of the data to operate.
      * @param dataObserver, Indicates the IDataAbilityObserver object
      */
-    void UnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver);
+    void UnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver, bool isSystem = false);
 
     /**
      * Notifies the registered observers of a change to the data resource specified by Uris.
      *
      * @param changeInfo Indicates the info of the data to operate.
      */
-    void NotifyChangeExt(const DataShareObserver::ChangeInfo &changeInfo);
+    void NotifyChangeExt(const DataShareObserver::ChangeInfo &changeInfo, bool isSystem = false);
 
     /**
      * @brief Converts the given uri that refer to the Data share into a normalized URI. A normalized URI can be used
@@ -426,9 +427,10 @@ public:
      * @brief Set default switch for silent access.
      * @param uri, the uri to disable/enable.
      * @param enable, the enable of silent switch.
+     * @param isSystem, is system app or not.
      * @return Returns the error code.
      */
-    static int SetSilentSwitch(Uri &uri, bool enable);
+    static int SetSilentSwitch(Uri &uri, bool enable, bool isSystem = false);
 
     /**
      * @brief Inserts a single data record into the database.
@@ -477,12 +479,12 @@ public:
 
 private:
     static std::shared_ptr<DataShareHelper> CreateServiceHelper(const std::string &extUri = "",
-        const std::string &bundleName = "");
+        const std::string &bundleName = "", bool isSystem = false);
 
-    static int GetSilentProxyStatus(const std::string &uri);
+    static int GetSilentProxyStatus(const std::string &uri, bool isSystem);
 
     static std::shared_ptr<DataShareHelper> CreateExtHelper(Uri &uri, const sptr<IRemoteObject> &token,
-        const int waitTime = 2);
+        const int waitTime = 2, bool isSystem = false);
 
     static std::string TransferUriPrefix(const std::string &originPrefix, const std::string &replacedPrefix,
         const std::string &originUriStr);

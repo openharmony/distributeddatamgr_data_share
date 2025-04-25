@@ -99,7 +99,7 @@ void ProxyDatasTest::TearDown(void)
 {
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_Insert_Test_001, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Insert_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Insert_Test_001::Start");
     auto helper = dataShareHelper;
@@ -115,7 +115,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Insert_Test_001, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_Insert_Test_001::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_QUERY_Test_001, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_QUERY_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_QUERY_Test_001::Start");
     auto helper = dataShareHelper;
@@ -131,7 +131,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QUERY_Test_001, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_QUERY_Test_001::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_001, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_ResultSet_Test_001::Start");
     auto helper = dataShareHelper;
@@ -163,7 +163,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_001, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_ResultSet_Test_001::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_001, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Template_Test_001::Start");
     auto helper = dataShareHelper;
@@ -181,7 +181,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_001, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_Template_Test_001::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_002, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_002, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Template_Test_002::Start");
     auto helper = dataShareHelper;
@@ -206,7 +206,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_002, TestSize.Level0)
 * @tc.type: FUNC
 * @tc.require:
 */
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Template_Test_003::Start");
     auto helper = dataShareHelper;
@@ -262,7 +262,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level0)
 * @tc.type: FUNC
 * @tc.require:
 */
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_004, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_004, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Template_Test_004::Start");
     auto helper = dataShareHelper;
@@ -292,7 +292,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_004, TestSize.Level0)
 * @tc.type: FUNC
 * @tc.require:
 */
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_005, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_005, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Template_Test_005::Start");
     auto helper = dataShareHelper;
@@ -310,7 +310,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_005, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_Template_Test_005::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Publish_Test_001::Start");
     auto helper = dataShareHelper;
@@ -338,7 +338,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_Publish_Test_001::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_002, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_002, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Publish_Test_002::Start");
     auto helper = dataShareHelper;
@@ -357,7 +357,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_002, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_Publish_Test_002::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_003, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_003, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Publish_Test_003::Start");
     auto helper = dataShareHelper;
@@ -385,7 +385,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_003, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_Publish_Test_003::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_001::Start");
     auto helper = dataShareHelper;
@@ -442,7 +442,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Le
 * @tc.type: FUNC
 * @tc.require:
 */
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_002, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_002, TestSize.Level1)
 {
     auto helper = dataShareHelper;
     auto helper2 = dataShareHelper2;
@@ -501,7 +501,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_002, TestSize.Le
 * @tc.type: FUNC
 * @tc.require:
 */
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationPublishedData_Test_001, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationPublishedData_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_CombinationPublishedData_Test_001::Start");
     auto helper = dataShareHelper;
@@ -552,7 +552,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationPublishedData_Test_001, TestS
     LOG_INFO("ProxyDatasTest_CombinationPublishedData_Test_001::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribePublishedData_Test_001, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribePublishedData_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_SubscribePublishedData_Test_001::Start");
     auto helper = dataShareHelper;
@@ -569,7 +569,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribePublishedData_Test_001, TestSiz
     LOG_INFO("ProxyDatasTest_SubscribePublishedData_Test_001::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_DisablePubSubs_Test_001, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_DisablePubSubs_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_DisablePubSubs_Test_001::Start");
     auto helper = dataShareHelper;
@@ -582,7 +582,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_DisablePubSubs_Test_001, TestSize.Level0
     LOG_INFO("ProxyDatasTest_DisablePubSubs_Test_001::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_EnablePubSubs_Test_001, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_EnablePubSubs_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_EnablePubSubs_Test_001::Start");
     auto helper = dataShareHelper;
@@ -595,7 +595,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_EnablePubSubs_Test_001, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_EnablePubSubs_Test_001::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_UnsubscribePublishedData_Test_001, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_UnsubscribePublishedData_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_UnsubscribePublishedData_Test_001::Start");
     auto helper = dataShareHelper;
@@ -609,7 +609,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_UnsubscribePublishedData_Test_001, TestS
     LOG_INFO("ProxyDatasTest_UnsubscribePublishedData_Test_001::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_001, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_001::Start");
     auto helper = dataShareHelper;
@@ -626,7 +626,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_001, TestSize.Level0)
     LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_001::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_002, TestSize.Level0)
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_002, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_002::Start");
     auto helper = dataShareHelper;

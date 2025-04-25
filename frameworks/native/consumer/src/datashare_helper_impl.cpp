@@ -30,17 +30,21 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
+// non-silent access
 DataShareHelperImpl::DataShareHelperImpl(const Uri &uri, const sptr<IRemoteObject> &token,
-    std::shared_ptr<DataShareConnection> connection)
+    std::shared_ptr<DataShareConnection> connection, bool isSystem)
 {
     LOG_DEBUG("starts");
+    isSystem_ = isSystem;
     generalCtl_ = std::make_shared<GeneralControllerProviderImpl>(connection, uri, token);
     extSpCtl_ = std::make_shared<ExtSpecialController>(connection, uri, token);
 }
 
-DataShareHelperImpl::DataShareHelperImpl(std::string extUri)
+// silent access
+DataShareHelperImpl::DataShareHelperImpl(std::string extUri, bool isSystem)
 {
     LOG_DEBUG("starts");
+    isSystem_ = isSystem;
     generalCtl_ = std::make_shared<GeneralControllerServiceImpl>(extUri);
     persistentDataCtl_ = std::make_shared<PersistentDataController>();
     publishedDataCtl_ = std::make_shared<PublishedDataController>();
@@ -99,7 +103,10 @@ int DataShareHelperImpl::Insert(Uri &uri, const DataShareValuesBucket &value)
         LOG_ERROR("generalCtl_ is nullptr");
         return DATA_SHARE_ERROR;
     }
-    return generalCtl->Insert(uri, value);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = generalCtl->Insert(uri, value);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 int DataShareHelperImpl::InsertExt(Uri &uri, const DataShareValuesBucket &value, std::string &result)
@@ -121,7 +128,10 @@ int DataShareHelperImpl::Update(Uri &uri, const DataSharePredicates &predicates,
         LOG_ERROR("generalCtl is nullptr");
         return DATA_SHARE_ERROR;
     }
-    return generalCtl->Update(uri, predicates, value);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = generalCtl->Update(uri, predicates, value);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 int DataShareHelperImpl::BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results)
@@ -142,7 +152,10 @@ int DataShareHelperImpl::Delete(Uri &uri, const DataSharePredicates &predicates)
         LOG_ERROR("generalCtl is nullptr");
         return DATA_SHARE_ERROR;
     }
-    return generalCtl->Delete(uri, predicates);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = generalCtl->Delete(uri, predicates);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 std::pair<int32_t, int32_t> DataShareHelperImpl::InsertEx(Uri &uri, const DataShareValuesBucket &value)
@@ -153,7 +166,9 @@ std::pair<int32_t, int32_t> DataShareHelperImpl::InsertEx(Uri &uri, const DataSh
         LOG_ERROR("generalCtl_ is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
+    DataShareServiceProxy::SetSystem(isSystem_);
     auto [errCode, status] = generalCtl->InsertEx(uri, value);
+    DataShareServiceProxy::CleanSystem();
     if (errCode != E_OK) {
         LOG_ERROR("generalCtl insert failed, errCode = %{public}d", errCode);
     }
@@ -169,7 +184,9 @@ std::pair<int32_t, int32_t> DataShareHelperImpl::UpdateEx(
         LOG_ERROR("generalCtl is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
+    DataShareServiceProxy::SetSystem(isSystem_);
     auto [errCode, status] = generalCtl->UpdateEx(uri, predicates, value);
+    DataShareServiceProxy::CleanSystem();
     if (errCode != E_OK) {
         LOG_ERROR("generalCtl update failed, errCode = %{public}d", errCode);
     }
@@ -184,7 +201,9 @@ std::pair<int32_t, int32_t> DataShareHelperImpl::DeleteEx(Uri &uri, const DataSh
         LOG_ERROR("generalCtl is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
+    DataShareServiceProxy::SetSystem(isSystem_);
     auto [errCode, status] = generalCtl->DeleteEx(uri, predicates);
+    DataShareServiceProxy::CleanSystem();
     if (errCode != E_OK) {
         LOG_ERROR("generalCtl delete failed, errCode = %{public}d", errCode);
     }
@@ -201,7 +220,9 @@ std::shared_ptr<DataShareResultSet> DataShareHelperImpl::Query(Uri &uri, const D
         return nullptr;
     }
     DatashareBusinessError error;
+    DataShareServiceProxy::SetSystem(isSystem_);
     auto resultSet = generalCtl->Query(uri, predicates, columns, error);
+    DataShareServiceProxy::CleanSystem();
     if (businessError != nullptr) {
         *businessError = error;
     }
@@ -283,7 +304,10 @@ void DataShareHelperImpl::NotifyChange(const Uri &uri)
         LOG_ERROR("extSpCtl is nullptr");
         return;
     }
-    return generalCtl->NotifyChange(uri);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    generalCtl->NotifyChange(uri);
+    DataShareServiceProxy::CleanSystem();
+    return;
 }
 
 Uri DataShareHelperImpl::NormalizeUri(Uri &uri)
@@ -318,7 +342,10 @@ int DataShareHelperImpl::AddQueryTemplate(const std::string &uri, int64_t subscr
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
         return DATA_SHARE_ERROR;
     }
-    return persistentDataCtl->AddQueryTemplate(uri, subscriberId, tpl);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = persistentDataCtl->AddQueryTemplate(uri, subscriberId, tpl);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 int DataShareHelperImpl::DelQueryTemplate(const std::string &uri, int64_t subscriberId)
@@ -331,7 +358,10 @@ int DataShareHelperImpl::DelQueryTemplate(const std::string &uri, int64_t subscr
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
         return DATA_SHARE_ERROR;
     }
-    return persistentDataCtl->DelQueryTemplate(uri, subscriberId);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = persistentDataCtl->DelQueryTemplate(uri, subscriberId);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 std::vector<OperationResult> DataShareHelperImpl::Publish(const Data &data, const std::string &bundleName)
@@ -342,7 +372,10 @@ std::vector<OperationResult> DataShareHelperImpl::Publish(const Data &data, cons
         LOG_ERROR("publishedDataCtl is nullptr");
         return std::vector<OperationResult>();
     }
-    return publishedDataCtl->Publish(data, bundleName);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = publishedDataCtl->Publish(data, bundleName);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 Data DataShareHelperImpl::GetPublishedData(const std::string &bundleName, int &resultCode)
@@ -353,7 +386,10 @@ Data DataShareHelperImpl::GetPublishedData(const std::string &bundleName, int &r
         LOG_ERROR("publishedDataCtl is nullptr");
         return Data();
     }
-    return publishedDataCtl->GetPublishedData(bundleName, resultCode);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = publishedDataCtl->GetPublishedData(bundleName, resultCode);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 std::vector<OperationResult> DataShareHelperImpl::SubscribeRdbData(const std::vector<std::string> &uris,
@@ -368,7 +404,10 @@ std::vector<OperationResult> DataShareHelperImpl::SubscribeRdbData(const std::ve
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
         return std::vector<OperationResult>();
     }
-    return persistentDataCtl->SubscribeRdbData(this, uris, templateId, callback);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = persistentDataCtl->SubscribeRdbData(this, uris, templateId, callback);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 __attribute__((no_sanitize("cfi"))) std::vector<OperationResult> DataShareHelperImpl::UnsubscribeRdbData(
@@ -383,7 +422,10 @@ __attribute__((no_sanitize("cfi"))) std::vector<OperationResult> DataShareHelper
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
         return std::vector<OperationResult>();
     }
-    return persistentDataCtl->UnSubscribeRdbData(this, uris, templateId);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = persistentDataCtl->UnSubscribeRdbData(this, uris, templateId);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 std::vector<OperationResult> DataShareHelperImpl::EnableRdbSubs(const std::vector<std::string> &uris,
@@ -395,7 +437,10 @@ std::vector<OperationResult> DataShareHelperImpl::EnableRdbSubs(const std::vecto
         LOG_ERROR("persistentDataCtl is nullptr");
         return std::vector<OperationResult>();
     }
-    return persistentDataCtl->EnableSubscribeRdbData(this, uris, templateId);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = persistentDataCtl->EnableSubscribeRdbData(this, uris, templateId);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 std::vector<OperationResult> DataShareHelperImpl::DisableRdbSubs(const std::vector<std::string> &uris,
@@ -407,7 +452,10 @@ std::vector<OperationResult> DataShareHelperImpl::DisableRdbSubs(const std::vect
         LOG_ERROR("persistentDataCtl is nullptr");
         return std::vector<OperationResult>();
     }
-    return persistentDataCtl->DisableSubscribeRdbData(this, uris, templateId);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = persistentDataCtl->DisableSubscribeRdbData(this, uris, templateId);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 std::vector<OperationResult> DataShareHelperImpl::SubscribePublishedData(const std::vector<std::string> &uris,
@@ -422,7 +470,10 @@ std::vector<OperationResult> DataShareHelperImpl::SubscribePublishedData(const s
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
         return std::vector<OperationResult>();
     }
-    return publishedDataCtl->SubscribePublishedData(this, uris, subscriberId, callback);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = publishedDataCtl->SubscribePublishedData(this, uris, subscriberId, callback);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 std::vector<OperationResult> DataShareHelperImpl::UnsubscribePublishedData(const std::vector<std::string> &uris,
@@ -437,7 +488,10 @@ std::vector<OperationResult> DataShareHelperImpl::UnsubscribePublishedData(const
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
         return std::vector<OperationResult>();
     }
-    return publishedDataCtl->UnSubscribePublishedData(this, uris, subscriberId);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = publishedDataCtl->UnSubscribePublishedData(this, uris, subscriberId);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 std::vector<OperationResult> DataShareHelperImpl::EnablePubSubs(const std::vector<std::string> &uris,
@@ -449,7 +503,10 @@ std::vector<OperationResult> DataShareHelperImpl::EnablePubSubs(const std::vecto
         LOG_ERROR("publishedDataCtl is nullptr");
         return std::vector<OperationResult>();
     }
-    return publishedDataCtl->EnableSubscribePublishedData(this, uris, subscriberId);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = publishedDataCtl->EnableSubscribePublishedData(this, uris, subscriberId);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 std::vector<OperationResult> DataShareHelperImpl::DisablePubSubs(const std::vector<std::string> &uris,
@@ -461,7 +518,10 @@ std::vector<OperationResult> DataShareHelperImpl::DisablePubSubs(const std::vect
         LOG_ERROR("publishedDataCtl is nullptr");
         return std::vector<OperationResult>();
     }
-    return publishedDataCtl->DisableSubscribePublishedData(this, uris, subscriberId);
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto res = publishedDataCtl->DisableSubscribePublishedData(this, uris, subscriberId);
+    DataShareServiceProxy::CleanSystem();
+    return res;
 }
 
 int32_t DataShareHelperImpl::UserDefineFunc(

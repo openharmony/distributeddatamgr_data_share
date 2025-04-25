@@ -246,8 +246,8 @@ int DataShareProxy::BatchUpdate(const UpdateOperations &operations, std::vector<
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_BATCH_UPDATE), data, reply, option);
     if (err != E_OK) {
-        LOG_ERROR("fail to SendRequest. err: %{public}d", err);
-        return err;
+        LOG_ERROR("BatchUpdate fail to SendRequest. err: %{public}d", err);
+        return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : ret;
     }
     if (!ITypesUtil::Unmarshal(reply, results)) {
         LOG_ERROR("fail to Unmarshal result");

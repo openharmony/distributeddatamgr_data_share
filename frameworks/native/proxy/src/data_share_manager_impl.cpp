@@ -17,6 +17,7 @@
 
 #include <thread>
 
+#include "datashare_errno.h"
 #include "datashare_log.h"
 #include "datashare_radar_reporter.h"
 #include "ikvstore_data_service.h"
