@@ -249,7 +249,8 @@ void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataSh
  * @param uri, Indicates the path of the data to operate.
  * @param dataObserver, Indicates the DataShareObserver object.
  */
-void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver, bool isSystem)
+void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+     bool isSystem)
 {
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
