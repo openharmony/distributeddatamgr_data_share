@@ -25,14 +25,34 @@ namespace OHOS {
 namespace DataShare {
 class ANIInnerObserver : public std::enable_shared_from_this<ANIInnerObserver> {
 public:
-    ANIInnerObserver(ani_env *env, ani_class cls, ani_method callback);
+    ANIInnerObserver(ani_vm *vm, ani_ref callback);
+    virtual ~ANIInnerObserver();
     void OnChange(const DataShareObserver::ChangeInfo &changeInfo = {}, bool isNotifyDetails = false);
-    ani_method GetCallback();
+    ani_ref GetCallback();
 
 private:
-    ani_env *env_;
-    ani_class cls_;
-    ani_method callback_;
+    ani_object GetNewChangeInfo(ani_env *env);
+    ani_enum_item GetEnumItem(ani_env *env, int32_t type);
+    ani_object Convert2TSValue(ani_env *env, const std::monostate &value = {});
+    ani_object Convert2TSValue(ani_env *env, int64_t value);
+    ani_object Convert2TSValue(ani_env *env, double value);
+    ani_object Convert2TSValue(ani_env *env, bool value);
+    ani_object Convert2TSValue(ani_env *env, const std::string &value);
+    ani_object Convert2TSValue(ani_env *env, const std::vector<uint8_t> &values);
+    template<class... Types>
+    ani_object Convert2TSValue(ani_env *env, const std::variant<Types...> &value);
+    ani_object Convert2TSValue(ani_env *env, const DataShareValuesBucket &valueBucket);
+    template<typename T>
+    ani_object Convert2TSValue(ani_env *env, const std::vector<T> &values);
+    ani_object Convert2TSValue(ani_env *env, const DataShareObserver::ChangeInfo& changeInfo);
+    template<typename _VTp>
+    ani_object ReadVariant(ani_env *env, size_t step, size_t index, const _VTp &value);
+    template<typename _VTp, typename _First, typename ..._Rest>
+    ani_object ReadVariant(ani_env *env, size_t step, size_t index, const _VTp &value);
+
+private:
+    ani_vm *vm_;
+    ani_ref callback_;
 };
 }  // namespace DataShare
 }  // namespace OHOS

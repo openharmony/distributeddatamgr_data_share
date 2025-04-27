@@ -18,6 +18,7 @@
  * @kit ArkData
  */
 
+import hilog from '@ohos.hilog'
 import { BusinessError } from '@ohos.base'
 import type { AsyncCallback } from '@ohos.base'
 import Context from 'application.Context'
@@ -49,41 +50,44 @@ export namespace dataShare {
     }
 
     export interface DataShareHelper {
-        on(type: 'dataChange', uri: string, callback:AsyncCallback<void>):void
-        off(type: 'dataChange', uri: string, callback:AsyncCallback<void>):void
-        on(event: 'dataChange', type: SubscriptionType, uri: string, callback:AsyncCallback<ChangeInfo>):void
-        off(event: 'dataChange', type: SubscriptionType, uri: string, callback:AsyncCallback<ChangeInfo>):void
+        on(type: 'dataChange', uri: string, callback: AsyncCallback<void>): void
+        off(type: 'dataChange', uri: string, callback?: AsyncCallback<void>): void
+        on(event: 'dataChange', type: SubscriptionType, uri: string, callback: AsyncCallback<ChangeInfo>): void
+        off(event: 'dataChange', type: SubscriptionType, uri: string, callback?: AsyncCallback<ChangeInfo>): void
         query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>, callback: AsyncCallback<DataShareResultSet>): void
         query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>): Promise<DataShareResultSet>
         update(uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket, callback: AsyncCallback<number>): void
         update(uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket): Promise<number>
     }
 
-    export native function native_create(context: Context, uri: string, options?: DataShareHelperOptions): DataShareHelper
-    native function native_on(obj: DataShareHelper, type: string, uri: string): void
-    native function native_off(obj: DataShareHelper, type: string, uri: string): void
-    native function native_onEvent(obj: DataShareHelper, event: string, type: SubscriptionType, uri: string): void
-    native function native_offEvent(obj: DataShareHelper, event: string, type: SubscriptionType, uri: string): void
-    export native function native_query(obj: DataShareHelper, uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>): DataShareResultSet
-    export native function native_update(obj: DataShareHelper, uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket): number
+    export native function create(context: Context, uri: string, options?: DataShareHelperOptions): DataShareHelper
 
     export function createDataShareHelper(context: Context, uri: string, callback: AsyncCallback<DataShareHelper>): void {
-        console.println("createDataShareHelper enter")
-        let p = taskpool.execute(native_create, context, uri, undefined)
+        hilog.info(0x0000, 'DataShareHelper', "createDataShareHelper enter")
+        let p = taskpool.execute(create, context, uri, undefined)
         p.then((e: NullishType) => {
             let r = e as DataShareHelper
             let err: BusinessError<void>
             callback(err, r)
+        }).catch((error: NullishType) => {
+            let r = new DataShareHelperInner(0)
+            let err =  error as BusinessError<void>
+            hilog.error(0x0000, 'DataShareHelper', "create failed:" + err)
+            callback(err, r)
         })
     }
 
-    export function createDataShareHelper(context: Context, uri: string, options: DataShareHelperOptions,
-        callback: AsyncCallback<DataShareHelper>): void {
-        console.println("createDataShareHelper enter")
-        let p = taskpool.execute(native_create, context, uri, options)
+    export function createDataShareHelper(context: Context, uri: string, options: DataShareHelperOptions, callback: AsyncCallback<DataShareHelper>): void {
+        hilog.info(0x0000, 'DataShareHelper', "createDataShareHelper enter")
+        let p = taskpool.execute(create, context, uri, options)
         p.then((e: NullishType) => {
             let r = e as DataShareHelper
             let err: BusinessError<void>
+            callback(err, r)
+        }).catch((error: NullishType) => {
+            let r = new DataShareHelperInner(0)
+            let err =  error as BusinessError<void>
+            hilog.error(0x0000, 'DataShareHelper', "create failed:" + err)
             callback(err, r)
         })
     }
@@ -91,102 +95,133 @@ export namespace dataShare {
     export function createDataShareHelper(context: Context, uri: string, options?: DataShareHelperOptions): Promise<DataShareHelper> {
         console.println("createDataShareHelper enter")
         return new Promise<DataShareHelper>((resolve: (v: DataShareHelper) => void, reject: (error: Error) => void) => {
-            let p = taskpool.execute(native_create, context, uri, options)
+            let p = taskpool.execute(create, context, uri, options)
             p.then((e: NullishType) => {
                 let r = e as DataShareHelper
                 resolve(r)
             }).catch((e: Error): void => {
-                console.log("create failed:", e)
+                hilog.error(0x0000, 'DataShareHelper', "create failed:" + e)
                 reject(e)
             })
         })
     }
 
     class ChangeInfoInner implements ChangeInfo {
-        type: ChangeType = ChangeType.INSERT
-        uri: string = ""
-        values: Array<ValuesBucket> = new Array<ValuesBucket>
+        type: ChangeType
+        uri: string
+        values: Array<ValuesBucket>
     }
+
+    class Cleaner {
+    static callback(cleaner: Cleaner): void {
+        console.println("enter Cleaner.callback");
+        cleaner.clean()
+    }
+
+    constructor(targetPtr: long) {
+        this.targetPtr = targetPtr
+    }
+
+    native clean(): void
+
+    private targetPtr: long = 0
+    }
+
+    class FinalizationAgent<T extends Object> {
+    constructor(obj: T, ptr: long) {
+        this.register(obj, ptr);
+    }
+
+    register(obj: T, ptr: long): void {
+        this.unregisterToken = {};
+        this.cleaner = new Cleaner(ptr);
+        finalizer.register(obj, this.cleaner!, this.unregisterToken);
+    }
+
+    unregister(): void {
+        finalizer.unregister(this.unregisterToken);
+    }
+
+    private cleaner: Cleaner | null = null;
+    private unregisterToken: object;
+    }
+
+    let finalizer = new FinalizationRegistry<Cleaner>(Cleaner.callback)
 
     class DataShareHelperInner implements DataShareHelper {
         private nativePtr: long = 0
+        private fzAgent: FinalizationAgent<DataShareHelperInner>;
         private onCallback: AsyncCallback<void> = () => {}
         private offCallback?: AsyncCallback<void>
         private onEventCallback: AsyncCallback<ChangeInfo> = () => {}
         private offEventCallback?: AsyncCallback<ChangeInfo>
 
         constructor(nativePtr:long) {
-            console.log("in constructor, context is ", nativePtr)
+            hilog.info(0x0000, 'DataShareHelper', "in constructor, context ：" + nativePtr)
             this.nativePtr = nativePtr
+            this.fzAgent = new FinalizationAgent<DataShareHelperInner>(this, this.nativePtr);
         }
+
+        unregisterCleaner(): void {
+            this.fzAgent.unregister();
+    }
 
         getNativePtr(): long {
             return this.nativePtr
         }
 
-        on(type: 'dataChange', uri: string, callback: AsyncCallback<void>): void {
-            this.onCallback = callback
-            native_on(this, type, uri)
-        }
-
-        off(type: 'dataChange', uri: string, callback?: AsyncCallback<void>): void {
-            if (callback != undefined) {
-                this.offCallback = callback
-            }
-            native_off(this, type, uri)
-        }
-
-        on(event: 'dataChange', type: SubscriptionType, uri: string, callback: AsyncCallback<ChangeInfo>): void {
-            this.onEventCallback = callback
-            native_onEvent(this, event, type, uri)
-        }
-
-        off(event: 'dataChange', type: SubscriptionType, uri: string, callback?: AsyncCallback<ChangeInfo>): void {
-            if (callback != undefined) {
-                this.offEventCallback = callback
-            }
-            native_offEvent(this, event, type, uri)
-        }
+        native function on(type: 'dataChange', uri: string, callback: AsyncCallback<void>): void
+        native function off(type: 'dataChange', uri: string, callback?: AsyncCallback<void>): void
+        native function on(event: 'dataChange', type: SubscriptionType, uri: string, callback: AsyncCallback<ChangeInfo>): void
+        native function off(event: 'dataChange', type: SubscriptionType, uri: string, callback?: AsyncCallback<ChangeInfo>): void
+        native function ani_query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>): DataShareResultSet
+        native function ani_update(uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket): number
 
         query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>, callback: AsyncCallback<DataShareResultSet>): void {
-            let p = taskpool.execute(native_query, this, uri, predicates, columns)
+            let p = taskpool.execute(this.ani_query, uri, predicates, columns)
             p.then((e: NullishType) => {
                 let r = e as DataShareResultSet
                 let err: BusinessError<void>
                 callback(err, r)
+            }).catch((error: NullishType) => {
+                let err =  error as BusinessError<void>
+                hilog.error(0x0000, 'DataShareHelper', "query failed:" + err)
             })
         }
 
         query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>): Promise<DataShareResultSet> {
             return new Promise<DataShareResultSet>((resolve: (v: DataShareResultSet) => void, reject: (error: Error) => void) => {
-                let p = taskpool.execute(native_query, this, uri, predicates, columns)
+                let p = taskpool.execute(this.ani_query, uri, predicates, columns)
                 p.then((e: NullishType) => {
                     let r = e as DataShareResultSet
                     resolve(r)
                 }).catch((e: Error): void => {
-                    console.log("query failed:", e)
+                    hilog.error(0x0000, 'DataShareHelper', "query failed:" + e)
                     reject(e)
                 })
             })
         }
 
         update(uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket, callback: AsyncCallback<number>): void {
-            let p = taskpool.execute(native_update, this, uri, predicates, value)
+            let p = taskpool.execute(this.ani_update, uri, predicates, value)
             p.then((e: NullishType) => {
                 let r = e as number
                 let err: BusinessError<void>
                 callback(err, r)
+            }).catch((error: NullishType) => {
+                let err =  error as BusinessError<void>
+                hilog.error(0x0000, 'DataShareHelper', "create failed:" + err)
             })
         }
 
         update(uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket): Promise<number> {
             return new Promise<number>((resolve: (v: number) => void, reject: (error: Error) => void) => {
-                let p = taskpool.execute(native_update, this, uri, predicates, value)
+                let p = taskpool.execute(this.ani_update, uri, predicates, value)
                 p.then((e: NullishType) => {
                     let r = e as number
                     resolve(r)
                 }).catch((e: Error): void => {
-                    console.log("update failed:", e)
+                    hilog.error(0x0000, 'DataShareHelper', "update failed:" + e)
                     reject(e)
                 })
             })

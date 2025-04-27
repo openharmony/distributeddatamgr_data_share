@@ -17,9 +17,47 @@
 import { ValueType } from "@ohos.data.ValuesBucket"
 
 export default namespace dataSharePredicates{
+
+class Cleaner {
+    static callback(cleaner: Cleaner): void {
+        console.println("enter Cleaner.callback");
+        cleaner.clean()
+    }
+
+    constructor(targetPtr: long) {
+        this.targetPtr = targetPtr
+    }
+
+    native clean(): void
+
+    private targetPtr: long = 0
+}
+
+class FinalizationAgent<T extends Object> {
+    constructor(obj: T, ptr: long) {
+        this.register(obj, ptr);
+    }
+
+    register(obj: T, ptr: long): void {
+        this.unregisterToken = {};
+        this.cleaner = new Cleaner(ptr);
+        finalizer.register(obj, this.cleaner!, this.unregisterToken);
+    }
+
+    unregister(): void {
+        finalizer.unregister(this.unregisterToken);
+    }
+
+    private cleaner: Cleaner | null = null;
+    private unregisterToken: object;
+}
+
+let finalizer = new FinalizationRegistry<Cleaner>(Cleaner.callback)
+
 export class DataSharePredicates{
     static { loadLibrary("datasharepredicates_ani") }
     private nativePtr:long = 0;
+    private fzAgent: FinalizationAgent<DataSharePredicates>;
 
     constructor() {
         console.log("enter constructor")
@@ -28,12 +66,16 @@ export class DataSharePredicates{
             this.nativePtr = DataSharePredicates.create();
             console.log("stop create")
         }
+        this.fzAgent = new FinalizationAgent<DataSharePredicates>(this, this.nativePtr);
+    }
+
+    unregisterCleaner(): void {
+        this.fzAgent.unregister();
     }
 
     getNativePtr():long {
         return this.nativePtr;
     }
-
     native static create(): long;
     native equalTo(field: string, value: ValueType):DataSharePredicates;
     native notEqualTo(field: string, value: ValueType):DataSharePredicates;
