@@ -49,7 +49,8 @@ int DataShareHelperInitError::GetCode() const
 
 std::string InnerError::GetMessage() const
 {
-    return "Inner error.";
+    return "Inner error. Possible causes: 1.The internal status is abnormal; 2.The interface is incorrectly used; "
+        "3.Permission configuration error; 4.A system error.";
 }
 
 int InnerError::GetCode() const
