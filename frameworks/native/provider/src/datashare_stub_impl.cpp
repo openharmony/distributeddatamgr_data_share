@@ -489,7 +489,7 @@ int32_t DataShareStubImpl::GetCallingUserId()
     if (type == Security::AccessToken::TOKEN_NATIVE || type == Security::AccessToken::TOKEN_SHELL) {
         return 0;
     } else {
-        uint32_t callingUid = IPCSkeleton::GetCallingUid();
+        int32_t callingUid = IPCSkeleton::GetCallingUid();
         int32_t userId = callingUid / Constants::BASE_USER_RANGE;
         return userId;
     }
