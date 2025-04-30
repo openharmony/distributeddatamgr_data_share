@@ -48,6 +48,7 @@ ohos_shared_library("datashare") {
     "ability_runtime:ani_base_context",
     "ability_runtime:ani_common",
     "ability_runtime:app_context",
+    "access_token:libtokenid_sdk",
     "c_utils:utils",
     "hilog:libhilog",
     "hitrace:hitrace_meter",

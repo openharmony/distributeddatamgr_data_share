@@ -112,13 +112,59 @@ export namespace dataShare {
         values: Array<ValuesBucket>
     }
 
+    class Cleaner {
+    static callback(cleaner: Cleaner): void {
+        console.println("enter Cleaner.callback");
+        cleaner.clean()
+    }
+
+    constructor(targetPtr: long) {
+        this.targetPtr = targetPtr
+    }
+
+    native clean(): void
+
+    private targetPtr: long = 0
+    }
+
+    class FinalizationAgent<T extends Object> {
+    constructor(obj: T, ptr: long) {
+        this.register(obj, ptr);
+    }
+
+    register(obj: T, ptr: long): void {
+        this.unregisterToken = {};
+        this.cleaner = new Cleaner(ptr);
+        finalizer.register(obj, this.cleaner!, this.unregisterToken);
+    }
+
+    unregister(): void {
+        finalizer.unregister(this.unregisterToken);
+    }
+
+    private cleaner: Cleaner | null = null;
+    private unregisterToken: object;
+    }
+
+    let finalizer = new FinalizationRegistry<Cleaner>(Cleaner.callback)
+
     class DataShareHelperInner implements DataShareHelper {
         private nativePtr: long = 0
+        private fzAgent: FinalizationAgent<DataShareHelperInner>;
+        private onCallback: AsyncCallback<void> = () => {}
+        private offCallback?: AsyncCallback<void>
+        private onEventCallback: AsyncCallback<ChangeInfo> = () => {}
+        private offEventCallback?: AsyncCallback<ChangeInfo>
 
         constructor(nativePtr:long) {
             hilog.info(0x0000, 'DataShareHelper', "in constructor, context ：" + nativePtr)
             this.nativePtr = nativePtr
+            this.fzAgent = new FinalizationAgent<DataShareHelperInner>(this, this.nativePtr);
         }
+
+        unregisterCleaner(): void {
+            this.fzAgent.unregister();
+    }
 
         getNativePtr(): long {
             return this.nativePtr

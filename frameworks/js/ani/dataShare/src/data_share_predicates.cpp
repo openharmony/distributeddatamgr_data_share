@@ -24,12 +24,20 @@ using namespace OHOS::DataShare;
 
 static DataSharePredicates* unwrapp(ani_env *env, ani_object object)
 {
-    return AniObjectUtils::Unwrap<DataSharePredicates>(env, object);
+    SharedPtrHolder<DataSharePredicates> *holder =
+        AniObjectUtils::Unwrap<SharedPtrHolder<DataSharePredicates>>(env, object);
+    if (holder == nullptr) {
+        LOG_ERROR("holder is nullptr");
+        return nullptr;
+    }
+    return holder->Get().get();
 }
 
 static ani_long Create([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_class clazz)
 {
-    return reinterpret_cast<ani_long>(new DataSharePredicates);
+    SharedPtrHolder<DataSharePredicates> *holder =
+        new SharedPtrHolder<DataSharePredicates>(std::make_shared<DataSharePredicates>());
+    return reinterpret_cast<ani_long>(holder);
 }
 
 static ani_object EqualTo([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object object, ani_string field,
@@ -415,6 +423,10 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         LOG_ERROR("Cannot bind native methods to %{public}s", className);
         return ANI_ERROR;
     };
+
+    static const char *cleanerName = "LCleaner;";
+    auto cleanerCls = AniTypeFinder(env).FindClass(ns, cleanerName);
+    NativePtrCleaner(env).Bind(cleanerCls.value());
 
     *result = ANI_VERSION_1;
     return ANI_OK;
