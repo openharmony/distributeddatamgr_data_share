@@ -13,6 +13,7 @@
 
 import("//build/config/components/ets_frontend/ets2abc_config.gni")
 import("//build/ohos.gni")
+import("//foundation/distributeddatamgr/data_share/datashare.gni")
 
 rust_cxx("datashare_ani_cxx_gen") {
   sources = [
@@ -38,12 +39,26 @@ ohos_static_library("datashare_ani_cxx") {
 
   sources = [
     "src/cxx/datashare_ani.cpp",
+    "src/cxx/ani_inner_observer.cpp",
+    "src/cxx/ani_observer.cpp",
   ]
   sources += get_target_outputs(":datashare_ani_cxx_gen")
   deps = [
     "../../../interfaces/inner_api:datashare_consumer",
+    "${datashare_innerapi_path}/common:datashare_common",
     ":datashare_ani_cxx_gen",
     "//third_party/rust/crates/cxx:cxx_cppdeps",
+  ]
+  external_deps = [
+    "ability_runtime:ani_base_context",
+    "ability_runtime:app_context",
+    "ability_runtime:dataobs_manager",
+    "runtime_core:ani",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "hitrace:libhitracechain",
+    "ipc:ipc_single",
   ]
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"

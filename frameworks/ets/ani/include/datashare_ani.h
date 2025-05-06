@@ -17,7 +17,8 @@
 #define DATASHARE_ANI_RESULT_SET_H
 
 #include "datashare_shared_result_set.h"
-#include "cxx.h"
+#include "ani_observer.h"
+#include "datashare_helper.h"
 
 namespace OHOS {
 using namespace DataShare;
