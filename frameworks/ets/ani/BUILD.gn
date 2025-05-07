@@ -41,6 +41,8 @@ ohos_static_library("datashare_ani_cxx") {
     "src/cxx/datashare_ani.cpp",
     "src/cxx/ani_inner_observer.cpp",
     "src/cxx/ani_observer.cpp",
+    "src/cxx/ani_subscriber.cpp",
+    "src/cxx/ani_subscriber_manager.cpp",
   ]
   sources += get_target_outputs(":datashare_ani_cxx_gen")
   deps = [

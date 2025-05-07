@@ -18,6 +18,7 @@
 
 #include "datashare_shared_result_set.h"
 #include "ani_observer.h"
+#include "ani_subscriber_manager.h"
 #include "datashare_helper.h"
 
 namespace OHOS {
@@ -127,6 +128,16 @@ void DataShareNativeOffPublishedDataChange(EnvPtrWrap envPtrWrap, rust::String a
                                            rust::Vec<rust::String> uris, rust::String subscriberId,
                                            PublishSretParam& sret);
 
+void ANIRegisterObserver(const std::string &uri, long long dataShareHelperPtr, long long envPtr,
+    long long callbackPtr, bool isNotifyDetails = false);
+
+void ANIUnRegisterObserver(const std::string &uri, long long dataShareHelperPtr, long long envPtr,
+    bool isNotifyDetails = false);
+
+void ANIUnRegisterObserver(const std::string &uri, long long dataShareHelperPtr, long long envPtr,
+    long long callbackPtr, bool isNotifyDetails = false);
+
+static std::map<std::string, std::list<sptr<ANIDataShareObserver>>> observerMap_;
 } // namespace DataShareAni
 } // namespace OHOS
 
