@@ -17,26 +17,24 @@
 #include <array>
 #include <iostream>
 #include "ani_utils.h"
-#include "datashare_predicates.h"
 #include "datashare_log.h"
+#include "datashare_predicates_cleaner.h"
 
 using namespace OHOS::DataShare;
 
 static DataSharePredicates* unwrapp(ani_env *env, ani_object object)
 {
-    SharedPtrHolder<DataSharePredicates> *holder =
-        AniObjectUtils::Unwrap<SharedPtrHolder<DataSharePredicates>>(env, object);
+    DataSharePredicates *holder = AniObjectUtils::Unwrap<DataSharePredicates>(env, object);
     if (holder == nullptr) {
         LOG_ERROR("holder is nullptr");
         return nullptr;
     }
-    return holder->Get().get();
+    return holder;
 }
 
 static ani_long Create([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_class clazz)
 {
-    SharedPtrHolder<DataSharePredicates> *holder =
-        new SharedPtrHolder<DataSharePredicates>(std::make_shared<DataSharePredicates>());
+    auto holder = new DataSharePredicates();
     return reinterpret_cast<ani_long>(holder);
 }
 
@@ -426,7 +424,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
 
     static const char *cleanerName = "LCleaner;";
     auto cleanerCls = AniTypeFinder(env).FindClass(ns, cleanerName);
-    NativePtrCleaner(env).Bind(cleanerCls.value());
+    DataSharePredicatesCleaner(env).Bind(cleanerCls.value());
 
     *result = ANI_VERSION_1;
     return ANI_OK;
