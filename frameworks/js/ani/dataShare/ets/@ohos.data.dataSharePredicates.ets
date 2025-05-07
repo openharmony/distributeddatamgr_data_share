@@ -73,6 +73,9 @@ export class DataSharePredicates{
         this.fzAgent.unregister();
     }
 
+    getNativePtr():long {
+        return this.nativePtr;
+    }
     native static create(): long;
     native equalTo(field: string, value: ValueType):DataSharePredicates;
     native notEqualTo(field: string, value: ValueType):DataSharePredicates;

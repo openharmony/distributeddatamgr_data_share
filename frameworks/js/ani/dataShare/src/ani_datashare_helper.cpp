@@ -544,9 +544,8 @@ static ani_object ANI_Query([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_
         return nullptr;
     }
 
-    const char *spaceName = "L@ohos/data/dataShare/dataShare;";
     const char *className = "L@ohos/data/DataShareResultSet/DataShareResultSetImpl;";
-    ani_object resultSetObj = AniObjectUtils::Create(env,  spaceName, className,
+    ani_object resultSetObj = AniObjectUtils::Create(env, className,
         reinterpret_cast<ani_long>(shareptrData));
 
     return resultSetObj;
