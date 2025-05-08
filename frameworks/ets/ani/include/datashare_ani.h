@@ -39,67 +39,67 @@ struct TemplateId;
 struct RdbDataChangeNode;
 struct PublishedDataChangeNode;
 
-bool GoToFirstRow(long long resultSetPtr);
-bool GoToLastRow(long long resultSetPtr);
-bool GoToNextRow(long long resultSetPtr);
-rust::String GetString(long long resultSetPtr, int columnIndex);
-long long GetLong(long long resultSetPtr, int columnIndex);
-void Close(long long resultSetPtr);
-int GetColumnIndex(long long resultSetPtr, rust::String columnName);
+bool GoToFirstRow(int64_t resultSetPtr);
+bool GoToLastRow(int64_t resultSetPtr);
+bool GoToNextRow(int64_t resultSetPtr);
+rust::String GetString(int64_t resultSetPtr, int columnIndex);
+int64_t GetLong(int64_t resultSetPtr, int columnIndex);
+void Close(int64_t resultSetPtr);
+int GetColumnIndex(int64_t resultSetPtr, rust::String columnName);
 
-long long DataSharePredicatesNew();
-void DataSharePredicatesClean(long long predicatesPtr);
-void DataSharePredicatesEqualTo(long long predicatesPtr, rust::String field, const ValueType& value);
-void DataSharePredicatesNotEqualTo(long long predicatesPtr, rust::String field, const ValueType& value);
-void DataSharePredicatesBeginWrap(long long predicatesPtr);
-void DataSharePredicatesEndWrap(long long predicatesPtr);
-void DataSharePredicatesOr(long long predicatesPtr);
-void DataSharePredicatesAnd(long long predicatesPtr);
-void DataSharePredicatesContains(long long predicatesPtr, rust::String field, rust::String value);
-void DataSharePredicatesIsNull(long long predicatesPtr, rust::String field);
-void DataSharePredicatesIsNotNull(long long predicatesPtr, rust::String field);
-void DataSharePredicatesLike(long long predicatesPtr, rust::String field, rust::String value);
-void DataSharePredicatesBetween(long long predicatesPtr, rust::String field,
+int64_t DataSharePredicatesNew();
+void DataSharePredicatesClean(int64_t predicatesPtr);
+void DataSharePredicatesEqualTo(int64_t predicatesPtr, rust::String field, const ValueType& value);
+void DataSharePredicatesNotEqualTo(int64_t predicatesPtr, rust::String field, const ValueType& value);
+void DataSharePredicatesBeginWrap(int64_t predicatesPtr);
+void DataSharePredicatesEndWrap(int64_t predicatesPtr);
+void DataSharePredicatesOr(int64_t predicatesPtr);
+void DataSharePredicatesAnd(int64_t predicatesPtr);
+void DataSharePredicatesContains(int64_t predicatesPtr, rust::String field, rust::String value);
+void DataSharePredicatesIsNull(int64_t predicatesPtr, rust::String field);
+void DataSharePredicatesIsNotNull(int64_t predicatesPtr, rust::String field);
+void DataSharePredicatesLike(int64_t predicatesPtr, rust::String field, rust::String value);
+void DataSharePredicatesBetween(int64_t predicatesPtr, rust::String field,
                                 const ValueType& low, const ValueType& high);
-void DataSharePredicatesGreaterThan(long long predicatesPtr, rust::String field, const ValueType& value);
-void DataSharePredicatesGreaterThanOrEqualTo(long long predicatesPtr, rust::String field, const ValueType& value);
-void DataSharePredicatesLessThanOrEqualTo(long long predicatesPtr, rust::String field, const ValueType& value);
-void DataSharePredicatesLessThan(long long predicatesPtr, rust::String field, const ValueType& value);
-void DataSharePredicatesOrderByAsc(long long predicatesPtr, rust::String field);
-void DataSharePredicatesOrderByDesc(long long predicatesPtr, rust::String field);
-void DataSharePredicatesLimit(long long predicatesPtr, double total, double offset);
-void DataSharePredicatesGroupBy(long long predicatesPtr, rust::Vec<rust::String> field);
-void DataSharePredicatesIn(long long predicatesPtr, rust::String field, rust::Vec<ValueType> value);
-void DataSharePredicatesNotIn(long long predicatesPtr, rust::String field, rust::Vec<ValueType> value);
+void DataSharePredicatesGreaterThan(int64_t predicatesPtr, rust::String field, const ValueType& value);
+void DataSharePredicatesGreaterThanOrEqualTo(int64_t predicatesPtr, rust::String field, const ValueType& value);
+void DataSharePredicatesLessThanOrEqualTo(int64_t predicatesPtr, rust::String field, const ValueType& value);
+void DataSharePredicatesLessThan(int64_t predicatesPtr, rust::String field, const ValueType& value);
+void DataSharePredicatesOrderByAsc(int64_t predicatesPtr, rust::String field);
+void DataSharePredicatesOrderByDesc(int64_t predicatesPtr, rust::String field);
+void DataSharePredicatesLimit(int64_t predicatesPtr, double total, double offset);
+void DataSharePredicatesGroupBy(int64_t predicatesPtr, rust::Vec<rust::String> field);
+void DataSharePredicatesIn(int64_t predicatesPtr, rust::String field, rust::Vec<ValueType> value);
+void DataSharePredicatesNotIn(int64_t predicatesPtr, rust::String field, rust::Vec<ValueType> value);
 
-long long DataShareNativeCreate(long long context, rust::String strUri, bool optionIsUndefined, bool isProxy);
+int64_t DataShareNativeCreate(int64_t context, rust::String strUri, bool optionIsUndefined, bool isProxy);
 
-void DataShareNativeClean(long long dataShareHelperPtr);
+void DataShareNativeClean(int64_t dataShareHelperPtr);
 
-long long DataShareNativeQuery(long long dataShareHelperPtr, rust::String strUri,
-                               long long dataSharePredicatesPtr, rust::Vec<rust::String> columns);
+int64_t DataShareNativeQuery(int64_t dataShareHelperPtr, rust::String strUri,
+                               int64_t dataSharePredicatesPtr, rust::Vec<rust::String> columns);
 
-int DataShareNativeUpdate(long long dataShareHelperPtr, rust::String strUri,
-                          long long dataSharePredicatesPtr, rust::Vec<ValuesBucketKvItem> bucket);
+int DataShareNativeUpdate(int64_t dataShareHelperPtr, rust::String strUri,
+                          int64_t dataSharePredicatesPtr, rust::Vec<ValuesBucketKvItem> bucket);
 
-void DataShareNativePublish(long long dataShareHelperPtr, rust::Vec<PublishedItem> data,
+void DataShareNativePublish(int64_t dataShareHelperPtr, rust::Vec<PublishedItem> data,
                             rust::String bundleName, VersionWrap version, PublishSretParam& sret);
 
-void DataShareNativeGetPublishedData(long long dataShareHelperPtr, rust::String bundleName,
+void DataShareNativeGetPublishedData(int64_t dataShareHelperPtr, rust::String bundleName,
                                      GetPublishedDataSretParam& sret);
 
-void DataShareNativeAddTemplate(long long dataShareHelperPtr, rust::String uri,
+void DataShareNativeAddTemplate(int64_t dataShareHelperPtr, rust::String uri,
                                 rust::String subscriberId, const Template& temp);
 
-void DataShareNativeDelTemplate(long long dataShareHelperPtr, rust::String uri, rust::String subscriberId);
+void DataShareNativeDelTemplate(int64_t dataShareHelperPtr, rust::String uri, rust::String subscriberId);
 
-int DataShareNativeInsert(long long dataShareHelperPtr, rust::String strUri, rust::Vec<ValuesBucketKvItem> bucket);
+int DataShareNativeInsert(int64_t dataShareHelperPtr, rust::String strUri, rust::Vec<ValuesBucketKvItem> bucket);
 
-int DataShareNativeBatchInsert(long long dataShareHelperPtr, rust::String strUri, rust::Vec<ValuesBucketWrap> buckets);
+int DataShareNativeBatchInsert(int64_t dataShareHelperPtr, rust::String strUri, rust::Vec<ValuesBucketWrap> buckets);
 
-int DataShareNativeDelete(long long dataShareHelperPtr, rust::String strUri, long long dataSharePredicatesPtr);
+int DataShareNativeDelete(int64_t dataShareHelperPtr, rust::String strUri, int64_t dataSharePredicatesPtr);
 
-void DataShareNativeClose(long long dataShareHelperPtr);
+void DataShareNativeClose(int64_t dataShareHelperPtr);
 
 void DataShareNativeOn(EnvPtrWrap envPtrWrap, rust::String strType, rust::String strUri);
 
