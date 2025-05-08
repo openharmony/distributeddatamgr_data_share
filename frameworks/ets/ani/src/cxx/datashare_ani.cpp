@@ -65,6 +65,10 @@ long long DataSharePredicatesNew()
     return UNIMPL_RET_CODE;
 }
 
+void DataSharePredicatesClean(long long predicatesPtr)
+{
+}
+
 void DataSharePredicatesEqualTo(long long predicatesPtr, rust::String field, const ValueType& value)
 {
 }
@@ -155,6 +159,10 @@ long long DataShareNativeCreate(long long context, rust::String strUri,
                                 bool optionIsUndefined, bool isProxy)
 {
     return UNIMPL_RET_CODE;
+}
+
+void DataShareNativeClean(long long dataShareHelperPtr)
+{
 }
 
 long long DataShareNativeQuery(long long dataShareHelperPtr, rust::String strUri,

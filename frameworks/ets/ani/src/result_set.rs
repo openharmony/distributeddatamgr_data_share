@@ -11,30 +11,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::ffi::CStr;
-
 use ani_rs::{
     objects::{AniObject, AniRef},
     AniEnv,
 };
 
 use crate::{get_native_ptr, wrapper};
-
-pub const GO_TO_FIRST_ROW: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"goToFirstRow\0") };
-
-pub const GO_TO_LAST_ROW: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"goToLastRow\0") };
-
-pub const GO_TO_NEXT_ROW: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"goToNextRow\0") };
-
-pub const GET_STRING: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"getString\0") };
-
-pub const GET_LONG: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"getLong\0") };
-
-pub const GET_COLUMN_INDEX: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"getColumnIndex\0") };
-
-pub const CLOSE: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"close\0") };
 
 pub fn go_to_first_row<'local>(env: AniEnv<'local>, ani_this: AniRef<'local>) -> bool {
     let result_set_ptr = get_native_ptr(&env, &ani_this.into());

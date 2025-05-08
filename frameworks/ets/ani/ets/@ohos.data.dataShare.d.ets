@@ -23,6 +23,17 @@ import { ValuesBucket } from '@ohos.data.ValuesBucket';
 export namespace dataShare {
   loadLibrary("datashare_ani")
 
+  class Cleaner {
+    private nativePtr: long = 0
+    constructor(ptr:long) {
+      this.nativePtr = ptr
+    }
+    native native_clean(): void
+  }
+
+  let destroyRegister = new FinalizationRegistry<Cleaner>((cleaner: Cleaner) => {cleaner.native_clean()})
+  let unregisterToken = new object()
+
   export interface DataShareHelperOptions {
     isProxy?: boolean;
   }
@@ -196,7 +207,6 @@ export namespace dataShare {
   export native function native_off_published_data_change(obj: DataShareHelper, type: string, uris: Array<string>, subscriberId: string, callback?: Callback<PublishedDataChangeNode>): Array<OperationResult>
 
   export function createDataShareHelper(context: Context, uri: string, callback: AsyncCallback<DataShareHelper>): void {
-        console.println("createDataShareHelper enter")
         let p = taskpool.execute(native_create, context, uri, undefined)
         p.then((e: NullishType) => {
             let r = e as DataShareHelper
@@ -211,7 +221,6 @@ export namespace dataShare {
     options: DataShareHelperOptions,
     callback: AsyncCallback<DataShareHelper>
   ): void {
-        console.println("createDataShareHelper enter")
         let p = taskpool.execute(native_create, context, uri, options)
         p.then((e: NullishType) => {
             let r = e as DataShareHelper
@@ -225,14 +234,12 @@ export namespace dataShare {
     uri: string,
     options?: DataShareHelperOptions
   ): Promise<DataShareHelper>  {
-      console.println("createDataShareHelper enter")
       return new Promise<DataShareHelper>((resolve: (v: DataShareHelper) => void, reject: (error: Object) => void) => {
           let p = taskpool.execute(native_create, context, uri, options)
           p.then((e: NullishType) => {
               let r = e as DataShareHelper
               resolve(r)
           }).catch((e: Error): void => {
-              console.log("create failed:", e)
               reject(e)
           })
       })
@@ -240,6 +247,23 @@ export namespace dataShare {
 
   class DataShareHelperInner implements DataShareHelper {
     private nativePtr: long = 0
+    private cleaner: Cleaner | null = null;
+
+    constructor(nativePtr: long) {
+        if(this.nativePtr == 0){
+            this.nativePtr = nativePtr;
+        }
+        this.registerCleaner(this.nativePtr)
+    }
+
+    registerCleaner(ptr: long): void {
+        this.cleaner = new Cleaner(ptr)
+        destroyRegister.register(this, this.cleaner!, unregisterToken);
+    }
+
+    unregisterCleaner(): void {
+        destroyRegister.unregister(unregisterToken);
+    }
 
     native addTemplate(uri: string, subscriberId: string, template: Template): void;
     native delTemplate(uri: string, subscriberId: string): void;
@@ -260,7 +284,6 @@ export namespace dataShare {
                 let r = e as DataShareResultSet
                 resolve(r)
             }).catch((e: Error): void => {
-                console.log("query failed:", e)
                 reject(e)
             })
         })
@@ -287,7 +310,6 @@ export namespace dataShare {
                 let r = e as int
                 resolve(r)
             }).catch((e: Error): void => {
-                console.log("update failed:", e)
                 reject(e)
             })
         })
@@ -327,7 +349,6 @@ export namespace dataShare {
                 let r = e as Array<OperationResult>
                 resolve(r)
             }).catch((e: Error): void => {
-                console.log("publish failed:", e)
                 reject(e)
             })
         })
@@ -349,7 +370,6 @@ export namespace dataShare {
                 let r = e as Array<PublishedItem>
                 resolve(r)
             }).catch((e: Error): void => {
-                console.log("get_published_data failed:", e)
                 reject(e)
             })
         })
@@ -371,7 +391,6 @@ export namespace dataShare {
                 let r = e as int
                 resolve(r)
             }).catch((e: Error): void => {
-                console.log("insert failed:", e)
                 reject(e)
             })
         })
@@ -393,7 +412,6 @@ export namespace dataShare {
                 let r = e as int
                 resolve(r)
             }).catch((e: Error): void => {
-                console.log("insert failed:", e)
                 reject(e)
             })
         })
@@ -415,7 +433,6 @@ export namespace dataShare {
                 let r = e as int
                 resolve(r)
             }).catch((e: Error): void => {
-                console.log("delete failed:", e)
                 reject(e)
             })
         })
@@ -427,7 +444,6 @@ export namespace dataShare {
             p.then(() => {
                 resolve(undefined);
             }).catch((e: Error): void => {
-                console.log("close failed:", e)
                 reject(e)
             })
         })

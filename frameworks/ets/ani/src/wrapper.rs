@@ -14,6 +14,7 @@
 use crate::datashare::{
     ChangeInfo, PublishedDataChangeNode, PublishedItem, RdbDataChangeNode, Template, TemplateId,
 };
+use crate::datashare_extension::*;
 use crate::predicates::ValueType;
 
 mod change_info;
@@ -172,61 +173,158 @@ pub mod ffi {
             env_ptr: i64,
             node: &PublishedDataChangeNode,
         );
+
+        type ValuesBucketHashWrap<'a>;
+        fn call_arkts_insert(
+            extension_ability_ptr: i64,
+            env_ptr: i64,
+            uri: String,
+            value_bucket: &ValuesBucketHashWrap,
+        );
+        fn rust_create_values_bucket() -> Box<ValuesBucketHashWrap<'static>>;
+        fn value_bucket_push_kv_str(
+            value_bucket: &mut ValuesBucketHashWrap,
+            key: String,
+            value: String,
+        );
+        fn value_bucket_push_kv_f64(
+            value_bucket: &mut ValuesBucketHashWrap,
+            key: String,
+            value: f64,
+        );
+        fn value_bucket_push_kv_boolean(
+            value_bucket: &mut ValuesBucketHashWrap,
+            key: String,
+            value: bool,
+        );
+        unsafe fn value_bucket_push_kv_uint8array<'a>(
+            value_bucket: &mut ValuesBucketHashWrap<'a>,
+            key: String,
+            value: &'a [u8],
+        );
+        fn value_bucket_push_kv_null(value_bucket: &mut ValuesBucketHashWrap, key: String);
+
+        type ValuesBucketArrayWrap<'a>;
+        fn call_arkts_batch_insert(
+            extension_ability_ptr: i64,
+            env_ptr: i64,
+            uri: String,
+            value_buckets: &ValuesBucketArrayWrap,
+        );
+        fn rust_create_values_bucket_array() -> Box<ValuesBucketArrayWrap<'static>>;
+        fn values_bucket_array_push_kv_str(
+            value_buckets: &mut ValuesBucketArrayWrap,
+            key: String,
+            value: String,
+            new_hashmap: bool,
+        );
+        fn values_bucket_array_push_kv_f64(
+            value_buckets: &mut ValuesBucketArrayWrap,
+            key: String,
+            value: f64,
+            new_hashmap: bool,
+        );
+        fn values_bucket_array_push_kv_boolean(
+            value_buckets: &mut ValuesBucketArrayWrap,
+            key: String,
+            value: bool,
+            new_hashmap: bool,
+        );
+        unsafe fn values_bucket_array_push_kv_uint8array<'a>(
+            value_buckets: &mut ValuesBucketArrayWrap<'a>,
+            key: String,
+            value: &'a [u8],
+            new_hashmap: bool,
+        );
+        fn values_bucket_array_push_kv_null(
+            value_buckets: &mut ValuesBucketArrayWrap,
+            key: String,
+            new_hashmap: bool,
+        );
+        fn call_arkts_update(
+            extension_ability_ptr: i64,
+            env_ptr: i64,
+            uri: String,
+            predicates_ptr: i64,
+            value_bucket: &ValuesBucketHashWrap,
+        );
+        fn call_arkts_delete(
+            extension_ability_ptr: i64,
+            env_ptr: i64,
+            uri: String,
+            predicates_ptr: i64,
+        );
+        fn call_arkts_query(
+            extension_ability_ptr: i64,
+            env_ptr: i64,
+            uri: String,
+            predicates_ptr: i64,
+            columns: Vec<String>
+        );
+        pub fn call_arkts_on_create(
+            extension_ability_ptr: i64,
+            env_ptr: i64,
+            ani_want: i64,
+        );
     }
 
     unsafe extern "C++" {
         include!("datashare_ani.h");
 
-        fn GoToFirstRow(result_set_ptr: i64) -> bool;
-        fn GoToLastRow(result_set_ptr: i64) -> bool;
-        fn GoToNextRow(result_set_ptr: i64) -> bool;
-        fn GetString(result_set_ptr: i64, column_index: i32) -> String;
-        fn GetLong(result_set_ptr: i64, column_index: i32) -> i64;
-        fn Close(result_set_ptr: i64);
-        fn GetColumnIndex(result_set_ptr: i64, s: String) -> i32;
+        fn GoToFirstRow(resultSetPtr: i64) -> bool;
+        fn GoToLastRow(resultSetPtr: i64) -> bool;
+        fn GoToNextRow(resultSetPtr: i64) -> bool;
+        fn GetString(resultSetPtr: i64, columnIndex: i32) -> String;
+        fn GetLong(resultSetPtr: i64, columnIndex: i32) -> i64;
+        fn Close(resultSetPtr: i64);
+        fn GetColumnIndex(resultSetPtr: i64, s: String) -> i32;
 
         fn DataSharePredicatesNew() -> i64;
-        fn DataSharePredicatesEqualTo(predicates_ptr: i64, field: String, value: &ValueType);
-        fn DataSharePredicatesNotEqualTo(predicates_ptr: i64, field: String, value: &ValueType);
-        fn DataSharePredicatesBeginWrap(predicates_ptr: i64);
-        fn DataSharePredicatesEndWrap(predicates_ptr: i64);
-        fn DataSharePredicatesOr(predicates_ptr: i64);
-        fn DataSharePredicatesAnd(predicates_ptr: i64);
-        fn DataSharePredicatesContains(predicates_ptr: i64, field: String, value: String);
-        fn DataSharePredicatesIsNull(predicates_ptr: i64, field: String);
-        fn DataSharePredicatesIsNotNull(predicates_ptr: i64, field: String);
-        fn DataSharePredicatesLike(predicates_ptr: i64, field: String, value: String);
+        fn DataSharePredicatesClean(predicatesPtr: i64);
+        fn DataSharePredicatesEqualTo(predicatesPtr: i64, field: String, value: &ValueType);
+        fn DataSharePredicatesNotEqualTo(predicatesPtr: i64, field: String, value: &ValueType);
+        fn DataSharePredicatesBeginWrap(predicatesPtr: i64);
+        fn DataSharePredicatesEndWrap(predicatesPtr: i64);
+        fn DataSharePredicatesOr(predicatesPtr: i64);
+        fn DataSharePredicatesAnd(predicatesPtr: i64);
+        fn DataSharePredicatesContains(predicatesPtr: i64, field: String, value: String);
+        fn DataSharePredicatesIsNull(predicatesPtr: i64, field: String);
+        fn DataSharePredicatesIsNotNull(predicatesPtr: i64, field: String);
+        fn DataSharePredicatesLike(predicatesPtr: i64, field: String, value: String);
         fn DataSharePredicatesBetween(
-            predicates_ptr: i64,
+            predicatesPtr: i64,
             field: String,
             low: &ValueType,
             high: &ValueType,
         );
-        fn DataSharePredicatesGreaterThan(predicates_ptr: i64, field: String, value: &ValueType);
+        fn DataSharePredicatesGreaterThan(predicatesPtr: i64, field: String, value: &ValueType);
         fn DataSharePredicatesGreaterThanOrEqualTo(
-            predicates_ptr: i64,
+            predicatesPtr: i64,
             field: String,
             value: &ValueType,
         );
         fn DataSharePredicatesLessThanOrEqualTo(
-            predicates_ptr: i64,
+            predicatesPtr: i64,
             field: String,
             value: &ValueType,
         );
-        fn DataSharePredicatesLessThan(predicates_ptr: i64, field: String, value: &ValueType);
-        fn DataSharePredicatesOrderByAsc(predicates_ptr: i64, field: String);
-        fn DataSharePredicatesOrderByDesc(predicates_ptr: i64, field: String);
-        fn DataSharePredicatesLimit(predicates_ptr: i64, total: f64, offset: f64);
-        fn DataSharePredicatesGroupBy(predicates_ptr: i64, field: Vec<String>);
-        fn DataSharePredicatesIn(predicates_ptr: i64, field: String, value: Vec<ValueType>);
-        fn DataSharePredicatesNotIn(predicates_ptr: i64, field: String, value: Vec<ValueType>);
+        fn DataSharePredicatesLessThan(predicatesPtr: i64, field: String, value: &ValueType);
+        fn DataSharePredicatesOrderByAsc(predicatesPtr: i64, field: String);
+        fn DataSharePredicatesOrderByDesc(predicatesPtr: i64, field: String);
+        fn DataSharePredicatesLimit(predicatesPtr: i64, total: f64, offset: f64);
+        fn DataSharePredicatesGroupBy(predicatesPtr: i64, field: Vec<String>);
+        fn DataSharePredicatesIn(predicatesPtr: i64, field: String, value: Vec<ValueType>);
+        fn DataSharePredicatesNotIn(predicatesPtr: i64, field: String, value: Vec<ValueType>);
 
         fn DataShareNativeCreate(
             context: i64,
-            str_uri: String,
-            option_is_undefined: bool,
-            is_proxy: bool,
+            strUri: String,
+            optionIsUndefined: bool,
+            isProxy: bool,
         ) -> i64;
+
+        fn DataShareNativeClean(dataShareHelperPtr: i64);
+
         fn DataShareNativeQuery(
             dataShareHelperPtr: i64,
             strUri: String,
@@ -283,11 +381,7 @@ pub mod ffi {
 
         fn DataShareNativeClose(dataShareHelperPtr: i64);
 
-        fn DataShareNativeOn(
-            ptrWrap: EnvPtrWrap,
-            strType: String,
-            strUri: String,
-        );
+        fn DataShareNativeOn(ptrWrap: EnvPtrWrap, strType: String, strUri: String);
 
         fn DataShareNativeOnChangeinfo(
             ptrWrap: EnvPtrWrap,
@@ -312,11 +406,7 @@ pub mod ffi {
             sret: &mut PublishSretParam,
         );
 
-        fn DataShareNativeOff(
-            ptrWrap: EnvPtrWrap,
-            strType: String,
-            strUri: String,
-        );
+        fn DataShareNativeOff(ptrWrap: EnvPtrWrap, strType: String, strUri: String);
 
         fn DataShareNativeOffChangeinfo(
             ptrWrap: EnvPtrWrap,
@@ -354,7 +444,7 @@ impl ffi::EnvPtrWrap {
 }
 
 impl ffi::VersionWrap {
-    pub fn new(version_is_undefined: bool, version: i32,) -> Self {
+    pub fn new(version_is_undefined: bool, version: i32) -> Self {
         Self {
             versionIsUndefined: version_is_undefined,
             version,

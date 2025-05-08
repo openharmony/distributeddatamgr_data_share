@@ -22,78 +22,20 @@ use ani_rs::{
 use crate::{
     get_native_ptr,
     wrapper::{
-        self, ffi::{EnvPtrWrap, VersionWrap}, GetPublishedDataSretParam, PublishSretParam, ValuesBucketKvItem, ValuesBucketWrap
+        self,
+        ffi::{EnvPtrWrap, VersionWrap},
+        GetPublishedDataSretParam, PublishSretParam, ValuesBucketKvItem, ValuesBucketWrap,
     },
+    DATA_SHARE,
 };
 
-pub const NATIVE_CREATE: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"native_create\0") };
-
-pub const NATIVE_QUERY: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"native_query\0") };
-
-pub const NATIVE_UPDATE: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"native_update\0") };
-
-pub const NATIVE_INSERT: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"native_insert\0") };
-
-pub const NATIVE_BATCH_INSERT: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"native_batch_insert\0") };
-
-pub const NATIVE_DELETE: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"native_delete\0") };
-
-pub const NATIVE_CLOSE: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"native_close\0") };
-
-pub const NATIVE_PUBLISH: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"native_publish\0") };
-
-pub const NATIVE_GET_PUBLISHED_DATA: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"native_get_published_data\0") };
-
-pub const NATIVE_ADD_TEMPLATE: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"addTemplate\0") };
-
-pub const NATIVE_DEL_TEMPLATE: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"delTemplate\0") };
-
-pub const NATIVE_ON: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"native_on\0") };
-
-pub const NATIVE_ON_CHANGEINFO: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"native_on_changeinfo\0") };
-
-pub const NATIVE_ON_RGB_DATA_CHANGE: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"native_on_rdb_data_change\0") };
-
-pub const NATIVE_ON_PUBLISHED_DATA_CHANGE: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"native_on_published_data_change\0") };
-
-pub const NATIVE_OFF: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"native_off\0") };
-
-pub const NATIVE_OFF_CHANGEINFO: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"native_off_changeinfo\0") };
-
-pub const NATIVE_OFF_RGB_DATA_CHANGE: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"native_off_rdb_data_change\0") };
-
-pub const NATIVE_OFF_PUBLISHED_DATA_CHANGE: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"native_off_published_data_change\0") };
-
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/DataShareHelperInner;")]
-#[derive(Debug)]
-struct DataShareHelperInner {
-    native_ptr: i64,
-}
-
-impl DataShareHelperInner {
-    pub fn new(native_ptr: i64) -> Self {
-        Self { native_ptr }
-    }
-}
-
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/DataShareHelperOptionsInner;")]
+#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/DataShareHelperOptionsInner")]
 #[derive(Debug)]
 struct DataShareHelperOptions {
     is_proxy: Option<bool>,
 }
 
-#[ani_rs::ani(path = "L@ohos/data/DataShareResultSet/DataShareResultSetInner;")]
+#[ani_rs::ani(path = "L@ohos/data/DataShareResultSet/DataShareResultSetInner")]
 #[derive(Debug)]
 struct DataShareResultSet {
     row_count: i32,
@@ -125,7 +67,7 @@ pub enum PublishedItemData<'a> {
     ArrayBuffer(&'a [u8]),
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/PublishedItemInner;")]
+#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/PublishedItemInner")]
 #[derive(Debug)]
 pub struct PublishedItem<'a> {
     pub key: String,
@@ -144,7 +86,7 @@ impl<'a> PublishedItem<'a> {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/OperationResultInner;")]
+#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/OperationResultInner")]
 #[derive(Debug)]
 pub struct OperationResult {
     key: String,
@@ -157,7 +99,7 @@ impl OperationResult {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/TemplateInner;")]
+#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/TemplateInner")]
 #[derive(Debug)]
 pub struct Template {
     pub predicates: HashMap<String, String>,
@@ -165,7 +107,7 @@ pub struct Template {
     pub update: Option<String>,
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/ChangeType;")]
+#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/ChangeType")]
 #[derive(Debug)]
 pub enum ChangeType {
     Insert = 0,
@@ -184,13 +126,13 @@ impl ChangeType {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/SubscriptionType;")]
+#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/SubscriptionType")]
 #[derive(Debug)]
 pub enum SubscriptionType {
     SubscriptionTypeExactUri = 0,
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/ChangeInfoInner;")]
+#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/ChangeInfoInner")]
 pub struct ChangeInfo<'a> {
     pub change_type: ChangeType,
     pub uri: String,
@@ -208,7 +150,7 @@ impl<'a> ChangeInfo<'a> {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/TemplateIdInner;")]
+#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/TemplateIdInner")]
 #[derive(Debug)]
 pub struct TemplateId {
     pub subscriber_id: String,
@@ -224,7 +166,7 @@ impl TemplateId {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/RdbDataChangeNodeInner;")]
+#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/RdbDataChangeNodeInner")]
 #[derive(Debug)]
 pub struct RdbDataChangeNode {
     uri: String,
@@ -246,7 +188,7 @@ impl RdbDataChangeNode {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/PublishedDataChangeNodeInner;")]
+#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/PublishedDataChangeNodeInner")]
 #[derive(Debug)]
 pub struct PublishedDataChangeNode<'a> {
     bundle_name: String,
@@ -294,8 +236,17 @@ pub fn native_create<'local>(
             wrapper::ffi::DataShareNativeCreate(native_context, str_url, true, false);
     }
 
-    let datashare_obj = DataShareHelperInner::new(datashare_helper_ptr);
-    env.serialize(&datashare_obj).unwrap()
+    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"J:V\0") };
+    let datashare_class = env.find_class(DATA_SHARE).unwrap();
+    let datashare_obj = env
+        .new_object_with_signature(&datashare_class, ctor_signature, (datashare_helper_ptr,))
+        .unwrap();
+    datashare_obj.into()
+}
+
+pub fn native_clean<'local>(env: AniEnv<'local>, ani_this: AniObject<'local>) {
+    let datashare_helper_ptr = get_native_ptr(&env, &ani_this.into());
+    wrapper::ffi::DataShareNativeClean(datashare_helper_ptr);
 }
 
 pub fn native_query<'local>(
@@ -357,12 +308,8 @@ pub fn native_publish<'local>(
 
     let mut sret_param = PublishSretParam::new();
     let version = match version {
-        Some(v) => {
-            VersionWrap::new(false, v)
-        }
-        None => {
-            VersionWrap::new(true, 0)
-        }
+        Some(v) => VersionWrap::new(false, v),
+        None => VersionWrap::new(true, 0),
     };
     wrapper::ffi::DataShareNativePublish(
         datashare_helper_ptr,
@@ -510,11 +457,7 @@ pub fn native_on<'local>(
     let callback_ptr = callback.as_raw() as i64;
     let env_ptr = env.inner as i64;
     let ptr_wrap = EnvPtrWrap::new(datashare_helper_ptr, callback_ptr, env_ptr);
-    wrapper::ffi::DataShareNativeOn(
-        ptr_wrap,
-        str_type,
-        str_uri,
-    );
+    wrapper::ffi::DataShareNativeOn(ptr_wrap, str_type, str_uri);
 }
 
 pub fn native_on_changeinfo<'local>(
@@ -534,12 +477,7 @@ pub fn native_on_changeinfo<'local>(
     let type_inner: SubscriptionType = env.deserialize(arktype).unwrap();
     let ptr_wrap = EnvPtrWrap::new(datashare_helper_ptr, callback_ptr, env_ptr);
 
-    wrapper::ffi::DataShareNativeOnChangeinfo(
-        ptr_wrap,
-        str_event,
-        type_inner as i32,
-        str_uri,
-    );
+    wrapper::ffi::DataShareNativeOnChangeinfo(ptr_wrap, str_event, type_inner as i32, str_uri);
 }
 
 pub fn native_on_rdb_data_change<'local>(
@@ -622,11 +560,7 @@ pub fn native_off<'local>(
 
     let env_ptr = env.inner as i64;
     let ptr_wrap = EnvPtrWrap::new(datashare_helper_ptr, callback_ptr, env_ptr);
-    wrapper::ffi::DataShareNativeOff(
-        ptr_wrap,
-        str_type,
-        str_uri,
-    );
+    wrapper::ffi::DataShareNativeOff(ptr_wrap, str_type, str_uri);
 }
 
 pub fn native_off_changeinfo<'local>(
@@ -650,12 +584,7 @@ pub fn native_off_changeinfo<'local>(
     let type_inner: SubscriptionType = env.deserialize(arktype).unwrap();
     let ptr_wrap = EnvPtrWrap::new(datashare_helper_ptr, callback_ptr, env_ptr);
 
-    wrapper::ffi::DataShareNativeOffChangeinfo(
-        ptr_wrap,
-        str_event,
-        type_inner as i32,
-        str_uri,
-    );
+    wrapper::ffi::DataShareNativeOffChangeinfo(ptr_wrap, str_event, type_inner as i32, str_uri);
 }
 
 pub fn native_off_rdb_data_change<'local>(

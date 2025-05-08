@@ -1,0 +1,9 @@
+[package]
+name = "ani"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ani_rs = { path = "../../../../../communication/netmanager_base/common/ani_rs" }
+serde = { version = "1.0", features = ["derive"] }
+cxx = "1.0.115"
