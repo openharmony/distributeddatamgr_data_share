@@ -168,7 +168,7 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(vo
         keys.emplace_back(uri, subscriberId);
     });
     return BaseCallbacks::DisableObservers(keys, subscriber,
-        [&proxy, &subscriberId, this](const std::vector<Key> &lastDisabledKeys,
+        [&proxy, &subscriberId, subscriber, this](const std::vector<Key> &lastDisabledKeys,
         std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDisabledUris;
             std::for_each(lastDisabledKeys.begin(), lastDisabledKeys.end(), [&lastDisabledUris](auto &result) {
@@ -179,7 +179,18 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(vo
             }
 
             auto results = proxy->DisableSubscribePublishedData(lastDisabledUris, subscriberId);
-            opResult.insert(opResult.end(), results.begin(), results.end());
+            std::vector<Key> failedKeys;
+            for (auto &result : results) {
+                opResult.emplace_back(result);
+                if (result.errCode_ != E_OK) {
+                    failedKeys.emplace_back(result.key_, subscriberId);
+                    LOG_WARN("DisableObservers failed, uri is %{public}s, errCode is %{public}d", result.key_.c_str(),
+                        result.errCode_);
+                }
+            }
+            if (failedKeys.size() > 0) {
+                BaseCallbacks::EnableObservers(failedKeys, subscriber);
+            }
         });
 }
 

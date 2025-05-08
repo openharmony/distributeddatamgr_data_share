@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #define LOG_TAG "DataShareHelperImpl"
-
+#include <cinttypes>
 #include "datashare_helper_impl.h"
 
 #include "adaptor.h"
@@ -438,6 +438,11 @@ std::vector<OperationResult> DataShareHelperImpl::EnableRdbSubs(const std::vecto
     const TemplateId &templateId)
 {
     LOG_DEBUG("Start EnableSubscribeRdbData");
+    for (auto uri : uris) {
+        LOG_INFO("uri is %{public}s", uri.c_str());
+    }
+    LOG_INFO("bundleName is %{public}s, subscriberId is %{public}" PRId64 "", templateId.bundleName_.c_str(),
+        templateId.subscriberId_);
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
@@ -453,6 +458,11 @@ std::vector<OperationResult> DataShareHelperImpl::DisableRdbSubs(const std::vect
     const TemplateId &templateId)
 {
     LOG_DEBUG("Start DisableSubscribeRdbData");
+    for (auto uri : uris) {
+        LOG_INFO("uri is %{public}s", uri.c_str());
+    }
+    LOG_INFO("bundleName is %{public}s, subscriberId is %{public}" PRId64 "", templateId.bundleName_.c_str(),
+        templateId.subscriberId_);
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
@@ -504,6 +514,10 @@ std::vector<OperationResult> DataShareHelperImpl::EnablePubSubs(const std::vecto
     int64_t subscriberId)
 {
     LOG_DEBUG("Start enablePubSubs");
+    for (auto uri : uris) {
+        LOG_INFO("uri is %{public}s", uri.c_str());
+    }
+    LOG_INFO("subscriberId is %{public}" PRId64 "", subscriberId);
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
@@ -519,6 +533,10 @@ std::vector<OperationResult> DataShareHelperImpl::DisablePubSubs(const std::vect
     int64_t subscriberId)
 {
     LOG_DEBUG("Start disablePubSubs");
+    for (auto uri : uris) {
+        LOG_INFO("uri is %{public}s", uri.c_str());
+    }
+    LOG_INFO("subscriberId is %{public}" PRId64 "", subscriberId);
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
