@@ -48,6 +48,7 @@ void Close(long long resultSetPtr);
 int GetColumnIndex(long long resultSetPtr, rust::String columnName);
 
 long long DataSharePredicatesNew();
+void DataSharePredicatesClean(long long predicatesPtr);
 void DataSharePredicatesEqualTo(long long predicatesPtr, rust::String field, const ValueType& value);
 void DataSharePredicatesNotEqualTo(long long predicatesPtr, rust::String field, const ValueType& value);
 void DataSharePredicatesBeginWrap(long long predicatesPtr);
@@ -72,6 +73,8 @@ void DataSharePredicatesIn(long long predicatesPtr, rust::String field, rust::Ve
 void DataSharePredicatesNotIn(long long predicatesPtr, rust::String field, rust::Vec<ValueType> value);
 
 long long DataShareNativeCreate(long long context, rust::String strUri, bool optionIsUndefined, bool isProxy);
+
+void DataShareNativeClean(long long dataShareHelperPtr);
 
 long long DataShareNativeQuery(long long dataShareHelperPtr, rust::String strUri,
                                long long dataSharePredicatesPtr, rust::Vec<rust::String> columns);

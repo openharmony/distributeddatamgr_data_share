@@ -16,23 +16,49 @@
 import { ValueType } from "@ohos.data.ValuesBucket"
 
 export default namespace dataSharePredicates{
+class Cleaner {
+  private nativePtr: long = 0
+  constructor(ptr:long) {
+    this.nativePtr = ptr
+  }
+  native native_clean(): void
+}
+
+let destroyRegister = new FinalizationRegistry<Cleaner>((cleaner: Cleaner) => {cleaner.native_clean()})
+let unregisterToken = new object()
+
 export class DataSharePredicates {
 
   static { loadLibrary("datashare_ani") }
 
   private nativePtr:long = 0;
+  private cleaner: Cleaner | null = null;
 
   constructor() {
-      console.log("enter constructor")
       if (this.nativePtr == 0) {
-          console.log("start create")
           this.nativePtr = DataSharePredicates.create();
-          console.log("stop create")
       }
+      this.registerCleaner(this.nativePtr)
+  }
+
+  constructor(nativePtr: long) {
+    if(this.nativePtr == 0){
+        this.nativePtr = nativePtr;
+    }
+    this.registerCleaner(this.nativePtr)
   }
 
   getNativePtr():long {
       return this.nativePtr;
+  }
+
+  registerCleaner(ptr: long): void {
+    this.cleaner = new Cleaner(ptr)
+    destroyRegister.register(this, this.cleaner!, unregisterToken);
+  }
+
+  unregisterCleaner(): void {
+    destroyRegister.unregister(unregisterToken);
   }
 
   native static create(): long;

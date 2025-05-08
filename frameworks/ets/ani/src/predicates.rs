@@ -11,8 +11,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::ffi::CStr;
-
 use ani_rs::{
     objects::{AniClass, AniObject, AniRef},
     AniEnv,
@@ -26,31 +24,6 @@ pub enum ValueType {
     F64(f64),
     Boolean(bool),
 }
-
-pub const CREATE: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"create\0") };
-pub const EQUAL_TO: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"equalTo\0") };
-pub const NOT_EQUAL_TO: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"notEqualTo\0") };
-pub const BEGIN_WRAP: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"beginWrap\0") };
-pub const END_WRAP: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"endWrap\0") };
-pub const OR: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"or\0") };
-pub const AND: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"and\0") };
-pub const CONTAINS: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"contains\0") };
-pub const IS_NULL: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"isNull\0") };
-pub const IS_NOT_NULL: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"isNotNull\0") };
-pub const LIKE: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"like\0") };
-pub const BETWEEN: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"between\0") };
-pub const GREATER_THAN: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"greaterThan\0") };
-pub const GREATER_THAN_OR_EQUAL_TO: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"greaterThanOrEqualTo\0") };
-pub const LESS_THAN_OR_EQUAL_TO: &CStr =
-    unsafe { CStr::from_bytes_with_nul_unchecked(b"lessThanOrEqualTo\0") };
-pub const LESS_THAN: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"lessThan\0") };
-pub const ORDER_BY_ASC: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"orderByAsc\0") };
-pub const ORDER_BY_DESC: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"orderByDesc\0") };
-pub const LIMIT: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"limit\0") };
-pub const GROUP_BY: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"groupBy\0") };
-pub const IN: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"in\0") };
-pub const NOT_IN: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"notIn\0") };
 
 pub fn create<'local>(_env: AniEnv<'local>, _clazz: AniClass<'local>) -> i64 {
     wrapper::ffi::DataSharePredicatesNew()
@@ -314,4 +287,12 @@ pub fn native_not_in<'local>(
     wrapper::ffi::DataSharePredicatesNotIn(predicates_ptr, filed_rust, value_rust);
 
     ani_this
+}
+
+pub fn native_clean<'local>(
+    env: AniEnv<'local>,
+    ani_this: AniRef<'local>,
+) {
+    let predicates_ptr = get_native_ptr(&env, &ani_this.into());
+    wrapper::ffi::DataSharePredicatesClean(predicates_ptr);
 }

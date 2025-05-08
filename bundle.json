@@ -65,7 +65,8 @@
                 "napi",
                 "relational_store",
                 "runtime_core",
-                "samgr"
+                "samgr",
+                "netmanager_base"
             ],
             "third_party": []
         },
@@ -75,6 +76,7 @@
                 ],
                 "fwk_group": [
                     "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_consumer",
+                    "//foundation/distributeddatamgr/data_share/frameworks/ets/ani:datashare_ani",
                     "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_permission",
                     "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_provider",
                     "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common",
