@@ -21,6 +21,8 @@ group("unittest") {
   deps += [
     ":AbnormalBranchTest",
     ":ControllerTest",
+    ":DataShareBlockWriterImplTest",
+    ":DataShareHelperTest",
     ":DataShareHelperImplTest",
     ":ErrorCodeTest",
     ":JoinTest",
@@ -540,6 +542,81 @@ ohos_unittest("SharedBlockTest") {
     "c_utils:utils",
     "googletest:gmock_main",
     "hilog:libhilog",
+  ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+ohos_unittest("DataShareBlockWriterImplTest") {
+  module_out_path = "data_share/data_share/inner_tests"
+
+  include_dirs = [
+    "${datashare_native_consumer_path}/include",
+    "${datashare_common_native_path}/include",
+    "${datashare_innerapi_path}/consumer/include",
+    "${datashare_innerapi_path}/common/include",
+    "${datashare_innerapi_path}/provider/include",
+    "${datashare_native_consumer_path}/controller/provider/include",
+    "${datashare_native_consumer_path}/controller/common",
+    "${datashare_native_consumer_path}/controller/service/include",
+    "${datashare_native_proxy_path}/include",
+  ]
+
+  sources = [ "./unittest/mediadatashare_test/src/datashare_block_writer_impl_test.cpp" ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+
+  external_deps = [
+    "ability_base:zuri",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
+  ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+ohos_unittest("DataShareHelperTest") {
+  module_out_path = "data_share/data_share/inner_tests"
+
+  include_dirs = [ "${datashare_base_path}/frameworks/native/common/include/" ]
+
+  sources = [ "./unittest/mediadatashare_test/src/datashare_helper_test.cpp" ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_context",
+    "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "hitrace:libhitracechain",
+    "ipc:ipc_single",
+    "ipc:rpc",
+    "samgr:samgr_proxy",
   ]
 
   cflags = [
