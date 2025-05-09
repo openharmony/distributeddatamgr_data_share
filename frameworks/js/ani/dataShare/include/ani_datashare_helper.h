@@ -21,7 +21,6 @@
 
 namespace OHOS {
 namespace DataShare {
-
 } // namespace DataShare
 } // namespace OHOS
 #endif /* ANI_DATASHARE_HELPER_H */

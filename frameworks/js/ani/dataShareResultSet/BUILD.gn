@@ -24,9 +24,12 @@ ohos_shared_library("data_share_result_set") {
     debug = false
   }
 
-  sources = [ "./src/data_share_result_set.cpp" ]
+  sources = [
+    "${datashare_ani_path}/common/src/ani_utils.cpp",
+    "./src/data_share_result_set.cpp"
+  ]
   include_dirs = [
-    "include",
+    "${datashare_ani_path}/common/include",
     "${datashare_innerapi_path}/consumer/include",
     "${datashare_innerapi_path}/provider/include",
     "${datashare_common_native_path}/include",

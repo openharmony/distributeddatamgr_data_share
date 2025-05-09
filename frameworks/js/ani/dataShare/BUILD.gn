@@ -30,11 +30,13 @@ ohos_shared_library("datashare") {
     "src/ani_datashare_helper.cpp",
     "src/ani_datashare_inner_observer.cpp",
     "src/ani_datashare_observer.cpp",
+    "${datashare_ani_path}/common/src/ani_utils.cpp",
   ]
 
   include_dirs = [
-    "${datashare_base_path}/interfaces/inner_api/common/include",
     "include/",
+    "${datashare_base_path}/interfaces/inner_api/common/include",
+    "${datashare_ani_path}/common/include",
   ]
 
   deps = [
@@ -46,6 +48,7 @@ ohos_shared_library("datashare") {
     "ability_runtime:ani_base_context",
     "ability_runtime:ani_common",
     "ability_runtime:app_context",
+    "access_token:libtokenid_sdk",
     "c_utils:utils",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
@@ -60,8 +63,8 @@ ohos_shared_library("datashare") {
 }
 
 generate_static_abc("datashare_abc") {
-  base_url = "./ets"
-  files = [ "./ets/@ohos.data.dataShare.ets" ]
+  base_url = "ets"
+  files = [ "ets/@ohos.data.dataShare.ets" ]
   dst_file = "$target_out_dir/datashare.abc"
   out_puts = [ "$target_out_dir/datashare.abc" ]
   is_boot_abc = "True"
@@ -92,25 +95,33 @@ ohos_shared_library("datasharepredicates_ani") {
     debug = false
   }
 
-  sources = [ "./src/data_share_predicates.cpp" ]
+  sources = [
+    "src/data_share_predicates.cpp",
+    "${datashare_ani_path}/common/src/ani_utils.cpp",
+  ]
+
   include_dirs = [
     "include",
     "${datashare_common_native_path}/include",
+    "${datashare_ani_path}/common/include",
   ]
+
   deps = [ "${datashare_innerapi_path}/common:datashare_common" ]
+
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
     "runtime_core:ani",
   ]
+
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
   output_extension = "so"
 }
 
 generate_static_abc("data_share_predicates_abc") {
-  base_url = "./ets"
-  files = [ "./ets/@ohos.data.dataSharePredicates.ets" ]
+  base_url = "ets"
+  files = [ "ets/@ohos.data.dataSharePredicates.ets" ]
   dst_file = "$target_out_dir/data_share_predicates.abc"
   out_puts = [ "$target_out_dir/data_share_predicates.abc" ]
   is_boot_abc = "True"

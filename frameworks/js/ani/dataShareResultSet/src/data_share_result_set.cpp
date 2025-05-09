@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include <ani.h>
+#include <ani_utils.h>
 #include <array>
 #include <iostream>
 #include <vector>
@@ -24,14 +24,28 @@
 #include "datashare_errno.h"
 #include "datashare_log.h"
 #include "datashare_result_set.h"
-#include "native_object_manager.h"
 
 using namespace OHOS::DataShare;
+
+static std::shared_ptr<DataShareResultSet> GetResultSet(ani_env *env, ani_object obj)
+{
+    auto holder = AniObjectUtils::Unwrap<SharedPtrHolder<DataShareResultSet>>(env, obj);
+    if (holder == nullptr) {
+        LOG_ERROR("SharedPtrHolder is NULL");
+        return nullptr;
+    }
+    if (holder->Get() == nullptr) {
+        LOG_ERROR("Holder shared_ptr is NULL");
+        return nullptr;
+    }
+
+    return holder->Get();
+}
 
 static void Close([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object obj)
 {
     static const char *className = "L@ohos/data/DataShareResultSet/DataShareResultSetImpl;";
-    auto classObj = AniObjectUtils::Unwrap<DataShareResultSet>(env, obj);
+    auto classObj = GetResultSet(env, obj);
     if (classObj == nullptr) {
         LOG_ERROR("DataShareResultSet is NULL");
         return;
@@ -59,15 +73,15 @@ static void Close([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object obj
     return;
 }
 
-static ani_int GetColumnIndex([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object obj, ani_string columnName)
+static ani_double GetColumnIndex([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object obj, ani_string columnName)
 {
     int32_t columnIndex = -1;
     if (columnName == nullptr) {
-        return static_cast<ani_int>(columnIndex);
+        return static_cast<ani_double>(columnIndex);
     }
     auto columnNameStr = AniStringUtils::ToStd(env, columnName);
 
-    auto classObj = AniObjectUtils::Unwrap<DataShareResultSet>(env, obj);
+    auto classObj = GetResultSet(env, obj);
     if (classObj == nullptr) {
         LOG_ERROR("DataShareResultSet is NULL");
         return static_cast<ani_double>(columnIndex);
@@ -79,14 +93,14 @@ static ani_int GetColumnIndex([[maybe_unused]] ani_env *env, [[maybe_unused]] an
         LOG_ERROR("failed code:%{public}d columnIndex: %{public}d. times %{public}" PRIu64 ".", errCode, columnIndex,
                   time);
     }
-    return static_cast<ani_int>(columnIndex);
+    return static_cast<ani_double>(columnIndex);
 }
 
 static ani_string GetString([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object obj, ani_double columnIndex)
 {
     std::string value;
     double columnIndexD = static_cast<double>(columnIndex);
-    auto classObj = AniObjectUtils::Unwrap<DataShareResultSet>(env, obj);
+    auto classObj = GetResultSet(env, obj);
     if (classObj == nullptr) {
         LOG_ERROR("DataShareResultSet is NULL");
         return nullptr;
@@ -97,7 +111,7 @@ static ani_string GetString([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_
 
 static bool GoToFirstRow([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object obj)
 {
-    auto classObj = AniObjectUtils::Unwrap<DataShareResultSet>(env, obj);
+    auto classObj = GetResultSet(env, obj);
     if (classObj == nullptr) {
         LOG_ERROR("DataShareResultSet is NULL");
         return false;
@@ -111,16 +125,16 @@ static bool GoToFirstRow([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_obj
     return true;
 }
 
-static ani_int GetRowCount([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object obj)
+static ani_double GetRowCount([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object obj)
 {
     int32_t count = -1;
-    auto classObj = AniObjectUtils::Unwrap<DataShareResultSet>(env, obj);
+    auto classObj = GetResultSet(env, obj);
     if (classObj == nullptr) {
         LOG_ERROR("DataShareResultSet is NULL");
-        return static_cast<ani_int>(count);
+        return static_cast<ani_double>(count);
     }
     classObj->GetRowCount(count);
-    return static_cast<ani_int>(count);
+    return static_cast<ani_double>(count);
 }
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
