@@ -218,6 +218,7 @@ void PublishedDataSubscriberManager::Emit(PublishedDataChangeNode &changeNode)
     std::map<std::shared_ptr<Observer>, PublishedDataChangeNode> results;
     for (auto &data : changeNode.datas_) {
         PublishedObserverMapKey key(data.key_, data.subscriberId_);
+        BaseCallbacks::SetObserversNotifiedOnEnabled(key);
         auto callbacks = BaseCallbacks::GetEnabledObservers(key);
         if (callbacks.empty()) {
             LOG_WARN("%{private}s nobody subscribe, but still notify", data.key_.c_str());
@@ -231,7 +232,6 @@ void PublishedDataSubscriberManager::Emit(PublishedDataChangeNode &changeNode)
         for (auto const &obs : callbacks) {
             results[obs].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
         }
-        BaseCallbacks::SetObserversNotifiedOnEnabled(key);
     }
     for (auto &[callback, node] : results) {
         node.ownerBundleName_ = changeNode.ownerBundleName_;
