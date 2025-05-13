@@ -438,11 +438,12 @@ std::vector<OperationResult> DataShareHelperImpl::EnableRdbSubs(const std::vecto
     const TemplateId &templateId)
 {
     LOG_DEBUG("Start EnableSubscribeRdbData");
+    std::string uriAll = "";
     for (auto uri : uris) {
-        LOG_INFO("uri is %{public}s", uri.c_str());
+        uriAll += uri;
     }
-    LOG_INFO("bundleName is %{public}s, subscriberId is %{public}" PRId64 "", templateId.bundleName_.c_str(),
-        templateId.subscriberId_);
+    LOG_INFO("uri is %{public}s, bundleName is %{public}s, subscriberId is %{public}" PRId64 "", uriAll.c_str(),
+        templateId.bundleName_.c_str(), templateId.subscriberId_);
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
@@ -458,11 +459,12 @@ std::vector<OperationResult> DataShareHelperImpl::DisableRdbSubs(const std::vect
     const TemplateId &templateId)
 {
     LOG_DEBUG("Start DisableSubscribeRdbData");
+    std::string uriAll = "";
     for (auto uri : uris) {
-        LOG_INFO("uri is %{public}s", uri.c_str());
+        uriAll += uri;
     }
-    LOG_INFO("bundleName is %{public}s, subscriberId is %{public}" PRId64 "", templateId.bundleName_.c_str(),
-        templateId.subscriberId_);
+    LOG_INFO("uri is %{public}s, bundleName is %{public}s, subscriberId is %{public}" PRId64 "", uriAll.c_str(),
+        templateId.bundleName_.c_str(), templateId.subscriberId_);
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
@@ -514,10 +516,11 @@ std::vector<OperationResult> DataShareHelperImpl::EnablePubSubs(const std::vecto
     int64_t subscriberId)
 {
     LOG_DEBUG("Start enablePubSubs");
+    std::string uriAll = "";
     for (auto uri : uris) {
-        LOG_INFO("uri is %{public}s", uri.c_str());
+        uriAll += uri;
     }
-    LOG_INFO("subscriberId is %{public}" PRId64 "", subscriberId);
+    LOG_INFO("uri is %{public}s, subscriberId is %{public}" PRId64 "", uriAll.c_str(), subscriberId);
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
@@ -533,10 +536,11 @@ std::vector<OperationResult> DataShareHelperImpl::DisablePubSubs(const std::vect
     int64_t subscriberId)
 {
     LOG_DEBUG("Start disablePubSubs");
+    std::string uriAll = "";
     for (auto uri : uris) {
-        LOG_INFO("uri is %{public}s", uri.c_str());
+        uriAll += uri;
     }
-    LOG_INFO("subscriberId is %{public}" PRId64 "", subscriberId);
+    LOG_INFO("uri is %{public}s, subscriberId is %{public}" PRId64 "", uriAll.c_str(), subscriberId);
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
