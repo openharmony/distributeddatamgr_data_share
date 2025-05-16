@@ -177,7 +177,8 @@ std::vector<OperationResult> RdbSubscriberManager::DisableObservers(void *subscr
         keys.emplace_back(uri, templateId);
     });
     return BaseCallbacks::DisableObservers(keys, subscriber,
-        [&proxy, &templateId, this](const std::vector<Key> &lastDisabledKeys, std::vector<OperationResult> &opResult) {
+        [&proxy, subscriber, &templateId, this](const std::vector<Key> &lastDisabledKeys,
+        std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDisabledUris;
             std::for_each(lastDisabledKeys.begin(), lastDisabledKeys.end(), [&lastDisabledUris](auto &result) {
                 lastDisabledUris.emplace_back(result);
@@ -187,7 +188,18 @@ std::vector<OperationResult> RdbSubscriberManager::DisableObservers(void *subscr
             }
 
             auto results = proxy->DisableSubscribeRdbData(lastDisabledUris, templateId);
-            opResult.insert(opResult.end(), results.begin(), results.end());
+            std::vector<Key> failedKeys;
+            for (auto &result : results) {
+                opResult.emplace_back(result);
+                if (result.errCode_ != E_OK) {
+                    failedKeys.emplace_back(result.key_, templateId);
+                    LOG_WARN("DisableObservers failed, uri is %{public}s, errCode is %{public}d", result.key_.c_str(),
+                        result.errCode_);
+                }
+            }
+            if (!failedKeys.empty()) {
+                BaseCallbacks::EnableObservers(failedKeys, subscriber);
+            }
         });
 }
 
