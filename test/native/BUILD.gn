@@ -22,6 +22,7 @@ group("unittest") {
     ":AbnormalBranchTest",
     ":ControllerTest",
     ":DataShareBlockWriterImplTest",
+    ":DataShareCommonTest",
     ":DataShareHelperTest",
     ":DataShareHelperImplTest",
     ":ErrorCodeTest",
@@ -631,6 +632,57 @@ ohos_unittest("DataShareHelperTest") {
     "samgr:samgr_proxy",
   ]
 
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+ohos_unittest("DataShareCommonTest") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  
+  module_out_path = "data_share/data_share/inner_tests"
+
+  include_dirs = [
+    "${datashare_base_path}/frameworks/native/common/include/"
+  ]
+
+  sources = [ "./unittest/mediadatashare_test/src/datashare_common_test.cpp" ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_context",
+    "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "hitrace:libhitracechain",
+    "ipc:ipc_single",
+    "ipc:rpc",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+  
   cflags = [
     "-fvisibility=hidden",
     "-Dprivate=public",
