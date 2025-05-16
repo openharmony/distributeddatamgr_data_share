@@ -170,12 +170,12 @@ export namespace dataShare {
             return this.nativePtr
         }
 
-        native function on(type: 'dataChange', uri: string, callback: AsyncCallback<void>): void
-        native function off(type: 'dataChange', uri: string, callback?: AsyncCallback<void>): void
-        native function on(event: 'dataChange', type: SubscriptionType, uri: string, callback: AsyncCallback<ChangeInfo>): void
-        native function off(event: 'dataChange', type: SubscriptionType, uri: string, callback?: AsyncCallback<ChangeInfo>): void
-        native function ani_query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>): DataShareResultSet
-        native function ani_update(uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket): number
+        native on(type: 'dataChange', uri: string, callback: AsyncCallback<void>): void
+        native off(type: 'dataChange', uri: string, callback?: AsyncCallback<void>): void
+        native on(event: 'dataChange', type: SubscriptionType, uri: string, callback: AsyncCallback<ChangeInfo>): void
+        native off(event: 'dataChange', type: SubscriptionType, uri: string, callback?: AsyncCallback<ChangeInfo>): void
+        native ani_query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>): DataShareResultSet
+        native ani_update(uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket): number
 
         query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>, callback: AsyncCallback<DataShareResultSet>): void {
             let p = taskpool.execute(this.ani_query, uri, predicates, columns)
