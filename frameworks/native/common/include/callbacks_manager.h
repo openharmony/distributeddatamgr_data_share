@@ -49,8 +49,10 @@ public:
             CallbacksManager::DefaultProcess);
 
     std::vector<OperationResult> EnableObservers(const std::vector<Key> &keys, void *subscriber,
-        std::function<void(std::map<Key, std::vector<ObserverNodeOnEnabled>> &)> processOnLocalEnabled,
-        std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)>);
+        std::function<void(std::map<Key, std::vector<ObserverNodeOnEnabled>> &)> processOnLocalEnabled =
+            CallbacksManager::DefaultProcessOnLocalEnabled,
+        std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnFirstAdd =
+            CallbacksManager::DefaultProcess);
 
     std::vector<OperationResult> DisableObservers(const std::vector<Key> &keys, void *subscriber,
         std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnLastDel =
@@ -65,6 +67,7 @@ public:
 
 private:
     static void DefaultProcess(const std::vector<Key> &, std::vector<OperationResult> &){};
+    static void DefaultProcessOnLocalEnabled(std::map<Key, std::vector<ObserverNodeOnEnabled>> &){};
     struct ObserverNode {
         std::shared_ptr<Observer> observer_;
         bool enabled_;

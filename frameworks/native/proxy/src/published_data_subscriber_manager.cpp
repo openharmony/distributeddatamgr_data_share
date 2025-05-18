@@ -168,7 +168,7 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(vo
         keys.emplace_back(uri, subscriberId);
     });
     return BaseCallbacks::DisableObservers(keys, subscriber,
-        [&proxy, &subscriberId, this](const std::vector<Key> &lastDisabledKeys,
+        [&proxy, &subscriberId, subscriber, this](const std::vector<Key> &lastDisabledKeys,
         std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDisabledUris;
             std::for_each(lastDisabledKeys.begin(), lastDisabledKeys.end(), [&lastDisabledUris](auto &result) {
@@ -179,7 +179,18 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(vo
             }
 
             auto results = proxy->DisableSubscribePublishedData(lastDisabledUris, subscriberId);
-            opResult.insert(opResult.end(), results.begin(), results.end());
+            std::vector<Key> failedKeys;
+            for (auto &result : results) {
+                opResult.emplace_back(result);
+                if (result.errCode_ != E_OK) {
+                    failedKeys.emplace_back(result.key_, subscriberId);
+                    LOG_WARN("DisableObservers failed, uri is %{public}s, errCode is %{public}d", result.key_.c_str(),
+                        result.errCode_);
+                }
+            }
+            if (failedKeys.size() > 0) {
+                BaseCallbacks::EnableObservers(failedKeys, subscriber);
+            }
         });
 }
 
@@ -208,27 +219,23 @@ void PublishedDataSubscriberManager::RecoverObservers(std::shared_ptr<DataShareS
 
 void PublishedDataSubscriberManager::Emit(PublishedDataChangeNode &changeNode)
 {
-    for (auto &data : changeNode.datas_) {
-        Key key(data.key_, data.subscriberId_);
-        lastChangeNodeMap_.Compute(key, [](const Key &, PublishedDataChangeNode &value) {
-            value.datas_.clear();
-            return true;
-        });
-    }
     std::map<std::shared_ptr<Observer>, PublishedDataChangeNode> results;
     for (auto &data : changeNode.datas_) {
         PublishedObserverMapKey key(data.key_, data.subscriberId_);
+        // Still set observer was notified flag and store data if there is no enabled observer.
         BaseCallbacks::SetObserversNotifiedOnEnabled(key);
         auto callbacks = BaseCallbacks::GetEnabledObservers(key);
-        if (callbacks.empty()) {
-            LOG_WARN("%{private}s nobody subscribe, but still notify", data.key_.c_str());
-            continue;
-        }
         lastChangeNodeMap_.Compute(key, [&data, &changeNode](const Key &, PublishedDataChangeNode &value) {
+            value.datas_.clear();
             value.datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
             value.ownerBundleName_ = changeNode.ownerBundleName_;
             return true;
         });
+
+        if (callbacks.empty()) {
+            LOG_WARN("%{private}s nobody subscribe, but still notify", data.key_.c_str());
+            continue;
+        }
         for (auto const &obs : callbacks) {
             results[obs].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
         }
