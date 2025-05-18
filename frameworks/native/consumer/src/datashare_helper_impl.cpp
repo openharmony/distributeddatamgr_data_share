@@ -17,10 +17,9 @@
 #include "datashare_helper_impl.h"
 
 #include "adaptor.h"
-#include "concurrent_map.h"
-#include "data_ability_observer_interface.h"
 #include "dataobs_mgr_client.h"
 #include "datashare_log.h"
+#include "datashare_string_utils.h"
 #include "datashare_radar_reporter.h"
 #include "datashare_result_set.h"
 
@@ -313,6 +312,98 @@ void DataShareHelperImpl::NotifyChange(const Uri &uri)
     DataShareServiceProxy::SetSystem(isSystem_);
     generalCtl->NotifyChange(uri);
     DataShareServiceProxy::CleanSystem();
+    return;
+}
+
+/**
+ * Registers an observer to DataObsMgr specified by the given Uri. Only non-silent is supported, and there is no
+ * default implemention for the provider. It needs to be handled by the user.
+ *
+ * @param uri, Indicates the path of the data to operate.
+ * @param dataObserver, Indicates the DataShareObserver object.
+ * @param isDescendants, Indicates the Whether to note the change of descendants.
+ */
+void DataShareHelperImpl::RegisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+    bool isDescendants)
+{
+    sptr<ObserverImpl> obs = ObserverImpl::GetObserver(uri, dataObserver);
+    if (obs == nullptr) {
+        LOG_ERROR("new ObserverImpl failed");
+        return;
+    }
+    auto generalCtl = generalCtl_;
+    if (generalCtl == nullptr) {
+        LOG_ERROR("generalCtl is nullptr");
+        return;
+    }
+    DataShareServiceProxy::SetSystem(isSystem_);
+    // only support non-silent access
+    ErrCode ret = generalCtl->RegisterObserverExtProvider(uri, obs, isDescendants);
+    DataShareServiceProxy::CleanSystem();
+    LOG_INFO("Register observerExt, ret:%{public}d, uri:%{public}s",
+        ret, DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+    if (ret != E_OK) {
+        ObserverImpl::DeleteObserver(uri, dataObserver);
+    }
+    return;
+}
+
+/**
+ * Deregisters an observer used for DataObsMgr specified by the given Uri. Only non-silent is supported, and there is
+ * no default implemention for the provider. It needs to be handled by the user.
+ *
+ * @param uri, Indicates the path of the data to operate.
+ * @param dataObserver, Indicates the DataShareObserver object.
+ */
+void DataShareHelperImpl::UnregisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver)
+{
+    if (dataObserver == nullptr) {
+        LOG_ERROR("dataObserver is nullptr");
+        return;
+    }
+    if (!ObserverImpl::FindObserver(uri, dataObserver)) {
+        LOG_ERROR("observer not exit!");
+        return;
+    }
+    sptr<ObserverImpl> obs = ObserverImpl::GetObserver(uri, dataObserver);
+    if (obs == nullptr) {
+        LOG_ERROR("new ObserverImpl failed");
+        return;
+    }
+    auto generalCtl = generalCtl_;
+    if (generalCtl == nullptr) {
+        LOG_ERROR("generalCtl is nullptr");
+        return;
+    }
+    DataShareServiceProxy::SetSystem(isSystem_);
+    // only support non-silent access
+    ErrCode ret = generalCtl->UnregisterObserverExtProvider(uri, obs);
+    DataShareServiceProxy::CleanSystem();
+    if (ret != E_OK) {
+        return;
+    }
+    ObserverImpl::DeleteObserver(uri, dataObserver);
+    return;
+}
+
+/**
+ * Notifies the registered observers of a change to the data resource specified by Uris. Only non-silent is supported,
+ * and there is no default implemention for the provider. It needs to be handled by the user.
+ *
+ * @param changeInfo Indicates the info of the data to operate.
+ */
+void DataShareHelperImpl::NotifyChangeExtProvider(const DataShareObserver::ChangeInfo &changeInfo)
+{
+    auto generalCtl = generalCtl_;
+    if (generalCtl == nullptr) {
+        LOG_ERROR("extSpCtl is nullptr");
+        return;
+    }
+    DataShareServiceProxy::SetSystem(isSystem_);
+    // only support non-silent access
+    ErrCode ret = generalCtl->NotifyChangeExtProvider(ObserverImpl::ConvertInfo(changeInfo));
+    DataShareServiceProxy::CleanSystem();
+    LOG_INFO("Notify changeExt, ret:%{public}d", ret);
     return;
 }
 

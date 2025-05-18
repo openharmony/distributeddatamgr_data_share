@@ -18,6 +18,7 @@
 
 #include <memory>
 #include "extension_base.h"
+#include "data_ability_observer_interface.h"
 #include "datashare_business_error.h"
 #include "datashare_values_bucket.h"
 #include "datashare_predicates.h"
@@ -36,6 +37,7 @@ using namespace AbilityRuntime;
 class DataShareExtAbilityContext;
 class DataShareExtAbility;
 using CreatorFunc = std::function<DataShareExtAbility* (const std::unique_ptr<Runtime>& runtime)>;
+using ChangeInfo = AAFwk::ChangeInfo;
 /**
  * @brief Basic datashare extension ability components.
  */
@@ -222,6 +224,35 @@ public:
      * @return Return true if success. otherwise return false.
      */
     virtual bool NotifyChange(const Uri &uri);
+
+    /**
+     * @brief Registers an observer to DataObsMgr specified by the given Uri.
+     * Return true, need override by users.
+     *
+     * @param uri, Indicates the path of the data to operate.
+     * @param dataObserver, Indicates the IDataAbilityObserver object.
+     */
+    virtual bool RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+        bool isDescendants);
+
+    /**
+     * @brief Deregisters an observer used for DataObsMgr specified by the given Uri.
+     * Return true, need override by users.
+     *
+     * @param uri, Indicates the path of the data to operate.
+     * @param dataObserver, Indicates the IDataAbilityObserver object.
+     */
+    virtual bool UnregisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+
+    /**
+     * @brief Notifies the registered observers of a change to the data resource specified by Uri.
+     * Return true, need override by users.
+     *
+     * @param uri, Indicates the path of the data to operate.
+     *
+     * @return Return true if success. otherwise return false.
+     */
+    virtual bool NotifyChangeExtProvider(const ChangeInfo changeInfo);
 
     /**
      * @brief Converts the given uri that refer to the Data ability into a normalized URI. A normalized URI can be used

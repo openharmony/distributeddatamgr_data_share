@@ -16,6 +16,8 @@
 #ifndef DATA_SHARE_HELPER_IMPL_H
 #define DATA_SHARE_HELPER_IMPL_H
 
+#include "concurrent_map.h"
+#include "data_ability_observer_stub.h"
 #include "datashare_helper.h"
 #include "ext_special_controller.h"
 #include "general_controller.h"
@@ -23,6 +25,26 @@
 #include "published_data_controller.h"
 
 namespace OHOS::DataShare {
+class ObserverImpl : public AAFwk::DataAbilityObserverStub {
+public:
+    explicit ObserverImpl(const std::shared_ptr<DataShareObserver> dataShareObserver)
+        : dataShareObserver_(dataShareObserver){};
+    void OnChange();
+    void OnChangeExt(const AAFwk::ChangeInfo &info);
+    static DataShareObserver::ChangeInfo ConvertInfo(const AAFwk::ChangeInfo &info);
+    static AAFwk::ChangeInfo ConvertInfo(const DataShareObserver::ChangeInfo &info);
+    static sptr<ObserverImpl> GetObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer);
+    static bool FindObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer);
+    static bool DeleteObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer);
+private:
+    struct ObserverParam {
+        sptr<ObserverImpl> obs_;
+        std::list<Uri> uris_;
+    };
+    std::shared_ptr<DataShareObserver> dataShareObserver_;
+    static ConcurrentMap<DataShareObserver *, ObserverParam> observers_;
+};
+
 class DataShareHelperImpl : public DataShareHelper {
 public:
     DataShareHelperImpl(const Uri &uri, const sptr<IRemoteObject> &token,
@@ -63,6 +85,13 @@ public:
     int UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
 
     void NotifyChange(const Uri &uri) override;
+
+    void RegisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+        bool isDescendants) override;
+
+    void UnregisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver) override;
+
+    void NotifyChangeExtProvider(const DataShareObserver::ChangeInfo &changeInfo) override;
 
     Uri NormalizeUri(Uri &uri) override;
 

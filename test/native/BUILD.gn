@@ -367,6 +367,12 @@ ohos_unittest("ControllerTest") {
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
 }
 
 ohos_unittest("AbnormalBranchTest") {

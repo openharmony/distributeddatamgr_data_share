@@ -204,6 +204,26 @@ void GeneralControllerServiceImpl::NotifyChange(const Uri &uri)
     proxy->Notify(uri.ToString());
 }
 
+// This function is supported only when using non-silent DataShareHelper
+int GeneralControllerServiceImpl::RegisterObserverExtProvider(const Uri &uri,
+    const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants)
+{
+    return DATA_SHARE_ERROR;
+}
+
+// This function is supported only when using non-silent DataShareHelper
+int GeneralControllerServiceImpl::UnregisterObserverExtProvider(const Uri &uri,
+    const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    return DATA_SHARE_ERROR;
+}
+
+// This function is supported only when using non-silent DataShareHelper
+int GeneralControllerServiceImpl::NotifyChangeExtProvider(const ChangeInfo &changeInfo)
+{
+    return DATA_SHARE_ERROR;
+}
+
 void GeneralControllerServiceImpl::SetRegisterCallback()
 {
     auto manager = DataShareManagerImpl::GetInstance();

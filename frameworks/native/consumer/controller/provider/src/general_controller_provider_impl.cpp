@@ -185,6 +185,75 @@ void GeneralControllerProviderImpl::NotifyChange(const Uri &uri)
     proxy->NotifyChange(uri);
 }
 
+// This function is supported only when using non-silent DataShareHelper
+int GeneralControllerProviderImpl::RegisterObserverExtProvider(const Uri &uri,
+    const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants)
+{
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("connection is nullptr");
+        return E_PROVIDER_CONN_NULL;
+    }
+    auto proxy = connection->GetDataShareProxy(uri_, token_);
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return E_PROVIDER_NOT_CONNECTED;
+    }
+    // the non-silent proxy's RegisterObserverExtProvider returns bool while this function returns int and 0 means ok
+    int ret = proxy->RegisterObserverExtProvider(uri, dataObserver, isDescendants) ? E_OK : E_REGISTER_ERROR;
+    LOG_INFO("Register non-silent observerExt provider ret: %{public}d, uri: %{public}s", ret,
+        DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+    // store the observer when successfully registered.
+    if (ret == E_OK) {
+        connection->UpdateObserverExtsProviderMap(uri, dataObserver, isDescendants);
+    }
+    return ret;
+}
+
+// This function is supported only when using non-silent DataShareHelper
+int GeneralControllerProviderImpl::UnregisterObserverExtProvider(const Uri &uri,
+    const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("connection is nullptr");
+        return E_PROVIDER_CONN_NULL;
+    }
+    auto proxy = connection->GetDataShareProxy(uri_, token_);
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return E_PROVIDER_NOT_CONNECTED;
+    }
+    // the non-silent proxy's UnregisterObserverExtProvider returns bool while this function returns int and 0 means ok
+    int ret = proxy->UnregisterObserverExtProvider(uri, dataObserver) ? E_OK : E_REGISTER_ERROR;
+    LOG_INFO("Unregister non-silent observerExt provider ret: %{public}d, uri: %{public}s", ret,
+        DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+    // remove the observer from storage when successfully unregistered.
+    if (ret == E_OK) {
+        connection->DeleteObserverExtsProviderMap(uri, dataObserver);
+    }
+    return ret;
+}
+
+// This function is supported only when using non-silent DataShareHelper
+int GeneralControllerProviderImpl::NotifyChangeExtProvider(const ChangeInfo &changeInfo)
+{
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("connection is nullptr");
+        return E_PROVIDER_CONN_NULL;
+    }
+    auto proxy = connection->GetDataShareProxy(uri_, token_);
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return E_PROVIDER_NOT_CONNECTED;
+    }
+    // the non-silent proxy's NotifyChangeExtProvider returns bool while this function returns int and 0 means ok
+    int ret = proxy->NotifyChangeExtProvider(changeInfo) ? E_OK : E_NOTIFYCHANGE_ERROR;
+    LOG_INFO("NotifyChangeExtProvider ret: %{public}d", ret);
+    return ret;
+}
+
 GeneralControllerProviderImpl::GeneralControllerProviderImpl(std::shared_ptr<DataShareConnection> connection,
     const Uri &uri, const sptr<IRemoteObject> &token) : connection_(connection), token_(token), uri_(uri)
 {

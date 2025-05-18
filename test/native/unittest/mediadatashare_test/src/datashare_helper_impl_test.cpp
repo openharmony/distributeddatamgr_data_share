@@ -41,6 +41,12 @@ public:
         (override));
     MOCK_METHOD(void, NotifyChange, (const Uri &uri), (override));
     MOCK_METHOD(
+        int, RegisterObserverExtProvider, (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+            bool isDescendants), (override));
+    MOCK_METHOD(int32_t, UnregisterObserverExtProvider, (const Uri &uri,
+        const sptr<AAFwk::IDataAbilityObserver> &dataObserver), (override));
+    MOCK_METHOD(int32_t, NotifyChangeExtProvider, (const ChangeInfo &changeInfo), (override));
+    MOCK_METHOD(
         (std::pair<int32_t, int32_t>), InsertEx, (const Uri &uri, const DataShareValuesBucket &value), (override));
     MOCK_METHOD((std::pair<int32_t, int32_t>), UpdateEx,
         (const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value), (override));
