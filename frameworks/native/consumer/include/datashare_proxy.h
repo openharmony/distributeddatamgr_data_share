@@ -19,10 +19,13 @@
 #include <iremote_proxy.h>
 #include <memory>
 
+#include "concurrent_map.h"
+#include "dataobs_mgr_changeinfo.h"
 #include "idatashare.h"
 
 namespace OHOS {
 namespace DataShare {
+using ChangeInfo = AAFwk::ChangeInfo;
 class DataShareProxy final : public IRemoteProxy<IDataShare> {
 public:
     explicit DataShareProxy(const sptr<IRemoteObject>& remote) : IRemoteProxy<IDataShare>(remote) {}
@@ -60,6 +63,14 @@ public:
     virtual bool UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
 
     virtual bool NotifyChange(const Uri &uri) override;
+
+    virtual bool RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+        bool isDescendants) override;
+
+    virtual bool UnregisterObserverExtProvider(const Uri &uri,
+        const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
+
+    virtual bool NotifyChangeExtProvider(const ChangeInfo &changeInfo) override;
 
     virtual Uri NormalizeUri(const Uri &uri) override;
 

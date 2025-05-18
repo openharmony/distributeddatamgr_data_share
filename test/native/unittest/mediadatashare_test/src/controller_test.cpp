@@ -22,12 +22,14 @@
 #include "data_ability_observer_interface.h"
 #include "dataobs_mgr_changeinfo.h"
 #include "datashare_connection.h"
+#include "datashare_errno.h"
 #include "datashare_helper.h"
 #include "datashare_log.h"
 #include "ext_special_controller.h"
 #include "extension_manager_proxy.h"
 #include "general_controller.h"
 #include "general_controller_provider_impl.h"
+#include "general_controller_service_impl.h"
 #include "hap_token_info.h"
 #include "iservice_registry.h"
 #include "rdb_data_ability_utils.h"
@@ -387,6 +389,184 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplNotifyChangeTest_002, Test
     EXPECT_EQ(uri, Uri(""));
     LOG_INFO("Generalcontroller_ServiceImplNotifyChangeTest_002::End");
 }
+
+/**
+* @tc.name: Generalcontroller_ProviderImpl_RegisterObserverExtProvider_Test_001
+* @tc.desc: Fill the branch connection == nullptr and proxy == nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(ControllerTest, Generalcontroller_ProviderImpl_RegisterObserverExtProvider_Test_001, TestSize.Level0)
+{
+    LOG_INFO("Generalcontroller_ProviderImpl_RegisterObserverExtProvider_Test_001::Start");
+
+    Uri uri("");
+    // connection is nullptr
+    std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(nullptr, uri, nullptr);
+    ASSERT_NE(tempGenConProImp, nullptr);
+    sptr<AAFwk::IDataAbilityObserver> dataObserver;
+    // make isDescendants false
+    int ret = tempGenConProImp->RegisterObserverExtProvider(uri, dataObserver, false);
+    EXPECT_EQ(ret, E_PROVIDER_CONN_NULL);
+
+    // connection not null
+    sptr<DataShare::DataShareConnection> connection =
+        new (std::nothrow) DataShare::DataShareConnection(uri, nullptr);
+    ASSERT_NE(connection, nullptr);
+    auto dataShareConnection =
+        std::shared_ptr<DataShare::DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
+            holder->DisconnectDataShareExtAbility();
+        });
+    tempGenConProImp =
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+    ret = tempGenConProImp->RegisterObserverExtProvider(uri, dataObserver, false);
+    EXPECT_EQ(ret, E_PROVIDER_NOT_CONNECTED);
+
+    LOG_INFO("Generalcontroller_ProviderImpl_RegisterObserverExtProvider_Test_001::End");
+}
+
+/**
+* @tc.name: Generalcontroller_ProviderImpl_UnregisterObserverExtProvider_Test_001
+* @tc.desc: Fill the branch connection == nullptr and proxy == nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(ControllerTest, Generalcontroller_ProviderImpl_UnregisterObserverExtProvider_Test_001, TestSize.Level0)
+{
+    LOG_INFO("Generalcontroller_ProviderImpl_UnregisterObserverExtProvider_Test_001::Start");
+
+    Uri uri("");
+    // connection is nullptr
+    std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(nullptr, uri, nullptr);
+    ASSERT_NE(tempGenConProImp, nullptr);
+    sptr<AAFwk::IDataAbilityObserver> dataObserver;
+    // make isDescendants false
+    int ret = tempGenConProImp->UnregisterObserverExtProvider(uri, dataObserver);
+    EXPECT_EQ(ret, E_PROVIDER_CONN_NULL);
+
+    // connection not null but dataShareProxy is nullptr
+    sptr<DataShare::DataShareConnection> connection =
+        new (std::nothrow) DataShare::DataShareConnection(uri, nullptr);
+    ASSERT_NE(connection, nullptr);
+    connection->dataShareProxy_ = nullptr;
+    ASSERT_EQ(connection->dataShareProxy_, nullptr);
+    auto dataShareConnection =
+        std::shared_ptr<DataShare::DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
+            holder->DisconnectDataShareExtAbility();
+        });
+    tempGenConProImp =
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+    ret = tempGenConProImp->UnregisterObserverExtProvider(uri, dataObserver);
+    EXPECT_EQ(ret, E_PROVIDER_NOT_CONNECTED);
+
+    LOG_INFO("Generalcontroller_ProviderImpl_UnregisterObserverExtProvider_Test_001::End");
+}
+
+/**
+* @tc.name: Generalcontroller_ProviderImpl_NotifyChangeExtProvider_Test_001
+* @tc.desc: Fill the branch connection == nullptr and proxy == nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(ControllerTest, Generalcontroller_ProviderImpl_NotifyChangeExtProvider_Test_001, TestSize.Level0)
+{
+    LOG_INFO("Generalcontroller_ProviderImpl_NotifyChangeExtProvider_Test_001::Start");
+
+    Uri uri("");
+    // connection is nullptr
+    ChangeInfo changeInfo = { ChangeInfo::ChangeType::INSERT, { uri } };
+    std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(nullptr, uri, nullptr);
+    sptr<AAFwk::IDataAbilityObserver> dataObserver;
+    // make isDescendants false
+    int ret = tempGenConProImp->NotifyChangeExtProvider(changeInfo);
+    EXPECT_EQ(ret, E_PROVIDER_CONN_NULL);
+
+    // connection not null
+    sptr<DataShare::DataShareConnection> connection =
+        new (std::nothrow) DataShare::DataShareConnection(uri, nullptr);
+    auto dataShareConnection =
+        std::shared_ptr<DataShare::DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
+            holder->DisconnectDataShareExtAbility();
+        });
+    tempGenConProImp =
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+    ret = tempGenConProImp->NotifyChangeExtProvider(changeInfo);
+    EXPECT_EQ(ret, E_PROVIDER_NOT_CONNECTED);
+
+    LOG_INFO("Generalcontroller_ProviderImpl_NotifyChangeExtProvider_Test_001::End");
+}
+
+/**
+* @tc.name: Generalcontroller_ServiceImpl_RegisterObserverExtProvider_Test_001
+* @tc.desc: test ServiceImpl RegisterObserverExtProvider func
+* @tc.type: FUNC
+*/
+HWTEST_F(ControllerTest, Generalcontroller_ServiceImpl_RegisterObserverExtProvider_Test_001, TestSize.Level0)
+{
+    LOG_INFO("Generalcontroller_ServiceImpl_RegisterObserverExtProvider_Test_001::Start");
+
+    Uri uri("");
+    std::string extUri = "GeneralControllerServiceImpl";
+
+    std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
+        std::make_shared<DataShare::GeneralControllerServiceImpl>(extUri);
+    ASSERT_NE(tempGenConProImp, nullptr);
+    sptr<AAFwk::IDataAbilityObserver> dataObserver;
+
+    int ret = tempGenConProImp->RegisterObserverExtProvider(uri, dataObserver, false);
+    EXPECT_EQ(ret, -1);
+
+    LOG_INFO("Generalcontroller_ServiceImpl_RegisterObserverExtProvider_Test_001::End");
+}
+
+/**
+* @tc.name: Generalcontroller_ServiceImpl_UnregisterObserverExtProvider_Test_001
+* @tc.desc: test ServiceImpl UnregisterObserverExtProvider func
+* @tc.type: FUNC
+*/
+HWTEST_F(ControllerTest, Generalcontroller_ServiceImpl_UnregisterObserverExtProvider_Test_001, TestSize.Level0)
+{
+    LOG_INFO("Generalcontroller_ServiceImpl_RegisterObserverExtProvider_Test_001::Start");
+
+    Uri uri("");
+    std::string extUri = "GeneralControllerServiceImpl";
+
+    std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
+        std::make_shared<DataShare::GeneralControllerServiceImpl>(extUri);
+    ASSERT_NE(tempGenConProImp, nullptr);
+    sptr<AAFwk::IDataAbilityObserver> dataObserver;
+
+    int ret = tempGenConProImp->UnregisterObserverExtProvider(uri, dataObserver);
+    EXPECT_EQ(ret, -1);
+
+    LOG_INFO("Generalcontroller_ServiceImpl_RegisterObserverExtProvider_Test_001::End");
+}
+
+/**
+* @tc.name: Generalcontroller_ServiceImpl_NotifyChangeExtProvider_Test_001
+* @tc.desc: test ServiceImpl NotifyChangeExtProvider func
+* @tc.type: FUNC
+*/
+HWTEST_F(ControllerTest, Generalcontroller_ServiceImpl_NotifyChangeExtProvider_Test_001, TestSize.Level0)
+{
+    LOG_INFO("Generalcontroller_ServiceImpl_NotifyChangeExtProvider_Test_001::Start");
+
+    Uri uri("");
+    std::string extUri = "GeneralControllerServiceImpl";
+
+    ChangeInfo changeInfo = { ChangeInfo::ChangeType::INSERT, { uri } };
+    // connection is nullptr
+    std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
+        std::make_shared<DataShare::GeneralControllerServiceImpl>(extUri);
+    ASSERT_NE(tempGenConProImp, nullptr);
+    sptr<AAFwk::IDataAbilityObserver> dataObserver;
+
+    int ret = tempGenConProImp->NotifyChangeExtProvider(changeInfo);
+    EXPECT_EQ(ret, -1);
+
+    LOG_INFO("Generalcontroller_ServiceImpl_NotifyChangeExtProvider_Test_001::End");
+}
+
 
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileTest_001, TestSize.Level0)
 {

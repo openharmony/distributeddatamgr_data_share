@@ -18,6 +18,7 @@
 
 #include <iremote_broker.h>
 
+#include "data_ability_observer_interface.h"
 #include "datashare_business_error.h"
 #include "datashare_operation_statement.h"
 #include "datashare_predicates.h"
@@ -32,6 +33,7 @@ class IDataAbilityObserver;
 }
 
 namespace DataShare {
+using ChangeInfo = AAFwk::ChangeInfo;
 class IDataShare : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DataShare.IDataShare");
@@ -65,6 +67,14 @@ public:
     virtual bool UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 
     virtual bool NotifyChange(const Uri &uri) = 0;
+
+    virtual bool RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+        bool isDescendants) = 0;
+
+    virtual bool UnregisterObserverExtProvider(const Uri &uri,
+        const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
+
+    virtual bool NotifyChangeExtProvider(const ChangeInfo &changeInfo) = 0;
 
     virtual Uri NormalizeUri(const Uri &uri) = 0;
 

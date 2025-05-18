@@ -29,6 +29,7 @@ class IDataAbilityObserver;
 }
 
 namespace DataShare {
+using ChangeInfo = AAFwk::ChangeInfo;
 class GeneralControllerServiceImpl : public GeneralController {
 public:
     GeneralControllerServiceImpl(const std::string &ext);
@@ -49,6 +50,13 @@ public:
     int UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
 
     void NotifyChange(const Uri &uri) override;
+
+    int RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+        bool isDescendants) override;
+
+    int UnregisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
+
+    int NotifyChangeExtProvider(const ChangeInfo &changeInfo) override;
 
     std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &value) override;
 

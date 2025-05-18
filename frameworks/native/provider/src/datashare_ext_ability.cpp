@@ -140,6 +140,23 @@ bool DataShareExtAbility::NotifyChange(const Uri &uri)
     return true;
 }
 
+bool DataShareExtAbility::RegisterObserverExtProvider(const Uri &uri,
+    const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants)
+{
+    return true;
+}
+
+bool DataShareExtAbility::UnregisterObserverExtProvider(const Uri &uri,
+    const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    return true;
+}
+
+bool DataShareExtAbility::NotifyChangeExtProvider(const ChangeInfo changeInfo)
+{
+    return true;
+}
+
 Uri DataShareExtAbility::NormalizeUri(const Uri &uri)
 {
     Uri urivalue("");
