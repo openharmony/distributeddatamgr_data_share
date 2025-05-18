@@ -2077,5 +2077,152 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_User_Define_Func_Test_002, TestS
     }
     LOG_INFO("MediaDataShare_User_Define_Func_Test_002 End");
 }
+
+/**
+* @tc.name: MediaDataShare_RegisterObserverExtProvider_Test_001
+* @tc.desc: Fill the branch obs == nullptr and generalCtl == nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_RegisterObserverExtProvider_Test_001::Start");
+
+    Uri uri("");
+    // GetObserver return nullptr
+    std::shared_ptr<DataShareObserver> dataObserver = nullptr;
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_NE(helper, nullptr);
+    helper->RegisterObserverExtProvider(uri, dataObserver, false);
+
+    // GetObserver return is not nullptr but controller is nullptr
+    uri = Uri(MEDIALIBRARY_DATA_URI);
+    dataObserver = std::make_shared<DataShareObserverTest>();
+    ASSERT_NE(dataObserver, nullptr);
+    bool ret = helper->Release();
+    EXPECT_TRUE(ret);
+    helper->RegisterObserverExtProvider(uri, dataObserver, false);
+
+    LOG_INFO("MediaDataShare_RegisterObserverExtProvider_Test_001::End");
+}
+
+/**
+* @tc.name: MediaDataShare_RegisterObserverExtProvider_Test_002
+* @tc.desc: test RegisterObserverExtProvider normal func
+* @tc.type: FUNC
+*/
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test_002, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_RegisterObserverExtProvider_Test_002::Start");
+
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    std::shared_ptr<DataShareObserver> dataObserver = std::make_shared<DataShareObserverTest>();
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    helper->RegisterObserverExtProvider(uri, dataObserver, false);
+    ASSERT_NE(helper, nullptr);
+
+    LOG_INFO("MediaDataShare_RegisterObserverExtProvider_Test_002::End");
+}
+
+/**
+* @tc.name: MediaDataShare_UnregisterObserverExtProvider_Test_001
+* @tc.desc: Fill the branch dataObserver == nullptr and ObserverImpl::FindObserver
+* @tc.type: FUNC
+*/
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExtProvider_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_UnregisterObserverExtProvider_Test_001::Start");
+
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    // dataObserver is nullptr
+    std::shared_ptr<DataShareObserver> dataObserver = nullptr;
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_NE(helper, nullptr);
+    helper->UnregisterObserverExtProvider(uri, dataObserver);
+
+    // FindObserver return false
+    dataObserver = std::make_shared<DataShareObserverTest>();
+    ASSERT_NE(dataObserver, nullptr);
+    helper->UnregisterObserverExtProvider(uri, dataObserver);
+
+    // FindObserver return true and general controller is nullptr
+    helper->RegisterObserverExtProvider(uri, dataObserver, false);
+    bool ret = helper->Release();
+    EXPECT_TRUE(ret);
+    helper->UnregisterObserverExtProvider(uri, dataObserver);
+
+    LOG_INFO("MediaDataShare_UnregisterObserverExtProvider_Test_001::End");
+}
+
+/**
+* @tc.name: MediaDataShare_UnregisterObserverExtProvider_Test_002
+* @tc.desc: test UnregisterObserverExtProvider mormal func
+* @tc.type: FUNC
+*/
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExtProvider_Test_002, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_UnregisterObserverExtProvider_Test_002::Start");
+
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    // dataObserver is not nullptr
+    std::shared_ptr<DataShareObserver> dataObserver = std::make_shared<DataShareObserverTest>();
+    ASSERT_NE(dataObserver, nullptr);
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_NE(helper, nullptr);
+
+    // FindObserver return true and general controller is not nullptr
+    helper->RegisterObserverExtProvider(uri, dataObserver, true);
+
+    helper->UnregisterObserverExtProvider(uri, dataObserver);
+
+    LOG_INFO("MediaDataShare_UnregisterObserverExtProvider_Test_002::End");
+}
+
+/**
+* @tc.name: MediaDataShare_NotifyChangeExtProvider_Test_001
+* @tc.desc: Fill the branch generalCtl == nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotifyChangeExtProvider_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_NotifyChangeExtProvider_Test_001::Start");
+
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    std::shared_ptr<DataShareObserver> dataObserver = std::make_shared<DataShareObserverTest>();
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_NE(helper, nullptr);
+    ASSERT_NE(dataObserver, nullptr);
+
+    helper->RegisterObserverExtProvider(uri, dataObserver, false);
+    // generalCtl is nullptr
+    bool ret = helper->Release();
+    EXPECT_TRUE(ret);
+
+    ChangeInfo changeInfo = { DataShareObserver::ChangeType::INSERT, { uri } };
+    helper->NotifyChangeExtProvider(changeInfo);
+    LOG_INFO("MediaDataShare_NotifyChangeExtProvider_Test_001::End");
+}
+
+/**
+* @tc.name: MediaDataShare_NotifyChangeExtProvider_Test_002
+* @tc.desc: test NotifyChangeExtProvider normal func
+* @tc.type: FUNC
+*/
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotifyChangeExtProvider_Test_002, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_NotifyChangeExtProvider_Test_002::Start");
+
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    // generalCtl is not nullptr
+    std::shared_ptr<DataShareObserver> dataObserver = std::make_shared<DataShareObserverTest>();
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_NE(helper, nullptr);
+    ASSERT_NE(dataObserver, nullptr);
+
+    helper->RegisterObserverExtProvider(uri, dataObserver, false);
+
+    ChangeInfo changeInfo = { DataShareObserver::ChangeType::INSERT, { uri } };
+    helper->NotifyChangeExtProvider(changeInfo);
+    LOG_INFO("MediaDataShare_NotifyChangeExtProvider_Test_002::End");
+}
 } // namespace DataShare
 } // namespace OHOS
