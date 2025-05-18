@@ -59,6 +59,11 @@ void DataShareConnection::OnAbilityConnectDone(
             DataShareStringUtils::Change(element.GetURI()).c_str(), resultCode);
         Disconnect();
     }
+    // re-register when re-connect successed
+    if (isReconnect_.load()) {
+        ReRegisterObserverExtProvider();
+        isReconnect_.store(false);
+    }
 }
 
 /**
@@ -109,6 +114,8 @@ void DataShareConnection::ReconnectExtAbility(const std::string &uri)
             reConnects_.count = 1;
             reConnects_.firstTime = std::chrono::duration_cast<std::chrono::milliseconds>(curr).count();
             reConnects_.prevTime = std::chrono::duration_cast<std::chrono::milliseconds>(curr).count();
+            // set status true
+            isReconnect_.store(true);
         }
         return;
     }
@@ -147,6 +154,7 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
                 selfSharedPtr->reConnects_.count++;
                 selfSharedPtr->reConnects_.prevTime = std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::system_clock::now().time_since_epoch()).count();
+                selfSharedPtr->isReconnect_.store(true);
             }
         }
     });
@@ -158,6 +166,47 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
     return;
 }
 
+// store observer when it was successfully registered
+void DataShareConnection::UpdateObserverExtsProviderMap(const Uri &uri,
+    const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants)
+{
+    observerExtsProvider_.Compute(dataObserver, [&uri, isDescendants](const auto &key, auto &value) {
+        value.emplace_back(uri, isDescendants);
+        return true;
+    });
+}
+
+// remove observer when it was successfully unregistered
+void DataShareConnection::DeleteObserverExtsProviderMap(const Uri &uri,
+    const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    observerExtsProvider_.Compute(dataObserver, [&uri](const auto &key, auto &value) {
+        value.remove_if([&uri](const auto &param) {
+            return uri == param.uri;
+        });
+        return !value.empty();
+    });
+}
+
+// re-register observer by dataShareProxy
+void DataShareConnection::ReRegisterObserverExtProvider()
+{
+    LOG_INFO("ReRegisterObserverExtProvider start");
+    decltype(observerExtsProvider_) observerExtsProvider(std::move(observerExtsProvider_));
+    observerExtsProvider_.Clear();
+    observerExtsProvider.ForEach([this](const auto &key, const auto &value) {
+        for (const auto &param : value) {
+            auto ret = dataShareProxy_->RegisterObserverExtProvider(param.uri, key, param.isDescendants);
+            if (ret != E_OK) {
+                LOG_ERROR(
+                    "RegisterObserverExt failed, param.uri:%{public}s, ret:%{public}d, param.isDescendants:%{public}d",
+                    DataShareStringUtils::Anonymous(param.uri.ToString()).c_str(), ret, param.isDescendants
+                );
+            }
+        }
+        return false;
+    });
+}
 /**
  * @brief connect remote ability of DataShareExtAbility.
  */

@@ -25,6 +25,7 @@ class IDataAbilityObserver;
 }
 
 namespace DataShare {
+using ChangeInfo = AAFwk::ChangeInfo;
 class GeneralControllerProviderImpl : public GeneralController {
 public:
     GeneralControllerProviderImpl(std::shared_ptr<DataShareConnection> connection,
@@ -53,6 +54,13 @@ public:
         const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) override;
 
     std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) override;
+
+    int RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+        bool isDescendants) override;
+
+    int UnregisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
+
+    int NotifyChangeExtProvider(const ChangeInfo &changeInfo) override;
 
 private:
     std::shared_ptr<DataShareConnection> connection_ = nullptr;

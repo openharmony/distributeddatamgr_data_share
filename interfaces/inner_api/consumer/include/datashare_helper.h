@@ -22,7 +22,7 @@
 #include <mutex>
 #include <string>
 
-#include "data_ability_observer_interface.h"
+#include "data_ability_observer_stub.h"
 #include "datashare_business_error.h"
 #include "datashare_errno.h"
 #include "datashare_observer.h"
@@ -277,6 +277,21 @@ public:
         bool isDescendants, bool isSystem = false);
 
     /**
+     * Registers an observer specified by the given Uri to the provider. This function is supported only when using
+     * non-silent DataShareHelper, and there is no default implemention in the provider side. It needs to be handled by
+     * the user. Otherwise, the provider side will do nothing but simply return error.
+     *
+     * @param uri, Indicates the path of the data to operate.
+     * @param dataObserver, Indicates the IDataAbilityObserver object.
+     * @param isDescendants, Indicates the Whether to note the change of descendants.
+     */
+    virtual void RegisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+        bool isDescendants)
+    {
+        return;
+    }
+
+    /**
      * Deregisters an observer used for DataObsMgr specified by the given Uri.
      *
      * @param uri, Indicates the path of the data to operate.
@@ -285,11 +300,36 @@ public:
     void UnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver, bool isSystem = false);
 
     /**
+     * Deregisters an observer specified by the given Uri to the provider. This function is supported only when using
+     * non-silent DataShareHelper, and there is no default implemention in the provider side. It needs to be handled by
+     * the user. Otherwise, the provider side will do nothing but simply return error.
+     *
+     * @param uri, Indicates the path of the data to operate.
+     * @param dataObserver, Indicates the IDataAbilityObserver object
+     */
+    virtual void UnregisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver)
+    {
+        return;
+    }
+
+    /**
      * Notifies the registered observers of a change to the data resource specified by Uris.
      *
      * @param changeInfo Indicates the info of the data to operate.
      */
     void NotifyChangeExt(const DataShareObserver::ChangeInfo &changeInfo, bool isSystem = false);
+
+    /**
+     * Notifies the registered observers of a change to the data resource specified by Uris. This function is supported
+     * only when using non-silent DataShareHelper, and there is no default implemention in the provider side. It needs
+     * to be handled by the user. Otherwise, the provider side will do nothing but simply return true.
+     *
+     * @param changeInfo Indicates the info of the data to operate.
+     */
+    virtual void NotifyChangeExtProvider(const DataShareObserver::ChangeInfo &changeInfo)
+    {
+        return;
+    }
 
     /**
      * @brief Converts the given uri that refer to the Data share into a normalized URI. A normalized URI can be used

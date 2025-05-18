@@ -198,6 +198,11 @@ constexpr int E_NOT_SYSTEM_APP = (E_BASE + 69);
 * @brief The error code for register observer inner error.
 */
 constexpr int E_REGISTER_ERROR = (E_BASE + 70);
+
+/**
+* @brief The error code for notify change inner error.
+*/
+constexpr int E_NOTIFYCHANGE_ERROR = (E_BASE + 71);
 } // namespace DataShare
 } // namespace OHOS
 

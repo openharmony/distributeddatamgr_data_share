@@ -29,6 +29,7 @@ namespace OHOS {
 namespace DataShare {
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
+using ChangeInfo = DataShareObserver::ChangeInfo;
 constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
 static int USER_100 = 100;
 std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
@@ -119,6 +120,31 @@ public:
     ConditionLock<std::string> data;
 private:
     std::string name;
+};
+
+class DataShareObserverTest : public DataShare::DataShareObserver {
+public:
+    DataShareObserverTest() {}
+    ~DataShareObserverTest() {}
+    
+    void OnChange(const ChangeInfo &changeInfo) override
+    {
+        changeInfo_ = changeInfo;
+        data.Notify();
+    }
+    
+    void Clear()
+    {
+        changeInfo_.changeType_ = INVAILD;
+        changeInfo_.uris_.clear();
+        changeInfo_.data_ = nullptr;
+        changeInfo_.size_ = 0;
+        changeInfo_.valueBuckets_ = {};
+        data.Clear();
+    }
+    
+    ChangeInfo changeInfo_;
+    ConditionLock<ChangeInfo> data;
 };
 
 std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t systemAbilityId, std::string uri)
@@ -887,6 +913,68 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001,
     EXPECT_NE(helper, nullptr);
     helper = nullptr;
     LOG_INFO("SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001::End");
+}
+
+
+/**
+* @tc.name: SlientAccess_RegisterObserverExtProvider_Test_001
+* @tc.desc: Fill the branch generalCtl == nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(SlientAccessTest, SlientAccess_RegisterObserverExtProvider_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_RegisterObserverExtProvider_Test_001::Begin");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ERROR_URI);
+    std::shared_ptr<DataShareObserver> dataObserver = std::make_shared<DataShareObserverTest>();
+    ASSERT_NE(helper, nullptr);
+    ASSERT_NE(dataObserver, nullptr);
+
+    helper->RegisterObserverExtProvider(uri, dataObserver, false);
+
+    LOG_INFO("SlientAccess_RegisterObserverExtProvider_Test_001::End");
+}
+
+/**
+* @tc.name: SlientAccess_UnregisterObserverExtProvider_Test_001
+* @tc.desc: Fill the branch generalCtl == nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(SlientAccessTest, SlientAccess_UnregisterObserverExtProvider_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_UnregisterObserverExtProvider_Test_001::Begin");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ERROR_URI);
+    std::shared_ptr<DataShareObserver> dataObserver = std::make_shared<DataShareObserverTest>();
+    ASSERT_NE(helper, nullptr);
+    ASSERT_NE(dataObserver, nullptr);
+
+    helper->UnregisterObserverExtProvider(uri, dataObserver);
+
+    ChangeInfo changeInfo = { DataShareObserver::ChangeType::INSERT, { uri } };
+    LOG_INFO("SlientAccess_UnregisterObserverExtProvider_Test_001::End");
+}
+
+/**
+* @tc.name: SlientAccess_NotifyChangeExtProvider_Test_001
+* @tc.desc: Fill the branch generalCtl == nullptr
+* @tc.type: FUNC
+*/
+HWTEST_F(SlientAccessTest, SlientAccess_NotifyChangeExtProvider_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_NotifyChangeExtProvider_Test_001::Begin");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ERROR_URI);
+    std::shared_ptr<DataShareObserver> dataObserver = std::make_shared<DataShareObserverTest>();
+    ASSERT_NE(helper, nullptr);
+    ASSERT_NE(dataObserver, nullptr);
+
+    helper->RegisterObserverExtProvider(uri, dataObserver, true);
+
+    ChangeInfo changeInfo = { DataShareObserver::ChangeType::INSERT, { uri } };
+    helper->NotifyChangeExtProvider(changeInfo);
+
+    LOG_INFO("SlientAccess_NotifyChangeExtProvider_Test_001::End");
 }
 } // namespace DataShare
 } // namespace OHOS

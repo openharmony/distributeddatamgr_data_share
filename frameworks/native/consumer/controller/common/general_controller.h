@@ -19,6 +19,7 @@
 #include <memory>
 #include <string_ex.h>
 
+#include "data_ability_observer_interface.h"
 #include "datashare_business_error.h"
 #include "datashare_errno.h"
 #include "datashare_predicates.h"
@@ -32,6 +33,7 @@ class IDataAbilityObserver;
 }
 
 namespace DataShare {
+using ChangeInfo = AAFwk::ChangeInfo;
 class GeneralController {
 public:
     virtual ~GeneralController() = default;
@@ -50,6 +52,29 @@ public:
     virtual int UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 
     virtual void NotifyChange(const Uri &uri) = 0;
+
+    /**
+     * Registers an observer specified by the given Uri to the provider. This function is supported only when using
+     * non-silent DataShareHelper, and there is no default implemention in the provider side. It needs to be handled by
+     * the user. Otherwise, the provider side will do nothing but simply return error.
+     */
+    virtual int RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+        bool isDescendants) = 0;
+
+    /**
+     * Deregisters an observer specified by the given Uri to the provider. This function is supported only when using
+     * non-silent DataShareHelper, and there is no default implemention in the provider side. It needs to be handled by
+     * the user. Otherwise, the provider side will do nothing but simply return error.
+     */
+    virtual int UnregisterObserverExtProvider(const Uri &uri,
+        const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
+
+    /**
+     * Notifies the registered observers of a change to the data resource specified by Uris. This function is supported
+     * only when using non-silent DataShareHelper, and there is no default implemention in the provider side. It needs
+     * to be handled by the user. Otherwise, the provider side will do nothing but simply return true.
+     */
+    virtual int NotifyChangeExtProvider(const ChangeInfo &changeInfo) = 0;
 
     virtual std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const DataShareValuesBucket &value) = 0;
 
