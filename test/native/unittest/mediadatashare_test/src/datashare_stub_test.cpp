@@ -36,6 +36,7 @@ namespace OHOS {
 namespace DataShare {
 using namespace testing::ext;
 using namespace DistributedShare::DataShare;
+using namespace OHOS::AAFwk;
 using ChangeInfo = AAFwk::ChangeInfo;
 class DataShareStubTest : public testing::Test {
 public:
@@ -46,7 +47,7 @@ public:
 };
 
 
-class IDataAbilityObserverTest : public AAFwk::DataAbilityObserverStub {
+class IDataAbilityObserverTest : public DataAbilityObserverStub {
 public:
     IDataAbilityObserverTest() {}
     ~IDataAbilityObserverTest()
@@ -132,13 +133,13 @@ void DataShareStubTest::SetUp(void) {}
 void DataShareStubTest::TearDown(void) {}
 
 /**
-* @tc.name: DataShareStubTest_CmdRegisterObserverExtProvider_Test_001
+* @tc.name: DataShareStub_CmdRegisterObserverExtProvider_Test_001
 * @tc.desc: test CmdRegisterObserverExtProvideroteRequest default func
 * @tc.type: FUNC
 */
-HWTEST_F(DataShareStubTest, DataShareStubTest_CmdRegisterObserverExtProvider_Test_001, TestSize.Level0)
+HWTEST_F(DataShareStubTest, DataShareStub_CmdRegisterObserverExtProvider_Test_001, TestSize.Level0)
 {
-    LOG_INFO("DataShareStubTest_CmdRegisterObserverExtProvider_Test_001::Start");
+    LOG_INFO("DataShareStub_CmdRegisterObserverExtProvider_Test_001::Start");
 
     Uri uri(DATA_SHARE_URI);
     sptr<IDataAbilityObserverTest> dataObserver = new (std::nothrow) IDataAbilityObserverTest();
@@ -159,17 +160,17 @@ HWTEST_F(DataShareStubTest, DataShareStubTest_CmdRegisterObserverExtProvider_Tes
     EXPECT_TRUE(ret);
     EXPECT_EQ(errCode, 1);
 
-    LOG_INFO("DataShareStubTest_CmdRegisterObserverExtProvider_Test_001::End");
+    LOG_INFO("DataShareStub_CmdRegisterObserverExtProvider_Test_001::End");
 }
 
 /**
-* @tc.name: DataShareStubTest_CmdUnregisterObserverExtProvider_Test_001
+* @tc.name: DataShareStub_CmdUnregisterObserverExtProvider_Test_001
 * @tc.desc: test CmdUnregisterObserverExtProvideroteRequest default func
 * @tc.type: FUNC
 */
-HWTEST_F(DataShareStubTest, DataShareStubTest_CmdUnregisterObserverExtProvider_Test_001, TestSize.Level0)
+HWTEST_F(DataShareStubTest, DataShareStub_CmdUnregisterObserverExtProvider_Test_001, TestSize.Level0)
 {
-    LOG_INFO("DataShareStubTest_CmdUnregisterObserverExtProvider_Test_001::Start");
+    LOG_INFO("DataShareStub_CmdUnregisterObserverExtProvider_Test_001::Start");
 
     Uri uri(DATA_SHARE_URI);
     sptr<IDataAbilityObserverTest> dataObserver = new (std::nothrow) IDataAbilityObserverTest();
@@ -189,17 +190,17 @@ HWTEST_F(DataShareStubTest, DataShareStubTest_CmdUnregisterObserverExtProvider_T
     EXPECT_TRUE(ret);
     EXPECT_EQ(errCode, 1);
 
-    LOG_INFO("DataShareStubTest_CmdUnregisterObserverExtProvider_Test_001::End");
+    LOG_INFO("DataShareStub_CmdUnregisterObserverExtProvider_Test_001::End");
 }
 
 /**
-* @tc.name: DataShareStubTest_CmdNotifyChangeExtProvider_Test_001
+* @tc.name: DataShareStub_CmdNotifyChangeExtProvider_Test_001
 * @tc.desc: test CmdNotifyChangeExtProvider default func
 * @tc.type: FUNC
 */
-HWTEST_F(DataShareStubTest, DataShareStubTest_CmdNotifyChangeExtProvider_Test_001, TestSize.Level0)
+HWTEST_F(DataShareStubTest, DataShareStub_CmdNotifyChangeExtProvider_Test_001, TestSize.Level0)
 {
-    LOG_INFO("DataShareStubTest_CmdNotifyChangeExtProvider_Test_001::Start");
+    LOG_INFO("DataShareStub_CmdNotifyChangeExtProvider_Test_001::Start");
 
     Uri uri(DATA_SHARE_URI);
     ChangeInfo changeInfo = { ChangeInfo::ChangeType::INSERT, { uri } };
@@ -218,7 +219,7 @@ HWTEST_F(DataShareStubTest, DataShareStubTest_CmdNotifyChangeExtProvider_Test_00
     EXPECT_TRUE(ret);
     EXPECT_EQ(errCode, 1);
 
-    LOG_INFO("DataShareStubTest_CmdNotifyChangeExtProvider_Test_001::End");
+    LOG_INFO("DataShareStub_CmdNotifyChangeExtProvider_Test_001::End");
 }
 }
 }

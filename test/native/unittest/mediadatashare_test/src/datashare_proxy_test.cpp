@@ -28,11 +28,10 @@
 #include "general_controller_provider_impl.h"
 #include "general_controller_service_impl.h"
 
-// proxy = connection -> getDataShareProxy
-// proxy->extProvider and so on
 namespace OHOS {
 namespace DataShare {
 using namespace testing::ext;
+using namespace OHOS::AAFwk;
 class DataShareProxyTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -68,7 +67,7 @@ public:
     }
 };
 
-class IDataAbilityObserverTest : public AAFwk::DataAbilityObserverStub {
+class IDataAbilityObserverTest : public DataAbilityObserverStub {
 public:
     IDataAbilityObserverTest() {}
     ~IDataAbilityObserverTest()
@@ -118,7 +117,6 @@ HWTEST_F(DataShareProxyTest, DataShareProxy_RegisterObserverExtProvider_Test_001
     ASSERT_NE(dataObserver, nullptr);
     // no provier, IPC sendRequset error
     bool ret = proxy->RegisterObserverExtProvider(uri, dataObserver, true);
-    LOG_ERROR("AXi_Beft ret:%{public}d", ret);
     EXPECT_FALSE(ret);
 
     LOG_INFO("DataShareProxy_RegisterObserverExtProvider_Test_001::End");
@@ -153,7 +151,6 @@ HWTEST_F(DataShareProxyTest, DataShareProxy_UnregisterObserverExtProvider_Test_0
     ASSERT_NE(dataObserver, nullptr);
     // no provier, IPC sendRequset error
     bool ret = proxy->UnregisterObserverExtProvider(uri, dataObserver);
-    LOG_ERROR("AXi_Beft ret:%{public}d", ret);
     EXPECT_FALSE(ret);
 
     LOG_INFO("DataShareProxy_UnregisterObserverExtProvider_Test_001::End");
@@ -186,10 +183,9 @@ HWTEST_F(DataShareProxyTest, DataShareProxy_NotifyChangeExtProvider_Test_001, Te
     ChangeInfo changeInfo = { ChangeInfo::ChangeType::INSERT, { uri } };
     // no provier, IPC sendRequset error
     bool ret = proxy->NotifyChangeExtProvider(changeInfo);
-    LOG_ERROR("AXi_Beft ret:%{public}d", ret);
     EXPECT_FALSE(ret);
 
     LOG_INFO("DataShareProxy_NotifyChangeExtProvider_Test_001::End");
 }
 }
-}    
+}
