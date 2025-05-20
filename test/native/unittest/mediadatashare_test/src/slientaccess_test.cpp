@@ -946,6 +946,7 @@ HWTEST_F(SlientAccessTest, SlientAccess_Create_With_Invalid_AppIndex_Test_001, T
     helper = DataShare::DataShareHelper::Creator(uri, options);
     EXPECT_EQ(helper, nullptr);
     LOG_INFO("SlientAccess_Create_With_Invalid_AppIndex_Test_001::End");
+}
 
 /**
 * @tc.name: SlientAccess_RegisterObserverExtProvider_Test_001
