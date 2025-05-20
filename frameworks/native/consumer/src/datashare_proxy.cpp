@@ -246,8 +246,8 @@ int DataShareProxy::BatchUpdate(const UpdateOperations &operations, std::vector<
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_BATCH_UPDATE), data, reply, option);
     if (err != E_OK) {
-        LOG_ERROR("fail to SendRequest. err: %{public}d", err);
-        return err;
+        LOG_ERROR("BatchUpdate fail to SendRequest. err: %{public}d", err);
+        return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : ret;
     }
     if (!ITypesUtil::Unmarshal(reply, results)) {
         LOG_ERROR("fail to Unmarshal result");
@@ -385,14 +385,17 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri, const 
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
+        businessError.SetCode(E_WRITE_TO_PARCE_ERROR);
         return nullptr;
     }
     if (!ITypesUtil::Marshal(data, uri, columns)) {
         LOG_ERROR("Marshalling uri and columns to data failed");
+        businessError.SetCode(E_MARSHAL_ERROR);
         return nullptr;
     }
     if (!ITypesUtil::MarshalPredicates(predicates, data)) {
         LOG_ERROR("Marshalling predicates to shared-memory failed");
+        businessError.SetCode(E_MARSHAL_ERROR);
         return nullptr;
     }
     MessageParcel reply;
@@ -400,12 +403,13 @@ std::shared_ptr<DataShareResultSet> DataShareProxy::Query(const Uri &uri, const 
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_QUERY), data, reply, option);
     auto result = ISharedResultSet::ReadFromParcel(reply);
-    businessError.SetCode(reply.ReadInt32());
-    businessError.SetMessage(reply.ReadString());
     if (err != E_OK) {
         LOG_ERROR("Query fail to SendRequest. err: %{public}d", err);
+        businessError.SetCode(err);
         return nullptr;
     }
+    businessError.SetCode(reply.ReadInt32());
+    businessError.SetMessage(reply.ReadString());
     return result;
 }
 
@@ -575,6 +579,87 @@ bool DataShareProxy::NotifyChange(const Uri &uri)
     return true;
 }
 
+// send IPC request, and there is no default implemention for the provider. It needs to be handled by the user.
+bool DataShareProxy::RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+    bool isDescendants)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
+        LOG_ERROR("WriteInterfaceToken failed");
+        return false;
+    }
+
+    if (!ITypesUtil::Marshal(data, uri, dataObserver->AsObject(), isDescendants)) {
+        LOG_ERROR("fail to Marshalling");
+        return false;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t result = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_REGISTER_OBSERVEREXT_PROVIDER), data, reply, option);
+    if (result != ERR_NONE) {
+        LOG_ERROR("SendRequest error, result=%{public}d", result);
+        return false;
+    }
+    // the stub write bool value as int value to reply, 0 is false
+    return reply.ReadInt32() != 0;
+}
+
+// send IPC request, and there is no default implemention for the provider. It needs to be handled by the user.
+bool DataShareProxy::UnregisterObserverExtProvider(const Uri &uri,
+    const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
+        LOG_ERROR("WriteInterfaceToken failed");
+        return false;
+    }
+
+    if (!ITypesUtil::Marshal(data, uri, dataObserver->AsObject())) {
+        LOG_ERROR("fail to Marshalling");
+        return false;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t result = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_UNREGISTER_OBSERVEREXT_PROVIDER), data, reply, option);
+    if (result != ERR_NONE) {
+        LOG_ERROR("SendRequest error, result=%{public}d", result);
+        return false;
+    }
+    // the stub write bool value as int value to reply, 0 is false
+    return reply.ReadInt32() != 0;
+}
+
+// send IPC request, and there is no default implemention for the provider. It needs to be handled by the user.
+bool DataShareProxy::NotifyChangeExtProvider(const ChangeInfo &changeInfo)
+{
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
+        LOG_ERROR("WriteInterfaceToken failed");
+        return false;
+    }
+    if (!ChangeInfo::Marshalling(changeInfo, data)) {
+        LOG_ERROR("changeInfo marshalling failed, changeType:%{public}ud, num:%{public}zu,"
+            "null data:%{public}d, size:%{public}ud",
+            changeInfo.changeType_, changeInfo.uris_.size(), changeInfo.data_ == nullptr, changeInfo.size_);
+        return false;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t result = Remote()->SendRequest(
+        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_NOTIFY_CHANGEEXT_PROVIDER), data, reply, option);
+    if (result != ERR_NONE) {
+        LOG_ERROR("SendRequest error, result=%{public}d", result);
+        return false;
+    }
+    // the stub write bool value as int value to reply, 0 is false
+    return reply.ReadInt32() != 0;
+}
+
 Uri DataShareProxy::NormalizeUri(const Uri &uri)
 {
     MessageParcel data;
@@ -645,6 +730,7 @@ bool DataShareProxy::CheckSize(const UpdateOperations &operations)
     }
     return true;
 }
+
 int32_t DataShareProxy::UserDefineFunc(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {

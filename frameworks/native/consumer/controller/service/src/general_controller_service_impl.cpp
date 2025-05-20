@@ -172,7 +172,8 @@ int GeneralControllerServiceImpl::RegisterObserver(const Uri &uri,
         LOG_ERROR("get DataObsMgrClient failed");
         return E_DATA_OBS_NOT_READY;
     }
-    ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
+    bool isSystem = DataShareServiceProxy::IsSystem();
+    ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver, -1, AAFwk::DataObsOption(isSystem));
     LOG_INFO("Register silent observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
     return ret;
@@ -186,7 +187,8 @@ int GeneralControllerServiceImpl::UnregisterObserver(const Uri &uri,
         LOG_ERROR("get DataObsMgrClient failed");
         return E_DATA_OBS_NOT_READY;
     }
-    ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver);
+    bool isSystem = DataShareServiceProxy::IsSystem();
+    ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver, -1, AAFwk::DataObsOption(isSystem));
     LOG_INFO("Unregister silent observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
     return ret;
@@ -200,6 +202,26 @@ void GeneralControllerServiceImpl::NotifyChange(const Uri &uri)
         return;
     }
     proxy->Notify(uri.ToString());
+}
+
+// This function is supported only when using non-silent DataShareHelper
+int GeneralControllerServiceImpl::RegisterObserverExtProvider(const Uri &uri,
+    const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants)
+{
+    return DATA_SHARE_ERROR;
+}
+
+// This function is supported only when using non-silent DataShareHelper
+int GeneralControllerServiceImpl::UnregisterObserverExtProvider(const Uri &uri,
+    const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    return DATA_SHARE_ERROR;
+}
+
+// This function is supported only when using non-silent DataShareHelper
+int GeneralControllerServiceImpl::NotifyChangeExtProvider(const ChangeInfo &changeInfo)
+{
+    return DATA_SHARE_ERROR;
 }
 
 void GeneralControllerServiceImpl::SetRegisterCallback()

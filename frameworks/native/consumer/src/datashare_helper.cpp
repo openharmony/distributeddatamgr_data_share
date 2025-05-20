@@ -18,9 +18,6 @@
 #include "datashare_helper_impl.h"
 
 #include "adaptor.h"
-#include "concurrent_map.h"
-#include "data_ability_observer_interface.h"
-#include "data_ability_observer_stub.h"
 #include "dataobs_mgr_client.h"
 #include "datashare_errno.h"
 #include "datashare_log.h"
@@ -33,25 +30,6 @@ namespace {
 static constexpr const char *DATA_SHARE_PREFIX = "datashare:///";
 static constexpr const char *FILE_PREFIX = "file://";
 } // namespace
-class ObserverImpl : public AAFwk::DataAbilityObserverStub {
-public:
-    explicit ObserverImpl(const std::shared_ptr<DataShareObserver> dataShareObserver)
-        : dataShareObserver_(dataShareObserver){};
-    void OnChange();
-    void OnChangeExt(const AAFwk::ChangeInfo &info);
-    static DataShareObserver::ChangeInfo ConvertInfo(const AAFwk::ChangeInfo &info);
-    static AAFwk::ChangeInfo ConvertInfo(const DataShareObserver::ChangeInfo &info);
-    static sptr<ObserverImpl> GetObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer);
-    static bool FindObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer);
-    static bool DeleteObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer);
-private:
-    struct ObserverParam {
-        sptr<ObserverImpl> obs_;
-        std::list<Uri> uris_;
-    };
-    std::shared_ptr<DataShareObserver> dataShareObserver_;
-    static ConcurrentMap<DataShareObserver *, ObserverParam> observers_;
-};
 
 ConcurrentMap<DataShareObserver *, ObserverImpl::ObserverParam> ObserverImpl::observers_;
 
@@ -223,7 +201,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
  * @param isDescendants, Indicates the Whether to note the change of descendants.
  */
 void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
-    bool isDescendants)
+    bool isDescendants, bool isSystem)
 {
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
@@ -239,7 +217,7 @@ void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataSh
         LOG_ERROR("new ObserverImpl failed");
         return;
     }
-    ErrCode ret = obsMgrClient->RegisterObserverExt(uri, obs, isDescendants);
+    ErrCode ret = obsMgrClient->RegisterObserverExt(uri, obs, isDescendants, AAFwk::DataObsOption(isSystem));
     if (ret != ERR_OK) {
         ObserverImpl::DeleteObserver(uri, dataObserver);
     }
@@ -253,7 +231,8 @@ void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataSh
  * @param uri, Indicates the path of the data to operate.
  * @param dataObserver, Indicates the DataShareObserver object.
  */
-void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver)
+void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+    bool isSystem)
 {
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
@@ -275,7 +254,7 @@ void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<Data
         LOG_ERROR("new ObserverImpl failed");
         return;
     }
-    ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, obs);
+    ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, obs, AAFwk::DataObsOption(isSystem));
     LOG_INFO("Unregister observerExt, ret:%{public}d, uri:%{public}s",
         ret, DataShareStringUtils::Anonymous(uri.ToString()).c_str());
     if (ret != ERR_OK) {
@@ -289,7 +268,7 @@ void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<Data
  *
  * @param changeInfo Indicates the info of the data to operate.
  */
-void DataShareHelper::NotifyChangeExt(const DataShareObserver::ChangeInfo &changeInfo)
+void DataShareHelper::NotifyChangeExt(const DataShareObserver::ChangeInfo &changeInfo, bool isSystem)
 {
     auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
@@ -297,7 +276,8 @@ void DataShareHelper::NotifyChangeExt(const DataShareObserver::ChangeInfo &chang
         return;
     }
 
-    ErrCode ret = obsMgrClient->NotifyChangeExt(ObserverImpl::ConvertInfo(changeInfo));
+    ErrCode ret = obsMgrClient->NotifyChangeExt(ObserverImpl::ConvertInfo(changeInfo),
+        AAFwk::DataObsOption(isSystem));
     LOG_INFO("Notify changeExt, ret:%{public}d", ret);
 }
 

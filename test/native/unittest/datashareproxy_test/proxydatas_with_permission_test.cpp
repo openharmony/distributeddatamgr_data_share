@@ -54,7 +54,8 @@ void ProxyDatasTest::SetUpTestCase(void)
     HapInfoParams info = { .userID = 100,
         .bundleName = "ohos.datashareproxyclienttest.demo",
         .instIndex = 0,
-        .appIDDesc = "ohos.datashareproxyclienttest.demo" };
+        .appIDDesc = "ohos.datashareproxyclienttest.demo",
+        .isSystemApp = true };
     HapPolicyParams policy = { .apl = APL_SYSTEM_BASIC,
         .domain = "test.domain",
         .permList = { { .permissionName = "ohos.permission.GET_BUNDLE_INFO",
@@ -71,9 +72,9 @@ void ProxyDatasTest::SetUpTestCase(void)
             .grantStatus = { PermissionState::PERMISSION_GRANTED },
             .grantFlags = { 1 } } } };
     AccessTokenKit::AllocHapToken(info, policy);
-    auto testTokenId =
-        Security::AccessToken::AccessTokenKit::GetHapTokenID(info.userID, info.bundleName, info.instIndex);
-    SetSelfTokenID(testTokenId);
+    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenIDEx(
+        info.userID, info.bundleName, info.instIndex);
+    SetSelfTokenID(testTokenId.tokenIDEx);
 
     CreateOptions options;
     options.enabled_ = true;
@@ -310,6 +311,31 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_005, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_Template_Test_005::End");
 }
 
+/**
+* @tc.name: ProxyDatasTest_Template_Test_006
+* @tc.desc: test use uri with userId to add template
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_006, TestSize.Level1)
+{
+    LOG_INFO("ProxyDatasTest_Template_Test_006::Start");
+    auto helper = dataShareHelper;
+    PredicateTemplateNode node1("p1", "select name0 as name from TBL00");
+    PredicateTemplateNode node2("p2", "select name1 as name from TBL00");
+    std::vector<PredicateTemplateNode> nodes;
+    nodes.emplace_back(node1);
+    nodes.emplace_back(node2);
+    Template tpl(nodes, "select name1 as name from TBL00");
+
+    std::string uri = DATA_SHARE_PROXY_URI + "?user=100";
+    auto result = helper->AddQueryTemplate(uri, SUBSCRIBER_ID, tpl);
+    EXPECT_EQ(result, E_OK);
+    result = helper->DelQueryTemplate(uri, SUBSCRIBER_ID);
+    EXPECT_EQ(result, E_OK);
+    LOG_INFO("ProxyDatasTest_Template_Test_006::End");
+}
+
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Publish_Test_001::Start");
@@ -493,6 +519,62 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_002, TestSize.Le
     EXPECT_EQ(callbackTimes, 2);
     helper->UnsubscribeRdbData(uris, tplId);
     helper2->UnsubscribeRdbData(uris, tplId);
+}
+
+/**
+* @tc.name: ProxyDatasTest_CombinationRdbData_Test_003
+* @tc.desc: combination test for persistent data updated between two constant disable
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_003, TestSize.Level1)
+{
+    LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_003::Start");
+    auto helper = dataShareHelper;
+    std::vector<PredicateTemplateNode> nodes;
+    Template tpl(nodes, "select name1 as name from TBL00");
+    auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
+    EXPECT_EQ(result, E_OK);
+
+    std::vector<std::string> uris = {DATA_SHARE_PROXY_URI};
+    TemplateId tplId;
+    tplId.subscriberId_ = SUBSCRIBER_ID;
+    tplId.bundleName_ = "ohos.datashareproxyclienttest.demo";
+    std::atomic_int callbackTimes = 0;
+    std::mutex mutex;
+    std::condition_variable cv;
+    auto timeout = std::chrono::seconds(2);
+    std::vector<OperationResult> results =
+        helper->SubscribeRdbData(uris, tplId, [&callbackTimes, &mutex, &cv](const RdbChangeNode &changeNode) {
+            std::lock_guard<std::mutex> lock(mutex);
+            callbackTimes++;
+            cv.notify_all();
+        });
+    EXPECT_EQ(results.size(), uris.size());
+    for (auto const &result : results) {
+        EXPECT_EQ(result.errCode_, E_OK);
+    }
+
+    std::unique_lock<std::mutex> lock(mutex);
+    cv.wait_for(lock, timeout);
+    EXPECT_EQ(callbackTimes, 1);
+    lock.unlock();
+    results = helper->DisableRdbSubs(uris, tplId);
+    EXPECT_EQ(results.size(), uris.size());
+    for (auto const &result : results) {
+        EXPECT_EQ(result.errCode_, 0);
+    }
+    results = helper->EnableRdbSubs(uris, tplId);
+    for (auto const &result : results) {
+        EXPECT_EQ(result.errCode_, 0);
+    }
+    EXPECT_EQ(callbackTimes, 1);
+    results = helper->UnsubscribeRdbData(uris, tplId);
+    EXPECT_EQ(results.size(), uris.size());
+    for (auto const &result : results) {
+        EXPECT_EQ(result.errCode_, E_OK);
+    }
+    LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_003::End");
 }
 
 /**

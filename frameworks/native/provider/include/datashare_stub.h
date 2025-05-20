@@ -53,6 +53,9 @@ private:
     ErrCode CmdUpdateEx(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdDeleteEx(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdUserDefineFunc(MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    ErrCode CmdRegisterObserverExtProvider(MessageParcel &data, MessageParcel &reply);
+    ErrCode CmdUnregisterObserverExtProvider(MessageParcel &data, MessageParcel &reply);
+    ErrCode CmdNotifyChangeExtProvider(MessageParcel &data, MessageParcel &reply);
 
     virtual int ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result) override;
     virtual int InsertExt(const Uri &uri, const DataShareValuesBucket &value, std::string &result) override;
@@ -63,6 +66,14 @@ private:
     virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) override;
     virtual int32_t UserDefineFunc(
         MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    // default return true, need override by users
+    virtual bool RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+        bool isDescendants) override;
+    // default return true, need override by users
+    virtual bool UnregisterObserverExtProvider(const Uri &uri,
+        const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
+    // default return true, need override by users
+    virtual bool NotifyChangeExtProvider(const ChangeInfo &changeInfo) override;
 
     using RequestFuncType = int (DataShareStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, RequestFuncType> stubFuncMap_;

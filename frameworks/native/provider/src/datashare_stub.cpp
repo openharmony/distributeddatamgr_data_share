@@ -58,6 +58,12 @@ DataShareStub::DataShareStub()
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERT_EX)] = &DataShareStub::CmdInsertEx;
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_UPDATE_EX)] = &DataShareStub::CmdUpdateEx;
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_DELETE_EX)] = &DataShareStub::CmdDeleteEx;
+    stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_REGISTER_OBSERVEREXT_PROVIDER)] =
+        &DataShareStub::CmdRegisterObserverExtProvider;
+    stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_UNREGISTER_OBSERVEREXT_PROVIDER)] =
+        &DataShareStub::CmdUnregisterObserverExtProvider;
+    stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_NOTIFY_CHANGEEXT_PROVIDER)] =
+        &DataShareStub::CmdNotifyChangeExtProvider;
 }
 
 DataShareStub::~DataShareStub()
@@ -219,9 +225,12 @@ ErrCode DataShareStub::CmdBatchUpdate(OHOS::MessageParcel &data, OHOS::MessagePa
     }
     std::vector<BatchUpdateResult> results;
     int ret = BatchUpdate(updateOperations, results);
-    if (ret != E_OK) {
+    if (ret == DEFAULT_NUMBER) {
         LOG_ERROR("BatchUpdate inner error, ret is %{public}d.", ret);
-        return ret;
+        return ERR_INVALID_VALUE;
+    } else if (ret == PERMISSION_ERROR_NUMBER) {
+        LOG_ERROR("BatchUpdate permission error");
+        return ERR_PERMISSION_DENIED;
     }
     if (!ITypesUtil::Marshal(reply, results)) {
         LOG_ERROR("marshalling updateOperations is failed");
@@ -460,6 +469,67 @@ ErrCode DataShareStub::CmdNotifyChange(MessageParcel &data, MessageParcel &reply
     return E_OK;
 }
 
+ErrCode DataShareStub::CmdRegisterObserverExtProvider(MessageParcel &data, MessageParcel &reply)
+{
+    Uri uri("");
+    sptr<IRemoteObject> observer;
+    bool isDescendants = false;
+    if (!ITypesUtil::Unmarshal(data, uri, observer, isDescendants)) {
+        LOG_ERROR("Unmarshalling uri and observer failed");
+        return ERR_INVALID_VALUE;
+    }
+    auto obServer = iface_cast<AAFwk::IDataAbilityObserver>(observer);
+    if (obServer == nullptr) {
+        LOG_ERROR("obServer is nullptr");
+        return ERR_INVALID_VALUE;
+    }
+
+    bool ret = RegisterObserverExtProvider(uri, obServer, isDescendants);
+    if (!reply.WriteInt32(ret)) {
+        LOG_ERROR("fail to WriteInt32 ret");
+        return ERR_INVALID_VALUE;
+    }
+    return E_OK;
+}
+
+ErrCode DataShareStub::CmdUnregisterObserverExtProvider(MessageParcel &data, MessageParcel &reply)
+{
+    Uri uri("");
+    sptr<IRemoteObject> observer;
+    if (!ITypesUtil::Unmarshal(data, uri, observer)) {
+        LOG_ERROR("Unmarshalling uri and observer failed");
+        return ERR_INVALID_VALUE;
+    }
+    auto obServer = iface_cast<AAFwk::IDataAbilityObserver>(observer);
+    if (obServer == nullptr) {
+        LOG_ERROR("obServer is nullptr");
+        return ERR_INVALID_VALUE;
+    }
+
+    bool ret = UnregisterObserverExtProvider(uri, obServer);
+    if (!reply.WriteInt32(ret)) {
+        LOG_ERROR("fail to WriteInt32 ret");
+        return ERR_INVALID_VALUE;
+    }
+    return E_OK;
+}
+
+ErrCode DataShareStub::CmdNotifyChangeExtProvider(MessageParcel &data, MessageParcel &reply)
+{
+    ChangeInfo changeInfo;
+    if (!ChangeInfo::Unmarshalling(changeInfo, data)) {
+        LOG_ERROR("Failed to unmarshall changeInfo.");
+        return IPC_STUB_INVALID_DATA_ERR;
+    }
+
+    bool ret = NotifyChangeExtProvider(changeInfo);
+    if (!reply.WriteInt32(ret)) {
+        LOG_ERROR("fail to WriteInt32 ret");
+        return ERR_INVALID_VALUE;
+    }
+    return E_OK;
+}
+
 ErrCode DataShareStub::CmdNormalizeUri(MessageParcel &data, MessageParcel &reply)
 {
     Uri uri("");
@@ -565,6 +635,21 @@ int32_t DataShareStub::UserDefineFunc(
 {
     LOG_ERROR("UserDefineFunc excuted.");
     return 0;
+}
+
+bool DataShareStub::RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+    bool isDescendants)
+{
+    return true;
+}
+
+bool DataShareStub::UnregisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+{
+    return true;
+}
+bool DataShareStub::NotifyChangeExtProvider(const ChangeInfo &changeInfo)
+{
+    return true;
 }
 } // namespace DataShare
 } // namespace OHOS

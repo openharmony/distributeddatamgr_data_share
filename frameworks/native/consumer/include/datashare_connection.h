@@ -21,8 +21,8 @@
 #include <mutex>
 
 #include "ability_connect_callback_stub.h"
+#include "data_ability_observer_interface.h"
 #include "datashare_proxy.h"
-#include "event_handler.h"
 #include "executor_pool.h"
 #include "want.h"
 
@@ -73,6 +73,11 @@ public:
 
     void SetConnectInvalid();
 
+    void UpdateObserverExtsProviderMap(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+        bool isDescendants);
+
+    void DeleteObserverExtsProviderMap(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+
 private:
     struct DataShareConnectionInfo {
         int count = 0;
@@ -88,6 +93,7 @@ private:
     ErrCode Disconnect();
     void ReconnectExtAbility(const std::string &uri);
     void DelayConnectExtAbility(const std::string &uri);
+    void ReRegisterObserverExtProvider();
     std::mutex mutex_{};
     std::shared_ptr<DataShareProxy> dataShareProxy_;
     ConnectCondition condition_;
@@ -101,7 +107,16 @@ private:
     static constexpr std::chrono::milliseconds MAX_RECONNECT_TIME_INTERVAL = std::chrono::milliseconds(70000);
     std::shared_ptr<ExecutorPool> pool_;
     DataShareConnectionInfo reConnects_;
+    struct Param {
+        Param(const Uri &uri, bool isDescendants) : uri(uri), isDescendants(isDescendants){};
+        Uri uri;
+        bool isDescendants;
+    };
+    // Store observers that have been successfully registered, allowing them to be re-registered during reconnection.
+    ConcurrentMap<sptr<AAFwk::IDataAbilityObserver>, std::list<Param>> observerExtsProvider_;
     int32_t waitTime_ = 0;
+    // An atomic variable used to identify the re-registration status.
+    std::atomic<bool> isReconnect_ = false;
 };
 }  // namespace DataShare
 }  // namespace OHOS

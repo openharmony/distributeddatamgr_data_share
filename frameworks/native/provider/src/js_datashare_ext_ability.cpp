@@ -64,6 +64,7 @@ void JsResult::SetAsyncResult(napi_env env, DatashareBusinessError &businessErro
         napi_unwrap(env, result, reinterpret_cast<void **>(&proxy));
         if (proxy == nullptr) {
             if (UnwrapBatchUpdateResult(env, result, updateResults_)) {
+                callbackResultNumber_ = E_OK;
                 isRecvReply_ = true;
                 return;
             }
@@ -315,13 +316,17 @@ napi_value JsDataShareExtAbility::CallObjectMethod(
         args[i] = argv[i];
     }
 
-    napi_create_function(env, ASYNC_CALLBACK_NAME, CALLBACK_LENGTH,
-        JsDataShareExtAbility::AsyncCallbackWithContext, point, &args[argc]);
+    if (napi_create_function(env, ASYNC_CALLBACK_NAME, CALLBACK_LENGTH,
+        JsDataShareExtAbility::AsyncCallbackWithContext, point, &args[argc]) != napi_ok) {
+        LOG_ERROR("napi_create_function error.");
+        delete point;
+        delete []args;
+        return nullptr;
+    }
     napi_value callResult = nullptr;
     napi_call_function(env, obj, method, count, args, &callResult);
     auto result = handleEscape.Escape(callResult);
-    napi_add_finalizer(env, args[argc], point,
-        [](napi_env env, void* point, void* finalize_hint) {
+    napi_add_finalizer(env, args[argc], point, [](napi_env env, void* point, void* finalize_hint) {
             delete static_cast<AsyncPoint *>(point);
             }, nullptr, nullptr);
     delete []args;
@@ -414,8 +419,13 @@ int32_t JsDataShareExtAbility::InitAsyncCallParams(size_t argc, napi_env &env, n
     }
 
     point->result = std::move(result_);
-    napi_create_function(env, ASYNC_CALLBACK_NAME, CALLBACK_LENGTH,
+    napi_status status = napi_create_function(env, ASYNC_CALLBACK_NAME, CALLBACK_LENGTH,
         JsDataShareExtAbility::AsyncCallback, point, &args[argc]);
+    if (status != napi_ok) {
+        LOG_ERROR("napi_create_function error: %{public}d.", status);
+        delete point;
+        return E_ERROR;
+    }
     napi_add_finalizer(env, args[argc], point,
         [](napi_env env, void* point, void* finalize_hint) {
             delete static_cast<AsyncCallBackPoint *>(point);
