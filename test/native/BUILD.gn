@@ -744,6 +744,15 @@ ohos_unittest("DataShareProxyTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+  }
 }
 
 ohos_unittest("DataShareConnectionTest") {
@@ -792,6 +801,15 @@ ohos_unittest("DataShareConnectionTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+  }
 }
 
 ohos_unittest("DataShareStubTest") {
