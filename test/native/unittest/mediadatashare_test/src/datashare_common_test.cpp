@@ -15,10 +15,17 @@
 
 #include <gtest/gtest.h>
 #include <unistd.h>
+#include <gtest/gtest.h>
 
+#include "datashare_errno.h"
+#include "datashare_itypes_utils.h"
 #include "datashare_log.h"
+#include "datashare_abs_result_set.h"
+#include "datashare_result_set.h"
+#include "ikvstore_data_service.h"
 #include "ipc_types.h"
 #include "ishared_result_set_stub.h"
+#include "itypes_util.h"
 #include "message_parcel.h"
 #include "gmock/gmock.h"
 
@@ -46,6 +53,19 @@ public:
     int OnGo(int32_t startRowIndex, int32_t targetRowIndex, Writer &writer) override {
         return 0;
     }
+};
+
+class MockDataShareAbsResultSet : public DataShareAbsResultSet {
+public:
+    MOCK_METHOD1(GoToRow, int(int));
+    MOCK_METHOD1(GetRowCount, int(int &));
+    MOCK_METHOD1(GetAllColumnNames, int(std::vector<std::string> &));
+    MOCK_METHOD1(GetColumnCount, int(int &));
+};
+
+class MockDataShareAbsResultSet2 : public DataShareAbsResultSet {
+public:
+    MOCK_METHOD1(GetAllColumnNames, int(std::vector<std::string> &));
 };
 
 /**
@@ -262,6 +282,397 @@ HWTEST_F(DataShareCommonTest, HandleOnGoRequestTest002, TestSize.Level0)
     EXPECT_NE(reply.ReadInt32(), E_ERROR);
     EXPECT_EQ(result, NO_ERROR);
     LOG_INFO("DataShareCommonTest HandleOnGoRequestTest002::End");
+}
+
+/**
+* @tc.name: GetDataTypeTest001
+* @tc.desc: test GetDataType function when sharedBlock_ is nullptr
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a DataShareResultSet object and sharedBlock_ is nullptr
+    2.call GetDataType function and check the result
+* @tc.experct: GetDataType failed and return E_ERROR
+*/
+HWTEST_F(DataShareCommonTest, GetDataTypeTest001, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest GetDataTypeTest001::Start");
+    DataShareResultSet dataShareResultSet;
+    int columnIndex = 1;
+    DataShare::DataType dataType;
+    auto result = dataShareResultSet.GetDataType(columnIndex, dataType);
+    EXPECT_EQ(result, E_ERROR);
+    LOG_INFO("DataShareCommonTest GetDataTypeTest001::End");
+}
+
+/**
+* @tc.name: CheckStateTest001
+* @tc.desc: test CheckState function when columnIndex >= 0
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a DataShareResultSet object
+    2.call CheckState function when columnIndex >= 0 and check the result
+* @tc.experct: CheckState failed and return E_INVALID_COLUMN_INDEX
+*/
+HWTEST_F(DataShareCommonTest, CheckStateTest001, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest CheckStateTest001::Start");
+    DataShareResultSet dataShareResultSet;
+    int columnIndex = 1;
+    auto result = dataShareResultSet.CheckState(columnIndex);
+    EXPECT_EQ(result, E_INVALID_COLUMN_INDEX);
+    LOG_INFO("DataShareCommonTest CheckStateTest001::End");
+}
+
+/**
+* @tc.name: CheckStateTest002
+* @tc.desc: test CheckState function when columnIndex < 0
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a DataShareResultSet object
+    2.call CheckState function when columnIndex < 0 and check the result
+* @tc.experct: CheckState failed and return E_INVALID_COLUMN_INDEX
+*/
+HWTEST_F(DataShareCommonTest, CheckStateTest002, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest CheckState002::Start");
+    DataShareResultSet dataShareResultSet;
+    int columnIndex = -1;
+    auto result = dataShareResultSet.CheckState(columnIndex);
+    EXPECT_EQ(result, E_INVALID_COLUMN_INDEX);
+    LOG_INFO("DataShareCommonTest CheckState002::End");
+}
+/**
+* @tc.name: UnmarshallingTest001
+* @tc.desc: test Unmarshalling function when parcel is nullptr
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a ITypesUtil object and parcel is nullptr
+    2.call Unmarshalling function and check the result
+* @tc.experct: Unmarshalling failed and return false
+*/
+HWTEST_F(DataShareCommonTest, UnmarshallingTest001, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest UnmarshallingTest001::Start");
+    ITypesUtil::Predicates predicates;
+    MessageParcel parcel;
+    auto result = ITypesUtil::Unmarshalling(predicates, parcel);
+    EXPECT_FALSE(result);
+    LOG_INFO("DataShareCommonTest UnmarshallingTest001::End");
+}
+
+/**
+* @tc.name: UnmarshallingTest002
+* @tc.desc: test Unmarshalling function when parcel is nullptr
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a ITypesUtil object and parcel is nullptr
+    2.call Unmarshalling function and check the result
+* @tc.experct: Unmarshalling failed and return false
+*/
+HWTEST_F(DataShareCommonTest, UnmarshallingTest002, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest UnmarshallingTest002::Start");
+    OperationStatement operationStatement;
+    MessageParcel parcel;
+    auto result = ITypesUtil::Unmarshalling(operationStatement, parcel);
+    EXPECT_FALSE(result);
+    LOG_INFO("DataShareCommonTest UnmarshallingTest002::End");
+}
+
+/**
+* @tc.name: UnmarshallingTest003
+* @tc.desc: test Unmarshalling function when parcel is nullptr
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a ITypesUtil object and parcel is nullptr
+    2.call Unmarshalling function and check the result
+* @tc.experct: Unmarshalling failed and return false
+*/
+HWTEST_F(DataShareCommonTest, UnmarshallingTest003, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest UnmarshallingTest003::Start");
+    ExecResult execResult;
+    MessageParcel parcel;
+    auto result = ITypesUtil::Unmarshalling(execResult, parcel);
+    EXPECT_FALSE(result);
+    LOG_INFO("DataShareCommonTest UnmarshallingTest003::End");
+}
+
+/**
+* @tc.name: UnmarshallingTest004
+* @tc.desc: test Unmarshalling function when parcel is nullptr
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a ITypesUtil object and parcel is nullptr
+    2.call Unmarshalling function and check the result
+* @tc.experct: Unmarshalling failed and return false
+*/
+HWTEST_F(DataShareCommonTest, UnmarshallingTest004, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest UnmarshallingTest004::Start");
+    ExecResultSet execResultSet;
+    MessageParcel parcel;
+    auto result = ITypesUtil::Unmarshalling(execResultSet, parcel);
+    EXPECT_FALSE(result);
+    LOG_INFO("DataShareCommonTest UnmarshallingTest004::End");
+}
+
+/**
+* @tc.name: MarshallingTest001
+* @tc.desc: test Marshalling function when parcel is nullptr
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a ITypesUtil object and parcel is nullptr
+    2.call Marshalling function and check the result
+* @tc.experct: Marshalling success and return ture
+*/
+HWTEST_F(DataShareCommonTest, MarshallingTest001, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest MarshallingTest001::Start");
+    ITypesUtil::RdbChangeNode changeNode;
+    MessageParcel parcel;
+    auto result = ITypesUtil::Marshalling(changeNode, parcel);
+    EXPECT_TRUE(result);
+    LOG_INFO("DataShareCommonTest MarshallingTest001::End");
+}
+
+/**
+* @tc.name: MarshallingTest002
+* @tc.desc: test Marshalling function when sharedBlock_ is nullptr
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a DataShareResultSet object
+    2.call Marshalling function when sharedBlock_ is nullptr and check the result
+* @tc.experct: Marshalling failed and return false
+*/
+HWTEST_F(DataShareCommonTest, MarshallingTest002, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest MarshallingTest002::Start");
+    DataShareResultSet dataShareResultSet;
+    MessageParcel parcel;
+    auto result = dataShareResultSet.Marshalling(parcel);
+    EXPECT_FALSE(result);
+    LOG_INFO("DataShareCommonTest MarshallingTest002::End");
+}
+
+/**
+* @tc.name: GoToTest001
+* @tc.desc: test GoTo function when GoToRow return E_ERROR
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a MockDataShareAbsResultSet object 
+    2.call GoTo function when GoToRow return E_ERROR and check the result
+* @tc.experct: GoTo failed and return E_ERROR
+*/
+HWTEST_F(DataShareCommonTest, GoToTest001, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest GoToTest001::Start");
+    MockDataShareAbsResultSet mockResultSet;
+    int offset = 1;
+    EXPECT_CALL(mockResultSet, GoToRow(testing::_))
+        .WillOnce(testing::Return(E_ERROR));
+    auto result = mockResultSet.GoTo(offset);
+    EXPECT_EQ(result, E_ERROR);
+    LOG_INFO("DataShareCommonTest GoToTest001::End");
+}
+
+/**
+* @tc.name: GoToTest002
+* @tc.desc: test GoTo function 
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a MockDataShareAbsResultSet object 
+    2.call GoTo function and check the result
+* @tc.experct: GoTo success and return E_OK
+*/
+HWTEST_F(DataShareCommonTest, GoToTest002, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest GoToTest002::Start");
+    DataShareAbsResultSet dataShareAbsResultSet;
+    int offset = 1;
+    auto result = dataShareAbsResultSet.GoTo(offset);
+    EXPECT_EQ(result, E_OK);
+    LOG_INFO("DataShareCommonTest GoToTest002::End");
+}
+
+/**
+* @tc.name: IsEndedTest001
+* @tc.desc: test IsEnded function when GetRowCount return E_ERROR
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a MockDataShareAbsResultSet object 
+    2.call IsEnded function when GetRowCount return E_ERROR and check the result
+* @tc.experct: IsEnded failed and return E_ERROR
+*/
+HWTEST_F(DataShareCommonTest, IsEndedTest001, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest IsEndedTest001::Start");
+    MockDataShareAbsResultSet mockResultSet;
+    EXPECT_CALL(mockResultSet, GetRowCount(testing::_))
+        .WillOnce(testing::Return(E_ERROR));
+    bool test = true;
+    auto result = mockResultSet.IsEnded(test);
+    EXPECT_EQ(result, E_ERROR);
+    LOG_INFO("DataShareCommonTest IsEndedTest001::End");
+}
+
+/**
+* @tc.name: IsEndedTest002
+* @tc.desc: test IsEnded function 
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a MockDataShareAbsResultSet object 
+    2.call IsEnded function and check the result
+* @tc.experct: IsEnded success and return E_OK
+*/
+HWTEST_F(DataShareCommonTest, IsEndedTest002, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest IsEndedTest002::Start");
+    DataShareAbsResultSet dataShareAbsResultSet;
+    bool test = true;
+    auto result = dataShareAbsResultSet.IsEnded(test);
+    EXPECT_EQ(result, E_OK);
+    LOG_INFO("DataShareCommonTest IsEndedTest002::End");
+}
+
+/**
+* @tc.name: GetColumnCountTest001
+* @tc.desc: test GetColumnCount function when GetAllColumnNames return E_ERROR
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a MockDataShareAbsResultSet2 object 
+    2.call GetColumnCount function when GetAllColumnNames return E_ERROR and check the result
+* @tc.experct: GetColumnCount failed and return E_ERROR
+*/
+HWTEST_F(DataShareCommonTest, GetColumnCountTest001, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest GetColumnCountTest001::Start");
+    MockDataShareAbsResultSet2 mockResultSet;
+    int offset = -1;
+    mockResultSet.count_ = -1;
+    EXPECT_CALL(mockResultSet, GetAllColumnNames(testing::_))
+        .WillOnce(testing::Return(E_ERROR));
+    auto result = mockResultSet.GetColumnCount(offset);
+    EXPECT_EQ(result, E_ERROR);
+    LOG_INFO("DataShareCommonTest GetColumnCountTest001::End");
+}
+
+/**
+* @tc.name: GetColumnName001
+* @tc.desc: test GetColumnName function when GetColumnCount return E_ERROR
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a MockDataShareAbsResultSet object
+    2.call GetColumnName function when GetColumnCount return E_ERROR and check the result
+* @tc.experct: GetColumnName failed and return E_ERROR
+*/
+HWTEST_F(DataShareCommonTest, GetColumnName001, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest GetColumnName001::Start");
+    MockDataShareAbsResultSet mockResultSet;
+    int columnIndex = 1;
+    std::string columnName = "test";
+    EXPECT_CALL(mockResultSet, GetColumnCount(testing::_))
+        .WillOnce(testing::Return(E_ERROR));
+    auto result = mockResultSet.GetColumnName(columnIndex, columnName);
+    EXPECT_EQ(result, E_ERROR);
+    LOG_INFO("DataShareCommonTest GetColumnName001::End");
+}
+
+/**
+* @tc.name: GetColumnName002
+* @tc.desc: test GetColumnName function when columnIndex >= 0
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a MockDataShareAbsResultSet object
+    2.call GetColumnName function when columnIndex >= 0 and check the result
+* @tc.experct: GetColumnName failed and return E_INVALID_COLUMN_INDEX
+*/
+HWTEST_F(DataShareCommonTest, GetColumnName002, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest MarshallingTest002::Start");
+    DataShareAbsResultSet dataShareAbsResultSet;
+    int columnIndex = 1;
+    std::string columnName = "test";
+    auto result = dataShareAbsResultSet.GetColumnName(columnIndex, columnName);
+    EXPECT_EQ(result, E_INVALID_COLUMN_INDEX);
+    LOG_INFO("DataShareCommonTest MarshallingTest002::End");
+}
+
+/**
+* @tc.name: GetColumnName003
+* @tc.desc: test GetColumnName function when columnIndex < 0
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a MockDataShareAbsResultSet object
+    2.call GetColumnName function when columnIndex < 0 and check the result
+* @tc.experct: GetColumnName failed and return E_INVALID_COLUMN_INDEX
+*/
+HWTEST_F(DataShareCommonTest, GetColumnName003, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest MarshallingTest002::Start");
+    DataShareAbsResultSet dataShareAbsResultSet;
+    int columnIndex = -1;
+    std::string columnName = "test";
+    auto result = dataShareAbsResultSet.GetColumnName(columnIndex, columnName);
+    EXPECT_EQ(result, E_INVALID_COLUMN_INDEX);
+    LOG_INFO("DataShareCommonTest MarshallingTest002::End");
+}
+
+/**
+* @tc.name: RegisterClientDeathObserver001
+* @tc.desc: test RegisterClientDeathObserver function when observer = nullptr
+* @tc.type: FUNC
+* @tc.require: issueIC9GIH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a MockDataShareAbsResultSet object when observer = nullptr
+    2.call RegisterClientDeathObserver function and check the result
+* @tc.experct: RegisterClientDeathObserver failed and return -1
+*/
+HWTEST_F(DataShareCommonTest, RegisterClientDeathObserver001, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest RegisterClientDeathObserver001::Start");
+    sptr<IRemoteObject> observer = nullptr;
+    std::string appId = "testAppid";
+    DataShareKvServiceProxy dataShareKvServiceProxy(observer);
+    auto result = dataShareKvServiceProxy.RegisterClientDeathObserver(appId, observer);
+    EXPECT_EQ(result, -1);
+    LOG_INFO("DataShareCommonTest RegisterClientDeathObserver001::End");
 }
 } // namespace DataShare
 } // namespace OHOS
