@@ -163,6 +163,11 @@ public:
     bool HasBlock();
 
     std::shared_ptr<ResultSetBridge> GetBridge();
+
+    static bool Marshal(const std::shared_ptr<DataShareResultSet> resultSet, MessageParcel &parcel);
+
+    static std::shared_ptr<DataShareResultSet> Unmarshal(MessageParcel &parcel);
+
 protected:
     int CheckState(int columnIndex);
     void ClosedBlockAndBridge();
@@ -181,7 +186,7 @@ private:
     int endRowPos_ = -1;
     // The SharedBlock owned by this DataShareResultSet
     std::shared_mutex mutex_;
-    std::shared_ptr<AppDataFwk::SharedBlock> sharedBlock_  = nullptr;
+    std::shared_ptr<AppDataFwk::SharedBlock> sharedBlock_ = nullptr;
     std::shared_ptr<DataShareBlockWriterImpl> blockWriter_ = nullptr;
     std::shared_ptr<ResultSetBridge> bridge_ = nullptr;
 };

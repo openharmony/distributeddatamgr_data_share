@@ -50,6 +50,7 @@ datashare_common_sources = [
   "${datashare_common_native_path}/src/ishared_result_set_proxy.cpp",
   "${datashare_common_native_path}/src/ishared_result_set_stub.cpp",
   "${datashare_common_native_path}/src/shared_block.cpp",
+  "${datashare_common_native_path}/src/datashare_predicates.cpp",
 ]
 
 datashare_common_external_deps = [
@@ -60,6 +61,7 @@ datashare_common_external_deps = [
   "hitrace:hitrace_meter",
   "hitrace:libhitracechain",
   "ipc:ipc_single",
+  "ipc:ipc_core",
   "kv_store:distributeddata_inner",
 ]
 
