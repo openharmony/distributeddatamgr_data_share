@@ -142,7 +142,6 @@
                 },
                 {
                     "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common_lite",
-                    "visibility": [ "kv_store", "relational_store", "datamgr_service" ],
                     "header": {
                         "header_files": [
                             "datashare_abs_predicates.h",
@@ -154,7 +153,6 @@
                 },
                 {
                     "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common_lite",
-                    "visibility": [ "kv_store", "relational_store", "datamgr_service" ],
                     "header": {
                         "header_files": [
                             "result_set_bridge.h"
