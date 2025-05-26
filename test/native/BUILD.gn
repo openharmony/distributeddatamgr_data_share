@@ -64,18 +64,7 @@ ohos_unittest("NativeDataShareTest") {
   visibility = [ ":*" ]
 
   include_dirs = [
-    "//foundation/ability/ability_runtime/interfaces/inner_api/ability_manager/include",
-    "//foundation/ability/ability_runtime/interfaces/inner_api/app_manager/include/appmgr",
-    "//foundation/ability/ability_runtime/interfaces/inner_api/dataobs_manager/include",
-    "//foundation/ability/ability_runtime/interfaces/kits/native/ability/native",
     "./unittest/mediadatashare_test/include",
-    "//base/security/access_token/frameworks/common/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//foundation/aafwk/standard/interfaces/innerkits/uri/include",
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//third_party/json/include",
     "${datashare_native_proxy_path}/include",
   ]
 
@@ -118,15 +107,6 @@ ohos_unittest("NativeDataShareTest") {
 ohos_unittest("PermissionTest") {
   module_out_path = "data_share/data_share/inner_tests"
 
-  include_dirs = [
-    "${access_token_path}/frameworks/common/include",
-    "${base_hiviewdfx_hilog_path}/interfaces/native/innerkits/include",
-    "${commonlibrary_cutils_path}/base/include",
-    "${foundation_path}/aafwk/standard/interfaces/innerkits/uri/include",
-    "${foundation_path}/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "${utils_system_safwk_path}/native/include",
-  ]
-
   sources = [ "./unittest/mediadatashare_test/src/permission_test.cpp" ]
   configs = [ ":permission_config" ]
 
@@ -155,15 +135,6 @@ ohos_unittest("PermissionTest") {
 
 ohos_unittest("SlientAccessTest") {
   module_out_path = "data_share/data_share/inner_tests"
-
-  include_dirs = [
-    "//base/security/access_token/frameworks/common/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//foundation/aafwk/standard/interfaces/innerkits/uri/include",
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-  ]
 
   sources = [ "./unittest/mediadatashare_test/src/slientaccess_test.cpp" ]
 
@@ -220,15 +191,6 @@ ohos_unittest("SlientSwitchTest") {
 ohos_unittest("ErrorCodeTest") {
   module_out_path = "data_share/data_share/inner_tests"
 
-  include_dirs = [
-    "//base/security/access_token/frameworks/common/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//foundation/aafwk/standard/interfaces/innerkits/uri/include",
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-  ]
-
   sources = [ "./unittest/mediadatashare_test/src/errorcode_test.cpp" ]
 
   deps = [
@@ -256,15 +218,6 @@ ohos_unittest("ErrorCodeTest") {
 ohos_unittest("JoinTest") {
   module_out_path = "data_share/data_share/inner_tests"
 
-  include_dirs = [
-    "//base/security/access_token/frameworks/common/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//foundation/aafwk/standard/interfaces/innerkits/uri/include",
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-  ]
-
   sources = [ "./unittest/mediadatashare_test/src/join_test.cpp" ]
 
   deps = [
@@ -291,15 +244,6 @@ ohos_unittest("JoinTest") {
 
 ohos_unittest("ProxyDatasTest") {
   module_out_path = "data_share/data_share/inner_tests"
-
-  include_dirs = [
-    "//base/security/access_token/frameworks/common/include",
-    "//base/hiviewdfx/hilog/interfaces/native/innerkits/include",
-    "//foundation/aafwk/standard/interfaces/innerkits/uri/include",
-    "//commonlibrary/c_utils/base/include",
-    "//utils/system/safwk/native/include",
-    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-  ]
 
   sources =
       [ "./unittest/datashareproxy_test/proxydatas_with_permission_test.cpp" ]
@@ -329,12 +273,6 @@ ohos_unittest("ControllerTest") {
   module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [
-    "${access_token_path}/frameworks/common/include",
-    "${base_hiviewdfx_hilog_path}/interfaces/native/innerkits/include",
-    "${foundation_path}/aafwk/standard/interfaces/innerkits/uri/include",
-    "${commonlibrary_cutils_path}/base/include",
-    "${utils_system_safwk_path}/native/include",
-    "${foundation_path}/communication/ipc/interfaces/innerkits/ipc_core/include",
     "${thirdparty_json_path}/include",
     "${datashare_innerapi_path}/consumer/include",
     "${datashare_native_consumer_path}/controller/common",
@@ -393,12 +331,6 @@ ohos_unittest("AbnormalBranchTest") {
   module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [
-    "${access_token_path}/frameworks/common/include",
-    "${base_hiviewdfx_hilog_path}/interfaces/native/innerkits/include",
-    "${foundation_path}/aafwk/standard/interfaces/innerkits/uri/include",
-    "${commonlibrary_cutils_path}/base/include",
-    "${utils_system_safwk_path}/native/include",
-    "${foundation_path}/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//foundation/distributeddatamgr/data_share/frameworks/native/proxy/include/",
     "//foundation/distributeddatamgr/data_share/frameworks/native/common/include/",
     "${datashare_native_proxy_path}/include",
