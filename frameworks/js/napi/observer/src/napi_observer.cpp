@@ -26,20 +26,20 @@ NapiObserver::NapiObserver(napi_env env, napi_value callback) : env_(env)
     napi_get_uv_event_loop(env, &loop_);
 }
 
-void NapiObserver::CallbackFunc(uv_work_t *work, int status)
+void NapiObserver::CallbackFunc(ObserverWorker *observerWorker)
 {
-    LOG_DEBUG("RdbObsCallbackFunc start");
-    std::shared_ptr<ObserverWorker> innerWorker(reinterpret_cast<ObserverWorker *>(work->data));
-    std::shared_ptr<NapiObserver> observer = innerWorker->observer_.lock();
+    LOG_DEBUG("ObsCallbackFunc start");
+    std::shared_ptr<NapiObserver> observer = observerWorker->observer_.lock();
     if (observer == nullptr || observer->ref_ == nullptr) {
-        delete work;
         LOG_ERROR("rdbObserver->ref_ is nullptr");
+        delete observerWorker;
         return;
     }
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(observer->env_, &scope);
     if (scope == nullptr) {
-        delete work;
+        LOG_ERROR("scope is nullptr");
+        delete observerWorker;
         return;
     }
     napi_value callback = nullptr;
@@ -49,13 +49,14 @@ void NapiObserver::CallbackFunc(uv_work_t *work, int status)
     napi_get_reference_value(observer->env_, observer->ref_, &callback);
     napi_get_global(observer->env_, &global);
     napi_get_undefined(observer->env_, &param[0]);
-    param[1] = innerWorker->getParam(observer->env_);
+    param[1] = observerWorker->getParam(observer->env_);
     napi_status callStatus = napi_call_function(observer->env_, global, callback, 2, param, &result);
     napi_close_handle_scope(observer->env_, scope);
     if (callStatus != napi_ok) {
         LOG_ERROR("napi_call_function failed status : %{public}d", callStatus);
     }
-    delete work;
+    LOG_DEBUG("napi_call_function succeed status : %{public}d", callStatus);
+    delete observerWorker;
 }
 
 NapiObserver::~NapiObserver()
@@ -104,20 +105,15 @@ void NapiRdbObserver::OnChange(const RdbChangeNode &changeNode)
         return DataShareJSUtils::Convert2JSValue(env, changeNode);
     };
 
-    uv_work_t *work = new (std::nothrow) uv_work_t();
-    if (work == nullptr) {
-        delete observerWorker;
-        LOG_ERROR("Failed to create uv work");
-        return;
-    }
-    work->data = observerWorker;
-    int ret = uv_queue_work(
-        loop_, work, [](uv_work_t *work) {}, CallbackFunc);
+    auto task = [observerWorker]() {
+        NapiObserver::CallbackFunc(observerWorker);
+    };
+    int ret = napi_send_event(env_, task, napi_eprio_immediate);
     if (ret != 0) {
-        LOG_ERROR("uv_queue_work failed");
+        LOG_ERROR("napi_send_event failed: %{public}d", ret);
         delete observerWorker;
-        delete work;
     }
+    LOG_DEBUG("NapiRdbObserver onchange End: %{public}d", ret);
 }
 
 void NapiPublishedObserver::OnChange(PublishedDataChangeNode &changeNode)
@@ -137,20 +133,15 @@ void NapiPublishedObserver::OnChange(PublishedDataChangeNode &changeNode)
         return DataShareJSUtils::Convert2JSValue(env, *node);
     };
 
-    uv_work_t *work = new (std::nothrow) uv_work_t();
-    if (work == nullptr) {
-        delete observerWorker;
-        LOG_ERROR("Failed to create uv work");
-        return;
-    }
-    work->data = observerWorker;
-    int ret = uv_queue_work(
-        loop_, work, [](uv_work_t *work) {}, CallbackFunc);
+    auto task = [observerWorker]() {
+        NapiObserver::CallbackFunc(observerWorker);
+    };
+    int ret = napi_send_event(env_, task, napi_eprio_immediate);
     if (ret != 0) {
-        LOG_ERROR("uv_queue_work failed");
+        LOG_ERROR("napi_send_event failed: %{public}d", ret);
         delete observerWorker;
-        delete work;
     }
+    LOG_DEBUG("NapiRdbObserver onchange End: %{public}d", ret);
 }
 } // namespace DataShare
 } // namespace OHOS

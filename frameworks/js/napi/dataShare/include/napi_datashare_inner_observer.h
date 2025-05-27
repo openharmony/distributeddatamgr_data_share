@@ -32,8 +32,7 @@ public:
     void DeleteReference();
     napi_ref GetCallback();
 
-private:
-    static void OnComplete(uv_work_t *work, int status);
+protected:
     struct ObserverWorker {
         std::weak_ptr<NAPIInnerObserver> observer_;
         DataShareObserver::ChangeInfo result_;
@@ -41,7 +40,7 @@ private:
         ObserverWorker(std::shared_ptr<NAPIInnerObserver> observerIn, DataShareObserver::ChangeInfo resultIn = {})
             : observer_(observerIn), result_(resultIn) {}
     };
-
+    static void OnComplete(ObserverWorker* observerWorker);
     napi_env env_ = nullptr;
     napi_ref ref_ = nullptr;
     uv_loop_s *loop_ = nullptr;
