@@ -69,7 +69,7 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
             [taskEntry] { return taskEntry->done; })) {
             auto time = static_cast<uint64_t>(duration_cast<milliseconds>(
                 system_clock::now().time_since_epoch()).count());
-            LOG_INFO("function ended successfully. times %{public}" PRIu64 ".", time);
+            LOG_WARN("function ended successfully. times %{public}" PRIu64 ".", time);
         }
     }
     CheckFuncAndExec(retFunc);
