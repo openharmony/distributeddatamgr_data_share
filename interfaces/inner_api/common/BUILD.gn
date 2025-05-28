@@ -121,3 +121,28 @@ ohos_static_library("datashare_common_static") {
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
 }
+
+config("datashare_common_lite_config") {
+  visibility = [ ":*" ]
+
+  include_dirs =
+      [ "${datashare_base_path}/interfaces/inner_api/common/include",
+        "${datashare_base_path}/interfaces/inner_api/provider/include", ]
+}
+
+ohos_static_library("datashare_common_lite") {
+  branch_protector_ret = "pac_ret"
+  sanitize = {
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+
+  configs = [ ":ability_config" ]
+  public_configs = [ ":datashare_common_lite_config" ]
+  
+  subsystem_name = "distributeddatamgr"
+  part_name = "data_share"
+}
