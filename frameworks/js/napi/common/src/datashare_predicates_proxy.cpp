@@ -217,6 +217,9 @@ napi_value DataSharePredicatesProxy::EqualTo(napi_env env, napi_callback_info in
     napi_get_cb_info(env, info, &argc, args, &thiz, nullptr);
     NAPI_ASSERT(env, argc > 1, "Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
+    if (field.empty()) {
+        LOG_WARN("The field is empty.");
+    }
     napi_valuetype valueType = napi_undefined;
     napi_status status = napi_typeof(env, args[1], &valueType);
     if (status != napi_ok) {
@@ -247,6 +250,7 @@ napi_value DataSharePredicatesProxy::EqualTo(napi_env env, napi_callback_info in
             break;
         }
         default:
+            LOG_ERROR("Invalid argument! Wrong argument Type");
             break;
     }
     return thiz;
@@ -686,6 +690,9 @@ napi_value DataSharePredicatesProxy::OrderByAsc(napi_env env, napi_callback_info
     napi_get_cb_info(env, info, &argc, args, &thiz, nullptr);
     NAPI_ASSERT(env, argc > 0, "Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
+    if (field.empty()) {
+        LOG_WARN("The field is empty.");
+    }
     auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
@@ -703,6 +710,9 @@ napi_value DataSharePredicatesProxy::OrderByDesc(napi_env env, napi_callback_inf
     napi_get_cb_info(env, info, &argc, args, &thiz, nullptr);
     NAPI_ASSERT(env, argc > 0, "Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
+    if (field.empty()) {
+        LOG_WARN("The field is empty.");
+    }
     auto nativePredicates = GetNativePredicates(env, info);
     if (nativePredicates == nullptr) {
         LOG_ERROR("GetNativePredicates failed.");
@@ -788,6 +798,9 @@ napi_value DataSharePredicatesProxy::In(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &argc, args, &thiz, nullptr);
     NAPI_ASSERT(env, argc > 1, "Invalid argvs!");
     std::string field = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
+    if (field.empty()) {
+        LOG_WARN("The field is empty.");
+    }
     std::vector<std::string> values = DataShareJSUtils::Convert2StrVector(env,
         args[1], DataShareJSUtils::DEFAULT_BUF_SIZE);
     auto nativePredicates = GetNativePredicates(env, info);
