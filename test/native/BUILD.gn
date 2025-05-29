@@ -273,7 +273,6 @@ ohos_unittest("ControllerTest") {
   module_out_path = "data_share/data_share/inner_tests"
 
   include_dirs = [
-    "${thirdparty_json_path}/include",
     "${datashare_innerapi_path}/consumer/include",
     "${datashare_native_consumer_path}/controller/common",
     "${datashare_native_consumer_path}/controller/provider/include",
