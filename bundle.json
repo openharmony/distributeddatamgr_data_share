@@ -159,6 +159,25 @@
                         ],
                         "header_base": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/provider/include"
                     }
+                },
+                {
+                    "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common_lite",
+                    "header": {
+                        "header_files": [
+                            "datashare_result_set.h"
+                        ],
+                        "header_base": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/consumer/include"
+                    }
+                },
+                {
+                    "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common_lite",
+                    "header": {
+                        "header_files": [
+                            "datashare_radar_reporter.h",
+                            "ishared_result_set.h"
+                        ],
+                        "header_base": "//foundation/distributeddatamgr/data_share/frameworks/native/common/include"
+                    }
                 }
             ],
             "test": [

@@ -42,6 +42,7 @@ datashare_common_sources = [
   "${datashare_common_native_path}/src/datashare_abs_result_set.cpp",
   "${datashare_common_native_path}/src/datashare_block_writer_impl.cpp",
   "${datashare_common_native_path}/src/datashare_itypes_utils.cpp",
+  "${datashare_common_native_path}/src/datashare_predicates.cpp",
   "${datashare_common_native_path}/src/datashare_result_set.cpp",
   "${datashare_common_native_path}/src/datashare_template.cpp",
   "${datashare_common_native_path}/src/datashare_valuebucket_convert.cpp",
@@ -50,7 +51,6 @@ datashare_common_sources = [
   "${datashare_common_native_path}/src/ishared_result_set_proxy.cpp",
   "${datashare_common_native_path}/src/ishared_result_set_stub.cpp",
   "${datashare_common_native_path}/src/shared_block.cpp",
-  "${datashare_common_native_path}/src/datashare_predicates.cpp",
 ]
 
 datashare_common_external_deps = [
@@ -60,8 +60,8 @@ datashare_common_external_deps = [
   "hisysevent:libhisysevent",
   "hitrace:hitrace_meter",
   "hitrace:libhitracechain",
-  "ipc:ipc_single",
   "ipc:ipc_core",
+  "ipc:ipc_single",
   "kv_store:distributeddata_inner",
 ]
 
@@ -125,9 +125,12 @@ ohos_static_library("datashare_common_static") {
 config("datashare_common_lite_config") {
   visibility = [ ":*" ]
 
-  include_dirs =
-      [ "${datashare_base_path}/interfaces/inner_api/common/include",
-        "${datashare_base_path}/interfaces/inner_api/provider/include", ]
+  include_dirs = [
+    "${datashare_base_path}/interfaces/inner_api/common/include",
+    "${datashare_base_path}/interfaces/inner_api/provider/include",
+    "${datashare_base_path}/interfaces/inner_api/consumer/include",
+    "${datashare_base_path}/frameworks/native/common/include",
+  ]
 }
 
 ohos_static_library("datashare_common_lite") {
@@ -142,7 +145,7 @@ ohos_static_library("datashare_common_lite") {
 
   configs = [ ":ability_config" ]
   public_configs = [ ":datashare_common_lite_config" ]
-  
+
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
 }

@@ -519,7 +519,9 @@ ohos_unittest("DataShareBlockWriterImplTest") {
     "${datashare_native_proxy_path}/include",
   ]
 
-  sources = [ "./unittest/mediadatashare_test/src/datashare_block_writer_impl_test.cpp" ]
+  sources = [
+    "./unittest/mediadatashare_test/src/datashare_block_writer_impl_test.cpp",
+  ]
 
   deps = [
     "${datashare_innerapi_path}:datashare_consumer_static",
@@ -589,12 +591,10 @@ ohos_unittest("DataShareCommonTest") {
     cfi_vcall_icall_only = true
     blocklist = "../../cfi_blocklist.txt"
   }
-  
+
   module_out_path = "data_share/data_share/inner_tests"
 
-  include_dirs = [
-    "${datashare_base_path}/frameworks/native/common/include/"
-  ]
+  include_dirs = [ "${datashare_base_path}/frameworks/native/common/include/" ]
 
   sources = [ "./unittest/mediadatashare_test/src/datashare_common_test.cpp" ]
 
@@ -617,12 +617,12 @@ ohos_unittest("DataShareCommonTest") {
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "hitrace:libhitracechain",
+    "ipc:ipc_core",
     "ipc:ipc_single",
     "ipc:rpc",
-    "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
-  
+
   cflags = [
     "-fvisibility=hidden",
     "-Dprivate=public",
