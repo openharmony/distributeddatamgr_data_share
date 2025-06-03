@@ -470,10 +470,10 @@ ohos_unittest("DataShareHelperImplTest") {
     "hitrace:libhitracechain",
     "ipc:ipc_single",
     "ipc:rpc",
+    "kv_store:distributeddata_inner",
+    "relational_store:native_appdatafwk",
     "samgr:samgr_proxy",
   ]
-
-  public_external_deps = [ "kv_store:distributeddata_inner" ]
 
   cflags = [
     "-fvisibility=hidden",
