@@ -28,6 +28,7 @@ group("unittest") {
     ":DataShareHelperTest",
     ":DataShareProxyTest",
     ":DataShareStubTest",
+    ":DatashareItypesUtilsTest",
     ":ErrorCodeTest",
     ":JoinTest",
     ":NativeDataShareTest",
@@ -783,6 +784,31 @@ ohos_unittest("DataShareStubTest") {
     "relational_store:rdb_data_ability_adapter",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+  ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+ohos_unittest("DatashareItypesUtilsTest") {
+  module_out_path = "data_share/data_share/inner_tests"
+
+  include_dirs = [ "${datashare_common_native_path}/include" ]
+
+  sources =
+      [ "./unittest/datashare_common_test/datashare_itypes_utils_test.cpp" ]
+
+  deps = [ "${datashare_innerapi_path}/common:datashare_common_static" ]
+
+  external_deps = [
+    "ability_base:zuri",
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "kv_store:distributeddata_inner",
   ]
 
   cflags = [
