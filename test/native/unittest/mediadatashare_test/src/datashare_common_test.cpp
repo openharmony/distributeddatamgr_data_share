@@ -347,6 +347,50 @@ HWTEST_F(DataShareCommonTest, CheckStateTest002, TestSize.Level0)
     EXPECT_EQ(result, E_INVALID_COLUMN_INDEX);
     LOG_INFO("DataShareCommonTest CheckState002::End");
 }
+
+/**
+* @tc.name: MarshalTest001
+* @tc.desc: test Marshal function when resultset = nullptr
+* @tc.type: FUNC
+* @tc.require: issueICCAXH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a DataShareResultSet object when resultset = nullptr
+    2.call Marshal function and check the result
+* @tc.experct: Marshal failed and return false
+*/
+HWTEST_F(DataShareCommonTest, MarshalTest001, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest MarshalTest001::Start");
+    DataShareResultSet dataShareResultSet;
+    std::shared_ptr<DataShareResultSet> resultset = nullptr;
+    MessageParcel parcel;
+    auto result = dataShareResultSet.Marshal(resultset, parcel);
+    EXPECT_FALSE(result);
+    LOG_INFO("DataShareCommonTest MarshalTest001::End");
+}
+
+/**
+* @tc.name: UnmarshalTest001
+* @tc.desc: test Unmarshal function
+* @tc.type: FUNC
+* @tc.require: issueICCAXH
+* @tc.precon: None
+* @tc.step:
+    1.Creat a DataShareResultSet object
+    2.call Unmarshal function and check the result
+* @tc.experct: Unmarshal failed and return nullptr
+*/
+HWTEST_F(DataShareCommonTest, UnmarshalTest001, TestSize.Level0)
+{
+    LOG_INFO("DataShareCommonTest UnmarshalTest001::Start");
+    DataShareResultSet dataShareResultSet;
+    MessageParcel parcel;
+    auto result = dataShareResultSet.Unmarshal(parcel);
+    EXPECT_EQ(result, nullptr);
+    LOG_INFO("DataShareCommonTest UnmarshalTest001::End");
+}
+
 /**
 * @tc.name: UnmarshallingTest001
 * @tc.desc: test Unmarshalling function when parcel is nullptr
