@@ -49,7 +49,7 @@ DataShareExtAbility* DataShareExtAbility::Create(const std::unique_ptr<Runtime>&
             return JsDataShareExtAbility::Create(runtime);
 
         default:
-            return new DataShareExtAbility();
+            return new (std::nothrow)DataShareExtAbility();
     }
 }
 

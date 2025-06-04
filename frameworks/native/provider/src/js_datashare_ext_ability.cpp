@@ -121,7 +121,7 @@ using DataObsMgrClient = OHOS::AAFwk::DataObsMgrClient;
 
 JsDataShareExtAbility* JsDataShareExtAbility::Create(const std::unique_ptr<Runtime>& runtime)
 {
-    return new JsDataShareExtAbility(static_cast<JsRuntime&>(*runtime));
+    return new (std::nothrow)JsDataShareExtAbility(static_cast<JsRuntime&>(*runtime));
 }
 
 JsDataShareExtAbility::JsDataShareExtAbility(JsRuntime& jsRuntime) : jsRuntime_(jsRuntime) {}
@@ -176,7 +176,7 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
     contextObj = contextRef->GetNapiValue();
     context->Bind(jsRuntime_, contextRef.release());
     napi_set_named_property(env, obj, "context", contextObj);
-    napi_status status = napi_wrap(env, contextObj, new std::weak_ptr<AbilityRuntime::Context>(context),
+    napi_status status = napi_wrap(env, contextObj, new (std::nothrow)std::weak_ptr<AbilityRuntime::Context>(context),
         [](napi_env, void *data, void *) {
             LOG_INFO("Finalizer for weak_ptr datashare extension ability context is called");
             delete static_cast<std::weak_ptr<AbilityRuntime::Context>*>(data);

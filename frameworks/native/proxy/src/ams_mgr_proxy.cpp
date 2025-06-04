@@ -52,7 +52,7 @@ AmsMgrProxy* AmsMgrProxy::GetInstance()
     if (proxy != nullptr) {
         return proxy;
     }
-    proxy = new AmsMgrProxy();
+    proxy = new (std::nothrow)AmsMgrProxy();
     if (proxy == nullptr) {
         LOG_ERROR("new proxy failed");
     }

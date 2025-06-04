@@ -52,7 +52,11 @@ void DataShareUvQueue::LambdaForWork(TaskEntry* taskEntry)
 
 void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
 {
-    auto *taskEntry = new TaskEntry {env_, std::move(func), false, {}, {}, std::atomic<int>(1)};
+    auto *taskEntry = new (std::nothrow)TaskEntry {env_, std::move(func), false, {}, {}, std::atomic<int>(1)};
+    if (taskEntry == nullptr) {
+        LOG_ERROR("invalid taskEntry.");
+        return;
+    }
     {
         std::unique_lock<std::mutex> lock(taskEntry->mutex);
         taskEntry->count.fetch_add(1);

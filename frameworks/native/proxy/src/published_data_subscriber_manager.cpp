@@ -299,7 +299,7 @@ PublishedDataSubscriberManager &PublishedDataSubscriberManager::GetInstance()
 
 PublishedDataSubscriberManager::PublishedDataSubscriberManager()
 {
-    serviceCallback_ = new PublishedDataObserverStub([this](PublishedDataChangeNode &changeNode) {
+    serviceCallback_ = new (std::nothrow)PublishedDataObserverStub([this](PublishedDataChangeNode &changeNode) {
         Emit(changeNode);
     });
 }
