@@ -64,6 +64,7 @@
                 "libuv",
                 "napi",
                 "relational_store",
+                "safwk",
                 "samgr"
             ],
             "third_party": []

@@ -496,6 +496,7 @@ ohos_unittest("SharedBlockTest") {
     "c_utils:utils",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "ipc:ipc_single",
   ]
 
   cflags = [
@@ -808,6 +809,7 @@ ohos_unittest("DatashareItypesUtilsTest") {
     "c_utils:utils",
     "googletest:gmock_main",
     "hilog:libhilog",
+    "ipc:ipc_single",
     "kv_store:distributeddata_inner",
   ]
 
