@@ -66,7 +66,7 @@ bool SharedBlock::Init()
 int SharedBlock::CreateSharedBlock(const std::string &name, size_t size, sptr<Ashmem> ashmem,
     SharedBlock *&outSharedBlock)
 {
-    outSharedBlock = new SharedBlock(name, ashmem, size, false);
+    outSharedBlock = new (std::nothrow)SharedBlock(name, ashmem, size, false);
     if (outSharedBlock == nullptr) {
         LOG_ERROR("CreateSharedBlock: new SharedBlock error.");
         return SHARED_BLOCK_BAD_VALUE;
