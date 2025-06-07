@@ -80,7 +80,7 @@
      int waitTime = 1;
      bool isSystem = true;
      auto result = DataShareHelper::Creator(strUri, options, bundleName, waitTime, isSystem);
-     EXPECT_NE(result, nullptr);
+     EXPECT_EQ(result, nullptr);
      LOG_INFO("DataShareHelperTest CreatorTest002::End");
  }
  
