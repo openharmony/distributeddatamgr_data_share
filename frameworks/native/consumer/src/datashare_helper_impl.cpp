@@ -323,18 +323,22 @@ void DataShareHelperImpl::NotifyChange(const Uri &uri)
  * @param dataObserver, Indicates the DataShareObserver object.
  * @param isDescendants, Indicates the Whether to note the change of descendants.
  */
-void DataShareHelperImpl::RegisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+int DataShareHelperImpl::RegisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
     bool isDescendants)
 {
+    if (dataObserver == nullptr) {
+        LOG_ERROR("dataObserver is nullptr");
+        return E_NULL_OBSERVER;
+    }
     sptr<ObserverImpl> obs = ObserverImpl::GetObserver(uri, dataObserver);
     if (obs == nullptr) {
         LOG_ERROR("new ObserverImpl failed");
-        return;
+        return E_NULL_OBSERVER;
     }
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
-        return;
+        return E_HELPER_DIED;
     }
     DataShareServiceProxy::SetSystem(isSystem_);
     // only support non-silent access
@@ -345,7 +349,7 @@ void DataShareHelperImpl::RegisterObserverExtProvider(const Uri &uri, std::share
     if (ret != E_OK) {
         ObserverImpl::DeleteObserver(uri, dataObserver);
     }
-    return;
+    return ret;
 }
 
 /**
@@ -355,35 +359,35 @@ void DataShareHelperImpl::RegisterObserverExtProvider(const Uri &uri, std::share
  * @param uri, Indicates the path of the data to operate.
  * @param dataObserver, Indicates the DataShareObserver object.
  */
-void DataShareHelperImpl::UnregisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver)
+int DataShareHelperImpl::UnregisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver)
 {
     if (dataObserver == nullptr) {
         LOG_ERROR("dataObserver is nullptr");
-        return;
+        return E_NULL_OBSERVER;
     }
     if (!ObserverImpl::FindObserver(uri, dataObserver)) {
         LOG_ERROR("observer not exit!");
-        return;
+        return E_NULL_OBSERVER;
     }
     sptr<ObserverImpl> obs = ObserverImpl::GetObserver(uri, dataObserver);
     if (obs == nullptr) {
         LOG_ERROR("new ObserverImpl failed");
-        return;
+        return E_NULL_OBSERVER;
     }
     auto generalCtl = generalCtl_;
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
-        return;
+        return E_HELPER_DIED;
     }
     DataShareServiceProxy::SetSystem(isSystem_);
     // only support non-silent access
     ErrCode ret = generalCtl->UnregisterObserverExtProvider(uri, obs);
     DataShareServiceProxy::CleanSystem();
     if (ret != E_OK) {
-        return;
+        return ret;
     }
     ObserverImpl::DeleteObserver(uri, dataObserver);
-    return;
+    return E_OK;
 }
 
 /**

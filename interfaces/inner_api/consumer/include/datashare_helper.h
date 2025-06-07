@@ -285,7 +285,7 @@ public:
      * @param dataObserver, Indicates the IDataAbilityObserver object.
      * @param isDescendants, Indicates the Whether to note the change of descendants.
      */
-    virtual void RegisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+    virtual int RegisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
         bool isDescendants) = 0;
 
     /**
@@ -304,7 +304,7 @@ public:
      * @param uri, Indicates the path of the data to operate.
      * @param dataObserver, Indicates the IDataAbilityObserver object
      */
-    virtual void UnregisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver) = 0;
+    virtual int UnregisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver) = 0;
 
     /**
      * Notifies the registered observers of a change to the data resource specified by Uris.
