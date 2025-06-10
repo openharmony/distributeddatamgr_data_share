@@ -398,10 +398,8 @@ napi_value DataShareResultSetProxy::GetColumnIndex(napi_env env, napi_callback_i
     if (innerResultSet != nullptr) {
         int errCode = innerResultSet->GetColumnIndex(columnName, columnIndex);
         if (errCode != E_OK) {
-            auto time = static_cast<uint64_t>(duration_cast<milliseconds>(
-                system_clock::now().time_since_epoch()).count());
-            LOG_ERROR("failed code:%{public}d columnIndex: %{public}d. times %{public}" PRIu64 ".",
-                errCode, columnIndex, time);
+            LOG_ERROR("code:%{public}d idx: %{public}d.",
+                errCode, columnIndex);
         }
     } else {
         LOG_ERROR("GetInnerResultSet failed.");
