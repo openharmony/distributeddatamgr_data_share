@@ -323,7 +323,7 @@ private:
 
 class DataShareObserverTest : public DataShare::DataShareObserver {
 public:
-    DataShareObserverTest(std::string uri)
+    explicit DataShareObserverTest(std::string uri)
     {
         uri_ = uri;
     }

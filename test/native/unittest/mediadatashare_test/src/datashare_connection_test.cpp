@@ -63,7 +63,7 @@ class RemoteObjectTest : public IRemoteObject {
 public:
     explicit RemoteObjectTest(std::u16string descriptor) : IRemoteObject(descriptor) {}
     ~RemoteObjectTest() {}
-    
+
     int32_t GetObjectRefCount()
     {
         return 0;
@@ -88,7 +88,7 @@ public:
 
 class IDataAbilityObserverTest : public DataAbilityObserverStub {
 public:
-    IDataAbilityObserverTest(std::string uri) {uri_ = uri;}
+    explicit IDataAbilityObserverTest(std::string uri) {uri_ = uri;}
     ~IDataAbilityObserverTest()
     {}
 
