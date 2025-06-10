@@ -34,23 +34,26 @@ namespace DataShare {
 using namespace testing::ext;
 class DataShareCommonTest : public testing::Test {
 public:
-     static void SetUpTestCase(void){};
-     static void TearDownTestCase(void){};
-     void SetUp(){};
-     void TearDown(){};
+    static void SetUpTestCase(void){};
+    static void TearDownTestCase(void){};
+    void SetUp(){};
+    void TearDown(){};
 };
 
 class ResultSetBridgeTest : public OHOS::DataShare::ResultSetBridge {
 public:
-    int GetAllColumnNames(std::vector<std::string> &columnNames) override {
+    int GetAllColumnNames(std::vector<std::string> &columnNames) override
+    {
         return 0;
     }
 
-    int GetRowCount(int32_t &count) override {
+    int GetRowCount(int32_t &count) override
+    {
         return 0;
     }
 
-    int OnGo(int32_t startRowIndex, int32_t targetRowIndex, Writer &writer) override {
+    int OnGo(int32_t startRowIndex, int32_t targetRowIndex, Writer &writer) override
+    {
         return 0;
     }
 };
@@ -524,7 +527,7 @@ HWTEST_F(DataShareCommonTest, MarshallingTest002, TestSize.Level0)
 * @tc.require: issueIC9GIH
 * @tc.precon: None
 * @tc.step:
-    1.Creat a MockDataShareAbsResultSet object 
+    1.Creat a MockDataShareAbsResultSet object
     2.call GoTo function when GoToRow return E_ERROR and check the result
 * @tc.experct: GoTo failed and return E_ERROR
 */
@@ -542,12 +545,12 @@ HWTEST_F(DataShareCommonTest, GoToTest001, TestSize.Level0)
 
 /**
 * @tc.name: GoToTest002
-* @tc.desc: test GoTo function 
+* @tc.desc: test GoTo function
 * @tc.type: FUNC
 * @tc.require: issueIC9GIH
 * @tc.precon: None
 * @tc.step:
-    1.Creat a MockDataShareAbsResultSet object 
+    1.Creat a MockDataShareAbsResultSet object
     2.call GoTo function and check the result
 * @tc.experct: GoTo success and return E_OK
 */
@@ -568,7 +571,7 @@ HWTEST_F(DataShareCommonTest, GoToTest002, TestSize.Level0)
 * @tc.require: issueIC9GIH
 * @tc.precon: None
 * @tc.step:
-    1.Creat a MockDataShareAbsResultSet object 
+    1.Creat a MockDataShareAbsResultSet object
     2.call IsEnded function when GetRowCount return E_ERROR and check the result
 * @tc.experct: IsEnded failed and return E_ERROR
 */
@@ -586,12 +589,12 @@ HWTEST_F(DataShareCommonTest, IsEndedTest001, TestSize.Level0)
 
 /**
 * @tc.name: IsEndedTest002
-* @tc.desc: test IsEnded function 
+* @tc.desc: test IsEnded function
 * @tc.type: FUNC
 * @tc.require: issueIC9GIH
 * @tc.precon: None
 * @tc.step:
-    1.Creat a MockDataShareAbsResultSet object 
+    1.Creat a MockDataShareAbsResultSet object
     2.call IsEnded function and check the result
 * @tc.experct: IsEnded success and return E_OK
 */
@@ -612,7 +615,7 @@ HWTEST_F(DataShareCommonTest, IsEndedTest002, TestSize.Level0)
 * @tc.require: issueIC9GIH
 * @tc.precon: None
 * @tc.step:
-    1.Creat a MockDataShareAbsResultSet2 object 
+    1.Creat a MockDataShareAbsResultSet2 object
     2.call GetColumnCount function when GetAllColumnNames return E_ERROR and check the result
 * @tc.experct: GetColumnCount failed and return E_ERROR
 */
