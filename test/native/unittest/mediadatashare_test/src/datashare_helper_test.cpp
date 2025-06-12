@@ -13,100 +13,99 @@
  * limitations under the License.
  */
 
- #include <gtest/gtest.h>
- #include <unistd.h>
- 
- #include "datashare_helper.h"
- #include "datashare_helper_impl.h"
- #include "datashare_log.h"
- #include "datashare_uri_utils.h"
- 
- namespace OHOS {
- namespace DataShare {
- using namespace testing::ext;
- class DataShareHelperTest : public testing::Test {
- public:
-     static void SetUpTestCase(void){};
-     static void TearDownTestCase(void){};
-     void SetUp(){};
-     void TearDown(){};
- };
- 
- /**
- * @tc.name: 
- * @tc.desc: test Creator function when options.isProxy_ = false and options.token_ = nullptr
- * @tc.type: FUNC
- * @tc.require:issueIC413F
- * @tc.precon: None
- * @tc.step:
-     1.Creat a DataShareHelper object what options.isProxy_ = false and options.token_ = nullptr
-     2.call Creator function and check the result
- * @tc.experct: Creator failed and reutrn nullptr
- */
- HWTEST_F(DataShareHelperTest, CreatorTest001, TestSize.Level0)
- {
-     LOG_INFO("DataShareHelperTest CreatorTest001::Start");
-     std::string strUri = "testUri";
-     CreateOptions options;
-     options.isProxy_ = false;
-     options.token_ = nullptr;
-     std::string bundleName = "testBundle";
-     int waitTime = 1;
-     bool isSystem = true;
-     auto result = DataShareHelper::Creator(strUri, options, bundleName, waitTime, isSystem);
-     EXPECT_EQ(result, nullptr);
-     LOG_INFO("DataShareHelperTest CreatorTest001::End");
- }
- 
- /**
- * @tc.name: 
- * @tc.desc: test Creator function when options.isProxy_ = true and options.token_ = nullptr
- * @tc.type: FUNC
- * @tc.require:issueIC413F
- * @tc.precon: None
- * @tc.step:
-     1.Creat a DataShareHelper object what options.isProxy_ = true and options.token_ = nullptr
-     2.call Creator function and check the result
- * @tc.experct: Creator failed and reutrn nullptr
- */
- HWTEST_F(DataShareHelperTest, CreatorTest002, TestSize.Level0)
- {
-     LOG_INFO("DataShareHelperTest CreatorTest002::Start");
-     std::string strUri = "testUri";
-     CreateOptions options;
-     options.isProxy_ = true;
-     options.token_ = nullptr;
-     std::string bundleName = "testBundle";
-     int waitTime = 1;
-     bool isSystem = true;
-     auto result = DataShareHelper::Creator(strUri, options, bundleName, waitTime, isSystem);
-     EXPECT_NE(result, nullptr);
-     LOG_INFO("DataShareHelperTest CreatorTest002::End");
- }
- 
- /**
- * @tc.name: 
- * @tc.desc: test CreateExtHelper function when Uri contains "appIndex="
- * @tc.type: FUNC
- * @tc.require:issueIC413F
- * @tc.precon: None
- * @tc.step:
-     1.Creat a DataShareHelper object what Uri contains "appIndex="
-     2.call CreateExtHelper function and check the result
- * @tc.experct: CreateExtHelper failed and reutrn nullptr
- */
- HWTEST_F(DataShareHelperTest, CreateExtHelper001, TestSize.Level0)
- {
-     LOG_INFO("DataShareHelperTest CreateExtHelper001::Start");
-     OHOS::Uri uri("datashareproxy://com.acts.ohos.data.datasharetest/test?appIndex=abcd");
-     uri.query_ = ("appIndex=abcd");
-     sptr<IRemoteObject> token = nullptr;
-     int waitTime = 1000;
-     bool isSystem = false;
-     auto result = DataShareHelper::CreateExtHelper(uri, token, waitTime, isSystem);
-     EXPECT_EQ(result, nullptr);
-     LOG_INFO("DataShareHelperTest CreateExtHelper001::End");
- }
- } // namespace DataShare
- } // namespace OHOS
- 
+#include <gtest/gtest.h>
+#include <unistd.h>
+
+#include "datashare_helper.h"
+#include "datashare_helper_impl.h"
+#include "datashare_log.h"
+#include "datashare_uri_utils.h"
+
+namespace OHOS {
+namespace DataShare {
+using namespace testing::ext;
+class DataShareHelperTest : public testing::Test {
+public:
+    static void SetUpTestCase(void){};
+    static void TearDownTestCase(void){};
+    void SetUp(){};
+    void TearDown(){};
+};
+
+/**
+* @tc.name: CreatorTest001
+* @tc.desc: test Creator function when options.isProxy_ = false and options.token_ = nullptr
+* @tc.type: FUNC
+* @tc.require:issueIC413F
+* @tc.precon: None
+* @tc.step:
+    1.Create a DataShareHelper object what options.isProxy_ = false and options.token_ = nullptr
+    2.call Creator function and check the result
+* @tc.experct: Creator failed and reutrn nullptr
+*/
+HWTEST_F(DataShareHelperTest, CreatorTest001, TestSize.Level0)
+{
+    LOG_INFO("DataShareHelperTest CreatorTest001::Start");
+    std::string strUri = "testUri";
+    CreateOptions options;
+    options.isProxy_ = false;
+    options.token_ = nullptr;
+    std::string bundleName = "testBundle";
+    int waitTime = 1;
+    bool isSystem = true;
+    auto result = DataShareHelper::Creator(strUri, options, bundleName, waitTime, isSystem);
+    EXPECT_EQ(result, nullptr);
+    LOG_INFO("DataShareHelperTest CreatorTest001::End");
+}
+
+/**
+* @tc.name: CreatorTest002
+* @tc.desc: test Creator function when options.isProxy_ = true and options.token_ = nullptr
+* @tc.type: FUNC
+* @tc.require:issueIC413F
+* @tc.precon: None
+* @tc.step:
+    1.Create a DataShareHelper object what options.isProxy_ = true and options.token_ = nullptr
+    2.call Creator function and check the result
+* @tc.experct: Creator failed and reutrn nullptr
+*/
+HWTEST_F(DataShareHelperTest, CreatorTest002, TestSize.Level0)
+{
+    LOG_INFO("DataShareHelperTest CreatorTest002::Start");
+    std::string strUri = "testUri";
+    CreateOptions options;
+    options.isProxy_ = true;
+    options.token_ = nullptr;
+    std::string bundleName = "testBundle";
+    int waitTime = 1;
+    bool isSystem = true;
+    auto result = DataShareHelper::Creator(strUri, options, bundleName, waitTime, isSystem);
+    EXPECT_NE(result, nullptr);
+    LOG_INFO("DataShareHelperTest CreatorTest002::End");
+}
+
+/**
+* @tc.name: CreateExtHelper001
+* @tc.desc: test CreateExtHelper function when Uri contains "appIndex="
+* @tc.type: FUNC
+* @tc.require:issueIC413F
+* @tc.precon: None
+* @tc.step:
+    1.Create a DataShareHelper object what Uri contains "appIndex="
+    2.call CreateExtHelper function and check the result
+* @tc.experct: CreateExtHelper failed and reutrn nullptr
+*/
+HWTEST_F(DataShareHelperTest, CreateExtHelper001, TestSize.Level0)
+{
+    LOG_INFO("DataShareHelperTest CreateExtHelper001::Start");
+    OHOS::Uri uri("datashareproxy://com.acts.ohos.data.datasharetest/test?appIndex=abcd");
+    uri.query_ = ("appIndex=abcd");
+    sptr<IRemoteObject> token = nullptr;
+    int waitTime = 1000;
+    bool isSystem = false;
+    auto result = DataShareHelper::CreateExtHelper(uri, token, waitTime, isSystem);
+    EXPECT_EQ(result, nullptr);
+    LOG_INFO("DataShareHelperTest CreateExtHelper001::End");
+}
+} // namespace DataShare
+} // namespace OHOS
