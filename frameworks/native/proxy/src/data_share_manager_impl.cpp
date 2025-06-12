@@ -219,9 +219,9 @@ void DataShareManagerImpl::OnAddSystemAbility(int32_t systemAbilityId, const std
     }
 }
 
-void DataShareManagerImpl::SetCallCount(const std::string &funcName, const std::string &uri)
+bool DataShareManagerImpl::SetCallCount(const std::string &funcName, const std::string &uri)
 {
-    dataShareCallReporter_.Count(funcName, uri);
+    return dataShareCallReporter_.Count(funcName, uri);
 }
 }
 }

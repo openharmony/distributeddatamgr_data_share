@@ -26,13 +26,21 @@ public:
     DataShareCallReporter() = default;
     struct CallInfo {
         int count = 0;
+        // total count for silent access threshold
+        int totalCount = 0;
         std::chrono::system_clock::time_point firstTime;
+        // start time of ervery 30s
+        std::chrono::system_clock::time_point startTime;
+        // print err log only once by using flag
+        bool logPrintFlag = false;
     };
-    void Count(const std::string &funcName, const std::string &uri);
+    bool Count(const std::string &funcName, const std::string &uri);
 private:
-    ConcurrentMap<std::string, CallInfo> callCounts;
+    ConcurrentMap<std::string, CallInfo> callCounts_;
     static constexpr int RESET_COUNT_THRESHOLD = 100;
+    static constexpr int ACCESS_COUNT_THRESHOLD = 3000; // silent access threshold
     static constexpr std::chrono::milliseconds TIME_THRESHOLD = std::chrono::milliseconds(30000);
+    void UpdateCallCounts(const std::string &funcName, int &overCount, int64_t &firstCallTime, bool &isOverThreshold);
 };
 } // namespace DataShare
 } // namespace OHOS
