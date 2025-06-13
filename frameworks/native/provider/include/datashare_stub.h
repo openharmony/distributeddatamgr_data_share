@@ -67,13 +67,13 @@ private:
     virtual int32_t UserDefineFunc(
         MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     // default return true, need override by users
-    virtual bool RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+    virtual int RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
         bool isDescendants) override;
     // default return true, need override by users
-    virtual bool UnregisterObserverExtProvider(const Uri &uri,
+    virtual int UnregisterObserverExtProvider(const Uri &uri,
         const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
     // default return true, need override by users
-    virtual bool NotifyChangeExtProvider(const ChangeInfo &changeInfo) override;
+    virtual int NotifyChangeExtProvider(const ChangeInfo &changeInfo) override;
 
     using RequestFuncType = int (DataShareStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, RequestFuncType> stubFuncMap_;

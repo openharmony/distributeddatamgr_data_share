@@ -68,13 +68,13 @@ public:
 
     virtual bool NotifyChange(const Uri &uri) = 0;
 
-    virtual bool RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+    virtual int RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
         bool isDescendants) = 0;
 
-    virtual bool UnregisterObserverExtProvider(const Uri &uri,
+    virtual int UnregisterObserverExtProvider(const Uri &uri,
         const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 
-    virtual bool NotifyChangeExtProvider(const ChangeInfo &changeInfo) = 0;
+    virtual int NotifyChangeExtProvider(const ChangeInfo &changeInfo) = 0;
 
     virtual Uri NormalizeUri(const Uri &uri) = 0;
 

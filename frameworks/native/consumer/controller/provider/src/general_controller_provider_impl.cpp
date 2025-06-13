@@ -199,8 +199,8 @@ int GeneralControllerProviderImpl::RegisterObserverExtProvider(const Uri &uri,
         LOG_ERROR("proxy is nullptr");
         return E_PROVIDER_NOT_CONNECTED;
     }
-    // the non-silent proxy's RegisterObserverExtProvider returns bool while this function returns int and 0 means ok
-    int ret = proxy->RegisterObserverExtProvider(uri, dataObserver, isDescendants) ? E_OK : E_REGISTER_ERROR;
+    // the non-silent proxy's RegisterObserverExtProvider returns int and 0 means ok
+    int ret = proxy->RegisterObserverExtProvider(uri, dataObserver, isDescendants);
     LOG_INFO("Register non-silent observerExt provider ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
     // store the observer when successfully registered.
@@ -224,8 +224,8 @@ int GeneralControllerProviderImpl::UnregisterObserverExtProvider(const Uri &uri,
         LOG_ERROR("proxy is nullptr");
         return E_PROVIDER_NOT_CONNECTED;
     }
-    // the non-silent proxy's UnregisterObserverExtProvider returns bool while this function returns int and 0 means ok
-    int ret = proxy->UnregisterObserverExtProvider(uri, dataObserver) ? E_OK : E_REGISTER_ERROR;
+    // the non-silent proxy's UnregisterObserverExtProvider returns int and 0 means ok
+    int ret = proxy->UnregisterObserverExtProvider(uri, dataObserver);
     LOG_INFO("Unregister non-silent observerExt provider ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
     // remove the observer from storage when successfully unregistered.
@@ -248,8 +248,8 @@ int GeneralControllerProviderImpl::NotifyChangeExtProvider(const ChangeInfo &cha
         LOG_ERROR("proxy is nullptr");
         return E_PROVIDER_NOT_CONNECTED;
     }
-    // the non-silent proxy's NotifyChangeExtProvider returns bool while this function returns int and 0 means ok
-    int ret = proxy->NotifyChangeExtProvider(changeInfo) ? E_OK : E_NOTIFYCHANGE_ERROR;
+    // the non-silent proxy's NotifyChangeExtProvider returns int and 0 means ok
+    int ret = proxy->NotifyChangeExtProvider(changeInfo);
     LOG_INFO("NotifyChangeExtProvider ret: %{public}d", ret);
     return ret;
 }
