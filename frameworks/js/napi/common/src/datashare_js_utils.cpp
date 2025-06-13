@@ -67,7 +67,6 @@ std::vector<uint8_t> DataShareJSUtils::Convert2U8Vector(napi_env env, napi_value
     if (!isTypedArray) {
         napi_is_arraybuffer(env, input_array, &isArrayBuffer);
         if (!isArrayBuffer) {
-            LOG_ERROR("unknow type");
             return {};
         }
     }
