@@ -38,7 +38,7 @@ DataShareManagerImpl* DataShareManagerImpl::GetInstance()
     if (manager_ != nullptr) {
         return manager_;
     }
-    manager_ = new DataShareManagerImpl();
+    manager_ = new (std::nothrow)DataShareManagerImpl();
     if (manager_ == nullptr) {
         LOG_ERROR("DataShareManagerImpl: GetInstance failed");
     }
@@ -47,7 +47,7 @@ DataShareManagerImpl* DataShareManagerImpl::GetInstance()
         LOG_ERROR("Failed to get saMgrProxy.");
         return manager_;
     }
-    sptr<DataShareClientStatusChangeStub> callback(new DataShareClientStatusChangeStub(manager_));
+    sptr<DataShareClientStatusChangeStub> callback(new (std::nothrow)DataShareClientStatusChangeStub(manager_));
     saManager->SubscribeSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, callback);
     return manager_;
 }

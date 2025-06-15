@@ -64,6 +64,8 @@
                 "libuv",
                 "napi",
                 "relational_store",
+                "runtime_core",
+                "safwk",
                 "samgr"
             ],
             "third_party": []
@@ -79,7 +81,8 @@
                     "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common",
                     "//foundation/distributeddatamgr/data_share/interfaces/inner_api:datashare_ext_ability_module",
                     "//foundation/distributeddatamgr/data_share/frameworks/js/napi:datashare_napi_packages",
-                    "//foundation/distributeddatamgr/data_share/frameworks/cj/ffi:datashare_cj_ffi_packages"
+                    "//foundation/distributeddatamgr/data_share/frameworks/cj/ffi:datashare_cj_ffi_packages",
+                    "//foundation/distributeddatamgr/data_share/frameworks/js/ani:datashare_ani_packages"
                 ],
                 "service_group": [
                 ]
@@ -139,11 +142,51 @@
                         ],
                         "header_base": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common/include"
                     }
+                },
+                {
+                    "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common_lite",
+                    "header": {
+                        "header_files": [
+                            "datashare_abs_predicates.h",
+                            "datashare_predicates_def.h",
+                            "datashare_predicates_object.h"
+                        ],
+                        "header_base": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common/include"
+                    }
+                },
+                {
+                    "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common_lite",
+                    "header": {
+                        "header_files": [
+                            "result_set_bridge.h"
+                        ],
+                        "header_base": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/provider/include"
+                    }
+                },
+                {
+                    "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common_lite",
+                    "header": {
+                        "header_files": [
+                            "datashare_result_set.h"
+                        ],
+                        "header_base": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/consumer/include"
+                    }
+                },
+                {
+                    "name": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/common:datashare_common_lite",
+                    "header": {
+                        "header_files": [
+                            "datashare_radar_reporter.h",
+                            "ishared_result_set.h"
+                        ],
+                        "header_base": "//foundation/distributeddatamgr/data_share/frameworks/native/common/include"
+                    }
                 }
             ],
             "test": [
                 "//foundation/distributeddatamgr/data_share/test/native:unittest",
-                "//foundation/distributeddatamgr/data_share/test/js/data_share:unittest"
+                "//foundation/distributeddatamgr/data_share/test/js/data_share:unittest",
+                "//foundation/distributeddatamgr/data_share/test/ets/data_share_ets:stage_unittest"
             ]
         }
     }

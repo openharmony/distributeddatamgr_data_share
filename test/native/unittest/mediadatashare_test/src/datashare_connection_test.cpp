@@ -28,12 +28,10 @@
 #include "general_controller_provider_impl.h"
 #include "general_controller_service_impl.h"
 
-// connection
-// update/delete/Reregister
-// onabilityConnectDone
 namespace OHOS {
 namespace DataShare {
 using namespace testing::ext;
+using namespace OHOS::AAFwk;
 class DataShareConnectionTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
@@ -65,7 +63,7 @@ class RemoteObjectTest : public IRemoteObject {
 public:
     explicit RemoteObjectTest(std::u16string descriptor) : IRemoteObject(descriptor) {}
     ~RemoteObjectTest() {}
-    
+
     int32_t GetObjectRefCount()
     {
         return 0;
@@ -88,9 +86,9 @@ public:
     }
 };
 
-class IDataAbilityObserverTest : public AAFwk::DataAbilityObserverStub {
+class IDataAbilityObserverTest : public DataAbilityObserverStub {
 public:
-    IDataAbilityObserverTest(std::string uri) {uri_ = uri;}
+    explicit IDataAbilityObserverTest(std::string uri) {uri_ = uri;}
     ~IDataAbilityObserverTest()
     {}
 

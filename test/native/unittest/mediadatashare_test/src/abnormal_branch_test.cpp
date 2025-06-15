@@ -130,11 +130,15 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_RegisterClientDeathObserverNull_
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_mReadOnlyInvalid_Test_001, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_mReadOnlyInvalid_Test_001::Start");
-    std::string name;
-    size_t size = 0;
+    std::string name = "Test Shared\0";
     bool readOnly = true;
-    AppDataFwk::SharedBlock temp(name, nullptr, size, readOnly);
-    int result = temp.Clear();
+    int32_t size = 1024;
+    sptr<Ashmem> ashmem = Ashmem::CreateAshmem(name.c_str(), size);
+    ashmem->MapReadAndWriteAshmem();
+    AppDataFwk::SharedBlock temp(name, ashmem, size, readOnly);
+    int result = temp.Init();
+    EXPECT_TRUE(result);
+    result = temp.Clear();
     EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
     result = temp.SetColumnNum(1);
     EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
@@ -150,7 +154,7 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_mReadOnlyInvalid_Test_001, TestS
     EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
     result = temp.PutNull(1, 1);
     EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
-    result = temp.SetRawData(nullptr, size);
+    result = temp.SetRawData(nullptr, 0);
     EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
     LOG_INFO("AbnormalBranchTest_mReadOnlyInvalid_Test_001::End");
 }

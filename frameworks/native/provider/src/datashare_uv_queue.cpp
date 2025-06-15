@@ -52,7 +52,11 @@ void DataShareUvQueue::LambdaForWork(TaskEntry* taskEntry)
 
 void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
 {
-    auto *taskEntry = new TaskEntry {env_, std::move(func), false, {}, {}, std::atomic<int>(1)};
+    auto *taskEntry = new (std::nothrow)TaskEntry {env_, std::move(func), false, {}, {}, std::atomic<int>(1)};
+    if (taskEntry == nullptr) {
+        LOG_ERROR("invalid taskEntry.");
+        return;
+    }
     {
         std::unique_lock<std::mutex> lock(taskEntry->mutex);
         taskEntry->count.fetch_add(1);
@@ -69,7 +73,7 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
             [taskEntry] { return taskEntry->done; })) {
             auto time = static_cast<uint64_t>(duration_cast<milliseconds>(
                 system_clock::now().time_since_epoch()).count());
-            LOG_INFO("function ended successfully. times %{public}" PRIu64 ".", time);
+            LOG_WARN("function ended successfully. times %{public}" PRIu64 ".", time);
         }
     }
     CheckFuncAndExec(retFunc);

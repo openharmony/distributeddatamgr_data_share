@@ -24,13 +24,14 @@
 #include "parcel.h"
 #include "shared_block.h"
 #include "string_ex.h"
+#include "ishared_result_set.h"
 
 namespace OHOS {
 namespace DataShare {
 namespace {
-    // The default position of the cursor
-    static const int INITIAL_POS = -1;
-    static const size_t DEFAULT_SHARE_BLOCK_SIZE = 2 * 1024 * 1024;
+// The default position of the cursor
+static const int INITIAL_POS = -1;
+static const size_t DEFAULT_SHARE_BLOCK_SIZE = 2 * 1024 * 1024;
 } // namespace
 int DataShareResultSet::blockId_ = 0;
 DataShareResultSet::DataShareResultSet()
@@ -460,5 +461,18 @@ bool DataShareResultSet::Unmarshalling(MessageParcel &parcel)
     }
     return true;
 }
-} // namespace DataShare
-} // namespace OHOS
+
+bool DataShareResultSet::Marshal(const std::shared_ptr<DataShareResultSet> resultSet, MessageParcel &parcel)
+{
+    if (resultSet == nullptr || !DataShare::ISharedResultSet::WriteToParcel(resultSet, parcel)) {
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<DataShareResultSet> DataShareResultSet::Unmarshal(MessageParcel &parcel)
+{
+    return DataShare::ISharedResultSet::ReadFromParcel(parcel);
+}
+}  // namespace DataShare
+}  // namespace OHOS

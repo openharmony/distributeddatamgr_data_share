@@ -86,7 +86,6 @@ private:
     };
     struct ConnectCondition {
         std::condition_variable condition;
-        std::mutex mutex;
     };
     std::shared_ptr<DataShareProxy> ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
     std::shared_ptr<DataShareProxy> GetDataShareProxy();
