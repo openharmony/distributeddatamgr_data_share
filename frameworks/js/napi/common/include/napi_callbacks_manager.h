@@ -21,6 +21,7 @@
 
 #include "datashare_errno.h"
 #include "datashare_template.h"
+#include "dataproxy_handle_common.h"
 
 namespace OHOS::DataShare {
 template<class Key, class Observer>
@@ -31,10 +32,19 @@ public:
         std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
             std::vector<OperationResult> &)>);
 
+    std::vector<DataProxyResult> AddObservers(const std::vector<Key> &keys, const std::shared_ptr<Observer> observer,
+        std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
+            std::vector<DataProxyResult> &)>);
+
     std::vector<OperationResult> DelObservers(const std::vector<Key> &keys,
         const std::shared_ptr<Observer> observer = nullptr,
         std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
             std::vector<OperationResult> &)> processOnLastDel = NapiCallbacksManager::DefaultProcess);
+
+    std::vector<DataProxyResult> DelObservers(const std::vector<Key> &keys,
+        const std::shared_ptr<Observer> observer,
+        std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
+            std::vector<DataProxyResult> &)> processOnLastDel);
 
     std::vector<std::shared_ptr<Observer>> GetEnabledObservers(const Key &);
 
@@ -94,6 +104,35 @@ std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::AddObservers(
 }
 
 template<class Key, class Observer>
+std::vector<DataProxyResult> NapiCallbacksManager<Key, Observer>::AddObservers(
+    const std::vector<Key> &keys, const std::shared_ptr<Observer> observer,
+    std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
+        std::vector<DataProxyResult> &)> processOnFirstAdd)
+{
+    std::vector<DataProxyResult> result;
+    std::vector<Key> firstRegisterKey;
+    {
+        std::lock_guard<decltype(mutex_)> lck(mutex_);
+        for (auto &key : keys) {
+            std::vector<std::shared_ptr<Observer>> enabledObservers = GetEnabledObservers(key);
+            if (enabledObservers.empty()) {
+                callbacks_[key].emplace_back(ObserverNode(observer));
+                firstRegisterKey.emplace_back(key);
+                continue;
+            }
+            if (IsRegistered(*observer, callbacks_[key])) {
+                result.emplace_back(static_cast<std::string>(key), INNER_ERROR);
+                continue;
+            }
+            callbacks_[key].emplace_back(observer);
+            result.emplace_back(key, SUCCESS);
+        }
+    }
+    processOnFirstAdd(firstRegisterKey, observer, result);
+    return result;
+}
+
+template<class Key, class Observer>
 bool NapiCallbacksManager<Key, Observer>::IsRegistered(const Observer &observer,
     const std::vector<ObserverNode> &observers)
 {
@@ -147,6 +186,61 @@ std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::DelObservers(
             }
             if (!it->second.empty()) {
                 result.emplace_back(key, E_OK);
+                continue;
+            }
+            callbacks_.erase(key);
+            lastDelKeys.emplace_back(key);
+        }
+        if (lastDelKeys.empty()) {
+            return result;
+        }
+    }
+    processOnLastDel(lastDelKeys, observer, result);
+    return result;
+}
+
+template<class Key, class Observer>
+std::vector<DataProxyResult> NapiCallbacksManager<Key, Observer>::DelObservers(
+    const std::vector<Key> &keys, const std::shared_ptr<Observer> observer,
+    std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &, std::vector<DataProxyResult> &)>
+        processOnLastDel)
+{
+    std::vector<DataProxyResult> result;
+    std::vector<Key> lastDelKeys;
+    {
+        std::lock_guard<decltype(mutex_)> lck(mutex_);
+        if (keys.empty() && observer == nullptr) {
+            for (auto &it : callbacks_) {
+                lastDelKeys.emplace_back(it.first);
+            }
+            callbacks_.clear();
+        }
+        for (auto &key : keys) {
+            auto it = callbacks_.find(key);
+            if (it == callbacks_.end()) {
+                result.emplace_back(key, INNER_ERROR);
+                continue;
+            }
+            if (observer == nullptr) {
+                callbacks_.erase(key);
+                lastDelKeys.emplace_back(key);
+                continue;
+            }
+            if (!IsRegistered(*observer, it->second)) {
+                result.emplace_back(key, INNER_ERROR);
+                continue;
+            }
+            std::vector<ObserverNode> &callbacks = it->second;
+            auto callbackIt = callbacks.begin();
+            while (callbackIt != callbacks.end()) {
+                if (!(*(callbackIt->observer_) == *observer)) {
+                    callbackIt++;
+                    continue;
+                }
+                callbackIt = callbacks.erase(callbackIt);
+            }
+            if (!it->second.empty()) {
+                result.emplace_back(key, SUCCESS);
                 continue;
             }
             callbacks_.erase(key);

@@ -26,6 +26,8 @@
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
 #include "napi_observer.h"
+#include "dataproxy_handle.h"
+#include "dataproxy_handle_common.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -116,6 +118,42 @@ private:
     void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
     std::weak_ptr<DataShareHelper> dataShareHelper_;
     ConcurrentMap<Key, PublishedDataChangeNode> lastChangeNodeMap_;
+};
+
+struct NapiProxyDataObserverMapKey {
+    std::string uri_;
+    NapiProxyDataObserverMapKey(const std::string &uri) : uri_(uri) {};
+    bool operator==(const NapiProxyDataObserverMapKey &node) const
+    {
+        return uri_ == node.uri_;
+    }
+    bool operator!=(const NapiProxyDataObserverMapKey &node) const
+    {
+        return !(node == *this);
+    }
+    bool operator<(const NapiProxyDataObserverMapKey &node) const
+    {
+        return uri_ < node.uri_;
+    }
+    operator std::string() const
+    {
+        return uri_;
+    }
+};
+
+class NapiProxyDataSubscriberManager : public NapiCallbacksManager<NapiProxyDataObserverMapKey, NapiProxyDataObserver> {
+public:
+    using Key = NapiProxyDataObserverMapKey;
+    using Observer = NapiProxyDataObserver;
+    using BaseCallbacks = NapiCallbacksManager<NapiProxyDataObserverMapKey, NapiProxyDataObserver>;
+    explicit NapiProxyDataSubscriberManager(std::weak_ptr<DataProxyHandle> dataProxyHandle)
+        : dataProxyHandle_(dataProxyHandle){};
+    std::vector<DataProxyResult> AddObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris);
+    std::vector<DataProxyResult> DelObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris);
+    void Emit(const std::vector<DataProxyChangeInfo> &changeNode);
+
+private:
+    std::weak_ptr<DataProxyHandle> dataProxyHandle_;
 };
 } // namespace DataShare
 } // namespace OHOS
