@@ -22,6 +22,7 @@
 #include "datashare_errno.h"
 #include "datashare_log.h"
 #include "datashare_template.h"
+#include "dataproxy_handle_common.h"
 
 namespace OHOS::DataShare {
 template<class Key, class Observer>
@@ -40,13 +41,25 @@ public:
         std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
             std::vector<OperationResult> &)>);
 
+    std::vector<DataProxyResult> AddObservers(const std::vector<Key> &keys, void *subscriber,
+        const std::shared_ptr<Observer> observer,
+        std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
+            std::vector<DataProxyResult> &)>);
+
     std::vector<OperationResult> DelObservers(const std::vector<Key> &keys, void *subscriber,
         std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnLastDel =
             CallbacksManager::DefaultProcess);
 
+    std::vector<DataProxyResult> DelProxyDataObservers(const std::vector<Key> &keys, void *subscriber,
+        std::function<void(const std::vector<Key> &, std::vector<DataProxyResult> &)> processOnLastDel =
+            CallbacksManager::ProxyDataDefaultProcess);
+
     std::vector<OperationResult> DelObservers(void *subscriber,
         std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnLastDel =
             CallbacksManager::DefaultProcess);
+
+    std::vector<DataProxyResult> DelObservers(void *subscriber,
+        std::function<void(const std::vector<Key> &, std::vector<DataProxyResult> &)> processOnLastDel);
 
     std::vector<OperationResult> EnableObservers(const std::vector<Key> &keys, void *subscriber,
         std::function<void(std::map<Key, std::vector<ObserverNodeOnEnabled>> &)> processOnLocalEnabled =
@@ -67,6 +80,7 @@ public:
 
 private:
     static void DefaultProcess(const std::vector<Key> &, std::vector<OperationResult> &){};
+    static void ProxyDataDefaultProcess(const std::vector<Key> &, std::vector<DataProxyResult> &){};
     static void DefaultProcessOnLocalEnabled(std::map<Key, std::vector<ObserverNodeOnEnabled>> &){};
     struct ObserverNode {
         std::shared_ptr<Observer> observer_;
@@ -82,7 +96,10 @@ private:
     };
     void DelLocalObservers(const Key &key, void *subscriber, std::vector<Key> &lastDelKeys,
         std::vector<OperationResult> &result);
+    void DelLocalObservers(const Key &key, void *subscriber, std::vector<Key> &lastDelKeys,
+        std::vector<DataProxyResult> &result);
     void DelLocalObservers(void *subscriber, std::vector<Key> &lastDelKeys, std::vector<OperationResult> &result);
+    void DelLocalObservers(void *subscriber, std::vector<Key> &lastDelKeys, std::vector<DataProxyResult> &result);
     std::recursive_mutex mutex_{};
     std::map<Key, std::vector<ObserverNode>> callbacks_;
 };
@@ -119,6 +136,23 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::AddObservers(const
 }
 
 template<class Key, class Observer>
+std::vector<DataProxyResult> CallbacksManager<Key, Observer>::AddObservers(const std::vector<Key> &keys,
+    void *subscriber, const std::shared_ptr<Observer> observer,
+    std::function<void(const std::vector<Key> &,
+        const std::shared_ptr<Observer> &observer, std::vector<DataProxyResult> &)> processOnFirstAdd)
+{
+    std::vector<DataProxyResult> result;
+    {
+        std::lock_guard<decltype(mutex_)> lck(mutex_);
+        for (auto &key : keys) {
+            callbacks_[key].emplace_back(observer, subscriber);
+        }
+    }
+    processOnFirstAdd(keys, observer, result);
+    return result;
+}
+
+template<class Key, class Observer>
 std::vector<Key> CallbacksManager<Key, Observer>::GetKeys()
 {
     std::vector<Key> keys;
@@ -134,6 +168,15 @@ std::vector<Key> CallbacksManager<Key, Observer>::GetKeys()
 template<class Key, class Observer>
 void CallbacksManager<Key, Observer>::DelLocalObservers(void *subscriber, std::vector<Key> &lastDelKeys,
     std::vector<OperationResult> &result)
+{
+    for (auto &it : callbacks_) {
+        DelLocalObservers(it.first, subscriber, lastDelKeys, result);
+    }
+}
+
+template<class Key, class Observer>
+void CallbacksManager<Key, Observer>::DelLocalObservers(void *subscriber, std::vector<Key> &lastDelKeys,
+    std::vector<DataProxyResult> &result)
 {
     for (auto &it : callbacks_) {
         DelLocalObservers(it.first, subscriber, lastDelKeys, result);
@@ -166,6 +209,31 @@ void CallbacksManager<Key, Observer>::DelLocalObservers(const Key &key, void *su
 }
 
 template<class Key, class Observer>
+void CallbacksManager<Key, Observer>::DelLocalObservers(const Key &key, void *subscriber,
+    std::vector<Key> &lastDelKeys, std::vector<DataProxyResult> &result)
+{
+    auto it = callbacks_.find(key);
+    if (it == callbacks_.end()) {
+        result.emplace_back(key, INNER_ERROR);
+        return;
+    }
+    std::vector<ObserverNode> &callbacks = it->second;
+    auto callbackIt = callbacks.begin();
+    while (callbackIt != callbacks.end()) {
+        if (callbackIt->subscriber_ != subscriber) {
+            callbackIt++;
+            continue;
+        }
+        callbackIt = callbacks.erase(callbackIt);
+    }
+    if (!it->second.empty()) {
+        result.emplace_back(key, INNER_ERROR);
+        return;
+    }
+    lastDelKeys.emplace_back(key);
+}
+
+template<class Key, class Observer>
 std::vector<OperationResult> CallbacksManager<Key, Observer>::DelObservers(void *subscriber,
     std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnLastDel)
 {
@@ -190,6 +258,48 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::DelObservers(const
     void *subscriber, std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnLastDel)
 {
     std::vector<OperationResult> result;
+    std::vector<Key> lastDelKeys;
+    {
+        std::lock_guard<decltype(mutex_)> lck(mutex_);
+        for (auto &key : keys) {
+            DelLocalObservers(key, subscriber, lastDelKeys, result);
+        }
+        if (lastDelKeys.empty()) {
+            return result;
+        }
+        for (auto &key : lastDelKeys) {
+            callbacks_.erase(key);
+        }
+    }
+    processOnLastDel(lastDelKeys, result);
+    return result;
+}
+
+template<class Key, class Observer>
+std::vector<DataProxyResult> CallbacksManager<Key, Observer>::DelObservers(void *subscriber,
+    std::function<void(const std::vector<Key> &, std::vector<DataProxyResult> &)> processOnLastDel)
+{
+    std::vector<DataProxyResult> result;
+    std::vector<Key> lastDelKeys;
+    {
+        std::lock_guard<decltype(mutex_)> lck(mutex_);
+        DelLocalObservers(subscriber, lastDelKeys, result);
+        if (lastDelKeys.empty()) {
+            return result;
+        }
+        for (auto &key : lastDelKeys) {
+            callbacks_.erase(key);
+        }
+    }
+    processOnLastDel(lastDelKeys, result);
+    return result;
+}
+
+template<class Key, class Observer>
+std::vector<DataProxyResult> CallbacksManager<Key, Observer>::DelProxyDataObservers(const std::vector<Key> &keys,
+    void *subscriber, std::function<void(const std::vector<Key> &, std::vector<DataProxyResult> &)> processOnLastDel)
+{
+    std::vector<DataProxyResult> result;
     std::vector<Key> lastDelKeys;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);

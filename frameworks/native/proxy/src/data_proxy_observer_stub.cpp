@@ -15,6 +15,7 @@
 
 #include "data_proxy_observer_stub.h"
 
+#include "dataproxy_handle_common.h"
 #include "datashare_itypes_utils.h"
 #include "datashare_log.h"
 
@@ -190,6 +191,47 @@ void PublishedDataObserverStub::ClearCallback()
 }
 
 PublishedDataObserverStub::~PublishedDataObserverStub()
+{
+    ClearCallback();
+}
+
+int ProxyDataObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
+{
+    std::u16string descriptor = PublishedDataObserverStub::GetDescriptor();
+    std::u16string remoteDescriptor = data.ReadInterfaceToken();
+    if (descriptor != remoteDescriptor) {
+        LOG_ERROR("local descriptor is not equal to remote");
+        return ERR_INVALID_STATE;
+    }
+    if (code != REQUEST_CODE) {
+        LOG_ERROR("not support code:%u", code);
+        return ERR_INVALID_STATE;
+    }
+    std::vector<DataProxyChangeInfo> changeInfo;
+    if (!ITypesUtil::Unmarshal(data, changeInfo)) {
+        LOG_ERROR("Unmarshalling  is nullptr");
+        return ERR_INVALID_VALUE;
+    }
+    OnChangeFromProxyData(changeInfo);
+    return ERR_OK;
+}
+
+void ProxyDataObserverStub::OnChangeFromProxyData(std::vector<DataProxyChangeInfo> &changeInfo)
+{
+    std::lock_guard<decltype(mutex_)> lock(mutex_);
+    if (callback_) {
+        callback_(changeInfo);
+    }
+}
+
+void ProxyDataObserverStub::ClearCallback()
+{
+    std::lock_guard<decltype(mutex_)> lock(mutex_);
+    callback_ = nullptr;
+}
+
+ProxyDataObserverStub::~ProxyDataObserverStub()
 {
     ClearCallback();
 }

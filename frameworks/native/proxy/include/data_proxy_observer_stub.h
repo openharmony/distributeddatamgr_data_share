@@ -17,6 +17,7 @@
 #define DATA_PROXY_OBSERVER_STUB_H
 
 #include "data_proxy_observer.h"
+#include "dataproxy_handle_common.h"
 #include "datashare_template.h"
 #include "iremote_stub.h"
 
@@ -49,6 +50,19 @@ public:
 private:
     std::mutex mutex_;
     PublishedDataCallback callback_;
+};
+
+using ProxyDataCallback = std::function<void(std::vector<DataProxyChangeInfo> &changeInfo)>;
+class ProxyDataObserverStub : public IRemoteStub<IProxyDataObserver> {
+public:
+    virtual ~ProxyDataObserverStub();
+    int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    explicit ProxyDataObserverStub(ProxyDataCallback callback) : callback_(callback){};
+    void OnChangeFromProxyData(std::vector<DataProxyChangeInfo> &changeInfo);
+    void ClearCallback();
+private:
+    std::mutex mutex_;
+    ProxyDataCallback callback_;
 };
 } // namespace DataShare
 } // namespace OHOS

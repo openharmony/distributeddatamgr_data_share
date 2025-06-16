@@ -104,6 +104,7 @@
                     "header": {
                         "header_files": [
                             "datashare_helper.h",
+                            "dataproxy_handle.h",
                             "datashare_result_set.h"
                         ],
                         "header_base": "//foundation/distributeddatamgr/data_share/interfaces/inner_api/consumer/include"

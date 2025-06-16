@@ -59,6 +59,7 @@ datashare_consumer_sources = [
   "${datashare_native_consumer_path}/src/datashare_connection.cpp",
   "${datashare_native_consumer_path}/src/datashare_helper.cpp",
   "${datashare_native_consumer_path}/src/datashare_helper_impl.cpp",
+  "${datashare_native_consumer_path}/src/dataproxy_handle.cpp",
   "${datashare_native_consumer_path}/src/datashare_proxy.cpp",
   "${datashare_native_proxy_path}/src/ams_mgr_proxy.cpp",
   "${datashare_native_proxy_path}/src/data_proxy_observer_stub.cpp",
@@ -67,6 +68,7 @@ datashare_consumer_sources = [
   "${datashare_native_proxy_path}/src/idata_share_client_death_observer.cpp",
   "${datashare_native_proxy_path}/src/published_data_subscriber_manager.cpp",
   "${datashare_native_proxy_path}/src/rdb_subscriber_manager.cpp",
+  "${datashare_native_proxy_path}/src/proxy_data_subscriber_manager.cpp",
 ]
 
 datashare_consumer_external_deps = [

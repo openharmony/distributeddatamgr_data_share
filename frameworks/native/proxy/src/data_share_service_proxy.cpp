@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include "data_ability_observer_interface.h"
+#include "dataproxy_handle_common.h"
 #include "datashare_errno.h"
 #include "datashare_itypes_utils.h"
 #include "datashare_log.h"
@@ -693,6 +694,148 @@ int DataShareServiceProxy::UnRegisterObserver(const Uri &uri, const sptr<OHOS::I
         return DATA_SHARE_ERROR;
     }
     return reply.ReadInt32();
+}
+
+std::vector<DataProxyResult> DataShareServiceProxy::PublishProxyData(
+    const std::vector<DataShareProxyData> &proxyDatas, const DataProxyConfig &proxyConfig)
+{
+    std::vector<DataProxyResult> results;
+    MessageParcel parcel;
+    if (!parcel.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+    if (!ITypesUtil::Marshal(parcel, proxyDatas, proxyConfig)) {
+        LOG_ERROR("Marshal failed!");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_PROXY_PUBLISH), parcel, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("PublishProxyData fail to sendRequest. err: %{public}d", err);
+        return results;
+    }
+
+    ITypesUtil::Unmarshal(reply, results);
+    return results;
+}
+
+std::vector<DataProxyResult> DataShareServiceProxy::DeleteProxyData(
+    const std::vector<std::string> &uris, const DataProxyConfig &proxyConfig)
+{
+    std::vector<DataProxyResult> results;
+    MessageParcel parcel;
+    if (!parcel.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+    if (!ITypesUtil::Marshal(parcel, uris, proxyConfig)) {
+        LOG_ERROR("Marshal failed!");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_PROXY_DELETE), parcel, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("DeleteProxyData fail to sendRequest. err: %{public}d", err);
+        return results;
+    }
+
+    ITypesUtil::Unmarshal(reply, results);
+    return results;
+}
+
+std::vector<DataProxyGetResult> DataShareServiceProxy::GetProxyData(const std::vector<std::string> uris,
+    const DataProxyConfig &proxyConfig)
+{
+    std::vector<DataProxyGetResult> results;
+    MessageParcel parcel;
+    if (!parcel.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+    if (!ITypesUtil::Marshal(parcel, uris, proxyConfig)) {
+        LOG_ERROR("Marshal failed!");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_PROXY_GET), parcel, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("GetProxyData fail to sendRequest. err: %{public}d", err);
+        return results;
+    }
+
+    ITypesUtil::Unmarshal(reply, results);
+    return results;
+}
+
+std::vector<DataProxyResult> DataShareServiceProxy::SubscribeProxyData(const std::vector<std::string> &uris,
+    const sptr<IProxyDataObserver> &observer)
+{
+    std::vector<DataProxyResult> results;
+    if (observer == nullptr) {
+        LOG_ERROR("Observer is nullptr");
+        return results;
+    }
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+
+    if (!ITypesUtil::Marshal(data, uris)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return results;
+    }
+    if (!data.WriteRemoteObject(observer->AsObject())) {
+        LOG_ERROR("Failed to write parcelable dataObserver ");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_SUBSCRIBE_PROXY_DATA), data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("SubscribeRdbData fail to sendRequest. err: %{public}d", err);
+        return results;
+    }
+    ITypesUtil::Unmarshal(reply, results);
+    return results;
+}
+
+std::vector<DataProxyResult> DataShareServiceProxy::UnsubscribeProxyData(const std::vector<std::string> &uris)
+{
+    std::vector<DataProxyResult> results;
+    MessageParcel data;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+
+    if (!ITypesUtil::Marshal(data, uris)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_UNSUBSCRIBE_PROXY_DATA), data, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("Fail to sendRequest. err: %{public}d", err);
+        return results;
+    }
+    ITypesUtil::Unmarshal(reply, results);
+    return results;
 }
 } // namespace DataShare
 } // namespace OHOS
