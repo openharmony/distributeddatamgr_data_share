@@ -115,9 +115,9 @@ HWTEST_F(DataShareProxyTest, DataShareProxy_RegisterObserverExtProvider_Test_001
     // Observer not null
     sptr<IDataAbilityObserverTest> dataObserver = new (std::nothrow) IDataAbilityObserverTest();
     ASSERT_NE(dataObserver, nullptr);
-    // no provier, IPC sendRequset error
-    bool ret = proxy->RegisterObserverExtProvider(uri, dataObserver, true);
-    EXPECT_FALSE(ret);
+    // datashare_stub returns default 0(E_OK)
+    int ret = proxy->RegisterObserverExtProvider(uri, dataObserver, true);
+    EXPECT_EQ(ret, 0);
 
     LOG_INFO("DataShareProxy_RegisterObserverExtProvider_Test_001::End");
 }
@@ -149,9 +149,9 @@ HWTEST_F(DataShareProxyTest, DataShareProxy_UnregisterObserverExtProvider_Test_0
     // observer  not null
     sptr<IDataAbilityObserverTest> dataObserver = new (std::nothrow) IDataAbilityObserverTest();
     ASSERT_NE(dataObserver, nullptr);
-    // no provier, IPC sendRequset error
-    bool ret = proxy->UnregisterObserverExtProvider(uri, dataObserver);
-    EXPECT_FALSE(ret);
+    // datashare_stub returns default 0(E_OK)
+    int ret = proxy->UnregisterObserverExtProvider(uri, dataObserver);
+    EXPECT_EQ(ret, 0);
 
     LOG_INFO("DataShareProxy_UnregisterObserverExtProvider_Test_001::End");
 }
@@ -181,9 +181,9 @@ HWTEST_F(DataShareProxyTest, DataShareProxy_NotifyChangeExtProvider_Test_001, Te
     ASSERT_NE(proxy, nullptr);
 
     ChangeInfo changeInfo = { ChangeInfo::ChangeType::INSERT, { uri } };
-    // no provier, IPC sendRequset error
-    bool ret = proxy->NotifyChangeExtProvider(changeInfo);
-    EXPECT_FALSE(ret);
+    // datashare_stub returns default 0(E_OK)
+    int ret = proxy->NotifyChangeExtProvider(changeInfo);
+    EXPECT_EQ(ret, 0);
 
     LOG_INFO("DataShareProxy_NotifyChangeExtProvider_Test_001::End");
 }
