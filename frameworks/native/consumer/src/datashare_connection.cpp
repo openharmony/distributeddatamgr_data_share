@@ -232,7 +232,11 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
     if (ret != ERR_OK) {
         return nullptr;
     }
-    std::unique_lock<std::mutex> condLock(condition_.mutex);
+    std::unique_lock<std::mutex> condLock(mutex_);
+    std::shared_ptr<DataShareProxy> proxy = dataShareProxy_;
+    if (proxy != nullptr) {
+        return proxy;
+    }
     auto start = std::chrono::steady_clock::now();
     if (condition_.condition.wait_for(condLock, std::chrono::seconds(waitTime_),
         [this] { return dataShareProxy_ != nullptr; })) {
@@ -247,7 +251,7 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
     } else {
         LOG_WARN("connect timeout uri:%{public}s", DataShareStringUtils::Change(reqUri).c_str());
     }
-    return GetDataShareProxy();
+    return dataShareProxy_;
 }
 
 /**

@@ -16,9 +16,11 @@
 #ifndef DATASHARE_COMMON_ITYPES_UTIL_H
 #define DATASHARE_COMMON_ITYPES_UTIL_H
 
+#include "dataproxy_handle_common.h"
 #include "datashare_operation_statement.h"
 #include "datashare_predicates.h"
 #include "datashare_template.h"
+#include "datashare_value_object.h"
 #include "datashare_values_bucket.h"
 #include "itypes_util.h"
 #include "uri.h"
@@ -40,6 +42,15 @@ using ExecResult = DataShare::ExecResult;
 using ExecResultSet = DataShare::ExecResultSet;
 using UpdateOperation = DataShare::UpdateOperation;
 using BatchUpdateResult = DataShare::BatchUpdateResult;
+using DataShareProxyData = DataShare::DataShareProxyData;
+using DataProxyConfig = DataShare::DataProxyConfig;
+using DataProxyType = DataShare::DataProxyType;
+using DataProxyResult = DataShare::DataProxyResult;
+using DataProxyErrorCode = DataShare::DataProxyErrorCode;
+using DataShareValueObject = DataShare::DataShareValueObject;
+using DataProxyValue = DataShare::DataProxyValue;
+using DataProxyGetResult = DataShare::DataProxyGetResult;
+using DataProxyChangeInfo = DataShare::DataProxyChangeInfo;
 
 template<>
 bool Marshalling(const BatchUpdateResult &result, MessageParcel &parcel);
@@ -159,5 +170,47 @@ bool UnmarshalPredicates(Predicates &predicates, MessageParcel &parcel);
 bool MarshalValuesBucketVec(const std::vector<DataShareValuesBucket> &values, MessageParcel &parcel);
 
 bool UnmarshalValuesBucketVec(std::vector<DataShareValuesBucket> &values, MessageParcel &parcel);
+
+template<>
+bool Marshalling(const DataShareProxyData &proxyData, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(DataShareProxyData &proxyData, MessageParcel &parcel);
+
+template<>
+bool Marshalling(const DataProxyConfig &proxyData, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(DataProxyConfig &proxyData, MessageParcel &parcel);
+
+template<>
+bool Marshalling(const DataProxyResult &result, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(DataProxyResult &result, MessageParcel &parcel);
+
+template<>
+bool Marshalling(const DataShareValueObject &result, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(DataShareValueObject &result, MessageParcel &parcel);
+
+template<>
+bool Marshalling(const DataProxyValue &result, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(DataProxyValue &result, MessageParcel &parcel);
+
+template<>
+bool Marshalling(const DataProxyGetResult &result, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(DataProxyGetResult &result, MessageParcel &parcel);
+
+template<>
+bool Marshalling(const DataProxyChangeInfo &result, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(DataProxyChangeInfo &result, MessageParcel &parcel);
 }
 #endif

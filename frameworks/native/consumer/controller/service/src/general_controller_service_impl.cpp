@@ -41,7 +41,10 @@ int GeneralControllerServiceImpl::Insert(const Uri &uri, const DataShareValuesBu
         LOG_ERROR("Manager is nullptr");
         return DATA_SHARE_ERROR;
     }
-    manager->SetCallCount(__FUNCTION__, uri.ToString());
+    // the ret of SetCallCount indicates whether the current call exceeds the access threshold, true means excced
+    if (manager->SetCallCount(__FUNCTION__, uri.ToString())) {
+        return DATA_SHARE_ERROR;
+    }
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -58,7 +61,10 @@ int GeneralControllerServiceImpl::Update(const Uri &uri, const DataSharePredicat
         LOG_ERROR("Manager is nullptr");
         return DATA_SHARE_ERROR;
     }
-    manager->SetCallCount(__FUNCTION__, uri.ToString());
+    // the ret of SetCallCount indicates whether the current call exceeds the access threshold, true means excced
+    if (manager->SetCallCount(__FUNCTION__, uri.ToString())) {
+        return DATA_SHARE_ERROR;
+    }
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -74,7 +80,10 @@ int GeneralControllerServiceImpl::Delete(const Uri &uri, const DataSharePredicat
         LOG_ERROR("Manager is nullptr");
         return DATA_SHARE_ERROR;
     }
-    manager->SetCallCount(__FUNCTION__, uri.ToString());
+    // the ret of SetCallCount indicates whether the current call exceeds the access threshold, true means excced
+    if (manager->SetCallCount(__FUNCTION__, uri.ToString())) {
+        return DATA_SHARE_ERROR;
+    }
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -90,7 +99,10 @@ std::pair<int32_t, int32_t> GeneralControllerServiceImpl::InsertEx(const Uri &ur
         LOG_ERROR("Manager is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
-    manager->SetCallCount(__FUNCTION__, uri.ToString());
+    // the ret of SetCallCount indicates whether the current call exceeds the access threshold, true means excced
+    if (manager->SetCallCount(__FUNCTION__, uri.ToString())) {
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -107,7 +119,10 @@ std::pair<int32_t, int32_t> GeneralControllerServiceImpl::UpdateEx(
         LOG_ERROR("Manager is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
-    manager->SetCallCount(__FUNCTION__, uri.ToString());
+    // the ret of SetCallCount indicates whether the current call exceeds the access threshold, true means excced
+    if (manager->SetCallCount(__FUNCTION__, uri.ToString())) {
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -124,7 +139,10 @@ std::pair<int32_t, int32_t> GeneralControllerServiceImpl::DeleteEx(const Uri &ur
         LOG_ERROR("Manager is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
-    manager->SetCallCount(__FUNCTION__, uri.ToString());
+    // the ret of SetCallCount indicates whether the current call exceeds the access threshold, true means excced
+    if (manager->SetCallCount(__FUNCTION__, uri.ToString())) {
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -141,7 +159,10 @@ std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Ur
         LOG_ERROR("Manager is nullptr");
         return nullptr;
     }
-    manager->SetCallCount(__FUNCTION__, uri.ToString());
+    // the ret of SetCallCount indicates whether the current call exceeds the access threshold, true means excced
+    if (manager->SetCallCount(__FUNCTION__, uri.ToString())) {
+        return nullptr;
+    }
     auto proxy = DataShareManagerImpl::GetServiceProxy();
     if (proxy == nullptr) {
         LOG_ERROR("proxy is nullptr");
@@ -166,7 +187,10 @@ int GeneralControllerServiceImpl::RegisterObserver(const Uri &uri,
         LOG_ERROR("Manager is nullptr");
         return E_DATA_SHARE_NOT_READY;
     }
-    manager->SetCallCount(__FUNCTION__, uri.ToString());
+    // the ret of SetCallCount indicates whether the current call exceeds the access threshold, true means excced
+    if (manager->SetCallCount(__FUNCTION__, uri.ToString())) {
+        return DATA_SHARE_ERROR;
+    }
     auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
         LOG_ERROR("get DataObsMgrClient failed");

@@ -29,6 +29,11 @@ class IDataProxyPublishedDataObserver : public OHOS::IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DataShare.IDataProxyPublishedDataObserver");
 };
+
+class IProxyDataObserver : public OHOS::IRemoteBroker {
+public:
+    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DataShare.IProxyDataObserver");
+};
 }  // namespace DataShare
 }  // namespace OHOS
 #endif // DATA_PROXY_OBSERVER_H

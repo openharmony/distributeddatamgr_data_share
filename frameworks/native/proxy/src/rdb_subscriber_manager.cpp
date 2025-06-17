@@ -31,7 +31,7 @@ RdbSubscriberManager &RdbSubscriberManager::GetInstance()
 
 RdbSubscriberManager::RdbSubscriberManager()
 {
-    serviceCallback_ = new RdbObserverStub([this](const RdbChangeNode &changeNode) {
+    serviceCallback_ = new (std::nothrow)RdbObserverStub([this](const RdbChangeNode &changeNode) {
         Emit(changeNode);
     });
 }

@@ -2088,11 +2088,12 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test
     LOG_INFO("MediaDataShare_RegisterObserverExtProvider_Test_001::Start");
 
     Uri uri("");
-    // GetObserver return nullptr
+    // GetObserver return not nullptr
     std::shared_ptr<DataShareObserver> dataObserver = nullptr;
     std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
     ASSERT_NE(helper, nullptr);
-    helper->RegisterObserverExtProvider(uri, dataObserver, false);
+    int errCode = helper->RegisterObserverExtProvider(uri, dataObserver, false);
+    EXPECT_EQ(errCode, E_NULL_OBSERVER);
 
     // GetObserver return is not nullptr but controller is nullptr
     uri = Uri(MEDIALIBRARY_DATA_URI);
@@ -2100,7 +2101,8 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test
     ASSERT_NE(dataObserver, nullptr);
     bool ret = helper->Release();
     EXPECT_TRUE(ret);
-    helper->RegisterObserverExtProvider(uri, dataObserver, false);
+    errCode = helper->RegisterObserverExtProvider(uri, dataObserver, false);
+    EXPECT_EQ(errCode, E_HELPER_DIED);
 
     LOG_INFO("MediaDataShare_RegisterObserverExtProvider_Test_001::End");
 }
@@ -2117,8 +2119,9 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test
     Uri uri(MEDIALIBRARY_DATA_URI);
     std::shared_ptr<DataShareObserver> dataObserver = std::make_shared<DataShareObserverTest>();
     std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
-    helper->RegisterObserverExtProvider(uri, dataObserver, false);
+    int errCode = helper->RegisterObserverExtProvider(uri, dataObserver, false);
     ASSERT_NE(helper, nullptr);
+    EXPECT_EQ(errCode, E_OK);
 
     LOG_INFO("MediaDataShare_RegisterObserverExtProvider_Test_002::End");
 }
@@ -2137,18 +2140,22 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExtProvider_Te
     std::shared_ptr<DataShareObserver> dataObserver = nullptr;
     std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
     ASSERT_NE(helper, nullptr);
-    helper->UnregisterObserverExtProvider(uri, dataObserver);
+    int errCode = helper->UnregisterObserverExtProvider(uri, dataObserver);
+    EXPECT_EQ(errCode, E_NULL_OBSERVER);
 
     // FindObserver return false
     dataObserver = std::make_shared<DataShareObserverTest>();
     ASSERT_NE(dataObserver, nullptr);
-    helper->UnregisterObserverExtProvider(uri, dataObserver);
+    errCode = helper->UnregisterObserverExtProvider(uri, dataObserver);
+    EXPECT_EQ(errCode, E_NULL_OBSERVER);
 
     // FindObserver return true and general controller is nullptr
-    helper->RegisterObserverExtProvider(uri, dataObserver, false);
+    errCode = helper->RegisterObserverExtProvider(uri, dataObserver, false);
+    EXPECT_EQ(errCode, E_OK);
     bool ret = helper->Release();
     EXPECT_TRUE(ret);
-    helper->UnregisterObserverExtProvider(uri, dataObserver);
+    errCode = helper->UnregisterObserverExtProvider(uri, dataObserver);
+    EXPECT_EQ(errCode, E_HELPER_DIED);
 
     LOG_INFO("MediaDataShare_UnregisterObserverExtProvider_Test_001::End");
 }
@@ -2170,9 +2177,11 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExtProvider_Te
     ASSERT_NE(helper, nullptr);
 
     // FindObserver return true and general controller is not nullptr
-    helper->RegisterObserverExtProvider(uri, dataObserver, true);
+    int errCode = helper->RegisterObserverExtProvider(uri, dataObserver, true);
+    EXPECT_EQ(errCode, E_OK);
 
-    helper->UnregisterObserverExtProvider(uri, dataObserver);
+    errCode = helper->UnregisterObserverExtProvider(uri, dataObserver);
+    EXPECT_EQ(errCode, E_OK);
 
     LOG_INFO("MediaDataShare_UnregisterObserverExtProvider_Test_002::End");
 }
@@ -2192,7 +2201,8 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotifyChangeExtProvider_Test_001
     ASSERT_NE(helper, nullptr);
     ASSERT_NE(dataObserver, nullptr);
 
-    helper->RegisterObserverExtProvider(uri, dataObserver, false);
+    int errCode = helper->RegisterObserverExtProvider(uri, dataObserver, false);
+    EXPECT_EQ(errCode, E_OK);
     // generalCtl is nullptr
     bool ret = helper->Release();
     EXPECT_TRUE(ret);
@@ -2218,7 +2228,8 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotifyChangeExtProvider_Test_002
     ASSERT_NE(helper, nullptr);
     ASSERT_NE(dataObserver, nullptr);
 
-    helper->RegisterObserverExtProvider(uri, dataObserver, false);
+    int errCode = helper->RegisterObserverExtProvider(uri, dataObserver, false);
+    EXPECT_EQ(errCode, E_OK);
 
     ChangeInfo changeInfo = { DataShareObserver::ChangeType::INSERT, { uri } };
     helper->NotifyChangeExtProvider(changeInfo);

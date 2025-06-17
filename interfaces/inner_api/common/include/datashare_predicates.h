@@ -22,6 +22,7 @@
 #include "datashare_errno.h"
 #include "datashare_predicates_object.h"
 #include "datashare_predicates_objects.h"
+#include "message_parcel.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -558,6 +559,16 @@ public:
     {
         settingMode_ = settingMode;
     }
+
+    /**
+     * @brief The following four functions are used for serializing and deserializing objects
+     * to and from shared memory during Query and BatchInsert operations,
+     * which has a 128M upper limit. The upper limit of other method is 200k.
+     * Other methods remain unchanged.
+     */
+    static bool Marshal(const DataSharePredicates &predicates, MessageParcel &parcel);
+
+    static bool Unmarshal(DataSharePredicates &predicates, MessageParcel &parcel);
 
 private:
     void SetOperationList(OperationType operationType, const MutliValue &param)

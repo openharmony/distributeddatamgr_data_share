@@ -285,11 +285,8 @@ public:
      * @param dataObserver, Indicates the IDataAbilityObserver object.
      * @param isDescendants, Indicates the Whether to note the change of descendants.
      */
-    virtual void RegisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
-        bool isDescendants)
-    {
-        return;
-    }
+    virtual int RegisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+        bool isDescendants) = 0;
 
     /**
      * Deregisters an observer used for DataObsMgr specified by the given Uri.
@@ -307,10 +304,7 @@ public:
      * @param uri, Indicates the path of the data to operate.
      * @param dataObserver, Indicates the IDataAbilityObserver object
      */
-    virtual void UnregisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver)
-    {
-        return;
-    }
+    virtual int UnregisterObserverExtProvider(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver) = 0;
 
     /**
      * Notifies the registered observers of a change to the data resource specified by Uris.
@@ -326,10 +320,7 @@ public:
      *
      * @param changeInfo Indicates the info of the data to operate.
      */
-    virtual void NotifyChangeExtProvider(const DataShareObserver::ChangeInfo &changeInfo)
-    {
-        return;
-    }
+    virtual void NotifyChangeExtProvider(const DataShareObserver::ChangeInfo &changeInfo) = 0;
 
     /**
      * @brief Converts the given uri that refer to the Data share into a normalized URI. A normalized URI can be used

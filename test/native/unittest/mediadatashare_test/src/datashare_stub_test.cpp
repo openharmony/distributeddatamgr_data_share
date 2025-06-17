@@ -110,7 +110,6 @@ public:
     }
     Uri NormalizeUri(const Uri &uri)
     {
-
         return uri;
     }
     Uri DenormalizeUri(const Uri &uri)

@@ -15,6 +15,7 @@
 
 #include "napi_observer.h"
 
+#include "dataproxy_handle_common.h"
 #include "datashare_js_utils.h"
 #include "datashare_log.h"
 
@@ -148,6 +149,35 @@ void NapiPublishedObserver::OnChange(PublishedDataChangeNode &changeNode)
         delete observerWorker;
     }
     LOG_DEBUG("NapiRdbObserver onchange End: %{public}d", ret);
+}
+
+void NapiProxyDataObserver::OnChange(const std::vector<DataProxyChangeInfo> &changeNode)
+{
+    LOG_INFO("NapiProxyDataObserver onchange Start");
+    if (ref_ == nullptr) {
+        LOG_ERROR("ref_ is nullptr");
+        return;
+    }
+    ObserverWorker *observerWorker = new (std::nothrow) ObserverWorker(shared_from_this());
+    if (observerWorker == nullptr) {
+        LOG_ERROR("Failed to create observerWorker");
+        return;
+    }
+    std::shared_ptr<std::vector<DataProxyChangeInfo>> node =
+        std::make_shared<std::vector<DataProxyChangeInfo>>(std::move(changeNode));
+    observerWorker->getParam = [node](napi_env env) {
+        return DataShareJSUtils::Convert2JSValue(env, *node);
+    };
+
+    auto task = [observerWorker]() {
+        NapiObserver::CallbackFunc(observerWorker);
+    };
+    int ret = napi_send_event(env_, task, napi_eprio_immediate);
+    if (ret != 0) {
+        LOG_ERROR("napi_send_event failed: %{public}d", ret);
+        delete observerWorker;
+    }
+    LOG_INFO("NapiProxyDataObserver onchange End: %{public}d", ret);
 }
 } // namespace DataShare
 } // namespace OHOS

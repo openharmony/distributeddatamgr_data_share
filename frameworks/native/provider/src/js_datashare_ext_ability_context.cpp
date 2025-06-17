@@ -53,7 +53,13 @@ napi_value CreateJsDataShareExtAbilityContext(napi_env env,
     LOG_DEBUG("CreateJsDataShareExtAbilityContext begin");
     napi_value objValue = CreateJsExtensionContext(env, context);
     std::unique_ptr<JsDataShareExtAbilityContext> jsContext = std::make_unique<JsDataShareExtAbilityContext>(context);
-    napi_wrap(env, objValue, jsContext.release(), JsDataShareExtAbilityContext::Finalizer, nullptr, nullptr);
+    napi_status status = napi_wrap(env, objValue, jsContext.release(), JsDataShareExtAbilityContext::Finalizer,
+        nullptr, nullptr);
+    if (status != napi_ok) {
+        LOG_ERROR("napi_wrap failed. code:%{public}d", status);
+        jsContext.release();
+        return nullptr;
+    }
     return objValue;
 }
 }  // namespace DataShare

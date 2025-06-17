@@ -18,7 +18,11 @@
 #include <cstdint>
 #include <iomanip>
 #include <sstream>
+#include <variant>
+#include "dataproxy_handle_common.h"
 #include "datashare_log.h"
+#include "datashare_value_object.h"
+#include "itypes_util.h"
 
 namespace OHOS::ITypesUtil {
 using namespace OHOS::DataShare;
@@ -294,6 +298,222 @@ bool Unmarshalling(ExecResultSet &execResultSet, MessageParcel &parcel)
     }
     execResultSet.errorCode = static_cast<DataShare::ExecErrorCode>(errorCode);
     return ITypesUtil::Unmarshal(parcel, execResultSet.results);
+}
+
+template<>
+bool Marshalling(const DataShareProxyData &proxyData, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, proxyData.uri_, proxyData.value_, proxyData.allowList_);
+}
+
+template<>
+bool Unmarshalling(DataShareProxyData &proxyData, MessageParcel &parcel)
+{
+    return ITypesUtil::Unmarshal(parcel, proxyData.uri_, proxyData.value_, proxyData.allowList_);
+}
+
+template<>
+bool Marshalling(const DataProxyConfig &config, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, static_cast<int32_t>(config.type_));
+}
+
+template<>
+bool Unmarshalling(DataProxyConfig &config, MessageParcel &parcel)
+{
+    int type;
+    if (!ITypesUtil::Unmarshalling(type, parcel)) {
+        return false;
+    }
+    config.type_ = static_cast<DataProxyType>(type);
+    return true;
+}
+
+template<>
+bool Marshalling(const DataProxyResult &result, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, static_cast<int32_t>(result.result_), result.uri_);
+}
+
+template<>
+bool Unmarshalling(DataProxyResult &result, MessageParcel &parcel)
+{
+    int errorCode;
+    if (!ITypesUtil::Unmarshalling(errorCode, parcel)) {
+        return false;
+    }
+    result.result_ = static_cast<DataProxyErrorCode>(errorCode);
+    return ITypesUtil::Unmarshal(parcel, result.uri_);
+}
+
+template<>
+bool Marshalling(const DataShareValueObject &value, MessageParcel &parcel)
+{
+    if (!ITypesUtil::Marshal(parcel, value.value.index())) {
+        return false;
+    }
+    switch (value.value.index()) {
+        case DataShareValueObjectType::TYPE_INT: {
+            return ITypesUtil::Marshal(parcel, std::get<int64_t>(value.value));
+        }
+        case DataShareValueObjectType::TYPE_DOUBLE: {
+            return ITypesUtil::Marshal(parcel, std::get<double>(value.value));
+        }
+        case DataShareValueObjectType::TYPE_STRING: {
+            return ITypesUtil::Marshal(parcel, std::get<std::string>(value.value));
+        }
+        case DataShareValueObjectType::TYPE_BOOL: {
+            return ITypesUtil::Marshal(parcel, std::get<bool>(value.value));
+        }
+        default: {
+            LOG_ERROR("Marshal ValueObject: unknown typeId");
+            return false;
+        }
+    }
+}
+
+template<>
+bool Unmarshalling(DataShareValueObject &value, MessageParcel &parcel)
+{
+    int32_t index;
+    if (!ITypesUtil::Unmarshal(parcel, index)) {
+        return false;
+    }
+    bool ret = true;
+    switch (index) {
+        case static_cast<uint8_t>(DataShareValueObjectType::TYPE_INT): {
+            int64_t val;
+            ret = ITypesUtil::Unmarshal(parcel, val);
+            value = val;
+            break;
+        }
+        case static_cast<uint8_t>(DataShareValueObjectType::TYPE_DOUBLE): {
+            double val;
+            ret = ITypesUtil::Unmarshal(parcel, val);
+            value = val;
+            break;
+        }
+        case static_cast<uint8_t>(DataShareValueObjectType::TYPE_STRING): {
+            std::string val;
+            ret = ITypesUtil::Unmarshal(parcel, val);
+            value = val;
+            break;
+        }
+        case static_cast<uint8_t>(DataShareValueObjectType::TYPE_BOOL): {
+            bool val;
+            ret = ITypesUtil::Unmarshal(parcel, val);
+            value = val;
+            break;
+        }
+        default: {
+            LOG_ERROR("Unmarshal ValueObject: unknown typeId");
+            ret = false;
+        }
+    }
+    return ret;
+}
+
+template<>
+bool Marshalling(const DataProxyValue &value, MessageParcel &parcel)
+{
+    if (!ITypesUtil::Marshal(parcel, value.index())) {
+        return false;
+    }
+    switch (value.index()) {
+        case static_cast<uint8_t>(DataProxyValueType::VALUE_INT): {
+            return ITypesUtil::Marshal(parcel, std::get<int64_t>(value));
+        }
+        case static_cast<uint8_t>(DataProxyValueType::VALUE_DOUBLE): {
+            return ITypesUtil::Marshal(parcel, std::get<double>(value));
+        }
+        case static_cast<uint8_t>(DataProxyValueType::VALUE_STRING): {
+            return ITypesUtil::Marshal(parcel, std::get<std::string>(value));
+        }
+        case static_cast<uint8_t>(DataProxyValueType::VALUE_BOOL): {
+            return ITypesUtil::Marshal(parcel, std::get<bool>(value));
+        }
+        default: {
+            LOG_ERROR("Marshal ValueObject: unknown typeId");
+            return false;
+        }
+    }
+}
+
+template<>
+bool Unmarshalling(DataProxyValue &value, MessageParcel &parcel)
+{
+    int32_t index;
+    if (!ITypesUtil::Unmarshal(parcel, index)) {
+        return false;
+    }
+    bool ret = true;
+    switch (index) {
+        case static_cast<uint8_t>(DataProxyValueType::VALUE_INT): {
+            int64_t val;
+            ret = ITypesUtil::Unmarshal(parcel, val);
+            value = val;
+            break;
+        }
+        case static_cast<uint8_t>(DataProxyValueType::VALUE_DOUBLE): {
+            double val;
+            ret = ITypesUtil::Unmarshal(parcel, val);
+            value = val;
+            break;
+        }
+        case static_cast<uint8_t>(DataProxyValueType::VALUE_STRING): {
+            std::string val;
+            ret = ITypesUtil::Unmarshal(parcel, val);
+            value = val;
+            break;
+        }
+        case static_cast<uint8_t>(DataProxyValueType::VALUE_BOOL): {
+            bool val;
+            ret = ITypesUtil::Unmarshal(parcel, val);
+            value = val;
+            break;
+        }
+        default: {
+            LOG_ERROR("Unmarshal DataProxyValue: unknown typeId");
+            ret = false;
+        }
+    }
+    return ret;
+}
+
+template<>
+bool Marshalling(const DataProxyGetResult &result, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, static_cast<int32_t>(result.result_),
+        result.uri_, result.value_, result.allowList_);
+}
+
+template<>
+bool Unmarshalling(DataProxyGetResult &result, MessageParcel &parcel)
+{
+    int errorCode;
+    if (!ITypesUtil::Unmarshalling(errorCode, parcel)) {
+        return false;
+    }
+    result.result_ = static_cast<DataProxyErrorCode>(errorCode);
+    return ITypesUtil::Unmarshal(parcel, result.uri_, result.value_, result.allowList_);
+}
+
+template<>
+bool Marshalling(const DataProxyChangeInfo &changeInfo, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, static_cast<int32_t>(changeInfo.changeType_),
+        changeInfo.uri_, changeInfo.value_);
+}
+
+template<>
+bool Unmarshalling(DataProxyChangeInfo &changeInfo, MessageParcel &parcel)
+{
+    int errorCode;
+    if (!ITypesUtil::Unmarshalling(errorCode, parcel)) {
+        return false;
+    }
+    changeInfo.changeType_ = static_cast<DataShareObserver::ChangeType>(errorCode);
+    return ITypesUtil::Unmarshal(parcel, changeInfo.uri_, changeInfo.value_);
 }
 
 template <typename T>

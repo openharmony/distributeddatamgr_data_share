@@ -915,6 +915,38 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001,
     LOG_INFO("SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001::End");
 }
 
+ /**
+* @tc.name: SlientAccess_Create_With_Invalid_AppIndex_Test_001
+* @tc.desc: test use invalid appIndex to create datashare helper
+* @tc.type: FUNC
+* @tc.require:
+*/
+HWTEST_F(SlientAccessTest, SlientAccess_Create_With_Invalid_AppIndex_Test_001, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Create_With_Invalid_AppIndex_Test_001::Start");
+    std::string uri("datashareproxy://com.acts.datasharetest/test?Proxy=true&appIndex=-1");
+    std::string extUri(DATA_SHARE_URI);
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        LOG_ERROR("GetSystemAbilityManager get samgr failed.");
+    }
+    auto remoteObj = saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID);
+    if (remoteObj == nullptr) {
+        LOG_ERROR("GetSystemAbility service failed.");
+    }
+    auto [ret, helper] = DataShare::DataShareHelper::Create(remoteObj, uri, "");
+    EXPECT_EQ(ret, E_EXT_URI_INVALID);
+    EXPECT_EQ(helper, nullptr);
+
+    helper = DataShare::DataShareHelper::Creator(remoteObj, uri);
+    EXPECT_EQ(helper, nullptr);
+
+    CreateOptions options;
+    options.isProxy_ = true;
+    helper = DataShare::DataShareHelper::Creator(uri, options);
+    EXPECT_EQ(helper, nullptr);
+    LOG_INFO("SlientAccess_Create_With_Invalid_AppIndex_Test_001::End");
+}
 
 /**
 * @tc.name: SlientAccess_RegisterObserverExtProvider_Test_001

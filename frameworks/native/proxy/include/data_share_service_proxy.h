@@ -90,6 +90,20 @@ public:
 
     static void SetSystem(bool isSystem);
 
+    std::vector<DataProxyResult> PublishProxyData(
+        const std::vector<DataShareProxyData> &proxyData, const DataProxyConfig &proxyConfig) override;
+
+    std::vector<DataProxyResult> DeleteProxyData(
+        const std::vector<std::string> &uris, const DataProxyConfig &proxyConfig) override;
+
+    std::vector<DataProxyGetResult> GetProxyData(
+        const std::vector<std::string> uris, const DataProxyConfig &proxyConfig) override;
+
+    std::vector<DataProxyResult> SubscribeProxyData(const std::vector<std::string> &uris,
+        const sptr<IProxyDataObserver> &observer) override;
+
+    std::vector<DataProxyResult> UnsubscribeProxyData(const std::vector<std::string> &uris) override;
+
     static bool IsSystem();
 
     static bool& GetSystem();
