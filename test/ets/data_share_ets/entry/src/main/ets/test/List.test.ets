@@ -14,7 +14,9 @@
  */
 
 import DataSharePredicatesEtsTest from './dataSharePredicate.test.ets';
+import DataShareSubscribeTest from './dataShareSubscribe.test.ets';
 
 export default function testsuite() {
   DataSharePredicatesEtsTest();
+  DataShareSubscribeTest();
 }
