@@ -38,6 +38,7 @@ ohos_shared_library("data_share_result_set") {
   external_deps = [
     "c_utils:utils",
     "hilog:libhilog",
+    "ipc:ipc_core",
     "runtime_core:ani",
   ]
   subsystem_name = "distributeddatamgr"
