@@ -96,7 +96,6 @@ ohos_unittest("NativeDataShareTest") {
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "relational_store:rdb_data_ability_adapter",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 
@@ -131,7 +130,6 @@ ohos_unittest("PermissionTest") {
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "ipc:ipc_single",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 }
@@ -159,7 +157,6 @@ ohos_unittest("SlientAccessTest") {
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "ipc:ipc_single",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 }
@@ -186,7 +183,6 @@ ohos_unittest("SlientSwitchTest") {
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "ipc:ipc_single",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 }
@@ -213,7 +209,6 @@ ohos_unittest("ErrorCodeTest") {
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "ipc:ipc_single",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 }
@@ -240,7 +235,6 @@ ohos_unittest("JoinTest") {
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "ipc:ipc_single",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 }
@@ -267,7 +261,6 @@ ohos_unittest("ProxyDatasTest") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 }
@@ -308,7 +301,6 @@ ohos_unittest("ControllerTest") {
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "relational_store:rdb_data_ability_adapter",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 
@@ -363,7 +355,6 @@ ohos_unittest("AbnormalBranchTest") {
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "relational_store:rdb_data_ability_adapter",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 
@@ -670,7 +661,6 @@ ohos_unittest("DataShareProxyTest") {
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "relational_store:rdb_data_ability_adapter",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 
@@ -727,7 +717,6 @@ ohos_unittest("DataShareConnectionTest") {
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "relational_store:rdb_data_ability_adapter",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 
@@ -781,7 +770,6 @@ ohos_unittest("DataShareStubTest") {
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "relational_store:rdb_data_ability_adapter",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 
@@ -851,7 +839,6 @@ ohos_unittest("DataShareAccessThresholdTest") {
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "ipc:ipc_single",
-    "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
 
