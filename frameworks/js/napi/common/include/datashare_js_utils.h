@@ -27,6 +27,7 @@
 #include "datashare_template.h"
 #include "datashare_value_object.h"
 #include "napi/native_api.h"
+#include "dataproxy_handle_common.h"
 
 #define NAPI_ASSERT_ERRCODE(env, assertion, error)                                                          \
 do {                                                                                                        \
@@ -85,6 +86,7 @@ public:
     static int32_t Convert2Value(napi_env env, napi_value input, DataShareValuesBucket &valueBucket);
     static int32_t Convert2Value(napi_env env, napi_value input, UpdateOperation &operation);
     static int32_t Convert2Value(napi_env env, napi_value input, DataShareObserver::ChangeInfo &changeInfo);
+    static int32_t Convert2Value(napi_env env, napi_value input, DataProxyType &proxyType);
     static std::string Convert2String(napi_env env, napi_value jsStr, size_t max = DEFAULT_BUF_SIZE);
     static std::vector<std::string> Convert2StrVector(napi_env env, napi_value value, size_t strMax);
     static std::vector<uint8_t> Convert2U8Vector(napi_env env, napi_value jsValue);
@@ -94,6 +96,7 @@ public:
     static Template Convert2Template(napi_env env, napi_value value);
     static TemplateId Convert2TemplateId(napi_env env, napi_value value);
     static Data Convert2PublishedData(napi_env env, napi_value value);
+    static std::vector<DataShareProxyData> Convert2ProxyData(napi_env env, napi_value value);
 
     static napi_value Convert2JSValue(napi_env env, const std::monostate &value = {});
     static napi_value Convert2JSValue(napi_env env, const std::vector<std::string> &value);
@@ -114,6 +117,12 @@ public:
     static napi_value Convert2JSValue(napi_env env, PublishedDataChangeNode &changeNode);
     static napi_value Convert2JSValue(napi_env env, const OperationResult &results);
     static napi_value Convert2JSValue(napi_env env, const std::vector<OperationResult> &results);
+    static napi_value Convert2JSValue(napi_env env, const DataProxyResult &result);
+    static napi_value Convert2JSValue(napi_env env, const std::vector<DataProxyResult> &results);
+    static napi_value Convert2JSValue(napi_env env, const DataProxyGetResult &result);
+    static napi_value Convert2JSValue(napi_env env, const std::vector<DataProxyGetResult> &results);
+    static napi_value Convert2JSValue(napi_env env, const DataShareValueObject &valueObject);
+    static napi_value Convert2JSValue(napi_env env, const DataProxyChangeInfo &changeInfo);
     static napi_value Convert2JSValue(napi_env env, const DataShareValuesBucket &valueBucket);
     static std::vector<uint8_t> ConvertU8Vector(napi_env env, napi_value jsValue);
     static napi_value Convert2JSValue(napi_env env, const DataShareObserver::ChangeInfo &changeInfo);
@@ -128,6 +137,10 @@ public:
         std::vector<PredicateTemplateNode> &predicates);
     static bool UnwrapStringByPropertyName(napi_env env, napi_value jsObject, const char *propertyName,
         std::string &value);
+    static bool UnwrapDataProxyValue(napi_env env, napi_value jsObject, DataProxyValue &value);
+    static bool UnwrapProxyDataItem(napi_env env, napi_value jsObject, DataShareProxyData &proxyData);
+    static bool UnwrapProxyDataItemVector(napi_env env, napi_value value, std::vector<DataShareProxyData> &proxyDatas);
+    static bool UnwrapDataProxyConfig(napi_env env, napi_value value, DataProxyConfig &config);
     static bool IsArrayForNapiValue(napi_env env, napi_value param, uint32_t &arraySize);
 private:
     template<typename _VTp>

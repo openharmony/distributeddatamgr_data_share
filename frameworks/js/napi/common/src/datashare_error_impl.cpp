@@ -14,6 +14,7 @@
  */
 
 #include "datashare_error_impl.h"
+#include <string>
 
 namespace OHOS {
 namespace DataShare {
@@ -33,6 +34,16 @@ std::string ParametersNumError::GetMessage() const
 }
 
 int ParametersNumError::GetCode() const
+{
+    return EXCEPTION_PARAMETER_CHECK;
+}
+
+std::string ParametersLimitError::GetMessage() const
+{
+    return "Parameter error. " + name + " over limit " + std::to_string(num);
+}
+
+int ParametersLimitError::GetCode() const
 {
     return EXCEPTION_PARAMETER_CHECK;
 }

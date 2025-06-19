@@ -14,10 +14,14 @@
  */
 
 #include "datashare_js_utils.h"
+#include <cstdint>
 
+#include "dataproxy_handle_common.h"
 #include "datashare_log.h"
 #include "datashare_predicates_proxy.h"
 #include "datashare_valuebucket_convert.h"
+#include "js_native_api.h"
+#include "js_native_api_types.h"
 #include "napi/native_common.h"
 #include "napi_datashare_values_bucket.h"
 #include "securec.h"
@@ -67,7 +71,6 @@ std::vector<uint8_t> DataShareJSUtils::Convert2U8Vector(napi_env env, napi_value
     if (!isTypedArray) {
         napi_is_arraybuffer(env, input_array, &isArrayBuffer);
         if (!isArrayBuffer) {
-            LOG_ERROR("unknow type");
             return {};
         }
     }
@@ -303,6 +306,39 @@ std::string DataShareJSUtils::UnwrapStringFromJS(napi_env env, napi_value param,
     return value;
 }
 
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataShareValueObject &valueObject)
+{
+    napi_value jsValue = nullptr;
+    switch (valueObject.value.index()) {
+        case DataShareValueObjectType::TYPE_INT: {
+            int64_t val = std::get<int64_t>(valueObject.value);
+            jsValue = Convert2JSValue(env, val);
+            break;
+        }
+        case DataShareValueObjectType::TYPE_DOUBLE: {
+            double val = std::get<double>(valueObject.value);
+            jsValue = Convert2JSValue(env, val);
+            break;
+        }
+        case DataShareValueObjectType::TYPE_STRING: {
+            std::string val = std::get<std::string>(valueObject.value);
+            jsValue = Convert2JSValue(env, val);
+            break;
+        }
+        case DataShareValueObjectType::TYPE_BOOL: {
+            bool val = std::get<bool>(valueObject.value);
+            jsValue = Convert2JSValue(env, val);
+            break;
+        }
+        default: {
+            LOG_ERROR("Marshal ValueObject: unknown typeId");
+            return nullptr;
+        }
+    }
+
+    return jsValue;
+}
+
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataShareValuesBucket &valueBucket)
 {
     napi_value res = NewInstance(env, valueBucket);
@@ -498,6 +534,110 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<Ope
     return jsValue;
 }
 
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataProxyResult &result)
+{
+    napi_value jsDataProxyResult = nullptr;
+    napi_create_object(env, &jsDataProxyResult);
+
+    napi_value uri = Convert2JSValue(env, result.uri_);
+    if (uri == nullptr) {
+        return nullptr;
+    }
+
+    napi_value errCode = Convert2JSValue(env, result.result_);
+    if (errCode == nullptr) {
+        return nullptr;
+    }
+    napi_set_named_property(env, jsDataProxyResult, "uri", uri);
+    napi_set_named_property(env, jsDataProxyResult, "result", errCode);
+    return jsDataProxyResult;
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<DataProxyResult> &results)
+{
+    napi_value jsValue;
+    napi_status status = napi_create_array_with_length(env, results.size(), &jsValue);
+    if (status != napi_ok) {
+        return nullptr;
+    }
+
+    for (size_t i = 0; i < results.size(); ++i) {
+        napi_set_element(env, jsValue, i, Convert2JSValue(env, results[i]));
+    }
+    return jsValue;
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataProxyGetResult &result)
+{
+    napi_value jsDataProxyGetResult = nullptr;
+    napi_create_object(env, &jsDataProxyGetResult);
+
+    napi_value uri = Convert2JSValue(env, result.uri_);
+    if (uri == nullptr) {
+        return nullptr;
+    }
+
+    napi_value errCode = Convert2JSValue(env, result.result_);
+    if (errCode == nullptr) {
+        return nullptr;
+    }
+
+    napi_value value = Convert2JSValue(env, result.value_);
+    if (value == nullptr) {
+        return nullptr;
+    }
+
+    napi_value allowList = Convert2JSValue(env, result.allowList_);
+    if (allowList == nullptr) {
+        return nullptr;
+    }
+
+    napi_set_named_property(env, jsDataProxyGetResult, "uri", uri);
+    napi_set_named_property(env, jsDataProxyGetResult, "result", errCode);
+    napi_set_named_property(env, jsDataProxyGetResult, "value", value);
+    napi_set_named_property(env, jsDataProxyGetResult, "allowList", allowList);
+    return jsDataProxyGetResult;
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<DataProxyGetResult> &results)
+{
+    napi_value jsValue;
+    napi_status status = napi_create_array_with_length(env, results.size(), &jsValue);
+    if (status != napi_ok) {
+        return nullptr;
+    }
+
+    for (size_t i = 0; i < results.size(); ++i) {
+        napi_set_element(env, jsValue, i, Convert2JSValue(env, results[i]));
+    }
+    return jsValue;
+}
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataProxyChangeInfo &changeInfo)
+{
+    napi_value jsDataProxyChangeInfo = nullptr;
+    napi_create_object(env, &jsDataProxyChangeInfo);
+
+    napi_value type = nullptr;
+    type = Convert2JSValue(env, changeInfo.changeType_);
+    if (type == nullptr) {
+        return nullptr;
+    }
+    napi_value uri = nullptr;
+    uri = Convert2JSValue(env, changeInfo.uri_);
+    if (uri == nullptr) {
+        return nullptr;
+    }
+    napi_value value = Convert2JSValue(env, changeInfo.value_);
+    if (value == nullptr) {
+        return nullptr;
+    }
+    napi_set_named_property(env, jsDataProxyChangeInfo, "type", type);
+    napi_set_named_property(env, jsDataProxyChangeInfo, "uri", uri);
+    napi_set_named_property(env, jsDataProxyChangeInfo, "value", value);
+    return jsDataProxyChangeInfo;
+}
+
 bool DataShareJSUtils::UnwrapTemplatePredicates(napi_env env, napi_value jsPredicates,
     std::vector<PredicateTemplateNode> &predicates)
 {
@@ -666,6 +806,148 @@ bool DataShareJSUtils::UnwrapPublishedDataItemVector(napi_env env, napi_value va
     return true;
 }
 
+bool DataShareJSUtils::UnwrapDataProxyValue(napi_env env, napi_value jsObject, DataProxyValue &value)
+{
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, jsObject, &valueType);
+    if (valueType != napi_object) {
+        LOG_ERROR("UnwrapDataProxyValue error, value is not object");
+        return false;
+    }
+
+    std::string keyStr = "value";
+    napi_value jsDataKey = Convert2JSValue(env, keyStr);
+    napi_value jsDataValue = nullptr;
+    napi_get_property(env, jsObject, jsDataKey, &jsDataValue);
+    napi_typeof(env, jsDataValue, &valueType);
+    switch (valueType) {
+        case napi_number: {
+            double valueNumber;
+            napi_get_value_double(env, jsDataValue, &valueNumber);
+            value = valueNumber;
+            break;
+        }
+        case napi_string: {
+            value = Convert2String(env, jsDataValue);
+            break;
+        }
+        case napi_boolean: {
+            bool valueBool;
+            napi_get_value_bool(env, jsDataValue, &valueBool);
+            value = valueBool;
+            break;
+        }
+        case napi_undefined:
+        case napi_null: {
+            value = {};
+            break;
+        }
+        default: {
+            LOG_ERROR("Convert dataValue failed, type is %{public}d", valueType);
+            return false;
+        }
+    }
+    return true;
+}
+
+bool DataShareJSUtils::UnwrapProxyDataItem(napi_env env, napi_value jsObject, DataShareProxyData &proxyData)
+{
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, jsObject, &valueType);
+    if (valueType != napi_object) {
+        LOG_ERROR("UnwrapPublishedDataItem error, value is not object");
+        return false;
+    }
+
+    if (!UnwrapStringByPropertyName(env, jsObject, "uri", proxyData.uri_)) {
+        LOG_ERROR("Convert uri failed");
+        return false;
+    }
+
+    if (!UnwrapDataProxyValue(env, jsObject, proxyData.value_)) {
+        LOG_ERROR("Convert dataproxy value failed");
+        return false;
+    }
+
+    std::string keyStr = "allowList";
+    napi_value jsDataKey = Convert2JSValue(env, keyStr);
+    napi_value jsDataValue = nullptr;
+    napi_get_property(env, jsObject, jsDataKey, &jsDataValue);
+    napi_typeof(env, jsDataValue, &valueType);
+    if (valueType == napi_undefined || valueType == napi_null) {
+        return true;
+    }
+    if (valueType != napi_object) {
+        LOG_ERROR("Convert allowList failed");
+        return false;
+    }
+    Convert2Value(env, jsDataValue, proxyData.allowList_);
+    return true;
+}
+
+bool DataShareJSUtils::UnwrapProxyDataItemVector(napi_env env, napi_value value,
+    std::vector<DataShareProxyData> &proxyDatas)
+{
+    uint32_t arraySize = 0;
+    if (!IsArrayForNapiValue(env, value, arraySize)) {
+        LOG_ERROR("IsArrayForNapiValue is false");
+        return false;
+    }
+
+    for (uint32_t i = 0; i < arraySize; i++) {
+        napi_value jsValue = nullptr;
+        if (napi_get_element(env, value, i, &jsValue) != napi_ok) {
+            LOG_ERROR("napi_get_element is false");
+            return false;
+        }
+
+        DataShareProxyData proxyDataItem;
+        if (!UnwrapProxyDataItem(env, jsValue, proxyDataItem)) {
+            LOG_ERROR("UnwrapPublishedDataItem failed");
+            return false;
+        }
+        proxyDatas.emplace_back(std::move(proxyDataItem));
+    }
+    return true;
+}
+
+std::vector<DataShareProxyData> DataShareJSUtils::Convert2ProxyData(napi_env env, napi_value value)
+{
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, value, &valueType);
+    if (valueType != napi_object) {
+        LOG_ERROR("Convert2PublishedData error, value is not object");
+        return {};
+    }
+    std::vector<DataShareProxyData> proxyDatas;
+    if (!UnwrapProxyDataItemVector(env, value,  proxyDatas)) {
+        LOG_ERROR("UnwrapPublishedDataItems failed");
+        return {};
+    }
+    return proxyDatas;
+}
+
+bool DataShareJSUtils::UnwrapDataProxyConfig(napi_env env, napi_value value, DataProxyConfig &config)
+{
+    napi_value jsResult = nullptr;
+    napi_status status = napi_get_named_property(env, value, "type", &jsResult);
+    if ((status != napi_ok) || (jsResult == nullptr)) {
+        LOG_ERROR("Convert DataProxyType failed");
+        return false;
+    }
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, jsResult, &valueType);
+    if (valueType != napi_number) {
+        LOG_ERROR("Convert DataProxyType error, value is not number");
+        return false;
+    }
+    if (Convert2Value(env, jsResult, config.type_) != napi_ok) {
+        LOG_ERROR("Convert DataProxyType failed");
+        return false;
+    }
+    return true;
+}
+
 Data DataShareJSUtils::Convert2PublishedData(napi_env env, napi_value value)
 {
     napi_valuetype valueType = napi_undefined;
@@ -797,6 +1079,14 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, DataShar
     changeInfo.uris_.push_back(uri);
     changeInfo.valueBuckets_ = ValueProxy::Convert(std::move(valuebuckets));
     return napi_ok;
+}
+
+int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, DataProxyType &proxyType)
+{
+    uint32_t number = 0;
+    napi_status status = napi_get_value_uint32(env, input, &number);
+    proxyType = static_cast<DataProxyType>(number);
+    return status;
 }
 
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataShareObserver::ChangeInfo &changeInfo)

@@ -64,13 +64,13 @@ public:
 
     virtual bool NotifyChange(const Uri &uri) override;
 
-    virtual bool RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+    virtual int RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
         bool isDescendants) override;
 
-    virtual bool UnregisterObserverExtProvider(const Uri &uri,
+    virtual int UnregisterObserverExtProvider(const Uri &uri,
         const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
 
-    virtual bool NotifyChangeExtProvider(const ChangeInfo &changeInfo) override;
+    virtual int NotifyChangeExtProvider(const ChangeInfo &changeInfo) override;
 
     virtual Uri NormalizeUri(const Uri &uri) override;
 

@@ -110,7 +110,6 @@ public:
     }
     Uri NormalizeUri(const Uri &uri)
     {
-
         return uri;
     }
     Uri DenormalizeUri(const Uri &uri)
@@ -158,7 +157,8 @@ HWTEST_F(DataShareStubTest, DataShareStub_CmdRegisterObserverExtProvider_Test_00
     EXPECT_EQ(errCode, 0);
     ret = ITypesUtil::Unmarshal(reply, errCode);
     EXPECT_TRUE(ret);
-    EXPECT_EQ(errCode, 1);
+    // return default errCode 0(E_OK)
+    EXPECT_EQ(errCode, 0);
 
     LOG_INFO("DataShareStub_CmdRegisterObserverExtProvider_Test_001::End");
 }
@@ -188,7 +188,8 @@ HWTEST_F(DataShareStubTest, DataShareStub_CmdUnregisterObserverExtProvider_Test_
     EXPECT_EQ(errCode, 0);
     ret = ITypesUtil::Unmarshal(reply, errCode);
     EXPECT_TRUE(ret);
-    EXPECT_EQ(errCode, 1);
+    // return default errCode 0(E_OK)
+    EXPECT_EQ(errCode, 0);
 
     LOG_INFO("DataShareStub_CmdUnregisterObserverExtProvider_Test_001::End");
 }
@@ -217,7 +218,8 @@ HWTEST_F(DataShareStubTest, DataShareStub_CmdNotifyChangeExtProvider_Test_001, T
     EXPECT_EQ(errCode, 0);
     ret = ITypesUtil::Unmarshal(reply, errCode);
     EXPECT_TRUE(ret);
-    EXPECT_EQ(errCode, 1);
+    // return default errCode 0(E_OK)
+    EXPECT_EQ(errCode, 0);
 
     LOG_INFO("DataShareStub_CmdNotifyChangeExtProvider_Test_001::End");
 }

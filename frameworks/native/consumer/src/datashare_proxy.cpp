@@ -580,18 +580,18 @@ bool DataShareProxy::NotifyChange(const Uri &uri)
 }
 
 // send IPC request, and there is no default implemention for the provider. It needs to be handled by the user.
-bool DataShareProxy::RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+int DataShareProxy::RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
     bool isDescendants)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
-        return false;
+        return E_WRITE_TO_PARCE_ERROR;
     }
 
     if (!ITypesUtil::Marshal(data, uri, dataObserver->AsObject(), isDescendants)) {
         LOG_ERROR("fail to Marshalling");
-        return false;
+        return E_MARSHAL_ERROR;
     }
 
     MessageParcel reply;
@@ -600,25 +600,25 @@ bool DataShareProxy::RegisterObserverExtProvider(const Uri &uri, const sptr<AAFw
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_REGISTER_OBSERVEREXT_PROVIDER), data, reply, option);
     if (result != ERR_NONE) {
         LOG_ERROR("SendRequest error, result=%{public}d", result);
-        return false;
+        return DATA_SHARE_ERROR;
     }
-    // the stub write bool value as int value to reply, 0 is false
-    return reply.ReadInt32() != 0;
+    // the stub write int value to reply
+    return reply.ReadInt32();
 }
 
 // send IPC request, and there is no default implemention for the provider. It needs to be handled by the user.
-bool DataShareProxy::UnregisterObserverExtProvider(const Uri &uri,
+int DataShareProxy::UnregisterObserverExtProvider(const Uri &uri,
     const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
-        return false;
+        return E_WRITE_TO_PARCE_ERROR;
     }
 
     if (!ITypesUtil::Marshal(data, uri, dataObserver->AsObject())) {
         LOG_ERROR("fail to Marshalling");
-        return false;
+        return E_MARSHAL_ERROR;
     }
 
     MessageParcel reply;
@@ -627,25 +627,25 @@ bool DataShareProxy::UnregisterObserverExtProvider(const Uri &uri,
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_UNREGISTER_OBSERVEREXT_PROVIDER), data, reply, option);
     if (result != ERR_NONE) {
         LOG_ERROR("SendRequest error, result=%{public}d", result);
-        return false;
+        return DATA_SHARE_ERROR;
     }
-    // the stub write bool value as int value to reply, 0 is false
-    return reply.ReadInt32() != 0;
+    // the stub writeint value to reply
+    return reply.ReadInt32();
 }
 
 // send IPC request, and there is no default implemention for the provider. It needs to be handled by the user.
-bool DataShareProxy::NotifyChangeExtProvider(const ChangeInfo &changeInfo)
+int DataShareProxy::NotifyChangeExtProvider(const ChangeInfo &changeInfo)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed");
-        return false;
+        return E_WRITE_TO_PARCE_ERROR;
     }
     if (!ChangeInfo::Marshalling(changeInfo, data)) {
         LOG_ERROR("changeInfo marshalling failed, changeType:%{public}ud, num:%{public}zu,"
             "null data:%{public}d, size:%{public}ud",
             changeInfo.changeType_, changeInfo.uris_.size(), changeInfo.data_ == nullptr, changeInfo.size_);
-        return false;
+        return E_MARSHAL_ERROR;
     }
 
     MessageParcel reply;
@@ -654,10 +654,10 @@ bool DataShareProxy::NotifyChangeExtProvider(const ChangeInfo &changeInfo)
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_NOTIFY_CHANGEEXT_PROVIDER), data, reply, option);
     if (result != ERR_NONE) {
         LOG_ERROR("SendRequest error, result=%{public}d", result);
-        return false;
+        return DATA_SHARE_ERROR;
     }
-    // the stub write bool value as int value to reply, 0 is false
-    return reply.ReadInt32() != 0;
+    // the stub write int value to reply
+    return reply.ReadInt32();
 }
 
 Uri DataShareProxy::NormalizeUri(const Uri &uri)

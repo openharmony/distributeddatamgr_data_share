@@ -28,6 +28,7 @@
 #include "datashare_values_bucket.h"
 #include "distributeddata_data_share_ipc_interface_code.h"
 #include "uri.h"
+#include "dataproxy_handle_common.h"
 
 namespace OHOS::DataShare {
 class IDataShareService : public IRemoteBroker {
@@ -97,6 +98,20 @@ public:
 
     virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const Uri &extUri,
         const DataSharePredicates &predicates) = 0;
+
+    virtual std::vector<DataProxyResult> PublishProxyData(const std::vector<DataShareProxyData> &proxyData,
+        const DataProxyConfig &proxyConfig) = 0;
+
+    virtual std::vector<DataProxyResult> DeleteProxyData(const std::vector<std::string> &uris,
+        const DataProxyConfig &proxyConfig) = 0;
+
+    virtual std::vector<DataProxyGetResult> GetProxyData(const std::vector<std::string> uris,
+        const DataProxyConfig &proxyConfig) = 0;
+
+    virtual std::vector<DataProxyResult> SubscribeProxyData(const std::vector<std::string> &uris,
+        const sptr<IProxyDataObserver> &observer) = 0;
+
+    virtual std::vector<DataProxyResult> UnsubscribeProxyData(const std::vector<std::string> &uris) = 0;
 };
 } // namespace OHOS::DataShare
 #endif

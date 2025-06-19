@@ -22,6 +22,7 @@
 #include "napi/native_api.h"
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
+#include "dataproxy_handle_common.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -54,6 +55,12 @@ class NapiPublishedObserver final: public NapiObserver, public std::enable_share
 public:
     NapiPublishedObserver(napi_env env, napi_value callback) : NapiObserver(env, callback) {};
     void OnChange(PublishedDataChangeNode &changeNode);
+};
+
+class NapiProxyDataObserver final: public NapiObserver, public std::enable_shared_from_this<NapiProxyDataObserver> {
+public:
+    NapiProxyDataObserver(napi_env env, napi_value callback) : NapiObserver(env, callback) {};
+    void OnChange(const std::vector<DataProxyChangeInfo> &changeNode);
 };
 } // namespace DataShare
 } // namespace OHOS

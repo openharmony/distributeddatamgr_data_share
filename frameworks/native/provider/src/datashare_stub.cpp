@@ -484,7 +484,7 @@ ErrCode DataShareStub::CmdRegisterObserverExtProvider(MessageParcel &data, Messa
         return ERR_INVALID_VALUE;
     }
 
-    bool ret = RegisterObserverExtProvider(uri, obServer, isDescendants);
+    int ret = RegisterObserverExtProvider(uri, obServer, isDescendants);
     if (!reply.WriteInt32(ret)) {
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
@@ -506,7 +506,7 @@ ErrCode DataShareStub::CmdUnregisterObserverExtProvider(MessageParcel &data, Mes
         return ERR_INVALID_VALUE;
     }
 
-    bool ret = UnregisterObserverExtProvider(uri, obServer);
+    int ret = UnregisterObserverExtProvider(uri, obServer);
     if (!reply.WriteInt32(ret)) {
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
@@ -519,10 +519,10 @@ ErrCode DataShareStub::CmdNotifyChangeExtProvider(MessageParcel &data, MessagePa
     ChangeInfo changeInfo;
     if (!ChangeInfo::Unmarshalling(changeInfo, data)) {
         LOG_ERROR("Failed to unmarshall changeInfo.");
-        return IPC_STUB_INVALID_DATA_ERR;
+        return ERR_INVALID_VALUE;
     }
 
-    bool ret = NotifyChangeExtProvider(changeInfo);
+    int ret = NotifyChangeExtProvider(changeInfo);
     if (!reply.WriteInt32(ret)) {
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
@@ -637,19 +637,19 @@ int32_t DataShareStub::UserDefineFunc(
     return 0;
 }
 
-bool DataShareStub::RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
+int DataShareStub::RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
     bool isDescendants)
 {
-    return true;
+    return 0;
 }
 
-bool DataShareStub::UnregisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
+int DataShareStub::UnregisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    return true;
+    return 0;
 }
-bool DataShareStub::NotifyChangeExtProvider(const ChangeInfo &changeInfo)
+int DataShareStub::NotifyChangeExtProvider(const ChangeInfo &changeInfo)
 {
-    return true;
+    return 0;
 }
 } // namespace DataShare
 } // namespace OHOS
