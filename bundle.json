@@ -65,7 +65,6 @@
                 "napi",
                 "relational_store",
                 "runtime_core",
-                "safwk",
                 "samgr"
             ],
             "third_party": []
