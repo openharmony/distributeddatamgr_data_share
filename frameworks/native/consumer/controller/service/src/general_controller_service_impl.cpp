@@ -187,10 +187,7 @@ int GeneralControllerServiceImpl::RegisterObserver(const Uri &uri,
         LOG_ERROR("Manager is nullptr");
         return E_DATA_SHARE_NOT_READY;
     }
-    // the ret of SetCallCount indicates whether the current call exceeds the access threshold, true means excced
-    if (manager->SetCallCount(__FUNCTION__, uri.ToString())) {
-        return DATA_SHARE_ERROR;
-    }
+    manager->SetCallCount(__FUNCTION__, uri.ToString());
     auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
         LOG_ERROR("get DataObsMgrClient failed");

@@ -399,41 +399,6 @@ HWTEST_F(DataShareThresholdTest, DeleteEx_Threshold_Test001, TestSize.Level1)
 }
 
 /**
-* @tc.name: RegisterObserver_Threshold_Test001
-* @tc.desc: test silent access registerObserver over threshold case
-* @tc.type: FUNC
-*/
-HWTEST_F(DataShareThresholdTest, RegisterObserver_Threshold_Test001, TestSize.Level1)
-{
-    LOG_INFO("RegisterObserver_Threshold_Test001::Start");
-
-    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI);
-    ASSERT_TRUE(helper != nullptr);
-
-    // not over threshold, registerObserver success
-    for (int i = 0; i < 2999; i++) {
-        sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest(i));
-        Uri uri(SLIENT_ACCESS_URI + std::to_string(i));
-        ASSERT_NE(dataObserver, nullptr);
-        EXPECT_EQ(dataObserver->code_, i);
-        int retVal = helper->RegisterObserver(uri, dataObserver);
-        EXPECT_EQ(retVal, 0);
-        helper->UnregisterObserver(uri, dataObserver);
-    }
-
-    // over threshold, registerObserver ret DATA_SHARE_ERROR(-1)
-    for (int i = 0; i < 10; i++) {
-        sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest(i));
-        Uri uri(SLIENT_ACCESS_URI + std::to_string(i));
-        ASSERT_NE(dataObserver, nullptr);
-        EXPECT_EQ(dataObserver->code_, i);
-        int retVal = helper->RegisterObserver(uri, dataObserver);
-        EXPECT_EQ(retVal, -1);
-    }
-    LOG_INFO("RegisterObserver_Threshold_Test001::End");
-}
-
-/**
 * @tc.name: Insert_Threshold_Test002
 * @tc.desc: test non-silent acess insert over threshold case
 * @tc.type: FUNC
@@ -647,39 +612,6 @@ HWTEST_F(DataShareThresholdTest, DeleteEx_Threshold_Test002, TestSize.Level1)
         EXPECT_EQ(retVal, 0);
     }
     LOG_INFO("DeleteEx_Threshold_Test002::End");
-}
-
-/**
-* @tc.name: RegisterObserver_Threshold_Test002
-* @tc.desc: test non-silent access registerObserver over threshold case
-* @tc.type: FUNC
-*/
-HWTEST_F(DataShareThresholdTest, RegisterObserver_Threshold_Test002, TestSize.Level1)
-{
-    LOG_INFO("RegisterObserver_Threshold_Test002::Start");
-
-    // not over threshold, registerObserver success
-    for (int i = 0; i < 2999; i++) {
-        sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest(i));
-        Uri uri(DATA_SHARE_URI + std::to_string(i));
-        ASSERT_NE(dataObserver, nullptr);
-        EXPECT_EQ(dataObserver->code_, i);
-        int retVal = g_exHelper->RegisterObserver(uri, dataObserver);
-        EXPECT_EQ(retVal, 0);
-        g_exHelper->UnregisterObserver(uri, dataObserver);
-    }
-
-    // over threshold, registerObserver success
-    for (int i = 0; i < 10; i++) {
-        sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest(i));
-        Uri uri(DATA_SHARE_URI + std::to_string(i));
-        ASSERT_NE(dataObserver, nullptr);
-        EXPECT_EQ(dataObserver->code_, i);
-        int retVal = g_exHelper->RegisterObserver(uri, dataObserver);
-        EXPECT_EQ(retVal, 0);
-        g_exHelper->UnregisterObserver(uri, dataObserver);
-    }
-    LOG_INFO("RegisterObserver_Threshold_Test002::End");
 }
 }
 }
