@@ -12,10 +12,12 @@
 // limitations under the License.
 
 import Ability from '@ohos.app.ability.UIAbility'
+import common from '@ohos.app.ability.common'
 
 export default class MainAbility extends Ability {
     onCreate(want, launchParam){
         // Ability is creating, initialize resources for this ability
+        AppStorage.setOrCreate<common.UIAbilityContext>('TestAbilityContext', this.context);
         console.log('[Demo] MainAbility onCreate');
         globalThis.abilityWant = want;
     }
