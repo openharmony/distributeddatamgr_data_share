@@ -234,7 +234,7 @@ export namespace dataShare {
     uri: string,
     options?: DataShareHelperOptions
   ): Promise<DataShareHelper>  {
-      return new Promise<DataShareHelper>((resolve: (v: DataShareHelper) => void, reject: (error: Object) => void) => {
+      return new Promise<DataShareHelper>((resolve, reject) => {
           let p = taskpool.execute(native_create, context, uri, options)
           p.then((e: NullishType) => {
               let r = e as DataShareHelper
@@ -278,7 +278,7 @@ export namespace dataShare {
     }
 
     query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>): Promise<DataShareResultSet> {
-        return new Promise<DataShareResultSet>((resolve: (v: DataShareResultSet) => void, reject: (error: Object) => void) => {
+        return new Promise<DataShareResultSet>((resolve, reject) => {
             let p = taskpool.execute(native_query, this, uri, predicates, columns)
             p.then((e: NullishType) => {
                 let r = e as DataShareResultSet
@@ -304,7 +304,7 @@ export namespace dataShare {
     }
 
     update(uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket): Promise<int> {
-        return new Promise<int>((resolve: (v: int) => void, reject: (error: Object) => void) => {
+        return new Promise<int>((resolve, reject) => {
             let p = taskpool.execute(native_update, this, uri, predicates, value)
             p.then((e: NullishType) => {
                 let r = e as int
@@ -343,7 +343,7 @@ export namespace dataShare {
     }
 
     publish(data: Array<PublishedItem>, bundleName: string, version?: int): Promise<Array<OperationResult>> {
-        return new Promise<Array<OperationResult>>((resolve: (v: Array<OperationResult>) => void, reject: (error: Object) => void) => {
+        return new Promise<Array<OperationResult>>((resolve, reject) => {
             let p = taskpool.execute(native_publish, this, data, bundleName, version)
             p.then((e: NullishType) => {
                 let r = e as Array<OperationResult>
@@ -364,7 +364,7 @@ export namespace dataShare {
     }
 
     getPublishedData(bundleName: string): Promise<Array<PublishedItem>> {
-        return new Promise<Array<PublishedItem>>((resolve: (v: Array<PublishedItem>) => void, reject: (error: Object) => void) => {
+        return new Promise<Array<PublishedItem>>((resolve, reject) => {
             let p = taskpool.execute(native_get_published_data, this, bundleName)
             p.then((e: NullishType) => {
                 let r = e as Array<PublishedItem>
@@ -385,7 +385,7 @@ export namespace dataShare {
     }
 
     insert(uri: string, value: ValuesBucket): Promise<int> {
-        return new Promise<int>((resolve: (v: int) => void, reject: (error: Object) => void) => {
+        return new Promise<int>((resolve, reject) => {
             let p = taskpool.execute(native_insert, this, uri, value)
             p.then((e: NullishType) => {
                 let r = e as int
@@ -406,7 +406,7 @@ export namespace dataShare {
     }
 
     batchInsert(uri: string, values: Array<ValuesBucket>): Promise<int> {
-        return new Promise<int>((resolve: (v: int) => void, reject: (error: Object) => void) => {
+        return new Promise<int>((resolve, reject) => {
             let p = taskpool.execute(native_batch_insert, this, uri, values)
             p.then((e: NullishType) => {
                 let r = e as int
@@ -427,7 +427,7 @@ export namespace dataShare {
     }
 
     delete(uri: string, predicates: dataSharePredicates.DataSharePredicates): Promise<int> {
-        return new Promise<int>((resolve: (v: int) => void, reject: (error: Object) => void) => {
+        return new Promise<int>((resolve, reject) => {
             let p = taskpool.execute(native_delete, this, uri, predicates)
             p.then((e: NullishType) => {
                 let r = e as int
@@ -439,7 +439,7 @@ export namespace dataShare {
     }
 
     close(): Promise<void> {
-        return new Promise<void>((resolve, reject: (error: Object) => void) => {
+        return new Promise<void>((resolve, reject) => {
             let p = taskpool.execute(native_close, this)
             p.then(() => {
                 resolve(undefined);

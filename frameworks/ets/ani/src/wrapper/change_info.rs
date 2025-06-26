@@ -13,7 +13,7 @@
 
 use std::collections::HashMap;
 
-use ani_rs::{callback::Callback, objects::AniFnObject, typed_array::Uint8Array, AniEnv};
+use ani_rs::{objects::AniFnObject, typed_array::Uint8Array, AniEnv};
 
 use crate::datashare::{BucketValue, ChangeInfo, ChangeType};
 
@@ -87,15 +87,13 @@ pub fn change_info_push_kv_null(change_info: &mut ChangeInfo, key: String, new_h
 pub fn execute_callback_changeinfo(callback_ptr: i64, env_ptr: i64, change_info: &ChangeInfo) {
     let env = AniEnv::from_raw(env_ptr as _);
     let callback = AniFnObject::from_raw(callback_ptr as _);
-    let callback = Callback::new(callback);
-    callback.execute_local(env, (change_info,)).unwrap();
+    callback.execute_local(&env, (change_info,)).unwrap();
 }
 
 pub fn execute_callback(callback_ptr: i64, env_ptr: i64) {
     let env = AniEnv::from_raw(env_ptr as _);
 
     let callback = AniFnObject::from_raw(callback_ptr as _);
-    let callback = Callback::new(callback);
 
-    callback.execute_local(env, ((),)).unwrap();
+    callback.execute_local(&env, ((),)).unwrap();
 }

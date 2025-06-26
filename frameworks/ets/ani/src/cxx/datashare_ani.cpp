@@ -961,5 +961,20 @@ void DataShareNativeOffPublishedDataChange(EnvPtrWrap envPtrWrap, rust::String a
     }
 }
 
+void DataShareNativeExtensionCallbackInt(double errorCode, rust::string errorMsg, int32_t data, int64_t nativePtr)
+{
+    //todo
+}
+
+void DataShareNativeExtensionCallbackObject(double errorCode, rust::string errorMsg, int64_t ptr, int64_t nativePtr)
+{
+    //todo
+}
+
+void DataShareNativeExtensionCallbackVoid(double errorCode, rust::string errorMsg, int64_t nativePtr)
+{
+    //todo
+}
+
 } // namespace DataShareAni
 } // namespace OHOS

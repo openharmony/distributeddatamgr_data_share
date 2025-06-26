@@ -13,7 +13,7 @@
 
 use std::ffi::CStr;
 
-use ani_rs::{ani_constructor, objects::AniObject, AniEnv, AniVm};
+use ani_rs::{ani_constructor, objects::AniObject, AniEnv};
 mod datashare;
 mod predicates;
 mod result_set;
@@ -30,8 +30,8 @@ const DATA_SHARE: &CStr = unsafe {
     CStr::from_bytes_with_nul_unchecked(b"L@ohos/data/dataShare/dataShare/DataShareHelperInner;\0")
 };
 
-const DATA_SHARE_EXTENSION: &CStr = unsafe {
-    CStr::from_bytes_with_nul_unchecked(b"L@ohos/application/DataShareExtensionAbility/DataShareExtensionAbility;\0")
+const DATA_SHARE_EXTENSION_HELPER: &CStr = unsafe {
+    CStr::from_bytes_with_nul_unchecked(b"L@ohos/application/DataShareExtensionAbility/dataShareExtensionAbilityHelper/CallbackWrap;\0")
 };
 
 pub fn get_native_ptr<'local>(env: &AniEnv<'local>, obj: &AniObject) -> i64 {
@@ -95,7 +95,6 @@ ani_constructor!(
         "native_off_changeinfo": datashare::native_off_changeinfo,
         "native_off_rdb_data_change": datashare::native_off_rdb_data_change,
         "native_off_published_data_change": datashare::native_off_published_data_change,
-
     ]
     class "L@ohos/data/dataShare/dataShare/DataShareHelperInner"
     [
@@ -109,5 +108,11 @@ ani_constructor!(
     class "L@ohos/data/dataShare/dataShare/Cleaner"
     [
         "native_clean" : datashare::native_clean,
+    ]
+    namespace "L@ohos/application/DataShareExtensionAbility/dataShareExtensionAbilityHelper"
+    [
+        "nativeExtensionCallbackInt": datashare_extension::native_extension_callback_int,
+        "nativeExtensionCallbackObject": datashare_extension::native_extension_callback_object,
+        "nativeExtensionCallbackVoid": datashare_extension::native_extension_callback_void,
     ]
 );
