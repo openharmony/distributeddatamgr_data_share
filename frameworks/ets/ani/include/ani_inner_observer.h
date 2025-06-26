@@ -17,12 +17,10 @@
 #define ANI_DATASHARE_INNER_OBSERVER_H
 
 #include <ani.h>
-  
 #include "cxx.h"
 #include "datashare_log.h"
 #include "datashare_helper.h"
 #include "datashare_observer.h"
-  
 namespace OHOS {
 using namespace DataShare;
 namespace DataShareAni {
@@ -31,10 +29,8 @@ namespace DataShareAni {
         ANIInnerDataShareObserver(long long envPtr, long long callbackPtr);
         void OnChange(const DataShareObserver::ChangeInfo &changeInfo = {}, bool isNotifyDetails = false);
         long long GetCallback();
-
     private:
         long long envPtr_;
-        // ani_class cls_;
         long long callbackPtr_;
     };
 }  // namespace DataShareAni
