@@ -151,10 +151,5 @@ Uri DataShareExtAbility::DenormalizeUri(const Uri &uri)
     Uri urivalue("");
     return uri;
 }
-
-void DataShareExtAbility::InitResult(std::shared_ptr<JsResult> result)
-{
-    return;
-}
 } // namespace DataShare
 } // namespace OHOS

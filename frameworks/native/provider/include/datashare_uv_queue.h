@@ -28,21 +28,21 @@
 namespace OHOS {
 namespace DataShare {
 class DataShareUvQueue {
-    using VoidFunc = std::function<void()>;
-    using BoolFunc = std::function<bool()>;
+    using NapiVoidFunc = std::function<void()>;
+    using NapiBoolFunc = std::function<bool()>;
 
 public:
     explicit DataShareUvQueue(napi_env env);
     virtual ~DataShareUvQueue() = default;
 
-    void JsSyncCall(VoidFunc func = VoidFunc(), BoolFunc retFunc = BoolFunc());
-    void StsSyncCall(VoidFunc func = VoidFunc(), BoolFunc retFunc = BoolFunc());
+    void SyncCall(NapiVoidFunc func = NapiVoidFunc(), NapiBoolFunc retFunc = NapiBoolFunc());
 
-    void CheckFuncAndExec(BoolFunc retFunc);
+    void CheckFuncAndExec(NapiBoolFunc retFunc);
 
 private:
     struct TaskEntry {
-        VoidFunc func;
+        napi_env env;
+        NapiVoidFunc func;
         bool done;
         std::condition_variable condition;
         std::mutex mutex;
@@ -51,7 +51,7 @@ private:
 
     static void LambdaForWork(TaskEntry* taskEntry);
 
-    napi_env naipEnv_ = nullptr;
+    napi_env env_ = nullptr;
     uv_loop_s* loop_ = nullptr;
 };
 } // namespace DataShare

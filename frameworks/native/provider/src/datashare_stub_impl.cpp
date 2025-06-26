@@ -27,7 +27,7 @@ using OHOS::Security::AccessToken::AccessTokenKit;
 
 constexpr int DEFAULT_NUMBER = -1;
 constexpr int PERMISSION_ERROR_NUMBER = -2;
-std::shared_ptr<DataShareExtAbility> DataShareStubImpl::GetOwner()
+std::shared_ptr<JsDataShareExtAbility> DataShareStubImpl::GetOwner()
 {
     if (extension_ == nullptr) {
         LOG_ERROR("extension_ is nullptr.");
@@ -70,11 +70,7 @@ std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const s
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
 
@@ -103,11 +99,7 @@ int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
 
@@ -127,11 +119,7 @@ int DataShareStubImpl::OpenRawFile(const Uri &uri, const std::string &mode)
         *ret = extension->OpenRawFile(uri, mode);
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc);
     return *ret;
 }
 
@@ -167,11 +155,7 @@ int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
 
@@ -208,11 +192,7 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
 
@@ -246,11 +226,7 @@ int DataShareStubImpl::BatchUpdate(const UpdateOperations &operations, std::vect
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return *ret;
 }
 
@@ -286,11 +262,7 @@ int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predica
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
 
@@ -326,11 +298,7 @@ std::pair<int32_t, int32_t> DataShareStubImpl::InsertEx(const Uri &uri, const Da
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return std::make_pair(E_OK, ret);
 }
 
@@ -367,11 +335,7 @@ std::pair<int32_t, int32_t> DataShareStubImpl::UpdateEx(const Uri &uri, const Da
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return std::make_pair(E_OK, ret);
 }
 
@@ -407,11 +371,7 @@ std::pair<int32_t, int32_t> DataShareStubImpl::DeleteEx(const Uri &uri, const Da
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return std::make_pair(E_OK, ret);
 }
 
@@ -449,11 +409,7 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return resultSet;
 }
 
@@ -485,11 +441,7 @@ std::string DataShareStubImpl::GetType(const Uri &uri)
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
 
@@ -524,11 +476,7 @@ int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareVa
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return ret;
 }
 
@@ -573,11 +521,7 @@ bool DataShareStubImpl::NotifyChange(const Uri &uri)
         *ret = extension->NotifyChange(uri);
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc);
     return *ret;
 }
 
@@ -610,11 +554,7 @@ Uri DataShareStubImpl::NormalizeUri(const Uri &uri)
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return normalizeUri;
 }
 
@@ -646,11 +586,7 @@ Uri DataShareStubImpl::DenormalizeUri(const Uri &uri)
         return isRecvReply;
     };
     std::lock_guard<std::mutex> lock(mutex_);
-    if (flag_ == 0) {
-        uvQueue_->JsSyncCall(syncTaskFunc, getRetFunc);
-    } else if (flag_ == 1) {
-        uvQueue_->StsSyncCall(syncTaskFunc, getRetFunc);
-    }
+    uvQueue_->SyncCall(syncTaskFunc, getRetFunc);
     return denormalizedUri;
 }
 

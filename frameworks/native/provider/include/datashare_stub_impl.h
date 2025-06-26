@@ -20,9 +20,7 @@
 #include "datashare_stub.h"
 #include "datashare_uv_queue.h"
 #include "js_datashare_ext_ability.h"
-#include "sts_datashare_ext_ability.h"
 #include "napi_remote_object.h"
-#include "ani.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -33,14 +31,6 @@ public:
         : extension_(extension)
     {
         uvQueue_ = std::make_shared<DataShare::DataShareUvQueue>(env);
-        flag_ = 0;
-    }
-
-    explicit DataShareStubImpl(const std::shared_ptr<StsDataShareExtAbility>& extension, ani_env env)
-        : extension_(extension)
-    {
-        uvQueue_ = std::make_shared<DataShare::DataShareUvQueue>(env);
-        flag_ = 1;
     }
 
     virtual ~DataShareStubImpl() {}
@@ -85,13 +75,12 @@ public:
     std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) override;
 
 private:
-    std::shared_ptr<DataShareExtAbility> GetOwner();
+    std::shared_ptr<JsDataShareExtAbility> GetOwner();
     bool CheckCallingPermission(const std::string &permission);
     void GetCallingInfo(CallingInfo& callingInfo);
-    std::shared_ptr<DataShareExtAbility> extension_;
+    std::shared_ptr<JsDataShareExtAbility> extension_;
     std::shared_ptr<DataShare::DataShareUvQueue> uvQueue_;
     std::mutex mutex_;
-    int flag_; // js:0, sts:1
 };
 } // namespace DataShare
 } // namespace OHOS

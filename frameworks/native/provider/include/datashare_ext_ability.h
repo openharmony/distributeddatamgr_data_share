@@ -33,61 +33,6 @@ class Runtime;
 }
 namespace DataShare {
 using namespace AbilityRuntime;
-
-class JsResult {
-public:
-    JsResult() = default;
-    bool GetRecvReply() const
-    {
-        return isRecvReply_;
-    }
-
-    void GetResult(int &value)
-    {
-        value = callbackResultNumber_;
-    }
-
-    void GetResult(std::string &value)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        value = callbackResultString_;
-    }
-
-    void GetResult(std::vector<std::string> &value)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        value = callbackResultStringArr_;
-    }
-
-    void GetResult(std::vector<BatchUpdateResult> &results)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        results = updateResults_;
-    }
-
-    void GetResultSet(std::shared_ptr<DataShareResultSet> &value)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        value = callbackResultObject_;
-    }
-
-    void GetBusinessError(DatashareBusinessError &businessError)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        businessError = businessError_;
-    }
-
-public:
-    bool isRecvReply_ = false;
-    int callbackResultNumber_ = -1;
-    std::string callbackResultString_ = "";
-    std::vector<std::string> callbackResultStringArr_ = {};
-    std::mutex asyncLock_;
-    std::shared_ptr<DataShareResultSet> callbackResultObject_ = nullptr;
-    DatashareBusinessError businessError_;
-    std::vector<BatchUpdateResult> updateResults_ = {};
-};
-
 class DataShareExtAbilityContext;
 class DataShareExtAbility;
 using CreatorFunc = std::function<DataShareExtAbility* (const std::unique_ptr<Runtime>& runtime)>;
@@ -304,8 +249,6 @@ public:
      * be found in the current environment.
      */
     virtual Uri DenormalizeUri(const Uri &uri);
-
-    virtual void InitResult(std::shared_ptr<JsResult> result);
 
     /**
      * @brief Set a creator function.
