@@ -20,8 +20,11 @@
 #include "datashare_predicates.h"
 #include "datashare_value_object.h"
 #include "datashare_values_bucket.h"
+#include "ikvstore_data_service.h"
+#include "idata_share_service.h"
+#include "iservice_registry.h"
+#include "sts_datashare_ext_ability.h"
 #include "wrapper.rs.h"
-
 #define UNIMPL_RET_CODE 0
 
 namespace OHOS {
@@ -106,6 +109,11 @@ int64_t DataSharePredicatesNew()
 
 void DataSharePredicatesClean(int64_t predicatesPtr)
 {
+    delete reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+}
+
+void DataSharePredicatesEqualTo(int64_t predicatesPtr, rust::String field, const ValueType& value)
+{
     std::string strFiled = std::string(field);
     EnumType type = value_type_get_type(value);
     switch (type) {
@@ -130,7 +138,7 @@ void DataSharePredicatesClean(int64_t predicatesPtr)
     }
 }
 
-void DataSharePredicatesEqualTo(int64_t predicatesPtr, rust::String field, const ValueType& value)
+void DataSharePredicatesNotEqualTo(int64_t predicatesPtr, rust::String field, const ValueType& value)
 {
     std::string strFiled = std::string(field);
     EnumType type = value_type_get_type(value);
@@ -156,48 +164,44 @@ void DataSharePredicatesEqualTo(int64_t predicatesPtr, rust::String field, const
     }
 }
 
-void DataSharePredicatesNotEqualTo(int64_t predicatesPtr, rust::String field, const ValueType& value)
+void DataSharePredicatesBeginWrap(int64_t predicatesPtr)
 {
     (void)(*reinterpret_cast<DataSharePredicates*>(predicatesPtr)->BeginWrap());
 }
 
-void DataSharePredicatesBeginWrap(int64_t predicatesPtr)
+void DataSharePredicatesEndWrap(int64_t predicatesPtr)
 {
     (void)(*reinterpret_cast<DataSharePredicates*>(predicatesPtr)->EndWrap());
 }
 
-void DataSharePredicatesEndWrap(int64_t predicatesPtr)
+void DataSharePredicatesOr(int64_t predicatesPtr)
 {
     (void)(*reinterpret_cast<DataSharePredicates*>(predicatesPtr)->Or());
 }
 
-void DataSharePredicatesOr(int64_t predicatesPtr)
+void DataSharePredicatesAnd(int64_t predicatesPtr)
 {
     (void)(*reinterpret_cast<DataSharePredicates*>(predicatesPtr)->And());
 }
 
-void DataSharePredicatesAnd(int64_t predicatesPtr)
+void DataSharePredicatesContains(int64_t predicatesPtr, rust::String field, rust::String value)
 {
     (void)(*reinterpret_cast<DataSharePredicates*>(predicatesPtr)->Contains(std::string(field), std::string(value)));
 }
 
-void DataSharePredicatesContains(int64_t predicatesPtr, rust::String field, rust::String value)
+void DataSharePredicatesIsNull(int64_t predicatesPtr, rust::String field)
 {
     (void)(*reinterpret_cast<DataSharePredicates*>(predicatesPtr)->IsNull(std::string(field)));
 }
 
-void DataSharePredicatesIsNull(int64_t predicatesPtr, rust::String field)
+void DataSharePredicatesIsNotNull(int64_t predicatesPtr, rust::String field)
 {
     (void)(*reinterpret_cast<DataSharePredicates*>(predicatesPtr)->IsNotNull(std::string(field)));
 }
 
-void DataSharePredicatesIsNotNull(int64_t predicatesPtr, rust::String field)
-{
-    (void)(*reinterpret_cast<DataSharePredicates*>(predicatesPtr)->Like(std::string(field), std::string(value)));
-}
-
 void DataSharePredicatesLike(int64_t predicatesPtr, rust::String field, rust::String value)
 {
+    (void)(*reinterpret_cast<DataSharePredicates*>(predicatesPtr)->Like(std::string(field), std::string(value)));
 }
 
 void DataSharePredicatesBetween(int64_t predicatesPtr, rust::String field,
@@ -248,7 +252,7 @@ void DataSharePredicatesBetween(int64_t predicatesPtr, rust::String field,
             break;
         }
     }
-    *reinterpret_cast<DataSharePredicates*>(predicatesPtr)->Between(std::string(field), strLow, strHigh);
+    (void)(*reinterpret_cast<DataSharePredicates*>(predicatesPtr)->Between(std::string(field), strLow, strHigh));
 }
 
 void DataSharePredicatesGreaterThan(int64_t predicatesPtr, rust::String field, const ValueType& value)
@@ -376,7 +380,11 @@ void DataSharePredicatesLimit(int64_t predicatesPtr, double total, double offset
 
 void DataSharePredicatesGroupBy(int64_t predicatesPtr, rust::Vec<rust::String> field)
 {
-    (void)(*reinterpret_cast<DataSharePredicates*>(predicatesPtr)->GroupBy(std::string(field)));
+    std::vector<std::string> strings;
+    for (const auto &str : field) {
+        strings.push_back(std::string(str));
+    }
+    (void)(*reinterpret_cast<DataSharePredicates*>(predicatesPtr)->GroupBy(strings));
 }
 
 void DataSharePredicatesIn(int64_t predicatesPtr, rust::String field,  rust::Vec<ValueType> value)
@@ -455,8 +463,6 @@ int64_t DataShareNativeCreate(int64_t context, rust::String strUri,
         };
         dataShareHelper = DataShareHelper::Creator(stdStrUri, options);
     }
-    jsRdbObsManager_ = std::make_shared<AniRdbSubscriberManager>(dataShareHelper);
-    jsPublishedObsManager_ = std::make_shared<AniPublishedSubscriberManager>(dataShareHelper);
     return reinterpret_cast<long long>(dataShareHelper.get());
 }
 
@@ -958,6 +964,95 @@ void DataShareNativeOffPublishedDataChange(EnvPtrWrap envPtrWrap, rust::String a
         envPtrWrap.callbackPtr, stdUris, innerSubscriberId);
     for (const auto &result : results) {
         publish_sret_push(sret, rust::String(result.key_), result.errCode_);
+    }
+}
+
+void DataShareNativeExtensionCallbackInt(double errorCode, rust::string errorMsg, int32_t data, int64_t nativePtr)
+{
+    AsyncCallBackPoint* point = static_cast<AsyncCallBackPoint*>(nativePtr);
+    if (point == nullptr) {
+        LOG_ERROR("AsyncCallBackPoint is nullptr.");
+        return;
+    }
+    auto jsResult = point->result;
+    if (result == nullptr) {
+        LOG_ERROR("JsResult is nullptr.");
+        return;
+    }
+    jsResult->callbackResultNumber_ = value;
+    DatashareBusinessError businessError;
+    businessError.SetCode((int)errorCode);
+    businessError.SetMessage(std::string(errorMsg));
+    jsResult->businessError_= businessError;
+    jsResult->isRecvReply_ = true;
+}
+
+void DataShareNativeExtensionCallbackObject(double errorCode, rust::string errorMsg, int64_t ptr, int64_t nativePtr)
+{
+    if (ptr == nullptr) {
+        LOG_ERROR("Result ptr is nullptr.");
+        return;
+    }
+    AsyncCallBackPoint* point = static_cast<AsyncCallBackPoint*>(nativePtr);
+    if (point == nullptr) {
+        LOG_ERROR("AsyncCallBackPoint is nullptr.");
+        return;
+    }
+    auto jsResult = point->result;
+    if (result == nullptr) {
+        LOG_ERROR("JsResult is nullptr.");
+        return;
+    }
+    ResultSetBridge *objPtr = reinterpret_cast<ResultSetBridge *>(ptr);
+    std::shared_ptr<ResultSetBridge> resultPtr(objPtr);
+    jsResult->callbackResultObject_ = std::make_shared<DataShareResultSet>(resultPtr);
+    businessError.SetCode((int)errorCode);
+    businessError.SetMessage(std::string(errorMsg));
+    jsResult->businessError_= businessError;
+    jsResult->isRecvReply_ = true;
+}
+
+void DataShareNativeExtensionCallbackVoid(double errorCode, rust::string errorMsg, int64_t nativePtr)
+{
+    AsyncPoint *point = reinterpret_cast<AsyncPoint *>(nativePtr);
+    if (point == nullptr) {
+        LOG_ERROR("AsyncPoint is nullptr.");
+        return;
+    }
+    if (point->context == nullptr) {
+        LOG_ERROR("AsyncContext is nullptr.");
+        return;
+    }
+    if (point->context->isNeedNotify_) {
+        auto manager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (manager == nullptr) {
+            LOG_ERROR("Get system ability manager failed!");
+            return;
+        }
+        auto remoteObject = manager->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+        if (remoteObject == nullptr) {
+            LOG_ERROR("CheckSystemAbility failed!");
+            return;
+        }
+        auto serviceProxy = std::make_shared<DataShareKvServiceProxy>(remoteObject);
+        if (serviceProxy == nullptr) {
+            LOG_ERROR("Create service proxy failed!");
+            return;
+        }
+        auto remote = serviceProxy->GetFeatureInterface("data_share");
+        if (remote == nullptr) {
+            LOG_ERROR("Get DataShare service failed!");
+            return;
+        }
+        MessageParcel data;
+        MessageParcel reply;
+        MessageOption option(MessageOption::TF_ASYNC);
+        if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+            LOG_ERROR("Write descriptor failed!");
+            return;
+        }
+        remote->SendRequest(
+            static_cast<uint32_t>(DataShareServiceInterfaceCode::DATA_SHARE_SERVICE_CMD_NOTIFY), data, reply, option);
     }
 }
 

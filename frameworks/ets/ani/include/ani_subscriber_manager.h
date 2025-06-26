@@ -18,12 +18,11 @@
 
 #include <memory>
 
-#include "ani_callbacks_manager.h"
-#include "ani_subscriber.h"
 #include "cxx.h"
 #include "concurrent_map.h"
+#include "ani_callbacks_manager.h"
 #include "datashare_helper.h"
-
+#include "ani_subscriber.h"
 
 namespace OHOS {
 using namespace DataShare;

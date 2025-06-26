@@ -13,12 +13,11 @@
  * limitations under the License.
  */
 
+#include "wrapper.rs.h"
+#include "ani_inner_observer.h"
+
 #include <chrono>
 #include <cinttypes>
-
-#include "ani_inner_observer.h"
-#include "wrapper.rs.h"
-
 namespace OHOS {
 using namespace DataShare;
 namespace DataShareAni {
@@ -28,7 +27,7 @@ ANIInnerDataShareObserver::ANIInnerDataShareObserver(long long envPtr,
 {
 }
 
-rust::Box<DataShareAni::ChangeInfo> ANIInnerDataShareObserver::ConvertChangeInfo(const std::string uri,
+rust::Box<DataShareAni::ChangeInfo> ConvertChangeInfo(const std::string uri,
     const DataShareObserver::ChangeInfo changeInfo)
 {
     rust::Box<DataShareAni::ChangeInfo> change_info = rust_create_change_info(changeInfo.changeType_,

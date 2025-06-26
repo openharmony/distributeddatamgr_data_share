@@ -20,7 +20,6 @@
 #include "ani_observer.h"
 #include "ani_subscriber_manager.h"
 #include "datashare_helper.h"
-
 namespace OHOS {
 using namespace DataShare;
 

@@ -15,12 +15,11 @@
 
 #define LOG_TAG "ANIObserver"
 
+#include "ani_observer.h"
+
 #include "adaptor.h"
 #include <memory>
-
-#include "ani_observer.h"
 #include "datashare_log.h"
-
 namespace OHOS {
 using namespace DataShare;
 namespace DataShareAni {

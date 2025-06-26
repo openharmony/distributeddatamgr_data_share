@@ -17,6 +17,7 @@
 #include <thread>
 #include <chrono>
 #include "datashare_log.h"
+#include "event_runner.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -25,7 +26,7 @@ constexpr int WAIT_TIME = 3;
 constexpr int SLEEP_TIME = 1;
 constexpr int TRY_TIMES = 2000;
 DataShareUvQueue::DataShareUvQueue(napi_env env)
-    : env_(env)
+    : naipEnv_(env)
 {
     napi_get_uv_event_loop(env, &loop_);
 }
@@ -50,16 +51,16 @@ void DataShareUvQueue::LambdaForWork(TaskEntry* taskEntry)
     }
 }
 
-void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
+void DataShareUvQueue::JsSyncCall(VoidFunc func, BoolFunc retFunc)
 {
-    auto *taskEntry = new TaskEntry {env_, std::move(func), false, {}, {}, std::atomic<int>(1)};
+    auto *taskEntry = new TaskEntry {std::move(func), false, {}, {}, std::atomic<int>(1)};
     {
         std::unique_lock<std::mutex> lock(taskEntry->mutex);
         taskEntry->count.fetch_add(1);
         auto task = [taskEntry]() {
             DataShareUvQueue::LambdaForWork(taskEntry);
         };
-        if (napi_status::napi_ok != napi_send_event(env_, task, napi_eprio_immediate)) {
+        if (napi_status::napi_ok != napi_send_event(naipEnv_, task, napi_eprio_immediate)) {
             LOG_ERROR("napi_send_event task failed");
             delete taskEntry;
             taskEntry = nullptr;
@@ -79,7 +80,12 @@ void DataShareUvQueue::SyncCall(NapiVoidFunc func, NapiBoolFunc retFunc)
     }
 }
 
-void DataShareUvQueue::CheckFuncAndExec(NapiBoolFunc retFunc)
+void DataShareUvQueue::StsSyncCall(VoidFunc func, BoolFunc retFunc)
+{
+    // todo
+}
+
+void DataShareUvQueue::CheckFuncAndExec(BoolFunc retFunc)
 {
     if (retFunc) {
         int tryTimes = TRY_TIMES;
