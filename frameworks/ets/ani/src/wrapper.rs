@@ -180,6 +180,7 @@ pub mod ffi {
             env_ptr: i64,
             uri: String,
             value_bucket: &ValuesBucketHashWrap,
+            native_ptr: i64,
         );
         fn rust_create_values_bucket() -> Box<ValuesBucketHashWrap<'static>>;
         fn value_bucket_push_kv_str(
@@ -210,6 +211,7 @@ pub mod ffi {
             env_ptr: i64,
             uri: String,
             value_buckets: &ValuesBucketArrayWrap,
+            native_ptr: i64,
         );
         fn rust_create_values_bucket_array() -> Box<ValuesBucketArrayWrap<'static>>;
         fn values_bucket_array_push_kv_str(
@@ -247,24 +249,28 @@ pub mod ffi {
             uri: String,
             predicates_ptr: i64,
             value_bucket: &ValuesBucketHashWrap,
+            native_ptr: i64,
         );
         fn call_arkts_delete(
             extension_ability_ptr: i64,
             env_ptr: i64,
             uri: String,
             predicates_ptr: i64,
+            native_ptr: i64,
         );
         fn call_arkts_query(
             extension_ability_ptr: i64,
             env_ptr: i64,
             uri: String,
             predicates_ptr: i64,
-            columns: Vec<String>
+            columns: Vec<String>,
+            native_ptr: i64,
         );
         pub fn call_arkts_on_create(
             extension_ability_ptr: i64,
             env_ptr: i64,
             ani_want: i64,
+            native_ptr: i64,
         );
     }
 
@@ -430,6 +436,12 @@ pub mod ffi {
             subscriberId: String,
             sret: &mut PublishSretParam,
         );
+
+        fn DataShareNativeExtensionCallbackInt(error_code: f64, error_msg: String, data: i32, native_ptr: i64);
+
+        fn DataShareNativeExtensionCallbackObject(error_code: f64, error_msg: String, ptr: i64, native_ptr: i64);
+
+        fn DataShareNativeExtensionCallbackVoid(error_code: f64, error_msg: String, native_ptr: i64);
     }
 }
 
