@@ -217,7 +217,6 @@ fn get_stage_mode_context<'local>(env: &AniEnv<'local>, context: AniObject<'loca
 
 pub fn native_create<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     context: AniObject<'local>,
     uri: AniObject<'local>,
     options: AniObject<'local>,
@@ -251,7 +250,6 @@ pub fn native_clean<'local>(env: AniEnv<'local>, ani_this: AniObject<'local>) {
 
 pub fn native_query<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     uri: AniObject<'local>,
     predicates: AniObject<'local>,
@@ -274,7 +272,6 @@ pub fn native_query<'local>(
 
 pub fn native_update<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     uri: AniObject<'local>,
     predicates: AniObject<'local>,
@@ -295,7 +292,6 @@ pub fn native_update<'local>(
 
 pub fn native_publish<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     data: AniObject<'local>,
     bundle_name: AniObject<'local>,
@@ -325,7 +321,6 @@ pub fn native_publish<'local>(
 
 pub fn native_get_published_data<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     bundle_name: AniObject<'local>,
 ) -> AniRef<'local> {
@@ -377,7 +372,6 @@ pub fn native_del_template<'local>(
 
 pub fn native_insert<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     uri: AniObject<'local>,
     value: AniObject<'local>,
@@ -396,7 +390,6 @@ pub fn native_insert<'local>(
 
 pub fn native_batch_insert<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     uri: AniObject<'local>,
     values: AniObject<'local>,
@@ -421,7 +414,6 @@ pub fn native_batch_insert<'local>(
 
 pub fn native_delete<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     uri: AniObject<'local>,
     predicates: AniObject<'local>,
@@ -435,7 +427,6 @@ pub fn native_delete<'local>(
 
 pub fn native_close<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
 ) {
     let datashare_helper_ptr = get_native_ptr(&env, &datashare_helper);
@@ -445,7 +436,6 @@ pub fn native_close<'local>(
 
 pub fn native_on<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     arktype: AniObject<'local>,
     uri: AniObject<'local>,
@@ -462,7 +452,6 @@ pub fn native_on<'local>(
 
 pub fn native_on_changeinfo<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     event: AniObject<'local>,
     arktype: AniObject<'local>,
@@ -482,7 +471,6 @@ pub fn native_on_changeinfo<'local>(
 
 pub fn native_on_rdb_data_change<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     arktype: AniObject<'local>,
     uris: AniObject<'local>,
@@ -512,7 +500,6 @@ pub fn native_on_rdb_data_change<'local>(
 
 pub fn native_on_published_data_change<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     arktype: AniObject<'local>,
     uris: AniObject<'local>,
@@ -542,7 +529,6 @@ pub fn native_on_published_data_change<'local>(
 
 pub fn native_off<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     arktype: AniObject<'local>,
     uri: AniObject<'local>,
@@ -565,7 +551,6 @@ pub fn native_off<'local>(
 
 pub fn native_off_changeinfo<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     event: AniObject<'local>,
     arktype: AniObject<'local>,
@@ -589,7 +574,6 @@ pub fn native_off_changeinfo<'local>(
 
 pub fn native_off_rdb_data_change<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     arktype: AniObject<'local>,
     uris: AniObject<'local>,
@@ -623,7 +607,6 @@ pub fn native_off_rdb_data_change<'local>(
 
 pub fn native_off_published_data_change<'local>(
     env: AniEnv<'local>,
-    _object: AniObject<'local>,
     datashare_helper: AniObject<'local>,
     arktype: AniObject<'local>,
     uris: AniObject<'local>,

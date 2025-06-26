@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ani_rs::{callback::Callback, objects::AniFnObject, AniEnv};
+use ani_rs::{objects::AniFnObject, AniEnv};
 
 use crate::datashare::{PublishedDataChangeNode, PublishedItem, PublishedItemData};
 
@@ -50,6 +50,5 @@ pub fn execute_callback_published_data_change(
     let env = AniEnv::from_raw(env_ptr as _);
 
     let callback = AniFnObject::from_raw(callback_ptr as _);
-    let callback = Callback::new(callback);
-    callback.execute_local(env, (node,)).unwrap();
+    callback.execute_local(&env, (node,)).unwrap();
 }

@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ani_rs::{callback::Callback, objects::AniFnObject, AniEnv};
+use ani_rs::{objects::AniFnObject, AniEnv};
 
 use crate::datashare::{RdbDataChangeNode, TemplateId};
 
@@ -40,6 +40,5 @@ pub fn rdb_data_change_node_push_data(node: &mut RdbDataChangeNode, data_item: S
 pub fn execute_callback_rdb_data_change(callback_ptr: i64, env_ptr: i64, node: &RdbDataChangeNode) {
     let env = AniEnv::from_raw(env_ptr as _);
     let callback = AniFnObject::from_raw(callback_ptr as _);
-    let callback = Callback::new(callback);
-    callback.execute_local(env, (node,)).unwrap();
+    callback.execute_local(&env, (node,)).unwrap();
 }

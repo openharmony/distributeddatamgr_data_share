@@ -127,6 +127,12 @@ void DataShareNativeOffPublishedDataChange(EnvPtrWrap envPtrWrap, rust::String a
                                            rust::Vec<rust::String> uris, rust::String subscriberId,
                                            PublishSretParam& sret);
 
+void DataShareNativeExtensionCallbackInt(double errorCode, rust::string errorMsg, int32_t data, int64_t nativePtr);
+
+void DataShareNativeExtensionCallbackObject(double errorCode, rust::string errorMsg, int64_t ptr, int64_t nativePtr);
+
+void DataShareNativeExtensionCallbackVoid(double errorCode, rust::string errorMsg, int64_t nativePtr);
+
 void ANIRegisterObserver(const std::string &uri, long long dataShareHelperPtr, long long envPtr,
     long long callbackPtr, bool isNotifyDetails = false);
 
@@ -137,6 +143,7 @@ void ANIUnRegisterObserver(const std::string &uri, long long dataShareHelperPtr,
     long long callbackPtr, bool isNotifyDetails = false);
 
 static std::map<std::string, std::list<sptr<ANIDataShareObserver>>> observerMap_;
+
 } // namespace DataShareAni
 } // namespace OHOS
 
