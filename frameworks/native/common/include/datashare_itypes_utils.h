@@ -213,11 +213,10 @@ bool Marshalling(const DataProxyChangeInfo &result, MessageParcel &parcel);
 
 template<>
 bool Unmarshalling(DataProxyChangeInfo &result, MessageParcel &parcel);
-}
-
 template<>
 bool Marshalling(const RegisterOption &option, MessageParcel &parcel);
 
 template<>
 bool Unmarshalling(RegisterOption &option, MessageParcel &parcel);
+}
 #endif
