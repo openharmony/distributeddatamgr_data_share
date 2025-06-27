@@ -221,7 +221,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ReRegisterObserverExtProvi
 
     // test ReRegister func
     connection->ReRegisterObserverExtProvider();
-    EXPECT_TRUE(connection->observerExtsProvider_.Empty());
+    // reRegister success, update observer map
+    EXPECT_FALSE(connection->observerExtsProvider_.Empty());
     connection = nullptr;
 
     LOG_INFO("DataShareConnection_ReRegisterObserverExtProvider_Test_001::End");
@@ -270,7 +271,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityConnectDone_Test_
     int resultCode = 0;
     connection->OnAbilityConnectDone(element, token, resultCode);
 
-    EXPECT_TRUE(connection->observerExtsProvider_.Empty());
+    // reRegister success, update observer map
+    EXPECT_FALSE(connection->observerExtsProvider_.Empty());
     connection = nullptr;
 
     LOG_INFO("DataShareConnection_OnAbilityConnectDone_Test_001::End");
