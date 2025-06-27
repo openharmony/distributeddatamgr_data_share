@@ -65,7 +65,7 @@ public:
     virtual bool NotifyChange(const Uri &uri) override;
 
     virtual int RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
-        bool isDescendants) override;
+        bool isDescendants, RegisterOption option) override;
 
     virtual int UnregisterObserverExtProvider(const Uri &uri,
         const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;

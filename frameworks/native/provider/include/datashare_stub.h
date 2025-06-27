@@ -68,7 +68,7 @@ private:
         MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
     // default return true, need override by users
     virtual int RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
-        bool isDescendants) override;
+        bool isDescendants, RegisterOption option) override;
     // default return true, need override by users
     virtual int UnregisterObserverExtProvider(const Uri &uri,
         const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;

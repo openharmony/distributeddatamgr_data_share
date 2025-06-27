@@ -581,7 +581,7 @@ bool DataShareProxy::NotifyChange(const Uri &uri)
 
 // send IPC request, and there is no default implemention for the provider. It needs to be handled by the user.
 int DataShareProxy::RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
-    bool isDescendants)
+    bool isDescendants, RegisterOption registerOption)
 {
     MessageParcel data;
     if (!data.WriteInterfaceToken(DataShareProxy::GetDescriptor())) {
@@ -589,7 +589,7 @@ int DataShareProxy::RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk
         return E_WRITE_TO_PARCE_ERROR;
     }
 
-    if (!ITypesUtil::Marshal(data, uri, dataObserver->AsObject(), isDescendants)) {
+    if (!ITypesUtil::Marshal(data, uri, dataObserver->AsObject(), isDescendants, registerOption)) {
         LOG_ERROR("fail to Marshalling");
         return E_MARSHAL_ERROR;
     }

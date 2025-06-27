@@ -1194,4 +1194,17 @@ bool UnmarshalValuesBucketVec(std::vector<DataShareValuesBucket> &values, Messag
     std::istringstream iss(std::string(buffer, length));
     return UnmarshalValuesBucketVecToBuffer(iss, values);
 }
+
+template<>
+bool Marshalling(const RegisterOption &option, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, option.isReconnect);
+}
+
+template<>
+bool Unmarshalling(RegisterOption &option, MessageParcel &parcel)
+{
+    return ITypesUtil::Unmarshal(parcel, option.isReconnect);
+}
+
 }  // namespace OHOS::ITypesUtil

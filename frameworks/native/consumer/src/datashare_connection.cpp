@@ -196,7 +196,7 @@ void DataShareConnection::ReRegisterObserverExtProvider()
     observerExtsProvider_.Clear();
     observerExtsProvider.ForEach([this](const auto &key, const auto &value) {
         for (const auto &param : value) {
-            auto ret = dataShareProxy_->RegisterObserverExtProvider(param.uri, key, param.isDescendants);
+            auto ret = dataShareProxy_->RegisterObserverExtProvider(param.uri, key, param.isDescendants, { true });
             if (ret != E_OK) {
                 LOG_ERROR(
                     "RegisterObserverExt failed, param.uri:%{public}s, ret:%{public}d, param.isDescendants:%{public}d",
