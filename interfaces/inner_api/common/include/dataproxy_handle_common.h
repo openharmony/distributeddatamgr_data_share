@@ -20,8 +20,9 @@
 
 namespace OHOS {
 namespace DataShare {
-static constexpr int32_t URI_MAX_SIZE = 128;
+static constexpr int32_t URI_MAX_SIZE = 256;
 static constexpr int32_t VALUE_MAX_SIZE = 4096;
+static constexpr int32_t APPIDENTIFIER_MAX_SIZE = 128;
 static constexpr int32_t URI_MAX_COUNT = 32;
 static constexpr int32_t PROXY_DATA_MAX_COUNT = 32;
 static constexpr int32_t ALLOW_LIST_MAX_COUNT = 256;

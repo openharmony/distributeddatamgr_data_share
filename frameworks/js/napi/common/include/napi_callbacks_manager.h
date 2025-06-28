@@ -121,7 +121,7 @@ std::vector<DataProxyResult> NapiCallbacksManager<Key, Observer>::AddObservers(
                 continue;
             }
             if (IsRegistered(*observer, callbacks_[key])) {
-                result.emplace_back(static_cast<std::string>(key), INNER_ERROR);
+                result.emplace_back(static_cast<std::string>(key), SUCCESS);
                 continue;
             }
             callbacks_[key].emplace_back(observer);

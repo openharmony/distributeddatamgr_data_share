@@ -18,6 +18,7 @@
 #include "datashare_error_impl.h"
 #include "datashare_js_utils.h"
 #include "datashare_log.h"
+#include "datashare_string_utils.h"
 #include "js_native_api_types.h"
 
 namespace OHOS {
@@ -115,8 +116,32 @@ napi_value NapiDataProxyHandle::Napi_CreateDataProxyHandle(napi_env env, napi_ca
 
 bool NapiDataProxyHandle::CheckIsParameterExceed(const std::vector<DataShareProxyData> &proxyDatas)
 {
+    if (proxyDatas.size() > PROXY_DATA_MAX_COUNT) {
+        return false;
+    }
     for (const auto &data : proxyDatas) {
+        // value's limit is 4096 bytes
+        if (data.value_.index() == DataProxyValueType::VALUE_STRING) {
+            std::string valStr = std::get<std::string>(data.value_);
+            if (valStr.size() > VALUE_MAX_SIZE) {
+                LOG_ERROR("ProxyData's value is over limit, uri: %{public}s",
+                    DataShareStringUtils::Anonymous(data.uri_).c_str());
+                return false;
+            }
+        }
         if (data.uri_.size() > URI_MAX_SIZE) {
+            LOG_ERROR("the size of uri %{public}s is over limit", DataShareStringUtils::Anonymous(data.uri_).c_str());
+            return false;
+        }
+    }
+    return true;
+}
+
+bool NapiDataProxyHandle::CheckIsParameterExceed(const std::vector<std::string> &uris)
+{
+    for (const auto &uri : uris) {
+        if (uri.size() > URI_MAX_SIZE) {
+            LOG_ERROR("the size of uri %{public}s is over limit", DataShareStringUtils::Anonymous(uri).c_str());
             return false;
         }
     }
@@ -138,11 +163,8 @@ napi_value NapiDataProxyHandle::Napi_Publish(napi_env env, napi_callback_info in
         NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
             context->error = std::make_shared<ParametersTypeError>("proxyData", "Array<ProxyData>"), napi_invalid_arg);
         context->proxyDatas = DataShareJSUtils::Convert2ProxyData(env, argv[0]);
-        NAPI_ASSERT_CALL_ERRCODE(env, !(context->proxyDatas.size() > PROXY_DATA_MAX_COUNT), context->error =
-            std::make_shared<ParametersLimitError>("proxyData", PROXY_DATA_MAX_COUNT), napi_invalid_arg);
-
-        NAPI_ASSERT_CALL_ERRCODE(env, CheckIsParameterExceed(context->proxyDatas),
-            context->error = std::make_shared<ParametersLimitError>("uri", URI_MAX_SIZE), napi_invalid_arg);
+        NAPI_ASSERT_CALL_ERRCODE(env, CheckIsParameterExceed(context->proxyDatas), context->error =
+            std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
         NAPI_CALL_BASE(env, napi_typeof(env, argv[1], &valueType), napi_invalid_arg);
         NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
             context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
@@ -187,8 +209,9 @@ napi_value NapiDataProxyHandle::Napi_Delete(napi_env env, napi_callback_info inf
             DataShareJSUtils::Convert2StrVector(env, argv[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
         NAPI_ASSERT_CALL_ERRCODE(env, !(context->uris.empty()),
             context->error = std::make_shared<ParametersTypeError>("uris", "empty"), napi_invalid_arg);
-        NAPI_ASSERT_CALL_ERRCODE(env, !(context->uris.size() > URI_MAX_COUNT),
-            context->error = std::make_shared<ParametersLimitError>("uris", URI_MAX_COUNT), napi_invalid_arg);
+        NAPI_ASSERT_CALL_ERRCODE(env, context->uris.size() <= URI_MAX_COUNT &&
+            CheckIsParameterExceed(context->uris), context->error =
+            std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
         NAPI_CALL_BASE(env, napi_typeof(env, argv[1], &valueType), napi_invalid_arg);
         NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
             context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
@@ -236,8 +259,9 @@ napi_value NapiDataProxyHandle::Napi_Get(napi_env env, napi_callback_info info)
             DataShareJSUtils::Convert2StrVector(env, argv[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
         NAPI_ASSERT_CALL_ERRCODE(env, !(context->uris.empty()),
             context->error = std::make_shared<ParametersTypeError>("uris", "empty"), napi_invalid_arg);
-        NAPI_ASSERT_CALL_ERRCODE(env, !(context->uris.size() > URI_MAX_COUNT),
-            context->error = std::make_shared<ParametersLimitError>("uris", URI_MAX_COUNT), napi_invalid_arg);
+        NAPI_ASSERT_CALL_ERRCODE(env, context->uris.size() <= URI_MAX_COUNT &&
+            CheckIsParameterExceed(context->uris), context->error =
+            std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
         if (!DataShareJSUtils::UnwrapDataProxyConfig(env, argv[1], context->config)) {
             context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig");
             return napi_invalid_arg;
@@ -275,10 +299,8 @@ napi_value NapiDataProxyHandle::Napi_On(napi_env env, napi_callback_info info)
         error = std::make_shared<ParametersNumError>("4"), error, nullptr);
     napi_valuetype valueType;
     NAPI_CALL(env, napi_typeof(env, argv[0], &valueType));
-    if (valueType != napi_string) {
-        LOG_ERROR("type is not string");
-        return nullptr;
-    }
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
+        error = std::make_shared<ParametersTypeError>("event", "string"), error, nullptr);
     std::string type = DataShareJSUtils::Convert2String(env, argv[0]);
     if (type == "dataChange") {
         return Napi_SubscribeProxyData(env, argc, argv, self);
@@ -299,10 +321,8 @@ napi_value NapiDataProxyHandle::Napi_Off(napi_env env, napi_callback_info info)
 
     napi_valuetype valueType;
     NAPI_CALL(env, napi_typeof(env, argv[0], &valueType));
-    if (valueType != napi_string) {
-        LOG_ERROR("type is not string");
-        return nullptr;
-    }
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_string,
+        error = std::make_shared<ParametersTypeError>("event", "string"), error, nullptr);
     std::string type = DataShareJSUtils::Convert2String(env, argv[0]);
     if (type == "dataChange") {
         return Napi_UnSubscribeProxyData(env, argc, argv, self);
@@ -344,10 +364,10 @@ napi_value NapiDataProxyHandle::Napi_SubscribeProxyData(napi_env env, size_t arg
         error = std::make_shared<ParametersTypeError>("uris", "Array<String>"), error, jsResults);
     std::vector<std::string> uris =
         DataShareJSUtils::Convert2StrVector(env, argv[PARAM1], DataShareJSUtils::DEFAULT_BUF_SIZE);
-    NAPI_ASSERT_CALL_ERRCODE(env, !(uris.empty()),
-        error = std::make_shared<ParametersTypeError>("uris", "empty"), nullptr);
-    NAPI_ASSERT_CALL_ERRCODE(env, !(uris.size() > URI_MAX_COUNT),
-        error = std::make_shared<ParametersLimitError>("uris", URI_MAX_COUNT), nullptr);
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, !(uris.empty()),
+        error = std::make_shared<ParametersTypeError>("uris", "empty"), error, jsResults);
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, uris.size() <= URI_MAX_COUNT &&
+        CheckIsParameterExceed(uris), error = std::make_shared<DataProxyHandleParamError>(), error, jsResults);
 
     NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_object,
@@ -383,10 +403,10 @@ napi_value NapiDataProxyHandle::Napi_UnSubscribeProxyData(napi_env env, size_t a
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_object,
         error = std::make_shared<ParametersTypeError>("uris", "Array<String>"), error, nullptr);
     auto uris = DataShareJSUtils::Convert2StrVector(env, argv[PARAM1], DataShareJSUtils::DEFAULT_BUF_SIZE);
-    NAPI_ASSERT_CALL_ERRCODE(env, !(uris.empty()),
-        error = std::make_shared<ParametersTypeError>("uris", "empty"), nullptr);
-    NAPI_ASSERT_CALL_ERRCODE(env, !(uris.size() > URI_MAX_COUNT),
-        error = std::make_shared<ParametersLimitError>("uris", URI_MAX_COUNT), nullptr);
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, !(uris.empty()),
+        error = std::make_shared<ParametersTypeError>("uris", "empty"), error, jsResults);
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, uris.size() <= URI_MAX_COUNT &&
+        CheckIsParameterExceed(uris), error = std::make_shared<DataProxyHandleParamError>(), error, jsResults);
 
     NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_object,
