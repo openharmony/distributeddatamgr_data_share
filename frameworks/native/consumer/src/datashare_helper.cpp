@@ -91,7 +91,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const string &strUri, 
     }
     if (options.isProxy_) {
         int ret = GetSilentProxyStatus(strUri, isSystem);
-        return ret == E_OK ? CreateServiceHelper("", bundleName, isSystem) : nullptr;
+        return (ret == E_OK || ret == E_METADATA_NOT_EXISTS) ? CreateServiceHelper("", bundleName, isSystem) : nullptr;
     } else {
         return CreateExtHelper(uri, options.token_, waitTime, isSystem);
     }
