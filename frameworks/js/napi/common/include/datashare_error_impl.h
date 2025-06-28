@@ -39,14 +39,11 @@ private:
     std::string wantNum;
 };
 
-class ParametersLimitError : public Error {
+class DataProxyHandleParamError : public Error {
 public:
-    ParametersLimitError(const std::string &name, const uint32_t &num) : name(name), num(num){};
+    DataProxyHandleParamError() = default;
     std::string GetMessage() const override;
     int GetCode() const override;
-private:
-    std::string name;
-    uint32_t num;
 };
 
 class DataShareHelperInitError : public Error {

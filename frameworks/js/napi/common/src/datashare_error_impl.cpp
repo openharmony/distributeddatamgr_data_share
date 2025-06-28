@@ -38,14 +38,15 @@ int ParametersNumError::GetCode() const
     return EXCEPTION_PARAMETER_CHECK;
 }
 
-std::string ParametersLimitError::GetMessage() const
+std::string DataProxyHandleParamError::GetMessage() const
 {
-    return "Parameter error. " + name + " over limit " + std::to_string(num);
+    return "Parameter error. Possible causes: 1.The size of parameter is over limit; "
+        "2.The length of array is over limit; 3.The format of uri is incorrect.";
 }
 
-int ParametersLimitError::GetCode() const
+int DataProxyHandleParamError::GetCode() const
 {
-    return EXCEPTION_PARAMETER_CHECK;
+    return EXCEPTION_PROXY_PARAMETER_CHECK;
 }
 
 std::string DataShareHelperInitError::GetMessage() const

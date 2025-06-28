@@ -19,6 +19,7 @@
 #include "dataproxy_handle_common.h"
 #include "datashare_log.h"
 #include "datashare_predicates_proxy.h"
+#include "datashare_string_utils.h"
 #include "datashare_valuebucket_convert.h"
 #include "js_native_api.h"
 #include "js_native_api_types.h"
@@ -882,6 +883,20 @@ bool DataShareJSUtils::UnwrapProxyDataItem(napi_env env, napi_value jsObject, Da
         return false;
     }
     Convert2Value(env, jsDataValue, proxyData.allowList_);
+    auto it = proxyData.allowList_.begin();
+    while (it != proxyData.allowList_.end()) {
+        if (it->size() > APPIDENTIFIER_MAX_SIZE) {
+            LOG_WARN("appIdentifier is over limit");
+            it = proxyData.allowList_.erase(it);
+        } else {
+            it++;
+        }
+    }
+    if (proxyData.allowList_.size() > ALLOW_LIST_MAX_COUNT) {
+        LOG_WARN("ProxyData's allowList is over limit, uri: %{public}s",
+            DataShareStringUtils::Anonymous(proxyData.uri_).c_str());
+        proxyData.allowList_.resize(ALLOW_LIST_MAX_COUNT);
+    }
     return true;
 }
 

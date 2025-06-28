@@ -46,6 +46,7 @@ private:
     void SetHandle(std::shared_ptr<DataProxyHandle> dataProxyHandle);
     std::shared_ptr<DataProxyHandle> GetHandle();
     static bool CheckIsParameterExceed(const std::vector<DataShareProxyData> &proxyDatas);
+    static bool CheckIsParameterExceed(const std::vector<std::string> &uris);
     std::shared_ptr<DataProxyHandle> dataProxyHandle_ = nullptr;
     std::shared_mutex mutex_;
     std::shared_ptr<NapiProxyDataSubscriberManager> jsProxyDataObsManager_ = nullptr;
