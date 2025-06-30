@@ -84,6 +84,16 @@ int DataShareHelperImpl::OpenFile(Uri &uri, const std::string &mode)
     return extSpCtl->OpenFile(uri, mode);
 }
 
+int DataShareHelperImpl::OpenFileWithErrCode(Uri &uri, const std::string &mode, int32_t &errCode)
+{
+    auto extSpCtl = extSpCtl_;
+    if (extSpCtl == nullptr) {
+        LOG_ERROR("extSpCtl is nullptr");
+        return DATA_SHARE_ERROR;
+    }
+    return extSpCtl->OpenFileWithErrCode(uri, mode, errCode);
+}
+
 int DataShareHelperImpl::OpenRawFile(Uri &uri, const std::string &mode)
 {
     auto extSpCtl = extSpCtl_;

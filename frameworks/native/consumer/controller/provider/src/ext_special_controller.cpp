@@ -34,6 +34,21 @@ int ExtSpecialController::OpenFile(const Uri &uri, const std::string &mode)
     return proxy->OpenFile(uri, mode);
 }
 
+int ExtSpecialController::OpenFileWithErrCode(const Uri &uri, const std::string &mode, int32_t &errCode)
+{
+    auto connection = connection_;
+    if (connection == nullptr) {
+        LOG_ERROR("connection is nullptr");
+        return INVALID_VALUE;
+    }
+    auto proxy = connection->GetDataShareProxy(uri_, token_);
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return INVALID_VALUE;
+    }
+    return proxy->OpenFileWithErrCode(uri, mode, errCode);
+}
+
 int ExtSpecialController::OpenRawFile(const Uri &uri, const std::string &mode)
 {
     auto connection = connection_;

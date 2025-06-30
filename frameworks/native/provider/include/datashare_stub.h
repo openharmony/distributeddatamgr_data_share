@@ -34,6 +34,7 @@ public:
 private:
     ErrCode CmdGetFileTypes(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdOpenFile(MessageParcel &data, MessageParcel &reply);
+    ErrCode CmdOpenFileWithErrCode(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdOpenRawFile(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdInsert(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdUpdate(MessageParcel &data, MessageParcel &reply);
@@ -56,6 +57,7 @@ private:
     ErrCode CmdRegisterObserverExtProvider(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdUnregisterObserverExtProvider(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdNotifyChangeExtProvider(MessageParcel &data, MessageParcel &reply);
+    ErrCode OpenFileInner(MessageParcel &data, MessageParcel &reply, int &fd);
 
     virtual int ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result) override;
     virtual int InsertExt(const Uri &uri, const DataShareValuesBucket &value, std::string &result) override;

@@ -31,6 +31,8 @@ public:
 
     int OpenFile(const Uri &uri, const std::string &mode);
 
+    int OpenFileWithErrCode(const Uri &uri, const std::string &mode, int32_t &errCode);
+
     int OpenRawFile(const Uri &uri, const std::string &mode);
 
     int BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results);
