@@ -147,7 +147,8 @@ HWTEST_F(DataShareStubTest, DataShareStub_CmdRegisterObserverExtProvider_Test_00
 
     MessageParcel data;
     data.WriteInterfaceToken(InterfaceToken);
-    bool ret = ITypesUtil::Marshal(data, uri, dataObserver->AsObject(), true);
+    RegisterOption registerOption;
+    bool ret = ITypesUtil::Marshal(data, uri, dataObserver->AsObject(), true, registerOption);
     EXPECT_TRUE(ret);
 
     MessageParcel reply;
