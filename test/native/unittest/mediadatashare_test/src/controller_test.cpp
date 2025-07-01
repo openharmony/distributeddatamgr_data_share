@@ -598,6 +598,49 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileTest_002, Te
     LOG_INFO("ControllerTest_ExtSpecialControllerOpenFileTest_002::End");
 }
 
+
+/**
+* @tc.name: ControllerTest_ExtSpecialControllerOpenFileWithErrCodeTest_001
+* @tc.desc: test OpenFileWithErrCode func
+* @tc.type: FUNC
+*/
+HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileWithErrCodeTest_001, TestSize.Level0)
+{
+    LOG_INFO("ControllerTest_ExtSpecialControllerOpenFileWithErrCodeTest_001::Start");
+    Uri uri("");
+    std::shared_ptr<DataShare::ExtSpecialController> tempExtSpeCon =
+        std::make_shared<DataShare::ExtSpecialController>(nullptr, uri, nullptr);
+    std::string mode = "test001";
+    int32_t errCode = 0;
+    int fd = tempExtSpeCon->OpenFileWithErrCode(uri, mode, errCode);
+    EXPECT_EQ(fd, -1);
+    LOG_INFO("ControllerTest_ExtSpecialControllerOpenFileWithErrCodeTest_001::End");
+}
+
+/**
+* @tc.name: ControllerTest_ExtSpecialControllerOpenFileWithErrCodeTest_002
+* @tc.desc: test OpenFileWithErrCode func
+* @tc.type: FUNC
+*/
+HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileWithErrCodeTest_002, TestSize.Level0)
+{
+    LOG_INFO("ControllerTest_ExtSpecialControllerOpenFileWithErrCodeTest_002::Start");
+    Uri uri("");
+    sptr<DataShare::DataShareConnection> connection =
+        new (std::nothrow) DataShare::DataShareConnection(uri, nullptr);
+    auto dataShareConnection =
+        std::shared_ptr<DataShare::DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
+            holder->DisconnectDataShareExtAbility();
+        });
+    std::shared_ptr<DataShare::ExtSpecialController> tempExtSpeCon =
+        std::make_shared<DataShare::ExtSpecialController>(dataShareConnection, uri, nullptr);
+    std::string mode = "test001";
+    int32_t errCode = 0;
+    int fd = tempExtSpeCon->OpenFileWithErrCode(uri, mode, errCode);
+    EXPECT_EQ(fd, -1);
+    LOG_INFO("ControllerTest_ExtSpecialControllerOpenFileWithErrCodeTest_002::End");
+}
+
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenRawFileTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerOpenRawFileTest_001::Start");

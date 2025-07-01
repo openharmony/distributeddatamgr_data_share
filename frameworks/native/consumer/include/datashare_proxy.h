@@ -36,6 +36,8 @@ public:
 
     virtual int OpenFile(const Uri &uri, const std::string &mode) override;
 
+    int OpenFileWithErrCode(const Uri &uri, const std::string &mode, int32_t &errCode);
+
     virtual int OpenRawFile(const Uri &uri, const std::string &mode) override;
 
     virtual int Insert(const Uri &uri, const DataShareValuesBucket &value) override;
@@ -88,6 +90,7 @@ public:
 
 private:
     bool CheckSize(const UpdateOperations &operations);
+    int OpenFileInner(const Uri &uri, const std::string &mode, uint32_t requestCode, int32_t &errCode);
     static inline BrokerDelegator<DataShareProxy> delegator_;
     static const size_t MTU_SIZE = 921600; // 900k
     static const size_t MAX_SIZE = 4000;

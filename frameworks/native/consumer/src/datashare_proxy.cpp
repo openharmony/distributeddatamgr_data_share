@@ -67,7 +67,7 @@ std::vector<std::string> DataShareProxy::GetFileTypes(const Uri &uri, const std:
     return types;
 }
 
-int DataShareProxy::OpenFile(const Uri &uri, const std::string &mode)
+int DataShareProxy::OpenFileInner(const Uri &uri, const std::string &mode, uint32_t requestCode, int32_t &errCode)
 {
     int fd = -1;
     MessageParcel data;
@@ -88,10 +88,10 @@ int DataShareProxy::OpenFile(const Uri &uri, const std::string &mode)
 
     MessageParcel reply;
     MessageOption option;
-    int32_t err = Remote()->SendRequest(
-        static_cast<uint32_t>(IDataShareInterfaceCode::CMD_OPEN_FILE), data, reply, option);
+    int32_t err = Remote()->SendRequest(requestCode, data, reply, option);
     if (err != E_OK) {
         LOG_ERROR("OpenFile fail to SendRequest. err: %{public}d", err);
+        errCode = err;
         return fd;
     }
 
@@ -102,6 +102,19 @@ int DataShareProxy::OpenFile(const Uri &uri, const std::string &mode)
     }
 
     return fd;
+}
+
+int DataShareProxy::OpenFile(const Uri &uri, const std::string &mode)
+{
+    int32_t errCode = 0;
+    uint32_t requestCode = static_cast<uint32_t>(IDataShareInterfaceCode::CMD_OPEN_FILE);
+    return OpenFileInner(uri, mode, requestCode, errCode);
+}
+
+int DataShareProxy::OpenFileWithErrCode(const Uri &uri, const std::string &mode, int32_t &errCode)
+{
+    uint32_t requestCode = static_cast<uint32_t>(IDataShareInterfaceCode::CMD_OPEN_FILE_WITH_ERR_CODE);
+    return OpenFileInner(uri, mode, requestCode, errCode);
 }
 
 int DataShareProxy::OpenRawFile(const Uri &uri, const std::string &mode)

@@ -59,6 +59,8 @@ public:
 
     int OpenFile(Uri &uri, const string &mode) override;
 
+    int OpenFileWithErrCode(Uri &uri, const string &mode, int32_t &errCode) override;
+
     int OpenRawFile(Uri &uri, const string &mode) override;
 
     int Insert(Uri &uri, const DataShareValuesBucket &value) override;

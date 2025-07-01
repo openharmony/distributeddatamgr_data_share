@@ -2235,5 +2235,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotifyChangeExtProvider_Test_002
     helper->NotifyChangeExtProvider(changeInfo);
     LOG_INFO("MediaDataShare_NotifyChangeExtProvider_Test_002::End");
 }
+
+/**
+* @tc.name: MediaDataShare_OpenFileWithErrCode_Test_001
+* @tc.desc: test OpenFileWithErrCode normal func
+* @tc.type: FUNC
+*/
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_OpenFileWithErrCode_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_OpenFileWithErrCode_Test_001::Start");
+
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_NE(helper, nullptr);
+
+    Uri uri(MEDIALIBRARY_DATA_URI);
+    std::string mode = "rw";
+
+    int32_t errCode = 0;
+    int fd = helper->OpenFileWithErrCode(uri, mode, errCode);
+    EXPECT_LT(fd, 0);
+    EXPECT_EQ(errCode, -1);
+    LOG_INFO("MediaDataShare_OpenFileWithErrCode_Test_001::End");
+}
 } // namespace DataShare
 } // namespace OHOS

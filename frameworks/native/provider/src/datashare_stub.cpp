@@ -37,6 +37,8 @@ DataShareStub::DataShareStub()
 {
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_GET_FILE_TYPES)] = &DataShareStub::CmdGetFileTypes;
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_OPEN_FILE)] = &DataShareStub::CmdOpenFile;
+    stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_OPEN_FILE_WITH_ERR_CODE)] =
+        &DataShareStub::CmdOpenFileWithErrCode;
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_OPEN_RAW_FILE)] = &DataShareStub::CmdOpenRawFile;
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_INSERT)] = &DataShareStub::CmdInsert;
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_UPDATE)] = &DataShareStub::CmdUpdate;
@@ -128,7 +130,7 @@ ErrCode DataShareStub::CmdGetFileTypes(MessageParcel &data, MessageParcel &reply
     return E_OK;
 }
 
-ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
+ErrCode DataShareStub::OpenFileInner(MessageParcel &data, MessageParcel &reply, int &fd)
 {
     Uri uri("");
     std::string mode;
@@ -140,9 +142,40 @@ ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("mode is nullptr");
         return ERR_INVALID_VALUE;
     }
-    int fd = OpenFile(uri, mode);
+    fd = OpenFile(uri, mode);
+    return E_OK;
+}
+
+ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
+{
+    int fd = -1;
+    int ret = OpenFileInner(data, reply, fd);
+    if (ret != E_OK) {
+        return ret;
+    }
+
     if (fd < 0) {
         return ERR_INVALID_DATA;
+    }
+    if (!reply.WriteFileDescriptor(fd)) {
+        LOG_ERROR("fail to WriteFileDescriptor fd");
+        close(fd);
+        return ERR_INVALID_VALUE;
+    }
+    close(fd);
+    return E_OK;
+}
+
+ErrCode DataShareStub::CmdOpenFileWithErrCode(MessageParcel &data, MessageParcel &reply)
+{
+    int fd = -1;
+    int ret = OpenFileInner(data, reply, fd);
+    if (ret != E_OK) {
+        return ret;
+    }
+
+    if (fd < 0) {
+        return fd;
     }
     if (!reply.WriteFileDescriptor(fd)) {
         LOG_ERROR("fail to WriteFileDescriptor fd");

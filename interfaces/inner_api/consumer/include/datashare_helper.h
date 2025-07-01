@@ -126,6 +126,20 @@ public:
     virtual int OpenFile(Uri &uri, const std::string &mode) = 0;
 
     /**
+     * @brief Opens a file in a specified remote path.
+     *
+     * @param uri Indicates the path of the file to open.
+     * @param mode Indicates the file open mode, which can be "r" for read-only access, "w" for write-only access
+     * (erasing whatever data is currently in the file), "wt" for write access that truncates any existing file,
+     * "wa" for write-only access to append to any existing data, "rw" for read and write access on any existing data,
+     *  or "rwt" for read and write access that truncates any existing file.
+     * @param errCode real error code.
+     *
+     * @return Returns the file descriptor.
+     */
+    virtual int OpenFileWithErrCode(Uri &uri, const std::string &mode, int32_t &errCode) = 0;
+
+    /**
      * @brief This is like openFile, open a file that need to be able to return sub-sections of files，often assets
      * inside of their .hap.
      *
