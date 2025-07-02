@@ -507,7 +507,8 @@ ErrCode DataShareStub::CmdRegisterObserverExtProvider(MessageParcel &data, Messa
     Uri uri("");
     sptr<IRemoteObject> observer;
     bool isDescendants = false;
-    if (!ITypesUtil::Unmarshal(data, uri, observer, isDescendants)) {
+    RegisterOption option;
+    if (!ITypesUtil::Unmarshal(data, uri, observer, isDescendants, option)) {
         LOG_ERROR("Unmarshalling uri and observer failed");
         return ERR_INVALID_VALUE;
     }
@@ -517,7 +518,7 @@ ErrCode DataShareStub::CmdRegisterObserverExtProvider(MessageParcel &data, Messa
         return ERR_INVALID_VALUE;
     }
 
-    int ret = RegisterObserverExtProvider(uri, obServer, isDescendants);
+    int ret = RegisterObserverExtProvider(uri, obServer, isDescendants, option);
     if (!reply.WriteInt32(ret)) {
         LOG_ERROR("fail to WriteInt32 ret");
         return ERR_INVALID_VALUE;
@@ -671,7 +672,7 @@ int32_t DataShareStub::UserDefineFunc(
 }
 
 int DataShareStub::RegisterObserverExtProvider(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
-    bool isDescendants)
+    bool isDescendants, RegisterOption option)
 {
     return 0;
 }

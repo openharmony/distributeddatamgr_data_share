@@ -61,6 +61,10 @@ struct ExecResultSet {
     ExecErrorCode errorCode;
     std::vector<ExecResult> results;
 };
+
+struct RegisterOption {
+    bool isReconnect;
+};
 }
 }
 #endif // DATASHARE_OPERATION_STATEMENT_H

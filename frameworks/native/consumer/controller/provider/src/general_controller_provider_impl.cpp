@@ -200,7 +200,7 @@ int GeneralControllerProviderImpl::RegisterObserverExtProvider(const Uri &uri,
         return E_PROVIDER_NOT_CONNECTED;
     }
     // the non-silent proxy's RegisterObserverExtProvider returns int and 0 means ok
-    int ret = proxy->RegisterObserverExtProvider(uri, dataObserver, isDescendants);
+    int ret = proxy->RegisterObserverExtProvider(uri, dataObserver, isDescendants, { false });
     LOG_INFO("Register non-silent observerExt provider ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
     // store the observer when successfully registered.

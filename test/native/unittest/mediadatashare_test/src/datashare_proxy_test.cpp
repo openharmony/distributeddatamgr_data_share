@@ -116,7 +116,7 @@ HWTEST_F(DataShareProxyTest, DataShareProxy_RegisterObserverExtProvider_Test_001
     sptr<IDataAbilityObserverTest> dataObserver = new (std::nothrow) IDataAbilityObserverTest();
     ASSERT_NE(dataObserver, nullptr);
     // datashare_stub returns default 0(E_OK)
-    int ret = proxy->RegisterObserverExtProvider(uri, dataObserver, true);
+    int ret = proxy->RegisterObserverExtProvider(uri, dataObserver, true, { false });
     EXPECT_EQ(ret, 0);
 
     LOG_INFO("DataShareProxy_RegisterObserverExtProvider_Test_001::End");

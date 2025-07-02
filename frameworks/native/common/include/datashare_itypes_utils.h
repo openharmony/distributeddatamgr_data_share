@@ -51,6 +51,7 @@ using DataShareValueObject = DataShare::DataShareValueObject;
 using DataProxyValue = DataShare::DataProxyValue;
 using DataProxyGetResult = DataShare::DataProxyGetResult;
 using DataProxyChangeInfo = DataShare::DataProxyChangeInfo;
+using RegisterOption = DataShare::RegisterOption;
 
 template<>
 bool Marshalling(const BatchUpdateResult &result, MessageParcel &parcel);
@@ -212,5 +213,10 @@ bool Marshalling(const DataProxyChangeInfo &result, MessageParcel &parcel);
 
 template<>
 bool Unmarshalling(DataProxyChangeInfo &result, MessageParcel &parcel);
+template<>
+bool Marshalling(const RegisterOption &option, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(RegisterOption &option, MessageParcel &parcel);
 }
 #endif
