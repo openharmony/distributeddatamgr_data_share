@@ -202,6 +202,8 @@ void DataShareConnection::ReRegisterObserverExtProvider()
                     "RegisterObserverExt failed, param.uri:%{public}s, ret:%{public}d, param.isDescendants:%{public}d",
                     DataShareStringUtils::Anonymous(param.uri.ToString()).c_str(), ret, param.isDescendants
                 );
+            } else {
+                UpdateObserverExtsProviderMap(param.uri, key, param.isDescendants);
             }
         }
         return false;
