@@ -91,13 +91,8 @@ static bool getNameSpace(ani_env *env, ani_namespace &ns)
 
 static bool getClass(ani_env *env, ani_class &cls)
 {
-    ani_namespace ns;
-    if (!getNameSpace(env, ns)) {
-        return false;
-    }
-
-    const char *className = "LDataShareHelperInner;";
-    if (ANI_OK != env->Namespace_FindClass(ns, className, &cls)) {
+    const char *className = "@ohos.data.dataShare.dataShare.DataShareHelperInner";
+    if (ANI_OK != env->FindClass(className, &cls)) {
         LOG_ERROR("Not found class name '%{public}s'", className);
         return false;
     }
@@ -257,8 +252,8 @@ static ani_object ANI_Create([[maybe_unused]] ani_env *env, ani_object context, 
         return nullptr;
     }
 
-    const char *spaceName = "L@ohos/data/dataShare/dataShare;";
-    const char *className = "LDataShareHelperInner;";
+    const char *spaceName = "@ohos.data.dataShare.dataShare";
+    const char *className = "DataShareHelperInner";
     ani_object dataShareObj = AniObjectUtils::Create(env, spaceName, className,
         reinterpret_cast<ani_long>(shareptrData));
 
@@ -544,7 +539,7 @@ static ani_object ANI_Query([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_
         return nullptr;
     }
 
-    const char *className = "L@ohos/data/DataShareResultSet/DataShareResultSetImpl;";
+    const char *className = "@ohos.data.DataShareResultSet.DataShareResultSetImpl";
     ani_object resultSetObj = AniObjectUtils::Create(env, className,
         reinterpret_cast<ani_long>(shareptrData));
 
@@ -674,8 +669,8 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_ERROR;
     }
 
-    static const char *cleanerName = "LCleaner;";
-    auto cleanerCls = AniTypeFinder(env).FindClass(ns, cleanerName);
+    static const char *cleanerName = "@ohos.data.dataShare.dataShare.DataShareHelperInner.Cleaner";
+    auto cleanerCls = AniTypeFinder(env).FindClass(cleanerName);
     NativePtrCleaner(env).Bind(cleanerCls.value());
 
     *result = ANI_VERSION_1;
