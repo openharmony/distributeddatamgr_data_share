@@ -539,9 +539,22 @@ ohos_unittest("DataShareBlockWriterImplTest") {
 }
 
 ohos_unittest("DataShareHelperTest") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  
   module_out_path = "data_share/data_share/inner_tests"
 
-  include_dirs = [ "${datashare_base_path}/frameworks/native/common/include/" ]
+  include_dirs = [
+    "${datashare_base_path}/frameworks/native/common/include/",
+    "${datashare_base_path}/test/native/unittest/mock",
+  ]
 
   sources = [ "./unittest/mediadatashare_test/src/datashare_helper_test.cpp" ]
 
