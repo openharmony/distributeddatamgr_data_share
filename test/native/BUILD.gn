@@ -445,6 +445,7 @@ ohos_unittest("DataShareHelperImplTest") {
     "${datashare_native_proxy_path}/src/idata_share_client_death_observer.cpp",
     "${datashare_native_proxy_path}/src/published_data_subscriber_manager.cpp",
     "${datashare_native_proxy_path}/src/rdb_subscriber_manager.cpp",
+    "${datashare_native_proxy_path}/src/proxy_data_subscriber_manager.cpp",
     "./unittest/mediadatashare_test/src/datashare_helper_impl_test.cpp",
   ]
 

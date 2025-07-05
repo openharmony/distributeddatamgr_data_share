@@ -416,7 +416,8 @@ bool Unmarshalling(DataShareValueObject &value, MessageParcel &parcel)
 template<>
 bool Marshalling(const DataProxyValue &value, MessageParcel &parcel)
 {
-    if (!ITypesUtil::Marshal(parcel, value.index())) {
+    int32_t index = value.index();
+    if (!ITypesUtil::Marshal(parcel, index)) {
         return false;
     }
     switch (value.index()) {

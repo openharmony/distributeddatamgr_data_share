@@ -218,7 +218,7 @@ std::vector<DataProxyResult> NapiCallbacksManager<Key, Observer>::DelObservers(
         for (auto &key : keys) {
             auto it = callbacks_.find(key);
             if (it == callbacks_.end()) {
-                result.emplace_back(key, INNER_ERROR);
+                result.emplace_back(key, URI_NOT_EXIST);
                 continue;
             }
             if (observer == nullptr) {
@@ -227,7 +227,7 @@ std::vector<DataProxyResult> NapiCallbacksManager<Key, Observer>::DelObservers(
                 continue;
             }
             if (!IsRegistered(*observer, it->second)) {
-                result.emplace_back(key, INNER_ERROR);
+                result.emplace_back(key, URI_NOT_EXIST);
                 continue;
             }
             std::vector<ObserverNode> &callbacks = it->second;

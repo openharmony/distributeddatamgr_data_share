@@ -106,7 +106,6 @@ napi_value NapiDataProxyHandle::Napi_CreateDataProxyHandle(napi_env env, napi_ca
     };
     auto exec = [ctxInfo](AsyncCall::Context *ctx) {
         auto ret = DataProxyHandle::Create();
-        ctxInfo->errCode = ret.first;
         ctxInfo->dataProxyHandle = ret.second;
     };
     ctxInfo->SetAction(std::move(input), std::move(output));
@@ -151,7 +150,6 @@ bool NapiDataProxyHandle::CheckIsParameterExceed(const std::vector<std::string> 
 napi_value NapiDataProxyHandle::Napi_Publish(napi_env env, napi_callback_info info)
 {
     auto context = std::make_shared<ContextInfo>();
-    context->config.type_ = context->type;
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2) {
             context->error = std::make_shared<ParametersNumError>("2");
@@ -194,7 +192,6 @@ napi_value NapiDataProxyHandle::Napi_Publish(napi_env env, napi_callback_info in
 napi_value NapiDataProxyHandle::Napi_Delete(napi_env env, napi_callback_info info)
 {
     auto context = std::make_shared<ContextInfo>();
-    context->config.type_ = context->type;
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2) {
             context->error = std::make_shared<ParametersNumError>("2");
@@ -244,7 +241,6 @@ napi_value NapiDataProxyHandle::Napi_Delete(napi_env env, napi_callback_info inf
 napi_value NapiDataProxyHandle::Napi_Get(napi_env env, napi_callback_info info)
 {
     auto context = std::make_shared<ContextInfo>();
-    context->config.type_ = context->type;
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
         if (argc != 2) {
             context->error = std::make_shared<ParametersNumError>("2");
