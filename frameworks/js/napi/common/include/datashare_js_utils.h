@@ -137,7 +137,7 @@ public:
         std::vector<PredicateTemplateNode> &predicates);
     static bool UnwrapStringByPropertyName(napi_env env, napi_value jsObject, const char *propertyName,
         std::string &value);
-    static bool UnwrapDataProxyValue(napi_env env, napi_value jsObject, DataProxyValue &value);
+    static bool UnwrapDataProxyValue(napi_env env, napi_value jsObject, DataProxyValue &value, bool &isValueUndefined);
     static bool UnwrapProxyDataItem(napi_env env, napi_value jsObject, DataShareProxyData &proxyData);
     static bool UnwrapProxyDataItemVector(napi_env env, napi_value value, std::vector<DataShareProxyData> &proxyDatas);
     static bool UnwrapDataProxyConfig(napi_env env, napi_value value, DataProxyConfig &config);
