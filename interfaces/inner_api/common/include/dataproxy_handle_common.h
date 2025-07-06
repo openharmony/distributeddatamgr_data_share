@@ -76,7 +76,7 @@ struct DataShareProxyData {
         const std::vector<std::string> &allowList = {}) : uri_(uri), value_(value), allowList_(allowList) {}
 
     std::string uri_;
-    DataProxyValue value_;
+    DataProxyValue value_ = "";
     std::vector<std::string> allowList_;
     bool isAllowListExceed = false;
 };

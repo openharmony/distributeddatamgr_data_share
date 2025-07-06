@@ -55,7 +55,6 @@ private:
         napi_env env = nullptr;
         napi_ref ref = nullptr;
         bool isStageMode = true;
-        int32_t errCode;
         std::string strUri;
         std::shared_ptr<DataProxyHandle> dataProxyHandle = nullptr;
 
@@ -75,7 +74,6 @@ private:
 
         DatashareBusinessError businessError;
         std::vector<DataShareProxyData> proxyDatas;
-        DataProxyType type = DataProxyType::SHARED_CONFIG;
         DataProxyConfig config;
         std::string bundleName;
         std::vector<std::string> uris;
@@ -83,7 +81,10 @@ private:
         std::vector<DataProxyGetResult> proxyGetResult;
         int32_t resultNumber = 0;
 
-        ContextInfo() : Context(nullptr, nullptr) {};
+        ContextInfo() : Context(nullptr, nullptr)
+        {
+            config.type_ = DataProxyType::SHARED_CONFIG;
+        };
         ContextInfo(InputAction input, OutputAction output) : Context(std::move(input), std::move(output)) {};
         virtual ~ContextInfo() {};
 

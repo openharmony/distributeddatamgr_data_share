@@ -24,6 +24,7 @@
 #include "iservice_registry.h"
 #include "system_ability_definition.h"
 #include "rdb_subscriber_manager.h"
+#include "proxy_data_subscriber_manager.h"
 #include "published_data_subscriber_manager.h"
 
 namespace OHOS {
@@ -130,6 +131,7 @@ DataShareManagerImpl::DataShareManagerImpl()
         LOG_INFO("RecoverObs start");
         RdbSubscriberManager::GetInstance().RecoverObservers(proxy);
         PublishedDataSubscriberManager::GetInstance().RecoverObservers(proxy);
+        ProxyDataSubscriberManager::GetInstance().RecoverObservers(proxy);
     });
 }
 

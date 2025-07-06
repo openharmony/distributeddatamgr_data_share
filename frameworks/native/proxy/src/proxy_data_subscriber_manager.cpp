@@ -123,18 +123,15 @@ void ProxyDataSubscriberManager::RecoverObservers(std::shared_ptr<DataShareServi
     }
 
     std::vector<std::string> uris;
-    {
-        std::lock_guard<decltype(mutex_)> lck(mutex_);
-        for (auto &it : callbacks_) {
-            uris.emplace_back(it.first);
-        }
+    std::vector<Key> keys = CallbacksManager::GetKeys();
+    for (const auto& key : keys) {
+        uris.emplace_back(key.uri_);
     }
-
     auto results = proxy->SubscribeProxyData(uris, serviceCallback_);
     for (const auto& result : results) {
         if (result.result_ != SUCCESS) {
-            LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d",
-                result.uri_.c_str(), result.result_);
+            LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d", result.uri_.c_str(),
+                result.result_);
         }
     }
 }
