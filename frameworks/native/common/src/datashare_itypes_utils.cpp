@@ -303,13 +303,15 @@ bool Unmarshalling(ExecResultSet &execResultSet, MessageParcel &parcel)
 template<>
 bool Marshalling(const DataShareProxyData &proxyData, MessageParcel &parcel)
 {
-    return ITypesUtil::Marshal(parcel, proxyData.uri_, proxyData.value_, proxyData.allowList_);
+    return ITypesUtil::Marshal(parcel, proxyData.uri_,
+        proxyData.value_, proxyData.isValueUndefined, proxyData.allowList_, proxyData.isAllowListUndefined);
 }
 
 template<>
 bool Unmarshalling(DataShareProxyData &proxyData, MessageParcel &parcel)
 {
-    return ITypesUtil::Unmarshal(parcel, proxyData.uri_, proxyData.value_, proxyData.allowList_);
+    return ITypesUtil::Unmarshal(parcel, proxyData.uri_,
+        proxyData.value_, proxyData.isValueUndefined, proxyData.allowList_, proxyData.isAllowListUndefined);
 }
 
 template<>

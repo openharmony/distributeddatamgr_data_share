@@ -583,14 +583,21 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataProxyGetRes
         return nullptr;
     }
 
-    napi_value value = Convert2JSValue(env, result.value_);
-    if (value == nullptr) {
-        return nullptr;
+    // when failed to get proxyData, value and allowList in getResult is undefined
+    napi_value value = nullptr;
+    if (result.result_ == SUCCESS) {
+        value = Convert2JSValue(env, result.value_);
+        if (value == nullptr) {
+            return nullptr;
+        }
     }
 
-    napi_value allowList = Convert2JSValue(env, result.allowList_);
-    if (allowList == nullptr) {
-        return nullptr;
+    napi_value allowList = nullptr;
+    if (result.result_ == SUCCESS) {
+        allowList = Convert2JSValue(env, result.allowList_);
+        if (allowList == nullptr) {
+            return nullptr;
+        }
     }
 
     napi_set_named_property(env, jsDataProxyGetResult, "uri", uri);
@@ -807,7 +814,8 @@ bool DataShareJSUtils::UnwrapPublishedDataItemVector(napi_env env, napi_value va
     return true;
 }
 
-bool DataShareJSUtils::UnwrapDataProxyValue(napi_env env, napi_value jsObject, DataProxyValue &value)
+bool DataShareJSUtils::UnwrapDataProxyValue(napi_env env, napi_value jsObject,
+    DataProxyValue &value, bool &isValueUndefined)
 {
     napi_valuetype valueType = napi_undefined;
     napi_typeof(env, jsObject, &valueType);
@@ -838,9 +846,14 @@ bool DataShareJSUtils::UnwrapDataProxyValue(napi_env env, napi_value jsObject, D
             value = valueBool;
             break;
         }
-        case napi_undefined:
+        case napi_undefined: {
+            value = "";
+            isValueUndefined = true;
+            break;
+        }
         case napi_null: {
-            value = {};
+            value = "";
+            isValueUndefined = true;
             break;
         }
         default: {
@@ -865,22 +878,25 @@ bool DataShareJSUtils::UnwrapProxyDataItem(napi_env env, napi_value jsObject, Da
         return false;
     }
 
-    if (!UnwrapDataProxyValue(env, jsObject, proxyData.value_)) {
+    bool isValueUndefined = false;
+    if (!UnwrapDataProxyValue(env, jsObject, proxyData.value_, isValueUndefined)) {
         LOG_ERROR("Convert dataproxy value failed");
         return false;
     }
+    proxyData.isValueUndefined = isValueUndefined;
 
     std::string keyStr = "allowList";
     napi_value jsDataKey = Convert2JSValue(env, keyStr);
     napi_value jsDataValue = nullptr;
     napi_get_property(env, jsObject, jsDataKey, &jsDataValue);
     napi_typeof(env, jsDataValue, &valueType);
-    if (valueType == napi_undefined || valueType == napi_null) {
-        return true;
-    }
     if (valueType != napi_object) {
-        LOG_ERROR("Convert allowList failed");
-        return false;
+        if (valueType == napi_undefined || valueType == napi_null) {
+            proxyData.isAllowListUndefined = true;
+        } else {
+            LOG_ERROR("Convert allowList failed");
+            return false;
+        }
     }
     Convert2Value(env, jsDataValue, proxyData.allowList_);
     auto it = proxyData.allowList_.begin();

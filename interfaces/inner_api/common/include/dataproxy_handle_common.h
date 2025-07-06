@@ -78,7 +78,8 @@ struct DataShareProxyData {
     std::string uri_;
     DataProxyValue value_ = "";
     std::vector<std::string> allowList_;
-    bool isAllowListExceed = false;
+    bool isValueUndefined = false;
+    bool isAllowListUndefined = false;
 };
 
 struct DataProxyResult {
