@@ -186,7 +186,8 @@
             "test": [
                 "//foundation/distributeddatamgr/data_share/test/native:unittest",
                 "//foundation/distributeddatamgr/data_share/test/js/data_share:unittest",
-                "//foundation/distributeddatamgr/data_share/test/ets/data_share_ets:stage_unittest"
+                "//foundation/distributeddatamgr/data_share/test/ets/data_share_ets:stage_unittest",
+                "//foundation/distributeddatamgr/data_share/test/fuzztest:fuzztest"
             ]
         }
     }
