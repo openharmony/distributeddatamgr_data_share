@@ -20,6 +20,7 @@
 #include <string>
 
 #include "datashare_helper.h"
+#include "dataproxy_handle_common.h"
 #include "napi_base_context.h"
 #include "napi_common_util.h"
 
@@ -54,11 +55,22 @@ static napi_value ExportSubscriptionType(napi_env env)
     napi_object_freeze(env, SubscriptionType);
     return SubscriptionType;
 }
+
+static napi_value ExportDataProxyType(napi_env env)
+{
+    napi_value dataProxyType = nullptr;
+    napi_create_object(env, &dataProxyType);
+    SetNamedProperty(env, dataProxyType, "SHARED_CONFIG", static_cast<int32_t>(DataProxyType::SHARED_CONFIG));
+    napi_object_freeze(env, dataProxyType);
+    return dataProxyType;
+}
+
 napi_status InitConstProperties(napi_env env, napi_value exports)
 {
     const napi_property_descriptor properties[] = {
         DECLARE_NAPI_PROPERTY("ChangeType", ExportChangeType(env)),
         DECLARE_NAPI_PROPERTY("SubscriptionType", ExportSubscriptionType(env)),
+        DECLARE_NAPI_PROPERTY("DataProxyType", ExportDataProxyType(env)),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
 
