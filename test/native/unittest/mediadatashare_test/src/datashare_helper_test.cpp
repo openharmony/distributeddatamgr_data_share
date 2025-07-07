@@ -241,14 +241,14 @@ HWTEST_F(DataShareHelperTest, GetSilentProxyStatus001, TestSize.Level0)
  */
 HWTEST_F(DataShareHelperTest, CreateServiceHelper001, TestSize.Level0)
 {
-    LOG_INFO("DataShareHelperTest GetSilentProxyStatus001::Start");
+    LOG_INFO("DataShareHelperTest CreateServiceHelper001::Start");
     DataShareManagerImplHelper();
     std::string exuri = "testExuri";
     std::string bundleName = "bundleName";
     bool isSystem = false;
     auto result = DataShareHelper::CreateServiceHelper(exuri, bundleName, isSystem);
     EXPECT_EQ(result, nullptr);
-    LOG_INFO("DataShareHelperTest GetSilentProxyStatus001::End");
+    LOG_INFO("DataShareHelperTest CreateServiceHelper001::End");
 }
 } // namespace DataShare
 } // namespace OHOS
