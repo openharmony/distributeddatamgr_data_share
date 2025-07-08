@@ -65,12 +65,25 @@ static napi_value ExportDataProxyType(napi_env env)
     return dataProxyType;
 }
 
+static napi_value ExportDataProxyErrorCode(napi_env env)
+{
+    napi_value dataProxyErrorCode = nullptr;
+    napi_create_object(env, &dataProxyErrorCode);
+    SetNamedProperty(env, dataProxyErrorCode, "SUCCESS", static_cast<int32_t>(DataProxyErrorCode::SUCCESS));
+    SetNamedProperty(env, dataProxyErrorCode, "URI_NOT_EXIST", static_cast<int32_t>(DataProxyErrorCode::URI_NOT_EXIST));
+    SetNamedProperty(env, dataProxyErrorCode, "NO_PERMISSION", static_cast<int32_t>(DataProxyErrorCode::NO_PERMISSION));
+    SetNamedProperty(env, dataProxyErrorCode, "OVER_LIMIT", static_cast<int32_t>(DataProxyErrorCode::OVER_LIMIT));
+    napi_object_freeze(env, dataProxyErrorCode);
+    return dataProxyErrorCode;
+}
+
 napi_status InitConstProperties(napi_env env, napi_value exports)
 {
     const napi_property_descriptor properties[] = {
         DECLARE_NAPI_PROPERTY("ChangeType", ExportChangeType(env)),
         DECLARE_NAPI_PROPERTY("SubscriptionType", ExportSubscriptionType(env)),
         DECLARE_NAPI_PROPERTY("DataProxyType", ExportDataProxyType(env)),
+        DECLARE_NAPI_PROPERTY("DataProxyErrorCode", ExportDataProxyErrorCode(env)),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
 

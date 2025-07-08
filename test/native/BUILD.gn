@@ -783,6 +783,7 @@ ohos_unittest("DataShareStubTest") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
+    "ipc:ipc_napi",
     "relational_store:rdb_data_ability_adapter",
     "samgr:samgr_proxy",
   ]
