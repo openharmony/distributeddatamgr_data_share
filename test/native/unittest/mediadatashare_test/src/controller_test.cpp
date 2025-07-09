@@ -276,7 +276,8 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplQueryTest_001, TestSize.Leve
     predicates.EqualTo("name", "Controller_Test001");
     vector<string> columns;
     DatashareBusinessError error;
-    auto result = tempGenConProImp->Query(uri, predicates, columns, error);
+    DataShareOption option;
+    auto result = tempGenConProImp->Query(uri, predicates, columns, error, option);
     EXPECT_EQ(result, nullptr);
     LOG_INFO("ControllerTest_ProviderImplQueryTest_001::End");
 }
@@ -297,7 +298,8 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplQueryTest_002, TestSize.Leve
     predicates.EqualTo("name", "Controller_Test001");
     vector<string> columns;
     DatashareBusinessError error;
-    auto result = tempGenConProImp->Query(uri, predicates, columns, error);
+    DataShareOption option;
+    auto result = tempGenConProImp->Query(uri, predicates, columns, error, option);
     EXPECT_EQ(result, nullptr);
     LOG_INFO("ControllerTest_ProviderImplQueryTest_002::End");
 }

@@ -203,6 +203,16 @@ constexpr int E_REGISTER_ERROR = (E_BASE + 70);
 * @brief The error code for notify change inner error.
 */
 constexpr int E_NOTIFYCHANGE_ERROR = (E_BASE + 71);
+
+/**
+* @brief The error code for timeout inner error.
+*/
+constexpr int E_TIMEOUT_ERROR = (E_BASE + 72);
+
+/**
+* @brief This error code indicates that the timeout interface is busy.
+*/
+constexpr int E_TIMEOUT_INTERFACE_BUSY = (E_BASE + 73);
 } // namespace DataShare
 } // namespace OHOS
 

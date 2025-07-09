@@ -45,7 +45,7 @@ public:
     virtual int Delete(const Uri &uri, const DataSharePredicates &predicates) = 0;
 
     virtual std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
-        std::vector<std::string> &columns, DatashareBusinessError &businessError) = 0;
+        std::vector<std::string> &columns, DatashareBusinessError &businessError, DataShareOption &option) = 0;
 
     virtual int RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) = 0;
 

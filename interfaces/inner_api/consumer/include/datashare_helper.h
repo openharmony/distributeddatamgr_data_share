@@ -27,11 +27,13 @@
 #include "datashare_errno.h"
 #include "datashare_observer.h"
 #include "datashare_operation_statement.h"
+#include "datashare_option.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
 #include "datashare_template.h"
 #include "datashare_values_bucket.h"
 #include "uri.h"
+
 
 using Uri = OHOS::Uri;
 
@@ -220,6 +222,21 @@ public:
      */
     virtual std::shared_ptr<DataShareResultSet> Query(Uri &uri, const DataSharePredicates &predicates,
         std::vector<std::string> &columns, DatashareBusinessError *businessError = nullptr) = 0;
+
+    /**
+     * @brief Query records from the database with timeout.
+     *
+     * @param uri Indicates the path of data to query.
+     * @param predicates Indicates filter criteria. You should define the processing logic when this parameter is null.
+     * @param columns Indicates the columns to query. If this parameter is null, all columns are queried.
+     * @param option Indicates the query options. The option includes a timeout period, in milliseconds.
+     * @param businessError Indicates the error by query.
+     *
+     * @return Returns the query result.
+     */
+    virtual std::shared_ptr<DataShareResultSet> QueryTimeout(Uri &uri, const DataSharePredicates &predicates,
+        std::vector<std::string> &columns, DataShareOption &option,
+        DatashareBusinessError *businessError = nullptr) { return nullptr; }
 
     /**
      * @brief Obtains the MIME type matching the data specified by the URI of the Data share. This method should be

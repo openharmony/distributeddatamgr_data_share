@@ -22,6 +22,7 @@
 #include "datashare_errno.h"
 #include "data_proxy_observer.h"
 #include "datashare_business_error.h"
+#include "datashare_common.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
 #include "datashare_template.h"
@@ -42,7 +43,7 @@ public:
 
     virtual int Delete(const Uri &uri, const Uri &extUri, const DataSharePredicates &predicates) = 0;
 
-    virtual std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const Uri &extUri,
+    virtual std::shared_ptr<DataShareResultSet> Query(DataShareParamSet &paramSet,
         const DataSharePredicates &predicates, std::vector<std::string> &columns,
         DatashareBusinessError &businessError) = 0;
 

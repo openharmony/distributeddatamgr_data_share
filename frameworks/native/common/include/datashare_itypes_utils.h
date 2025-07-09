@@ -18,6 +18,7 @@
 
 #include "dataproxy_handle_common.h"
 #include "datashare_operation_statement.h"
+#include "datashare_common.h"
 #include "datashare_predicates.h"
 #include "datashare_template.h"
 #include "datashare_value_object.h"
@@ -51,6 +52,7 @@ using DataShareValueObject = DataShare::DataShareValueObject;
 using DataProxyValue = DataShare::DataProxyValue;
 using DataProxyGetResult = DataShare::DataProxyGetResult;
 using DataProxyChangeInfo = DataShare::DataProxyChangeInfo;
+using DataShareParamSet = DataShare::DataShareParamSet;
 using RegisterOption = DataShare::RegisterOption;
 
 template<>
@@ -213,6 +215,13 @@ bool Marshalling(const DataProxyChangeInfo &result, MessageParcel &parcel);
 
 template<>
 bool Unmarshalling(DataProxyChangeInfo &result, MessageParcel &parcel);
+
+template<>
+bool Marshalling(const DataShareParamSet &result, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(DataShareParamSet &result, MessageParcel &parcel);
+
 template<>
 bool Marshalling(const RegisterOption &option, MessageParcel &parcel);
 

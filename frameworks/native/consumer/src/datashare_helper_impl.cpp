@@ -228,9 +228,29 @@ std::shared_ptr<DataShareResultSet> DataShareHelperImpl::Query(Uri &uri, const D
         LOG_ERROR("generalCtl is nullptr");
         return nullptr;
     }
+    DataShareOption option;
     DatashareBusinessError error;
     DataShareServiceProxy::SetSystem(isSystem_);
-    auto resultSet = generalCtl->Query(uri, predicates, columns, error);
+    auto resultSet = generalCtl->Query(uri, predicates, columns, error, option);
+    DataShareServiceProxy::CleanSystem();
+    if (businessError != nullptr) {
+        *businessError = error;
+    }
+    return resultSet;
+}
+
+std::shared_ptr<DataShareResultSet> DataShareHelperImpl::QueryTimeout(Uri &uri, const DataSharePredicates &predicates,
+    std::vector<std::string> &columns, DataShareOption &option, DatashareBusinessError *businessError)
+{
+    DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
+    auto generalCtl = generalCtl_;
+    if (generalCtl == nullptr) {
+        LOG_ERROR("generalCtl is nullptr");
+        return nullptr;
+    }
+    DatashareBusinessError error;
+    DataShareServiceProxy::SetSystem(isSystem_);
+    auto resultSet = generalCtl->Query(uri, predicates, columns, error, option);
     DataShareServiceProxy::CleanSystem();
     if (businessError != nullptr) {
         *businessError = error;

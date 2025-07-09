@@ -115,8 +115,10 @@ std::pair<int32_t, int32_t> GeneralControllerProviderImpl::DeleteEx(const Uri &u
 }
 
 std::shared_ptr<DataShareResultSet> GeneralControllerProviderImpl::Query(const Uri &uri,
-    const DataSharePredicates &predicates, std::vector<std::string> &columns, DatashareBusinessError &businessError)
+    const DataSharePredicates &predicates, std::vector<std::string> &columns,
+    DatashareBusinessError &businessError, DataShareOption &option)
 {
+    (void)option;
     auto connection = connection_;
     if (connection == nullptr) {
         LOG_ERROR("connection is nullptr");

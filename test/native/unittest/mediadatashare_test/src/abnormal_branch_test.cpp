@@ -708,7 +708,8 @@ HWTEST_F(AbnormalBranchTest, GeneralControllerServiceImplQueryTest001, TestSize.
     std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
     Uri uri(proxyUri);
     auto generalCtl = std::make_shared<GeneralControllerServiceImpl>(proxyUri);
-    auto ret = generalCtl->Query(uri, predicates, columns, error);
+    DataShareOption option;
+    auto ret = generalCtl->Query(uri, predicates, columns, error, option);
     EXPECT_EQ(ret, nullptr);
     LOG_INFO("GeneralControllerServiceImplQueryTest001::End");
 }

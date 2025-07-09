@@ -519,6 +519,18 @@ bool Unmarshalling(DataProxyChangeInfo &changeInfo, MessageParcel &parcel)
     return ITypesUtil::Unmarshal(parcel, changeInfo.uri_, changeInfo.value_);
 }
 
+template<>
+bool Marshalling(const DataShareParamSet &result, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, result.uri, result.extUri, result.option.timeout);
+}
+
+template<>
+bool Unmarshalling(DataShareParamSet &result, MessageParcel &parcel)
+{
+    return ITypesUtil::Unmarshal(parcel, result.uri, result.extUri, result.option.timeout);
+}
+
 template <typename T>
 bool MarshalBasicTypeToBuffer(std::ostringstream &oss, const T &value)
 {
