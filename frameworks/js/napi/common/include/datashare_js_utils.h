@@ -169,7 +169,7 @@ private:
 template<class... Types>
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::variant<Types...> &value)
 {
-    return ReadVariant<decltype(value), Types...>(env, 0, value.index(), value);
+    return ReadVariant<decltype(value), Types...>(env, 0, static_cast<uint32_t>(value.index()), value);
 }
 
 template<typename T>
