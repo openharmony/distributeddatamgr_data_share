@@ -383,15 +383,10 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         std::cerr << "Unsupported ANI_VERSION_1" << std::endl;
         return ANI_ERROR;
     }
-    ani_namespace ns;
-    if (env->FindNamespace("L@ohos/data/dataSharePredicates/dataSharePredicates;", &ns) != ANI_OK) {
-        LOG_ERROR("Namespace not found");
-        return ANI_ERROR;
-    };
 
     ani_class cls;
-    static const char *className = "LDataSharePredicates;";
-    if (env->Namespace_FindClass(ns, className, &cls) != ANI_OK) {
+    static const char *className = "@ohos.data.dataSharePredicates.dataSharePredicates.DataSharePredicates";
+    if (env->FindClass(className, &cls) != ANI_OK) {
         LOG_ERROR("Class not found");
         return ANI_ERROR;
     }
@@ -422,8 +417,8 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_ERROR;
     };
 
-    static const char *cleanerName = "LCleaner;";
-    auto cleanerCls = AniTypeFinder(env).FindClass(ns, cleanerName);
+    static const char *cleanerName = "@ohos.data.dataSharePredicates.dataSharePredicates.Cleaner";
+    auto cleanerCls = AniTypeFinder(env).FindClass(cleanerName);
     DataSharePredicatesCleaner(env).Bind(cleanerCls.value());
 
     *result = ANI_VERSION_1;
