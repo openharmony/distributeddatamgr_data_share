@@ -156,13 +156,13 @@ bool forEachMapEntry(ani_env *env, ani_object map_object, F &&callback, std::sha
         }
 
         ani_ref ani_key;
-        if (ANI_OK != env->TupleValue_GetItem_Ref(static_cast<ani_tuple_value>(key_value), 0, &ani_key)) {
+        if (ANI_OK != env->Object_GetFieldByName_Ref(static_cast<ani_object>(key_value), "$0", &ani_key)) {
             std::cout << "Failed to get key value" << std::endl;
             return false;
         }
 
         ani_ref ani_val;
-        if (ANI_OK != env->TupleValue_GetItem_Ref(static_cast<ani_tuple_value>(key_value), 1, &ani_val)) {
+        if (ANI_OK != env->Object_GetFieldByName_Ref(static_cast<ani_object>(key_value), "$1", &ani_val)) {
             std::cout << "Failed to get key value" << std::endl;
             return false;
         }
