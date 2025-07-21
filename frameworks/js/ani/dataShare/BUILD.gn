@@ -16,6 +16,7 @@ import("//build/ohos.gni")
 import("//foundation/distributeddatamgr/data_share/datashare.gni")
 
 ohos_shared_library("datashare_ani") {
+  shlib_type = "ani"
   branch_protector_ret = "pac_ret"
   sanitize = {
     integer_overflow = true
@@ -87,6 +88,7 @@ group("data_share") {
 }
 
 ohos_shared_library("datasharepredicates_ani") {
+  shlib_type = "ani"
   sanitize = {
     ubsan = true
     boundary_sanitize = true
