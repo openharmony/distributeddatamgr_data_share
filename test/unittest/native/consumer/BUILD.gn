@@ -1,0 +1,218 @@
+# Copyright (C) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//foundation/distributeddatamgr/data_share/datashare.gni")
+
+group("unittest") {
+  testonly = true
+  deps = []
+
+  deps += [
+    ":DataShareHelperImplTest",
+    ":DataShareHelperTest",
+    ":DataShareProxyTest",
+  ]
+}
+
+config("permission_config") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "${datashare_common_native_path}/include",
+    "${datashare_native_permission_path}/include",
+  ]
+
+  cflags = []
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+}
+
+ohos_unittest("DataShareHelperImplTest") {
+  module_out_path = "data_share/data_share/native/consumer"
+
+  include_dirs = [
+    "${datashare_native_consumer_path}/include",
+    "${datashare_common_native_path}/include",
+    "${datashare_innerapi_path}/consumer/include",
+    "${datashare_innerapi_path}/common/include",
+    "${datashare_innerapi_path}/provider/include",
+    "${datashare_native_consumer_path}/controller/provider/include",
+    "${datashare_native_consumer_path}/controller/common",
+    "${datashare_native_consumer_path}/controller/service/include",
+    "${datashare_native_proxy_path}/include",
+  ]
+
+  sources = [
+    "${datashare_common_native_path}/src/call_reporter.cpp",
+    "${datashare_common_native_path}/src/datashare_abs_result_set.cpp",
+    "${datashare_common_native_path}/src/datashare_itypes_utils.cpp",
+    "${datashare_common_native_path}/src/datashare_result_set.cpp",
+    "${datashare_common_native_path}/src/datashare_string_utils.cpp",
+    "${datashare_common_native_path}/src/datashare_template.cpp",
+    "${datashare_common_native_path}/src/datashare_uri_utils.cpp",
+    "${datashare_common_native_path}/src/ikvstore_data_service.cpp",
+    "${datashare_common_native_path}/src/ishared_result_set.cpp",
+    "${datashare_common_native_path}/src/ishared_result_set_proxy.cpp",
+    "${datashare_native_consumer_path}/controller/provider/src/ext_special_controller.cpp",
+    "${datashare_native_consumer_path}/controller/service/src/general_controller_service_impl.cpp",
+    "${datashare_native_consumer_path}/controller/service/src/persistent_data_controller.cpp",
+    "${datashare_native_consumer_path}/controller/service/src/published_data_controller.cpp",
+    "${datashare_native_consumer_path}/src/datashare_connection.cpp",
+    "${datashare_native_consumer_path}/src/datashare_helper.cpp",
+    "${datashare_native_consumer_path}/src/datashare_helper_impl.cpp",
+    "${datashare_native_consumer_path}/src/datashare_proxy.cpp",
+    "${datashare_native_proxy_path}/src/ams_mgr_proxy.cpp",
+    "${datashare_native_proxy_path}/src/data_proxy_observer_stub.cpp",
+    "${datashare_native_proxy_path}/src/data_share_manager_impl.cpp",
+    "${datashare_native_proxy_path}/src/data_share_service_proxy.cpp",
+    "${datashare_native_proxy_path}/src/idata_share_client_death_observer.cpp",
+    "${datashare_native_proxy_path}/src/published_data_subscriber_manager.cpp",
+    "${datashare_native_proxy_path}/src/rdb_subscriber_manager.cpp",
+    "${datashare_native_proxy_path}/src/proxy_data_subscriber_manager.cpp",
+    "${datashare_base_path}/test/unittest/native/consumer/src/datashare_helper_impl_test.cpp",
+      ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_context",
+    "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "hitrace:libhitracechain",
+    "ipc:ipc_single",
+    "ipc:rpc",
+    "kv_store:distributeddata_inner",
+    "relational_store:native_appdatafwk",
+    "samgr:samgr_proxy",
+  ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+ohos_unittest("DataShareHelperTest") {
+  module_out_path = "data_share/data_share/native/consumer"
+
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "${datashare_base_path}/cfi_blocklist.txt"
+  }
+
+  include_dirs = [
+    "${datashare_base_path}/frameworks/native/common/include/",
+    "${datashare_base_path}/test/unittest/native/consumer/include/",
+  ]
+
+  sources = [ "${datashare_base_path}/test/unittest/native/consumer/src/datashare_helper_test.cpp" ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_context",
+    "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "hitrace:libhitracechain",
+    "ipc:ipc_single",
+    "ipc:rpc",
+    "samgr:samgr_proxy",
+  ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+ohos_unittest("DataShareProxyTest") {
+  module_out_path = "data_share/data_share/native/consumer"
+ 
+  include_dirs = [
+    "${datashare_innerapi_path}/consumer/include",
+    "${datashare_native_consumer_path}/controller/common",
+    "${datashare_native_consumer_path}/controller/provider/include",
+    "${datashare_native_consumer_path}/controller/service/include",
+    "${datashare_native_consumer_path}/include",
+    "${datashare_innerapi_path}/common/include",
+    "${datashare_native_proxy_path}/include",
+  ]
+ 
+  sources = [ "${datashare_base_path}/test/unittest/native/consumer/src/datashare_proxy_test.cpp" ]
+ 
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+ 
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_single",
+    "relational_store:rdb_data_ability_adapter",
+    "samgr:samgr_proxy",
+  ]
+ 
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+  }
+}
