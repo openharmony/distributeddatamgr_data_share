@@ -747,12 +747,10 @@ bool DataShareProxy::CheckSize(const UpdateOperations &operations)
 int32_t DataShareProxy::UserDefineFunc(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    int32_t errCode = -1;
     int32_t err = Remote()->SendRequest(
         static_cast<uint32_t>(IDataShareInterfaceCode::CMD_USER_DEFINE_FUNC), data, reply, option);
     if (err != E_OK) {
-        LOG_ERROR("UserDefineFunc fail to SendRequest. err: %{public}d", err);
-        return err == PERMISSION_ERR ? PERMISSION_ERR_CODE : errCode;
+        LOG_ERROR("UserDefineFunc SendRequest fails. err: %{public}d", err);
     }
     return err;
 }
