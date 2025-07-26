@@ -20,6 +20,8 @@ group("unittest") {
 
   deps += [
     "consumer:unittest",
+    "common:unittest",
+    "provider:unittest",
   ]
 }
 ##################################################################

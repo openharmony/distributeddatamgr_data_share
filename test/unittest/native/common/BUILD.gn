@@ -1,0 +1,95 @@
+# Copyright (C) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//foundation/distributeddatamgr/data_share/datashare.gni")
+
+group("unittest") {
+  testonly = true
+  deps = []
+
+  deps += [
+    ":DataShareBlockWriterImplTest",
+    ":ValueProxyTest",
+  ]
+}
+
+config("permission_config") {
+  visibility = [ ":*" ]
+  include_dirs = [
+    "${datashare_common_native_path}/include",
+    "${datashare_native_permission_path}/include",
+  ]
+
+  cflags = []
+  if (target_cpu == "arm") {
+    cflags += [ "-DBINDER_IPC_32BIT" ]
+  }
+}
+
+ohos_unittest("DataShareBlockWriterImplTest") {
+  module_out_path = "data_share/data_share/native/common"
+
+  include_dirs = [
+    "${datashare_native_consumer_path}/include",
+    "${datashare_common_native_path}/include",
+    "${datashare_innerapi_path}/consumer/include",
+    "${datashare_innerapi_path}/common/include",
+    "${datashare_innerapi_path}/provider/include",
+    "${datashare_native_consumer_path}/controller/provider/include",
+    "${datashare_native_consumer_path}/controller/common",
+    "${datashare_native_consumer_path}/controller/service/include",
+    "${datashare_native_proxy_path}/include",
+  ]
+
+  sources = [
+    "${datashare_base_path}/test/unittest/native/common/src/datashare_block_writer_impl_test.cpp",
+  ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+
+  external_deps = [
+    "ability_base:zuri",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
+  ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+ohos_unittest("ValueProxyTest") {
+  module_out_path = "data_share/data_share/native/common"
+
+  include_dirs = [ "${datashare_base_path}/frameworks/native/common/include/" ]
+
+  sources = [ "${datashare_base_path}/test/unittest/native/common/src/datashare_valuebucket_convert_test.cpp" ]
+
+  deps = [ "${datashare_innerapi_path}/common:datashare_common_static" ]
+
+  external_deps = [
+    "ability_base:zuri",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
+  ]
+}
