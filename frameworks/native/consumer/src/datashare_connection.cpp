@@ -26,6 +26,7 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
+constexpr const char *DATASHARE_EXECUTOR_NAME = "DShare_Connect";
 const std::chrono::milliseconds TIME_THRESHOLD = std::chrono::milliseconds(200);
 /**
  * @brief This method is called back to receive the connection result after an ability calls the
@@ -92,7 +93,7 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
     if (pool_ == nullptr) {
         std::lock_guard<std::mutex> lock(mutex_);
         if (pool_ == nullptr) {
-            pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS);
+            pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS, DATASHARE_EXECUTOR_NAME);
         }
     }
     ReconnectExtAbility(uri);

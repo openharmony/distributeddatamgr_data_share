@@ -275,5 +275,30 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityConnectDone_Test_
 
     LOG_INFO("DataShareConnection_OnAbilityConnectDone_Test_001::End");
 }
+
+/**
+* @tc.name: DataShareConnection_OnAbilityDisconnectDone_Test_001
+* @tc.desc: Verifying that the thread name of Pool_ is correctly set.
+* @tc.type: FUNC
+*/
+HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityDisconnectDone_Test_001, TestSize.Level1)
+{
+    LOG_INFO("DataShareConnection_OnAbilityDisconnectDone_Test_001::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    sptr<DataShare::DataShareConnection> connection =
+        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+
+    connection->isReconnect_.store(true);
+    std::string deviceId = "deviceId";
+    std::string bundleName = "bundleName";
+    std::string abilityName = "abilityName";
+    AppExecFwk::ElementName element(deviceId, bundleName, abilityName);
+    int resultCode = 0;
+    connection->OnAbilityDisconnectDone(element, resultCode);
+    EXPECT_EQ(connection->pool_->pool_.threadName_, "DShare_Connect");
+    LOG_INFO("DataShareConnection_OnAbilityDisconnectDone_Test_001::End");
+}
 }
 }
