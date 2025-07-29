@@ -19,8 +19,11 @@ group("unittest") {
   deps = []
 
   deps += [
+    ":DataShareAbsResultSetTest",
     ":DataShareBlockWriterImplTest",
+    ":DatashareResultSetTest",
     ":ValueProxyTest",
+    ":IsharedResultSetStubTest",
   ]
 }
 
@@ -35,6 +38,55 @@ config("permission_config") {
   if (target_cpu == "arm") {
     cflags += [ "-DBINDER_IPC_32BIT" ]
   }
+}
+
+ohos_unittest("DataShareAbsResultSetTest") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "${datashare_base_path}/cfi_blocklist.txt"
+  }
+ 
+  module_out_path = "data_share/data_share/native/common"
+ 
+  include_dirs = [ "${datashare_base_path}/frameworks/native/common/include/" ]
+ 
+  sources = [ "${datashare_base_path}/test/unittest/native/common/src/datashare_abs_result_set_test.cpp" ]
+ 
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+ 
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_context",
+    "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "hitrace:libhitracechain",
+    "ipc:ipc_single",
+    "ipc:rpc",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+ 
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
 }
 
 ohos_unittest("DataShareBlockWriterImplTest") {
@@ -76,6 +128,45 @@ ohos_unittest("DataShareBlockWriterImplTest") {
   ]
 }
 
+ohos_unittest("DatashareResultSetTest") {
+  module_out_path = "data_share/data_share/native/common"
+ 
+  include_dirs = [ "${datashare_base_path}/frameworks/native/common/include/" ]
+ 
+  sources = [ "${datashare_base_path}/test/unittest/native/common/src/datashare_result_set_test.cpp" ]
+ 
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+ 
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_context",
+    "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "hitrace:libhitracechain",
+    "ipc:ipc_single",
+    "ipc:rpc",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+ 
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+
 ohos_unittest("ValueProxyTest") {
   module_out_path = "data_share/data_share/native/common"
 
@@ -91,5 +182,54 @@ ohos_unittest("ValueProxyTest") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "kv_store:distributeddata_inner",
+  ]
+}
+
+
+ohos_unittest("IsharedResultSetStubTest") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "${datashare_base_path}/cfi_blocklist.txt"
+  }
+  
+  module_out_path = "data_share/data_share/native/common"
+ 
+  include_dirs = [ "${datashare_base_path}/frameworks/native/common/include/" ]
+ 
+  sources = [ "${datashare_base_path}/test/unittest/native/common/src/ishared_result_set_stub_test.cpp" ]
+ 
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+ 
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_context",
+    "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "hitrace:libhitracechain",
+    "ipc:ipc_single",
+    "ipc:rpc",
+    "ipc:ipc_core",
+    "samgr:samgr_proxy",
+  ]
+ 
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 }

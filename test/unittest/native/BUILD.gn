@@ -22,6 +22,10 @@ group("unittest") {
     "consumer:unittest",
     "common:unittest",
     "provider:unittest",
+    "../../native/resource/datashare_ext_bundle:datashare_ext",
+    "../../native/resource/datashareproxy_bundle/proxydatas_with_permission:proxydatas_with_permission",
+    "../../native/resource/errorcode_ext_bundle:errorcode_ext",
+    "../../native/resource/ohos_test_new:copy_ohos_test_new",
   ]
 }
 ##################################################################
