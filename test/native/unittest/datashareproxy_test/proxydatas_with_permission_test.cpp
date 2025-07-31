@@ -132,6 +132,132 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QUERY_Test_001, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_QUERY_Test_001::End");
 }
 
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimout_Test_001, TestSize.Level1)
+{
+    LOG_INFO("ProxyDatasTest_QueryTimeout_Test_001::Start");
+    auto helper = dataShareHelper;
+    Uri uri(DATA_SHARE_PROXY_URI);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_NAME0, "wang");
+    std::vector<string> columns;
+    DataShareOption option;
+    option.timeout = 0;
+    DatashareBusinessError businessError;
+    auto resultSet = helper->QueryTimeout(uri, predicates, columns, option, &businessError);
+    EXPECT_NE(resultSet, nullptr);
+    EXPECT_EQ(businessError.GetCode(), E_OK);
+    LOG_INFO("ProxyDatasTest_QueryTimeout_Test_001::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_002, TestSize.Level1)
+{
+    LOG_INFO("ProxyDatasTest_QueryTimeout_Test_002::Start");
+    auto helper = dataShareHelper;
+    Uri uri(DATA_SHARE_PROXY_URI);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_NAME0, "wang");
+    std::vector<string> columns;
+    DataShareOption option;
+    option.timeout = 4000; // 4000 is the query timeout time.
+    auto limitTime = 1000; // 1000 is used to detect whether the query timeout waiting logic is abnormal.
+    int repeatTimes = 100; // 100 is the number of times the query is executed.
+    DatashareBusinessError businessError;
+    for (int i = 0; i < repeatTimes; i++) {
+        auto start = std::chrono::steady_clock::now();
+        auto resultSet = helper->QueryTimeout(uri, predicates, columns, option, &businessError);
+        auto finish = std::chrono::steady_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
+        EXPECT_TRUE(duration < std::chrono::milliseconds(limitTime));
+        EXPECT_NE(resultSet, nullptr);
+        EXPECT_EQ(businessError.GetCode(), E_OK);
+        int result = 0;
+        resultSet->GetRowCount(result);
+        EXPECT_EQ(result, 1);
+    }
+    LOG_INFO("ProxyDatasTest_QueryTimeout_Test_002::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_003, TestSize.Level1)
+{
+    LOG_INFO("ProxyDatasTest_QueryTimeout_Test_003::Start");
+    auto helper = dataShareHelper;
+    Uri uri(DATA_SHARE_PROXY_URI);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_NAME0, "wang");
+    std::vector<string> columns;
+    DataShareOption option;
+    option.timeout = 4000; // 4000 is the query timeout time.
+    auto limitTime = 1000; // 1000 is used to detect whether the query timeout waiting logic is abnormal.
+    int repeatTimes = 100; // 100 is the number of times the query is executed.
+    DatashareBusinessError businessError;
+    
+    std::function<void()> func = [&option, &helper, &uri, &predicates, &columns, &businessError,
+        &limitTime, &repeatTimes]() {
+        for (int i = 0; i < repeatTimes; i++) {
+            auto start = std::chrono::steady_clock::now();
+            auto resultSet = helper->QueryTimeout(uri, predicates, columns, option, &businessError);
+            auto finish = std::chrono::steady_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
+            EXPECT_TRUE(duration < std::chrono::milliseconds(limitTime));
+            EXPECT_NE(resultSet, nullptr);
+            EXPECT_EQ(businessError.GetCode(), E_OK);
+            int result = 0;
+            resultSet->GetRowCount(result);
+            EXPECT_EQ(result, 1);
+        }
+    };
+    int threadNum = 10; // 10 is the number of threads.
+    std::thread threads[threadNum];
+    for (int i = 0; i < threadNum; ++i) {
+        threads[i] = std::thread(func);
+    }
+
+    for (int i = 0; i < threadNum; ++i) {
+        threads[i].join();
+    }
+    LOG_INFO("ProxyDatasTest_QueryTimeout_Test_003::End");
+}
+
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_004, TestSize.Level1)
+{
+    LOG_INFO("ProxyDatasTest_QueryTimeout_Test_004::Start");
+    auto helper = dataShareHelper;
+    Uri uri(DATA_SHARE_PROXY_URI);
+    std::string name = "timeout";
+    int retVal = 0;
+    int insertTimes = 500; // 500 is the number of times the insert is executed.
+    for (int i = 0; i < insertTimes; i++) {
+        DataShare::DataShareValuesBucket valuesBucket;
+        std::string name0 = "query" + std::to_string(i);
+        valuesBucket.Put(TBL_NAME0, name0);
+        valuesBucket.Put(TBL_NAME1, name);
+        retVal = helper->Insert(uri, valuesBucket);
+        EXPECT_EQ((retVal > 0), true);
+    }
+
+    DataShare::DataSharePredicates predicates;
+    predicates.Like(TBL_NAME0, "query");
+    std::vector<string> columns;
+    DataShareOption option;
+    option.timeout = 1; // 1 is the query timeout time.
+    int count = 0;
+    int queryTimes = 10; // 10 is the number of times the query is executed.
+    for (int i = 0; i < queryTimes; i++) {
+        DatashareBusinessError businessError;
+        auto resultSet = helper->QueryTimeout(uri, predicates, columns, option, &businessError);
+        if (businessError.GetCode() == E_TIMEOUT_ERROR) {
+            count++;
+        }
+    }
+    LOG_INFO("ProxyDatasTest_QueryTimeout_Test_004 Query Timeout %{public}d times", count);
+    EXPECT_TRUE(count > 0);
+    DataShare::DataSharePredicates delPredicates;
+    delPredicates.EqualTo(TBL_NAME1, name);
+    retVal = helper->Delete(uri, delPredicates);
+    EXPECT_EQ((retVal > 0), true);
+    LOG_INFO("ProxyDatasTest_QueryTimeout_Test_004::End");
+}
+
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_ResultSet_Test_001::Start");

@@ -152,7 +152,8 @@ std::pair<int32_t, int32_t> GeneralControllerServiceImpl::DeleteEx(const Uri &ur
 }
 
 std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Uri &uri,
-    const DataSharePredicates &predicates, std::vector<std::string> &columns, DatashareBusinessError &businessError)
+    const DataSharePredicates &predicates, std::vector<std::string> &columns,
+    DatashareBusinessError &businessError, DataShareOption &option)
 {
     auto manager = DataShareManagerImpl::GetInstance();
     if (manager == nullptr) {
@@ -168,13 +169,18 @@ std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Ur
         LOG_ERROR("proxy is nullptr");
         return nullptr;
     }
-    auto resultSet = proxy->Query(uri, Uri(extUri_), predicates, columns, businessError);
+    DataShareParamSet paramSet = {
+        .uri = uri.ToString(),
+        .extUri = extUri_,
+        .option = { .timeout = option.timeout },
+    };
+    auto resultSet = proxy->Query(paramSet, predicates, columns, businessError);
     int retryCount = 0;
     while (resultSet == nullptr && businessError.GetCode() == E_RESULTSET_BUSY && retryCount++ < MAX_RETRY_COUNT) {
         LOG_ERROR("resultSet busy retry, uri: %{public}s", DataShareStringUtils::Anonymous(uri.ToString()).c_str());
         std::this_thread::sleep_for(std::chrono::milliseconds(
             DataShareStringUtils::GetRandomNumber(RANDOM_MIN, RANDOM_MAX)));
-        resultSet = proxy->Query(uri, Uri(extUri_), predicates, columns, businessError);
+        resultSet = proxy->Query(paramSet, predicates, columns, businessError);
     }
     return resultSet;
 }

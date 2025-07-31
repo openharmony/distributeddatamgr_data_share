@@ -195,10 +195,10 @@ std::pair<int32_t, int32_t> DataShareServiceProxy::DeleteEx(const Uri &uri, cons
     return std::make_pair(errCode, result);
 }
 
-std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri, const Uri &extUri,
-    const DataSharePredicates &predicates, std::vector<std::string> &columns, DatashareBusinessError &businessError)
+std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(DataShareParamSet &paramSet,
+    const DataSharePredicates &predicates, std::vector<std::string> &columns,
+    DatashareBusinessError &businessError)
 {
-    const std::string &uriStr = uri.ToString();
     MessageParcel data;
     if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
         LOG_ERROR("WriteInterfaceToken failed!");
@@ -206,7 +206,7 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri,
         return nullptr;
     }
 
-    if (!ITypesUtil::Marshal(data, uriStr, extUri.ToString(), predicates, columns)) {
+    if (!ITypesUtil::Marshal(data, paramSet, predicates, columns)) {
         LOG_ERROR("Write to message parcel failed!");
         businessError.SetCode(E_MARSHAL_ERROR);
         return nullptr;
@@ -220,7 +220,7 @@ std::shared_ptr<DataShareResultSet> DataShareServiceProxy::Query(const Uri &uri,
     auto result = ISharedResultSet::ReadFromParcel(reply);
     if (err != NO_ERROR) {
         LOG_ERROR("Query fail to sendRequest. uri: %{public}s, err: %{public}d",
-            DataShareStringUtils::Anonymous(uriStr).c_str(), err);
+            DataShareStringUtils::Anonymous(paramSet.uri).c_str(), err);
         businessError.SetCode(err);
         return nullptr;
     }

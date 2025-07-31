@@ -30,8 +30,7 @@ public:
     MOCK_METHOD(int, Delete, (const Uri &uri, const DataSharePredicates &predicates), (override));
     MOCK_METHOD((std::shared_ptr<DataShareResultSet>), Query,
         (const Uri &uri, const DataSharePredicates &predicates, (std::vector<std::string> & columns),
-            DatashareBusinessError &businessError),
-        (override));
+            DatashareBusinessError &businessError, DataShareOption &option), (override));
     MOCK_METHOD(
         int, RegisterObserver, (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver), (override));
     MOCK_METHOD(int32_t, UnregisterObserver, (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver),

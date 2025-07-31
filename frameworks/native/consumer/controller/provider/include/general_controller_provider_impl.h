@@ -17,6 +17,7 @@
 #define GENERAL_CONTROLLER_PORVIDER_IMPL_H
 
 #include "datashare_connection.h"
+#include "datashare_option.h"
 #include "general_controller.h"
 
 namespace OHOS {
@@ -40,7 +41,7 @@ public:
     int Delete(const Uri &uri, const DataSharePredicates &predicates) override;
 
     std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const DataSharePredicates &predicates,
-        std::vector<std::string> &columns, DatashareBusinessError &businessError) override;
+        std::vector<std::string> &columns, DatashareBusinessError &businessError, DataShareOption &option) override;
 
     int RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
 

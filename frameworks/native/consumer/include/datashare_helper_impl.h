@@ -76,6 +76,9 @@ public:
     std::shared_ptr<DataShareResultSet> Query(Uri &uri, const DataSharePredicates &predicates,
         std::vector<std::string> &columns, DatashareBusinessError *businessError) override;
 
+    std::shared_ptr<DataShareResultSet> QueryTimeout(Uri &uri, const DataSharePredicates &predicates,
+        std::vector<std::string> &columns, DataShareOption &option, DatashareBusinessError *businessError) override;
+
     string GetType(Uri &uri) override;
 
     int BatchInsert(Uri &uri, const std::vector<DataShareValuesBucket> &values) override;

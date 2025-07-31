@@ -33,8 +33,7 @@ public:
     MOCK_METHOD(int, Delete, (const Uri &uri, const DataSharePredicates &predicates), (override));
     MOCK_METHOD((std::shared_ptr<DataShareResultSet>), Query,
         (const Uri &uri, const DataSharePredicates &predicates, (std::vector<std::string> & columns),
-            DatashareBusinessError &businessError),
-        (override));
+            DatashareBusinessError &businessError, DataShareOption &option), (override));
     MOCK_METHOD(
         int, RegisterObserver, (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver), (override));
     MOCK_METHOD(int32_t, UnregisterObserver, (const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver),
@@ -102,6 +101,55 @@ std::shared_ptr<MockGeneralController> DataShareHelperImplTest::GetController(
         controllerInstance = instance;
     }
     return controllerInstance;
+}
+
+HWTEST_F(DataShareHelperImplTest, QueryTest001, TestSize.Level0)
+{
+    LOG_INFO("QueryTest001::Start");
+    OHOS::Uri uri("datashare:///com.datasharehelperimpl.test");
+    DataSharePredicates predicates;
+    std::vector<std::string> columns;
+    DataShareHelperImplTest::GetInstance()->generalCtl_ = nullptr;
+    auto result = DataShareHelperImplTest::GetInstance()->Query(uri, predicates, columns, nullptr);
+    EXPECT_EQ(result, nullptr);
+    auto expectResult = std::make_shared<DataShareResultSet>();
+    std::shared_ptr<MockGeneralController> controller = DataShareHelperImplTest::GetController();
+    DataShareHelperImplTest::GetInstance()->generalCtl_ = controller;
+    EXPECT_CALL(*controller, Query(testing::_, testing::_, testing::_, testing::_, testing::_))
+        .WillOnce(testing::Return(expectResult));
+    result = DataShareHelperImplTest::GetInstance()->Query(uri, predicates, columns, nullptr);
+    EXPECT_EQ(result.get(), expectResult.get());
+    DatashareBusinessError error;
+    EXPECT_CALL(*controller, Query(testing::_, testing::_, testing::_, testing::_, testing::_))
+        .WillOnce(testing::Return(expectResult));
+    result = DataShareHelperImplTest::GetInstance()->Query(uri, predicates, columns, &error);
+    EXPECT_EQ(result.get(), expectResult.get());
+    LOG_INFO("QueryTest001::End");
+}
+
+HWTEST_F(DataShareHelperImplTest, QueryTimeoutTest001, TestSize.Level0)
+{
+    LOG_INFO("QueryTimeoutTest001::Start");
+    OHOS::Uri uri("datashare:///com.datasharehelperimpl.test");
+    DataSharePredicates predicates;
+    std::vector<std::string> columns;
+    DataShareOption option;
+    DataShareHelperImplTest::GetInstance()->generalCtl_ = nullptr;
+    auto result = DataShareHelperImplTest::GetInstance()->QueryTimeout(uri, predicates, columns, option, nullptr);
+    EXPECT_EQ(result, nullptr);
+    auto expectResult = std::make_shared<DataShareResultSet>();
+    std::shared_ptr<MockGeneralController> controller = DataShareHelperImplTest::GetController();
+    DataShareHelperImplTest::GetInstance()->generalCtl_ = controller;
+    EXPECT_CALL(*controller, Query(testing::_, testing::_, testing::_, testing::_, testing::_))
+        .WillOnce(testing::Return(expectResult));
+    result = DataShareHelperImplTest::GetInstance()->QueryTimeout(uri, predicates, columns, option, nullptr);
+    EXPECT_EQ(result.get(), expectResult.get());
+    DatashareBusinessError error;
+    EXPECT_CALL(*controller, Query(testing::_, testing::_, testing::_, testing::_, testing::_))
+        .WillOnce(testing::Return(expectResult));
+    result = DataShareHelperImplTest::GetInstance()->QueryTimeout(uri, predicates, columns, option, &error);
+    EXPECT_EQ(result.get(), expectResult.get());
+    LOG_INFO("QueryTimeoutTest001::End");
 }
 
 HWTEST_F(DataShareHelperImplTest, BatchUpdateTest001, TestSize.Level0)
