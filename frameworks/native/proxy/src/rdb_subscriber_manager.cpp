@@ -69,7 +69,8 @@ std::vector<OperationResult> RdbSubscriberManager::AddObservers(void *subscriber
                 opResult.emplace_back(subResult);
                 if (subResult.errCode_ != E_OK) {
                     failedKeys.emplace_back(subResult.key_, templateId);
-                    LOG_WARN("registered failed, uri is %{public}s", subResult.key_.c_str());
+                    LOG_WARN("registered failed, uri is %{public}s",
+                        DataShareStringUtils::Anonymous(subResult.key_).c_str());
                 }
             }
             if (!failedKeys.empty()) {
@@ -156,7 +157,8 @@ std::vector<OperationResult> RdbSubscriberManager::EnableObservers(void *subscri
                 opResult.emplace_back(subResult);
                 if (subResult.errCode_ != E_OK) {
                     failedKeys.emplace_back(subResult.key_, templateId);
-                    LOG_WARN("registered failed, uri is %{public}s", subResult.key_.c_str());
+                    LOG_WARN("registered failed, uri is %{public}s",
+                        DataShareStringUtils::Anonymous(subResult.key_).c_str());
                 }
             }
             if (!failedKeys.empty()) {
@@ -193,8 +195,8 @@ std::vector<OperationResult> RdbSubscriberManager::DisableObservers(void *subscr
                 opResult.emplace_back(result);
                 if (result.errCode_ != E_OK) {
                     failedKeys.emplace_back(result.key_, templateId);
-                    LOG_WARN("DisableObservers failed, uri is %{public}s, errCode is %{public}d", result.key_.c_str(),
-                        result.errCode_);
+                    LOG_WARN("DisableObservers failed, uri is %{public}s, errCode is %{public}d",
+                        DataShareStringUtils::Anonymous(result.key_).c_str(), result.errCode_);
                 }
             }
             if (!failedKeys.empty()) {
@@ -218,8 +220,8 @@ void RdbSubscriberManager::RecoverObservers(std::shared_ptr<DataShareServiceProx
         auto results = proxy->SubscribeRdbData(uris, templateId, serviceCallback_);
         for (const auto& result : results) {
             if (result.errCode_ != E_OK) {
-                LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d", result.key_.c_str(),
-                    result.errCode_);
+                LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d",
+                    DataShareStringUtils::Anonymous(result.key_).c_str(), result.errCode_);
             }
         }
     }

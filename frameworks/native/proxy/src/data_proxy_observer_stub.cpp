@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace DataShare {
+static constexpr int MAX_VEC_SIZE = 1024;
 static constexpr int REQUEST_CODE = 0;
 int RdbObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -85,7 +86,10 @@ int RdbObserverStub::DeserializeDataFromAshmem(RdbChangeNode &changeNode)
         return E_ERROR;
     }
     int vecLen = *vecLenRead;
-
+    if (vecLen > MAX_VEC_SIZE || vecLen < 0) {
+        LOG_ERROR("vecLen is invalid: %{public}d", vecLen);
+        return E_ERROR;
+    }
     // Read data
     for (int i = 0; i < vecLen; i++) {
         const int *dataLenRead;

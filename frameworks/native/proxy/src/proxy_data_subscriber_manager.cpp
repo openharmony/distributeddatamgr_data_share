@@ -55,7 +55,8 @@ std::vector<DataProxyResult> ProxyDataSubscriberManager::AddObservers(void *subs
                 opResult.emplace_back(subResult);
                 if (subResult.result_ != SUCCESS) {
                     failedKeys.emplace_back(subResult.uri_);
-                    LOG_WARN("registered failed, uri is %{public}s", subResult.uri_.c_str());
+                    LOG_WARN("registered failed, uri is %{public}s, errCode",
+                        DataShareStringUtils::Anonymous(subResult.uri_).c_str());
                 }
             }
 
@@ -130,8 +131,8 @@ void ProxyDataSubscriberManager::RecoverObservers(std::shared_ptr<DataShareServi
     auto results = proxy->SubscribeProxyData(uris, serviceCallback_);
     for (const auto& result : results) {
         if (result.result_ != SUCCESS) {
-            LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d", result.uri_.c_str(),
-                result.result_);
+            LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d",
+                DataShareStringUtils::Anonymous(result.uri_).c_str(), result.result_);
         }
     }
 }

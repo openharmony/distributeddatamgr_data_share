@@ -547,8 +547,8 @@ std::vector<OperationResult> DataShareHelperImpl::EnableRdbSubs(const std::vecto
     for (auto uri : uris) {
         uriAll += (DataShareStringUtils::Anonymous(uri) + ",");
     }
-    LOG_INFO("uri is %{public}s bundleName is %{public}s, subscriberId is %{public}" PRId64 "", uriAll.c_str(),
-        templateId.bundleName_.c_str(), templateId.subscriberId_);
+    LOG_INFO("uri is %{public}s bundleName is %{public}s, subscriberId is %{public}" PRId64 "",
+        DataShareStringUtils::Anonymous(uriAll).c_str(), templateId.bundleName_.c_str(), templateId.subscriberId_);
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
@@ -568,8 +568,8 @@ std::vector<OperationResult> DataShareHelperImpl::DisableRdbSubs(const std::vect
     for (auto uri : uris) {
         uriAll += (DataShareStringUtils::Anonymous(uri) + ",");
     }
-    LOG_INFO("uri is %{public}s bundleName is %{public}s, subscriberId is %{public}" PRId64 "", uriAll.c_str(),
-        templateId.bundleName_.c_str(), templateId.subscriberId_);
+    LOG_INFO("uri is %{public}s bundleName is %{public}s, subscriberId is %{public}" PRId64 "",
+        DataShareStringUtils::Anonymous(uriAll).c_str(), templateId.bundleName_.c_str(), templateId.subscriberId_);
     auto persistentDataCtl = persistentDataCtl_;
     if (persistentDataCtl == nullptr) {
         LOG_ERROR("persistentDataCtl is nullptr");
@@ -625,7 +625,8 @@ std::vector<OperationResult> DataShareHelperImpl::EnablePubSubs(const std::vecto
     for (auto uri : uris) {
         uriAll += (DataShareStringUtils::Anonymous(uri) + ",");
     }
-    LOG_INFO("uri is %{public}s subscriberId is %{public}" PRId64 "", uriAll.c_str(), subscriberId);
+    LOG_INFO("uri is %{public}s subscriberId is %{public}" PRId64 "",
+        DataShareStringUtils::Anonymous(uriAll).c_str(), subscriberId);
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
@@ -645,7 +646,8 @@ std::vector<OperationResult> DataShareHelperImpl::DisablePubSubs(const std::vect
     for (auto uri : uris) {
         uriAll += (DataShareStringUtils::Anonymous(uri) + ",");
     }
-    LOG_INFO("uri is %{public}s subscriberId is %{public}" PRId64 "", uriAll.c_str(), subscriberId);
+    LOG_INFO("uri is %{public}s subscriberId is %{public}" PRId64 "",
+        DataShareStringUtils::Anonymous(uriAll).c_str(), subscriberId);
     auto publishedDataCtl = publishedDataCtl_;
     if (publishedDataCtl == nullptr) {
         LOG_ERROR("publishedDataCtl is nullptr");
