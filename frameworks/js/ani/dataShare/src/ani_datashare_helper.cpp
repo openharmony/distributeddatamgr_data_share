@@ -251,7 +251,7 @@ static ani_object ANI_Create([[maybe_unused]] ani_env *env, ani_object context, 
         return nullptr;
     }
 
-    auto shareptrData = new SharedPtrHolder<DataShareHelper>(dataShareHelper);
+    auto shareptrData = new (std::nothrow) SharedPtrHolder<DataShareHelper>(dataShareHelper);
     if (shareptrData == nullptr) {
         LOG_ERROR("Create Object SharedPtrHolder is null");
         return nullptr;
@@ -538,7 +538,7 @@ static ani_object ANI_Query([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_
         return nullptr;
     }
 
-    auto shareptrData = new SharedPtrHolder<DataShareResultSet>(resultObject);
+    auto shareptrData = new (std::nothrow) SharedPtrHolder<DataShareResultSet>(resultObject);
     if (shareptrData == nullptr) {
         LOG_ERROR("Create Object SharedPtrHolder is null");
         return nullptr;
