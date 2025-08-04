@@ -2055,7 +2055,8 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_User_Define_Func_Test_001, TestS
     MessageParcel reply;
     MessageOption option;
     auto errCode = helper->UserDefineFunc(data, reply, option);
-    EXPECT_EQ(errCode, -1);
+    // 10 is IPC error ERR_INVALID_STATE
+    EXPECT_EQ(errCode, 10);
     LOG_INFO("MediaDataShare_User_Define_Func_Test_001 End");
 }
 
