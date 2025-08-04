@@ -44,14 +44,14 @@ static bool IsSystemApp()
 static void ThrowBusinessError(ani_env *env, int errCode, std::string&& errMsg)
 {
     LOG_DEBUG("Begin ThrowBusinessError.");
-    static const char *errorClsName = "L@ohos/base/BusinessError;";
+    static const char *errorClsName = "C{@ohos.base.BusinessError}";
     ani_class cls {};
     if (ANI_OK != env->FindClass(errorClsName, &cls)) {
         LOG_ERROR("find class BusinessError %{public}s failed", errorClsName);
         return;
     }
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         LOG_ERROR("find method BusinessError.constructor failed");
         return;
     }
@@ -80,7 +80,7 @@ static void ThrowBusinessError(ani_env *env, int errCode, std::string&& errMsg)
 
 static bool getNameSpace(ani_env *env, ani_namespace &ns)
 {
-    const char *spaceName = "L@ohos/data/dataShare/dataShare;";
+    const char *spaceName = "C{@ohos.data.dataShare.dataShare}";
     if (ANI_OK != env->FindNamespace(spaceName, &ns)) {
         LOG_ERROR("Not found space name '%{public}s'", spaceName);
         return false;
@@ -554,21 +554,21 @@ auto g_convertValuesBucket = [](ani_env *env, ani_ref &ani_key, ani_ref &object,
     auto key = AniStringUtils::ToStd(env, static_cast<ani_string>(ani_key));
     auto unionObject = static_cast<ani_object>(object);
     UnionAccessor unionAccessor(env, unionObject);
-    if (unionAccessor.IsInstanceOf("Lstd/core/Double;")) {
+    if (unionAccessor.IsInstanceOf("std.core.Double")) {
         double value;
         unionAccessor.TryConvert<double>(value);
         records->emplace(key, value);
         return true;
     }
 
-    if (unionAccessor.IsInstanceOf("Lstd/core/String;")) {
+    if (unionAccessor.IsInstanceOf("std.core.String")) {
         std::string value;
         unionAccessor.TryConvert<std::string>(value);
         records->emplace(key, value);
         return true;
     }
 
-    if (unionAccessor.IsInstanceOf("Lstd/core/Boolean;")) {
+    if (unionAccessor.IsInstanceOf("std.core.Boolean")) {
         bool value;
         unionAccessor.TryConvert<bool>(value);
         records->emplace(key, value);
@@ -645,15 +645,17 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     }
 
     std::array methods = {
-        ani_native_function {"on", "Lstd/core/String;Lstd/core/String;Lstd/core/Function2;:V",
+        ani_native_function {"on", "C{std.core.String}C{std.core.String}C{std.core.Function2}:",
             reinterpret_cast<void *>(ANI_OnType)},
-        ani_native_function {"off", "Lstd/core/String;Lstd/core/String;Lstd/core/Function2;:V",
+        ani_native_function {"off", "C{std.core.String}C{std.core.String}C{std.core.Function2}:",
             reinterpret_cast<void *>(ANI_OffType)},
-        ani_native_function {"on",
-            "Lstd/core/String;L@ohos/data/dataShare/dataShare/SubscriptionType;Lstd/core/String;Lstd/core/Function2;:V",
-            reinterpret_cast<void *>(ANI_OnEvent)},
-        ani_native_function {"off",
-            "Lstd/core/String;L@ohos/data/dataShare/dataShare/SubscriptionType;Lstd/core/String;Lstd/core/Function2;:V",
+        ani_native_function{ "on",
+            "C{std.core.String}C{@ohos.data.dataShare.dataShare.SubscriptionType}C{std.core.String}C{std.core."
+            "Function2}:",
+            reinterpret_cast<void *>(ANI_OnEvent) },
+        ani_native_function{ "off",
+            "C{std.core.String}C{@ohos.data.dataShare.dataShare.SubscriptionType}C{std.core.String}C{std.core."
+            "Function2}:",
             reinterpret_cast<void *>(ANI_OffEvent)},
         ani_native_function {"ani_query", nullptr, reinterpret_cast<void *>(ANI_Query)},
         ani_native_function {"ani_update", nullptr, reinterpret_cast<void *>(ANI_Update)},
