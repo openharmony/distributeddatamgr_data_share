@@ -22,6 +22,20 @@ namespace DataShare {
 using namespace testing::ext;
 class ValueProxyTest : public testing::Test {
 };
+
+/**
+* @tc.name: VBucketsDataShare2Normal
+* @tc.desc: Test conversion from DataShareValuesBucket vector to normal VBuckets
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: NA
+* @tc.step:
+* 1. Create two DataShareValuesBucket objects and add key-value pairs
+* 2. Put the buckets into a vector
+* 3. Convert the vector using ValueProxy::Convert()
+* 4. Verify the converted VBuckets size is 2
+* @tc.expect: The converted VBuckets has size 2, matching original vector size
+*/
 HWTEST_F(ValueProxyTest, VBucketsDataShare2Normal, TestSize.Level0)
 {
     using DataShareBucket = OHOS::DataShare::DataShareValuesBucket;
@@ -35,6 +49,19 @@ HWTEST_F(ValueProxyTest, VBucketsDataShare2Normal, TestSize.Level0)
     extends = ValueProxy::Convert(std::move(VBuckets));
     ASSERT_EQ(extends.size(), 2);
 }
+
+/**
+* @tc.name: VBucketsNormal2DataShare
+* @tc.desc: Test conversion from normal VBuckets to DataShareValuesBucket vector
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: NA
+* @tc.step:
+* 1. Create a VBuckets object with two entries containing key-value pairs
+* 2. Convert the VBuckets using ValueProxy::Convert()
+* 3. Verify the converted DataShareValuesBucket vector size is 2
+* @tc.expect: The converted vector has size 2, matching original VBuckets size
+*/
 HWTEST_F(ValueProxyTest, VBucketsNormal2DataShare, TestSize.Level0)
 {
     using DataShareBucket = OHOS::DataShare::DataShareValuesBucket;
