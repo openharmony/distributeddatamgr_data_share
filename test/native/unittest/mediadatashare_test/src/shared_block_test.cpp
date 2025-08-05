@@ -162,7 +162,7 @@ HWTEST_F(SharedBlockTest, ReadMessageParcelTest001, TestSize.Level0)
     2. Set the SharedBlock to read-only mode, call Clear() and check return code
     3. Set the SharedBlock to read-write mode, set mSize to SharedBlockHeader size, call Clear and check return code
     4. Restore mSize to original valid size, call Clear() and check return code
-* @tc.expect: 
+* @tc.expect:
     - Clear() returns SHARED_BLOCK_INVALID_OPERATION when read-only
     - Clear() returns SHARED_BLOCK_BAD_VALUE when size is insufficient
     - Clear() returns SHARED_BLOCK_OK when in read-write mode with valid size
@@ -197,7 +197,7 @@ HWTEST_F(SharedBlockTest, ClearTest001, TestSize.Level0)
     4. Test with max column num (32768) and conflicting row nums, check return code
     5. Test valid configuration (matching row/column nums), check return code
     6. Test setting column num to 0 with no rows, check return code
-* @tc.expect: 
+* @tc.expect:
     - Returns SHARED_BLOCK_INVALID_OPERATION in read-only mode
     - Returns SHARED_BLOCK_INVALID_OPERATION for invalid value combinations
     - Returns SHARED_BLOCK_OK for valid configurations
@@ -248,7 +248,7 @@ HWTEST_F(SharedBlockTest, SetColumnNumTest001, TestSize.Level0)
     2. Set to read-only mode, call AllocRow() and check return code
     3. Set to read-write mode, set mSize to 0 (insufficient memory), call AllocRow() and check return code
     4. Restore mSize to valid value, call Clear() to clean up
-* @tc.expect: 
+* @tc.expect:
     - AllocRow() returns SHARED_BLOCK_INVALID_OPERATION in read-only mode
     - AllocRow() returns SHARED_BLOCK_NO_MEMORY when size is insufficient
     - Clear() returns SHARED_BLOCK_OK after restoring size
@@ -282,7 +282,7 @@ HWTEST_F(SharedBlockTest, AllocRow, TestSize.Level0)
     3. Set to read-write mode, set rowNums to 0, call FreeLastRow() and check return code
     4. Set rowNums to a positive value, call FreeLastRow() and check return code
     5. Call Clear() to clean up
-* @tc.expect: 
+* @tc.expect:
     - FreeLastRow() returns SHARED_BLOCK_INVALID_OPERATION in read-only mode
     - FreeLastRow() returns SHARED_BLOCK_OK when rowNums is 0
     - FreeLastRow() returns SHARED_BLOCK_OK when rowNums is positive
@@ -318,7 +318,7 @@ HWTEST_F(SharedBlockTest, FreeLastRowTest001, TestSize.Level0)
     2. Save original mSize, set mSize to 0 (insufficient memory)
     3. Call AllocRowOffset() and check return value
     4. Restore mSize to original value, call Clear() to clean up
-* @tc.expect: 
+* @tc.expect:
     - AllocRowOffset() returns nullptr when mSize is 0 (insufficient memory)
     - Clear() returns SHARED_BLOCK_OK after restoring size
 */
@@ -387,7 +387,7 @@ HWTEST_F(SharedBlockTest, GetCellUnitTest001, TestSize.Level0)
     2. Set to read-only mode, call PutBlobOrString with valid parameters and check return code
     3. Set to read-write mode, call PutBlobOrString with invalid row index and check return code
     4. Call Clear() to clean up
-* @tc.expect: 
+* @tc.expect:
     - Returns SHARED_BLOCK_INVALID_OPERATION in read-only mode
     - Returns SHARED_BLOCK_BAD_VALUE with invalid row index
     - Clear() returns SHARED_BLOCK_OK
@@ -421,7 +421,7 @@ HWTEST_F(SharedBlockTest, PutBlobOrStringTest001, TestSize.Level0)
     2. Set to read-only mode, call PutLong with invalid indices and check return code
     3. Set to read-write mode, call PutLong with invalid indices and check return code
     4. Call Clear() to clean up
-* @tc.expect: 
+* @tc.expect:
     - Returns SHARED_BLOCK_INVALID_OPERATION in read-only mode
     - Returns SHARED_BLOCK_BAD_VALUE with invalid indices
     - Clear() returns SHARED_BLOCK_OK
@@ -454,7 +454,7 @@ HWTEST_F(SharedBlockTest, PutLongTest001, TestSize.Level0)
     2. Set to read-only mode, call PutDouble with invalid indices and check return code
     3. Set to read-write mode, call PutDouble with invalid indices and check return code
     4. Call Clear() to clean up
-* @tc.expect: 
+* @tc.expect:
     - Returns SHARED_BLOCK_INVALID_OPERATION in read-only mode
     - Returns SHARED_BLOCK_BAD_VALUE with invalid indices
     - Clear() returns SHARED_BLOCK_OK
@@ -487,7 +487,7 @@ HWTEST_F(SharedBlockTest, PutDoubleTest001, TestSize.Level0)
     2. Set to read-only mode, call PutNull with invalid indices and check return code
     3. Set to read-write mode, call PutNull with invalid indices and check return code
     4. Call Clear() to clean up
-* @tc.expect: 
+* @tc.expect:
     - Returns SHARED_BLOCK_INVALID_OPERATION in read-only mode
     - Returns SHARED_BLOCK_BAD_VALUE with invalid indices
     - Clear() returns SHARED_BLOCK_OK
@@ -520,7 +520,7 @@ HWTEST_F(SharedBlockTest, PutNullTest001, TestSize.Level0)
     4. Call SetRawData with header data and valid size, check return code
     5. Restore mSize to original value, call SetRawData with valid size, check return code
     6. Call Clear() to clean up
-* @tc.expect: 
+* @tc.expect:
     - Returns SHARED_BLOCK_INVALID_OPERATION when size is 0
     - Returns SHARED_BLOCK_NO_MEMORY when mSize is 0
     - Returns SHARED_BLOCK_OK when mSize is valid

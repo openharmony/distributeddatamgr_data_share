@@ -1530,11 +1530,11 @@ HWTEST_F(MediaDataShareUnitTest, Insert_ConnectionNull_Test_001, TestSize.Level0
     2. Update the record to name "Datashare_CRUD_Test002" using predicates
     3. Query for the updated record to verify the change
     4. Delete the record using predicates
-* @tc.expected: 
-    - Insert returns a positive ID indicating success
-    - Update returns non-negative value indicating success
-    - Query returns exactly 1 row for the updated record
-    - Delete returns non-negative value indicating success
+* @tc.expected:
+    1.Insert returns a positive ID indicating success
+    2.Update returns non-negative value indicating success
+    3.Query returns exactly 1 row for the updated record
+    4.Delete returns non-negative value indicating success
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUD_Test_001, TestSize.Level0)
 {
@@ -1583,11 +1583,11 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUD_Test_001, TestSize.Level0)
     2. Update the record using UpdateEx with predicates and verify results
     3. Query for the updated record to confirm changes
     4. Delete the record using DeleteEx and verify results
-* @tc.expected: 
-    - InsertEx returns error code 0 and non-negative ID
-    - UpdateEx returns error code 0 and non-negative affected rows
-    - Query returns exactly 1 row for the updated record
-    - DeleteEx returns error code 0 and non-negative affected rows
+* @tc.expected:
+    1.InsertEx returns error code 0 and non-negative ID
+    2.UpdateEx returns error code 0 and non-negative affected rows
+    3.Query returns exactly 1 row for the updated record
+    4.DeleteEx returns error code 0 and non-negative affected rows
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUDEX_Test_001, TestSize.Level0)
 {
@@ -1636,11 +1636,11 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUDEX_Test_001, TestSize.Level0
     1. Create predicates with In("name", {1, 2, 3}) condition
     2. Retrieve the operation items from predicates
     3. Verify operation type, parameters, and values
-* @tc.expected: 
-    - Exactly 1 operation item is generated
-    - Operation type is correct for In condition
-    - Parameters contain "name" and the correct integer values
-    - Variant indices match expected types (string and integer vector)
+* @tc.expected:
+    1.Exactly 1 operation item is generated
+    2.Operation type is correct for In condition
+    3.Parameters contain "name" and the correct integer values
+    4.Variant indices match expected types (string and integer vector)
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ImplPredicates_Test_001, TestSize.Level0)
 {
@@ -1718,11 +1718,11 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotImplPredicates_Test_001, Test
     2. Insert a new record and trigger notification
     3. Delete the record and trigger notification
     4. Unregister the observer
-* @tc.expected: 
-    - Registration returns 0 indicating success
-    - Insert returns positive ID and notification is triggered
-    - Delete returns positive value and notification is triggered
-    - Unregistration returns 0 indicating success
+* @tc.expected:
+    1.Registration returns 0 indicating success
+    2.Insert returns positive ID and notification is triggered
+    3.Delete returns positive value and notification is triggered
+    4.Unregistration returns 0 indicating success
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Observer_001, TestSize.Level0)
 {
@@ -1761,11 +1761,11 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Observer_001, TestSize.Level0)
     2. Attempt to register the same observer again
     3. Perform insert and delete operations with notifications
     4. Unregister the observer
-* @tc.expected: 
-    - First registration returns 0 indicating success
-    - Second registration returns E_REGISTER_ERROR
-    - Insert and delete operations complete successfully
-    - Unregistration returns 0 indicating success
+* @tc.expected:
+    1.First registration returns 0 indicating success
+    2.Second registration returns E_REGISTER_ERROR
+    3.Insert and delete operations complete successfully
+    4.Unregistration returns 0 indicating success
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ReregisterObserver_001, TestSize.Level0)
 {
@@ -1928,9 +1928,9 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_001, TestS
     3. Query the media library URI with the predicates and empty columns
     4. Convert the query result to AbsSharedResultSet using RdbDataAbilityUtils
     5. Get the row count from the converted result set
-* @tc.expect: 
-    - The converted AbsSharedResultSet is not null
-    - The row count of the result set is 1 (matches the expected test data)
+* @tc.expect:
+    1.The converted AbsSharedResultSet is not null
+    2.The row count of the result set is 1 (matches the expected test data)
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ToAbsSharedResultSet_Test_001, TestSize.Level0)
 {
@@ -2038,10 +2038,10 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_InsertExt_Test_001, TestSize.Lev
     2. Get the SystemAbilityManager instance and verify it is not null
     3. Get the Storage Manager system ability remote object and verify it is not null
     4. Create a DataShare helper using the remote object and file data URI
-* @tc.expect: 
-    - SystemAbilityManager instance is not null
-    - Storage Manager remote object is not null
-    - DataShare helper instance is successfully created (not null)
+* @tc.expect:
+    1.SystemAbilityManager instance is not null
+    2.Storage Manager remote object is not null
+    3.DataShare helper instance is successfully created (not null)
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_TransferUri_Test_001, TestSize.Level0)
 {
@@ -2284,11 +2284,11 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperExecuteBatchControllerNull
     7. Delete the test data using predicates and check the return value
     8. Notify a change again for the URI
     9. Call UnregisterObserver with the URI and observer, check the return value
-* @tc.expect: 
-    - RegisterObserver returns E_HELPER_DIED
-    - Insert returns a negative value (failure)
-    - Delete returns a negative value (failure)
-    - UnregisterObserver returns E_HELPER_DIED
+* @tc.expect:
+    1.RegisterObserver returns E_HELPER_DIED
+    2.Insert returns a negative value (failure)
+    3.Delete returns a negative value (failure)
+    4.UnregisterObserver returns E_HELPER_DIED
 */
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperRegisterObserverControllerNullTest_001, TestSize.Level0)
 {
@@ -2332,9 +2332,9 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperRegisterObserverController
     6. Notify an INSERT change with the extended data
     7. Wait for observer notification and verify the change info matches
     8. Unregister the observer extension
-* @tc.expect: 
-    - Batch insertion returns a positive value (success)
-    - Observer correctly receives and matches INSERT change info with extended data
+* @tc.expect:
+    1.Batch insertion returns a positive value (success)
+    2.Observer correctly receives and matches INSERT change info with extended data
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_002, TestSize.Level0)
 {
@@ -2380,9 +2380,9 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_002, TestSize.Level0
     7. Notify an UPDATE change with the extended data
     8. Wait for observer notification and verify the change info matches
     9. Unregister the observer extension
-* @tc.expect: 
-    - Update operation returns a positive value (success)
-    - Observer correctly receives and matches UPDATE change info with extended data
+* @tc.expect:
+    1.Update operation returns a positive value (success)
+    2.Observer correctly receives and matches UPDATE change info with extended data
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_003, TestSize.Level0)
 {
@@ -2428,9 +2428,9 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_003, TestSize.Level0
     7. Notify a DELETE change with the extended data
     8. Wait for observer notification and verify the change info matches
     9. Unregister the observer extension
-* @tc.expect: 
-    - Delete operation returns a positive value (success)
-    - Observer correctly receives and matches DELETE change info with extended data
+* @tc.expect:
+    1.Delete operation returns a positive value (success)
+    2.Observer correctly receives and matches DELETE change info with extended data
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_004, TestSize.Level0)
 {
@@ -2475,10 +2475,10 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_004, TestSize.Level0
     6. Unregister the observer extension
     7. Notify a DELETE change with the same extended data
     8. Wait for observer notification and verify the change info does not match
-* @tc.expect: 
-    - Data insertion returns a positive value (success)
-    - Registered observer correctly receives INSERT change info with extended data
-    - Unregistered observer does not receive DELETE change info (change info mismatch)
+* @tc.expect:
+    1.Data insertion returns a positive value (success)
+    2.Registered observer correctly receives INSERT change info with extended data
+    3.Unregistered observer does not receive DELETE change info (change info mismatch)
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_002, TestSize.Level0)
 {
@@ -2526,12 +2526,12 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_002, TestS
         - For "uri2": Update non-existent data to "undefined1"
     4. Execute batch update and get results
     5. Delete the test data to clean up
-* @tc.expect: 
-    - Initial insertion returns a positive value (success)
-    - Batch update returns success, with results size 2
-    - Results for "uri1" contain [1, 0] (1 success, 1 no match)
-    - Results for "uri2" contain [0] (no match)
-    - Cleanup deletion returns a positive value (success)
+* @tc.expect:
+    1.Initial insertion returns a positive value (success)
+    2.Batch update returns success, with results size 2
+    3.Results for "uri1" contain [1, 0] (1 success, 1 no match)
+    4.Results for "uri2" contain [0] (no match)
+    5.Cleanup deletion returns a positive value (success)
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_BatchUpdate_Test_001, TestSize.Level0)
 {
@@ -2584,9 +2584,9 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_BatchUpdate_Test_001, TestSize.L
     2. Create a media library URI
     3. Create a batch update operation list with 4001 identical update operations (exceeding limit)
     4. Execute batch update and check the return value and results
-* @tc.expect: 
-    - Batch update returns -1 (failure due to exceeding limit)
-    - Results list is empty
+* @tc.expect:
+    1.Batch update returns -1 (failure due to exceeding limit)
+    2.Results list is empty
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_BatchUpdateThanLimit_Test_001, TestSize.Level0)
 {
@@ -2661,10 +2661,10 @@ void PrepareNodeContent(RdbChangeNode &node)
     3. Use RdbObserverStub to read the length from Ashmem and verify it matches
     4. Read the URI string from Ashmem and verify it matches the original
     5. Test error path: attempt to read data exceeding Ashmem size
-* @tc.expect: 
-    - Normal read of length returns E_OK and matches written length
-    - Normal read of string returns E_OK and matches original URI
-    - Error read (exceeding size) returns E_ERROR
+* @tc.expect:
+    1.Normal read of length returns E_OK and matches written length
+    2.Normal read of string returns E_OK and matches original URI
+    3.Error read (exceeding size) returns E_ERROR
 */
 HWTEST_F(MediaDataShareUnitTest, ReadAshmem, TestSize.Level1)
 {
@@ -2716,9 +2716,9 @@ HWTEST_F(MediaDataShareUnitTest, ReadAshmem, TestSize.Level1)
     2. Create an RdbObserverStub with OnChangeCallback
     3. Call DeserializeDataFromAshmem on the stub with the node
     4. Verify the deserialized data in the node
-* @tc.expect: 
-    - Deserialization returns E_OK
-    - Node contains 2 URIs, both matching DATA_SHARE_URI
+* @tc.expect:
+    1.Deserialization returns E_OK
+    2.Node contains 2 URIs, both matching DATA_SHARE_URI
 */
 HWTEST_F(MediaDataShareUnitTest, DeserializeDataFromAshmem001, TestSize.Level1)
 {
@@ -2817,7 +2817,7 @@ HWTEST_F(MediaDataShareUnitTest, DeserializeDataFromAshmem002, TestSize.Level1)
     5. Prepare a second RdbChangeNode with shared memory but set isSharedMemory_ to false
     6. Call RecoverRdbChangeNodeData on the second node and verify return value
     7. Check that node data remains empty, memory is retained, and size is unchanged
-* @tc.expect: 
+* @tc.expect:
     1.First recovery returns E_OK, node contains 2 URIs, memory is null, size is 0, and isSharedMemory_ is false
     2.non-recovery returns E_OK, node data is empty, memory is not null, size is 82, and isSharedMemory_ is false
 */
@@ -2864,9 +2864,9 @@ HWTEST_F(MediaDataShareUnitTest, RecoverRdbChangeNodeData001, TestSize.Level0)
     2. Create an RdbObserverStub with OnChangeCallback
     3. Call RecoverRdbChangeNodeData on the stub with the node
     4. Verify the return value and node state after recovery
-* @tc.expect: 
-    - Recovery returns E_ERROR
-    - Node data is empty, memory is null, size is 0, and isSharedMemory_ is false
+* @tc.expect:
+    1.Recovery returns E_ERROR
+    2.Node data is empty, memory is null, size is 0, and isSharedMemory_ is false
 */
 HWTEST_F(MediaDataShareUnitTest, RecoverRdbChangeNodeData002, TestSize.Level0)
 {
@@ -2895,9 +2895,9 @@ HWTEST_F(MediaDataShareUnitTest, RecoverRdbChangeNodeData002, TestSize.Level0)
     2. Create an RdbObserverStub with OnChangeCallback
     3. Call OnChangeFromRdb on the stub with the node
     4. Verify the node's data, memory, size, and isSharedMemory_ state
-* @tc.expect: 
-    - Node contains 2 URIs matching DATA_SHARE_URI
-    - Node memory is null, size is 0, and isSharedMemory_ is false
+* @tc.expect:
+    1.Node contains 2 URIs matching DATA_SHARE_URI
+    2.Node memory is null, size is 0, and isSharedMemory_ is false
 */
 HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb001, TestSize.Level0)
 {
@@ -2928,9 +2928,9 @@ HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb001, TestSize.Level0)
     2. Create an RdbObserverStub with OnChangeCallback
     3. Call OnChangeFromRdb on the stub with the node
     4. Verify the node's data, memory, size, and isSharedMemory_ state
-* @tc.expect: 
-    - Node data is empty
-    - Node memory is null, size is 0, and isSharedMemory_ is false
+* @tc.expect:
+    1.Node data is empty
+    2.Node memory is null, size is 0, and isSharedMemory_ is false
 */
 HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb002, TestSize.Level0)
 {
@@ -2959,10 +2959,10 @@ HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb002, TestSize.Level0)
     4. Write the correct interface token and call OnRemoteRequest with code 1
     5. Call OnRemoteRequest with the correct token and code 0
     6. Verify the return values for each scenario
-* @tc.expect: 
-    - Request with invalid token returns ERR_INVALID_STATE
-    - Request with valid token and invalid code (1) returns ERR_INVALID_STATE
-    - Request with valid token and code 0 returns ERR_INVALID_VALUE
+* @tc.expect:
+    1.Request with invalid token returns ERR_INVALID_STATE
+    2.Request with valid token and invalid code (1) returns ERR_INVALID_STATE
+    3.Request with valid token and code 0 returns ERR_INVALID_VALUE
 */
 HWTEST_F(MediaDataShareUnitTest, OnremoteRequestTest001, TestSize.Level0)
 {
@@ -3079,9 +3079,9 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_User_Define_Func_Test_002, TestS
     2. Attempt to register a null observer with an empty URI, check error code
     3. Create a valid observer and use a media library URI
     4. Release the helper's controller and attempt to register the observer, check error code
-* @tc.expect: 
-    - Registering null observer returns E_NULL_OBSERVER
-    - Registering with released (null) controller returns E_HELPER_DIED
+* @tc.expect:
+    1.Registering null observer returns E_NULL_OBSERVER
+    2.Registering with released (null) controller returns E_HELPER_DIED
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test_001, TestSize.Level0)
 {
@@ -3145,7 +3145,7 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test
     2. Attempt to unregister a null observer, check error code
     3. Create a valid observer and attempt to unregister it (not previously registered), check error code
     4. Register the observer, release the helper's controller, then attempt to unregister, check error code
-* @tc.expect: 
+* @tc.expect:
     - Unregistering null observer returns E_NULL_OBSERVER
     - Unregistering unregistered observer returns E_NULL_OBSERVER
     - Unregistering with released (null) controller returns E_HELPER_DIED
@@ -3191,9 +3191,9 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExtProvider_Te
     3. Register the observer using RegisterObserverExtProvider and verify success
     4. Unregister the observer using UnregisterObserverExtProvider
     5. Verify the error code of unregistration
-* @tc.expect: 
-    - Registration returns E_OK
-    - Unregistration returns E_OK (success)
+* @tc.expect:
+    1.Registration returns E_OK
+    2.Unregistration returns E_OK (success)
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExtProvider_Test_002, TestSize.Level0)
 {
@@ -3292,9 +3292,9 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotifyChangeExtProvider_Test_002
     2. Create a media library URI and specify "rw" mode
     3. Call OpenFileWithErrCode with the URI, mode, and error code pointer
     4. Verify the returned file descriptor (fd) and error code
-* @tc.expect: 
-    - File descriptor (fd) is negative (failure to open)
-    - Error code is -1
+* @tc.expect:
+    1.File descriptor (fd) is negative (failure to open)
+    2.Error code is -1
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_OpenFileWithErrCode_Test_001, TestSize.Level0)
 {

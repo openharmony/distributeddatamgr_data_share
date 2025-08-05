@@ -440,7 +440,7 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t system
  * @tc.desc: Verify concurrent RegisterObserverExtProvider and UnregisterObserverExtProvider operations
  * @tc.type: concurrent
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. DataShare service is properly initialized
     2. STORAGE_MANAGER_MANAGER_ID system ability is available
  * @tc.step:

@@ -734,14 +734,14 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Delete_Test_002, TestSize.L
 * @tc.require: NA
 * @tc.precon: None
 * @tc.step:
-* 1. Create initial DataShareHelper with valid parameters (should succeed)
-* 2. Disable silent switch using SetSilentSwitch() with empty URI
-* 3. Try to create another DataShareHelper with same parameters
-* 4. Re-enable silent switch
-* @tc.expect: 
-* 1. First helper creation succeeds (helper != nullptr)
-* 2. Second helper creation fails (helper == nullptr)
-* 3. Re-enabling switch returns E_OK
+    1. Create initial DataShareHelper with valid parameters (should succeed)
+    2. Disable silent switch using SetSilentSwitch() with empty URI
+    3. Try to create another DataShareHelper with same parameters
+    4. Re-enable silent switch
+* @tc.expect:
+    1. First helper creation succeeds (helper != nullptr)
+    2. Second helper creation fails (helper == nullptr)
+    3. Re-enabling switch returns E_OK
 */
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_CreateHelper_Test_001, TestSize.Level0)
 {
@@ -783,7 +783,7 @@ Template GetTemplate()
 * 3. Get query template using GetTemplate()
 * 4. Call AddQueryTemplate with proxy URI, subscriber ID and template
 * 5. Re-enable silent switch
-* @tc.expect: 
+* @tc.expect:
 * 1. Helper creation succeeds (helper != nullptr)
 * 2. AddQueryTemplate returns ERROR (-1)
 * 3. Re-enabling switch returns E_OK
@@ -817,7 +817,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_CreateHelper_Test_002, Tes
 * 2. Create DataShareHelper with valid parameters (without provider URI)
 * 3. Get query template using GetTemplate()
 * 4. Call AddQueryTemplate with proxy URI, subscriber ID and template
-* @tc.expect: 
+* @tc.expect:
 * 1. Helper creation succeeds (helper != nullptr)
 * 2. AddQueryTemplate returns E_BUNDLE_NAME_NOT_EXIST
 */
@@ -848,7 +848,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_CreateHelper_Test_001, Test
 * 2. Create DataShareHelper with valid parameters (including provider URI)
 * 3. Get query template using GetTemplate()
 * 4. Call AddQueryTemplate with proxy URI, subscriber ID and template
-* @tc.expect: 
+* @tc.expect:
 * 1. Helper creation succeeds (helper != nullptr)
 * 2. AddQueryTemplate returns E_BUNDLE_NAME_NOT_EXIST
 */
