@@ -133,8 +133,18 @@ void DataShareStubTest::TearDown(void) {}
 
 /**
 * @tc.name: DataShareStub_CmdRegisterObserverExtProvider_Test_001
-* @tc.desc: test CmdRegisterObserverExtProvideroteRequest default func
+* @tc.desc: Verify functionality of CMD_REGISTER_OBSERVEREXT_PROVIDER command handling
 * @tc.type: FUNC
+* @tc.precon: None
+* @tc.step:
+    1. Create test URI and IDataAbilityObserverTest instance
+    2. Prepare message parcel with interface token and parameters
+    3. Call OnRemoteRequest with REGISTER_OBSERVEREXT_PROVIDER command
+    4. Check returned error code and unmarshal result
+* @tc.expect:
+    1. All objects are successfully initialized
+    2. OnRemoteRequest returns 0 (success)
+    3. Unmarshaled result code is 0 (E_OK)
 */
 HWTEST_F(DataShareStubTest, DataShareStub_CmdRegisterObserverExtProvider_Test_001, TestSize.Level0)
 {
@@ -166,8 +176,18 @@ HWTEST_F(DataShareStubTest, DataShareStub_CmdRegisterObserverExtProvider_Test_00
 
 /**
 * @tc.name: DataShareStub_CmdUnregisterObserverExtProvider_Test_001
-* @tc.desc: test CmdUnregisterObserverExtProvideroteRequest default func
+* @tc.desc: Verify functionality of CMD_UNREGISTER_OBSERVEREXT_PROVIDER command handling
 * @tc.type: FUNC
+* @tc.precon: None
+* @tc.step:
+    1. Create test URI and IDataAbilityObserverTest instance
+    2. Prepare message parcel with interface token and parameters
+    3. Call OnRemoteRequest with UNREGISTER_OBSERVEREXT_PROVIDER command
+    4. Check returned error code and unmarshal result
+* @tc.expect:
+    1. All objects are successfully initialized
+    2. OnRemoteRequest returns 0 (success)
+    3. Unmarshaled result code is 0 (E_OK)
 */
 HWTEST_F(DataShareStubTest, DataShareStub_CmdUnregisterObserverExtProvider_Test_001, TestSize.Level0)
 {
@@ -197,8 +217,18 @@ HWTEST_F(DataShareStubTest, DataShareStub_CmdUnregisterObserverExtProvider_Test_
 
 /**
 * @tc.name: DataShareStub_CmdNotifyChangeExtProvider_Test_001
-* @tc.desc: test CmdNotifyChangeExtProvider default func
+* @tc.desc: Verify functionality of CMD_NOTIFY_CHANGEEXT_PROVIDER command handling
 * @tc.type: FUNC
+* @tc.precon: None
+* @tc.step:
+    1. Create test URI and ChangeInfo object
+    2. Prepare message parcel with interface token and marshaled ChangeInfo
+    3. Call OnRemoteRequest with NOTIFY_CHANGEEXT_PROVIDER command
+    4. Check returned error code and unmarshal result
+* @tc.expect:
+    1. All objects are successfully initialized
+    2. OnRemoteRequest returns 0 (success)
+    3. Unmarshaled result code is 0 (E_OK)
 */
 HWTEST_F(DataShareStubTest, DataShareStub_CmdNotifyChangeExtProvider_Test_001, TestSize.Level0)
 {

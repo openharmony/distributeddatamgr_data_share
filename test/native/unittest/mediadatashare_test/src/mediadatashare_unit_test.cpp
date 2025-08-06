@@ -249,6 +249,18 @@ void MediaDataShareUnitTest::TearDownTestCase(void)
 void MediaDataShareUnitTest::SetUp(void) {}
 void MediaDataShareUnitTest::TearDown(void) {}
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_001
+* @tc.desc: Verify query with Equals and Limit predicates returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with Equals("name", "dataShareTest003") and Limit(1, 0)
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 1 row
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_001::Start");
@@ -267,6 +279,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_001, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_001, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_002
+* @tc.desc: Verify query with NotEqualTo predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with NotEqualTo("name", "dataShareTest003")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 2 rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_002, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_002::Start");
@@ -284,6 +308,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_002, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_002, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_003
+* @tc.desc: Verify query with Contains predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with Contains("name", "dataShareTest")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 3 rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_003, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_003::Start");
@@ -301,6 +337,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_003, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_003, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_004
+* @tc.desc: Verify query with BeginsWith predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with BeginsWith("name", "dataShare")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 3 rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_004, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_004::Start");
@@ -318,6 +366,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_004, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_004, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_005
+* @tc.desc: Verify query with EndsWith predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with EndsWith("name", "003")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 1 row
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_005, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_005::Start");
@@ -335,6 +395,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_005, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_005, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_006
+* @tc.desc: Verify query with IsNull predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with IsNull("name")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 0 rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_006, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_006::Start");
@@ -352,6 +424,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_006, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_006, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_007
+* @tc.desc: Verify query with IsNotNull predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with IsNotNull("name")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 3 rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_007, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_007::Start");
@@ -369,6 +453,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_007, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_007, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_008
+* @tc.desc: Verify query with Like predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with Like("name", "%Test003")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 1 row
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_008, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_008::Start");
@@ -386,6 +482,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_008, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_008, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_009
+* @tc.desc: Verify query with Glob predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with Glob("name", "dataShareTes?003")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 1 row
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_009, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_009::Start");
@@ -403,6 +511,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_009, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_009, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_010
+* @tc.desc: Verify query with Between predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with Between("age", "0", "999")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 1 row
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_010, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_010::Start");
@@ -420,6 +540,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_010, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_010, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_011
+* @tc.desc: Verify query with NotBetween predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with NotBetween("age", "0", "999")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 2 rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_011, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_011::Start");
@@ -437,6 +569,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_011, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_011, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_012
+* @tc.desc: Verify query with GreaterThan predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with GreaterThan("age", 999)
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 2 rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_012, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_012::Start");
@@ -454,6 +598,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_012, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_012, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_013
+* @tc.desc: Verify query with LessThan predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with LessThan("age", 1000)
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 1 row
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_013, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_013::Start");
@@ -471,6 +627,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_013, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_013, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_014
+* @tc.desc: Verify query with GreaterThanOrEqualTo predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with GreaterThanOrEqualTo("age", 1000)
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 2 rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_014, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_014::Start");
@@ -488,6 +656,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_014, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_014, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_015
+* @tc.desc: Verify query with LessThanOrEqualTo predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with LessThanOrEqualTo("age", 1000)
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 2 rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_015, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_015::Start");
@@ -505,6 +685,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_015, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_015, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_016
+* @tc.desc: Verify query with combined predicates (AND/OR) returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create complex predicates with nested conditions
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 1 row
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_016, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_016::Start");
@@ -527,6 +719,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_016, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_016, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_017
+* @tc.desc: Verify query with AND combined predicates returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates combining two EqualTo conditions with AND
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 1 row
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_017, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_017::Start");
@@ -544,6 +748,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_017, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_017, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_018
+* @tc.desc: Verify query with ascending order predicate returns correctly ordered results
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with OrderByAsc("age")
+    2. Execute query with these predicates
+    3. Check the name of the first row in results
+* @tc.expected: First row contains name "dataShareTest005"
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_018, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_018::Start");
@@ -564,6 +780,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_018, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_018, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_019
+* @tc.desc: Verify query with descending order predicate returns correctly ordered results
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with OrderByDesc("phoneNumber")
+    2. Execute query with these predicates
+    3. Check the name of the first row in results
+* @tc.expected: First row contains name "dataShareTest005"
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_019, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_019::Start");
@@ -584,6 +812,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_019, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_019, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_020
+* @tc.desc: Verify predicate setting mode can be set and retrieved correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create empty predicates
+    2. Set setting mode to PREDICATES_METHOD
+    3. Retrieve and check the setting mode
+* @tc.expected: Retrieved setting mode matches PREDICATES_METHOD
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_020, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_020::Start");
@@ -594,6 +834,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_020, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_020, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_021
+* @tc.desc: Verify predicate operation list is correctly generated
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with Equals("name", "dataShareTest003")
+    2. Retrieve the operation list
+    3. Verify operation type and parameters
+* @tc.expected: Operation list contains correct type and parameters
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_021, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_021::Start");
@@ -612,6 +864,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_021, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_021, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_022
+* @tc.desc: Verify where clause can be set and retrieved correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create empty predicates
+    2. Set where clause to "`data2` > ?"
+    3. Retrieve and verify the where clause
+* @tc.expected: Retrieved where clause matches the set value
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_022, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_023::Start");
@@ -623,6 +887,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_022, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_023, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_023
+* @tc.desc: Verify where arguments can be set and retrieved correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create empty predicates
+    2. Set where arguments with vector containing "-5"
+    3. Retrieve and verify the where arguments
+* @tc.expected: Retrieved where arguments match the set values
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_023, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_024::Start");
@@ -634,6 +910,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_023, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_024, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_024
+* @tc.desc: Verify order clause can be set and retrieved correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create empty predicates
+    2. Set order clause to "data3"
+    3. Retrieve and verify the order clause
+* @tc.expected: Retrieved order clause matches the set value
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_024, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_025::Start");
@@ -645,6 +933,19 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_024, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_025, End");
 }
 
+/**
+* @tc.name: MediaDataShare_ValuesBucket_Test_001
+* @tc.desc: Verify DataShareValuesBucket basic operations work correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create empty ValuesBucket and verify it's empty
+    2. Add a value and verify it's no longer empty
+    3. Retrieve and verify the value
+    4. Clear the bucket and verify it's empty again
+* @tc.expected: All operations work as expected with correct values
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ValuesBucket_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ValuesBucket_Test_001::Start");
@@ -664,6 +965,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ValuesBucket_Test_001, TestSize.
     LOG_INFO("MediaDataShare_ValuesBucket_Test_001 End");
 }
 
+/**
+* @tc.name: MediaDataShare_ValueObject_Test_001
+* @tc.desc: Verify DataShareValueObject handles various data types correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create ValueObjects with different data types (int, int64, double, bool, vector)
+    2. Verify copy and move operations
+    3. Check that retrieved values match original values
+* @tc.expected: All value types are stored and retrieved correctly
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ValueObject_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ValueObject_Test_001::Start");
@@ -704,6 +1017,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ValueObject_Test_001, TestSize.L
     LOG_INFO("MediaDataShare_ValueObject_Test_001 End");
 }
 
+/**
+* @tc.name: MediaDataShare_batchInsert_Test_001
+* @tc.desc: Verify batch insert operation correctly inserts multiple records
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create two ValuesBuckets with test data
+    2. Perform batch insert with these buckets
+    3. Verify the number of inserted records
+* @tc.expected: Batch insert returns 2 indicating successful insertion of both records
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_batchInsert_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_batchInsert_Test_001::Start");
@@ -724,6 +1049,17 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_batchInsert_Test_001, TestSize.L
     LOG_INFO("MediaDataShare_batchInsert_Test_001 End");
 }
 
+/**
+* @tc.name: MediaDataShare_NormalizeUri_Test_001
+* @tc.desc: Verify URI normalization function works correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Call NormalizeUri with media library URI
+    2. Compare result with expected normalized URI
+* @tc.expected: Normalized URI matches the expected value
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NormalizeUri_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_NormalizeUri_Test_001::Start");
@@ -735,6 +1071,17 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NormalizeUri_Test_001, TestSize.
     LOG_INFO("MediaDataShare_NormalizeUri_Test_001 End");
 }
 
+/**
+* @tc.name: MediaDataShare_DenormalizeUri_Test_001
+* @tc.desc: Verify URI denormalization function works correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Call DenormalizeUri with media library URI
+    2. Compare result with expected denormalized URI
+* @tc.expected: Denormalized URI matches the expected value
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_DenormalizeUri_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_DenormalizeUri_Test_001::Start");
@@ -746,6 +1093,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_DenormalizeUri_Test_001, TestSiz
     LOG_INFO("MediaDataShare_DenormalizeUri_Test_001 End");
 }
 
+/**
+* @tc.name: MediaDataShare_SingleValue_Test_001
+* @tc.desc: Verify SingleValue handles various data types correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create SingleValue objects with different data types
+    2. Verify copy and move operations
+    3. Check that retrieved values match original values
+* @tc.expected: All value types are stored and retrieved correctly
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_SingleValue_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_SingleValue_Test_001::Start");
@@ -784,6 +1143,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_SingleValue_Test_001, TestSize.L
     LOG_INFO("MediaDataShare_SingleValue_Test_001 End");
 }
 
+/**
+* @tc.name: MediaDataShare_MutliValue_Test_001
+* @tc.desc: Verify MutliValue handles various collection types correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create MutliValue objects with different collection types
+    2. Verify copy and move operations
+    3. Check that retrieved values match original values
+* @tc.expected: All collections are stored and retrieved correctly
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_MutliValue_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_MutliValue_Test_001::Start");
@@ -821,6 +1192,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_MutliValue_Test_001, TestSize.Le
     LOG_INFO("MediaDataShare_MutliValue_Test_001 End");
 }
 
+/**
+* @tc.name: MediaDataShare_ResultSet_Test_001
+* @tc.desc: Verify default ResultSet behavior with no data
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create empty ResultSet
+    2. Attempt various operations (get columns, row count, move to row, get values)
+    3. Verify operations return appropriate error codes
+* @tc.expected: All operations on empty ResultSet return errors
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ResultSet_Test_005::Start");
@@ -854,6 +1237,19 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_001, TestSize.Lev
     LOG_INFO("MediaDataShare_ResultSet_Test_005, End");
 }
 
+/**
+* @tc.name: MediaDataShare_ResultSet_Test_002
+* @tc.require: None
+* @tc.desc: Verify ResultSet column operations work correctly
+* @tc.type: FUNC
+* @tc.precon: None
+* @tc.step:
+    1. Query data for "dataShareTest003"
+    2. Verify column name retrieval
+    3. Check blob retrieval from result set
+    4. Verify all column names can be retrieved
+* @tc.expected: All column operations return valid results
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_002, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ResultSet_Test_002::Start");
@@ -885,6 +1281,19 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_002, TestSize.Lev
     LOG_INFO("MediaDataShare_ResultSet_Test_002, End");
 }
 
+/**
+* @tc.name: MediaDataShare_ResultSet_Test_003
+* @tc.desc: Verify ResultSet block operations work correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Query data for "dataShareTest003"
+    2. Check if result set has a block
+    3. Retrieve, set and fill block
+    4. Verify block operations maintain correct reference
+* @tc.expected: All block operations work as expected
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_003, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ResultSet_Test_003::Start");
@@ -909,6 +1318,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_003, TestSize.Lev
     LOG_INFO("MediaDataShare_ResultSet_Test_003, End");
 }
 
+/**
+* @tc.name: MediaDataShare_ResultSet_Test_004
+* @tc.desc: Verify ResultSet navigation works correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Query data with names containing "dataShareTest"
+    2. Move to first row
+    3. Attempt navigation with OnGo method
+* @tc.expected: Navigation operation returns true indicating success
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_004, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ResultSet_Test_004::Start");
@@ -927,6 +1348,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_004, TestSize.Lev
     LOG_INFO("MediaDataShare_ResultSet_Test_004, End");
 }
 
+/**
+* @tc.name: MediaDataShare_ResultSet_Test_005
+* @tc.desc: Verify empty ResultSet operations return appropriate errors
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create empty ResultSet
+    2. Attempt various operations without data
+    3. Verify error codes and return values
+* @tc.expected: All operations on empty ResultSet return errors
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_005, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ResultSet_Test_005::Start");
@@ -957,6 +1390,19 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_005, TestSize.Lev
     LOG_INFO("MediaDataShare_ResultSet_Test_005, End");
 }
 
+/**
+* @tc.name: MediaDataShare_ResultSet_Test_006
+* @tc.desc: Verify ResultSet data type and value retrieval
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Insert test data with specific age value
+    2. Query for the inserted data
+    3. Verify data type and value match expectations
+    4. Clean up test data
+* @tc.expected: Data type is INTEGER and retrieved value matches inserted value
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_006, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ResultSet_Test_006::Start");
@@ -991,6 +1437,17 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_006, TestSize.Lev
     LOG_INFO("MediaDataShare_ResultSet_Test_006, End");
 }
 
+/**
+* @tc.name: Creator_IRemoteObjectNull_Test_001
+* @tc.desc: Verify Creator handles null remote object correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Attempt to create DataShareHelper with null IRemoteObject
+    2. Check if returned helper is null
+* @tc.expected: Creator returns nullptr when remote object is null
+*/
 HWTEST_F(MediaDataShareUnitTest, Creator_IRemoteObjectNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("Creator_IRemoteObjectNull_Test_001::Start");
@@ -1000,6 +1457,18 @@ HWTEST_F(MediaDataShareUnitTest, Creator_IRemoteObjectNull_Test_001, TestSize.Le
     LOG_INFO("Creator_IRemoteObjectNull_Test_001 End");
 }
 
+/**
+* @tc.name: Creator_UriError_Test_001
+* @tc.desc: Verify Creator handles invalid URI correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Get valid remote object from system ability manager
+    2. Attempt to create DataShareHelper with invalid URI
+    3. Check if returned helper is null
+* @tc.expected: Creator returns nullptr when URI is invalid
+*/
 HWTEST_F(MediaDataShareUnitTest, Creator_UriError_Test_001, TestSize.Level0)
 {
     LOG_INFO("Creator_UriError_Test_001::Start");
@@ -1012,6 +1481,19 @@ HWTEST_F(MediaDataShareUnitTest, Creator_UriError_Test_001, TestSize.Level0)
     LOG_INFO("Creator_UriError_Test_001 End");
 }
 
+/**
+* @tc.name: Insert_ConnectionNull_Test_001
+* @tc.desc: Verify operations fail correctly when connection is released
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create DataShareHelper and immediately release it
+    2. Attempt insert operation with released connection
+    3. Attempt get type operation
+    4. Verify error results
+* @tc.expected: Insert returns -1 and GetType returns empty string
+*/
 HWTEST_F(MediaDataShareUnitTest, Insert_ConnectionNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("Insert_ConnectionNull_Test_001::Start");
@@ -1037,6 +1519,23 @@ HWTEST_F(MediaDataShareUnitTest, Insert_ConnectionNull_Test_001, TestSize.Level0
     LOG_INFO("Insert_ConnectionNull_Test_001 End");
 }
 
+/**
+* @tc.name: MediaDataShare_CRUD_Test_001
+* @tc.desc: Verify basic CRUD operations (Create, Read, Update, Delete) work correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Insert a new record with name "Datashare_CRUD_Test001"
+    2. Update the record to name "Datashare_CRUD_Test002" using predicates
+    3. Query for the updated record to verify the change
+    4. Delete the record using predicates
+* @tc.expected:
+    1.Insert returns a positive ID indicating success
+    2.Update returns non-negative value indicating success
+    3.Query returns exactly 1 row for the updated record
+    4.Delete returns non-negative value indicating success
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUD_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_CRUD_Test_001::Start");
@@ -1073,6 +1572,23 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUD_Test_001, TestSize.Level0)
     LOG_INFO("MediaDataShare_CRUD_Test_001, End");
 }
 
+/**
+* @tc.name: MediaDataShare_CRUDEX_Test_001
+* @tc.desc: Verify extended CRUD operations with error code returns work correctly
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Insert a new record using InsertEx and verify error code and return value
+    2. Update the record using UpdateEx with predicates and verify results
+    3. Query for the updated record to confirm changes
+    4. Delete the record using DeleteEx and verify results
+* @tc.expected:
+    1.InsertEx returns error code 0 and non-negative ID
+    2.UpdateEx returns error code 0 and non-negative affected rows
+    3.Query returns exactly 1 row for the updated record
+    4.DeleteEx returns error code 0 and non-negative affected rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUDEX_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_CRUDEX_Test_001::Start");
@@ -1110,6 +1626,22 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUDEX_Test_001, TestSize.Level0
     LOG_INFO("MediaDataShare_CRUDEX_Test_001, End");
 }
 
+/**
+* @tc.name: MediaDataShare_ImplPredicates_Test_001
+* @tc.desc: Verify In predicate generates correct operation items
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with In("name", {1, 2, 3}) condition
+    2. Retrieve the operation items from predicates
+    3. Verify operation type, parameters, and values
+* @tc.expected:
+    1.Exactly 1 operation item is generated
+    2.Operation type is correct for In condition
+    3.Parameters contain "name" and the correct integer values
+    4.Variant indices match expected types (string and integer vector)
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ImplPredicates_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ImplPredicates_Test_001::Start");
@@ -1135,6 +1667,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ImplPredicates_Test_001, TestSiz
     LOG_INFO("MediaDataShare_ImplPredicates_Test_001, End");
 }
 
+/**
+* @tc.name: MediaDataShare_NotImplPredicates_Test_001
+* @tc.desc: Verify multiple predicate combinations generate correct number of operation items
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with multiple conditions: In, NotIn, Unlike, GroupBy, Distinct, IndexedBy, KeyPrefix, InKeys
+    2. Retrieve the operation items from predicates
+    3. Verify the total number of operation items
+* @tc.expected: Exactly 8 operation items are generated matching the number of conditions
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotImplPredicates_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_NotImplPredicates_Test_001::Start");
@@ -1164,10 +1708,21 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotImplPredicates_Test_001, Test
 }
 
 /**
-* @tc.name: MediaDataShare_RegisterObserver_001
-* @tc.desc: normal test register non-silent observer function.
+* @tc.name: MediaDataShare_Observer_001
+* @tc.desc: Verify normal registration and operation of non-silent data observer
 * @tc.type: FUNC
-* @tc.require:
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Register a data observer for the media library URI
+    2. Insert a new record and trigger notification
+    3. Delete the record and trigger notification
+    4. Unregister the observer
+* @tc.expected:
+    1.Registration returns 0 indicating success
+    2.Insert returns positive ID and notification is triggered
+    3.Delete returns positive value and notification is triggered
+    4.Unregistration returns 0 indicating success
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Observer_001, TestSize.Level0)
 {
@@ -1197,9 +1752,20 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Observer_001, TestSize.Level0)
 
 /**
 * @tc.name: MediaDataShare_ReregisterObserver_001
-* @tc.desc: abnormal test reregister non-silent observer function.
+* @tc.desc: Verify error handling when re-registering an existing observer
 * @tc.type: FUNC
-* @tc.require:
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Register a data observer for the media library URI
+    2. Attempt to register the same observer again
+    3. Perform insert and delete operations with notifications
+    4. Unregister the observer
+* @tc.expected:
+    1.First registration returns 0 indicating success
+    2.Second registration returns E_REGISTER_ERROR
+    3.Insert and delete operations complete successfully
+    4.Unregistration returns 0 indicating success
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ReregisterObserver_001, TestSize.Level0)
 {
@@ -1229,6 +1795,31 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ReregisterObserver_001, TestSize
     LOG_INFO("MediaDataShare_ReregisterObserver_001 end");
 }
 
+/**
+* @tc.name: MediaDataShare_ObserverExt_001
+* @tc.desc: Verify observer extension functionality for data change notifications
+* @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: DataShareHelper instance is properly initialized and MEDIALIBRARY_DATA_URI is accessible
+* @tc.step:
+    1. Get DataShareHelper instance and verify it's not null
+    2. Create test URI and DataShareObserverTest instance
+    3. Register observer extension with the URI
+    4. Insert test data and notify INSERT change
+    5. Verify observer receives correct INSERT change information
+    6. Insert data to descendant URI and notify INSERT change
+    7. Verify observer receives correct descendant INSERT change information
+    8. Delete test data and notify DELETE change with additional data
+    9. Verify observer receives correct DELETE change information
+    10. Unregister the observer
+* @tc.expect:
+    1. DataShareHelper instance is successfully obtained
+    2. Test data is inserted successfully (retVal > 0)
+    3. Observer receives accurate INSERT change information for main URI
+    4. Observer receives accurate INSERT change information for descendant URI
+    5. Observer receives accurate DELETE change information including additional data
+    6. All operations complete without errors
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ObserverExt_001 start");
@@ -1274,6 +1865,28 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_001, TestSize.Level0
     LOG_INFO("MediaDataShare_ObserverExt_001 end");
 }
 
+/**
+* @tc.name: MediaDataShare_UnregisterObserverExt_001
+* @tc.desc: Verify unregister functionality of observer extension
+* @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: DataShareHelper instance is properly initialized and MEDIALIBRARY_DATA_URI is accessible
+* @tc.step:
+    1. Get DataShareHelper instance and verify it's not null
+    2. Create test URI and DataShareObserverTest instance
+    3. Register observer extension with the URI
+    4. Insert test data and notify INSERT change
+    5. Verify observer receives correct change information
+    6. Unregister the observer from the URI
+    7. Notify another DELETE change
+    8. Verify observer no longer receives change information
+* @tc.expect:
+    1. DataShareHelper instance is successfully obtained
+    2. Test data is inserted successfully (retVal > 0)
+    3. Observer receives accurate change information before unregistration
+    4. After unregistration, observer does NOT receive change notifications
+    5. All operations complete without errors
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_UnregisterObserverExt_001 start");
@@ -1303,6 +1916,22 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_001, TestS
     LOG_INFO("MediaDataShare_UnregisterObserverExt_001 end");
 }
 
+/**
+* @tc.name: MediaDataShare_ToAbsSharedResultSet_Test_001
+* @tc.desc: Test conversion of DataShare query result to AbsSharedResultSet
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Get the DataShare helper instance
+    2. Create predicates to filter data by name "dataShareTest003"
+    3. Query the media library URI with the predicates and empty columns
+    4. Convert the query result to AbsSharedResultSet using RdbDataAbilityUtils
+    5. Get the row count from the converted result set
+* @tc.expect:
+    1.The converted AbsSharedResultSet is not null
+    2.The row count of the result set is 1 (matches the expected test data)
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ToAbsSharedResultSet_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ToAbsSharedResultSet_Test_001::Start");
@@ -1322,6 +1951,20 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ToAbsSharedResultSet_Test_001, T
     LOG_INFO("MediaDataShare_ToAbsSharedResultSet_Test_001 End");
 }
 
+/**
+* @tc.name: MediaDataShare_ExecuteBatch_Test_001
+* @tc.desc: Test batch execution of INSERT and DELETE operations via DataShare helper
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Get the DataShare helper instance
+    2. Create an INSERT operation statement with test data and predicates
+    3. Create a DELETE operation statement with test data and predicates
+    4. Add both statements to a batch list
+    5. Execute the batch operation using helper->ExecuteBatch()
+* @tc.expect: Batch execution returns 0 (success status)
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ExecuteBatch_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ExecuteBatch_Test_001::Start");
@@ -1357,6 +2000,19 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ExecuteBatch_Test_001, TestSize.
     LOG_INFO("MediaDataShare_ExecuteBatch_Test_001 End");
 }
 
+/**
+* @tc.name: MediaDataShare_InsertExt_Test_001
+* @tc.desc: Test extended insertion functionality (InsertExt) of DataShare helper
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Get the DataShare helper instance and verify it is not null
+    2. Create a URI for media library data
+    3. Create a ValuesBucket with test data (name="Datashare_CRUD_Test001")
+    4. Call InsertExt with the URI, ValuesBucket, and result string
+* @tc.expect: InsertExt returns 0 (success status)
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_InsertExt_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_InsertExt_Test_001::Start");
@@ -1371,6 +2027,22 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_InsertExt_Test_001, TestSize.Lev
     LOG_INFO("MediaDataShare_InsertExt_Test_001 End");
 }
 
+/**
+* @tc.name: MediaDataShare_TransferUri_Test_001
+* @tc.desc: Test URI transfer functionality and DataShare helper creation for file data URI
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a file data URI
+    2. Get the SystemAbilityManager instance and verify it is not null
+    3. Get the Storage Manager system ability remote object and verify it is not null
+    4. Create a DataShare helper using the remote object and file data URI
+* @tc.expect:
+    1.SystemAbilityManager instance is not null
+    2.Storage Manager remote object is not null
+    3.DataShare helper instance is successfully created (not null)
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_TransferUri_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_TransferUri_Test_001::Start");
@@ -1391,6 +2063,19 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_TransferUri_Test_001, TestSize.L
     LOG_INFO("MediaDataShare_TransferUri_Test_001 End");
 }
 
+/**
+* @tc.name: ControllerTest_HelperInsertExtControllerNullTest_001
+* @tc.desc: Test InsertExt operation when DataShare controller is released (null)
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShare helper instance and verify it is not null
+    2. Create a test URI and release the helper's controller
+    3. Create a ValuesBucket with test data (phoneNumber=20.07, name="dataShareTest003", age=1001)
+    4. Call InsertExt with the URI, ValuesBucket, and result string
+* @tc.expect: InsertExt returns a negative value (failure due to released controller)
+*/
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperInsertExtControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperInsertExtControllerNullTest_001::Start");
@@ -1410,6 +2095,20 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperInsertExtControllerNullTes
     LOG_INFO("ControllerTest_HelperInsertExtControllerNullTest_001::End");
 }
 
+/**
+* @tc.name: ControllerTest_HelperUpdateControllerNullTest_001
+* @tc.desc: Test Update operation when DataShare controller is released (null)
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShare helper instance and verify it is not null
+    2. Create a test URI and release the helper's controller
+    3. Create predicates to filter data by name "Datashare_CRUD_Test001"
+    4. Create a ValuesBucket to update name to "Datashare_CRUD_Test002"
+    5. Call Update with the URI, predicates, and ValuesBucket
+* @tc.expect: Update returns a negative value (failure due to released controller)
+*/
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperUpdateControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperUpdateControllerNullTest_001::Start");
@@ -1426,6 +2125,19 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperUpdateControllerNullTest_0
     LOG_INFO("ControllerTest_HelperUpdateControllerNullTest_001::End");
 }
 
+/**
+* @tc.name: ControllerTest_HelperDeleteControllerNullTest_001
+* @tc.desc: Test Delete operation when DataShare controller is released (null)
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShare helper instance and verify it is not null
+    2. Create a test URI and release the helper's controller
+    3. Create predicates to filter data by age=1112
+    4. Call Delete with the URI and predicates
+* @tc.expect: Delete returns a negative value (failure due to released controller)
+*/
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperDeleteControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperDeleteControllerNullTest_001::Start");
@@ -1440,6 +2152,19 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperDeleteControllerNullTest_0
     LOG_INFO("ControllerTest_HelperDeleteControllerNullTest_001::End");
 }
 
+/**
+* @tc.name: ControllerTest_HelperQueryControllerNullTest_001
+* @tc.desc: Test Query operation when DataShare controller is released (null)
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShare helper instance and verify it is not null
+    2. Create a test URI and release the helper's controller
+    3. Create predicates to filter data by name "dataShareTest003" with limit 1
+    4. Call Query with the URI, predicates, and empty columns
+* @tc.expect: Query returns a null result set (failure due to released controller)
+*/
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperQueryControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperQueryControllerNullTest_001::Start");
@@ -1456,6 +2181,20 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperQueryControllerNullTest_00
     LOG_INFO("ControllerTest_HelperQueryControllerNullTest_001::End");
 }
 
+/**
+* @tc.name: ControllerTest_HelperBatchInsertControllerNullTest_001
+* @tc.desc: Test BatchInsert operation when DataShare controller is released (null)
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShare helper instance and verify it is not null
+    2. Create a test URI and release the helper's controller
+    3. Create two ValuesBuckets with test data (name and phoneNumber)
+    4. Add both buckets to a batch list
+    5. Call BatchInsert with the URI and batch list
+* @tc.expect: BatchInsert returns a negative value (failure due to released controller)
+*/
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperBatchInsertControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperBatchInsertControllerNullTest_001::Start");
@@ -1477,6 +2216,21 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperBatchInsertControllerNullT
     LOG_INFO("ControllerTest_HelperBatchInsertControllerNullTest_001::End");
 }
 
+/**
+* @tc.name: ControllerTest_HelperExecuteBatchControllerNullTest_001
+* @tc.desc: Test ExecuteBatch operation when DataShare controller is released (null)
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShare helper instance and verify it is not null
+    2. Create a test URI and release the helper's controller
+    3. Create an INSERT operation statement with test data and predicates
+    4. Create a DELETE operation statement with test data and predicates
+    5. Add both statements to a batch list
+    6. Call ExecuteBatch with the batch list and result set
+* @tc.expect: ExecuteBatch returns a negative value (failure due to released controller)
+*/
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperExecuteBatchControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperExecuteBatchControllerNullTest_001::Start");
@@ -1516,9 +2270,25 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperExecuteBatchControllerNull
 
 /**
 * @tc.name: ControllerTest_HelperRegisterObserverControllerNullTest_001
-* @tc.desc: abnormal test register non-silent observer function while controller is nullptr.
+* @tc.desc: Test RegisterObserver, Insert, NotifyChange, Delete
 * @tc.type: FUNC
-* @tc.require:
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShare helper instance and verify it is not null
+    2. Create a media library URI and release the helper's controller
+    3. Create an IDataAbilityObserverTest instance
+    4. Call RegisterObserver with the URI and observer, check the return value
+    5. Insert test data into the URI and check the return value
+    6. Notify a change for the URI
+    7. Delete the test data using predicates and check the return value
+    8. Notify a change again for the URI
+    9. Call UnregisterObserver with the URI and observer, check the return value
+* @tc.expect:
+    1.RegisterObserver returns E_HELPER_DIED
+    2.Insert returns a negative value (failure)
+    3.Delete returns a negative value (failure)
+    4.UnregisterObserver returns E_HELPER_DIED
 */
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperRegisterObserverControllerNullTest_001, TestSize.Level0)
 {
@@ -1547,6 +2317,25 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperRegisterObserverController
     LOG_INFO("ControllerTest_HelperRegisterObserverControllerNullTest_001 end");
 }
 
+/**
+* @tc.name: MediaDataShare_ObserverExt_002
+* @tc.desc: Test DataShare observer extension for batch INSERT operation notification with extended data
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Get the DataShare helper instance and verify it is not null
+    2. Create a media library URI and a DataShareObserverTest instance
+    3. Register the observer extension with the URI
+    4. Create two ValuesBuckets with test data and batch insert them
+    5. Convert the batch data to extended format for change info
+    6. Notify an INSERT change with the extended data
+    7. Wait for observer notification and verify the change info matches
+    8. Unregister the observer extension
+* @tc.expect:
+    1.Batch insertion returns a positive value (success)
+    2.Observer correctly receives and matches INSERT change info with extended data
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_002, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ObserverExt_002 start");
@@ -1575,6 +2364,26 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_002, TestSize.Level0
     LOG_INFO("MediaDataShare_ObserverExt_002 end");
 }
 
+/**
+* @tc.name: MediaDataShare_ObserverExt_003
+* @tc.desc: Test DataShare observer extension for UPDATE operation notification with extended data
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Get the DataShare helper instance and verify it is not null
+    2. Create a media library URI and a DataShareObserverTest instance
+    3. Register the observer extension with the URI
+    4. Create a ValuesBucket with update data (name="Datashare_Observer_Test003")
+    5. Update existing data filtered by predicates (name="Datashare_Observer_Test002")
+    6. Convert the update data to extended format for change info
+    7. Notify an UPDATE change with the extended data
+    8. Wait for observer notification and verify the change info matches
+    9. Unregister the observer extension
+* @tc.expect:
+    1.Update operation returns a positive value (success)
+    2.Observer correctly receives and matches UPDATE change info with extended data
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_003, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ObserverExt_003 start");
@@ -1603,6 +2412,26 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_003, TestSize.Level0
     LOG_INFO("MediaDataShare_ObserverExt_003 end");
 }
 
+/**
+* @tc.name: MediaDataShare_ObserverExt_004
+* @tc.desc: Test DataShare observer extension for DELETE operation notification with extended data
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Get the DataShare helper instance and verify it is not null
+    2. Create a media library URI and a DataShareObserverTest instance
+    3. Register the observer extension with the URI
+    4. Create predicates to filter data by name "Datashare_Observer_Test003"
+    5. Delete the filtered data and verify success
+    6. Convert the deleted data info to extended format for change info
+    7. Notify a DELETE change with the extended data
+    8. Wait for observer notification and verify the change info matches
+    9. Unregister the observer extension
+* @tc.expect:
+    1.Delete operation returns a positive value (success)
+    2.Observer correctly receives and matches DELETE change info with extended data
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_004, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ObserverExt_004 start");
@@ -1631,6 +2460,26 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_004, TestSize.Level0
     LOG_INFO("MediaDataShare_ObserverExt_004 end");
 }
 
+/**
+* @tc.name: MediaDataShare_UnregisterObserverExt_002
+* @tc.desc: Test that unregistered DataShare observer no longer receives notifications with extended data
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Get the DataShare helper instance and verify it is not null
+    2. Create a media library URI and a DataShareObserverTest instance
+    3. Register the observer extension with the URI
+    4. Insert test data into the URI and verify success
+    5. Convert the inserted data to extended format, notify an INSERT change, and verify observer receives it
+    6. Unregister the observer extension
+    7. Notify a DELETE change with the same extended data
+    8. Wait for observer notification and verify the change info does not match
+* @tc.expect:
+    1.Data insertion returns a positive value (success)
+    2.Registered observer correctly receives INSERT change info with extended data
+    3.Unregistered observer does not receive DELETE change info (change info mismatch)
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_002, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_UnregisterObserverExt_002 start");
@@ -1663,6 +2512,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_002, TestS
     LOG_INFO("MediaDataShare_UnregisterObserverExt_002 end");
 }
 
+/**
+* @tc.name: MediaDataShare_BatchUpdate_Test_001
+* @tc.desc: Test batch update functionality of DataShare helper with multiple operations and URIs
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Get the DataShare helper instance and verify it is not null
+    2. Create a media library URI and insert test data (name="batchUpdateTest")
+    3. Create batch update operations:
+        - For "uri1": Update existing test data to "batchUpdateTested"; Update non-existent data to "undefined1"
+        - For "uri2": Update non-existent data to "undefined1"
+    4. Execute batch update and get results
+    5. Delete the test data to clean up
+* @tc.expect:
+    1.Initial insertion returns a positive value (success)
+    2.Batch update returns success, with results size 2
+    3.Results for "uri1" contain [1, 0] (1 success, 1 no match)
+    4.Results for "uri2" contain [0] (no match)
+    5.Cleanup deletion returns a positive value (success)
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_BatchUpdate_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_BatchUpdate_Test_001::Start");
@@ -1703,6 +2573,21 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_BatchUpdate_Test_001, TestSize.L
     LOG_INFO("MediaDataShare_BatchUpdate_Test_001 End");
 }
 
+/**
+* @tc.name: MediaDataShare_BatchUpdateThanLimit_Test_001
+* @tc.desc: Test batch update functionality when operation count exceeds the limit
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Get the DataShare helper instance and verify it is not null
+    2. Create a media library URI
+    3. Create a batch update operation list with 4001 identical update operations (exceeding limit)
+    4. Execute batch update and check the return value and results
+* @tc.expect:
+    1.Batch update returns -1 (failure due to exceeding limit)
+    2.Results list is empty
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_BatchUpdateThanLimit_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_BatchUpdateThanLimit_Test_001::Start");
@@ -1766,9 +2651,20 @@ void PrepareNodeContent(RdbChangeNode &node)
 
 /**
 * @tc.name: ReadAshmem
-* @tc.desc: test ReadAshmem function.
+* @tc.desc: Test ReadAshmem function for normal read operations and error scenarios
 * @tc.type: FUNC
-* @tc.require:
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create an Ashmem instance and map it for read/write
+    2. Write test data (string length and URI string) into Ashmem
+    3. Use RdbObserverStub to read the length from Ashmem and verify it matches
+    4. Read the URI string from Ashmem and verify it matches the original
+    5. Test error path: attempt to read data exceeding Ashmem size
+* @tc.expect:
+    1.Normal read of length returns E_OK and matches written length
+    2.Normal read of string returns E_OK and matches original URI
+    3.Error read (exceeding size) returns E_ERROR
 */
 HWTEST_F(MediaDataShareUnitTest, ReadAshmem, TestSize.Level1)
 {
@@ -1811,9 +2707,18 @@ HWTEST_F(MediaDataShareUnitTest, ReadAshmem, TestSize.Level1)
 
 /**
 * @tc.name: DeserializeDataFromAshmem001
-* @tc.desc: test DeserializeDataFromAshmem function.
+* @tc.desc: Test DeserializeDataFromAshmem function for successful data deserialization from Ashmem
 * @tc.type: FUNC
-* @tc.require:
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Prepare an RdbChangeNode with Ashmem containing serialized data (2 URIs) using PrepareNodeContent
+    2. Create an RdbObserverStub with OnChangeCallback
+    3. Call DeserializeDataFromAshmem on the stub with the node
+    4. Verify the deserialized data in the node
+* @tc.expect:
+    1.Deserialization returns E_OK
+    2.Node contains 2 URIs, both matching DATA_SHARE_URI
 */
 HWTEST_F(MediaDataShareUnitTest, DeserializeDataFromAshmem001, TestSize.Level1)
 {
@@ -1833,9 +2738,16 @@ HWTEST_F(MediaDataShareUnitTest, DeserializeDataFromAshmem001, TestSize.Level1)
 
 /**
 * @tc.name: DeserializeDataFromAshmem002
-* @tc.desc: test DeserializeDataFromAshmem function, error tests.
+* @tc.desc: Test DeserializeDataFromAshmem function for error scenarios (invalid Ashmem data)
 * @tc.type: FUNC
-* @tc.require:
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Test with null Ashmem: call deserialization on a node with no memory_
+    2. Test with invalid string length: write Ashmem with excessive string length and call deserialization
+    3. Test with insufficient size for vector length: create small Ashmem and call deserialization
+    4. Test with insufficient size for string length: create Ashmem with partial data and call deserialization
+* @tc.expect: All error scenarios return E_ERROR
 */
 HWTEST_F(MediaDataShareUnitTest, DeserializeDataFromAshmem002, TestSize.Level1)
 {
@@ -1893,9 +2805,21 @@ HWTEST_F(MediaDataShareUnitTest, DeserializeDataFromAshmem002, TestSize.Level1)
 
 /**
 * @tc.name: RecoverRdbChangeNodeData001
-* @tc.desc: test RecoverRdbChangeNodeData function
+* @tc.desc: Test RecoverRdbChangeNodeData function for normal recovery and non-recovery scenarios
 * @tc.type: FUNC
-* @tc.require:
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Prepare an RdbChangeNode with shared memory containing 2 URIs using PrepareNodeContent
+    2. Create an RdbObserverStub with OnChangeCallback
+    3. Call RecoverRdbChangeNodeData on the stub with the node and verify return value
+    4. Check that node data is correctly recovered, memory is nullified, and size is 0
+    5. Prepare a second RdbChangeNode with shared memory but set isSharedMemory_ to false
+    6. Call RecoverRdbChangeNodeData on the second node and verify return value
+    7. Check that node data remains empty, memory is retained, and size is unchanged
+* @tc.expect:
+    1.First recovery returns E_OK, node contains 2 URIs, memory is null, size is 0, and isSharedMemory_ is false
+    2.non-recovery returns E_OK, node data is empty, memory is not null, size is 82, and isSharedMemory_ is false
 */
 HWTEST_F(MediaDataShareUnitTest, RecoverRdbChangeNodeData001, TestSize.Level0)
 {
@@ -1931,9 +2855,18 @@ HWTEST_F(MediaDataShareUnitTest, RecoverRdbChangeNodeData001, TestSize.Level0)
 
 /**
 * @tc.name: RecoverRdbChangeNodeData002
-* @tc.desc: test RecoverRdbChangeNodeData function with error
+* @tc.desc: Test RecoverRdbChangeNodeData function with error scenario (null shared memory)
 * @tc.type: FUNC
-* @tc.require:
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create an RdbChangeNode with isSharedMemory_ set to true but no memory allocated
+    2. Create an RdbObserverStub with OnChangeCallback
+    3. Call RecoverRdbChangeNodeData on the stub with the node
+    4. Verify the return value and node state after recovery
+* @tc.expect:
+    1.Recovery returns E_ERROR
+    2.Node data is empty, memory is null, size is 0, and isSharedMemory_ is false
 */
 HWTEST_F(MediaDataShareUnitTest, RecoverRdbChangeNodeData002, TestSize.Level0)
 {
@@ -1953,9 +2886,18 @@ HWTEST_F(MediaDataShareUnitTest, RecoverRdbChangeNodeData002, TestSize.Level0)
 
 /**
 * @tc.name: OnChangeFromRdb001
-* @tc.desc: test OnChangeFromRdb function
+* @tc.desc: Test OnChangeFromRdb function for normal data processing
 * @tc.type: FUNC
-* @tc.require:
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Prepare an RdbChangeNode with shared memory containing 2 URIs using PrepareNodeContent
+    2. Create an RdbObserverStub with OnChangeCallback
+    3. Call OnChangeFromRdb on the stub with the node
+    4. Verify the node's data, memory, size, and isSharedMemory_ state
+* @tc.expect:
+    1.Node contains 2 URIs matching DATA_SHARE_URI
+    2.Node memory is null, size is 0, and isSharedMemory_ is false
 */
 HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb001, TestSize.Level0)
 {
@@ -1977,9 +2919,18 @@ HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb001, TestSize.Level0)
 
 /**
 * @tc.name: OnChangeFromRdb002
-* @tc.desc: test OnChangeFromRdb function with error
+* @tc.desc: Test OnChangeFromRdb function with error scenario (null shared memory)
 * @tc.type: FUNC
-* @tc.require:
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create an RdbChangeNode with isSharedMemory_ set to true but no memory allocated
+    2. Create an RdbObserverStub with OnChangeCallback
+    3. Call OnChangeFromRdb on the stub with the node
+    4. Verify the node's data, memory, size, and isSharedMemory_ state
+* @tc.expect:
+    1.Node data is empty
+    2.Node memory is null, size is 0, and isSharedMemory_ is false
 */
 HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb002, TestSize.Level0)
 {
@@ -1997,9 +2948,21 @@ HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb002, TestSize.Level0)
 
 /**
 * @tc.name: OnremoteRequestTest001
-* @tc.desc: test OnRemoteRequest function
+* @tc.desc: Test OnRemoteRequest function with invalid and valid interface tokens and request codes
 * @tc.type: FUNC
-* @tc.require:
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create an RdbObserverStub with OnChangeCallback
+    2. Prepare MessageParcel, reply, and option objects
+    3. Write an invalid interface token to the parcel and call OnRemoteRequest with code 0
+    4. Write the correct interface token and call OnRemoteRequest with code 1
+    5. Call OnRemoteRequest with the correct token and code 0
+    6. Verify the return values for each scenario
+* @tc.expect:
+    1.Request with invalid token returns ERR_INVALID_STATE
+    2.Request with valid token and invalid code (1) returns ERR_INVALID_STATE
+    3.Request with valid token and code 0 returns ERR_INVALID_VALUE
 */
 HWTEST_F(MediaDataShareUnitTest, OnremoteRequestTest001, TestSize.Level0)
 {
@@ -2025,9 +2988,16 @@ HWTEST_F(MediaDataShareUnitTest, OnremoteRequestTest001, TestSize.Level0)
 
 /**
 * @tc.name: ReadAshmemTest001
-* @tc.desc: test ReadAshmem function
+* @tc.desc: Test ReadAshmem function with null shared memory
 * @tc.type: FUNC
-* @tc.require:
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create an RdbObserverStub with OnChangeCallback
+    2. Create an RdbChangeNode with a null Ashmem pointer
+    3. Call ReadAshmem on the stub with the node, null data pointer, size 0, and undefined offset
+    4. Verify the return value
+* @tc.expect: ReadAshmem returns E_ERROR
 */
 HWTEST_F(MediaDataShareUnitTest, ReadAshmemTest001, TestSize.Level0)
 {
@@ -2043,9 +3013,18 @@ HWTEST_F(MediaDataShareUnitTest, ReadAshmemTest001, TestSize.Level0)
     LOG_INFO("ReadAshmemTest001::End");
 }
 
-/*
-* @tc.desc: test UserDefineFunc with no descriptor
-* @tc.require: Null
+/**
+* @tc.name: MediaDataShare_User_Define_Func_Test_001
+* @tc.desc: Test UserDefineFunc with no interface descriptor
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Get the DataShare helper instance
+    2. Prepare empty MessageParcel, reply, and option objects (no descriptor written)
+    3. Call UserDefineFunc on the helper
+    4. Verify the error code
+* @tc.expect: UserDefineFunc returns -1 (failure due to missing descriptor)
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_User_Define_Func_Test_001, TestSize.Level0)
 {
@@ -2060,9 +3039,19 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_User_Define_Func_Test_001, TestS
     LOG_INFO("MediaDataShare_User_Define_Func_Test_001 End");
 }
 
-/*
-* @tc.desc: test UserDefineFunc with descriptor
-* @tc.require: Null
+/**
+* @tc.name: MediaDataShare_User_Define_Func_Test_002
+* @tc.desc: Test UserDefineFunc with a valid interface descriptor
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Get the DataShare helper instance
+    2. Prepare MessageParcel, reply, and option objects
+    3. Write the valid interface descriptor ("OHOS.DataShare.IDataShare") to the parcel
+    4. Call UserDefineFunc on the helper
+    5. Verify the error code
+* @tc.expect: UserDefineFunc returns 0 (success with valid descriptor)
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_User_Define_Func_Test_002, TestSize.Level0)
 {
@@ -2081,8 +3070,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_User_Define_Func_Test_002, TestS
 
 /**
 * @tc.name: MediaDataShare_RegisterObserverExtProvider_Test_001
-* @tc.desc: Fill the branch obs == nullptr and generalCtl == nullptr
+* @tc.desc: Test RegisterObserverExtProvider with null observer and null controller scenarios
 * @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShare helper instance and verify it is not null
+    2. Attempt to register a null observer with an empty URI, check error code
+    3. Create a valid observer and use a media library URI
+    4. Release the helper's controller and attempt to register the observer, check error code
+* @tc.expect:
+    1.Registering null observer returns E_NULL_OBSERVER
+    2.Registering with released (null) controller returns E_HELPER_DIED
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test_001, TestSize.Level0)
 {
@@ -2110,8 +3109,16 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test
 
 /**
 * @tc.name: MediaDataShare_RegisterObserverExtProvider_Test_002
-* @tc.desc: test RegisterObserverExtProvider normal func
+* @tc.desc: Test normal functionality of RegisterObserverExtProvider
 * @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a media library URI and a valid DataShareObserverTest instance
+    2. Create a DataShare helper instance and verify it is not null
+    3. Call RegisterObserverExtProvider with the URI, observer, and false flag
+    4. Verify the error code
+* @tc.expect: RegisterObserverExtProvider returns E_OK (success)
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test_002, TestSize.Level0)
 {
@@ -2129,8 +3136,19 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test
 
 /**
 * @tc.name: MediaDataShare_UnregisterObserverExtProvider_Test_001
-* @tc.desc: Fill the branch dataObserver == nullptr and ObserverImpl::FindObserver
+* @tc.desc: Test UnregisterObserverExtProvider with null observer, unregistered observer, and null controller
 * @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShare helper instance and verify it is not null
+    2. Attempt to unregister a null observer, check error code
+    3. Create a valid observer and attempt to unregister it (not previously registered), check error code
+    4. Register the observer, release the helper's controller, then attempt to unregister, check error code
+* @tc.expect:
+    - Unregistering null observer returns E_NULL_OBSERVER
+    - Unregistering unregistered observer returns E_NULL_OBSERVER
+    - Unregistering with released (null) controller returns E_HELPER_DIED
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExtProvider_Test_001, TestSize.Level0)
 {
@@ -2163,8 +3181,19 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExtProvider_Te
 
 /**
 * @tc.name: MediaDataShare_UnregisterObserverExtProvider_Test_002
-* @tc.desc: test UnregisterObserverExtProvider mormal func
+* @tc.desc: Test normal functionality of UnregisterObserverExtProvider
 * @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a media library URI and a valid DataShareObserverTest instance
+    2. Create a DataShare helper instance and verify it is not null
+    3. Register the observer using RegisterObserverExtProvider and verify success
+    4. Unregister the observer using UnregisterObserverExtProvider
+    5. Verify the error code of unregistration
+* @tc.expect:
+    1.Registration returns E_OK
+    2.Unregistration returns E_OK (success)
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExtProvider_Test_002, TestSize.Level0)
 {
@@ -2189,8 +3218,16 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExtProvider_Te
 
 /**
 * @tc.name: MediaDataShare_NotifyChangeExtProvider_Test_001
-* @tc.desc: Fill the branch generalCtl == nullptr
+* @tc.desc: Test NotifyChangeExtProvider with null controller (released helper)
 * @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a media library URI and a valid DataShareObserverTest instance
+    2. Create a DataShare helper instance, register the observer, and verify registration success
+    3. Release the helper's controller to make it null
+    4. Create an INSERT-type ChangeInfo and call NotifyChangeExtProvider with it
+* @tc.expect: NotifyChangeExtProvider executes without crashing (no explicit error code check in test)
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotifyChangeExtProvider_Test_001, TestSize.Level0)
 {
@@ -2215,8 +3252,15 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotifyChangeExtProvider_Test_001
 
 /**
 * @tc.name: MediaDataShare_NotifyChangeExtProvider_Test_002
-* @tc.desc: test NotifyChangeExtProvider normal func
+* @tc.desc: Test normal functionality of NotifyChangeExtProvider with valid controller
 * @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a media library URI and a valid DataShareObserverTest instance
+    2. Create a DataShare helper instance, register the observer, and verify registration success
+    3. Create an INSERT-type ChangeInfo and call NotifyChangeExtProvider with it
+* @tc.expect: NotifyChangeExtProvider executes successfully (no errors)
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotifyChangeExtProvider_Test_002, TestSize.Level0)
 {
@@ -2239,8 +3283,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotifyChangeExtProvider_Test_002
 
 /**
 * @tc.name: MediaDataShare_OpenFileWithErrCode_Test_001
-* @tc.desc: test OpenFileWithErrCode normal func
+* @tc.desc: Test OpenFileWithErrCode function for file opening scenario
 * @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShare helper instance and verify it is not null
+    2. Create a media library URI and specify "rw" mode
+    3. Call OpenFileWithErrCode with the URI, mode, and error code pointer
+    4. Verify the returned file descriptor (fd) and error code
+* @tc.expect:
+    1.File descriptor (fd) is negative (failure to open)
+    2.Error code is -1
 */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_OpenFileWithErrCode_Test_001, TestSize.Level0)
 {

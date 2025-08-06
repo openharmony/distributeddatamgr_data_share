@@ -90,8 +90,19 @@ void ProxyHandleTest::TearDown(void)
 
 /**
  * @tc.name: ProxyHandleTest_Publish_Test_001
- * @tc.desc: DataProxyHandle publish string data success
+ * @tc.desc: Verify DataProxyHandle successfully publishing string data
  * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataProxyHandle instance
+    2. Configure the publish parameters to SHARED_CONFIG type
+    3. Prepare string-type test data and publish it
+    4. Retrieve the data via the same URI
+ * @tc.expect:
+    1. The DataProxyHandle is created successfully
+    2. The data publish operation returns a SUCCESS status code
+    3. The retrieved data matches the originally published data
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_001, TestSize.Level0)
 {
@@ -124,8 +135,19 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_001, TestSize.Level0)
 
 /**
  * @tc.name: ProxyHandleTest_Publish_Test_002
- * @tc.desc: DataProxyHandle publish int data success
+ * @tc.desc: Verify DataProxyHandle successfully publishing integer data
  * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataProxyHandle instance
+    2. Configure the publish parameters to SHARED_CONFIG type
+    3. Prepare integer-type test data and publish it
+    4. Retrieve the data via the same URI
+ * @tc.expect:
+    1. The DataProxyHandle is created successfully
+    2. The data publish operation returns a SUCCESS status code
+    3. The retrieved data matches the originally published data
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_002, TestSize.Level0)
 {
@@ -155,8 +177,19 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_002, TestSize.Level0)
 
 /**
  * @tc.name: ProxyHandleTest_Publish_Test_003
- * @tc.desc: DataProxyHandle publish double data success
+ * @tc.desc: Verify DataProxyHandle successfully
  * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataProxyHandle instance
+    2. Configure the publish parameters to SHARED_CONFIG type
+    3. Prepare double-precision floating-point test data and publish it
+    4. Retrieve the data via the same URI
+ * @tc.expect:
+    1. The DataProxyHandle is created successfully
+    2. The data publish operation returns a SUCCESS status code
+    3. The retrieved data matches the originally published data
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_003, TestSize.Level0)
 {
@@ -186,8 +219,19 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_003, TestSize.Level0)
 
 /**
  * @tc.name: ProxyHandleTest_Publish_Test_004
- * @tc.desc: DataProxyHandle publish bool data success
+ * @tc.desc: Verify DataProxyHandle successfully publishing boolean data
  * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataProxyHandle instance
+    2. Configure the publish parameters to SHARED_CONFIG type
+    3. Prepare boolean-type test data and publish it
+    4. Retrieve the data via the same URI
+ * @tc.expect:
+    1. The DataProxyHandle is created successfully
+    2. The data publish operation returns a SUCCESS status code
+    3. The retrieved data matches the originally published data
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_004, TestSize.Level0)
 {
@@ -214,12 +258,20 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_004, TestSize.Level0)
 
     LOG_INFO("ProxyHandleTest_Publish_Test_004::End");
 }
- 
+
 /**
  * @tc.name: ProxyHandleTest_Publish_Test_005
- * @tc.desc: DataProxyHandle publish data of other bundle name,
- * failed because of no permission.
+ * @tc.desc: Verify that DataProxyHandle fails to publish data from another bundlename
  * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataProxyHandle instance
+    2. Configure the publish parameters to SHARED_CONFIG type
+    3. Prepare test data pointing to another application's bundlename and attempt to publish it
+ * @tc.expect:
+    1. The DataProxyHandle is created successfully
+    2. The data publish operation returns a NO_PERMISSION status code
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_005, TestSize.Level0)
 {
@@ -245,8 +297,22 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_005, TestSize.Level0)
 
 /**
  * @tc.name: ProxyHandleTest_Delete_Test_001
- * @tc.desc: DataProxyHandle delete data success
+ * @tc.desc: Verify the functionality of DataProxyHandle successfully deleting published data
  * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataProxyHandle instance
+    2. Configure the operation parameters to SHARED_CONFIG type
+    3. Publish test data
+    4. Verify that the data can be retrieved normally
+    5. Delete the published data
+    6. Attempt to retrieve the deleted data again
+ * @tc.expect:
+    1. The data publish operation returns a SUCCESS status code
+    2. The data retrieval operation returns data that matches the published data
+    3. The data deletion operation returns a SUCCESS status code
+    4. Attempting to retrieve the data after deletion returns a URI_NOT_EXIST status code
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_001, TestSize.Level0)
 {
@@ -284,9 +350,17 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_001, TestSize.Level0)
 
 /**
  * @tc.name: ProxyHandleTest_Delete_Test_002
- * @tc.desc: DataProxyHandle delete data of other bundle name,
- * failed because of no permission.
+ * @tc.desc: Verify that DataProxyHandle fails to delete data from another bundlename
  * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataProxyHandle instance
+    2. Configure the operation parameters to SHARED_CONFIG type
+    3. Attempt to delete test data pointing to another application's bundle name
+ * @tc.expect:
+    1. The DataProxyHandle is created successfully
+    2. The data deletion operation returns a NO_PERMISSION status code
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_002, TestSize.Level0)
 {
@@ -309,8 +383,17 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_002, TestSize.Level0)
 
 /**
  * @tc.name: ProxyHandleTest_Delete_Test_003
- * @tc.desc: DataProxyHandle delete unpublished data failed
+ * @tc.desc: Verify that DataProxyHandle fails to delete unpublished data
  * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataProxyHandle instance
+    2. Configure the operation parameters to SHARED_CONFIG type
+    3. Attempt to delete unpublished test data
+ * @tc.expect:
+    1. The DataProxyHandle is created successfully
+    2. The data deletion operation returns a URI_NOT_EXIST status code
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_003, TestSize.Level0)
 {
@@ -333,8 +416,17 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_003, TestSize.Level0)
 
 /**
  * @tc.name: ProxyHandleTest_Get_Test_001
- * @tc.desc: DataProxyHandle get unpublished data failed
+ * @tc.desc: Verify that DataProxyHandle fails to retrieve unpublished data
  * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataProxyHandle instance
+    2. Configure the operation parameters to SHARED_CONFIG type
+    3. Attempt to retrieve unpublished test data
+ * @tc.expect:
+    1. The DataProxyHandle is created successfully
+    2. The data retrieval operation returns a URI_NOT_EXIST status code
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Get_Test_001, TestSize.Level0)
 {
@@ -357,8 +449,21 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Get_Test_001, TestSize.Level0)
 
 /**
  * @tc.name: ProxyHandleTest_Subscribe_Test_001
- * @tc.desc: DataProxyHandle subscribe data and callback success
+ * @tc.desc: Verify the functionality of DataProxyHandle successfully subscribing
  * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataProxyHandle instance
+    2. Configure the operation parameters to SHARED_CONFIG type
+    3. Publish initial test data
+    4. Subscribe to data change events
+    5. Update the subscribed data
+ * @tc.expect:
+    1. The data publish operation returns a SUCCESS status code
+    2. The data subscription operation returns a SUCCESS status code
+    3. The callback function is triggered once after the data is updated
+    4. The number of change notifications received by the callback function is correct
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Subscribe_Test_001, TestSize.Level0)
 {
@@ -399,8 +504,17 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Subscribe_Test_001, TestSize.Level0)
 
 /**
  * @tc.name: ProxyHandleTest_Subscribe_Test_002
- * @tc.desc: DataProxyHandle subscribe unpublished data failed
+ * @tc.desc: Verify that DataProxyHandle fails to subscribe to unpublished data
  * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataProxyHandle instance
+    2. Configure the operation parameters to SHARED_CONFIG type
+    3. Attempt to subscribe to unpublished test data
+ * @tc.expect:
+    1. The DataProxyHandle is created successfully
+    2. The data subscription operation returns a URI_NOT_EXIST status code
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Subscribe_Test_002, TestSize.Level0)
 {
@@ -427,8 +541,24 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Subscribe_Test_002, TestSize.Level0)
 
 /**
  * @tc.name: ProxyHandleTest_Unsubscribe_Test_001
- * @tc.desc: DataProxyHandle unsubscribe success
+ * @tc.desc: Verify the functionality of DataProxyHandle successfully unsubscribing from data changes
  * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataProxyHandle instance
+    2. Configure the operation parameters to SHARED_CONFIG type
+    3. Publish initial test data
+    4. Subscribe to data change events
+    5. Update the data to verify that the callback function is triggered
+    6. Unsubscribe from the data
+    7. Update the data again
+ * @tc.expect:
+    1. The data publish operation returns a SUCCESS status code
+    2. The data subscription operation returns a SUCCESS status code
+    3. The callback function is triggered after the first data update
+    4. The unsubscribe operation is successful
+    5. The callback function is not triggered after the second data update
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Unsubscribe_Test_001, TestSize.Level0)
 {
@@ -475,8 +605,24 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Unsubscribe_Test_001, TestSize.Level0)
 
 /**
  * @tc.name: ProxyHandleTest_Unsubscribe_Test_002
- * @tc.desc: DataProxyHandle unsubscribe all uris success
+ * @tc.desc: Verify the functionality of DataProxyHandle successfully unsubscribing
  * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataProxyHandle instance
+    2. Configure the operation parameters to SHARED_CONFIG type
+    3. Publish initial test data
+    4. Subscribe to data change events
+    5. Update the data to verify that the callback function is triggered
+    6. Call the unsubscribe interface with no parameters to unsubscribe from all subscriptions
+    7. Update the data again
+ * @tc.expect:
+    1. The data publish operation returns a SUCCESS status code
+    2. The data subscription operation returns a SUCCESS status code
+    3. The callback function is triggered after the first data update
+    4. The operation to unsubscribe from all subscriptions is successful
+    5. The callback function is not triggered after the second data update
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Unsubscribe_Test_002, TestSize.Level0)
 {

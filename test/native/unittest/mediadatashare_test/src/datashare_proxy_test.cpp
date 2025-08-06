@@ -88,8 +88,18 @@ void DataShareProxyTest::TearDown(void) {}
 
 /**
 * @tc.name: DataShareProxy_RegisterObserverExtProvider_Test_001
-* @tc.desc: test RegisterObserverExtProvider default func
+* @tc.desc: Verify basic functionality of RegisterObserverExtProvider method
 * @tc.type: FUNC
+* @tc.precon: None
+* @tc.step:
+    1. Create DataShareConnection with test URI and token
+    2. Initialize DataShareProxy and assign to connection
+    3. Get proxy instance and verify it's not null
+    4. Create test observer and call RegisterObserverExtProvider
+    5. Check returned result code
+* @tc.expect:
+    1. All objects are successfully initialized
+    2. RegisterObserverExtProvider returns 0 (E_OK)
 */
 HWTEST_F(DataShareProxyTest, DataShareProxy_RegisterObserverExtProvider_Test_001, TestSize.Level0)
 {
@@ -124,8 +134,18 @@ HWTEST_F(DataShareProxyTest, DataShareProxy_RegisterObserverExtProvider_Test_001
 
 /**
 * @tc.name: DataShareProxy_UnregisterObserverExtProvider_Test_001
-* @tc.desc: test UnregisterObserverExtProvider default func
+* @tc.desc: Verify basic functionality of UnregisterObserverExtProvider method
 * @tc.type: FUNC
+* @tc.precon: None
+* @tc.step:
+    1. Create DataShareConnection with test URI and token
+    2. Initialize DataShareProxy and assign to connection
+    3. Get proxy instance and verify it's not null
+    4. Create test observer and call UnregisterObserverExtProvider
+    5. Check returned result code
+* @tc.expect:
+    1. All objects are successfully initialized
+    2. UnregisterObserverExtProvider returns 0 (E_OK)
 */
 HWTEST_F(DataShareProxyTest, DataShareProxy_UnregisterObserverExtProvider_Test_001, TestSize.Level0)
 {
@@ -158,8 +178,18 @@ HWTEST_F(DataShareProxyTest, DataShareProxy_UnregisterObserverExtProvider_Test_0
 
 /**
 * @tc.name: DataShareProxy_NotifyChangeExtProvider_Test_001
-* @tc.desc: test NotifyChangeExtProvider default func
+* @tc.desc: Verify basic functionality of NotifyChangeExtProvider method
 * @tc.type: FUNC
+* @tc.precon: None
+* @tc.step:
+    1. Create DataShareConnection with test URI and token
+    2. Initialize DataShareProxy and assign to connection
+    3. Get proxy instance and verify it's not null
+    4. Create test ChangeInfo object and call NotifyChangeExtProvider
+    5. Check returned result code
+* @tc.expect:
+    1. All objects are successfully initialized
+    2. NotifyChangeExtProvider returns 0 (E_OK)
 */
 HWTEST_F(DataShareProxyTest, DataShareProxy_NotifyChangeExtProvider_Test_001, TestSize.Level0)
 {
