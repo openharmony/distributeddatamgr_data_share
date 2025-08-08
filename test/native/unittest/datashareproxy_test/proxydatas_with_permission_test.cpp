@@ -367,6 +367,34 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_004, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_004::End");
 }
 
+
+/**
+* @tc.name: ProxyDatasTest_QueryTimeout_Test_005
+* @tc.desc: test QueryTimeout function
+* @tc.type: FUNC
+* @tc.require: issueICS05H
+* @tc.precon: None
+* @tc.step:
+    1.Creat a DataShareHelper class
+    2.call QueryTimeout function
+* @tc.experct: QueryTimeout return nullptr when The function of the parent class was called
+*/
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_005, TestSize.Level1)
+{
+    LOG_INFO("ProxyDatasTest_QueryTimeout_Test_005::Start");
+    auto helper = dataShareHelper;
+    Uri uri(DATA_SHARE_PROXY_URI);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_NAME0, "wang");
+    std::vector<string> columns;
+    DataShareOption option;
+    option.timeout = 0; // The function has no specific implementation, timeoutis meaningless
+    DatashareBusinessError businessError;
+    auto resultSet = helper->DataShareHelper::QueryTimeout(uri, predicates, columns, option, &businessError);
+    EXPECT_EQ(resultSet, nullptr);
+    LOG_INFO("ProxyDatasTest_QueryTimeout_Test_005::End");
+}
+
 /**
 * @tc.name: ProxyDatasTest_ResultSet_Test_001
 * @tc.desc: Verify result set functionality and error handling for invalid operations
