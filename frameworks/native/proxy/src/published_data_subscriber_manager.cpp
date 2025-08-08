@@ -56,7 +56,8 @@ std::vector<OperationResult> PublishedDataSubscriberManager::AddObservers(void *
                 opResult.emplace_back(subResult);
                 if (subResult.errCode_ != E_OK) {
                     failedKeys.emplace_back(subResult.key_, subscriberId);
-                    LOG_WARN("registered failed, uri is %{public}s", subResult.key_.c_str());
+                    LOG_WARN("registered failed, uri is %{public}s",
+                        DataShareStringUtils::Anonymous(subResult.key_).c_str());
                 }
             }
             if (failedKeys.size() > 0) {
@@ -147,7 +148,8 @@ std::vector<OperationResult> PublishedDataSubscriberManager::EnableObservers(voi
                 opResult.emplace_back(subResult);
                 if (subResult.errCode_ != E_OK) {
                     failedKeys.emplace_back(subResult.key_, subscriberId);
-                    LOG_WARN("registered failed, uri is %{public}s", subResult.key_.c_str());
+                    LOG_WARN("registered failed, uri is %{public}s",
+                        DataShareStringUtils::Anonymous(subResult.key_).c_str());
                 }
             }
             if (failedKeys.size() > 0) {
@@ -184,8 +186,8 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DisableObservers(vo
                 opResult.emplace_back(result);
                 if (result.errCode_ != E_OK) {
                     failedKeys.emplace_back(result.key_, subscriberId);
-                    LOG_WARN("DisableObservers failed, uri is %{public}s, errCode is %{public}d", result.key_.c_str(),
-                        result.errCode_);
+                    LOG_WARN("DisableObservers failed, uri is %{public}s, errCode is %{public}d",
+                        DataShareStringUtils::Anonymous(result.key_).c_str(), result.errCode_);
                 }
             }
             if (failedKeys.size() > 0) {
@@ -211,7 +213,7 @@ void PublishedDataSubscriberManager::RecoverObservers(std::shared_ptr<DataShareS
         for (const auto& result : results) {
             if (result.errCode_ != E_OK) {
                 LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d",
-                         result.key_.c_str(), result.errCode_);
+                    DataShareStringUtils::Anonymous(result.key_).c_str(), result.errCode_);
             }
         }
     }
@@ -233,7 +235,8 @@ void PublishedDataSubscriberManager::Emit(PublishedDataChangeNode &changeNode)
         });
 
         if (callbacks.empty()) {
-            LOG_WARN("%{private}s nobody subscribe, but still notify", data.key_.c_str());
+            LOG_WARN("%{public}s nobody subscribe, but still notify",
+                DataShareStringUtils::Anonymous(data.key_).c_str());
             continue;
         }
         for (auto const &obs : callbacks) {
