@@ -54,19 +54,6 @@ void ControllerTest::TearDownTestCase(void) {}
 void ControllerTest::SetUp(void) {}
 void ControllerTest::TearDown(void) {}
 
-/**
-* @tc.name: ControllerTest_ProviderImplInsertTest_001
-* @tc.desc: Verify Insert operation with null connection in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerProviderImpl with null connection and empty URI
-    2. Prepare DataShareValuesBucket with test data
-    3. Call Insert method with empty URI and values bucket
-    4. Check if returned result is negative (indicating failure)
-* @tc.expect:
-    1. Insert operation returns negative value
-*/
 HWTEST_F(ControllerTest, ControllerTest_ProviderImplInsertTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ProviderImplInsertTest_001::Start");
@@ -81,20 +68,6 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplInsertTest_001, TestSize.Lev
     LOG_INFO("ControllerTest_ProviderImplInsertTest_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ProviderImplInsertTest_002
-* @tc.desc: Verify Insert operation with valid connection but unconnected state in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create GeneralControllerProviderImpl with the connection and empty URI
-    3. Prepare DataShareValuesBucket with test data
-    4. Call Insert method with empty URI and values bucket
-    5. Check if returned result is negative (indicating failure)
-* @tc.expect:
-    1. Insert operation returns negative value
-*/
 HWTEST_F(ControllerTest, ControllerTest_ProviderImplInsertTest_002, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ProviderImplInsertTest_002::Start");
@@ -115,19 +88,6 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplInsertTest_002, TestSize.Lev
     LOG_INFO("ControllerTest_ProviderImplInsertTest_002::End");
 }
 
-/**
-* @tc.name: ControllerTest_ProviderImplUpdateTest_001
-* @tc.desc: Verify Update operation with null connection in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerProviderImpl with null connection and empty URI
-    2. Prepare DataSharePredicates and DataShareValuesBucket with test data
-    3. Call Update method with empty URI, predicates and values bucket
-    4. Check if returned result is negative (indicating failure)
-* @tc.expect:
-    1. Update operation returns negative value
-*/
 HWTEST_F(ControllerTest, ControllerTest_ProviderImplUpdateTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ProviderImplUpdateTest_001::Start");
@@ -143,20 +103,6 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplUpdateTest_001, TestSize.Lev
     LOG_INFO("ControllerTest_ProviderImplUpdateTest_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ProviderImplUpdateTest_002
-* @tc.desc: Verify Update operation with valid connection but unconnected state in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create GeneralControllerProviderImpl with the connection and empty URI
-    3. Prepare DataSharePredicates and DataShareValuesBucket with test data
-    4. Call Update method with empty URI, predicates and values bucket
-    5. Check if returned result is negative (indicating failure)
-* @tc.expect:
-    1. Update operation returns negative value
-*/
 HWTEST_F(ControllerTest, ControllerTest_ProviderImplUpdateTest_002, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ProviderImplUpdateTest_002::Start");
@@ -178,19 +124,6 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplUpdateTest_002, TestSize.Lev
     LOG_INFO("ControllerTest_ProviderImplUpdateTest_002::End");
 }
 
-/**
-* @tc.name: ControllerTest_ProviderImplDeleteTest_001
-* @tc.desc: Verify Delete operation with null connection in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerProviderImpl with null connection and empty URI
-    2. Prepare DataSharePredicates with test conditions
-    3. Call Delete method with empty URI and predicates
-    4. Check if returned result is negative (indicating failure)
-* @tc.expect:
-    1. Delete operation returns negative value
-*/
 HWTEST_F(ControllerTest, ControllerTest_ProviderImplDeleteTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ProviderImplDeleteTest_001::Start");
@@ -204,20 +137,6 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplDeleteTest_001, TestSize.Lev
     LOG_INFO("ControllerTest_ProviderImplDeleteTest_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ProviderImplDeleteTest_002
-* @tc.desc: Verify Delete operation with valid connection but unconnected state in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create GeneralControllerProviderImpl with the connection and empty URI
-    3. Prepare DataSharePredicates with test conditions
-    4. Call Delete method with empty URI and predicates
-    5. Check if returned result is negative (indicating failure)
-* @tc.expect:
-    1. Delete operation returns negative value
-*/
 HWTEST_F(ControllerTest, ControllerTest_ProviderImplDeleteTest_002, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ProviderImplDeleteTest_002::Start");
@@ -237,19 +156,6 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplDeleteTest_002, TestSize.Lev
     LOG_INFO("ControllerTest_ProviderImplDeleteTest_002::End");
 }
 
-/**
-* @tc.name: Generalcontroller_ServiceImplInsertExTest_001
-* @tc.desc: Verify InsertEx operation with null connection in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerProviderImpl with null connection and empty URI
-    2. Prepare DataShareValuesBucket with test data
-    3. Call InsertEx method with empty URI and values bucket
-    4. Check if returned result is (DATA_SHARE_ERROR, 0)
-* @tc.expect:
-    1. InsertEx operation returns pair(DATA_SHARE_ERROR, 0)
-*/
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImplInsertExTest_001, TestSize.Level0)
 {
     LOG_INFO("Generalcontroller_ServiceImplInsertExTest_001::Start");
@@ -265,20 +171,6 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplInsertExTest_001, TestSize
     LOG_INFO("Generalcontroller_ServiceImplInsertExTest_001::End");
 }
 
-/**
-* @tc.name: Generalcontroller_ServiceImplInsertExTest_002
-* @tc.desc: Verify InsertEx operation with valid connection but unconnected state in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create GeneralControllerProviderImpl with the connection and empty URI
-    3. Prepare DataShareValuesBucket with test data
-    4. Call InsertEx method with empty URI and values bucket
-    5. Check if returned result is (DATA_SHARE_ERROR, 0)
-* @tc.expect:
-    1. InsertEx operation returns pair(DATA_SHARE_ERROR, 0)
-*/
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImplInsertExTest_002, TestSize.Level0)
 {
     LOG_INFO("Generalcontroller_ServiceImplInsertExTest_002::Start");
@@ -300,19 +192,6 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplInsertExTest_002, TestSize
     LOG_INFO("Generalcontroller_ServiceImplInsertExTest_002::End");
 }
 
-/**
-* @tc.name: Generalcontroller_ServiceImplUpdateExTest_001
-* @tc.desc: Verify UpdateEx operation with null connection in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerProviderImpl with null connection and empty URI
-    2. Prepare DataSharePredicates and DataShareValuesBucket with test data
-    3. Call UpdateEx method with empty URI, predicates and values bucket
-    4. Check if returned result is (DATA_SHARE_ERROR, 0)
-* @tc.expect:
-    1. UpdateEx operation returns pair(DATA_SHARE_ERROR, 0)
-*/
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImplUpdateExTest_001, TestSize.Level0)
 {
     LOG_INFO("Generalcontroller_ServiceImplUpdateExTest_001::Start");
@@ -330,23 +209,9 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplUpdateExTest_001, TestSize
     LOG_INFO("Generalcontroller_ServiceImplUpdateExTest_001::End");
 }
 
-/**
-* @tc.name: Generalcontroller_ServiceImplUpdateExTest_002
-* @tc.desc: Verify UpdateEx operation with valid connection but unconnected state in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create GeneralControllerProviderImpl with the connection and empty URI
-    3. Prepare DataSharePredicates and DataShareValuesBucket with test data
-    4. Call UpdateEx method with empty URI, predicates and values bucket
-    5. Check if returned result is (DATA_SHARE_ERROR, 0)
-* @tc.expect:
-    1. UpdateEx operation returns pair(DATA_SHARE_ERROR, 0)
-*/
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImplUpdateExTest_002, TestSize.Level0)
 {
-    LOG_INFO("Generalcontroller_ServiceImplUpdateExTest_002::Start");
+    LOG_INFO("Generalcontroller_ServiceImplUpdateExTest_001::Start");
     Uri uri("");
     sptr<DataShare::DataShareConnection> connection =
         new (std::nothrow) DataShare::DataShareConnection(uri, nullptr);
@@ -367,19 +232,6 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplUpdateExTest_002, TestSize
     LOG_INFO("Generalcontroller_ServiceImplUpdateExTest_002::End");
 }
 
-/**
-* @tc.name: Generalcontroller_ServiceImplDeleteExTest_001
-* @tc.desc: Verify DeleteEx operation with null connection in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerProviderImpl with null connection and empty URI
-    2. Prepare DataSharePredicates with test conditions
-    3. Call DeleteEx method with empty URI and predicates
-    4. Check if returned result is (DATA_SHARE_ERROR, 0)
-* @tc.expect:
-    1. DeleteEx operation returns pair(DATA_SHARE_ERROR, 0)
-*/
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImplDeleteExTest_001, TestSize.Level0)
 {
     LOG_INFO("Generalcontroller_ServiceImplDeleteExTest_001::Start");
@@ -394,20 +246,6 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplDeleteExTest_001, TestSize
     LOG_INFO("Generalcontroller_ServiceImplDeleteExTest_001::End");
 }
 
-/**
-* @tc.name: Generalcontroller_ServiceImplDeleteExTest_002
-* @tc.desc: Verify DeleteEx operation with valid connection but unconnected state in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create GeneralControllerProviderImpl with the connection and empty URI
-    3. Prepare DataSharePredicates with test conditions
-    4. Call DeleteEx method with empty URI and predicates
-    5. Check if returned result is (DATA_SHARE_ERROR, 0)
-* @tc.expect:
-    1. DeleteEx operation returns pair(DATA_SHARE_ERROR, 0)
-*/
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImplDeleteExTest_002, TestSize.Level0)
 {
     LOG_INFO("Generalcontroller_ServiceImplDeleteExTest_002::Start");
@@ -428,19 +266,6 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplDeleteExTest_002, TestSize
     LOG_INFO("Generalcontroller_ServiceImplDeleteExTest_002::End");
 }
 
-/**
-* @tc.name: ControllerTest_ProviderImplQueryTest_001
-* @tc.desc: Verify Query operation with null connection in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerProviderImpl with null connection and empty URI
-    2. Prepare DataSharePredicates and column list
-    3. Call Query method with empty URI, predicates and columns
-    4. Check if returned result is nullptr
-* @tc.expect:
-    1. Query operation returns nullptr
-*/
 HWTEST_F(ControllerTest, ControllerTest_ProviderImplQueryTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ProviderImplQueryTest_001::Start");
@@ -457,20 +282,6 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplQueryTest_001, TestSize.Leve
     LOG_INFO("ControllerTest_ProviderImplQueryTest_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ProviderImplQueryTest_002
-* @tc.desc: Verify Query operation with valid connection but unconnected state in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create GeneralControllerProviderImpl with the connection and empty URI
-    3. Prepare DataSharePredicates and column list
-    4. Call Query method with empty URI, predicates and columns
-    5. Check if returned result is nullptr
-* @tc.expect:
-    1. Query operation returns nullptr
-*/
 HWTEST_F(ControllerTest, ControllerTest_ProviderImplQueryTest_002, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ProviderImplQueryTest_002::Start");
@@ -493,18 +304,6 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplQueryTest_002, TestSize.Leve
     LOG_INFO("ControllerTest_ProviderImplQueryTest_002::End");
 }
 
-/**
-* @tc.name: Generalcontroller_ServiceImplRegisterObserverTest_001
-* @tc.desc: Verify RegisterObserver operation with null connection in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerProviderImpl with null connection and empty URI
-    2. Call RegisterObserver method with empty URI and null observer
-    3. Verify URI remains empty
-* @tc.expect:
-    1. URI remains empty after operation
-*/
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImplRegisterObserverTest_001, TestSize.Level0)
 {
     LOG_INFO("Generalcontroller_ServiceImplRegisterObserverTest_001::Start");
@@ -517,19 +316,6 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplRegisterObserverTest_001, 
     LOG_INFO("Generalcontroller_ServiceImplRegisterObserverTest_001::End");
 }
 
-/**
-* @tc.name: Generalcontroller_ServiceImplRegisterObserverTest_002
-* @tc.desc: Verify RegisterObserver with valid connection but unconnected state in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create GeneralControllerProviderImpl with the connection and empty URI
-    3. Call RegisterObserver method with empty URI and null observer
-    4. Verify URI remains empty
-* @tc.expect:
-    1. URI remains empty after operation
-*/
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImplRegisterObserverTest_002, TestSize.Level0)
 {
     LOG_INFO("Generalcontroller_ServiceImplRegisterObserverTest_002::Start");
@@ -548,18 +334,6 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplRegisterObserverTest_002, 
     LOG_INFO("Generalcontroller_ServiceImplRegisterObserverTest_002::End");
 }
 
-/**
-* @tc.name: Generalcontroller_ServiceImplUnregisterObserverTest_001
-* @tc.desc: Verify UnregisterObserver operation with null connection in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerProviderImpl with null connection and empty URI
-    2. Call UnregisterObserver method with empty URI and null observer
-    3. Verify URI remains empty
-* @tc.expect:
-    1. URI remains empty after operation
-*/
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImplUnregisterObserverTest_001, TestSize.Level0)
 {
     LOG_INFO("Generalcontroller_ServiceImplUnregisterObserverTest_001::Start");
@@ -572,19 +346,6 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplUnregisterObserverTest_001
     LOG_INFO("Generalcontroller_ServiceImplUnregisterObserverTest_001::End");
 }
 
-/**
-* @tc.name: Generalcontroller_ServiceImplUnregisterObserverTest_002
-* @tc.desc: Verify UnregisterObserver with valid connection but unconnected state in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create GeneralControllerProviderImpl with the connection and empty URI
-    3. Call UnregisterObserver method with empty URI and null observer
-    4. Verify URI remains empty
-* @tc.expect:
-    1. URI remains empty after operation
-*/
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImplUnregisterObserverTest_002, TestSize.Level0)
 {
     LOG_INFO("Generalcontroller_ServiceImplUnregisterObserverTest_002::Start");
@@ -603,18 +364,6 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplUnregisterObserverTest_002
     LOG_INFO("Generalcontroller_ServiceImplUnregisterObserverTest_002::End");
 }
 
-/**
-* @tc.name: Generalcontroller_ServiceImplNotifyChangeTest_001
-* @tc.desc: Verify NotifyChange operation with null connection in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerProviderImpl with null connection and empty URI
-    2. Call NotifyChange method with empty URI
-    3. Verify URI remains empty
-* @tc.expect:
-    1. URI remains empty after operation
-*/
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImplNotifyChangeTest_001, TestSize.Level0)
 {
     LOG_INFO("Generalcontroller_ServiceImplNotifyChangeTest_001::Start");
@@ -626,19 +375,6 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplNotifyChangeTest_001, Test
     LOG_INFO("Generalcontroller_ServiceImplNotifyChangeTest_001::End");
 }
 
-/**
-* @tc.name: Generalcontroller_ServiceImplNotifyChangeTest_002
-* @tc.desc: Verify NotifyChange with valid connection but unconnected state in GeneralControllerProviderImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create GeneralControllerProviderImpl with the connection and empty URI
-    3. Call NotifyChange method with empty URI
-    4. Verify URI remains empty
-* @tc.expect:
-    1. URI remains empty after operation
-*/
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImplNotifyChangeTest_002, TestSize.Level0)
 {
     LOG_INFO("Generalcontroller_ServiceImplNotifyChangeTest_002::Start");
@@ -658,16 +394,8 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplNotifyChangeTest_002, Test
 
 /**
 * @tc.name: Generalcontroller_ProviderImpl_RegisterObserverExtProvider_Test_001
-* @tc.desc: Verify RegisterObserverExtProvider with null connection and unconnected state
+* @tc.desc: Fill the branch connection == nullptr and proxy == nullptr
 * @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create provider with null connection and call RegisterObserverExtProvider
-    2. Create provider with valid but unconnected connection and call RegisterObserverExtProvider
-    3. Check return codes for both cases
-* @tc.expect:
-    1. First call returns E_PROVIDER_CONN_NULL
-    2. Second call returns E_PROVIDER_NOT_CONNECTED
 */
 HWTEST_F(ControllerTest, Generalcontroller_ProviderImpl_RegisterObserverExtProvider_Test_001, TestSize.Level0)
 {
@@ -701,16 +429,8 @@ HWTEST_F(ControllerTest, Generalcontroller_ProviderImpl_RegisterObserverExtProvi
 
 /**
 * @tc.name: Generalcontroller_ProviderImpl_UnregisterObserverExtProvider_Test_001
-* @tc.desc: Verify UnregisterObserverExtProvider with null connection and unconnected state
+* @tc.desc: Fill the branch connection == nullptr and proxy == nullptr
 * @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create provider with null connection and call UnregisterObserverExtProvider
-    2. Create provider with valid but unconnected connection and call UnregisterObserverExtProvider
-    3. Check return codes for both cases
-* @tc.expect:
-    1. First call returns E_PROVIDER_CONN_NULL
-    2. Second call returns E_PROVIDER_NOT_CONNECTED
 */
 HWTEST_F(ControllerTest, Generalcontroller_ProviderImpl_UnregisterObserverExtProvider_Test_001, TestSize.Level0)
 {
@@ -746,16 +466,8 @@ HWTEST_F(ControllerTest, Generalcontroller_ProviderImpl_UnregisterObserverExtPro
 
 /**
 * @tc.name: Generalcontroller_ProviderImpl_NotifyChangeExtProvider_Test_001
-* @tc.desc: Verify NotifyChangeExtProvider with null connection and unconnected state
+* @tc.desc: Fill the branch connection == nullptr and proxy == nullptr
 * @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create provider with null connection and call NotifyChangeExtProvider
-    2. Create provider with valid but unconnected connection and call NotifyChangeExtProvider
-    3. Check return codes for both cases
-* @tc.expect:
-    1. First call returns E_PROVIDER_CONN_NULL
-    2. Second call returns E_PROVIDER_NOT_CONNECTED
 */
 HWTEST_F(ControllerTest, Generalcontroller_ProviderImpl_NotifyChangeExtProvider_Test_001, TestSize.Level0)
 {
@@ -788,15 +500,8 @@ HWTEST_F(ControllerTest, Generalcontroller_ProviderImpl_NotifyChangeExtProvider_
 
 /**
 * @tc.name: Generalcontroller_ServiceImpl_RegisterObserverExtProvider_Test_001
-* @tc.desc: Verify RegisterObserverExtProvider operation in GeneralControllerServiceImpl
+* @tc.desc: test ServiceImpl RegisterObserverExtProvider func
 * @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerServiceImpl with test URI
-    2. Call RegisterObserverExtProvider with empty URI and null observer
-    3. Check return code
-* @tc.expect:
-    1. Operation returns -1 (failure)
 */
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImpl_RegisterObserverExtProvider_Test_001, TestSize.Level0)
 {
@@ -818,19 +523,12 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImpl_RegisterObserverExtProvid
 
 /**
 * @tc.name: Generalcontroller_ServiceImpl_UnregisterObserverExtProvider_Test_001
-* @tc.desc: Verify UnregisterObserverExtProvider operation in GeneralControllerServiceImpl
+* @tc.desc: test ServiceImpl UnregisterObserverExtProvider func
 * @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerServiceImpl with test URI
-    2. Call UnregisterObserverExtProvider with empty URI and null observer
-    3. Check return code
-* @tc.expect:
-    1. Operation returns -1 (failure)
 */
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImpl_UnregisterObserverExtProvider_Test_001, TestSize.Level0)
 {
-    LOG_INFO("Generalcontroller_ServiceImpl_UnregisterObserverExtProvider_Test_001::Start");
+    LOG_INFO("Generalcontroller_ServiceImpl_RegisterObserverExtProvider_Test_001::Start");
 
     Uri uri("");
     std::string extUri = "GeneralControllerServiceImpl";
@@ -843,21 +541,13 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImpl_UnregisterObserverExtProv
     int ret = tempGenConProImp->UnregisterObserverExtProvider(uri, dataObserver);
     EXPECT_EQ(ret, -1);
 
-    LOG_INFO("Generalcontroller_ServiceImpl_UnregisterObserverExtProvider_Test_001::End");
+    LOG_INFO("Generalcontroller_ServiceImpl_RegisterObserverExtProvider_Test_001::End");
 }
 
 /**
 * @tc.name: Generalcontroller_ServiceImpl_NotifyChangeExtProvider_Test_001
-* @tc.desc: Verify NotifyChangeExtProvider operation in GeneralControllerServiceImpl
+* @tc.desc: test ServiceImpl NotifyChangeExtProvider func
 * @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerServiceImpl with test URI
-    2. Prepare ChangeInfo with empty URI
-    3. Call NotifyChangeExtProvider with the change info
-    4. Check return code
-* @tc.expect:
-    1. Operation returns -1 (failure)
 */
 HWTEST_F(ControllerTest, Generalcontroller_ServiceImpl_NotifyChangeExtProvider_Test_001, TestSize.Level0)
 {
@@ -879,18 +569,7 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImpl_NotifyChangeExtProvider_T
     LOG_INFO("Generalcontroller_ServiceImpl_NotifyChangeExtProvider_Test_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerOpenFileTest_001
-* @tc.desc: Verify OpenFile operation with null connection in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create ExtSpecialController with null connection and empty URI
-    2. Call OpenFile with empty URI and test mode
-    3. Check if returned result is negative
-* @tc.expect:
-    1. OpenFile operation returns negative value
-*/
+
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerOpenFileTest_001::Start");
@@ -903,19 +582,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileTest_001, Te
     LOG_INFO("ControllerTest_ExtSpecialControllerOpenFileTest_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerOpenFileTest_002
-* @tc.desc: Verify OpenFile operation with valid connection but unconnected state in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create ExtSpecialController with the connection and empty URI
-    3. Call OpenFile with empty URI and test mode
-    4. Check if returned result is negative
-* @tc.expect:
-    1. OpenFile operation returns negative value
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileTest_002, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerOpenFileTest_002::Start");
@@ -934,17 +600,11 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileTest_002, Te
     LOG_INFO("ControllerTest_ExtSpecialControllerOpenFileTest_002::End");
 }
 
+
 /**
 * @tc.name: ControllerTest_ExtSpecialControllerOpenFileWithErrCodeTest_001
-* @tc.desc: Verify OpenFileWithErrCode function with null connection in ExtSpecialController
+* @tc.desc: test OpenFileWithErrCode func
 * @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create ExtSpecialController with null connection and empty URI
-    2. Call OpenFileWithErrCode with empty URI, test mode and error code
-    3. Check if returned file descriptor is -1
-* @tc.expect:
-    1. OpenFileWithErrCode returns -1
 */
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileWithErrCodeTest_001, TestSize.Level0)
 {
@@ -961,16 +621,8 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileWithErrCodeT
 
 /**
 * @tc.name: ControllerTest_ExtSpecialControllerOpenFileWithErrCodeTest_002
-* @tc.desc: Verify OpenFileWithErrCode function with valid connection but unconnected state in ExtSpecialController
+* @tc.desc: test OpenFileWithErrCode func
 * @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create ExtSpecialController with the connection and empty URI
-    3. Call OpenFileWithErrCode with empty URI, test mode and error code
-    4. Check if returned file descriptor is -1
-* @tc.expect:
-    1. OpenFileWithErrCode returns -1
 */
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileWithErrCodeTest_002, TestSize.Level0)
 {
@@ -991,18 +643,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileWithErrCodeT
     LOG_INFO("ControllerTest_ExtSpecialControllerOpenFileWithErrCodeTest_002::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerOpenRawFileTest_001
-* @tc.desc: Verify OpenRawFile operation with null connection in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create ExtSpecialController with null connection and empty URI
-    2. Call OpenRawFile with empty URI and test mode
-    3. Check if returned result is negative
-* @tc.expect:
-    1. OpenRawFile operation returns negative value
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenRawFileTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerOpenRawFileTest_001::Start");
@@ -1015,19 +655,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenRawFileTest_001,
     LOG_INFO("ControllerTest_ExtSpecialControllerOpenRawFileTest_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControlleOpenRawFileTest_002
-* @tc.desc: Verify OpenRawFile operation with valid connection but unconnected state in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create ExtSpecialController with the connection and empty URI
-    3. Call OpenRawFile with empty URI and test mode
-    4. Check if returned result is negative
-* @tc.expect:
-    1. OpenRawFile operation returns negative value
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControlleOpenRawFileTest_002, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerOpenRawFileTest_002::Start");
@@ -1046,18 +673,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControlleOpenRawFileTest_002, 
     LOG_INFO("ControllerTest_ExtSpecialControllerOpenRawFileTest_002::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerGetTypeTest_001
-* @tc.desc: Verify GetType operation with null connection in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create ExtSpecialController with null connection and empty URI
-    2. Call GetType with empty URI
-    3. Check if returned result is empty string
-* @tc.expect:
-    1. GetType operation returns empty string
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerGetTypeTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerGetTypeTest_001::Start");
@@ -1069,19 +684,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerGetTypeTest_001, Tes
     LOG_INFO("ControllerTest_ExtSpecialControllerGetTypeTest_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControlleGetTypeTest_002
-* @tc.desc: Verify GetType operation with valid connection but unconnected state in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create ExtSpecialController with the connection and empty URI
-    3. Call GetType with empty URI
-    4. Check if returned result is empty string
-* @tc.expect:
-    1. GetType operation returns empty string
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControlleGetTypeTest_002, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerGetTypeTest_002::Start");
@@ -1099,19 +701,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControlleGetTypeTest_002, Test
     LOG_INFO("ControllerTest_ExtSpecialControllerGetTypeTest_002::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerBatchInsertTest_001
-* @tc.desc: Verify BatchInsert operation with null connection in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create ExtSpecialController with null connection and empty URI
-    2. Prepare vector of DataShareValuesBucket with test data
-    3. Call BatchInsert with empty URI and values vector
-    4. Check if returned result is negative
-* @tc.expect:
-    1. BatchInsert operation returns negative value
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerBatchInsertTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerBatchInsertTest_001::Start");
@@ -1132,20 +721,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerBatchInsertTest_001,
     LOG_INFO("ControllerTest_ExtSpecialControllerBatchInsertTest_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerBatchInsertTest_002
-* @tc.desc: Verify BatchInsert operation with valid connection but unconnected state in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create ExtSpecialController with the connection and empty URI
-    3. Prepare vector of DataShareValuesBucket with test data
-    4. Call BatchInsert with empty URI and values vector
-    5. Check if returned result is negative
-* @tc.expect:
-    1. BatchInsert operation returns negative value
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerBatchInsertTest_002, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerBatchInsertTest_002::Start");
@@ -1172,19 +747,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerBatchInsertTest_002,
     LOG_INFO("ControllerTest_ExtSpecialControllerBatchInsertTest_002::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerBatchUpdateTest_001
-* @tc.desc: Verify BatchUpdate operation with null connection in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create ExtSpecialController with null connection and empty URI
-    2. Prepare empty UpdateOperations and results vector
-    3. Call BatchUpdate with operations and results
-    4. Check if returned result is -1
-* @tc.expect:
-    1. BatchUpdate operation returns -1
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerBatchUpdateTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerBatchUpdateTest_001::Start");
@@ -1198,20 +760,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerBatchUpdateTest_001,
     LOG_INFO("ControllerTest_ExtSpecialControllerBatchUpdateTest_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerBatchUpdateTest_002
-* @tc.desc: Verify BatchUpdate operation with valid connection but unconnected state in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create ExtSpecialController with the connection and empty URI
-    3. Prepare empty UpdateOperations and results vector
-    4. Call BatchUpdate with operations and results
-    5. Check if returned result is -1
-* @tc.expect:
-    1. BatchUpdate operation returns -1
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerBatchUpdateTest_002, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerBatchUpdateTest_002::Start");
@@ -1231,19 +779,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerBatchUpdateTest_002,
     LOG_INFO("ControllerTest_ExtSpecialControllerBatchUpdateTest_002::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerInsertExtTest_001
-* @tc.desc: Verify InsertExt operation with null connection in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create ExtSpecialController with null connection and empty URI
-    2. Prepare DataShareValuesBucket with test data and result string
-    3. Call InsertExt with empty URI, values bucket and result string
-    4. Check if returned result is -1
-* @tc.expect:
-    1. InsertExt operation returns -1
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerInsertExtTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerInsertExtTest_001::Start");
@@ -1259,20 +794,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerInsertExtTest_001, T
     LOG_INFO("ControllerTest_ExtSpecialControllerInsertExtTest_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerInsertExtTest_002
-* @tc.desc: Verify InsertExt operation with valid connection but unconnected state in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create ExtSpecialController with the connection and empty URI
-    3. Prepare DataShareValuesBucket with test data and result string
-    4. Call InsertExt with empty URI, values bucket and result string
-    5. Check if returned result is -1
-* @tc.expect:
-    1. InsertExt operation returns -1
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerInsertExtTest_002, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerInsertExtTest_002::Start");
@@ -1294,19 +815,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerInsertExtTest_002, T
     LOG_INFO("ControllerTest_ExtSpecialControllerInsertExtTest_002::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerExecuteBatchTest_001
-* @tc.desc: Verify ExecuteBatch operation with null connection in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create ExtSpecialController with null connection and empty URI
-    2. Prepare empty OperationStatement vector and ExecResultSet
-    3. Call ExecuteBatch with statements and result set
-    4. Check if returned result is -1
-* @tc.expect:
-    1. ExecuteBatch operation returns -1
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerExecuteBatchTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerExecuteBatchTest_001::Start");
@@ -1321,20 +829,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerExecuteBatchTest_001
     LOG_INFO("ControllerTest_ExtSpecialControllerExecuteBatchTest_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerExecuteBatchTest_002
-* @tc.desc: Verify ExecuteBatch operation with valid connection but unconnected state in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create ExtSpecialController with the connection and empty URI
-    3. Prepare empty OperationStatement vector and ExecResultSet
-    4. Call ExecuteBatch with statements and result set
-    5. Check if returned result is -1
-* @tc.expect:
-    1. ExecuteBatch operation returns -1
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerExecuteBatchTest_002, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerExecuteBatchTest_002::Start");
@@ -1355,18 +849,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerExecuteBatchTest_002
     LOG_INFO("ControllerTest_ExtSpecialControllerExecuteBatchTest_002::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerGetFileTypesTest_001
-* @tc.desc: Verify GetFileTypes operation with null connection in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create ExtSpecialController with null connection and empty URI
-    2. Call GetFileTypes with empty URI and test type string
-    3. Check if returned result is empty vector
-* @tc.expect:
-    1. GetFileTypes operation returns empty vector
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerGetFileTypesTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerGetFileTypesTest_001::Start");
@@ -1379,19 +861,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerGetFileTypesTest_001
     LOG_INFO("ControllerTest_ExtSpecialControllerGetFileTypesTest_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControlleGetFileTypesTest_002
-* @tc.desc: Verify GetFileTypes operation with valid connection but unconnected state in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create ExtSpecialController with the connection and empty URI
-    3. Call GetFileTypes with empty URI and test type string
-    4. Check if returned result is empty vector
-* @tc.expect:
-    1. GetFileTypes operation returns empty vector
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControlleGetFileTypesTest_002, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerGetFileTypesTest_002::Start");
@@ -1410,18 +879,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControlleGetFileTypesTest_002,
     LOG_INFO("ControllerTest_ExtSpecialControllerGetFileTypesTest_002::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerNormalizeUriTest_001
-* @tc.desc: Verify NormalizeUri operation with null connection in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create ExtSpecialController with null connection and empty URI
-    2. Call NormalizeUri with empty URI
-    3. Check if returned result is empty URI
-* @tc.expect:
-    1. NormalizeUri operation returns empty URI
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerNormalizeUriTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerNormalizeUriTest_001::Start");
@@ -1433,19 +890,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerNormalizeUriTest_001
     LOG_INFO("ControllerTest_ExtSpecialControllerNormalizeUriTest_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerNormalizeUriTest_002
-* @tc.desc: Verify NormalizeUri operation with valid connection but unconnected state in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create ExtSpecialController with the connection and empty URI
-    3. Call NormalizeUri with empty URI
-    4. Check if returned result is empty URI
-* @tc.expect:
-    1. NormalizeUri operation returns empty URI
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerNormalizeUriTest_002, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerNormalizeUriTest_002::Start");
@@ -1463,18 +907,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerNormalizeUriTest_002
     LOG_INFO("ControllerTest_ExtSpecialControllerNormalizeUriTest_002::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerDenormalizeUriTest_001
-* @tc.desc: Verify DenormalizeUri operation with null connection in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create ExtSpecialController with null connection and empty URI
-    2. Call DenormalizeUri with empty URI
-    3. Check if returned result is empty URI
-* @tc.expect:
-    1. DenormalizeUri operation returns empty URI
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerDenormalizeUriTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerDenormalizeUriTest_001::Start");
@@ -1486,19 +918,6 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerDenormalizeUriTest_0
     LOG_INFO("ControllerTest_ExtSpecialControllerDenormalizeUriTest_001::End");
 }
 
-/**
-* @tc.name: ControllerTest_ExtSpecialControllerDenormalizeUriTest_002
-* @tc.desc: Verify DenormalizeUri operation with valid connection but unconnected state in ExtSpecialController
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with empty URI
-    2. Create ExtSpecialController with the connection and empty URI
-    3. Call DenormalizeUri with empty URI
-    4. Check if returned result is empty URI
-* @tc.expect:
-    1. DenormalizeUri operation returns empty URI
-*/
 HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerDenormalizeUriTest_002, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_ExtSpecialControllerDenormalizeUriTest_002::Start");

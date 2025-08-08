@@ -83,18 +83,6 @@ void DataShareManagerImplHelper()
     helper->dataMgrService_ = (sptr<DataShareKvServiceProxy>)mockProxy;
 }
 
-/**
- * @tc.name: AbnormalBranchTest_shareBlock_Null_Test_001
- * @tc.desc: Verify operations on DataShareBlockWriterImpl when share block is null
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Create DataShareBlockWriterImpl instance
-    2. Call various write operations (AllocRow, Write with different types)
-    3. Check return values of all operations
- * @tc.expect:
-    1. All operations return E_ERROR
- */
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_shareBlock_Null_Test_001, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_shareBlock_Null_Test_001::Start");
@@ -118,18 +106,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_shareBlock_Null_Test_001, TestSi
     LOG_INFO("AbnormalBranchTest_shareBlock_Null_Test_001::End");
 }
 
-/**
- * @tc.name: AbnormalBranchTest_ResultSetStubNull_Test_001
- * @tc.desc: Verify ISharedResultSetStub behavior when input parameters are null
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Create ISharedResultSetStub instance with null parameter
-    2. Call CreateStub method with null result and valid parcel
-    3. Check returned ISharedResultSet pointer
- * @tc.expect:
-    1. CreateStub returns nullptr
- */
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_ResultSetStubNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_ResultSetStubNull_Test_001::Start");
@@ -141,18 +117,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_ResultSetStubNull_Test_001, Test
     LOG_INFO("AbnormalBranchTest_ResultSetStubNull_Test_001::End");
 }
 
-/**
- * @tc.name: AbnormalBranchTest_RegisterClientDeathObserverNull_Test_001
- * @tc.desc: Verify RegisterClientDeathObserver with null observer
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Create DataShareKvServiceProxy with null parameter
-    2. Call RegisterClientDeathObserver with empty appId and null observer
-    3. Check return value
- * @tc.expect:
-    1. Method returns -1 (failure)
- */
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_RegisterClientDeathObserverNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_RegisterClientDeathObserverNull_Test_001::Start");
@@ -163,19 +127,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_RegisterClientDeathObserverNull_
     LOG_INFO("AbnormalBranchTest_RegisterClientDeathObserverNull_Test_001::End");
 }
 
-/**
- * @tc.name: AbnormalBranchTest_mReadOnlyInvalid_Test_001
- * @tc.desc: Verify invalid operations on read-only SharedBlock
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Create read-only SharedBlock instance
-    2. Attempt modification operations (Clear, SetColumnNum, AllocRow, etc.)
-    3. Check return values of all operations
- * @tc.expect:
-    1. All modification operations return SHARED_BLOCK_INVALID_OPERATION
-    2. Init operation succeeds
- */
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_mReadOnlyInvalid_Test_001, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_mReadOnlyInvalid_Test_001::Start");
@@ -208,18 +159,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_mReadOnlyInvalid_Test_001, TestS
     LOG_INFO("AbnormalBranchTest_mReadOnlyInvalid_Test_001::End");
 }
 
-/**
- * @tc.name: AbnormalBranchTest_CreatorPossibleNull_Test_002
- * @tc.desc: Verify DataShareHelper::Creator with invalid parameters
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Prepare CreateOptions with null token
-    2. Call DataShareHelper::Creator with empty URI and prepared options
-    3. Check returned DataShareHelper pointer
- * @tc.expect:
-    1. Creator returns nullptr (failure to create helper)
- */
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_CreatorPossibleNull_Test_002, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_CreatorPossibleNull_Test_002::Start");
@@ -233,18 +172,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_CreatorPossibleNull_Test_002, Te
     LOG_INFO("AbnormalBranchTest_CreatorPossibleNull_Test_002::End");
 }
 
-/**
- * @tc.name: AbnormalBranchTest_AddObserversProxyNull_Test_001
- * @tc.desc: Verify PublishedDataSubscriberManager::AddObservers with null proxy
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Prepare null proxy and empty URIs list
-    2. Call AddObservers with null subscriber, proxy and empty URIs
-    3. Check size of returned results
- * @tc.expect:
-    1. Results size equals URIs size (0 in this case)
- */
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_AddObserversProxyNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_AddObserversProxyNull_Test_001::Start");
@@ -259,18 +186,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_AddObserversProxyNull_Test_001, 
     LOG_INFO("AbnormalBranchTest_AddObserversProxyNull_Test_001::End");
 }
 
-/**
- * @tc.name: AbnormalBranchTest_AddObserversProxyNull_Test_002
- * @tc.desc: Verify RdbSubscriberManager::AddObservers with null proxy
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Prepare null proxy and empty URIs list
-    2. Call AddObservers with null subscriber, proxy and empty URIs
-    3. Check size of returned results
- * @tc.expect:
-    1. Results size equals URIs size (0 in this case)
- */
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_AddObserversProxyNull_Test_002, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_AddObserversProxyNull_Test_002::Start");
@@ -285,18 +200,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_AddObserversProxyNull_Test_002, 
     LOG_INFO("AbnormalBranchTest_AddObserversProxyNull_Test_002::End");
 }
 
-/**
- * @tc.name: AbnormalBranchTest_DelObserversProxyNull_Test_001
- * @tc.desc: Verify PublishedDataSubscriberManager::DelObservers with null proxy
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Prepare null proxy and empty URIs list
-    2. Call DelObservers with null subscriber and proxy (both overloads)
-    3. Check size of returned results
- * @tc.expect:
-    1. Results size equals URIs size (0 in this case) for both overloads
- */
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_DelObserversProxyNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_DelObserversProxyNull_Test_001::Start");
@@ -312,18 +215,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_DelObserversProxyNull_Test_001, 
     LOG_INFO("AbnormalBranchTest_DelObserversProxyNull_Test_001::End");
 }
 
-/**
- * @tc.name: AbnormalBranchTest_DelObserversProxyNull_Test_002
- * @tc.desc: Verify RdbSubscriberManager::DelObservers with null proxy
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Prepare null proxy and empty URIs list
-    2. Call DelObservers with null subscriber and proxy (both overloads)
-    3. Check size of returned results
- * @tc.expect:
-    1. Results size equals URIs size (0 in this case) for both overloads
- */
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_DelObserversProxyNull_Test_002, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_DelObserversProxyNull_Test_002::Start");
@@ -339,18 +230,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_DelObserversProxyNull_Test_002, 
     LOG_INFO("AbnormalBranchTest_DelObserversProxyNull_Test_002::End");
 }
 
-/**
- * @tc.name: AbnormalBranchTest_EnableObserversProxyNull_Test_001
- * @tc.desc: Verify PublishedDataSubscriberManager::EnableObservers with null proxy
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Prepare null proxy and empty URIs list
-    2. Call EnableObservers with null subscriber, proxy and empty URIs
-    3. Check size of returned results
- * @tc.expect:
-    1. Results size equals URIs size (0 in this case)
- */
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_EnableObserversProxyNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_EnableObserversProxyNull_Test_001::Start");
@@ -364,18 +243,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_EnableObserversProxyNull_Test_00
     LOG_INFO("AbnormalBranchTest_EnableObserversProxyNull_Test_001::End");
 }
 
-/**
- * @tc.name: AbnormalBranchTest_EnableObserversProxyNull_Test_002
- * @tc.desc: Verify RdbSubscriberManager::EnableObservers with null proxy
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Prepare null proxy and empty URIs list
-    2. Call EnableObservers with null subscriber, proxy and empty URIs
-    3. Check size of returned results
- * @tc.expect:
-    1. Results size equals URIs size (0 in this case)
- */
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_EnableObserversProxyNull_Test_002, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_EnableObserversProxyNull_Test_002::Start");
@@ -389,18 +256,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_EnableObserversProxyNull_Test_00
     LOG_INFO("AbnormalBranchTest_EnableObserversProxyNull_Test_002::End");
 }
 
-/**
- * @tc.name: AbnormalBranchTest_DisableObserversProxyNull_Test_001
- * @tc.desc: Verify PublishedDataSubscriberManager::DisableObservers with null proxy
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Prepare null proxy and empty URIs list
-    2. Call DisableObservers with null subscriber, proxy and empty URIs
-    3. Check size of returned results
- * @tc.expect:
-    1. Results size equals URIs size (0 in this case)
- */
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_DisableObserversProxyNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_DisableObserversProxyNull_Test_001::Start");
@@ -414,18 +269,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_DisableObserversProxyNull_Test_0
     LOG_INFO("AbnormalBranchTest_DisableObserversProxyNull_Test_001::End");
 }
 
-/**
- * @tc.name: AbnormalBranchTest_DisableObserversProxyNull_Test_002
- * @tc.desc: Verify RdbSubscriberManager::DisableObservers with null proxy
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Prepare null proxy and empty URIs list
-    2. Call DisableObservers with null subscriber, proxy and empty URIs
-    3. Check size of returned results
- * @tc.expect:
-    1. Results size equals URIs size (0 in this case)
- */
 HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_DisableObserversProxyNull_Test_002, TestSize.Level0)
 {
     LOG_INFO("AbnormalBranchTest_DisableObserversProxyNull_Test_002::Start");
@@ -439,21 +282,6 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_DisableObserversProxyNull_Test_0
     LOG_INFO("AbnormalBranchTest_DisableObserversProxyNull_Test_002::End");
 }
 
-/**
- * @tc.name: PublishDelObserversTest001
- * @tc.desc: Verify PublishedDataSubscriberManager observer operations with null proxy
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Prepare null subscriber and valid proxy
-    2. Call DisableObservers with null proxy and valid URIs
-    3. Call DelObservers with valid proxy and URIs
-    4. Call RecoverObservers with null proxy
-    5. Check results sizes
- * @tc.expect:
-    1. DisableObservers with null proxy returns 0 results
-    2. DelObservers with valid proxy returns results matching URIs size
- */
 HWTEST_F(AbnormalBranchTest, PublishDelObserversTest001, TestSize.Level0)
 {
     LOG_INFO("PublishDelObserversTest001::Start");
@@ -474,19 +302,6 @@ HWTEST_F(AbnormalBranchTest, PublishDelObserversTest001, TestSize.Level0)
     LOG_INFO("PublishDelObserversTest001::End");
 }
 
-/**
- * @tc.name: PublishedDataSubscriberManagerOperatorTest001
- * @tc.desc: Verify PublishedDataObserver comparison operators
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Create two PublishedDataObserver instances with identical callbacks
-    2. Compare them using != and == operators
-    3. Check comparison results
- * @tc.expect:
-    1. != operator returns true (observers are distinct)
-    2. == operator returns false (observers are distinct)
- */
 HWTEST_F(AbnormalBranchTest, PublishedDataSubscriberManagerOperatorTest001, TestSize.Level0)
 {
     LOG_INFO("PublishedDataSubscriberManagerOperatorTest001::Start");
@@ -498,19 +313,6 @@ HWTEST_F(AbnormalBranchTest, PublishedDataSubscriberManagerOperatorTest001, Test
     LOG_INFO("PublishedDataSubscriberManagerOperatorTest001::End");
 }
 
-/**
- * @tc.name: RdbDelObserversTest001
- * @tc.desc: Verify RdbSubscriberManager::DelObservers with valid and null proxy
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Prepare null subscriber and valid proxy
-    2. Call DelObservers with valid proxy and URIs
-    3. Call RecoverObservers with null proxy
-    4. Check results size
- * @tc.expect:
-    1. DelObservers returns results matching URIs size
- */
 HWTEST_F(AbnormalBranchTest, RdbDelObserversTest001, TestSize.Level0)
 {
     LOG_INFO("RdbDelObserversTest001::Start");
@@ -528,21 +330,6 @@ HWTEST_F(AbnormalBranchTest, RdbDelObserversTest001, TestSize.Level0)
     LOG_INFO("RdbDelObserversTest001::End");
 }
 
-/**
- * @tc.name: RdbDisableObserversTest001
- * @tc.desc: Verify RdbSubscriberManager::DisableObservers with valid and null proxy
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Prepare null subscriber and valid proxy
-    2. Call DisableObservers with null proxy and valid URIs
-    3. Call DisableObservers with valid proxy and URIs
-    4. Call RecoverObservers with null proxy
-    5. Check results sizes
- * @tc.expect:
-    1. DisableObservers with null proxy returns 0 results
-    2. DisableObservers with valid proxy returns results matching URIs size
- */
 HWTEST_F(AbnormalBranchTest, RdbDisableObserversTest001, TestSize.Level0)
 {
     LOG_INFO("RdbDisableObserversTest001::Start");
@@ -563,19 +350,6 @@ HWTEST_F(AbnormalBranchTest, RdbDisableObserversTest001, TestSize.Level0)
     LOG_INFO("RdbDisableObserversTest001::End");
 }
 
-/**
- * @tc.name: RdbSubscriberManagerOperatorTest001
- * @tc.desc: Verify RdbObserver comparison operators
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Create two RdbObserver instances with identical callbacks
-    2. Compare them using != and == operators
-    3. Check comparison results
- * @tc.expect:
-    1. != operator returns true (observers are distinct)
-    2. == operator returns false (observers are distinct)
- */
 HWTEST_F(AbnormalBranchTest, RdbSubscriberManagerOperatorTest001, TestSize.Level0)
 {
     LOG_INFO("RdbSubscriberManagerOperatorTest001::Start");
@@ -587,24 +361,9 @@ HWTEST_F(AbnormalBranchTest, RdbSubscriberManagerOperatorTest001, TestSize.Level
     LOG_INFO("RdbSubscriberManagerOperatorTest001::End");
 }
 
-/**
- * @tc.name: RegisterClientDeathObserverTest001
- * @tc.desc: Verify DataShareManagerImpl::RegisterClientDeathObserver under various conditions
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Create DataShareManagerImpl instance with null service and empty bundle name
-    2. Call RegisterClientDeathObserver
-    3. Set valid service proxy and call again
-    4. Set valid bundle name and call again
-    5. Check clientDeathObserverPtr_ state
- * @tc.expect:
-    1. Observer remains null with empty bundle name
-    2. Observer is created when valid bundle name is provided
- */
 HWTEST_F(AbnormalBranchTest, RegisterClientDeathObserverTest001, TestSize.Level0)
 {
-    LOG_INFO("RegisterClientDeathObserverTest001::Start");
+    LOG_INFO("RegisterClientDeathObserverTest001::Start");\
     auto datashareManager = new DataShareManagerImpl();
     datashareManager->dataMgrService_ = nullptr;
     datashareManager->bundleName_ = "";
@@ -691,24 +450,9 @@ HWTEST_F(AbnormalBranchTest, SetRegisterCallbackTest001, TestSize.Level0)
     LOG_INFO("SetRegisterCallbackTest001::End");
 }
 
-/**
- * @tc.name: AmsMgrProxyOnProxyDiedTest001
- * @tc.desc: Verify AmsMgrProxy behavior when proxy dies
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Create AmsMgrProxy with null service and proxy
-    2. Call OnProxyDied and verify state
-    3. Create new proxy, connect to SA, verify initialization
-    4. Call OnProxyDied again and verify cleanup
- * @tc.expect:
-    1. OnProxyDied handles null pointers gracefully
-    2. Proxy initializes properly after ConnectSA
-    3. OnProxyDied cleans up resources
- */
 HWTEST_F(AbnormalBranchTest, AmsMgrProxyOnProxyDiedTest001, TestSize.Level0)
 {
-    LOG_INFO("AmsMgrProxyOnProxyDiedTest001::Start");
+    LOG_INFO("AmsMgrProxyOnProxyDiedTest001::Start");\
     AmsMgrProxy* proxy = new AmsMgrProxy();
     proxy->sa_ = nullptr;
     proxy->proxy_ = nullptr;
@@ -750,24 +494,9 @@ HWTEST_F(AbnormalBranchTest, AmsMgrProxyOnProxyDiedTest002, TestSize.Level0)
     LOG_INFO("AmsMgrProxyOnProxyDiedTest002::End");
 }
 
-/**
- * @tc.name: DataShareServiceProxySubscribeRdbDataTest001
- * @tc.desc: Verify DataShareServiceProxy subscription behavior after proxy death
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Create AmsMgrProxy with null service and proxy
-    2. Call OnProxyDied and verify cleanup
-    3. Create new proxy, connect to SA, verify initialization
-    4. Call OnProxyDied again and verify cleanup
- * @tc.expect:
-    1. Proxy handles null states gracefully
-    2. Proxy initializes properly after ConnectSA
-    3. Resources are cleaned up after OnProxyDied
- */
 HWTEST_F(AbnormalBranchTest, DataShareServiceProxySubscribeRdbDataTest001, TestSize.Level0)
 {
-    LOG_INFO("DataShareServiceProxySubscribeRdbDataTest001::Start");
+    LOG_INFO("DataShareServiceProxySubscribeRdbDataTest001::Start");\
     AmsMgrProxy* proxy = new AmsMgrProxy();
     proxy->sa_ = nullptr;
     proxy->proxy_ = nullptr;
@@ -785,18 +514,6 @@ HWTEST_F(AbnormalBranchTest, DataShareServiceProxySubscribeRdbDataTest001, TestS
     LOG_INFO("DataShareServiceProxySubscribeRdbDataTest001::End");
 }
 
-/**
- * @tc.name: SubscribeRdbDataTest001
- * @tc.desc: Verify SubscribeRdbData with empty URIs and null observer
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Prepare empty URIs list and null observer
-    2. Call SubscribeRdbData with valid proxy
-    3. Check size of returned result set
- * @tc.expect:
-    1. Result set size is 0 (matches empty URIs list)
- */
 HWTEST_F(AbnormalBranchTest, SubscribeRdbDataTest001, TestSize.Level0)
 {
     LOG_INFO("EnableSubscribePublishedDataTest001::Start");
@@ -809,18 +526,6 @@ HWTEST_F(AbnormalBranchTest, SubscribeRdbDataTest001, TestSize.Level0)
     LOG_INFO("EnableSubscribePublishedDataTest001::End");
 }
 
-/**
- * @tc.name: SubscribePublishedDataTest001
- * @tc.desc: Verify SubscribePublishedData with empty URIs and null observer
- * @tc.type: FUNC
- * @tc.precon: None
- * @tc.step:
-    1. Prepare empty URIs list and null observer
-    2. Call SubscribePublishedData with valid proxy
-    3. Check size of returned result set
- * @tc.expect:
-    1. Result set size is 0 (matches empty URIs list)
- */
 HWTEST_F(AbnormalBranchTest, SubscribePublishedDataTest001, TestSize.Level0)
 {
     LOG_INFO("SubscribePublishedDataTest001::Start");
