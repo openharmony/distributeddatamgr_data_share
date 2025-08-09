@@ -120,19 +120,6 @@ void ErrorCodeTest::TearDownTestCase(void)
 void ErrorCodeTest::SetUp(void) {}
 void ErrorCodeTest::TearDown(void) {}
 
-/**
-* @tc.name: ErrorCodeTest_Insert_Test_001
-* @tc.desc: Verify successful insertion operation returns positive ID
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Get slient access helper instance
-    2. Create test URI and DataShareValuesBucket with student data
-    3. Call Insert method with URI and values bucket
-    4. Check if returned ID is positive
-* @tc.experct: Insert operation succeeds and returns positive ID
-*/
 HWTEST_F(ErrorCodeTest, ErrorCodeTest_Insert_Test_001, TestSize.Level0)
 {
     LOG_INFO("ErrorCodeTest_Insert_Test_001::Start");
@@ -149,21 +136,6 @@ HWTEST_F(ErrorCodeTest, ErrorCodeTest_Insert_Test_001, TestSize.Level0)
     LOG_INFO("ErrorCodeTest_Insert_Test_001::End");
 }
 
-/**
-* @tc.name: ErrorCodeTest_QUERY_Test_001
-* @tc.desc: Verify query operations return correct error codes for valid and invalid URIs
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Query existing data with valid URI and check for success
-    2. Verify row count is 1 for existing data
-    3. Query with invalid URI and check error code
-    4. Verify result set is null for invalid URI
-* @tc.experct:
-    1. Valid query returns 0 error code and 1 row
-    2. Invalid query returns E_DB_NOT_EXIST error and null result set
-*/
 HWTEST_F(ErrorCodeTest, ErrorCodeTest_QUERY_Test_001, TestSize.Level0)
 {
     LOG_INFO("ErrorCodeTest_QUERY_Test_001::Start");
@@ -190,22 +162,6 @@ HWTEST_F(ErrorCodeTest, ErrorCodeTest_QUERY_Test_001, TestSize.Level0)
     LOG_INFO("ErrorCodeTest_QUERY_Test_001::End");
 }
 
-/**
-* @tc.name: ErrorCodeTest_QUERY_Test_002
-* @tc.desc: Verify unauthorized query returns correct error code
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Insert test data using dataShareHelper
-    2. Query inserted data with predicates
-    3. Check error code and result set for unauthorized access
-    4. Clean up by deleting inserted data
-* @tc.experct:
-    1. Insert succeeds with positive ID
-    2. Query returns 401 error code and null result set
-    3. Delete operation succeeds with positive count
-*/
 HWTEST_F(ErrorCodeTest, ErrorCodeTest_QUERY_Test_002, TestSize.Level0)
 {
     LOG_INFO("ErrorCodeTest_QUERY_Test_002::Start");

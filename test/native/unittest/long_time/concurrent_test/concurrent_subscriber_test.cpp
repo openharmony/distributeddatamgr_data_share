@@ -144,25 +144,9 @@ void RdbSubscriberManagerTest::DelObservers(
 }
 
 /**
- * @tc.name: ConcurrentRdbObserverTest
- * @tc.desc: Verify concurrent SubscribeRdbData and UnsubscribeRdbData operations
- * @tc.type: concurrent
- * @tc.require: None
- * @tc.precon: RdbSubscriberManager is properly initialized
- * @tc.step:
-    1. Create an instance of RdbSubscriberManagerTest
-    2. Define two URIs and two bundle names for testing
-    3. Create four threads to concurrently perform:
-        - Add observers for URI0 with bundleName0
-        - Delete observers for URI0 with bundleName0
-        - Add observers for URI1 with bundleName1
-        - Delete observers for URI1 with bundleName1
-    4. Run the concurrent operations for a specified test duration
-    5. Stop all threads and wait for their completion
- * @tc.expect:
-    1. All concurrent operations complete without crashes
-    2. No deadlocks occur during concurrent subscription management
-    3. Observer management maintains internal consistency
+ * @tc.name:ConcurrentRdbObserverTest
+ * @tc.desc:verify concurrent SubscribeRdbData/UnsubscribeRdbData scenario
+ * @tc.type:concurrent
  */
 HWTEST_F(ConcurrentSubscriberTest, ConcurrentRdbObserverTest, TestSize.Level0)
 {
@@ -269,26 +253,9 @@ void PublishedDataSubscriberManagerTest::DelObservers(int64_t subscriberId, std:
 }
 
 /**
- * @tc.name: ConcurrentPublishObserverTest
- * @tc.desc: Verify concurrent SubscribePublishedData and UnsubscribePublishedData operations
- * @tc.type: concurrent
- * @tc.require: None
- * @tc.precon: PublishedDataSubscriberManager is properly initialized
- * @tc.step:
-    1. Create an instance of PublishedDataSubscriberManagerTest
-    2. Define two URIs for testing
-    3. Create four threads to concurrently perform:
-        - Add observers for URI0 with subscriber ID 0
-        - Delete observers for URI0 with subscriber ID 0
-        - Add observers for URI1 with subscriber ID 1
-        - Delete observers for URI1 with subscriber ID 1
-    4. Run the concurrent operations for a specified test duration
-    5. Stop all threads and wait for their completion
- * @tc.expect:
-    1. All concurrent operations complete without crashes
-    2. No deadlocks occur during concurrent subscription management
-    3. Published data observer map maintains internal consistency
-    4. Change node data is properly managed during concurrent access
+ * @tc.name:ConcurrentPublishObserverTest
+ * @tc.desc:verify concurrent SubscribePublishedData/UnsubscribePublishedData scenario
+ * @tc.type:concurrent
  */
 HWTEST_F(ConcurrentSubscriberTest, ConcurrentPublishObserverTest, TestSize.Level0)
 {
@@ -436,29 +403,9 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t system
 }
 
 /**
- * @tc.name: ConcurrentRegisterObserverExtProviderTest
- * @tc.desc: Verify concurrent RegisterObserverExtProvider and UnregisterObserverExtProvider operations
- * @tc.type: concurrent
- * @tc.require: None
- * @tc.precon:
-    1. DataShare service is properly initialized
-    2. STORAGE_MANAGER_MANAGER_ID system ability is available
- * @tc.step:
-    1. Create a DataShareHelper instance using STORAGE_MANAGER_MANAGER_ID
-    2. Define two URIs for testing (DATA_SHARE_URI1 and DATA_SHARE_URI2)
-    3. Create two DataShareObserverTest instances for the URIs
-    4. Create four threads to concurrently perform:
-        - Register observer for URI1
-        - Unregister observer for URI1
-        - Register observer for URI2
-        - Unregister observer for URI2
-    5. Run the concurrent operations for a specified test duration
-    6. Stop all threads and wait for their completion
- * @tc.expect:
-    1. DataShareHelper is created successfully (not nullptr)
-    2. All concurrent registration and unregistration operations complete without crashes
-    3. No deadlocks occur during concurrent observer management
-    4. Observer registration state remains consistent during concurrent access
+ * @tc.name:ConcurrentRegisterObserverExtProviderTest
+ * @tc.desc:verify concurrent RegisterObserverExtProvider/UnregisterObserverExtProvider scenario
+ * @tc.type:concurrent
  */
 HWTEST_F(ConcurrentSubscriberTest, ConcurrentRegisterObserverExtProviderTest, TestSize.Level0)
 {

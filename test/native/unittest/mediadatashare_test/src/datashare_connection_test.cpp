@@ -109,17 +109,8 @@ void DataShareConnectionTest::TearDown(void) {}
 
 /**
 * @tc.name: DataShareConnection_UpdateObserverExtsProviderMap_Test_001
-* @tc.desc: Verify normal functionality of UpdateObserverExtsProviderMap method
+* @tc.desc: test UpdateObserverExtsProviderMap normal func
 * @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with test URI and token
-    2. Verify observer map is initially empty
-    3. Add two observers with different URIs using UpdateObserverExtsProviderMap
-    4. Check that observer map size is correctly updated
-* @tc.expect:
-    1. Observer map is empty initially
-    2. After adding observers, map size becomes 2
 */
 HWTEST_F(DataShareConnectionTest, DataShareConnection_UpdateObserverExtsProviderMap_Test_001, TestSize.Level0)
 {
@@ -153,17 +144,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_UpdateObserverExtsProvider
 
 /**
 * @tc.name: DataShareConnection_DeleteObserverExtsProviderMap_001
-* @tc.desc: Verify DeleteObserverExtsProviderMap functionality for removing observers
+* @tc.desc: test DeleteObserverExtsProviderMap default func
 * @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection and add two observers
-    2. Verify initial map size is 2
-    3. Delete one valid observer and check map size
-    4. Attempt to delete an invalid observer and check map size remains unchanged
-* @tc.expect:
-    1. After first deletion, map size is 1
-    2. After second deletion attempt, map size remains 1
 */
 HWTEST_F(DataShareConnectionTest, DataShareConnection_DeleteObserverExtsProviderMap_001, TestSize.Level0)
 {
@@ -203,16 +185,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_DeleteObserverExtsProvider
 
 /**
 * @tc.name: DataShareConnection_ReRegisterObserverExtProvider_Test_001
-* @tc.desc: Verify ReRegisterObserverExtProvider can re-register existing observers
+* @tc.desc: test ReRegisterObserverExtProvider default func
 * @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with valid proxy
-    2. Add two observers to the map
-    3. Call ReRegisterObserverExtProvider method
-    4. Verify observer map remains populated after re-registration
-* @tc.expect:
-    1. Observer map remains non-empty after re-registration
 */
 HWTEST_F(DataShareConnectionTest, DataShareConnection_ReRegisterObserverExtProvider_Test_001, TestSize.Level0)
 {
@@ -254,16 +228,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ReRegisterObserverExtProvi
 
 /**
 * @tc.name: DataShareConnection_OnAbilityConnectDone_Test_001
-* @tc.desc: Verify OnAbilityConnectDone handles reconnection and observer reregistration
+* @tc.desc: test ReRegisterObserverExtProvider default func
 * @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with valid proxy and observers
-    2. Set isReconnect_ flag to true
-    3. Call OnAbilityConnectDone with test parameters
-    4. Verify observer map remains intact after connection
-* @tc.expect:
-    1. Observer map remains non-empty after connection completes
 */
 HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityConnectDone_Test_001, TestSize.Level0)
 {
@@ -312,15 +278,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityConnectDone_Test_
 
 /**
 * @tc.name: DataShareConnection_OnAbilityDisconnectDone_Test_001
-* @tc.desc: Verify thread name is correctly set after disconnection
+* @tc.desc: Verifying that the thread name of Pool_ is correctly set.
 * @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection and set isReconnect_ to true
-    2. Call OnAbilityDisconnectDone with test parameters
-    3. Check that the thread name in the connection pool is correct
-* @tc.expect:
-    1. Thread name is set to "DShare_Connect"
 */
 HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityDisconnectDone_Test_001, TestSize.Level1)
 {

@@ -121,18 +121,6 @@ void SlientSwitchTest::TearDownTestCase(void)
 void SlientSwitchTest::SetUp(void) {}
 void SlientSwitchTest::TearDown(void) {}
 
-/**
-* @tc.name: SlientSwitch_SetSilentSwitch_Test_001
-* @tc.desc: Test enabling silent switch with valid access URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create Uri object with SLIENT_ACCESS_URI
-* 2. Call DataShareHelper::SetSilentSwitch() with URI and true (enable)
-* 3. Verify the return value
-* @tc.expect: The operation succeeds with return value E_OK
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SetSilentSwitch_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SetSilentSwitch_Test_001::Start");
@@ -142,18 +130,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SetSilentSwitch_Test_001, TestSize.Level
     LOG_INFO("SlientSwitch_SetSilentSwitch_Test_001::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SetSilentSwitch_Test_002
-* @tc.desc: Test disabling silent switch with valid access URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create Uri object with SLIENT_ACCESS_URI
-* 2. Call DataShareHelper::SetSilentSwitch() with URI and false (disable)
-* 3. Verify the return value
-* @tc.expect: The operation succeeds with return value E_OK
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SetSilentSwitch_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SetSilentSwitch_Test_002::Start");
@@ -163,18 +139,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SetSilentSwitch_Test_002, TestSize.Level
     LOG_INFO("SlientSwitch_SetSilentSwitch_Test_002::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SetSilentSwitch_Test_003
-* @tc.desc: Test disabling silent switch with empty URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create empty Uri object
-* 2. Call DataShareHelper::SetSilentSwitch() with empty URI and false (disable)
-* 3. Verify the return value
-* @tc.expect: The operation succeeds with return value E_OK
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SetSilentSwitch_Test_003, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SetSilentSwitch_Test_003::Start");
@@ -184,18 +148,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SetSilentSwitch_Test_003, TestSize.Level
     LOG_INFO("SlientSwitch_SetSilentSwitch_Test_003::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SetSilentSwitch_Test_004
-* @tc.desc: Test enabling silent switch with empty URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create empty Uri object
-* 2. Call DataShareHelper::SetSilentSwitch() with empty URI and true (enable)
-* 3. Verify the return value
-* @tc.expect: The operation succeeds with return value E_OK
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SetSilentSwitch_Test_004, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SetSilentSwitch_Test_004::Start");
@@ -205,20 +157,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SetSilentSwitch_Test_004, TestSize.Level
     LOG_INFO("SlientSwitch_SetSilentSwitch_Test_004::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchDisable_Insert_Test_001
-* @tc.desc: Test data insertion when silent switch is disabled with valid URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create Uri object with SLIENT_ACCESS_URI
-* 2. Disable silent switch using SetSilentSwitch() with URI
-* 3. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
-* 4. Call Insert() method with URI and values bucket
-* 5. Verify the return value
-* @tc.expect: Insert operation fails (return value <= 0)
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Insert_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchDisable_Insert_Test_001::Start");
@@ -238,20 +176,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Insert_Test_001, TestSize.
     LOG_INFO("SlientSwitch_SwitchDisable_Insert_Test_001::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchDisable_Insert_Test_002
-* @tc.desc: Test data insertion when silent switch is disabled with empty URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Disable silent switch using SetSilentSwitch() with empty URI
-* 2. Prepare DataShareValuesBucket with test data (name="wangwu", age=25)
-* 3. Create Uri object with SLIENT_ACCESS_URI
-* 4. Call Insert() method with URI and values bucket
-* 5. Verify the return value
-* @tc.expect: Insert operation fails (return value <= 0)
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Insert_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchDisable_Insert_Test_002::Start");
@@ -271,20 +195,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Insert_Test_002, TestSize.
     LOG_INFO("SlientSwitch_SwitchDisable_Insert_Test_002::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchEnable_Insert_Test_001
-* @tc.desc: Test data insertion when silent switch is enabled with valid URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create Uri object with SLIENT_ACCESS_URI
-* 2. Enable silent switch using SetSilentSwitch() with URI
-* 3. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
-* 4. Call Insert() method with URI and values bucket
-* 5. Verify the return value
-* @tc.expect: Insert operation succeeds (return value > 0)
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Insert_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchEnable_Insert_Test_001::Start");
@@ -304,20 +214,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Insert_Test_001, TestSize.L
     LOG_INFO("SlientSwitch_SwitchEnable_Insert_Test_001::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchEnable_Insert_Test_002
-* @tc.desc: Test data insertion when silent switch is enabled with empty URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Enable silent switch using SetSilentSwitch() with empty URI
-* 2. Prepare DataShareValuesBucket with test data (name="wangwu", age=25)
-* 3. Create Uri object with SLIENT_ACCESS_URI
-* 4. Call Insert() method with URI and values bucket
-* 5. Verify the return value
-* @tc.expect: Insert operation succeeds (return value > 0)
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Insert_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchEnable_Insert_Test_002::Start");
@@ -337,21 +233,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Insert_Test_002, TestSize.L
     LOG_INFO("SlientSwitch_SwitchEnable_Insert_Test_002::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchDisable_Update_Test_001
-* @tc.desc: Test data update when silent switch is disabled with valid URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create Uri object with SLIENT_ACCESS_URI
-* 2. Disable silent switch using SetSilentSwitch() with URI
-* 3. Prepare DataShareValuesBucket with update data (age=50)
-* 4. Create DataSharePredicates to select record with name="lisi"
-* 5. Call Update() method with URI, predicates and values bucket
-* 6. Verify the return value
-* @tc.expect: Update operation fails (return value <= 0)
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Update_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchDisable_Update_Test_001::Start");
@@ -371,21 +252,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Update_Test_001, TestSize.
     LOG_INFO("SlientSwitch_SwitchDisable_Update_Test_001::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchDisable_Update_Test_002
-* @tc.desc: Test data update when silent switch is disabled with empty URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Disable silent switch using SetSilentSwitch() with empty URI
-* 2. Prepare DataShareValuesBucket with update data (age=50)
-* 3. Create DataSharePredicates to select record with name="wangwu"
-* 4. Create Uri object with SLIENT_ACCESS_URI
-* 5. Call Update() method with URI, predicates and values bucket
-* 6. Verify the return value
-* @tc.expect: Update operation fails (return value <= 0)
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Update_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchDisable_Update_Test_002::Start");
@@ -406,21 +272,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Update_Test_002, TestSize.
     LOG_INFO("SlientSwitch_SwitchDisable_Update_Test_002::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchEnable_Update_Test_001
-* @tc.desc: Test data update when silent switch is enabled with valid URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create Uri object with SLIENT_ACCESS_URI
-* 2. Enable silent switch using SetSilentSwitch() with URI
-* 3. Prepare DataShareValuesBucket with update data (age=50)
-* 4. Create DataSharePredicates to select record with name="lisi"
-* 5. Call Update() method with URI, predicates and values bucket
-* 6. Verify the return value
-* @tc.expect: Update operation succeeds (return value > 0)
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Update_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchEnable_Update_Test_001::Start");
@@ -440,21 +291,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Update_Test_001, TestSize.L
     LOG_INFO("SlientSwitch_SwitchEnable_Update_Test_001::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchEnable_Update_Test_002
-* @tc.desc: Test data update when silent switch is enabled with empty URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Enable silent switch using SetSilentSwitch() with empty URI
-* 2. Prepare DataShareValuesBucket with update data (age=50)
-* 3. Create DataSharePredicates to select record with name="wangwu"
-* 4. Create Uri object with SLIENT_ACCESS_URI
-* 5. Call Update() method with URI, predicates and values bucket
-* 6. Verify the return value
-* @tc.expect: Update operation succeeds (return value > 0)
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Update_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchEnable_Update_Test_002::Start");
@@ -475,20 +311,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Update_Test_002, TestSize.L
     LOG_INFO("SlientSwitch_SwitchEnable_Update_Test_002::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchDisable_Query_Test_001
-* @tc.desc: Test data query when silent switch is disabled with valid URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create Uri object with SLIENT_ACCESS_URI
-* 2. Disable silent switch using SetSilentSwitch() with URI
-* 3. Create DataSharePredicates to select record with name="lisi"
-* 4. Call Query() method with URI, predicates and empty columns list
-* 5. Verify the result set
-* @tc.expect: Query operation fails (resultSet is nullptr)
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Query_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchDisable_Query_Test_001::Start");
@@ -505,20 +327,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Query_Test_001, TestSize.L
     LOG_INFO("SlientSwitch_SwitchDisable_Query_Test_001::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchDisable_Query_Test_002
-* @tc.desc: Test data query when silent switch is disabled with empty URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Disable silent switch using SetSilentSwitch() with empty URI
-* 2. Create DataSharePredicates to select record with name="wangwu"
-* 3. Create Uri object with SLIENT_ACCESS_URI
-* 4. Call Query() method with URI, predicates and empty columns list
-* 5. Verify the result set
-* @tc.expect: Query operation fails (resultSet is nullptr)
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Query_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchDisable_Query_Test_002::Start");
@@ -536,20 +344,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Query_Test_002, TestSize.L
     LOG_INFO("SlientSwitch_SwitchDisable_Query_Test_002::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchEnable_Query_Test_001
-* @tc.desc: Test data query when silent switch is enabled with valid URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create Uri object with SLIENT_ACCESS_URI
-* 2. Enable silent switch using SetSilentSwitch() with URI
-* 3. Create DataSharePredicates to select record with name="lisi"
-* 4. Call Query() method with URI, predicates and empty columns list
-* 5. Check row count of the result set
-* @tc.expect: Query operation succeeds and returns 1 record
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Query_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchEnable_Query_Test_001::Start");
@@ -570,20 +364,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Query_Test_001, TestSize.Le
     LOG_INFO("SlientSwitch_SwitchEnable_Query_Test_001::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchEnable_Query_Test_002
-* @tc.desc: Test data query when silent switch is enabled with empty URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Enable silent switch using SetSilentSwitch() with empty URI
-* 2. Create DataSharePredicates to select record with name="wangwu"
-* 3. Create Uri object with SLIENT_ACCESS_URI
-* 4. Call Query() method with URI, predicates and empty columns list
-* 5. Check row count of the result set
-* @tc.expect: Query operation succeeds and returns 1 record
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Query_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchEnable_Query_Test_002::Start");
@@ -605,20 +385,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Query_Test_002, TestSize.Le
     LOG_INFO("SlientSwitch_SwitchEnable_Query_Test_002::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchDisable_Delete_Test_001
-* @tc.desc: Test data deletion when silent switch is disabled with valid URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create Uri object with SLIENT_ACCESS_URI
-* 2. Disable silent switch using SetSilentSwitch() with URI
-* 3. Create DataSharePredicates to select record with name="lisi"
-* 4. Call Delete() method with URI and predicates
-* 5. Verify the return value
-* @tc.expect: Delete operation fails (return value <= 0)
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Delete_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchDisable_Delete_Test_001::Start");
@@ -635,20 +401,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Delete_Test_001, TestSize.
     LOG_INFO("SlientSwitch_SwitchDisable_Delete_Test_001::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchDisable_Delete_Test_002
-* @tc.desc: Test data deletion when silent switch is disabled with empty URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Disable silent switch using SetSilentSwitch() with empty URI
-* 2. Create DataSharePredicates to select record with name="wangwu"
-* 3. Create Uri object with SLIENT_ACCESS_URI
-* 4. Call Delete() method with URI and predicates
-* 5. Verify the return value
-* @tc.expect: Delete operation fails (return value <= 0)
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Delete_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchDisable_Delete_Test_002::Start");
@@ -666,20 +418,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Delete_Test_002, TestSize.
     LOG_INFO("SlientSwitch_SwitchDisable_Delete_Test_002::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchEnable_Delete_Test_001
-* @tc.desc: Test data deletion when silent switch is enabled with valid URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create Uri object with SLIENT_ACCESS_URI
-* 2. Enable silent switch using SetSilentSwitch() with URI
-* 3. Create DataSharePredicates to select record with name="lisi"
-* 4. Call Delete() method with URI and predicates
-* 5. Verify the return value
-* @tc.expect: Delete operation succeeds (return value > 0)
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Delete_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchEnable_Delete_Test_001::Start");
@@ -696,20 +434,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Delete_Test_001, TestSize.L
     LOG_INFO("SlientSwitch_SwitchEnable_Delete_Test_001::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchEnable_Delete_Test_002
-* @tc.desc: Test data deletion when silent switch is enabled with empty URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Enable silent switch using SetSilentSwitch() with empty URI
-* 2. Create DataSharePredicates to select record with name="wangwu"
-* 3. Create Uri object with SLIENT_ACCESS_URI
-* 4. Call Delete() method with URI and predicates
-* 5. Verify the return value
-* @tc.expect: Delete operation succeeds (return value > 0)
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Delete_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchEnable_Delete_Test_002::Start");
@@ -727,22 +451,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Delete_Test_002, TestSize.L
     LOG_INFO("SlientSwitch_SwitchEnable_Delete_Test_002::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchDisable_CreateHelper_Test_001
-* @tc.desc: Test DataShareHelper creation when silent switch is disabled
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-    1. Create initial DataShareHelper with valid parameters (should succeed)
-    2. Disable silent switch using SetSilentSwitch() with empty URI
-    3. Try to create another DataShareHelper with same parameters
-    4. Re-enable silent switch
-* @tc.expect:
-    1. First helper creation succeeds (helper != nullptr)
-    2. Second helper creation fails (helper == nullptr)
-    3. Re-enabling switch returns E_OK
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_CreateHelper_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchDisable_CreateHelper_Test_001::Start");
@@ -771,23 +479,6 @@ Template GetTemplate()
     return tpl;
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchDisable_CreateHelper_Test_002
-* @tc.desc: Test AddQueryTemplate when silent switch is disabled
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Disable silent switch using SetSilentSwitch() with empty URI
-* 2. Create DataShareHelper with valid parameters
-* 3. Get query template using GetTemplate()
-* 4. Call AddQueryTemplate with proxy URI, subscriber ID and template
-* 5. Re-enable silent switch
-* @tc.expect:
-* 1. Helper creation succeeds (helper != nullptr)
-* 2. AddQueryTemplate returns ERROR (-1)
-* 3. Re-enabling switch returns E_OK
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_CreateHelper_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchDisable_CreateHelper_Test_002::Start");
@@ -806,21 +497,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_CreateHelper_Test_002, Tes
     LOG_INFO("SlientSwitch_SwitchDisable_CreateHelper_Test_002::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchEnable_CreateHelper_Test_001
-* @tc.desc: Test AddQueryTemplate when silent switch is enabled (without provider URI)
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Enable silent switch using SetSilentSwitch() with empty URI
-* 2. Create DataShareHelper with valid parameters (without provider URI)
-* 3. Get query template using GetTemplate()
-* 4. Call AddQueryTemplate with proxy URI, subscriber ID and template
-* @tc.expect:
-* 1. Helper creation succeeds (helper != nullptr)
-* 2. AddQueryTemplate returns E_BUNDLE_NAME_NOT_EXIST
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_CreateHelper_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchEnable_CreateHelper_Test_001::Start");
@@ -837,21 +513,6 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_CreateHelper_Test_001, Test
     LOG_INFO("SlientSwitch_SwitchEnable_CreateHelper_Test_001::End");
 }
 
-/**
-* @tc.name: SlientSwitch_SwitchEnable_CreateHelper_Test_002
-* @tc.desc: Test AddQueryTemplate when silent switch is enabled (with provider URI)
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Enable silent switch using SetSilentSwitch() with empty URI
-* 2. Create DataShareHelper with valid parameters (including provider URI)
-* 3. Get query template using GetTemplate()
-* 4. Call AddQueryTemplate with proxy URI, subscriber ID and template
-* @tc.expect:
-* 1. Helper creation succeeds (helper != nullptr)
-* 2. AddQueryTemplate returns E_BUNDLE_NAME_NOT_EXIST
-*/
 HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_CreateHelper_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientSwitch_SwitchEnable_CreateHelper_Test_002::Start");
