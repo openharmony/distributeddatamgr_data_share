@@ -243,6 +243,21 @@ void SlientAccessTest::TearDownTestCase(void)
 void SlientAccessTest::SetUp(void) {}
 void SlientAccessTest::TearDown(void) {}
 
+/**
+* @tc.name: SlientAccess_Creator_Errorcode_Test_001
+* @tc.desc: Test DataShareHelper creation with valid parameters
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Get SystemAbilityManager instance
+* 2. Get remote object for STORAGE_MANAGER_MANAGER_ID
+* 3. Call DataShareHelper::Create() with valid remote object and URIs
+* 4. Check return code and helper instance
+* @tc.expect:
+* 1. Return code is E_OK
+* 2. Helper instance is not null
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_001::Start");
@@ -263,6 +278,19 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_001, TestSize.Lev
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_Creator_Errorcode_Test_002
+* @tc.desc: Test DataShareHelper creation with null remote object
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Call DataShareHelper::Create() with null remote object and valid URIs
+* 2. Check return code and helper instance
+* @tc.expect:
+* 1. Return code is E_TOKEN_EMPTY
+* 2. Helper instance is null
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_002::Start");
@@ -274,6 +302,21 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_002, TestSize.Lev
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_002::End");
 }
 
+/**
+* @tc.name: SlientAccess_Creator_Errorcode_Test_003
+* @tc.desc: Test DataShareHelper creation with invalid URIs
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Get SystemAbilityManager instance
+* 2. Get remote object for STORAGE_MANAGER_MANAGER_ID
+* 3. Call DataShareHelper::Create() with valid remote object, error URI and empty URI
+* 4. Check return code and helper instance
+* @tc.expect:
+* 1. Return code is E_EXT_URI_INVALID
+* 2. Helper instance is null
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_003, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_003::Start");
@@ -295,6 +338,21 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_003, TestSize.Lev
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_003::End");
 }
 
+/**
+* @tc.name: SlientAccess_Creator_Errorcode_Test_004
+* @tc.desc: Test DataShareHelper creation with same valid URIs
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Get SystemAbilityManager instance
+* 2. Get remote object for STORAGE_MANAGER_MANAGER_ID
+* 3. Call DataShareHelper::Create() with valid remote object and same URIs
+* 4. Check return code and helper instance
+* @tc.expect:
+* 1. Return code is E_OK
+* 2. Helper instance is not null
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_004, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_004::Start");
@@ -315,6 +373,20 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_004, TestSize.Lev
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_004::End");
 }
 
+/**
+* @tc.name: SlientAccess_InsertEx_Test_001
+* @tc.desc: Test InsertEx operation with valid data
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
+* 2. Call InsertEx() with SLIENT_ACCESS_URI and values bucket
+* 3. Check error code and return value
+* @tc.expect:
+* 1. Error code is 0 (success)
+* 2. Return value is greater than 0 (valid row ID)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_InsertEx_Test_001::Start");
@@ -332,6 +404,18 @@ HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_001, TestSize.Level0)
     LOG_INFO("SlientAccess_InsertEx_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_InsertEx_Test_002
+* @tc.desc: Test base class InsertEx operation
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
+* 2. Call base class InsertEx() with SLIENT_ACCESS_URI and values bucket
+* 3. Check return pair
+* @tc.expect: The return pair is (0, 0)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_002, TestSize.Level0)
 {
     LOG_INFO("SilentAccess_InsertEx_Test_002::Start");
@@ -347,6 +431,21 @@ HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_002, TestSize.Level0)
     LOG_INFO("SilentAccess_InsertEx_Test_002::End");
 }
 
+/**
+* @tc.name: SlientAccess_UpdateEx_Test_001
+* @tc.desc: Test UpdateEx operation with valid data
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Prepare DataShareValuesBucket with update data (age=50)
+* 2. Create DataSharePredicates to select record with name="lisi"
+* 3. Call UpdateEx() with SLIENT_ACCESS_URI, predicates and values bucket
+* 4. Check error code and return value
+* @tc.expect:
+* 1. Error code is 0 (success)
+* 2. Return value is greater than 0 (number of affected rows)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_UpdateEx_Test_001::Start");
@@ -364,6 +463,19 @@ HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_001, TestSize.Level0)
     LOG_INFO("SlientAccess_UpdateEx_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_UpdateEx_Test_002
+* @tc.desc: Test base class UpdateEx operation
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Prepare DataShareValuesBucket with update data (age=50)
+* 2. Create DataSharePredicates to select record with name="lisi"
+* 3. Call base class UpdateEx() with SLIENT_ACCESS_URI, predicates and values bucket
+* 4. Check return pair
+* @tc.expect: The return pair is (0, 0)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_002, TestSize.Level0)
 {
     LOG_INFO("SilentAccess_UpdateEx_Test_002::Start");
@@ -380,6 +492,20 @@ HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_002, TestSize.Level0)
     LOG_INFO("SilentAccess_UpdateEx_Test_002::End");
 }
 
+/**
+* @tc.name: SlientAccess_DeleteEx_Test_001
+* @tc.desc: Test DeleteEx operation with valid parameters
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create DataSharePredicates to select record with name="lisi"
+* 2. Call DeleteEx() with SLIENT_ACCESS_URI and predicates
+* 3. Check error code and return value
+* @tc.expect:
+* 1. Error code is 0 (success)
+* 2. Return value is greater than 0 (number of deleted rows)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_DeleteEx_Test_001::Start");
@@ -395,6 +521,18 @@ HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_001, TestSize.Level0)
     LOG_INFO("SlientAccess_DeleteEx_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_DeleteEx_Test_002
+* @tc.desc: Test base class DeleteEx operation
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create DataSharePredicates to select record with name="lisi"
+* 2. Call base class DeleteEx() with SLIENT_ACCESS_URI and predicates
+* 3. Check return pair
+* @tc.expect: The return pair is (0, 0)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_002, TestSize.Level0)
 {
     LOG_INFO("SilentAccess_DeleteEx_Test_002::Start");
@@ -408,6 +546,18 @@ HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_002, TestSize.Level0)
     LOG_INFO("SilentAccess_DeleteEx_Test_002::End");
 }
 
+/**
+* @tc.name: SlientAccess_Insert_Test_001
+* @tc.desc: Test Insert operation with valid data
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
+* 2. Call Insert() with SLIENT_ACCESS_URI and values bucket
+* 3. Check return value
+* @tc.expect: Return value is greater than 0 (valid row ID)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Insert_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Insert_Test_001::Start");
@@ -424,6 +574,19 @@ HWTEST_F(SlientAccessTest, SlientAccess_Insert_Test_001, TestSize.Level0)
     LOG_INFO("SlientAccess_Insert_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_Update_Test_001
+* @tc.desc: Test Update operation with valid data
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Prepare DataShareValuesBucket with update data (age=50)
+* 2. Create DataSharePredicates to select record with name="lisi"
+* 3. Call Update() with SLIENT_ACCESS_URI, predicates and values bucket
+* 4. Check return value
+* @tc.expect: Return value is greater than 0 (number of affected rows)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Update_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Update_Test_001::Start");
@@ -440,6 +603,18 @@ HWTEST_F(SlientAccessTest, SlientAccess_Update_Test_001, TestSize.Level0)
     LOG_INFO("SlientAccess_Update_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_Query_Test_001
+* @tc.desc: Test Query operation with valid parameters
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create DataSharePredicates to select record with name="lisi"
+* 2. Call Query() with SLIENT_ACCESS_URI, predicates and empty columns list
+* 3. Check row count of the result set
+* @tc.expect: Query returns 1 record
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Query_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Query_Test_001::Start");
@@ -457,6 +632,18 @@ HWTEST_F(SlientAccessTest, SlientAccess_Query_Test_001, TestSize.Level0)
     LOG_INFO("SlientAccess_Query_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_Delete_Test_001
+* @tc.desc: Test Delete operation with valid parameters
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create DataSharePredicates to select record with name="lisi"
+* 2. Call Delete() with SLIENT_ACCESS_URI and predicates
+* 3. Check return value
+* @tc.expect: Return value is greater than 0 (number of deleted rows)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Delete_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Delete_Test_001::Start");
@@ -471,6 +658,24 @@ HWTEST_F(SlientAccessTest, SlientAccess_Delete_Test_001, TestSize.Level0)
     LOG_INFO("SlientAccess_Delete_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_Register_Test_001
+* @tc.desc: Test observer registration and notification in silent access mode
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create IDataShareAbilityObserverTest instance and set initial name "zhangsan"
+* 2. Register observer with SLIENT_ACCESS_URI
+* 3. Insert test data (name="lisi", age=25) using helper
+* 4. Wait for observer notification
+* 5. Verify observer name changes to "OnChangeName"
+* 6. Delete test data and unregister observer
+* @tc.expect:
+* 1. Insert operation succeeds (retVal > 0)
+* 2. Observer is notified and name updates to "OnChangeName"
+* 3. Delete operation succeeds (retVal >= 0)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Register_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Register_Test_001::Start");
@@ -499,6 +704,23 @@ HWTEST_F(SlientAccessTest, SlientAccess_Register_Test_001, TestSize.Level0)
     LOG_INFO("SlientAccess_Register_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_RegisterErrorUri_Test_001
+* @tc.desc: Test observer registration with incorrect URI
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create IDataShareAbilityObserverTest instance and set name "zhangsan"
+* 2. Register observer with incorrect URI (SLIENT_REGISTER_URI)
+* 3. Insert test data (name="lisi", age=25) to SLIENT_ACCESS_URI
+* 4. Check if observer is notified
+* 5. Delete test data and unregister observer
+* @tc.expect:
+* 1. Insert operation succeeds (retVal > 0)
+* 2. Observer is NOT notified (name remains "zhangsan")
+* 3. Delete operation succeeds (retVal >= 0)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_RegisterErrorUri_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_RegisterErrorUri_Test_001::Start");
@@ -526,6 +748,22 @@ HWTEST_F(SlientAccessTest, SlientAccess_RegisterErrorUri_Test_001, TestSize.Leve
     LOG_INFO("SlientAccess_RegisterErrorUri_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_NoRegister_Test_001
+* @tc.desc: Test data operation without observer registration
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create IDataShareAbilityObserverTest instance but do NOT register it
+* 2. Insert test data (name="lisi", age=25) using helper
+* 3. Check if observer is notified
+* 4. Delete test data
+* @tc.expect:
+* 1. Insert operation succeeds (retVal > 0)
+* 2. Observer is NOT notified (name remains "zhangsan")
+* 3. Delete operation succeeds (retVal >= 0)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_NoRegister_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_NoRegister_Test_001::Start");
@@ -551,6 +789,23 @@ HWTEST_F(SlientAccessTest, SlientAccess_NoRegister_Test_001, TestSize.Level0)
     LOG_INFO("SlientAccess_NoRegister_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_NoRegister_Test_002
+* @tc.desc: Test data operation after unregistering observer
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create IDataShareAbilityObserverTest instance and register it
+* 2. Immediately unregister the observer
+* 3. Insert test data (name="lisi", age=25) using helper
+* 4. Check if observer is notified
+* 5. Delete test data
+* @tc.expect:
+* 1. Insert operation succeeds (retVal > 0)
+* 2. Observer is NOT notified (name remains "zhangsan")
+* 3. Delete operation succeeds (retVal >= 0)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_NoRegister_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_NoRegister_Test_002::Start");
@@ -577,6 +832,18 @@ HWTEST_F(SlientAccessTest, SlientAccess_NoRegister_Test_002, TestSize.Level0)
     LOG_INFO("SlientAccess_NoRegister_Test_002::End");
 }
 
+/**
+* @tc.name: SlientAccess_Permission_Insert_Test_001
+* @tc.desc: Test insert operation with proper permissions
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
+* 2. Call Insert() with SLIENT_ACCESS_URI
+* 3. Check return value
+* @tc.expect: Insert operation succeeds (retVal > 0)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Insert_Test_001::Start");
@@ -593,6 +860,18 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_001, TestSize.Lev
     LOG_INFO("SlientAccess_Permission_Insert_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_Permission_Insert_Test_003
+* @tc.desc: Test insert operation with proxy permission URI
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
+* 2. Call Insert() with SLIENT_PROXY_PERMISSION1_URI
+* 3. Check return value
+* @tc.expect: Insert operation succeeds (retVal > 0)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_003, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Insert_Test_003::Start");
@@ -609,6 +888,19 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_003, TestSize.Lev
     LOG_INFO("SlientAccess_Permission_Insert_Test_003::End");
 }
 
+/**
+* @tc.name: SlientAccess_Permission_Update_Test_001
+* @tc.require: NA
+* @tc.desc: Test update operation with proxy permission URI
+* @tc.type: FUNC
+* @tc.precon: None
+* @tc.step:
+* 1. Prepare DataShareValuesBucket with update data (age=50)
+* 2. Create predicates to select record with name="lisi"
+* 3. Call Update() with SLIENT_PROXY_PERMISSION1_URI
+* 4. Check return value
+* @tc.expect: Update operation succeeds (retVal > 0)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Update_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Update_Test_001::Start");
@@ -625,6 +917,22 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Update_Test_001, TestSize.Lev
     LOG_INFO("SlientAccess_Permission_Update_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_Permission_Query_Test_002
+* @tc.desc: Test query operation with proxy permission URI
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Insert test data (name="lisi", age=25) into SLIENT_PROXY_PERMISSION2_URI
+* 2. Create predicates to select inserted record
+* 3. Call Query() with SLIENT_PROXY_PERMISSION2_URI
+* 4. Check result set row count and business error code
+* @tc.expect:
+* 1. Insert operation succeeds (retVal > 0)
+* 2. Query returns 1 record
+* 3. Business error code is 0 (no error)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Query_Test_002::Start");
@@ -653,6 +961,18 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_002, TestSize.Leve
     LOG_INFO("SlientAccess_Permission_Query_Test_002::End");
 }
 
+/**
+* @tc.name: SlientAccess_Permission_Delete_Test_001
+* @tc.desc: Test delete operation with proxy permission URI
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create predicates to select record with name="lisi"
+* 2. Call Delete() with SLIENT_PROXY_PERMISSION2_URI
+* 3. Check return value
+* @tc.expect: Delete operation succeeds and deletes 1 record (retVal = 1)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Delete_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Delete_Test_001::Start");
@@ -667,6 +987,20 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Delete_Test_001, TestSize.Lev
     LOG_INFO("SlientAccess_Permission_Delete_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_Permission_Insert_Test_002
+* @tc.desc: Test insert operation without required permissions
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create HAP token with limited permissions
+* 2. Set token ID for current process
+* 3. Create DataShareHelper instance
+* 4. Try to insert data into SLIENT_ACCESS_PERMISSION1_URI
+* 5. Clean up token
+* @tc.expect: Insert operation fails (retVal = -2)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Insert_Test_002::Start");
@@ -710,6 +1044,20 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_002, TestSize.Lev
     LOG_INFO("SlientAccess_Permission_Insert_Test_002::End");
 }
 
+/**
+* @tc.name: SlientAccess_Permission_Update_Test_002
+* @tc.desc: Test update operation without required permissions
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create HAP token with limited permissions
+* 2. Set token ID for current process
+* 3. Create DataShareHelper instance
+* 4. Try to update data in SLIENT_ACCESS_PERMISSION1_URI
+* 5. Clean up token
+* @tc.expect: Update operation fails (retVal = -2)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Update_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Update_Test_002::Start");
@@ -754,6 +1102,24 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Update_Test_002, TestSize.Lev
     LOG_INFO("SlientAccess_Permission_Update_Test_002::End");
 }
 
+/**
+* @tc.name: SlientAccess_Permission_Query_Test_001
+* @tc.desc: Test query operation without required permissions
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create HAP token with limited permissions (only WRITE_CONTACTS granted)
+* 2. Set token ID for current process
+* 3. Create DataShareHelper instance
+* 4. Try to query data from SLIENT_ACCESS_PERMISSION2_URI with predicates for "lisi"
+* 5. Check result set, row count and business error code
+* 6. Clean up token
+* @tc.expect:
+* 1. Result set is nullptr
+* 2. Row count is 0
+* 3. Business error code is -2 (permission denied)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Query_Test_001::Start");
@@ -802,6 +1168,18 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_001, TestSize.Leve
     LOG_INFO("SlientAccess_Permission_Query_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_Access_When_Uri_Error_Test_001
+* @tc.desc: Test data insertion with invalid URI
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
+* 2. Call Insert() with invalid URI (SLIENT_ERROR_URI)
+* 3. Check return value
+* @tc.expect: Insert operation fails (retVal < 0)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Access_When_Uri_Error_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Access_When_URI_ERROR_Test_001::Begin");
@@ -818,6 +1196,18 @@ HWTEST_F(SlientAccessTest, SlientAccess_Access_When_Uri_Error_Test_001, TestSize
     LOG_INFO("SlientAccess_Permission_Access_When_URI_ERROR_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_Access_With_Uncreated_DataBase_Test_001
+* @tc.desc: Test data insertion to uncreated database
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
+* 2. Call Insert() with URI pointing to uncreated database (SLIENT_ERROR_DATABASE_URI)
+* 3. Check return value
+* @tc.expect: Insert operation fails (retVal < 0)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Access_With_Uncreated_DataBase_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Access_With_Uncreated_DataBase_Test_001::Begin");
@@ -834,6 +1224,18 @@ HWTEST_F(SlientAccessTest, SlientAccess_Access_With_Uncreated_DataBase_Test_001,
     LOG_INFO("SlientAccess_Access_With_Uncreated_DataBase_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_Creator_With_Uri_Error_Test_001
+* @tc.desc: Test DataShareHelper creation with invalid URI
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Get SystemAbilityManager instance and remote object for STORAGE_MANAGER_MANAGER_ID
+* 2. Try to create DataShareHelper with invalid URI (DATA_SHARE_ERROR_URI)
+* 3. Check helper instance
+* @tc.expect: Helper creation fails (helper == nullptr)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_With_Uri_Error_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_With_Uri_Error_Test_001::Begin");
@@ -851,6 +1253,18 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_With_Uri_Error_Test_001, TestSiz
     LOG_INFO("SlientAccess_Creator_With_Uri_Error_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_Creator_When_TimeOut_Test_001
+* @tc.desc: Test DataShareHelper creation with timeout
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Get SystemAbilityManager instance and remote object for STORAGE_MANAGER_MANAGER_ID
+* 2. Try to create DataShareHelper with valid URI but timeout parameter 0
+* 3. Check helper instance
+* @tc.expect: Helper creation fails due to timeout (helper == nullptr)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_When_TimeOut_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_With_Uri_Error_Test_001::Begin");
@@ -868,9 +1282,18 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_When_TimeOut_Test_001, TestSize.
     LOG_INFO("SlientAccess_Creator_With_Uri_Error_Test_001::End");
 }
 
-/*
-* @tc.desc: test UserDefineFunc
-* @tc.require: Null
+/**
+* @tc.name: SlientAccess_UserDefineFunc_Test_001
+* @tc.desc: Test custom user-defined function in DataShareHelper
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create empty MessageParcel objects for data and reply
+* 2. Create default MessageOption
+* 3. Call UserDefineFunc() on the helper
+* 4. Check return value
+* @tc.expect: User-defined function returns 0 (success)
 */
 HWTEST_F(SlientAccessTest, SlientAccess_UserDefineFunc_Test_001, TestSize.Level0)
 {
@@ -884,6 +1307,18 @@ HWTEST_F(SlientAccessTest, SlientAccess_UserDefineFunc_Test_001, TestSize.Level0
     LOG_INFO("SilentAccess_UserDefineFunc_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_Creator_ErrorBundle_Test_001
+* @tc.desc: Test DataShareHelper creation with invalid bundle name in URI
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create URI with invalid bundle name ("com.acts.error.bundleName")
+* 2. Try to create DataShareHelper with this URI
+* 3. Check helper instance
+* @tc.expect: Helper creation fails (helper == nullptr) due to invalid bundle name
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_ErrorBundle_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_ErrorBundle_Test_001::Start");
@@ -894,6 +1329,20 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_ErrorBundle_Test_001, TestSize.L
     LOG_INFO("SlientAccess_Creator_ErrorBundle_Test_001::End");
 }
 
+/**
+* @tc.name: SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001
+* @tc.desc: Test DataShareHelper creation with invalid silent URI but valid ext URI
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Get SystemAbilityManager instance and remote object for STORAGE_MANAGER_MANAGER_ID
+* 2. Try to create DataShareHelper with invalid silent URI but valid ext URI
+* 3. Check return code and helper instance
+* @tc.expect:
+* 1. Return code is E_OK
+* 2. Helper instance is not null (success due to valid ext URI)
+*/
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001::Start");
@@ -915,11 +1364,21 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001,
     LOG_INFO("SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001::End");
 }
 
- /**
+/**
 * @tc.name: SlientAccess_Create_With_Invalid_AppIndex_Test_001
-* @tc.desc: test use invalid appIndex to create datashare helper
+* @tc.desc: Test DataShareHelper creation with invalid appIndex in URI
 * @tc.type: FUNC
-* @tc.require:
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create URI with invalid appIndex parameter ("appIndex=-1")
+* 2. Try to create DataShareHelper using Create() method
+* 3. Try to create DataShareHelper using Creator() method
+* 4. Try to create DataShareHelper with CreateOptions
+* 5. Check return code and helper instances
+* @tc.expect:
+* 1. Create() returns E_EXT_URI_INVALID with null helper
+* 2. Both Creator() methods return null helper
 */
 HWTEST_F(SlientAccessTest, SlientAccess_Create_With_Invalid_AppIndex_Test_001, TestSize.Level0)
 {
@@ -950,8 +1409,15 @@ HWTEST_F(SlientAccessTest, SlientAccess_Create_With_Invalid_AppIndex_Test_001, T
 
 /**
 * @tc.name: SlientAccess_RegisterObserverExtProvider_Test_001
-* @tc.desc: Fill the branch generalCtl == nullptr
+* @tc.desc: Test RegisterObserverExtProvider with invalid URI (covers generalCtl == nullptr branch)
 * @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create invalid URI (SLIENT_ERROR_URI)
+* 2. Create DataShareObserverTest instance
+* 3. Call RegisterObserverExtProvider with invalid URI and observer
+* @tc.expect: No crash occurs, method executes without errors
 */
 HWTEST_F(SlientAccessTest, SlientAccess_RegisterObserverExtProvider_Test_001, TestSize.Level0)
 {
@@ -969,8 +1435,16 @@ HWTEST_F(SlientAccessTest, SlientAccess_RegisterObserverExtProvider_Test_001, Te
 
 /**
 * @tc.name: SlientAccess_UnregisterObserverExtProvider_Test_001
-* @tc.desc: Fill the branch generalCtl == nullptr
+* @tc.desc: Test UnregisterObserverExtProvider with invalid URI (covers generalCtl == nullptr branch)
 * @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create invalid URI (SLIENT_ERROR_URI)
+* 2. Create DataShareObserverTest instance
+* 3. Call UnregisterObserverExtProvider with invalid URI and observer
+* 4. Create dummy ChangeInfo object
+* @tc.expect: No crash occurs, method executes without errors
 */
 HWTEST_F(SlientAccessTest, SlientAccess_UnregisterObserverExtProvider_Test_001, TestSize.Level0)
 {
@@ -989,8 +1463,17 @@ HWTEST_F(SlientAccessTest, SlientAccess_UnregisterObserverExtProvider_Test_001, 
 
 /**
 * @tc.name: SlientAccess_NotifyChangeExtProvider_Test_001
-* @tc.desc: Fill the branch generalCtl == nullptr
+* @tc.desc: Test NotifyChangeExtProvider with invalid URI (covers generalCtl == nullptr branch)
 * @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create invalid URI (SLIENT_ERROR_URI)
+* 2. Create DataShareObserverTest instance
+* 3. Register observer with invalid URI
+* 4. Create ChangeInfo object for INSERT operation
+* 5. Call NotifyChangeExtProvider with ChangeInfo
+* @tc.expect: No crash occurs, notification process executes without errors
 */
 HWTEST_F(SlientAccessTest, SlientAccess_NotifyChangeExtProvider_Test_001, TestSize.Level0)
 {
