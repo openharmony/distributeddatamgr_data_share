@@ -249,6 +249,18 @@ void MediaDataShareUnitTest::TearDownTestCase(void)
 void MediaDataShareUnitTest::SetUp(void) {}
 void MediaDataShareUnitTest::TearDown(void) {}
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_001
+* @tc.desc: Verify query with Equals and Limit predicates returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with Equals("name", "dataShareTest003") and Limit(1, 0)
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 1 row
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_001::Start");
@@ -267,6 +279,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_001, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_001, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_002
+* @tc.desc: Verify query with NotEqualTo predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with NotEqualTo("name", "dataShareTest003")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 2 rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_002, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_002::Start");
@@ -284,6 +308,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_002, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_002, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_003
+* @tc.desc: Verify query with Contains predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with Contains("name", "dataShareTest")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 3 rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_003, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_003::Start");
@@ -301,6 +337,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_003, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_003, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_004
+* @tc.desc: Verify query with BeginsWith predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with BeginsWith("name", "dataShare")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 3 rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_004, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_004::Start");
@@ -318,6 +366,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_004, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_004, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_005
+* @tc.desc: Verify query with EndsWith predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with EndsWith("name", "003")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 1 row
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_005, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_005::Start");
@@ -335,6 +395,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_005, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_005, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_006
+* @tc.desc: Verify query with IsNull predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with IsNull("name")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 0 rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_006, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_006::Start");
@@ -352,6 +424,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_006, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_006, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_007
+* @tc.desc: Verify query with IsNotNull predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with IsNotNull("name")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 3 rows
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_007, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_007::Start");
@@ -369,6 +453,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_007, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_007, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_008
+* @tc.desc: Verify query with Like predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with Like("name", "%Test003")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 1 row
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_008, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_008::Start");
@@ -386,6 +482,18 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_008, TestSize.Le
     LOG_INFO("MediaDataShare_Predicates_Test_008, End");
 }
 
+/**
+* @tc.name: MediaDataShare_Predicates_Test_009
+* @tc.desc: Verify query with Glob predicate returns correct result count
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create predicates with Glob("name", "dataShareTes?003")
+    2. Execute query with these predicates
+    3. Check the returned row count
+* @tc.expected: Query returns exactly 1 row
+*/
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_009, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_009::Start");
