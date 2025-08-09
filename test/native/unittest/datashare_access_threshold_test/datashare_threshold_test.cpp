@@ -157,10 +157,22 @@ void DataShareThresholdTest::SetUp(void) {}
 void DataShareThresholdTest::TearDown(void) {}
 
 /**
-* @tc.name: Insert_Threshold_Test001
-* @tc.desc: test silent access insert over threshold case
-* @tc.type: FUNC
-*/
+ * @tc.name: Insert_Threshold_Test001
+ * @tc.desc: Verify silent access Insert operation behavior when exceeding and not exceeding the threshold
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataShareHelper instance with silent access configuration
+    2. Prepare test data (name and age) in a DataShareValuesBucket
+    3. Perform initial Insert operation and verify success
+    4. Perform 2998 additional Insert operations (not exceeding threshold) and verify success
+    5. Perform 10 more Insert operations (exceeding threshold) and check results
+ * @tc.expect:
+    1. DataShareHelper is created successfully (not nullptr)
+    2. All Insert operations before threshold return positive values (success)
+    3. All Insert operations after threshold return DATA_SHARE_ERROR(-1)
+ */
 HWTEST_F(DataShareThresholdTest, Insert_Threshold_Test001, TestSize.Level1)
 {
     LOG_INFO("Insert_Threshold_Test001::Start");
@@ -198,8 +210,20 @@ HWTEST_F(DataShareThresholdTest, Insert_Threshold_Test001, TestSize.Level1)
 
 /**
 * @tc.name: Update_Threshold_Test001
-* @tc.desc: test silent access update over threshold case
+* @tc.desc: Verify silent access Update operation behavior when exceeding and not exceeding the threshold
 * @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShareHelper instance with silent access configuration
+    2. Define update predicates to target specific data
+    3. Prepare update data in a DataShareValuesBucket
+    4. Perform 2999 Update operations (not exceeding threshold) and verify success
+    5. Perform 10 more Update operations (exceeding threshold) and check results
+* @tc.expect:
+    1. DataShareHelper is created successfully (not nullptr)
+    2. All Update operations before threshold return 1 (success)
+    3. All Update operations after threshold return DATA_SHARE_ERROR(-1)
 */
 HWTEST_F(DataShareThresholdTest, Update_Threshold_Test001, TestSize.Level1)
 {
@@ -231,8 +255,19 @@ HWTEST_F(DataShareThresholdTest, Update_Threshold_Test001, TestSize.Level1)
 
 /**
 * @tc.name: Query_Threshold_Test001
-* @tc.desc: test silent access query over threshold case
+* @tc.desc: Verify silent access Query operation behavior when exceeding and not exceeding the threshold
 * @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShareHelper instance with silent access configuration
+    2. Define query predicates to target specific data
+    3. Perform 2999 Query operations (not exceeding threshold) and verify results
+    4. Perform 10 more Query operations (exceeding threshold) and check results
+* @tc.expect:
+    1. DataShareHelper is created successfully (not nullptr)
+    2. All Query operations before threshold return valid result sets with 1 row
+    3. All Query operations after threshold return nullptr (DATA_SHARE_ERROR)
 */
 HWTEST_F(DataShareThresholdTest, Query_Threshold_Test001, TestSize.Level1)
 {
@@ -266,8 +301,19 @@ HWTEST_F(DataShareThresholdTest, Query_Threshold_Test001, TestSize.Level1)
 
 /**
 * @tc.name: Delete_Threshold_Test001
-* @tc.desc: test silent access delete delete over threshold case
+* @tc.desc: Verify silent access Delete operation behavior when exceeding and not exceeding the threshold
 * @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShareHelper instance with silent access configuration
+    2. Define delete predicates targeting non-existent data
+    3. Perform 2999 Delete operations (not exceeding threshold) and verify results
+    4. Perform 10 more Delete operations (exceeding threshold) and check results
+* @tc.expect:
+    1. DataShareHelper is created successfully (not nullptr)
+    2. All Delete operations before threshold return 0 (no data deleted)
+    3. All Delete operations after threshold return DATA_SHARE_ERROR(-1)
 */
 HWTEST_F(DataShareThresholdTest, Delete_Threshold_Test001, TestSize.Level1)
 {
@@ -297,8 +343,19 @@ HWTEST_F(DataShareThresholdTest, Delete_Threshold_Test001, TestSize.Level1)
 
 /**
 * @tc.name: InsertEx_Threshold_Test001
-* @tc.desc: test silent access insertEx over threshold case
+* @tc.desc: Verify silent access InsertEx operation behavior when exceeding and not exceeding the threshold
 * @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShareHelper instance with silent access configuration
+    2. Prepare test data (name and age) in a DataShareValuesBucket
+    3. Perform 2999 InsertEx operations (not exceeding threshold) and verify success
+    4. Perform 10 more InsertEx operations (exceeding threshold) and check results
+* @tc.expect:
+    1. DataShareHelper is created successfully (not nullptr)
+    2. All InsertEx operations before threshold return (0, positive value) indicating success
+    3. All InsertEx operations after threshold return (DATA_SHARE_ERROR(-1), 0)
 */
 HWTEST_F(DataShareThresholdTest, InsertEx_Threshold_Test001, TestSize.Level1)
 {
@@ -331,8 +388,20 @@ HWTEST_F(DataShareThresholdTest, InsertEx_Threshold_Test001, TestSize.Level1)
 
 /**
 * @tc.name: UpdateEx_Threshold_Test001
-* @tc.desc: test silent access updateEx over threshold case
+* @tc.desc: Verify silent access UpdateEx operation behavior when exceeding and not exceeding the threshold
 * @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShareHelper instance with silent access configuration
+    2. Define update predicates to target specific data
+    3. Prepare update data in a DataShareValuesBucket
+    4. Perform 2999 UpdateEx operations (not exceeding threshold) and verify success
+    5. Perform 10 more UpdateEx operations (exceeding threshold) and check results
+* @tc.expect:
+    1. DataShareHelper is created successfully (not nullptr)
+    2. All UpdateEx operations before threshold return (0, 1) indicating success
+    3. All UpdateEx operations after threshold return (DATA_SHARE_ERROR(-1), 0)
 */
 HWTEST_F(DataShareThresholdTest, UpdateEx_Threshold_Test001, TestSize.Level1)
 {
@@ -367,8 +436,19 @@ HWTEST_F(DataShareThresholdTest, UpdateEx_Threshold_Test001, TestSize.Level1)
 
 /**
 * @tc.name: DeleteEx_Threshold_Test001
-* @tc.desc: test silent access deleteEx over threshold case
+* @tc.desc: Verify silent access DeleteEx operation behavior when exceeding and not exceeding the threshold
 * @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Create a DataShareHelper instance with silent access configuration
+    2. Define delete predicates targeting non-existent data
+    3. Perform 2999 DeleteEx operations (not exceeding threshold) and verify results
+    4. Perform 10 more DeleteEx operations (exceeding threshold) and check results
+* @tc.expect:
+    1. DataShareHelper is created successfully (not nullptr)
+    2. All DeleteEx operations before threshold return (0, 0) indicating no data deleted
+    3. All DeleteEx operations after threshold return (DATA_SHARE_ERROR(-1), 0)
 */
 HWTEST_F(DataShareThresholdTest, DeleteEx_Threshold_Test001, TestSize.Level1)
 {
@@ -400,8 +480,17 @@ HWTEST_F(DataShareThresholdTest, DeleteEx_Threshold_Test001, TestSize.Level1)
 
 /**
 * @tc.name: Insert_Threshold_Test002
-* @tc.desc: test non-silent acess insert over threshold case
+* @tc.desc: Verify non-silent access Insert operation behavior when exceeding the threshold
 * @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Prepare test data (name and age) in a DataShareValuesBucket
+    2. Perform 2999 Insert operations (not exceeding threshold) and verify success
+    3. Perform 10 more Insert operations (exceeding threshold) and check results
+* @tc.expect:
+    1. All Insert operations before and after threshold return positive values (success)
+    2. No failure occurs when exceeding threshold for non-silent access
 */
 HWTEST_F(DataShareThresholdTest, Insert_Threshold_Test002, TestSize.Level1)
 {
@@ -429,8 +518,18 @@ HWTEST_F(DataShareThresholdTest, Insert_Threshold_Test002, TestSize.Level1)
 
 /**
 * @tc.name: Update_Threshold_Test002
-* @tc.desc: test non-silent access update over threshold case
+* @tc.desc: Verify non-silent access Update operation behavior when exceeding the threshold
 * @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Define update predicates to target specific data
+    2. Prepare update data in a DataShareValuesBucket
+    3. Perform 2999 Update operations (not exceeding threshold) and verify success
+    4. Perform 10 more Update operations (exceeding threshold) and check results
+* @tc.expect:
+    1. All Update operations before and after threshold return 1 (success)
+    2. No failure occurs when exceeding threshold for non-silent access
 */
 HWTEST_F(DataShareThresholdTest, Update_Threshold_Test002, TestSize.Level1)
 {
@@ -459,8 +558,17 @@ HWTEST_F(DataShareThresholdTest, Update_Threshold_Test002, TestSize.Level1)
 
 /**
 * @tc.name: Query_Threshold_Test002
-* @tc.desc: test non-silent access query over threshold case
+* @tc.desc: Verify non-silent access Query operation behavior when exceeding the threshold
 * @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Define query predicates to target specific data
+    2. Perform 2999 Query operations (not exceeding threshold) and verify results
+    3. Perform 10 more Query operations (exceeding threshold) and check results
+* @tc.expect:
+    1. All Query operations before and after threshold return valid result sets with 1 row
+    2. No failure occurs when exceeding threshold for non-silent access
 */
 HWTEST_F(DataShareThresholdTest, Query_Threshold_Test002, TestSize.Level1)
 {
@@ -494,8 +602,17 @@ HWTEST_F(DataShareThresholdTest, Query_Threshold_Test002, TestSize.Level1)
 
 /**
 * @tc.name: Delete_Threshold_Test002
-* @tc.desc: test non-silent accessdelete over threshold case
+* @tc.desc: Verify non-silent access Delete operation behavior when exceeding the threshold
 * @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Define delete predicates targeting non-existent data
+    2. Perform 2999 Delete operations (not exceeding threshold) and verify results
+    3. Perform 10 more Delete operations (exceeding threshold) and check results
+* @tc.expect:
+    1. All Delete operations before and after threshold return 0 (no data deleted)
+    2. No failure occurs when exceeding threshold for non-silent access
 */
 HWTEST_F(DataShareThresholdTest, Delete_Threshold_Test002, TestSize.Level1)
 {
@@ -523,8 +640,17 @@ HWTEST_F(DataShareThresholdTest, Delete_Threshold_Test002, TestSize.Level1)
 
 /**
 * @tc.name: InsertEx_Threshold_Test002
-* @tc.desc: test non-silent access insertEx over threshold case
+* @tc.desc: Verify non-silent access InsertEx operation behavior when exceeding the threshold
 * @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Prepare test data (name and age) in a DataShareValuesBucket
+    2. Perform 2999 InsertEx operations (not exceeding threshold) and verify success
+    3. Perform 10 more InsertEx operations (exceeding threshold) and check results
+* @tc.expect:
+    1. All InsertEx operations before and after threshold return (0, positive value) indicating success
+    2. No failure occurs when exceeding threshold for non-silent access
 */
 HWTEST_F(DataShareThresholdTest, InsertEx_Threshold_Test002, TestSize.Level1)
 {
@@ -554,8 +680,18 @@ HWTEST_F(DataShareThresholdTest, InsertEx_Threshold_Test002, TestSize.Level1)
 
 /**
 * @tc.name: UpdateEx_Threshold_Test002
-* @tc.desc: test non-silent access updateEx over threshold case
+* @tc.desc: Verify non-silent access UpdateEx operation behavior when exceeding the threshold
 * @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Define update predicates to target specific data
+    2. Prepare update data in a DataShareValuesBucket
+    3. Perform 2999 UpdateEx operations (not exceeding threshold) and verify success
+    4. Perform 10 more UpdateEx operations (exceeding threshold) and check results
+* @tc.expect:
+    1. All UpdateEx operations before and after threshold return (0, 1) indicating success
+    2. No failure occurs when exceeding threshold for non-silent access
 */
 HWTEST_F(DataShareThresholdTest, UpdateEx_Threshold_Test002, TestSize.Level1)
 {
@@ -586,8 +722,17 @@ HWTEST_F(DataShareThresholdTest, UpdateEx_Threshold_Test002, TestSize.Level1)
 
 /**
 * @tc.name: DeleteEx_Threshold_Test002
-* @tc.desc: test non-silent access deleteEx over threshold case
+* @tc.desc: Verify non-silent access DeleteEx operation behavior when exceeding the threshold
 * @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Define delete predicates targeting non-existent data
+    2. Perform 2999 DeleteEx operations (not exceeding threshold) and verify results
+    3. Perform 10 more DeleteEx operations (exceeding threshold) and check results
+* @tc.expect:
+    1. All DeleteEx operations before and after threshold return (0, 0) indicating no data deleted
+    2. No failure occurs when exceeding threshold for non-silent access
 */
 HWTEST_F(DataShareThresholdTest, DeleteEx_Threshold_Test002, TestSize.Level1)
 {
