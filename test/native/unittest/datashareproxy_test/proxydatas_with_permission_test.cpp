@@ -100,6 +100,20 @@ void ProxyDatasTest::TearDown(void)
 {
 }
 
+/**
+ * @tc.name: ProxyDatasTest_Insert_Test_001
+ * @tc.desc: Verify the functionality of DataShareHelper successfully inserting data into the data share proxy
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Obtain the DataShareHelper instance
+    2. Create a Uri object using the data share proxy URI
+    3. Prepare a DataShareValuesBucket and add string data to it
+    4. Call the Insert method of DataShareHelper with the Uri and ValuesBucket
+ * @tc.expect:
+    1. The return value of the Insert method is greater than 0, indicating successful data insertion
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Insert_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Insert_Test_001::Start");
@@ -116,6 +130,22 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Insert_Test_001, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_Insert_Test_001::End");
 }
 
+/**
+* @tc.name: ProxyDatasTest_QUERY_Test_001
+* @tc.desc: Verify basic query functionality with specific equality condition
+* @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: Test data containing record with TBL_NAME0 value "wang" exists
+* @tc.step:
+    1. Obtain the DataShareHelper instance
+    2. Create URI for proxy data access using DATA_SHARE_PROXY_URI
+    3. Create DataSharePredicates with condition: TBL_NAME0 equals "wang"
+    4. Execute query with empty columns list
+    5. Check the returned result set and its row count
+* @tc.expect:
+    1. Query returns a non-null result set
+    2. Result set contains exactly 1 record (row count = 1)
+*/
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_QUERY_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_QUERY_Test_001::Start");
@@ -132,7 +162,24 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QUERY_Test_001, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_QUERY_Test_001::End");
 }
 
-HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimout_Test_001, TestSize.Level1)
+/**
+* @tc.name: ProxyDatasTest_QueryTimout_Test_001
+* @tc.desc: Verify query timeout functionality with zero timeout configuration
+* @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: Test data containing record with TBL_NAME0 value "wang" exists
+* @tc.step:
+    1. Obtain the DataShareHelper instance
+    2. Create URI for proxy data access using DATA_SHARE_PROXY_URI
+    3. Create DataSharePredicates with condition: TBL_NAME0 equals "wang"
+    4. Configure DataShareOption with timeout set to 0
+    5. Execute QueryTimeout with specified parameters and business error pointer
+    6. Verify result set and error code
+* @tc.expect:
+    1. Query returns a non-null result set
+    2. Business error code is E_OK (success status)
+*/
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_001::Start");
     auto helper = dataShareHelper;
@@ -149,6 +196,26 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimout_Test_001, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_001::End");
 }
 
+/**
+* @tc.name: ProxyDatasTest_QueryTimeout_Test_002
+* @tc.desc: Verify query timeout stability and performance with multiple executions
+* @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: Test data containing record with TBL_NAME0 value "wang" exists
+* @tc.step:
+    1. Obtain the DataShareHelper instance
+    2. Create URI for proxy data access using DATA_SHARE_PROXY_URI
+    3. Create DataSharePredicates with condition: TBL_NAME0 equals "wang"
+    4. Configure DataShareOption with 4000ms timeout
+    5. Execute QueryTimeout 100 times in sequence
+    6. Measure execution time for each query
+    7. Verify result set, error code and row count for each execution
+* @tc.expect:
+    1. Each query returns a non-null result set
+    2. Each query completes within 1000ms
+    3. Each query returns business error code E_OK
+    4. Each result set contains exactly 1 record
+*/
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_002, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_002::Start");
@@ -177,6 +244,28 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_002, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_002::End");
 }
 
+/**
+* @tc.name: ProxyDatasTest_QueryTimeout_Test_003
+* @tc.desc: Verify query timeout stability under multi-threaded concurrent access
+* @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: Test data containing record with TBL_NAME0 value "wang" exists
+* @tc.step:
+    1. Obtain the DataShareHelper instance
+    2. Create URI for proxy data access using DATA_SHARE_PROXY_URI
+    3. Create DataSharePredicates with condition: TBL_NAME0 equals "wang"
+    4. Configure DataShareOption with 4000ms timeout
+    5. Define query function that executes QueryTimeout 100 times
+    6. Create 10 threads to run the query function concurrently
+    7. Wait for all threads to complete execution
+    8. Verify each query's execution time, result set and error code
+* @tc.expect:
+    1. All threads complete without execution errors
+    2. Each query returns a non-null result set
+    3. Each query completes within 1000ms
+    4. Each query returns business error code E_OK
+    5. Each result set contains exactly 1 record
+*/
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_003, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_003::Start");
@@ -218,6 +307,26 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_003, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_003::End");
 }
 
+/**
+* @tc.name: ProxyDatasTest_QueryTimeout_Test_004
+* @tc.require: issueIC8OCN
+* @tc.desc: Verify query timeout behavior when threshold is intentionally exceeded
+* @tc.type: FUNC
+* @tc.precon: Data store has sufficient capacity for test data insertion
+* @tc.step:
+    1. Obtain the DataShareHelper instance
+    2. Create URI for proxy data access using DATA_SHARE_PROXY_URI
+    3. Insert 500 test records with TBL_NAME0 values "query0" to "query499"
+    4. Create DataSharePredicates with LIKE condition for TBL_NAME0 containing "query"
+    5. Configure DataShareOption with 1ms timeout (intentionally short)
+    6. Execute QueryTimeout 10 times and count timeout errors
+    7. Delete all inserted test records using cleanup predicate
+    8. Verify insertion success, timeout occurrences and cleanup success
+* @tc.expect:
+    1. All 500 test records are inserted successfully
+    2. At least one query execution results in E_TIMEOUT_ERROR
+    3. Cleanup delete operation removes all inserted records successfully
+*/
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_004, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_004::Start");
@@ -286,6 +395,27 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_005, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_005::End");
 }
 
+/**
+* @tc.name: ProxyDatasTest_ResultSet_Test_001
+* @tc.desc: Verify result set functionality and error handling for invalid operations
+* @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: Test data containing record with TBL_NAME0 value "wang" exists
+* @tc.step:
+    1. Obtain the DataShareHelper instance
+    2. Create URI for proxy data access using DATA_SHARE_PROXY_URI
+    3. Execute query to get result set for TBL_NAME0 equals "wang"
+    4. Verify basic result set properties and row count
+    5. Check block management functionality (HasBlock, GetBlock)
+    6. Test error handling with invalid column index for GetBlob
+    7. Nullify block and verify subsequent value retrieval errors
+* @tc.expect:
+    1. Query returns non-null result set with row count = 1
+    2. Result set reports HasBlock = true and non-null block
+    3. GetBlob with invalid column index returns E_INVALID_COLUMN_INDEX
+    4. After SetBlock(nullptr), GetBlock returns null
+    5. GetString and GetInt operations after nullifying block return E_ERROR
+*/
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_ResultSet_Test_001::Start");
@@ -318,6 +448,22 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_001, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_ResultSet_Test_001::End");
 }
 
+/**
+ * @tc.name: ProxyDatasTest_Template_Test_001
+ * @tc.desc: Verify the functionality of adding and deleting query templates in the data share proxy
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Obtain the DataShareHelper instance
+    2. Create PredicateTemplateNode objects with SQL queries
+    3. Assemble the nodes into a Template object
+    4. Call AddQueryTemplate to register the template with the proxy URI and subscriber ID
+    5. Call DelQueryTemplate to remove the registered template
+ * @tc.expect:
+    1. AddQueryTemplate returns 0, indicating successful template registration
+    2. DelQueryTemplate returns 0, indicating successful template deletion
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Template_Test_001::Start");
@@ -336,6 +482,21 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_001, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_Template_Test_001::End");
 }
 
+/**
+ * @tc.name: ProxyDatasTest_Template_Test_002
+ * @tc.desc: Verify that adding and deleting query templates with an invalid URI fails as expected
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Obtain the DataShareHelper instance
+    2. Create PredicateTemplateNode objects and assemble them into a Template
+    3. Call AddQueryTemplate with an invalid URI and subscriber ID
+    4. Call DelQueryTemplate with the same invalid URI and subscriber ID
+ * @tc.expect:
+    1. AddQueryTemplate returns E_URI_NOT_EXIST, indicating failure due to invalid URI
+    2. DelQueryTemplate returns E_URI_NOT_EXIST, indicating failure due to invalid URI
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_002, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Template_Test_002::Start");
@@ -356,11 +517,23 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_002, TestSize.Level1)
 }
 
 /**
-* @tc.name: ProxyDatasTest_Template_Test_003
-* @tc.desc: test Template update function
-* @tc.type: FUNC
-* @tc.require:
-*/
+ * @tc.name: ProxyDatasTest_Template_Test_003
+ * @tc.desc: Verify the update functionality of query templates in the data share proxy
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a Template with an update SQL statement and register it via AddQueryTemplate
+    2. Subscribe to RDB data changes using the template ID
+    3. Insert new data that triggers the template's update condition
+    4. Query the data to verify the update was applied
+    5. Unsubscribe from RDB data changes
+ * @tc.expect:
+    1. Template registration returns 0 (success)
+    2. Subscription and unsubscription operations return 0 (success)
+    3. Insert operation succeeds (return value > 0)
+    4. Query returns a result set with 1 row, confirming the update was applied
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Template_Test_003::Start");
@@ -412,11 +585,20 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level1)
 }
 
 /**
-* @tc.name: ProxyDatasTest_Template_Test_004
-* @tc.desc: test add template with parameter update function
-* @tc.type: FUNC
-* @tc.require:
-*/
+ * @tc.name: ProxyDatasTest_Template_Test_004
+ * @tc.desc: Verify adding and deleting query templates with parameterized update functions
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a Template with predicate nodes and register it via AddQueryTemplate
+    2. Delete the registered template via DelQueryTemplate
+    3. Create another Template with an explicit update SQL statement and register it
+    4. Delete the second template
+ * @tc.expect:
+    1. All AddQueryTemplate calls return 0 (success)
+    2. All DelQueryTemplate calls return 0 (success)
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_004, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Template_Test_004::Start");
@@ -442,11 +624,19 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_004, TestSize.Level1)
 }
 
 /**
-* @tc.name: ProxyDatasTest_Template_Test_005
-* @tc.desc: test add template with wrong parameter update function
-* @tc.type: FUNC
-* @tc.require:
-*/
+ * @tc.name: ProxyDatasTest_Template_Test_005
+ * @tc.desc: Verify that adding a template with an invalid parameterized update function (non-update SQL) fails
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a Template with an insert SQL statement as the update function
+    2. Attempt to register the template via AddQueryTemplate
+    3. Attempt to delete the (unregistered) template via DelQueryTemplate
+ * @tc.expect:
+    1. AddQueryTemplate returns -1 (failure) due to invalid update SQL
+    2. DelQueryTemplate returns 0 (success) (no error if template does not exist)
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_005, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Template_Test_005::Start");
@@ -466,11 +656,19 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_005, TestSize.Level1)
 }
 
 /**
-* @tc.name: ProxyDatasTest_Template_Test_006
-* @tc.desc: test use uri with userId to add template
-* @tc.type: FUNC
-* @tc.require:
-*/
+ * @tc.name: ProxyDatasTest_Template_Test_006
+ * @tc.desc: Verify adding and deleting query templates using a URI with a user ID parameter
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a URI by appending "?user=100" to the base data share proxy URI
+    2. Create a Template with predicate nodes and register it using the new URI
+    3. Delete the registered template using the same URI
+ * @tc.expect:
+    1. AddQueryTemplate returns E_OK (success)
+    2. DelQueryTemplate returns E_OK (success)
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_006, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Template_Test_006::Start");
@@ -490,6 +688,22 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_006, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_Template_Test_006::End");
 }
 
+/**
+ * @tc.name: ProxyDatasTest_Publish_Test_001
+ * @tc.desc: Verify the functionality of publishing string data via the data share proxy and retrieving it
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a Data object containing a URI, subscriber ID, and string value
+    2. Publish the data using Publish method with the target bundle name
+    3. Retrieve the published data using GetPublishedData
+    4. Verify the retrieved data matches the published data
+ * @tc.expect:
+    1. Publish returns OperationResult with errCode_ 0 (success)
+    2. GetPublishedData returns errCode_ 0 (success)
+    3. Retrieved data has the same size, subscriber ID, key, and value as published data
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Publish_Test_001::Start");
@@ -518,6 +732,20 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_Publish_Test_001::End");
 }
 
+/**
+ * @tc.name: ProxyDatasTest_Publish_Test_002
+ * @tc.desc: Verify that publishing data with a non-existent bundle name fails as expected
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a Data object with a URI, subscriber ID, and string value
+    2. Attempt to publish the data using a non-existent bundle name
+    3. Attempt to retrieve published data using the same invalid bundle name
+ * @tc.expect:
+    1. Publish returns OperationResult with errCode_ E_BUNDLE_NAME_NOT_EXIST (failure)
+    2. GetPublishedData returns errCode_ E_BUNDLE_NAME_NOT_EXIST (failure)
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_002, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Publish_Test_002::Start");
@@ -537,6 +765,22 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_002, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_Publish_Test_002::End");
 }
 
+/**
+ * @tc.name: ProxyDatasTest_Publish_Test_003
+ * @tc.desc: Verify the functionality of publishing binary data (ashmem) via the data share proxy and retrieving it
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a Data object containing a URI, subscriber ID, and binary buffer
+    2. Publish the data using Publish method with the target bundle name
+    3. Retrieve the published data using GetPublishedData
+    4. Verify the retrieved binary data matches the published data
+ * @tc.expect:
+    1. Publish returns OperationResult with errCode_ 0 (success)
+    2. GetPublishedData returns errCode_ 0 (success)
+    3. Retrieved data has the same size, subscriber ID, and binary content as published data
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_003, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_Publish_Test_003::Start");
@@ -565,6 +809,24 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_003, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_Publish_Test_003::End");
 }
 
+/**
+ * @tc.name: ProxyDatasTest_CombinationRdbData_Test_001
+ * @tc.desc: Verify combination functionality of RDB data subscription, enabling/disabling, and unsubscription
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Register a query template and subscribe to RDB data changes with a callback
+    2. Enable RDB subscriptions
+    3. Insert data to trigger the subscription callback
+    4. Verify the callback is invoked the expected number of times
+    5. Unsubscribe from RDB data changes and insert more data
+ * @tc.expect:
+    1. Template registration, subscription, and enabling return 0 (success)
+    2. Insert operations return values > 0 (success)
+    3. Callback is invoked 2 times before unsubscription
+    4. No additional callback invocations after unsubscription
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_001::Start");
@@ -617,11 +879,21 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Le
 }
 
 /**
-* @tc.name: ProxyDatasTest_CombinationRdbData_Test_002
-* @tc.desc: combination test for persistent data updated between two constant disable
-* @tc.type: FUNC
-* @tc.require:
-*/
+ * @tc.name: ProxyDatasTest_CombinationRdbData_Test_002
+ * @tc.desc: Verify combination functionality of RDB data subscription, multiple disable operations, and re-enable
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Register a template and subscribe to RDB data changes with two helpers
+    2. Disable subscriptions, insert data, and disable again
+    3. Re-enable subscriptions and verify callback behavior
+    4. Unsubscribe from both helpers
+ * @tc.expect:
+    1. Template registration, subscriptions, disable/enable return 0 (success)
+    2. Insert operation returns value > 0 (success)
+    3. Callback is invoked 2 times total (1 before disable, 1 after re-enable)
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_002, TestSize.Level1)
 {
     auto helper = dataShareHelper;
@@ -676,11 +948,20 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_002, TestSize.Le
 }
 
 /**
-* @tc.name: ProxyDatasTest_CombinationRdbData_Test_003
-* @tc.desc: combination test for persistent data updated between two constant disable
-* @tc.type: FUNC
-* @tc.require:
-*/
+ * @tc.name: ProxyDatasTest_CombinationRdbData_Test_003
+ * @tc.desc: Verify combination functionality of RDB data subscription, disable, re-enable, and unsubscription
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Register a template and subscribe to RDB data changes with a callback
+    2. Disable subscriptions, then re-enable them
+    3. Unsubscribe from RDB data changes
+ * @tc.expect:
+    1. Template registration, subscription, disable/enable, and unsubscription return 0 (success)
+    2. Callback is invoked 1 time (initial subscription)
+    3. No additional callback invocations after disable/re-enable
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_003, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_003::Start");
@@ -732,11 +1013,20 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_003, TestSize.Le
 }
 
 /**
-* @tc.name: ProxyDatasTest_CombinationPublishedData_Test_001
-* @tc.desc: combination test for published data updated between two constant disable
-* @tc.type: FUNC
-* @tc.require:
-*/
+ * @tc.name: ProxyDatasTest_CombinationPublishedData_Test_001
+ * @tc.desc: Verify combination functionality of published data subscription, disable, re-enable, and unsubscription
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Publish data and subscribe to published data changes with two helpers
+    2. Disable subscriptions, republish data, then disable again
+    3. Re-enable subscriptions and verify callback behavior
+    4. Unsubscribe from both helpers
+ * @tc.expect:
+    1. Publish, subscription, disable/enable return 0 (success)
+    2. Callback is invoked 2 times total (1 before disable, 1 after re-enable)
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationPublishedData_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_CombinationPublishedData_Test_001::Start");
@@ -788,6 +1078,19 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationPublishedData_Test_001, TestS
     LOG_INFO("ProxyDatasTest_CombinationPublishedData_Test_001::End");
 }
 
+/**
+ * @tc.name: ProxyDatasTest_SubscribePublishedData_Test_001
+ * @tc.desc: Verify the functionality of subscribing to published data changes
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a list of URIs to subscribe to
+    2. Call SubscribePublishedData with the URIs, subscriber ID, and a verification callback
+ * @tc.expect:
+    1. Subscription returns OperationResult with errCode_ 0 (success)
+    2. Callback verifies the owner bundle name when triggered
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribePublishedData_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_SubscribePublishedData_Test_001::Start");
@@ -805,6 +1108,18 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribePublishedData_Test_001, TestSiz
     LOG_INFO("ProxyDatasTest_SubscribePublishedData_Test_001::End");
 }
 
+/**
+ * @tc.name: ProxyDatasTest_DisablePubSubs_Test_001
+ * @tc.desc: Verify the functionality of disabling published data subscriptions
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a list of URIs with active subscriptions
+    2. Call DisablePubSubs with the URIs and subscriber ID
+ * @tc.expect:
+    1. DisablePubSubs returns OperationResult with errCode_ 0 (success)
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_DisablePubSubs_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_DisablePubSubs_Test_001::Start");
@@ -818,6 +1133,18 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_DisablePubSubs_Test_001, TestSize.Level1
     LOG_INFO("ProxyDatasTest_DisablePubSubs_Test_001::End");
 }
 
+/**
+ * @tc.name: ProxyDatasTest_EnablePubSubs_Test_001
+ * @tc.desc: Verify the functionality of enabling published data subscriptions
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a list of URIs with disabled subscriptions
+    2. Call EnablePubSubs with the URIs and subscriber ID
+ * @tc.expect:
+    1. EnablePubSubs returns OperationResult with errCode_ 0 (success)
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_EnablePubSubs_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_EnablePubSubs_Test_001::Start");
@@ -831,6 +1158,18 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_EnablePubSubs_Test_001, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_EnablePubSubs_Test_001::End");
 }
 
+/**
+ * @tc.name: ProxyDatasTest_UnsubscribePublishedData_Test_001
+ * @tc.desc: Verify the functionality of unsubscribing from published data changes
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a list of URIs with active subscriptions
+    2. Call UnsubscribePublishedData with the URIs and subscriber ID
+ * @tc.expect:
+    1. UnsubscribePublishedData returns OperationResult with errCode_ 0 (success)
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_UnsubscribePublishedData_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_UnsubscribePublishedData_Test_001::Start");
@@ -845,6 +1184,21 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_UnsubscribePublishedData_Test_001, TestS
     LOG_INFO("ProxyDatasTest_UnsubscribePublishedData_Test_001::End");
 }
 
+/**
+ * @tc.name: ProxyDatasTest_extSpCtl_Null_Test_001
+ * @tc.desc: Verify extended special control operations after releasing the helper
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Release the DataShareHelper instance
+    2. Call GetFileTypes with an empty URI and string
+    3. Call OpenFile and OpenRawFile with an empty URI and string
+ * @tc.expect:
+    1. Release returns true (success)
+    2. GetFileTypes returns an empty list
+    3. OpenFile and OpenRawFile return -1 (failure)
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_001::Start");
@@ -862,6 +1216,19 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_001, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_001::End");
 }
 
+/**
+ * @tc.name: ProxyDatasTest_extSpCtl_Null_Test_002
+ * @tc.desc: Verify NormalizeUri and DenormalizeUri operations after releasing the helper
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Release the DataShareHelper instance
+    2. Call NormalizeUri and DenormalizeUri with an empty URI
+ * @tc.expect:
+    1. Release returns true (success)
+    2. NormalizeUri and DenormalizeUri return the input empty URI unchanged
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_002, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_extSpCtl_Null_Test_002::Start");
