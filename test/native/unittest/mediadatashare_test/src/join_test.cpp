@@ -204,6 +204,21 @@ int JoinTest::ResultSize(std::shared_ptr<DataShareResultSet> &resultSet)
     return count;
 }
 
+/**
+* @tc.name: Join_CrossJoin_001
+* @tc.desc: Verify cross join operation returns correct results
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create cross join predicate with "user.userId = book.userId" condition
+    2. Execute query on user table with join predicate
+    3. Verify row count is 3
+    4. Check first row data matches expected values
+* @tc.experct:
+    1. Query returns 3 rows
+    2. First row contains correct user and book data for userId = 1
+*/
 HWTEST_F(JoinTest, Join_CrossJoin_001, TestSize.Level0)
 {
     auto helper = g_slientAccessHelper;
@@ -253,6 +268,22 @@ HWTEST_F(JoinTest, Join_CrossJoin_001, TestSize.Level0)
     EXPECT_EQ(1, userId_1);
 }
 
+/**
+* @tc.name: Join_InnerJoin_001
+* @tc.require: None
+* @tc.desc: Verify inner join with filter returns correct single result
+* @tc.type: FUNC
+* @tc.precon: None
+* @tc.step:
+    1. Create inner join predicate with "user.userId = book.userId" condition
+    2. Add filter for book.name = "SanGuo"
+    3. Execute query on user table with join predicate
+    4. Verify row count is 1
+    5. Check row data matches expected values for "SanGuo" book
+* @tc.experct:
+    1. Query returns 1 row
+    2. Row contains correct user and book data for "SanGuo" book
+*/
 HWTEST_F(JoinTest, Join_InnerJoin_001, TestSize.Level0)
 {
     auto helper = g_slientAccessHelper;
@@ -303,6 +334,22 @@ HWTEST_F(JoinTest, Join_InnerJoin_001, TestSize.Level0)
     EXPECT_EQ(1, userId_1);
 }
 
+/**
+* @tc.name: Join_LeftOuterJoin_001
+* @tc.desc: Verify left outer join with Using clause returns correct result
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create left outer join predicate using "userId" column
+    2. Add filter for name = "SanGuo"
+    3. Execute query on user table with join predicate
+    4. Verify row count is 1
+    5. Check row data matches expected values
+* @tc.experct:
+    1. Query returns 1 row
+    2. Row contains correct user and book data for matching record
+*/
 HWTEST_F(JoinTest, Join_LeftOuterJoin_001, TestSize.Level0)
 {
     auto helper = g_slientAccessHelper;
@@ -349,6 +396,20 @@ HWTEST_F(JoinTest, Join_LeftOuterJoin_001, TestSize.Level0)
     EXPECT_EQ("SanGuo", name);
 }
 
+/**
+* @tc.name: Join_LeftOuterJoin_002
+* @tc.desc: Verify left outer join returns all user records with matching books
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Create left outer join predicate with "user.userId = book.userId" condition
+    2. Execute query on user table with join predicate
+    3. Verify row count is 5 (all users including those without books)
+* @tc.experct:
+    1. Query returns 5 rows
+    2. All user records are included in results
+*/
 HWTEST_F(JoinTest, Join_LeftOuterJoin_002, TestSize.Level0)
 {
     auto helper = g_slientAccessHelper;
