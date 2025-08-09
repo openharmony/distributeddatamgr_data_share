@@ -23,6 +23,7 @@ namespace OHOS {
 namespace DataShare {
 NapiObserver::NapiObserver(napi_env env, napi_value callback) : env_(env)
 {
+    envMutexPtr_ = std::make_unique<std::mutex>();
     napi_create_reference(env, callback, 1, &ref_);
     napi_get_uv_event_loop(env, &loop_);
 }
@@ -31,8 +32,14 @@ void NapiObserver::CallbackFunc(ObserverWorker *observerWorker)
 {
     LOG_DEBUG("ObsCallbackFunc start");
     std::shared_ptr<NapiObserver> observer = observerWorker->observer_.lock();
-    if (observer == nullptr || observer->ref_ == nullptr) {
+    if (observer == nullptr || observer->ref_ == nullptr || observer->envMutexPtr_ == nullptr) {
         LOG_ERROR("rdbObserver->ref_ is nullptr");
+        delete observerWorker;
+        return;
+    }
+    std::lock_guard<std::mutex> lck(*observer->envMutexPtr_);
+    if (observer->env_ == nullptr) {
+        LOG_ERROR("rdbObserver->env_ is nullptr");
         delete observerWorker;
         return;
     }
@@ -62,15 +69,25 @@ void NapiObserver::CallbackFunc(ObserverWorker *observerWorker)
 
 NapiObserver::~NapiObserver()
 {
+    if (env_ == nullptr) {
+        LOG_ERROR("env_ is nullptr");
+        return;
+    }
+    
     if (ref_ != nullptr) {
-        auto task = [env = env_, ref = ref_]() {
+        auto task = [env = env_, ref = ref_, observerEnvHookWorker = observerEnvHookWorker_]() {
             napi_delete_reference(env, ref);
+            napi_remove_env_cleanup_hook(env, &CleanEnv, observerEnvHookWorker);
         };
         int ret = napi_send_event(env_, task, napi_eprio_immediate);
         if (ret != 0) {
             LOG_ERROR("napi_send_event failed: %{public}d", ret);
         }
         ref_ = nullptr;
+    }
+    if (observerEnvHookWorker_ != nullptr) {
+        delete observerEnvHookWorker_;
+        observerEnvHookWorker_ = nullptr;
     }
 }
 
@@ -96,11 +113,45 @@ bool NapiObserver::operator!=(const NapiObserver &rhs) const
     return !(rhs == *this);
 }
 
+void NapiObserver::RegisterEnvCleanHook()
+{
+    observerEnvHookWorker_ = new (std::nothrow) ObserverEnvHookWorker(shared_from_this());
+    if (observerEnvHookWorker_ == nullptr) {
+        LOG_ERROR("Failed to create observerEnvHookWorker_");
+        return;
+    }
+    napi_add_env_cleanup_hook(env_, &CleanEnv, observerEnvHookWorker_);
+}
+
+void NapiObserver::CleanEnv(void *obj)
+{
+    LOG_INFO("Napi env cleanup hook is executed, env is about to exit");
+    auto observerEnvHookWorker = reinterpret_cast<ObserverEnvHookWorker *>(obj);
+    // Prevent concurrency with NAPIInnerObserver destructors
+    auto observer = observerEnvHookWorker->observer_.lock();
+    if (observer == nullptr || observer->envMutexPtr_ == nullptr) {
+        LOG_ERROR("observer or observer->envMutexPtr_ is nullptr");
+        delete observerEnvHookWorker;
+        return;
+    }
+    std::lock_guard<std::mutex> lck(*observer->envMutexPtr_);
+    if (observer->ref_ != nullptr) {
+        napi_delete_reference(observer->env_, observer->ref_);
+        observer->ref_ = nullptr;
+    }
+    observer->env_ = nullptr;
+}
+
 void NapiRdbObserver::OnChange(const RdbChangeNode &changeNode)
 {
     LOG_DEBUG("NapiRdbObserver onchange Start");
-    if (ref_ == nullptr) {
-        LOG_ERROR("ref_ is nullptr");
+    if (ref_ == nullptr || envMutexPtr_ == nullptr) {
+        LOG_ERROR("ref_ or envMutexPtr_ is nullptr");
+        return;
+    }
+    std::lock_guard<std::mutex> lck(*envMutexPtr_);
+    if (env_ == nullptr) {
+        LOG_ERROR("env_ is nullptr");
         return;
     }
     ObserverWorker *observerWorker = new (std::nothrow) ObserverWorker(shared_from_this());
@@ -126,8 +177,13 @@ void NapiRdbObserver::OnChange(const RdbChangeNode &changeNode)
 void NapiPublishedObserver::OnChange(PublishedDataChangeNode &changeNode)
 {
     LOG_DEBUG("NapiPublishedObserver onchange Start");
-    if (ref_ == nullptr) {
-        LOG_ERROR("ref_ is nullptr");
+    if (ref_ == nullptr || envMutexPtr_ == nullptr) {
+        LOG_ERROR("ref_ or envMutexPtr_ is nullptr");
+        return;
+    }
+    std::lock_guard<std::mutex> lck(*envMutexPtr_);
+    if (env_ == nullptr) {
+        LOG_ERROR("env_ is nullptr");
         return;
     }
     ObserverWorker *observerWorker = new (std::nothrow) ObserverWorker(shared_from_this());
@@ -154,8 +210,13 @@ void NapiPublishedObserver::OnChange(PublishedDataChangeNode &changeNode)
 void NapiProxyDataObserver::OnChange(const std::vector<DataProxyChangeInfo> &changeNode)
 {
     LOG_INFO("NapiProxyDataObserver onchange Start");
-    if (ref_ == nullptr) {
-        LOG_ERROR("ref_ is nullptr");
+    if (ref_ == nullptr || envMutexPtr_ == nullptr) {
+        LOG_ERROR("ref_ or envMutexPtr_ is nullptr");
+        return;
+    }
+    std::lock_guard<std::mutex> lck(*envMutexPtr_);
+    if (env_ == nullptr) {
+        LOG_ERROR("env_ is nullptr");
         return;
     }
     ObserverWorker *observerWorker = new (std::nothrow) ObserverWorker(shared_from_this());

@@ -26,9 +26,10 @@
 
 namespace OHOS {
 namespace DataShare {
-class NapiObserver {
+class NapiObserver : public std::enable_shared_from_this<NapiObserver> {
 public:
     NapiObserver(napi_env env, napi_value callback);
+    void RegisterEnvCleanHook();
     virtual ~NapiObserver();
     virtual bool operator==(const NapiObserver &rhs) const;
     virtual bool operator!=(const NapiObserver &rhs) const;
@@ -39,25 +40,32 @@ protected:
         std::function<napi_value(napi_env)> getParam;
         explicit ObserverWorker(std::shared_ptr<NapiObserver> observerIn) : observer_(observerIn) {}
     };
+    struct ObserverEnvHookWorker {
+        std::weak_ptr<NapiObserver> observer_;
+        ObserverEnvHookWorker(std::shared_ptr<NapiObserver> observerIn): observer_(observerIn) {}
+    };
     static void CallbackFunc(ObserverWorker *observerWorker);
+    static void CleanEnv(void *obj);
     napi_env env_ = nullptr;
     napi_ref ref_ = nullptr;
     uv_loop_s *loop_ = nullptr;
+    std::unique_ptr<std::mutex> envMutexPtr_;
+    ObserverEnvHookWorker* observerEnvHookWorker_ = nullptr;
 };
 
-class NapiRdbObserver final: public NapiObserver, public std::enable_shared_from_this<NapiRdbObserver> {
+class NapiRdbObserver final: public NapiObserver {
 public:
     NapiRdbObserver(napi_env env, napi_value callback) : NapiObserver(env, callback) {};
     void OnChange(const RdbChangeNode &changeNode);
 };
 
-class NapiPublishedObserver final: public NapiObserver, public std::enable_shared_from_this<NapiPublishedObserver> {
+class NapiPublishedObserver final: public NapiObserver {
 public:
     NapiPublishedObserver(napi_env env, napi_value callback) : NapiObserver(env, callback) {};
     void OnChange(PublishedDataChangeNode &changeNode);
 };
 
-class NapiProxyDataObserver final: public NapiObserver, public std::enable_shared_from_this<NapiProxyDataObserver> {
+class NapiProxyDataObserver final: public NapiObserver {
 public:
     NapiProxyDataObserver(napi_env env, napi_value callback) : NapiObserver(env, callback) {};
     void OnChange(const std::vector<DataProxyChangeInfo> &changeNode);

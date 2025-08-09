@@ -31,12 +31,48 @@ NAPIInnerObserver::NAPIInnerObserver(napi_env env, napi_value callback)
     napi_get_uv_event_loop(env, &loop_);
 }
 
+NAPIInnerObserver::~NAPIInnerObserver()
+{
+    if (env_ == nullptr) {
+        LOG_ERROR("env_ is nullptr");
+        return;
+    }
+    // SAFETY: observerEnvHookWorker will not be accessed in napi_remove_env_cleanup_hook
+    auto task = [env = env_, observerEnvHookWorker = observerEnvHookWorker_]() {
+        napi_remove_env_cleanup_hook(env, &CleanEnv, observerEnvHookWorker);
+    };
+    int ret = napi_send_event(env_, task, napi_eprio_immediate);
+    if (ret != 0) {
+        LOG_ERROR("napi_send_event failed: %{public}d", ret);
+    }
+    if (observerEnvHookWorker_ != nullptr) {
+        delete observerEnvHookWorker_;
+        observerEnvHookWorker_ = nullptr;
+    }
+}
+
+void NAPIInnerObserver::RegisterEnvCleanHook()
+{
+    observerEnvHookWorker_ = new (std::nothrow) ObserverEnvHookWorker(shared_from_this());
+    if (observerEnvHookWorker_ == nullptr) {
+        LOG_ERROR("Failed to create observerEnvHookWorker_");
+        return;
+    }
+    napi_add_env_cleanup_hook(env_, &CleanEnv, observerEnvHookWorker_);
+}
+
 void NAPIInnerObserver::OnComplete(ObserverWorker* observerWorker)
 {
     LOG_DEBUG("napi_send_event start");
     auto observer = observerWorker->observer_.lock();
     if (observer == nullptr || observer->ref_ == nullptr) {
         LOG_ERROR("innerWorker->observer_->ref_ is nullptr");
+        delete observerWorker;
+        return;
+    }
+    std::lock_guard<std::mutex> lck(observer->envMutex_);
+    if (observer->env_ == nullptr) {
+        LOG_ERROR("innerWorker->observer_->env_ is nullptr");
         delete observerWorker;
         return;
     }
@@ -74,6 +110,12 @@ void NAPIInnerObserver::OnChange(const DataShareObserver::ChangeInfo& changeInfo
         LOG_ERROR("ref_ is nullptr");
         return;
     }
+    std::lock_guard<std::mutex> lck(envMutex_);
+    if (env_ == nullptr) {
+        LOG_ERROR("env_ is nullptr");
+        return;
+    }
+
     ObserverWorker* observerWorker = new (std::nothrow) ObserverWorker(shared_from_this(), changeInfo);
     if (observerWorker == nullptr) {
         LOG_ERROR("Failed to create observerWorker");
@@ -103,5 +145,21 @@ napi_ref NAPIInnerObserver::GetCallback()
 {
     return ref_;
 }
+
+void NAPIInnerObserver::CleanEnv(void *obj)
+{
+    LOG_INFO("Napi env cleanup hook is executed, env is about to exit");
+    auto observerEnvHookWorker = reinterpret_cast<ObserverEnvHookWorker *>(obj);
+    // Prevent concurrency with NAPIInnerObserver destructors
+    auto observer = observerEnvHookWorker->observer_.lock();
+    if (observer == nullptr) {
+        LOG_ERROR("observer is nullptr");
+        return;
+    }
+    std::lock_guard<std::mutex> lck(observer->envMutex_);
+    observer->DeleteReference();
+    observer->env_ = nullptr;
+}
+
 }  // namespace DataShare
 }  // namespace OHOS
