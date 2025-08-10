@@ -1062,6 +1062,7 @@ void NapiDataShareHelper::RegisteredObserver(napi_env env, const std::string &ur
         return;
     }
     auto innerObserver = std::make_shared<NAPIInnerObserver>(env, callback);
+    innerObserver->RegisterEnvCleanHook();
     sptr<NAPIDataShareObserver> observer(new (std::nothrow) NAPIDataShareObserver(innerObserver));
     if (observer == nullptr) {
         LOG_ERROR("observer is nullptr");

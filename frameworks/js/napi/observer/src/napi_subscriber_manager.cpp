@@ -35,8 +35,10 @@ std::vector<OperationResult> NapiRdbSubscriberManager::AddObservers(napi_env env
     std::for_each(uris.begin(), uris.end(), [&keys, &templateId](auto &uri) {
         keys.emplace_back(uri, templateId);
     });
+    auto rdbObserver = std::make_shared<Observer>(env, callback);
+    rdbObserver->RegisterEnvCleanHook();
     return BaseCallbacks::AddObservers(
-        keys, std::make_shared<Observer>(env, callback),
+        keys, rdbObserver,
         [this](const std::vector<Key> &localRegisterKeys, const std::shared_ptr<Observer> observer) {
             Emit(localRegisterKeys, observer);
         },
@@ -136,8 +138,10 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::AddObservers(napi_e
     std::for_each(uris.begin(), uris.end(), [&keys, &subscriberId](auto &uri) {
         keys.emplace_back(uri, subscriberId);
     });
+    auto publishedObserver = std::make_shared<Observer>(env, callback);
+    publishedObserver->RegisterEnvCleanHook();
     return BaseCallbacks::AddObservers(
-        keys, std::make_shared<Observer>(env, callback),
+        keys, publishedObserver,
         [this](const std::vector<Key> &localRegisterKeys, const std::shared_ptr<Observer> observer) {
             Emit(localRegisterKeys, observer);
         },
@@ -257,8 +261,10 @@ std::vector<DataProxyResult> NapiProxyDataSubscriberManager::AddObservers(napi_e
     std::for_each(uris.begin(), uris.end(), [&keys](auto &uri) {
         keys.emplace_back(uri);
     });
+    auto proxyDataObserver = std::make_shared<Observer>(env, callback);
+    proxyDataObserver->RegisterEnvCleanHook();
     return BaseCallbacks::AddObservers(
-        keys, std::make_shared<Observer>(env, callback),
+        keys, proxyDataObserver,
         [&dataProxyHandle, this](const std::vector<Key> &firstAddKeys,
             const std::shared_ptr<Observer> observer, std::vector<DataProxyResult> &opResult) {
             std::vector<std::string> firstAddUris;

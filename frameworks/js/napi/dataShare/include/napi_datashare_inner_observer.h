@@ -28,8 +28,10 @@ namespace DataShare {
 class NAPIInnerObserver : public std::enable_shared_from_this<NAPIInnerObserver> {
 public:
     NAPIInnerObserver(napi_env env, napi_value callback);
+    ~NAPIInnerObserver();
     void OnChange(const DataShareObserver::ChangeInfo &changeInfo = {}, bool isNotifyDetails = false);
     void DeleteReference();
+    void RegisterEnvCleanHook();
     napi_ref GetCallback();
 
 protected:
@@ -40,10 +42,18 @@ protected:
         ObserverWorker(std::shared_ptr<NAPIInnerObserver> observerIn, DataShareObserver::ChangeInfo resultIn = {})
             : observer_(observerIn), result_(resultIn) {}
     };
+
+    struct ObserverEnvHookWorker {
+        std::weak_ptr<NAPIInnerObserver> observer_;
+        ObserverEnvHookWorker(std::shared_ptr<NAPIInnerObserver> observerIn): observer_(observerIn) {}
+    };
     static void OnComplete(ObserverWorker* observerWorker);
+    static void CleanEnv(void *obj);
     napi_env env_ = nullptr;
     napi_ref ref_ = nullptr;
     uv_loop_s *loop_ = nullptr;
+    std::mutex envMutex_{};
+    ObserverEnvHookWorker* observerEnvHookWorker_ = nullptr;;
 };
 }  // namespace DataShare
 }  // namespace OHOS
