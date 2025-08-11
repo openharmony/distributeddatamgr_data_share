@@ -229,7 +229,7 @@ void RdbSubscriberManager::Emit(const RdbChangeNode &changeNode)
 {
     RdbObserverMapKey key(changeNode.uri_, changeNode.templateId_);
     lastChangeNodeMap_.InsertOrAssign(key, changeNode);
-    auto callbacks = BaseCallbacks::GetEnabledObservers(key);
+    auto callbacks = BaseCallbacks::GetObserversAndSetNotifiedOn(key);
     for (auto &obs : callbacks) {
         if (obs != nullptr) {
             LOG_INFO("Client send data to form, uri is %{public}s, subscriberId is %{public}" PRId64,
@@ -237,7 +237,6 @@ void RdbSubscriberManager::Emit(const RdbChangeNode &changeNode)
             obs->OnChange(changeNode);
         }
     }
-    BaseCallbacks::SetObserversNotifiedOnEnabled(key);
 }
 
 void RdbSubscriberManager::Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer)
@@ -270,8 +269,9 @@ void RdbSubscriberManager::EmitOnEnable(std::map<Key, std::vector<ObserverNodeOn
             continue;
         }
         for (auto &obs : obsVector) {
-            if (obs.isNotifyOnEnabled_) {
-                obs.isNotifyOnEnabled_ = false;
+            // after the flag in callbacks is put into obsMap, the real flag in callbacks maybe modified
+            // before read in obsMap here
+            if (BaseCallbacks::IsObserversNotifiedOnEnabled(key, obs.observer_)) {
                 obs.observer_->OnChange(node);
             }
         }
