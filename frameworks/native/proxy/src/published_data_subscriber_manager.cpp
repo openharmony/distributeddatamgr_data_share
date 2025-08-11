@@ -278,7 +278,6 @@ void PublishedDataSubscriberManager::EmitOnEnable(std::map<Key, std::vector<Obse
                         num++;
                         results[obs.observer_].datas_.emplace_back(data.key_, data.subscriberId_, data.GetData());
                         results[obs.observer_].ownerBundleName_ = value.ownerBundleName_;
-                        obs.isNotifyOnEnabled_ = false;
                     }
                 }
             }
