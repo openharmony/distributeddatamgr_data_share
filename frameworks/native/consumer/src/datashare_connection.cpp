@@ -17,6 +17,7 @@
 #include "datashare_connection.h"
 
 #include "ams_mgr_proxy.h"
+#include "datashare_common.h"
 #include "datashare_errno.h"
 #include "datashare_log.h"
 #include "datashare_proxy.h"
@@ -26,7 +27,6 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-constexpr const char *DATASHARE_EXECUTOR_NAME = "DShare_Connect";
 const std::chrono::milliseconds TIME_THRESHOLD = std::chrono::milliseconds(200);
 /**
  * @brief This method is called back to receive the connection result after an ability calls the

@@ -52,7 +52,7 @@ using DataShareValueObject = DataShare::DataShareValueObject;
 using DataProxyValue = DataShare::DataProxyValue;
 using DataProxyGetResult = DataShare::DataProxyGetResult;
 using DataProxyChangeInfo = DataShare::DataProxyChangeInfo;
-using DataShareParamSet = DataShare::DataShareParamSet;
+using UriInfo = DataShare::UriInfo;
 using RegisterOption = DataShare::RegisterOption;
 
 template<>
@@ -217,10 +217,10 @@ template<>
 bool Unmarshalling(DataProxyChangeInfo &result, MessageParcel &parcel);
 
 template<>
-bool Marshalling(const DataShareParamSet &result, MessageParcel &parcel);
+bool Marshalling(const UriInfo &result, MessageParcel &parcel);
 
 template<>
-bool Unmarshalling(DataShareParamSet &result, MessageParcel &parcel);
+bool Unmarshalling(UriInfo &result, MessageParcel &parcel);
 
 template<>
 bool Marshalling(const RegisterOption &option, MessageParcel &parcel);

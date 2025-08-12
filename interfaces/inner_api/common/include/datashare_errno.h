@@ -212,7 +212,12 @@ constexpr int E_TIMEOUT_ERROR = (E_BASE + 72);
 /**
 * @brief This error code indicates that the timeout interface is busy.
 */
-constexpr int E_TIMEOUT_INTERFACE_BUSY = (E_BASE + 73);
+constexpr int E_ERROR_OVER_LIMIT_TASK = (E_BASE + 73);
+
+/**
+* @brief The error code for pool is null.
+*/
+constexpr int E_EXECUTOR_POOL_IS_NULL = (E_BASE + 74);
 } // namespace DataShare
 } // namespace OHOS
 

@@ -520,13 +520,13 @@ bool Unmarshalling(DataProxyChangeInfo &changeInfo, MessageParcel &parcel)
 }
 
 template<>
-bool Marshalling(const DataShareParamSet &result, MessageParcel &parcel)
+bool Marshalling(const UriInfo &result, MessageParcel &parcel)
 {
     return ITypesUtil::Marshal(parcel, result.uri, result.extUri, result.option.timeout);
 }
 
 template<>
-bool Unmarshalling(DataShareParamSet &result, MessageParcel &parcel)
+bool Unmarshalling(UriInfo &result, MessageParcel &parcel)
 {
     return ITypesUtil::Unmarshal(parcel, result.uri, result.extUri, result.option.timeout);
 }

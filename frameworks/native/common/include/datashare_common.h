@@ -19,8 +19,11 @@
 #include "datashare_option.h"
 
 namespace OHOS::DataShare {
+constexpr int MAX_THREADS = 2;
+constexpr int MIN_THREADS = 0;
+constexpr const char *DATASHARE_EXECUTOR_NAME = "DShare_Executor";
 
-struct DataShareParamSet {
+struct UriInfo {
     std::string uri;
     std::string extUri;
     DataShareOption option;

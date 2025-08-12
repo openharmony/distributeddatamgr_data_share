@@ -20,6 +20,7 @@
 
 #include "concurrent_map.h"
 #include "data_share_manager_impl.h"
+#include "executor_pool.h"
 #include "general_controller.h"
 #include "uri.h"
 
@@ -30,6 +31,17 @@ class IDataAbilityObserver;
 
 namespace DataShare {
 using ChangeInfo = AAFwk::ChangeInfo;
+
+struct TimedQueryResult {
+    bool isFinish_;
+    DatashareBusinessError businessError_;
+    std::shared_ptr<DataShareResultSet> resultSet_;
+
+    explicit TimedQueryResult(bool isFinish, DatashareBusinessError businessError,
+        std::shared_ptr<DataShareResultSet> resultSet) : isFinish_(isFinish),
+        businessError_(businessError), resultSet_(resultSet) {}
+};
+
 class GeneralControllerServiceImpl : public GeneralController {
 public:
     GeneralControllerServiceImpl(const std::string &ext);
@@ -70,9 +82,15 @@ private:
 
     void SetRegisterCallback();
 
+    std::pair<std::shared_ptr<DataShareResultSet>, DatashareBusinessError> TimedQuery(
+        std::shared_ptr<DataShareServiceProxy> proxy, const UriInfo &paramSet,
+        const DataSharePredicates &predicates, const std::vector<std::string> &columns);
+
     ConcurrentMap<sptr<AAFwk::IDataAbilityObserver>, std::list<Uri>> observers_;
 
     std::string extUri_;
+
+    std::shared_ptr<ExecutorPool> pool_;
 
     static constexpr int MAX_RETRY_COUNT = 3;
 
