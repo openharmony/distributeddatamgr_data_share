@@ -16,6 +16,8 @@
 #include "general_controller_service_impl.h"
 #include <thread>
 
+#include "block_data.h"
+#include "datashare_common.h"
 #include "dataobs_mgr_client.h"
 #include "dataobs_mgr_errors.h"
 #include "datashare_log.h"
@@ -26,6 +28,7 @@ namespace DataShare {
 GeneralControllerServiceImpl::GeneralControllerServiceImpl(const std::string &ext)
 {
     extUri_ = ext;
+    pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS, DATASHARE_EXECUTOR_NAME);
 }
 
 GeneralControllerServiceImpl::~GeneralControllerServiceImpl()
@@ -169,18 +172,26 @@ std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Ur
         LOG_ERROR("proxy is nullptr");
         return nullptr;
     }
-    DataShareParamSet paramSet = {
-        .uri = uri.ToString(),
-        .extUri = extUri_,
-        .option = { .timeout = option.timeout },
-    };
-    auto resultSet = proxy->Query(paramSet, predicates, columns, businessError);
+
+    if (option.timeout > 0) {
+        UriInfo uriInfo = {
+            .uri = uri.ToString(),
+            .extUri = extUri_,
+            .option = { .timeout = option.timeout },
+        };
+
+        auto [resultSet, err] = TimedQuery(proxy, uriInfo, predicates, columns);
+        businessError = err;
+        return resultSet;
+    }
+
+    auto resultSet = proxy->Query(uri, Uri(extUri_), predicates, columns, businessError);
     int retryCount = 0;
     while (resultSet == nullptr && businessError.GetCode() == E_RESULTSET_BUSY && retryCount++ < MAX_RETRY_COUNT) {
         LOG_ERROR("resultSet busy retry, uri: %{public}s", DataShareStringUtils::Anonymous(uri.ToString()).c_str());
         std::this_thread::sleep_for(std::chrono::milliseconds(
             DataShareStringUtils::GetRandomNumber(RANDOM_MIN, RANDOM_MAX)));
-        resultSet = proxy->Query(paramSet, predicates, columns, businessError);
+        resultSet = proxy->Query(uri, Uri(extUri_), predicates, columns, businessError);
     }
     return resultSet;
 }
@@ -275,6 +286,50 @@ void GeneralControllerServiceImpl::ReRegisterObserver()
         }
         return false;
     });
+}
+
+std::pair<std::shared_ptr<DataShareResultSet>, DatashareBusinessError> GeneralControllerServiceImpl::TimedQuery(
+    std::shared_ptr<DataShareServiceProxy> proxy, const UriInfo &uriInfo,
+    const DataSharePredicates &predicates, const std::vector<std::string> &columns)
+{
+    DatashareBusinessError businessError;
+    if (pool_ == nullptr) {
+        LOG_ERROR("pool is nullptr");
+        businessError.SetCode(E_EXECUTOR_POOL_IS_NULL);
+        businessError.SetMessage("pool is nullptr");
+        return std::make_pair(nullptr, businessError);
+    }
+
+    auto timedQueryResult = std::make_shared<OHOS::BlockData<TimedQueryResult, std::chrono::milliseconds>>(
+        uriInfo.option.timeout, TimedQueryResult{false, DatashareBusinessError(), nullptr});
+
+    auto task = [proxy, uriInfo, predicates, columns, timedQueryResult]() {
+        DatashareBusinessError businessError;
+        auto ncolumns = columns;
+        auto resultSet = proxy->Query(Uri(uriInfo.uri), Uri(uriInfo.extUri), predicates,
+            ncolumns, businessError);
+        int retryCount = 0;
+        while (resultSet == nullptr && businessError.GetCode() == E_RESULTSET_BUSY && retryCount++ < MAX_RETRY_COUNT) {
+            LOG_ERROR("resultSet busy retry, uri: %{public}s", DataShareStringUtils::Anonymous(uriInfo.uri).c_str());
+            std::this_thread::sleep_for(std::chrono::milliseconds(
+                DataShareStringUtils::GetRandomNumber(RANDOM_MIN, RANDOM_MAX)));
+            resultSet = proxy->Query(Uri(uriInfo.uri), Uri(uriInfo.extUri), predicates,
+                ncolumns, businessError);
+        }
+
+        timedQueryResult->SetValue(TimedQueryResult{true, businessError, std::move(resultSet)});
+    };
+    auto taskId = pool_->Execute(task);
+    auto res = timedQueryResult->GetValue();
+    if (!res.isFinish_) {
+        LOG_ERROR("query time out, waited time: %{public}d, uri: %{public}s", uriInfo.option.timeout,
+            DataShareStringUtils::Anonymous(uriInfo.uri).c_str());
+        pool_->Remove(taskId);
+        businessError.SetCode(E_TIMEOUT_ERROR);
+        businessError.SetMessage("query time out");
+        return std::make_pair(nullptr, businessError);
+    }
+    return std::make_pair(res.resultSet_, res.businessError_);
 }
 } // namespace DataShare
 } // namespace OHOS

@@ -190,7 +190,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_001, TestSize.Level1)
     DataShareOption option;
     option.timeout = 0;
     DatashareBusinessError businessError;
-    auto resultSet = helper->QueryTimeout(uri, predicates, columns, option, &businessError);
+    auto resultSet = helper->Query(uri, predicates, columns, option, &businessError);
     EXPECT_NE(resultSet, nullptr);
     EXPECT_EQ(businessError.GetCode(), E_OK);
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_001::End");
@@ -231,7 +231,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_002, TestSize.Level1)
     DatashareBusinessError businessError;
     for (int i = 0; i < repeatTimes; i++) {
         auto start = std::chrono::steady_clock::now();
-        auto resultSet = helper->QueryTimeout(uri, predicates, columns, option, &businessError);
+        auto resultSet = helper->Query(uri, predicates, columns, option, &businessError);
         auto finish = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
         EXPECT_TRUE(duration < std::chrono::milliseconds(limitTime));
@@ -284,7 +284,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_003, TestSize.Level1)
         &limitTime, &repeatTimes]() {
         for (int i = 0; i < repeatTimes; i++) {
             auto start = std::chrono::steady_clock::now();
-            auto resultSet = helper->QueryTimeout(uri, predicates, columns, option, &businessError);
+            auto resultSet = helper->Query(uri, predicates, columns, option, &businessError);
             auto finish = std::chrono::steady_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(finish - start);
             EXPECT_TRUE(duration < std::chrono::milliseconds(limitTime));
@@ -353,7 +353,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_004, TestSize.Level1)
     int queryTimes = 10; // 10 is the number of times the query is executed.
     for (int i = 0; i < queryTimes; i++) {
         DatashareBusinessError businessError;
-        auto resultSet = helper->QueryTimeout(uri, predicates, columns, option, &businessError);
+        auto resultSet = helper->Query(uri, predicates, columns, option, &businessError);
         if (businessError.GetCode() == E_TIMEOUT_ERROR) {
             count++;
         }
@@ -390,7 +390,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_005, TestSize.Level1)
     DataShareOption option;
     option.timeout = 0; // The function has no specific implementation, timeoutis meaningless
     DatashareBusinessError businessError;
-    auto resultSet = helper->DataShareHelper::QueryTimeout(uri, predicates, columns, option, &businessError);
+    auto resultSet = helper->DataShareHelper::Query(uri, predicates, columns, option, &businessError);
     EXPECT_EQ(resultSet, nullptr);
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_005::End");
 }

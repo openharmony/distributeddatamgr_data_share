@@ -234,7 +234,7 @@ public:
      *
      * @return Returns the query result.
      */
-    virtual std::shared_ptr<DataShareResultSet> QueryTimeout(Uri &uri, const DataSharePredicates &predicates,
+    virtual std::shared_ptr<DataShareResultSet> Query(Uri &uri, const DataSharePredicates &predicates,
         std::vector<std::string> &columns, DataShareOption &option,
         DatashareBusinessError *businessError = nullptr) { return nullptr; }
 

@@ -23,7 +23,7 @@
 #include "idata_share_service.h"
 
 namespace OHOS::DataShare {
-class DataShareServiceProxy final : public IRemoteProxy<IDataShareService> {
+class DataShareServiceProxy : public IRemoteProxy<IDataShareService> {
 public:
     explicit DataShareServiceProxy(const sptr<IRemoteObject> &object);
     int Insert(const Uri &uri, const Uri &extUri, const DataShareValuesBucket &valuesBucket) override;
@@ -33,7 +33,7 @@ public:
 
     int Delete(const Uri &uri, const Uri &extUri, const DataSharePredicates &predicate) override;
 
-    std::shared_ptr<DataShareResultSet> Query(DataShareParamSet &paramSet, const DataSharePredicates &predicates,
+    std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const Uri &extUri, const DataSharePredicates &predicates,
         std::vector<std::string> &columns, DatashareBusinessError &businessError) override;
 
     int AddQueryTemplate(const std::string &uri, int64_t subscriberId, Template &tpl) override;

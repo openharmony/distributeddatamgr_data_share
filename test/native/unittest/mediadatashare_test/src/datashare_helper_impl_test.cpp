@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "datashare_helper_impl.h"
+#include "general_controller_service_impl.h"
 
 #include <gtest/gtest.h>
 
@@ -135,12 +136,12 @@ HWTEST_F(DataShareHelperImplTest, QueryTest001, TestSize.Level0)
     EXPECT_CALL(*controller, Query(testing::_, testing::_, testing::_, testing::_, testing::_))
         .WillOnce(testing::Return(expectResult));
     result = DataShareHelperImplTest::GetInstance()->Query(uri, predicates, columns, nullptr);
-    EXPECT_EQ(result.get(), expectResult.get());
+    EXPECT_EQ(result, expectResult);
     DatashareBusinessError error;
     EXPECT_CALL(*controller, Query(testing::_, testing::_, testing::_, testing::_, testing::_))
         .WillOnce(testing::Return(expectResult));
     result = DataShareHelperImplTest::GetInstance()->Query(uri, predicates, columns, &error);
-    EXPECT_EQ(result.get(), expectResult.get());
+    EXPECT_EQ(result, expectResult);
     LOG_INFO("QueryTest001::End");
 }
 
@@ -169,20 +170,20 @@ HWTEST_F(DataShareHelperImplTest, QueryTimeoutTest001, TestSize.Level0)
     std::vector<std::string> columns;
     DataShareOption option;
     DataShareHelperImplTest::GetInstance()->generalCtl_ = nullptr;
-    auto result = DataShareHelperImplTest::GetInstance()->QueryTimeout(uri, predicates, columns, option, nullptr);
+    auto result = DataShareHelperImplTest::GetInstance()->Query(uri, predicates, columns, option, nullptr);
     EXPECT_EQ(result, nullptr);
     auto expectResult = std::make_shared<DataShareResultSet>();
     std::shared_ptr<MockGeneralController> controller = DataShareHelperImplTest::GetController();
     DataShareHelperImplTest::GetInstance()->generalCtl_ = controller;
     EXPECT_CALL(*controller, Query(testing::_, testing::_, testing::_, testing::_, testing::_))
         .WillOnce(testing::Return(expectResult));
-    result = DataShareHelperImplTest::GetInstance()->QueryTimeout(uri, predicates, columns, option, nullptr);
-    EXPECT_EQ(result.get(), expectResult.get());
+    result = DataShareHelperImplTest::GetInstance()->Query(uri, predicates, columns, option, nullptr);
+    EXPECT_EQ(result, expectResult);
     DatashareBusinessError error;
     EXPECT_CALL(*controller, Query(testing::_, testing::_, testing::_, testing::_, testing::_))
         .WillOnce(testing::Return(expectResult));
-    result = DataShareHelperImplTest::GetInstance()->QueryTimeout(uri, predicates, columns, option, &error);
-    EXPECT_EQ(result.get(), expectResult.get());
+    result = DataShareHelperImplTest::GetInstance()->Query(uri, predicates, columns, option, &error);
+    EXPECT_EQ(result, expectResult);
     LOG_INFO("QueryTimeoutTest001::End");
 }
 
@@ -557,6 +558,105 @@ HWTEST_F(DataShareHelperImplTest, User_Define_func_No_ExtSpCtl_Test001, TestSize
     auto result = DataShareHelperImplTest::GetInstance()->UserDefineFunc(data, reply, option);
     EXPECT_EQ(result, DATA_SHARE_ERROR);
     LOG_INFO("User_Define_func_No_ExtSpCtl_Test001::End");
+}
+
+class MockDataShareServiceProxy : public DataShareServiceProxy {
+public:
+    explicit MockDataShareServiceProxy(const sptr<IRemoteObject>& impl) : DataShareServiceProxy(impl) {}
+    ~MockDataShareServiceProxy() = default;
+
+    std::shared_ptr<DataShareResultSet> Query(const Uri &uri, const Uri &extUri, const DataSharePredicates &predicates,
+        std::vector<std::string> &columns, DatashareBusinessError &businessError)
+    {
+        businessError.SetCode(E_OK);
+        std::this_thread::sleep_for(std::chrono::seconds(3)); // sleep 3s
+        return nullptr;
+    }
+};
+
+/**
+* @tc.name: QueryTimeoutTest002
+* @tc.desc: Test Query function with timeout option
+* @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Create GeneralControllerServiceImpl and call Query with default option
+    2. Set option timeout to 1 and call Query function again
+    3. Set pool_ to nullptr and call Query function the third time
+* @tc.experct: All Query calls return nullptr
+*/
+HWTEST_F(DataShareHelperImplTest, QueryTimeoutTest002, TestSize.Level0)
+{
+    LOG_INFO("QueryTimeoutTest002::Start");
+    sptr<IRemoteObject> remoteObject;
+    std::shared_ptr<MockDataShareServiceProxy> service = std::make_shared<MockDataShareServiceProxy>(remoteObject);
+    auto manager = DataShareManagerImpl::GetInstance();
+    manager->dataShareService_ = static_cast<std::shared_ptr<DataShareServiceProxy>>(service);
+    auto generalCtl = GeneralControllerServiceImpl("datashare://datasharehelperimpl");
+    OHOS::Uri uri("datashare:///com.datasharehelperimpl.test");
+    DataSharePredicates predicates;
+    std::vector<std::string> columns;
+    DataShareOption option;
+    DatashareBusinessError businessError;
+    auto res = generalCtl.Query(uri, predicates, columns, businessError, option);
+    EXPECT_EQ(res, nullptr);
+
+    option.timeout = 1;
+    res = generalCtl.Query(uri, predicates, columns, businessError, option);
+    EXPECT_EQ(businessError.GetCode(), E_TIMEOUT_ERROR);
+
+    option.timeout = 4000; // time out lager than task execute time
+    res = generalCtl.Query(uri, predicates, columns, businessError, option);
+    EXPECT_EQ(businessError.GetCode(), E_OK);
+    
+    generalCtl.pool_ = nullptr;
+    res = generalCtl.Query(uri, predicates, columns, businessError, option);
+    EXPECT_EQ(businessError.GetCode(), E_EXECUTOR_POOL_IS_NULL);
+    LOG_INFO("QueryTimeoutTest002::End");
+}
+
+/**
+* @tc.name: QueryTimeoutTest003
+* @tc.desc: Test Query function timeout scenarios with different timeout values
+* @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Set up MockDataShareServiceProxy and GeneralControllerServiceImpl
+    2. Call Query with timeout less than task execute time
+    3. Call Query with timeout larger than task execute time
+* @tc.experct: First call returns E_TIMEOUT_ERROR, second call returns E_OK
+*/
+HWTEST_F(DataShareHelperImplTest, QueryTimeoutTest003, TestSize.Level0)
+{
+    LOG_INFO("QueryTimeoutTest003::Start");
+    sptr<IRemoteObject> remoteObject;
+    std::shared_ptr<MockDataShareServiceProxy> service = std::make_shared<MockDataShareServiceProxy>(remoteObject);
+    auto manager = DataShareManagerImpl::GetInstance();
+    manager->dataShareService_ = static_cast<std::shared_ptr<DataShareServiceProxy>>(service);
+
+    auto generalCtl = std::make_shared<GeneralControllerServiceImpl>("datashare://datasharehelperimpl");
+    auto helper = DataShareHelperImplTest::GetInstance();
+    helper->generalCtl_ = generalCtl;
+
+    OHOS::Uri uri("datashare:///com.datasharehelperimpl.test");
+    DataSharePredicates predicates;
+    std::vector<std::string> columns;
+    DataShareOption option;
+    option.timeout = 2000; // time out less than task execute time
+    DatashareBusinessError businessError;
+    auto res = helper->Query(uri, predicates, columns, option, &businessError);
+    EXPECT_EQ(businessError.GetCode(), E_TIMEOUT_ERROR);
+
+    option.timeout = 4000; // time out lager than task execute time
+    res = helper->Query(uri, predicates, columns, option, &businessError);
+    EXPECT_EQ(businessError.GetCode(), E_OK);
+
+    option.timeout = 0;
+    res = helper->Query(uri, predicates, columns, option, &businessError);
+    EXPECT_EQ(businessError.GetCode(), E_OK);
+    LOG_INFO("QueryTimeoutTest003::End");
 }
 } // namespace DataShare
 } // namespace OHOS

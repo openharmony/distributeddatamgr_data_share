@@ -239,7 +239,7 @@ std::shared_ptr<DataShareResultSet> DataShareHelperImpl::Query(Uri &uri, const D
     return resultSet;
 }
 
-std::shared_ptr<DataShareResultSet> DataShareHelperImpl::QueryTimeout(Uri &uri, const DataSharePredicates &predicates,
+std::shared_ptr<DataShareResultSet> DataShareHelperImpl::Query(Uri &uri, const DataSharePredicates &predicates,
     std::vector<std::string> &columns, DataShareOption &option, DatashareBusinessError *businessError)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
