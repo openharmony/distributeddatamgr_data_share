@@ -44,6 +44,33 @@
         "description": "$string:description_datashareextability",
         "type": "dataShare",
         "uri": "datashare://com.acts.datasharetest",
+        "readPermission": "ohos.permission.WIFI",
+        "writePermission": "ohos.permission.WIFI",
+        "exported": true,
+        "visible": true
+      },
+      {
+        "srcEntrance": "./ets/DataShareExtAbility/DataShareExtAbility.ts",
+        "name": "DataShareExtAbility2",
+        "icon": "$media:icon",
+        "description": "$string:description_datashareextability",
+        "type": "dataShare",
+        "uri": "datashare://com.acts.datasharetest2",
+        "readPermission": "ohos.permission.WRITE_CONTACTS",
+        "writePermission": "ohos.permission.GET_BUNDLE_INFO",
+        "exported": true,
+        "visible": true
+      },
+      {
+        "srcEntrance": "./ets/DataShareExtAbility/DataShareExtAbility.ts",
+        "name": "DataShareExtAbility3",
+        "icon": "$media:icon",
+        "description": "$string:description_datashareextability",
+        "type": "dataShare",
+        "uri": "datashare://com.acts.testddd",
+        "exported": true,
+        "readPermission": "ohos.permission.WIFI",
+        "writePermission": "ohos.permission.WIFI",
         "visible": true
       }
     ],
@@ -58,7 +85,7 @@
         }
       },
       {
-        "uri": "datashare://com.acts.datasharetest/test",
+        "uri": "datashareproxy://com.acts.datasharetest/readtest",
         "requiredReadPermission":"ohos.permission.READ_CALL_LOG",
         "metadata": {
           "name": "dataProperties",
@@ -66,7 +93,7 @@
         }
       },
       {
-        "uri": "datashare://com.acts.datasharetest/test/permission",
+        "uri": "datashareproxy://com.acts.datasharetest/permissiontest/permission",
         "requiredWritePermission":"ohos.permission.WRITE_CALL_LOG",
         "metadata": {
           "name": "dataProperties",

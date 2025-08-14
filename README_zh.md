@@ -48,8 +48,8 @@
 │   │   └── napi                                 # NAPI代码存放目录
 │   │       ├── common                           # 公用NAPI代码存放目录
 │   │       ├── dataShare                        # 客户端NAPI代码存放目录
-│   │       ├── datashare_ext_ability            # DataShareExtentionAbility模块JS代码存放目录
-│   │       └── datashare_ext_ability_context    # DataShareExtentionAbilityContext模块JS代码存放目录
+│   │       ├── datashare_ext_ability            # DataShareextensionAbility模块JS代码存放目录
+│   │       └── datashare_ext_ability_context    # DataShareextensionAbilityContext模块JS代码存放目录
 │   └── native
 │       ├── common
 │       ├── consumer

@@ -60,7 +60,6 @@ std::shared_ptr<DataShareHelper> DataShareHelper::Creator(const sptr<IRemoteObje
         LOG_ERROR("token == nullptr");
         return nullptr;
     }
-
     std::string replacedUriStr = TransferUriPrefix(FILE_PREFIX, DATA_SHARE_PREFIX, strUri);
     Uri uri(replacedUriStr);
     std::shared_ptr<DataShareHelper> helper = nullptr;

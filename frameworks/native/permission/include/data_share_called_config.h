@@ -32,19 +32,25 @@ public:
 
     struct ProviderInfo {
         std::string uri;
+        std::string schema;
         std::string bundleName;
         std::string moduleName;
         std::string readPermission;
         std::string writePermission;
         int32_t currentUserId = -1;
+        bool isExtension = false;
     };
-    std::pair<int, ProviderInfo> GetProviderInfo(uint32_t tokenId);
+    std::pair<int, ProviderInfo> GetProviderInfo(int32_t user);
+    static std::pair<bool, OHOS::AppExecFwk::BundleInfo> GetBundleInfoFromBMS(std::string bundleName, int32_t user);
+    static std::pair<bool, AppExecFwk::ExtensionAbilityInfo> GetExtensionInfoFromBMS(std::string &uri, int32_t user);
+    static int32_t GetUserByToken(uint32_t tokenId);
+    std::string BundleName();
 private:
     int GetFromProxyData();
-    int32_t GetUserByToken(uint32_t tokenId);
-    std::pair<bool, OHOS::AppExecFwk::BundleInfo> GetBundleInfoFromBMS();
-    ProviderInfo providerInfo_;
     static constexpr const char *PROXY_URI_SCHEMA = "datashareproxy";
+    static constexpr const char *PROXY_URI_SCHEMA_SEPARATOR = "datashareproxy://";
+    static constexpr const char *EXT_URI_SCHEMA_SEPARATOR = "datashare://";
+    ProviderInfo providerInfo_;
 };
 } // namespace DataShare
 } // namespace OHOS

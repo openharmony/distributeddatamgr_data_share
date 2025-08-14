@@ -23,6 +23,7 @@
 #include "datashare_stub_impl.h"
 #include "ikvstore_data_service.h"
 #include "idata_share_service.h"
+#include "ipc_skeleton.h"
 #include "iservice_registry.h"
 #include "js_datashare_ext_ability_context.h"
 #include "js_proxy.h"
@@ -823,7 +824,11 @@ bool JsDataShareExtAbility::RegisterObserver(const Uri &uri, const sptr<AAFwk::I
     }
 
     int32_t callingUserId = DataShareStubImpl::GetCallingUserId();
-    ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver, callingUserId);
+    uint32_t token = IPCSkeleton::GetCallingTokenID();
+    DataObsOption opt;
+    opt.SetFirstCallerTokenID(token);
+    Uri innerUri = uri;
+    ErrCode ret = obsMgrClient->RegisterObserverFromExtension(innerUri, dataObserver, callingUserId);
     if (ret != ERR_OK) {
         LOG_ERROR("obsMgrClient->RegisterObserver error return %{public}d", ret);
         return false;
@@ -873,7 +878,8 @@ bool JsDataShareExtAbility::NotifyChangeWithUser(const Uri &uri, int32_t userId)
         LOG_ERROR("obsMgrClient is nullptr");
         return false;
     }
-    ErrCode ret = obsMgrClient->NotifyChange(uri, userId);
+    Uri innerUri = uri;
+    ErrCode ret = obsMgrClient->NotifyChangeFromExtension(innerUri, userId);
     if (ret != ERR_OK) {
         LOG_ERROR("obsMgrClient->NotifyChange error return %{public}d", ret);
         return false;

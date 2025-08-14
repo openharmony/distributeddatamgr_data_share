@@ -14,12 +14,17 @@
  */
 
 #include "datashare_stub_impl.h"
-#include <memory>
+#include <string>
 
 #include "accesstoken_kit.h"
 #include "bundle_constants.h"
+#include "bundle_mgr_helper.h"
+#include "dataobs_mgr_client.h"
+#include "data_share_config.h"
+#include "datashare_errno.h"
 #include "datashare_log.h"
 #include "datashare_string_utils.h"
+#include "hiview_datashare.h"
 #include "ipc_skeleton.h"
 
 namespace OHOS {
@@ -36,14 +41,30 @@ std::shared_ptr<JsDataShareExtAbility> DataShareStubImpl::GetOwner()
     return extension_;
 }
 
+int CheckTrusts(uint32_t consumerToken, uint32_t providerToken)
+{
+    auto obsMgrClient = AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("obsMgrClient is nullptr");
+        return E_DATA_OBS_NOT_READY;
+    }
+    ErrCode ret = obsMgrClient->CheckTrusts(consumerToken, providerToken);
+    if (ret != E_OK) {
+        LOG_ERROR("CheckTrusts error return %{public}d", ret);
+        return ret;
+    }
+    return E_OK;
+}
+
 bool DataShareStubImpl::CheckCallingPermission(const std::string &permission)
 {
-    if (!permission.empty() && AccessTokenKit::VerifyAccessToken(IPCSkeleton::GetCallingTokenID(), permission)
-        != AppExecFwk::Constants::PERMISSION_GRANTED) {
-        LOG_ERROR("permission not granted.");
-        return false;
+    uint32_t token = IPCSkeleton::GetCallingTokenID();
+    if (permission.empty() || AccessTokenKit::VerifyAccessToken(token, permission)
+        == AppExecFwk::Constants::PERMISSION_GRANTED) {
+        return true;
     }
-    return true;
+    LOG_WARN("permission not granted. permission %{public}s, token %{public}d", permission.c_str(), token);
+    return false;
 }
 
 std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
@@ -501,10 +522,15 @@ bool DataShareStubImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IData
     if (extension == nullptr) {
         return false;
     }
-    if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {
-        LOG_ERROR("Register observer check permission failed. uri: %{public}s",
-            DataShareStringUtils::Anonymous(uri.ToString()).c_str());
-        return false;
+    int32_t callingToken = IPCSkeleton::GetCallingTokenID();
+    bool isSuccess = CheckCallingPermission(extension->abilityInfo_->readPermission);
+    if (!isSuccess) {
+        int selfToken = IPCSkeleton::GetSelfTokenID();
+        if (CheckTrusts(callingToken, selfToken) != E_OK) {
+            LOG_ERROR("Register observer check permission failed. uri: %{public}s, token:%{public}d",
+                DataShareStringUtils::Anonymous(uri.ToString()).c_str(), callingToken);
+            // just log
+        }
     }
     return extension->RegisterObserver(uri, dataObserver);
 }
@@ -515,11 +541,17 @@ bool DataShareStubImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDa
     if (extension == nullptr) {
         return false;
     }
-    if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {
-        LOG_ERROR("UnRegister observer check permission failed. uri: %{public}s",
-            DataShareStringUtils::Anonymous(uri.ToString()).c_str());
-        return false;
+    int32_t callingToken = IPCSkeleton::GetCallingTokenID();
+    bool isSuccess = CheckCallingPermission(extension->abilityInfo_->readPermission);
+    if (!isSuccess) {
+        int selfToken = IPCSkeleton::GetSelfTokenID();
+        if (CheckTrusts(callingToken, selfToken) != E_OK) {
+            LOG_ERROR("UnRegister observer check permission failed. uri: %{public}s, token:%{public}d",
+                DataShareStringUtils::Anonymous(uri.ToString()).c_str(), callingToken);
+            // just log
+        }
     }
+    
     return extension->UnregisterObserver(uri, dataObserver);
 }
 
@@ -530,6 +562,16 @@ bool DataShareStubImpl::NotifyChange(const Uri &uri)
     auto extension = client->GetOwner();
     if (extension == nullptr) {
         return *ret;
+    }
+    int32_t callingToken = IPCSkeleton::GetCallingTokenID();
+    bool isSuccess = CheckCallingPermission(extension->abilityInfo_->writePermission);
+    if (!isSuccess) {
+        int selfToken = IPCSkeleton::GetSelfTokenID();
+        if (CheckTrusts(callingToken, selfToken) != E_OK) {
+            LOG_ERROR("extension NotifyChange check permission failed. uri: %{public}s token %{public}d",
+                uri.ToString().c_str(), IPCSkeleton::GetCallingTokenID());
+            // just log
+        }
     }
 
     int32_t callingUserId = GetCallingUserId();
