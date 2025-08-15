@@ -16,6 +16,7 @@
 #ifndef DATASHARE_ERRNO_H
 #define DATASHARE_ERRNO_H
 
+#include "errors.h"
 namespace OHOS {
 namespace DataShare {
 /**
@@ -218,6 +219,52 @@ constexpr int E_ERROR_OVER_LIMIT_TASK = (E_BASE + 73);
 * @brief The error code for pool is null.
 */
 constexpr int E_EXECUTOR_POOL_IS_NULL = (E_BASE + 74);
+
+/**
+* @brief The error code for not hap.
+*/
+constexpr int E_NOT_HAP = (E_BASE + 75);
+
+/**
+* @brief The error code for get bundle info failed.
+*/
+constexpr int E_GET_BUNDLEINFO_FAILED = (E_BASE + 76);
+
+/**
+* @brief The error code for not datashare extension.
+*/
+constexpr int E_NOT_DATASHARE_EXTENSION = (E_BASE + 77);
+
+/**
+* @brief The error code for invalid uri.
+*/
+constexpr int E_DATASHARE_INVALID_URI = (E_BASE + 78);
+
+/**
+* @brief The error code for verify failed.
+*/
+constexpr int E_VERIFY_FAILED = (E_BASE + 79);
+
+/**
+* @brief The error code for permission denied.
+*/
+constexpr int E_DATASHARE_PERMISSION_DENIED = (E_BASE + 80);
+
+/**
+* @brief The error code for empty uri.
+*/
+constexpr int E_EMPTY_URI = (E_BASE + 81);
+
+/**
+* @brief The error code for uri not trust.
+*/
+constexpr int E_NOT_IN_TRUSTS = (E_BASE + 82);
+
+/**
+* @brief The error code for get caller failed.
+*/
+constexpr int E_GET_CALLER_NAME_FAILED = (E_BASE + 83);
+
 } // namespace DataShare
 } // namespace OHOS
 

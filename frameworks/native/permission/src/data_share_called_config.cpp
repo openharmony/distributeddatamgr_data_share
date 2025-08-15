@@ -25,8 +25,11 @@
 #include "datashare_errno.h"
 #include "datashare_log.h"
 #include "datashare_string_utils.h"
+#include "data_share_permission.h"
+#include "hiview_datashare.h"
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
+#include "ipc_skeleton.h"
 #include "system_ability_definition.h"
 
 namespace OHOS::DataShare {
@@ -35,6 +38,23 @@ using namespace OHOS::Security::AccessToken;
 DataShareCalledConfig::DataShareCalledConfig(const std::string &uri)
 {
     providerInfo_.uri = uri;
+    Uri uriTemp(providerInfo_.uri);
+    providerInfo_.schema = uriTemp.GetScheme();
+    auto isProxyData = PROXY_URI_SCHEMA == providerInfo_.schema;
+    std::string bundleName = uriTemp.GetAuthority();
+    if (!isProxyData) {
+        std::vector<std::string> pathSegments;
+        uriTemp.GetPathSegments(pathSegments);
+        if (pathSegments.size() != 0) {
+            bundleName = pathSegments[0];
+        }
+    }
+    providerInfo_.bundleName = bundleName;
+}
+
+std::string DataShareCalledConfig::BundleName()
+{
+    return providerInfo_.bundleName;
 }
 
 int32_t DataShareCalledConfig::GetUserByToken(uint32_t tokenId)
@@ -46,8 +66,8 @@ int32_t DataShareCalledConfig::GetUserByToken(uint32_t tokenId)
     HapTokenInfo tokenInfo;
     auto result = AccessTokenKit::GetHapTokenInfo(tokenId, tokenInfo);
     if (result != RET_SUCCESS) {
-        LOG_ERROR("Get user failed!token:0x%{public}x, result:%{public}d, uri:%{public}s",
-            tokenId, result, DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
+        LOG_ERROR("Get user failed!token:0x%{public}x, result:%{public}d",
+            tokenId, result);
         return -1;
     }
     return tokenInfo.userID;
@@ -55,7 +75,7 @@ int32_t DataShareCalledConfig::GetUserByToken(uint32_t tokenId)
 
 int DataShareCalledConfig::GetFromProxyData()
 {
-    auto [success, bundleInfo] = GetBundleInfoFromBMS();
+    auto [success, bundleInfo] = GetBundleInfoFromBMS(providerInfo_.bundleName, providerInfo_.currentUserId);
     if (!success) {
         LOG_ERROR("Get bundleInfo failed! bundleName:%{public}s, userId:%{public}d, uri:%{public}s",
             providerInfo_.bundleName.c_str(), providerInfo_.currentUserId,
@@ -68,9 +88,14 @@ int DataShareCalledConfig::GetFromProxyData()
     if (schemePos != uriWithoutQuery.npos) {
         uriWithoutQuery.replace(schemePos, Constants::PARAM_URI_SEPARATOR_LEN, Constants::URI_SEPARATOR);
     }
+    schemePos = uriWithoutQuery.find(EXT_URI_SCHEMA_SEPARATOR);
+    if (schemePos != uriWithoutQuery.npos) {
+        uriWithoutQuery.replace(schemePos, strlen(EXT_URI_SCHEMA_SEPARATOR), PROXY_URI_SCHEMA_SEPARATOR);
+    }
     for (auto &hapModuleInfo : bundleInfo.hapModuleInfos) {
         for (auto &data : hapModuleInfo.proxyDatas) {
-            if (data.uri != uriWithoutQuery) {
+            if (data.uri.length() > uriWithoutQuery.length() ||
+                uriWithoutQuery.compare(0, data.uri.length(), data.uri) != 0) {
                 continue;
             }
             providerInfo_.readPermission = std::move(data.requiredReadPermission);
@@ -79,53 +104,78 @@ int DataShareCalledConfig::GetFromProxyData()
             return E_OK;
         }
     }
+    LOG_ERROR("E_URI_NOT_EXIST uriWithoutQuery %{public}s", uriWithoutQuery.c_str());
     return E_URI_NOT_EXIST;
 }
 
-std::pair<int, DataShareCalledConfig::ProviderInfo> DataShareCalledConfig::GetProviderInfo(uint32_t tokenId)
+std::pair<int, DataShareCalledConfig::ProviderInfo> DataShareCalledConfig::GetProviderInfo(int32_t user)
 {
-    Uri uriTemp(providerInfo_.uri);
-    auto isProxyData = PROXY_URI_SCHEMA == uriTemp.GetScheme();
-    std::string bundleName = uriTemp.GetAuthority();
-    if (!isProxyData) {
-        std::vector<std::string> pathSegments;
-        uriTemp.GetPathSegments(pathSegments);
-        if (pathSegments.size() != 0) {
-            bundleName = pathSegments[0];
-        }
-    }
-    if (bundleName.empty()) {
-        LOG_ERROR("BundleName not exist!, tokenId:0x%{public}x, uri:%{public}s",
-            tokenId, DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
+    if (providerInfo_.bundleName.empty()) {
+        LOG_ERROR("BundleName not exist!, user:%{public}d, uri:%{public}s",
+            user, DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
         return std::make_pair(E_BUNDLE_NAME_NOT_EXIST, DataShareCalledConfig::ProviderInfo{});
     }
-    providerInfo_.bundleName = bundleName;
-    providerInfo_.currentUserId = GetUserByToken(tokenId);
+    providerInfo_.currentUserId = user;
     auto ret = GetFromProxyData();
     if (ret != E_OK) {
-        LOG_ERROR("Failed! isProxyData:%{public}d,ret:%{public}d,tokenId:0x%{public}x,uri:%{public}s",
-            isProxyData, ret, tokenId, DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
+        LOG_ERROR("GetFromProxyData Failed! ret:%{public}d,user:%{public}d,uri:%{public}s",
+            ret, user, providerInfo_.uri.c_str());
     }
     return std::make_pair(ret, providerInfo_);
 }
 
-std::pair<bool, BundleInfo> DataShareCalledConfig::GetBundleInfoFromBMS()
+std::pair<bool, BundleInfo> DataShareCalledConfig::GetBundleInfoFromBMS(std::string bundleName, int32_t user)
 {
     BundleInfo bundleInfo;
     auto bmsHelper = DelayedSingleton<BundleMgrHelper>::GetInstance();
     if (bmsHelper == nullptr) {
         LOG_ERROR("BmsHelper is nullptr!.uri: %{public}s",
-            DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
+            DataShareStringUtils::Anonymous(bundleName).c_str());
         return std::make_pair(false, bundleInfo);
     }
-    bool ret = bmsHelper->GetBundleInfo(providerInfo_.bundleName,
-        BundleFlag::GET_BUNDLE_WITH_EXTENSION_INFO, bundleInfo, providerInfo_.currentUserId);
+
+    if (user == 0) {
+        user = Constants::ANY_USERID;
+    }
+    // because BMS and obs are in the same process.
+    // set IPCSkeleton tokenid to this process's tokenid.
+    // otherwise BMS may check permission failed.
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    bool ret = bmsHelper->GetBundleInfo(bundleName,
+        BundleFlag::GET_BUNDLE_WITH_EXTENSION_INFO, bundleInfo, user);
+    IPCSkeleton::SetCallingIdentity(identity);
     if (!ret) {
-        LOG_ERROR("Get BundleInfo failed! bundleName:%{public}s, userId:%{public}d,uri:%{public}s",
-            providerInfo_.bundleName.c_str(), providerInfo_.currentUserId,
-            DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
+        LOG_ERROR("Get BundleInfo failed! bundleName:%{public}s, userId:%{public}d",
+            bundleName.c_str(), user);
         return std::make_pair(false, bundleInfo);
     }
     return std::make_pair(true, bundleInfo);
+}
+
+std::pair<bool, ExtensionAbilityInfo> DataShareCalledConfig::GetExtensionInfoFromBMS(std::string &uri, int32_t user)
+{
+    ExtensionAbilityInfo info;
+    auto bmsHelper = DelayedSingleton<BundleMgrHelper>::GetInstance();
+    if (bmsHelper == nullptr) {
+        LOG_ERROR("BmsHelper is nullptr!.uri: %{public}s",
+            DataShareStringUtils::Anonymous(uri).c_str());
+        return std::make_pair(false, info);
+    }
+
+    if (user == 0) {
+        user = Constants::ANY_USERID;
+    }
+    // because BMS and obs are in the same process.
+    // set IPCSkeleton tokenid to this process's tokenid.
+    // otherwise BMS may check permission failed.
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    bool ret = bmsHelper->QueryExtensionAbilityInfoByUri(uri, user, info);
+    IPCSkeleton::SetCallingIdentity(identity);
+    if (!ret) {
+        LOG_ERROR("QueryExtensionAbilityInfoByUri failed! uri:%{public}s, userId:%{public}d",
+            uri.c_str(), user);
+        return std::make_pair(false, info);
+    }
+    return std::make_pair(true, info);
 }
 } // namespace OHOS::DataShare

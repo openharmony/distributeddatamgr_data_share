@@ -33,6 +33,9 @@ datashare_native_consumer_path =
 datashare_native_permission_path =
     "${datashare_base_path}/frameworks/native/permission"
 
+datashare_native_dfx_path =
+    "${datashare_base_path}/frameworks/native/dfx"
+
 datashare_native_proxy_path = "${datashare_base_path}/frameworks/native/proxy"
 
 foundation_path = "//foundation"

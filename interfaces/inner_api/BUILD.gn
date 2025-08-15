@@ -91,6 +91,7 @@ config("permission_config") {
   visibility = [ ":*" ]
   include_dirs = [
     "common/include",
+    "dfx/include",
     "permission/include",
     "${datashare_common_native_path}/include",
     "${datashare_native_permission_path}/include",
@@ -147,12 +148,15 @@ ohos_shared_library("datashare_permission") {
     cfi_cross_dso = true
     debug = false
   }
-  include_dirs = []
+  include_dirs = [ "${datashare_native_dfx_path}/include" ]
 
   sources = [
     "${datashare_common_native_path}/src/datashare_string_utils.cpp",
+    "${datashare_common_native_path}/src/serializable.cpp",
     "${datashare_native_permission_path}/src/data_share_called_config.cpp",
     "${datashare_native_permission_path}/src/data_share_permission.cpp",
+    "${datashare_native_permission_path}/src/data_share_config.cpp",
+    "${datashare_native_dfx_path}/src/hiview_datashare.cpp",
   ]
   configs = [ ":permission_config" ]
   public_configs = [ ":permission_public_config" ]
@@ -170,6 +174,8 @@ ohos_shared_library("datashare_permission") {
     "bundle_framework:libappexecfwk_common",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "hisysevent:libhisysevent",
+    "kv_store:distributeddata_inner",
     "hilog:libhilog",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
@@ -188,10 +194,15 @@ ohos_shared_library("datashare_provider") {
     cfi_cross_dso = true
     debug = false
   }
-  include_dirs = [ "${datashare_common_napi_path}/include" ]
+  include_dirs = [
+    "${datashare_common_napi_path}/include",
+    "${datashare_native_dfx_path}/include",
+    "${datashare_native_permission_path}/include",
+  ]
 
   sources = [
     "${datashare_common_native_path}/src/datashare_string_utils.cpp",
+    "${datashare_common_native_path}/src/serializable.cpp",
     "${datashare_native_provider_path}/src/datashare_ext_ability.cpp",
     "${datashare_native_provider_path}/src/datashare_ext_ability_context.cpp",
     "${datashare_native_provider_path}/src/datashare_stub.cpp",
@@ -199,6 +210,8 @@ ohos_shared_library("datashare_provider") {
     "${datashare_native_provider_path}/src/datashare_uv_queue.cpp",
     "${datashare_native_provider_path}/src/js_datashare_ext_ability.cpp",
     "${datashare_native_provider_path}/src/js_datashare_ext_ability_context.cpp",
+    "${datashare_native_permission_path}/src/data_share_config.cpp",
+    "${datashare_native_dfx_path}/src/hiview_datashare.cpp",
   ]
   configs = [ ":ability_config" ]
   public_configs = [ ":datashare_public_config" ]
