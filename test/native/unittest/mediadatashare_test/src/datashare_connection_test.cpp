@@ -338,7 +338,7 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityDisconnectDone_Te
     AppExecFwk::ElementName element(deviceId, bundleName, abilityName);
     int resultCode = 0;
     connection->OnAbilityDisconnectDone(element, resultCode);
-    EXPECT_EQ(connection->pool_->pool_.threadName_, "DShare_Connect");
+    EXPECT_EQ(connection->pool_->pool_.threadName_, DATASHARE_EXECUTOR_NAME);
     LOG_INFO("DataShareConnection_OnAbilityDisconnectDone_Test_001::End");
 }
 }
