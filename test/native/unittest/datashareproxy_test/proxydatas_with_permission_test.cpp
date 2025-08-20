@@ -448,6 +448,49 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_001, TestSize.Level1)
 }
 
 /**
+* @tc.name: ProxyDatasTest_ResultSet_Test_002
+* @tc.desc: Verify result set functionality and error handling for invalid operations
+* @tc.type: FUNC
+* @tc.precon: Test query fail while result set is full
+* @tc.step:
+    1. Obtain the DataShareHelper instance
+    2. Create URI for proxy data access using DATA_SHARE_PROXY_URI
+    3. Execute query to get result set for TBL_NAME0 equals "wang" for 32 times and success
+    4. Query for 33rd times
+    5. Close all the result set
+* @tc.expect:
+    1. Query returns non-null result set in the early 32 times
+    2. Query returns null result set in the 33rd time and errCode is E_RESULTSET_BUSY
+*/
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_002, TestSize.Level1)
+{
+    LOG_INFO("ProxyDatasTest_ResultSet_Test_002::Start");
+    auto helper = dataShareHelper;
+    Uri uri(DATA_SHARE_PROXY_URI);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_NAME0, "wang");
+    std::vector<string> columns;
+    std::vector<std::shared_ptr<DataShareResultSet>> results;
+    for (int i = 0; i < 32; ++i) {
+        auto resultSet = helper->Query(uri, predicates, columns);
+        EXPECT_NE(resultSet, nullptr);
+        results.push_back(resultSet);
+    }
+    DatashareBusinessError errorCode;
+    auto resultSet = helper->Query(uri, predicates, columns, &errorCode);
+    EXPECT_EQ(resultSet, nullptr);
+    EXPECT_NE(&errorCode, nullptr);
+    auto code = errorCode.GetCode();
+    EXPECT_EQ(code, E_RESULTSET_BUSY);
+
+    for (const auto &result : results) {
+        auto ret = result->Close();
+        EXPECT_EQ(ret, E_OK);
+    }
+    LOG_INFO("ProxyDatasTest_ResultSet_Test_002::End");
+}
+
+/**
  * @tc.name: ProxyDatasTest_Template_Test_001
  * @tc.desc: Verify the functionality of adding and deleting query templates in the data share proxy
  * @tc.type: FUNC
