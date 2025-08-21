@@ -42,8 +42,6 @@ public:
 
     static std::pair<int, std::string> GetExtensionUriPermission(Uri &uri,
         int32_t user, bool isRead);
-    static std::pair<int, std::string> GetDataShareSilentUriPermission(uint32_t tokenId,
-        int32_t user, std::string &extUri, bool isRead);
 
     static int CheckExtensionTrusts(uint32_t consumerToken, uint32_t providerToken);
 
