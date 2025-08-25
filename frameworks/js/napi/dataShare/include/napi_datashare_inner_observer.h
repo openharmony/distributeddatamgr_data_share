@@ -53,7 +53,7 @@ protected:
     napi_ref ref_ = nullptr;
     uv_loop_s *loop_ = nullptr;
     std::mutex envMutex_{};
-    ObserverEnvHookWorker* observerEnvHookWorker_ = nullptr;;
+    ObserverEnvHookWorker* observerEnvHookWorker_ = nullptr;
 };
 }  // namespace DataShare
 }  // namespace OHOS

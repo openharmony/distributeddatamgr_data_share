@@ -114,7 +114,7 @@ HWTEST_F(DataShareHelperTest, CreatorTest002, TestSize.Level0)
  * @tc.step:
     1.Create a DataShareHelper object what options.isProxy_ = false and options.token_ != nullptr
     2.call Creator function and check the result
- * @tc.experct: Creator success and not reutrn nullptr
+ * @tc.experct: Creator succeed and not reutrn nullptr
  */
 HWTEST_F(DataShareHelperTest, CreatorTest003, TestSize.Level0)
 {
@@ -122,14 +122,14 @@ HWTEST_F(DataShareHelperTest, CreatorTest003, TestSize.Level0)
     CreateOptions options;
     options.isProxy_ = false;
 
-auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-EXPECT_NE(saManager, nullptr);
-auto remoteObj = saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID);
-EXPECT_NE(remoteObj, nullptr);
-options.token_ = remoteObj;
-auto result = DataShareHelper::Creator(NON_SILENT_ACCESS_URI, options);
-EXPECT_NE(result, nullptr);
-LOG_INFO("DataShareHelperTest CreatorTest003::End");
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    EXPECT_NE(saManager, nullptr);
+    auto remoteObj = saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID);
+    EXPECT_NE(remoteObj, nullptr);
+    options.token_ = remoteObj;
+    auto result = DataShareHelper::Creator(NON_SILENT_ACCESS_URI, options);
+    EXPECT_NE(result, nullptr);
+    LOG_INFO("DataShareHelperTest CreatorTest003::End");
 }
 
 /**
@@ -147,7 +147,6 @@ HWTEST_F(DataShareHelperTest, CreatorTest004, TestSize.Level0)
     LOG_INFO("DataShareHelperTest CreatorTest004::Start");
     CreateOptions options;
     options.isProxy_ = true;
-
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     EXPECT_NE(saManager, nullptr);
     auto remoteObj = saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID);
