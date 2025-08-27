@@ -392,7 +392,6 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     }
 
     std::array methods = {
-        ani_native_function {"create", nullptr, reinterpret_cast<void *>(Create) },
         ani_native_function {"equalTo", nullptr, reinterpret_cast<void *>(EqualTo)},
         ani_native_function {"notEqualTo", nullptr, reinterpret_cast<void *>(NotEqualTo)},
         ani_native_function {"orderByDesc", nullptr, reinterpret_cast<void *>(OrderByDesc)},
@@ -411,11 +410,18 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         ani_native_function {"in", nullptr, reinterpret_cast<void *>(In)},
         ani_native_function {"notIn", nullptr, reinterpret_cast<void *>(NotIn)},
     };
-
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         LOG_ERROR("Cannot bind native methods to %{public}s", className);
         return ANI_ERROR;
+    }
+
+    std::array staticMethods = {
+        ani_native_function {"create", nullptr, reinterpret_cast<void *>(Create) },
     };
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        LOG_ERROR("Cannot bind static native methods to %{public}s", className);
+        return ANI_ERROR;
+    }
 
     static const char *cleanerName = "@ohos.data.dataSharePredicates.dataSharePredicates.Cleaner";
     auto cleanerCls = AniTypeFinder(env).FindClass(cleanerName);
