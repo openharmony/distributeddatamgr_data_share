@@ -132,6 +132,12 @@ ohos_unittest("PermissionTest") {
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
 }
 
 ohos_unittest("SlientAccessTest") {
