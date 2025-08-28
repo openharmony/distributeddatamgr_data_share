@@ -542,6 +542,32 @@ public:
      */
     virtual int32_t UserDefineFunc(MessageParcel &data, MessageParcel &reply, MessageOption &option);
 
+    /**
+     * Registers an observer to DataObsMgr specified by the given Uri, then return error code.
+     *
+     * @param uri, Indicates the path of the data to operate.
+     * @param dataObserver, Indicates the DataShareObserver object.
+     * @param isDescendants, Indicates the Whether to note the change of descendants.
+     * @param isSystem, Indicates the app is system app or not.
+     *
+     * @return Returns the result. Error codes are listed in DataShare datashare_errno.h and
+     * DataObs dataobs_mgr_errors.h.
+     */
+    virtual int TryRegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+        bool isDescendants, bool isSystem = false) { return E_UNIMPLEMENT; };
+
+    /**
+     * Deregisters an observer used for DataObsMgr specified by the given Uri, then return error code.
+     *
+     * @param uri, Indicates the path of the data to operate.
+     * @param dataObserver, Indicates the DataShareObserver object.
+     * @param isSystem, Indicates the app is system app or not.
+     *
+     * @return Returns the result. Error codes are listed in DataShare datashare_errno.h and
+     * DataObs dataobs_mgr_errors.h.
+     */
+    virtual int TryUnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+        bool isSystem = false) { return E_UNIMPLEMENT; };
 private:
     static std::shared_ptr<DataShareHelper> CreateServiceHelper(const std::string &extUri = "",
         const std::string &bundleName = "", bool isSystem = false);

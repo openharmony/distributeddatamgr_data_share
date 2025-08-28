@@ -202,26 +202,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
 void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
     bool isDescendants, bool isSystem)
 {
-    if (dataObserver == nullptr) {
-        LOG_ERROR("dataObserver is nullptr");
-        return;
-    }
-    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
-    if (obsMgrClient == nullptr) {
-        LOG_ERROR("get DataObsMgrClient failed");
-        return;
-    }
-    sptr<ObserverImpl> obs = ObserverImpl::GetObserver(uri, dataObserver);
-    if (obs == nullptr) {
-        LOG_ERROR("new ObserverImpl failed");
-        return;
-    }
-    ErrCode ret = obsMgrClient->RegisterObserverExt(uri, obs, isDescendants, AAFwk::DataObsOption(isSystem));
-    if (ret != ERR_OK) {
-        ObserverImpl::DeleteObserver(uri, dataObserver);
-    }
-    LOG_INFO("Register observerExt, ret:%{public}d, uri:%{public}s",
-        ret, DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+    (void) TryRegisterObserverExtInner(uri, dataObserver, isDescendants, isSystem);
 }
 
 /**
@@ -233,33 +214,7 @@ void DataShareHelper::RegisterObserverExt(const Uri &uri, std::shared_ptr<DataSh
 void DataShareHelper::UnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
     bool isSystem)
 {
-    if (dataObserver == nullptr) {
-        LOG_ERROR("dataObserver is nullptr");
-        return;
-    }
-    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
-    if (obsMgrClient == nullptr) {
-        LOG_ERROR("get DataObsMgrClient failed");
-        return;
-    }
-
-    if (!ObserverImpl::FindObserver(uri, dataObserver)) {
-        LOG_ERROR("observer not exit!");
-        return;
-    }
-
-    sptr<ObserverImpl> obs = ObserverImpl::GetObserver(uri, dataObserver);
-    if (obs == nullptr) {
-        LOG_ERROR("new ObserverImpl failed");
-        return;
-    }
-    ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, obs, AAFwk::DataObsOption(isSystem));
-    LOG_INFO("Unregister observerExt, ret:%{public}d, uri:%{public}s",
-        ret, DataShareStringUtils::Anonymous(uri.ToString()).c_str());
-    if (ret != ERR_OK) {
-        return;
-    }
-    ObserverImpl::DeleteObserver(uri, dataObserver);
+    (void) TryUnregisterObserverExtInner(uri, dataObserver, isSystem);
 }
 
 /**

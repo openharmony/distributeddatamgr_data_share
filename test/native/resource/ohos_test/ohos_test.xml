@@ -126,4 +126,13 @@
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
         </cleaner>
     </target>
+    <target name="DataShareHelperImplRegisterTest">
+        <preparer>
+            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
+        </preparer>
+        <cleaner>
+            <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
+        </cleaner>
+    </target>
 </configuration>
