@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 #include <gtest/gtest.h>
+#include <cstdint>
+#include <memory>
 #include <string>
 
 #include "access_token.h"
@@ -39,6 +41,8 @@ static const std::string DATA_SHARE_URI = "datashareproxy://com.acts.datasharete
 static const std::string DATA_SHARE_WRITEURI = "datashareproxy://com.acts.datasharetest/permissiontest/permission";
 static const std::string DATA_SHARE_EXTENSION_URI = "datashare:///com.acts.datasharetest";
 static const std::string DATA_SHARE_SELF_URI = "datashareproxy://ohos.datashareclienttest.demo";
+static const std::string TEST_BUNDLE_NAME = "com.acts.datasharetest";
+static const std::string TEST_PERMISSION = "ohos.permission.GET_BUNDLE_INFO";
 
 class PermissionTest : public testing::Test {
 public:
@@ -355,7 +359,8 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_Empty_Test_
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_Empty_Test_001::Start");
     Uri uri(EMPTY_URI);
-    auto [ret, permission] = DataShare::DataSharePermission::GetUriPermission(uri, USER_100, true, false);
+    auto datashare = std::make_shared<DataShare::DataSharePermission>();
+    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, true, false);
     EXPECT_EQ(ret, E_EMPTY_URI);
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_Empty_Test_001::End");
 }
@@ -364,7 +369,8 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_Error_Test_
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_Error_Test_001::Start");
     Uri uri(PROXY_ERROR_BUNDLE_URI);
-    auto [ret, permission] = DataShare::DataSharePermission::GetUriPermission(uri, USER_100, true, false);
+    auto datashare = std::make_shared<DataShare::DataSharePermission>();
+    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, true, false);
     EXPECT_EQ(ret, E_BUNDLE_NAME_NOT_EXIST);
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_Error_Test_001::End");
 }
@@ -373,7 +379,8 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_001
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_001::Start");
     Uri uri(PROXY_URI_OK);
-    auto [ret, permission] = DataShare::DataSharePermission::GetUriPermission(uri, USER_100, true, false);
+    auto datashare = std::make_shared<DataShare::DataSharePermission>();
+    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, true, false);
     EXPECT_EQ(ret, E_OK);
     EXPECT_EQ(permission, "ohos.permission.GET_BUNDLE_INFO");
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_001::End");
@@ -383,7 +390,8 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_002
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_002::Start");
     Uri uri(PROXY_URI_OK);
-    auto [ret, permission] = DataShare::DataSharePermission::GetUriPermission(uri, USER_100, false, false);
+    auto datashare = std::make_shared<DataShare::DataSharePermission>();
+    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, false, false);
     EXPECT_EQ(ret, E_OK);
     EXPECT_EQ(permission, "ohos.permission.WRITE_CONTACTS");
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_002::End");
@@ -393,7 +401,8 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_003
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_003::Start");
     Uri uri(DATA_SHARE_EXTENSION_URI);
-    auto [ret, permission] = DataShare::DataSharePermission::GetUriPermission(uri, USER_100, true, true);
+    auto datashare = std::make_shared<DataShare::DataSharePermission>();
+    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, true, true);
     EXPECT_EQ(ret, E_OK);
     EXPECT_EQ(permission, "");
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_003::End");
@@ -403,7 +412,8 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_004
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_004::Start");
     Uri uri(DATA_SHARE_EXTENSION_URI);
-    auto [ret, permission] = DataShare::DataSharePermission::GetUriPermission(uri, USER_100, false, true);
+    auto datashare = std::make_shared<DataShare::DataSharePermission>();
+    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, false, true);
     EXPECT_EQ(ret, E_OK);
     EXPECT_EQ(permission, "");
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_004::End");
@@ -491,6 +501,126 @@ HWTEST_F(PermissionTest, PermissionTest_IsExtensionValid_002, TestSize.Level1)
     auto ret = DataShare::DataSharePermission::IsExtensionValid(tokenId.tokenIDEx, tokenId.tokenIDEx, USER_100);
     EXPECT_EQ(ret, E_NOT_DATASHARE_EXTENSION);
     LOG_INFO("PermissionTest_IsExtensionValid_002::End");
+}
+
+HWTEST_F(PermissionTest, PermissionTest_GetSilentUriPermission_001, TestSize.Level1)
+{
+    LOG_INFO("PermissionTest_GetSilentUriPermission_001::Start");
+    auto datashare = std::make_shared<DataSharePermission>();
+
+    DataSharePermission::Permission permissionInfo;
+    permissionInfo.bundleName = TEST_BUNDLE_NAME;
+    permissionInfo.readPermission = TEST_PERMISSION;
+    std::string uri = PROXY_URI_OK;
+    DataSharePermission::UriKey uriKey(uri, USER_100);
+    datashare->silentCache_.Emplace(uriKey, permissionInfo);
+
+    Uri dstUri(PROXY_URI_OK);
+    auto [ret, permission] = datashare->GetSilentUriPermission(dstUri, USER_100, true);
+    EXPECT_EQ(ret, E_OK);
+    EXPECT_EQ(permission, TEST_PERMISSION);
+    LOG_INFO("PermissionTest_GetSilentUriPermission_001::End");
+}
+
+HWTEST_F(PermissionTest, PermissionTest_GetSilentUriPermission_002, TestSize.Level1)
+{
+    LOG_INFO("PermissionTest_GetSilentUriPermission_002::Start");
+    auto datashare = std::make_shared<DataSharePermission>();
+
+    for (int32_t i = 0; i < DataSharePermission::CACHE_SIZE; i++) {
+        DataSharePermission::Permission permissionInfo;
+        permissionInfo.readPermission = TEST_PERMISSION;
+        std::string uri = std::to_string(i);
+        DataSharePermission::UriKey uriKey(uri, USER_100);
+        datashare->silentCache_.Emplace(uriKey, permissionInfo);
+    }
+    EXPECT_EQ(datashare->silentCache_.Size(), DataSharePermission::CACHE_SIZE);
+
+    Uri dstUri(PROXY_URI_OK);
+    auto [ret, permission] = datashare->GetSilentUriPermission(dstUri, USER_100, true);
+    EXPECT_EQ(ret, E_OK);
+    EXPECT_EQ(permission, TEST_PERMISSION);
+    EXPECT_EQ(datashare->silentCache_.Size(), 1);
+    LOG_INFO("PermissionTest_GetSilentUriPermission_002::End");
+}
+
+HWTEST_F(PermissionTest, PermissionTest_GetSilentUriPermission_003, TestSize.Level1)
+{
+    LOG_INFO("PermissionTest_GetSilentUriPermission_003::Start");
+    auto datashare = std::make_shared<DataSharePermission>();
+    EXPECT_EQ(datashare->silentCache_.Size(), 0);
+
+    Uri dstUri(PROXY_URI_OK);
+    auto [ret, permission] = datashare->GetSilentUriPermission(dstUri, USER_100, true);
+    EXPECT_EQ(ret, E_OK);
+    EXPECT_EQ(permission, TEST_PERMISSION);
+    EXPECT_EQ(datashare->silentCache_.Size(), 1);
+
+    auto [ret2, permission2] = datashare->GetSilentUriPermission(dstUri, USER_100, true);
+    EXPECT_EQ(ret2, E_OK);
+    EXPECT_EQ(permission2, TEST_PERMISSION);
+    EXPECT_EQ(datashare->silentCache_.Size(), 1);
+    LOG_INFO("PermissionTest_GetSilentUriPermission_003::End");
+}
+
+HWTEST_F(PermissionTest, PermissionTest_GetExtensionUriPermission_001, TestSize.Level1)
+{
+    LOG_INFO("PermissionTest_GetExtensionUriPermission_001::Start");
+    auto datashare = std::make_shared<DataSharePermission>();
+
+    DataSharePermission::Permission permissionInfo;
+    permissionInfo.bundleName = TEST_BUNDLE_NAME;
+    permissionInfo.readPermission = TEST_PERMISSION;
+    std::string uri = DATA_SHARE_EXTENSION_URI;
+    DataSharePermission::UriKey uriKey(uri, USER_100);
+    datashare->extensionCache_.Emplace(uriKey, permissionInfo);
+
+    Uri dstUri(DATA_SHARE_EXTENSION_URI);
+    auto [ret, permission] = datashare->GetExtensionUriPermission(dstUri, USER_100, true);
+    EXPECT_EQ(ret, E_OK);
+    EXPECT_EQ(permission, TEST_PERMISSION);
+    LOG_INFO("PermissionTest_GetExtensionUriPermission_001::End");
+}
+
+HWTEST_F(PermissionTest, PermissionTest_GetExtensionUriPermission_002, TestSize.Level1)
+{
+    LOG_INFO("PermissionTest_GetExtensionUriPermission_002::Start");
+    auto datashare = std::make_shared<DataSharePermission>();
+
+    for (int32_t i = 0; i < DataSharePermission::CACHE_SIZE; i++) {
+        DataSharePermission::Permission permissionInfo;
+        permissionInfo.readPermission = TEST_PERMISSION;
+        std::string uri = std::to_string(i);
+        DataSharePermission::UriKey uriKey(uri, USER_100);
+        datashare->extensionCache_.Emplace(uriKey, permissionInfo);
+    }
+    EXPECT_EQ(datashare->extensionCache_.Size(), DataSharePermission::CACHE_SIZE);
+
+    Uri dstUri(DATA_SHARE_EXTENSION_URI);
+    auto [ret, permission] = datashare->GetExtensionUriPermission(dstUri, USER_100, true);
+    EXPECT_EQ(ret, E_OK);
+    EXPECT_EQ(permission, "");
+    EXPECT_EQ(datashare->extensionCache_.Size(), 1);
+    LOG_INFO("PermissionTest_GetExtensionUriPermission_002::End");
+}
+
+HWTEST_F(PermissionTest, PermissionTest_GetExtensionUriPermission_003, TestSize.Level1)
+{
+    LOG_INFO("PermissionTest_GetExtensionUriPermission_003::Start");
+    auto datashare = std::make_shared<DataSharePermission>();
+    EXPECT_EQ(datashare->extensionCache_.Size(), 0);
+
+    Uri dstUri(DATA_SHARE_EXTENSION_URI);
+    auto [ret, permission] = datashare->GetExtensionUriPermission(dstUri, USER_100, true);
+    EXPECT_EQ(ret, E_OK);
+    EXPECT_EQ(permission, "");
+    EXPECT_EQ(datashare->extensionCache_.Size(), 1);
+
+    auto [ret2, permission2] = datashare->GetExtensionUriPermission(dstUri, USER_100, true);
+    EXPECT_EQ(ret2, E_OK);
+    EXPECT_EQ(permission2, "");
+    LOG_INFO("PermissionTest_GetExtensionUriPermission_003::End");
+    EXPECT_EQ(datashare->extensionCache_.Size(), 1);
 }
 
 /**

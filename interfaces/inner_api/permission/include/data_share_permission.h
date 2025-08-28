@@ -20,11 +20,14 @@
 
 #include "access_token.h"
 #include "accesstoken_kit.h"
+#include "concurrent_map.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
 #include "uri.h"
 
 namespace OHOS {
 namespace DataShare {
-class DataSharePermission {
+class DataSharePermission : public std::enable_shared_from_this<DataSharePermission> {
 using Uri = OHOS::Uri;
 public:
     DataSharePermission() = default;
@@ -40,10 +43,10 @@ public:
      */
     static int VerifyPermission(Security::AccessToken::AccessTokenID tokenId, const Uri &uri, bool isRead);
 
-    static std::pair<int, std::string> GetExtensionUriPermission(Uri &uri,
+    void SubscribeCommonEvent();
+
+    std::pair<int, std::string> GetExtensionUriPermission(Uri &uri,
         int32_t user, bool isRead);
-    static std::pair<int, std::string> GetDataShareSilentUriPermission(uint32_t tokenId,
-        int32_t user, std::string &extUri, bool isRead);
 
     static int CheckExtensionTrusts(uint32_t consumerToken, uint32_t providerToken);
 
@@ -54,14 +57,57 @@ public:
 
     static bool VerifyPermission(Uri &uri, uint32_t tokenId, std::string &permission, bool isExtension);
 
-    static std::pair<int, std::string> GetSilentUriPermission(Uri &uri, int32_t user, bool isRead);
+    std::pair<int, std::string> GetSilentUriPermission(Uri &uri, int32_t user, bool isRead);
 
     static int32_t UriIsTrust(Uri &uri);
 
-    static std::pair<int, std::string> GetUriPermission(Uri &uri, int32_t user, bool isRead, bool isExtension);
+    std::pair<int, std::string> GetUriPermission(Uri &uri, int32_t user, bool isRead, bool isExtension);
 
     static int32_t IsExtensionValid(uint32_t tokenId, uint32_t fullToken, int32_t user);
+
+    void DeleteCache(std::string bundleName);
 private:
+
+    class SysEventSubscriber : public EventFwk::CommonEventSubscriber {
+    public:
+        using SysEventCallback = void (SysEventSubscriber::*)(const std::string &bundleName);
+        explicit SysEventSubscriber(const EventFwk::CommonEventSubscribeInfo &info,
+            std::weak_ptr<DataSharePermission> permission);
+        ~SysEventSubscriber() = default;
+        void OnReceiveEvent(const EventFwk::CommonEventData& event) override;
+        void OnUpdate(const std::string &bundleName);
+        void OnUninstall(const std::string &bundleName);
+
+    private:
+        std::weak_ptr<DataSharePermission> permission_;
+        std::map<std::string, SysEventCallback> callbacks_;
+        static constexpr const char *USER_ID = "userId";
+    };
+
+    static constexpr int32_t CACHE_SIZE = 32;
+    struct Permission {
+        std::string bundleName;
+        std::string readPermission;
+        std::string writePermission;
+    };
+
+    struct UriKey {
+        std::string uri;
+        int32_t userId;
+
+        UriKey(std::string &uri, int32_t userId):uri(uri), userId(userId) {}
+
+        bool operator<(const UriKey &other) const
+        {
+            if (uri < other.uri) {
+                return true;
+            }
+            if (userId < other.userId) {
+                return true;
+            }
+            return false;
+        }
+    };
 
     static constexpr const char *SCHEMA_DATASHARE = "datashare";
     static constexpr const char *SCHEMA_DATASHARE_PROXY = "datashareproxy";
@@ -73,6 +119,10 @@ private:
 
     static int VerifyDataObsPermissionInner(Security::AccessToken::AccessTokenID tokenID,
         Uri &uri, bool isRead, bool &isTrust);
+
+    std::shared_ptr<SysEventSubscriber> subscriber_ = nullptr;
+    ConcurrentMap<UriKey, Permission> extensionCache_;
+    ConcurrentMap<UriKey, Permission> silentCache_;
 };
 } // namespace DataShare
 } // namespace OHOS

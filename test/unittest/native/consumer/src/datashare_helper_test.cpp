@@ -107,6 +107,33 @@ HWTEST_F(DataShareHelperTest, CreatorTest002, TestSize.Level0)
 
 /**
  * @tc.name:
+ * @tc.desc: test Creator function when options.isProxy_ = false and options.token_ != nullptr
+ * @tc.type: FUNC
+ * @tc.require:issueICDSBD
+ * @tc.precon: None
+ * @tc.step:
+    1.Create a DataShareHelper object what options.isProxy_ = false and options.token_ != nullptr
+    2.call Creator function and check the result
+ * @tc.experct: Creator success and not reutrn nullptr
+ */
+HWTEST_F(DataShareHelperTest, CreatorTest003, TestSize.Level0)
+{
+    LOG_INFO("DataShareHelperTest CreatorTest003::Start");
+    CreateOptions options;
+    options.isProxy_ = false;
+
+auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+EXPECT_NE(saManager, nullptr);
+auto remoteObj = saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID);
+EXPECT_NE(remoteObj, nullptr);
+options.token_ = remoteObj;
+auto result = DataShareHelper::Creator(NON_SILENT_ACCESS_URI, options);
+EXPECT_NE(result, nullptr);
+LOG_INFO("DataShareHelperTest CreatorTest003::End");
+}
+
+/**
+ * @tc.name:
  * @tc.desc: test Creator function when options.isProxy_ = true and options.token_ != nullptr
  * @tc.type: FUNC
  * @tc.precon: None
