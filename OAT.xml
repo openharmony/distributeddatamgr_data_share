@@ -53,6 +53,7 @@
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
                 <filteritem type="filepath" name="figures/zh-cn_dataShare.png" desc="self developed image"/>
                 <filteritem type="filepath" name="test/native/resource/.*.png" desc="self developed image"/>
+                <filteritem type="filepath" name="test/unittest/native/resource/.*.png" desc="self developed image"/>             
             </filefilter>
         </filefilterlist>
     </oatconfig>
