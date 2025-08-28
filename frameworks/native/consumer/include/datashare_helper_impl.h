@@ -142,6 +142,33 @@ public:
     int32_t UserDefineFunc(
         MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
+    /**
+     * Registers an observer to DataObsMgr specified by the given Uri, then return error code.
+     *
+     * @param uri, Indicates the path of the data to operate.
+     * @param dataObserver, Indicates the DataShareObserver object.
+     * @param isDescendants, Indicates the Whether to note the change of descendants.
+     * @param isSystem, Indicates the app is system app or not.
+     *
+     * @return Returns the result. Error codes are listed in DataShare datashare_errno.h and
+     * DataObs dataobs_mgr_errors.h.
+     */
+    int TryRegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+        bool isDescendants, bool isSystem = false) override;
+
+    /**
+     * Deregisters an observer used for DataObsMgr specified by the given Uri, then return error code.
+     *
+     * @param uri, Indicates the path of the data to operate.
+     * @param dataObserver, Indicates the DataShareObserver object.
+     * @param isSystem, Indicates the app is system app or not.
+     *
+     * @return Returns the result. Error codes are listed in DataShare datashare_errno.h and
+     * DataObs dataobs_mgr_errors.h.
+     */
+    int TryUnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+        bool isSystem = false) override;
+
 private:
     std::shared_ptr<ExtSpecialController> extSpCtl_ = nullptr;
     std::shared_ptr<GeneralController> generalCtl_ = nullptr;
@@ -149,5 +176,34 @@ private:
     std::shared_ptr<PublishedDataController> publishedDataCtl_ = nullptr;
     bool isSystem_;
 };
+
+/**
+ * Registers an observer to DataObsMgr specified by the given Uri, then return error code,
+ * here is the internal implementation.
+ *
+ * @param uri, Indicates the path of the data to operate.
+ * @param dataObserver, Indicates the DataShareObserver object.
+ * @param isDescendants, Indicates the Whether to note the change of descendants.
+ * @param isSystem, Indicates the app is system app or not.
+ *
+ * @return Returns the result. Error codes are listed in DataShare datashare_errno.h and
+ * DataObs dataobs_mgr_errors.h.
+ */
+int TryRegisterObserverExtInner(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+    bool isDescendants, bool isSystem = false);
+
+/**
+ * Deregisters an observer used for DataObsMgr specified by the given Uri, then return error code,
+ * here is the internal implementation.
+ *
+ * @param uri, Indicates the path of the data to operate.
+ * @param dataObserver, Indicates the DataShareObserver object.
+ * @param isSystem, Indicates the app is system app or not.
+ *
+ * @return Returns the result. Error codes are listed in DataShare datashare_errno.h and
+ * DataObs dataobs_mgr_errors.h.
+ */
+int TryUnregisterObserverExtInner(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+    bool isSystem = false);
 } // namespace OHOS::DataShare
 #endif // DATA_SHARE_HELPER_IMPL_H
