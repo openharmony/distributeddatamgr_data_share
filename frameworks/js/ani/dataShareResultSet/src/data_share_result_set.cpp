@@ -162,7 +162,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     };
 
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
-        LOG_ERROR("Cannot bind native methods to {%public}s", className);
+        LOG_ERROR("Cannot bind native methods to %{public}s", className);
         return ANI_ERROR;
     };
 
