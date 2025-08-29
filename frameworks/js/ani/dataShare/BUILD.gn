@@ -112,6 +112,7 @@ ohos_shared_library("datasharepredicates_ani") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_core",
+    "ipc:ipc_single",
     "runtime_core:ani",
   ]
 

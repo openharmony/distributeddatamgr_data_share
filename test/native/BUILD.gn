@@ -735,6 +735,7 @@ ohos_unittest("DataShareConnectionTest") {
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
+    "ipc:ipc_napi",
     "ipc:ipc_single",
     "relational_store:rdb_data_ability_adapter",
     "samgr:samgr_proxy",
