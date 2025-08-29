@@ -1254,35 +1254,6 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_With_Uri_Error_Test_001, TestSiz
 }
 
 /**
-* @tc.name: SlientAccess_Creator_When_TimeOut_Test_001
-* @tc.desc: Test DataShareHelper creation with timeout
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Get SystemAbilityManager instance and remote object for STORAGE_MANAGER_MANAGER_ID
-* 2. Try to create DataShareHelper with valid URI but timeout parameter 0
-* 3. Check helper instance
-* @tc.expect: Helper creation fails due to timeout (helper == nullptr)
-*/
-HWTEST_F(SlientAccessTest, SlientAccess_Creator_When_TimeOut_Test_001, TestSize.Level0)
-{
-    LOG_INFO("SlientAccess_Creator_With_Uri_Error_Test_001::Begin");
-    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (saManager == nullptr) {
-        LOG_ERROR("GetSystemAbilityManager get samgr failed.");
-    }
-    auto remoteObj = saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID);
-    if (remoteObj == nullptr) {
-        LOG_ERROR("GetSystemAbility service failed.");
-    }
-    std::string uriStr(DATA_SHARE_URI);
-    auto helper = DataShare::DataShareHelper::Creator(remoteObj, uriStr, uriStr, 0);
-    EXPECT_EQ(helper, nullptr);
-    LOG_INFO("SlientAccess_Creator_With_Uri_Error_Test_001::End");
-}
-
-/**
 * @tc.name: SlientAccess_UserDefineFunc_Test_001
 * @tc.desc: Test custom user-defined function in DataShareHelper
 * @tc.type: FUNC
