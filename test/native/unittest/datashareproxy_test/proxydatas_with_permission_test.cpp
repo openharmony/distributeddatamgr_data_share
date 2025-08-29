@@ -367,7 +367,6 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_004, TestSize.Level1)
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_004::End");
 }
 
-
 /**
 * @tc.name: ProxyDatasTest_QueryTimeout_Test_005
 * @tc.desc: test QueryTimeout function

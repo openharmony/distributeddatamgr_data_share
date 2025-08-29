@@ -863,7 +863,7 @@ ohos_unittest("DataShareAccessThresholdTest") {
     "samgr:samgr_proxy",
   ]
 
-    cflags = [
+  cflags = [
     "-fvisibility=hidden",
     "-Dprivate=public",
     "-Dprotected=public",
