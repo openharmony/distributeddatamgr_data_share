@@ -758,5 +758,115 @@ HWTEST_F(DataShareThresholdTest, DeleteEx_Threshold_Test002, TestSize.Level1)
     }
     LOG_INFO("DeleteEx_Threshold_Test002::End");
 }
+
+/**
+* @tc.name: Query_Threshold_Test003
+* @tc.desc: Verify that the time consumed for traversing 1000 string-type data result sets does not exceed 150ms
+* @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Insert 1000 pieces of string type data, with 10 attributes for each piece
+    2. query 1000 pieces of data，return resultSet
+    3. Traverse the resultSet
+* @tc.expect: The time consumed for traversal does not exceed 30ms
+*/
+HWTEST_F(DataShareThresholdTest, Query_Threshold_Test003, TestSize.Level1)
+{
+    LOG_INFO("Query_Threshold_Test003::Start");
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI);
+    ASSERT_NE(helper, nullptr);
+    Uri uri(SLIENT_ACCESS_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "wangwu";
+    for (int i = 0; i < 10; i++) {
+        valuesBucket.Put(TBL_STU_NAME, value);
+    }
+    for (int i = 0; i < 1000; i++) {
+        helper->Insert(uri, valuesBucket);
+    }
+    vector<string> columns;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_NAME, "wangwu");
+    auto resultSet = helper->Query(uri, predicates, columns);
+    ASSERT_NE(resultSet, nullptr);
+    std::vector<std::string> columnNames;
+    int rowCount = 0;
+    resultSet->GetRowCount(rowCount);
+    resultSet->GetAllColumnNames(columnNames);
+    int columnCount = columnNames.size();
+    std::string valueResult;
+    std::chrono::system_clock::time_point startTimeStamp = std::chrono::system_clock::now();
+    int64_t start = std::chrono::duration_cast<std::chrono::milliseconds>(
+        startTimeStamp.time_since_epoch()).count();
+    for (int i = 0; i < rowCount; i++) {
+        resultSet->GoToRow(i);
+        for (int j = 0; j < columnCount; j++) {
+            resultSet-> GetString(columnCount, valueResult);
+        }
+    }
+    std::chrono::system_clock::time_point endTimeStamp = std::chrono::system_clock::now();
+    int64_t end = std::chrono::duration_cast<std::chrono::milliseconds>(
+        endTimeStamp.time_since_epoch()).count();
+    int time = end - start;
+    LOG_INFO("Query_Threshold_Test003::end - start = %{public}d", time);
+    EXPECT_LT(time, 150);
+    LOG_INFO("Query_Threshold_Test003::End");
+}
+
+/**
+* @tc.name: Query_Threshold_Test004
+* @tc.desc: Verify that the time consumed for traversing 1000 int-type data result sets does not exceed 150ms
+* @tc.type: FUNC
+* @tc.require: issueIC8OCN
+* @tc.precon: None
+* @tc.step:
+    1. Insert 1000 pieces of int type data, with 10 attributes for each piece
+    2. query 1000 pieces of data，return resultSet
+    3. Traverse the resultSet
+* @tc.expect: The time consumed for traversal does not exceed 30ms
+*/
+HWTEST_F(DataShareThresholdTest, Query_Threshold_Test004, TestSize.Level1)
+{
+    LOG_INFO("Query_Threshold_Test004::Start");
+    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI);
+    ASSERT_NE(helper, nullptr);
+    Uri uri(SLIENT_ACCESS_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    int age = 20;
+    for (int i = 0; i < 10; i++) {
+        valuesBucket.Put(TBL_STU_AGE, age);
+    }
+    for (int i = 0; i < 1000; i++) {
+        helper->Insert(uri, valuesBucket);
+    }
+    vector<string> columns;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_AGE, age);
+    auto resultSet = helper->Query(uri, predicates, columns);
+    ASSERT_NE(resultSet, nullptr);
+    std::vector<std::string> columnNames;
+    int rowCount = 0;
+    resultSet->GetRowCount(rowCount);
+    resultSet->GetAllColumnNames(columnNames);
+    int columnCount = columnNames.size();
+    int valueResult;
+    std::chrono::system_clock::time_point startTimeStamp = std::chrono::system_clock::now();
+    int64_t start = std::chrono::duration_cast<std::chrono::milliseconds>(
+        startTimeStamp.time_since_epoch()).count();
+    for (int i = 0; i < rowCount; i++) {
+        resultSet->GoToRow(i);
+        for (int j = 0; j < columnCount; j++) {
+            resultSet-> GetInt(columnCount, valueResult);
+        }
+    }
+    std::chrono::system_clock::time_point endTimeStamp = std::chrono::system_clock::now();
+    int64_t end = std::chrono::duration_cast<std::chrono::milliseconds>(
+        endTimeStamp.time_since_epoch()).count();
+    int time = end - start;
+    LOG_INFO("Query_Threshold_Test004::end - start = %{public}d", time);
+    EXPECT_LT(time, 150);
+    LOG_INFO("Query_Threshold_Test004::End");
+}
 }
 }
