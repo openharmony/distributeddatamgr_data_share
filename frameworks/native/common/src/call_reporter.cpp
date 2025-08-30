@@ -15,7 +15,6 @@
 
 #include "call_reporter.h"
 
-#include <cinttypes>
 #include "datashare_log.h"
 #include "datashare_string_utils.h"
 
@@ -33,8 +32,10 @@ bool DataShareCallReporter::Count(const std::string &funcName, const std::string
 
     UpdateCallCounts(funcName, overCount, firstCallTime, isOverThreshold);
 
-    int64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::system_clock::now().time_since_epoch()).count();
+    int64_t now  = bootTimeAdaptor_.GetBootTimeMs();
+    if (now < 0) {
+        return isOverThreshold;
+    }
     if (overCount > 0) {
         LOG_WARN("Call the threshold, func: %{public}s, first:%{public}" PRIi64 "ms, now:%{public}" PRIi64
             "ms, uri:%{public}s", funcName.c_str(), firstCallTime, now, DataShareStringUtils::Anonymous(uri).c_str());
@@ -47,9 +48,7 @@ bool DataShareCallReporter::Count(const std::string &funcName, const std::string
     if (isOverThreshold) {
         callCounts_.Compute(funcName, [funcName, now, uri](auto &key, CallInfo &callInfo) {
             if (!callInfo.logPrintFlag) {
-                int64_t thresholdStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-                    callInfo.startTime.time_since_epoch()).count();
-
+                int64_t thresholdStartTime = callInfo.startTime;
                 callInfo.logPrintFlag = true;
                 LOG_ERROR("Over threshold, func: %{public}s, first:%{public}" PRIi64 "ms, now:%{public}" PRIi64
                     "ms, uri:%{public}s", funcName.c_str(), thresholdStartTime, now,
@@ -64,22 +63,23 @@ bool DataShareCallReporter::Count(const std::string &funcName, const std::string
 void DataShareCallReporter::UpdateCallCounts(const std::string &funcName, int &overCount, int64_t &firstCallTime,
     bool &isOverThreshold)
 {
-    callCounts_.Compute(funcName, [&overCount, &firstCallTime, &isOverThreshold](auto &key, CallInfo &callInfo) {
+    callCounts_.Compute(funcName, [&overCount, &firstCallTime, &isOverThreshold, this](auto &key, CallInfo &callInfo) {
         int callCount = callInfo.count;
         // totalCallCount is the call count of funcName in 30s
         int totalCallCount = callInfo.totalCount;
-        std::chrono::system_clock::time_point nowTimeStamp = std::chrono::system_clock::now();
-        int64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(
-            nowTimeStamp.time_since_epoch()).count();
+        int64_t currTime = bootTimeAdaptor_.GetBootTimeMs();
+        // get boot time failed
+        if (currTime < 0) {
+            return false;
+        }
         if (callCount == 0) {
-            callInfo.firstTime = nowTimeStamp;
+            callInfo.firstTime = currTime;
         }
         if (++callCount % RESET_COUNT_THRESHOLD == 0) {
-            int64_t first = std::chrono::duration_cast<std::chrono::milliseconds>(
-                callInfo.firstTime.time_since_epoch()).count();
+            int64_t first = callInfo.firstTime;
             ++overCount;
             firstCallTime = first;
-            if (now - first <= TIME_THRESHOLD.count()) {
+            if (currTime - first <= TIME_THRESHOLD) {
                 ++overCount;
             }
             callCount = 0;
@@ -88,13 +88,12 @@ void DataShareCallReporter::UpdateCallCounts(const std::string &funcName, int &o
 
         // update access control count
         if (totalCallCount == 0) {
-            callInfo.startTime = nowTimeStamp;
+            callInfo.startTime = currTime;
         }
-        int64_t thresholdStartTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-            callInfo.startTime.time_since_epoch()).count();
-        // reset callInfo when time >= 30s
-        if (now - thresholdStartTime >= TIME_THRESHOLD.count()) {
-            callInfo.startTime = nowTimeStamp;
+        int64_t thresholdStartTime = callInfo.startTime;
+        // reset callInfo when time >= 30s or currTime < thresholdStartTime
+        if (currTime - thresholdStartTime >= TIME_THRESHOLD || currTime < thresholdStartTime) {
+            callInfo.startTime = currTime;
             callInfo.totalCount = 0;
             callInfo.logPrintFlag = false;
             totalCallCount = 0;
