@@ -265,6 +265,16 @@ constexpr int E_NOT_IN_TRUSTS = (E_BASE + 82);
 */
 constexpr int E_GET_CALLER_NAME_FAILED = (E_BASE + 83);
 
+/**
+* @brief The error code for nullptr observer client.
+*/
+constexpr int E_NULL_OBSERVER_CLIENT = (E_BASE + 84);
+
+/**
+* @brief The virtual function is not yet implement.
+*/
+constexpr int E_UNIMPLEMENT = (E_BASE + 85);
+
 } // namespace DataShare
 } // namespace OHOS
 

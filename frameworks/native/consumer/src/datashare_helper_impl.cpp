@@ -690,5 +690,126 @@ int32_t DataShareHelperImpl::UserDefineFunc(
     }
     return extSpCtl->UserDefineFunc(data, reply, option);
 }
+
+/**
+ * Registers an observer to DataObsMgr specified by the given Uri, then return error code.
+ *
+ * @param uri, Indicates the path of the data to operate.
+ * @param dataObserver, Indicates the DataShareObserver object.
+ * @param isDescendants, Indicates the Whether to note the change of descendants.
+ * @param isSystem, Indicates the app is system app or not.
+ *
+ * @return Returns the result. Error codes are listed in DataShare datashare_errno.h and
+ * DataObs dataobs_mgr_errors.h.
+ */
+int DataShareHelperImpl::TryRegisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+    bool isDescendants, bool isSystem)
+{
+    return TryRegisterObserverExtInner(uri, dataObserver, isDescendants, isSystem);
+}
+
+/**
+ * Deregisters an observer used for DataObsMgr specified by the given Uri, then return error code.
+ *
+ * @param uri, Indicates the path of the data to operate.
+ * @param dataObserver, Indicates the DataShareObserver object.
+ * @param isSystem, Indicates the app is system app or not.
+ *
+ * @return Returns the result. Error codes are listed in DataShare datashare_errno.h and
+ * DataObs dataobs_mgr_errors.h.
+ */
+int DataShareHelperImpl::TryUnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+    bool isSystem)
+{
+    return TryUnregisterObserverExtInner(uri, dataObserver, isSystem);
+}
+
+/**
+ * Registers an observer to DataObsMgr specified by the given Uri, then return error code,
+ * here is the internal implementation.
+ *
+ * @param uri, Indicates the path of the data to operate.
+ * @param dataObserver, Indicates the DataShareObserver object.
+ * @param isDescendants, Indicates the Whether to note the change of descendants.
+ * @param isSystem, Indicates the app is system app or not.
+ *
+ * @return Returns the result. Error codes are listed in DataShare datashare_errno.h and
+ * DataObs dataobs_mgr_errors.h.
+ */
+int TryRegisterObserverExtInner(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+    bool isDescendants, bool isSystem)
+{
+    if (dataObserver == nullptr) {
+        LOG_ERROR("dataObserver is nullptr");
+        return E_NULL_OBSERVER;
+    }
+
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
+        return E_NULL_OBSERVER_CLIENT;
+    }
+
+    sptr<ObserverImpl> obs = ObserverImpl::GetObserver(uri, dataObserver);
+    if (obs == nullptr) {
+        LOG_ERROR("new ObserverImpl failed");
+        return E_NULL_OBSERVER;
+    }
+
+    ErrCode ret = obsMgrClient->RegisterObserverExt(uri, obs, isDescendants, AAFwk::DataObsOption(isSystem));
+    if (ret != ERR_OK) {
+        ObserverImpl::DeleteObserver(uri, dataObserver);
+    }
+
+    LOG_INFO("Register observerExt with error, ret:%{public}d, uri:%{public}s",
+        ret, DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+    return ret;
+}
+
+/**
+ * Deregisters an observer used for DataObsMgr specified by the given Uri, then return error code,
+ * here is the internal implementation.
+ *
+ * @param uri, Indicates the path of the data to operate.
+ * @param dataObserver, Indicates the DataShareObserver object.
+ * @param isSystem, Indicates the app is system app or not.
+ *
+ * @return Returns the result. Error codes are listed in DataShare datashare_errno.h and
+ * DataObs dataobs_mgr_errors.h.
+ */
+int TryUnregisterObserverExtInner(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
+    bool isSystem)
+{
+    if (dataObserver == nullptr) {
+        LOG_ERROR("dataObserver is nullptr");
+        return E_NULL_OBSERVER;
+    }
+
+    auto obsMgrClient = OHOS::AAFwk::DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("get DataObsMgrClient failed");
+        return E_NULL_OBSERVER_CLIENT;
+    }
+
+    if (!ObserverImpl::FindObserver(uri, dataObserver)) {
+        LOG_ERROR("observer not exit!");
+        return E_NULL_OBSERVER;
+    }
+
+    sptr<ObserverImpl> obs = ObserverImpl::GetObserver(uri, dataObserver);
+    if (obs == nullptr) {
+        LOG_ERROR("new ObserverImpl failed");
+        return E_NULL_OBSERVER;
+    }
+
+    ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, obs, AAFwk::DataObsOption(isSystem));
+    LOG_INFO("Unregister observerExt, ret:%{public}d, uri:%{public}s",
+        ret, DataShareStringUtils::Anonymous(uri.ToString()).c_str());
+    if (ret != ERR_OK) {
+        return ret;
+    }
+    ObserverImpl::DeleteObserver(uri, dataObserver);
+    return ret;
+}
 } // namespace DataShare
 } // namespace OHOS
