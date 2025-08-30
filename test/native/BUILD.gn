@@ -860,6 +860,15 @@ ohos_unittest("DatashareItypesUtilsTest") {
     "kv_store:distributeddata_inner",
   ]
 
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+  }
+
   cflags = [
     "-fvisibility=hidden",
     "-Dprivate=public",
