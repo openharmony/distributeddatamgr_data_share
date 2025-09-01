@@ -30,7 +30,7 @@ using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
 constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
 std::string DATA_SHARE_URI = "datashare:///com.acts.errorcodetest";
-std::string SLIENT_ACCESS_URI = "datashare:///com.acts.errorcodetest/entry/DB00/TBL00?Proxy=true";
+std::string SLIENT_ACCESS_URI = "datashareproxy://com.acts.errorcodetest/test?Proxy=true";
 std::string TBL_STU_NAME = "name";
 std::string TBL_STU_AGE = "age";
 std::shared_ptr<DataShare::DataShareHelper> g_slientAccessHelper;
@@ -60,20 +60,8 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t system
     return DataShare::DataShareHelper::Creator(remoteObj, uri);
 }
 
-void ErrorCodeTest::SetUpTestCase(void)
+HapPolicyParams GetPolicy()
 {
-    LOG_INFO("SetUpTestCase invoked");
-    dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
-    ASSERT_TRUE(dataShareHelper != nullptr);
-    int sleepTime = 3;
-    sleep(sleepTime);
-
-    HapInfoParams info = {
-        .userID = 100,
-        .bundleName = "ohos.datashareclienttest.demo",
-        .instIndex = 0,
-        .appIDDesc = "ohos.datashareclienttest.demo"
-    };
     HapPolicyParams policy = {
         .apl = APL_NORMAL,
         .domain = "test.domain",
@@ -96,9 +84,34 @@ void ErrorCodeTest::SetUpTestCase(void)
                 .resDeviceID = { "local" },
                 .grantStatus = { PermissionState::PERMISSION_GRANTED },
                 .grantFlags = { 1 }
+            },
+            {
+                .permissionName = "ohos.permission.GET_BUNDLE_INFO",
+                .isGeneral = true,
+                .resDeviceID = { "local" },
+                .grantStatus = { PermissionState::PERMISSION_GRANTED },
+                .grantFlags = { 1 }
             }
         }
     };
+    return policy;
+}
+
+void ErrorCodeTest::SetUpTestCase(void)
+{
+    LOG_INFO("SetUpTestCase invoked");
+    dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
+    ASSERT_TRUE(dataShareHelper != nullptr);
+    int sleepTime = 3;
+    sleep(sleepTime);
+
+    HapInfoParams info = {
+        .userID = 100,
+        .bundleName = "ohos.datashareclienttest.demo",
+        .instIndex = 0,
+        .appIDDesc = "ohos.datashareclienttest.demo"
+    };
+    auto policy = GetPolicy();
     AccessTokenKit::AllocHapToken(info, policy);
     auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(
         info.userID, info.bundleName, info.instIndex);
