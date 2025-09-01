@@ -221,5 +221,105 @@ HWTEST_F(DatashareItypesUtilsTest, Marshal_RdbChangeNode_003, TestSize.Level0)
     unmashalchangeNode.memory_->CloseAshmem();
     ZLOGI("Marshal_RdbChangeNode_003 ends");
 }
+
+/**
+ * @tc.name: Marshal_Predicates_001
+ * @tc.desc: Test the marshalling and unmarshalling functionality of Predicates.
+ * @tc.type: FUNC
+ * @tc.require: The marshalling and unmarshalling process should succeed, data correctness and consistency should
+ *     be ensured.
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a MessageParcel and a DataSharePredicates object.
+    2. Define a string for testing and an abnormal size exceeding MAX_IPC_SIZE.
+    3. Write the abnormal size and raw data to the MessageParcel.
+    4. Attempt to unmarshal the predicates from the MessageParcel and verify the operation fails due to
+        abnormal size.
+    5. Test the normal marshalling and unmarshalling of the predicates.
+ * @tc.experct: The marshalling operation should succeed, and the unmarshalling operation should correctly handle both
+        normal and abnormal cases.
+ */
+HWTEST_F(DatashareItypesUtilsTest, Marshal_Predicates_001, TestSize.Level0)
+{
+    ZLOGI("Marshal_Predicates_001 starts");
+    MessageParcel parcel1;
+    DataSharePredicates predicates1;
+    std::string str = "Unmarshal_Predicates_001";
+    size_t size = str.size();
+    // size is over MAX_IPC_SIZE
+    size_t abnormalSize = 128 * 1024 * 1024 + 1;
+    // marshal wrong data to message parcel
+    bool ret = parcel1.WriteInt32(abnormalSize);
+    EXPECT_TRUE(ret);
+    ret = parcel1.WriteRawData(reinterpret_cast<const void *>(str.data()), size);
+    EXPECT_TRUE(ret);
+    // test unmarshal predicates abnormal func
+    ret = UnmarshalPredicates(predicates1, parcel1);
+    EXPECT_FALSE(ret);
+
+    // test unmarshal predicates normal func
+    MessageParcel parcel2;
+    DataSharePredicates predicates2;
+    predicates2.EqualTo("name", "Unmarshal_Predicates_001");
+    ret = MarshalPredicates(predicates2, parcel2);
+    EXPECT_TRUE(ret);
+    DataSharePredicates predicates3;
+    ret = UnmarshalPredicates(predicates3, parcel2);
+    EXPECT_TRUE(ret);
+    ZLOGI("Marshal_Predicates_001 ends");
+}
+
+/**
+* @tc.name: Marshal_ValuesBucketVec_001
+* @tc.desc: Test the marshalling and unmarshalling functionality of Predicates.
+* @tc.type: FUNC
+* @tc.require: The marshalling and unmarshalling process should succeed, data correctness and consistency should
+*    be ensured.
+* @tc.precon: None
+* @tc.step:
+    1. Create a MessageParcel and a DataShareValuesBucket object.
+    2. Add key-value pairs to the ValuesBucket, including "name" and "phoneNumber".
+    3. Marshal the ValuesBucket vector to a buffer and verify the operation succeeds.
+    4. Convert the marshaled data to a string and set an abnormal size exceeding MAX_IPC_SIZE.
+    5. Write the abnormal size and marshaled data to the MessageParcel.
+    6. Attempt to unmarshal the ValuesBucket vector from the MessageParcel and verify the operation fails due to
+        abnormal size.
+    7. Test the normal marshalling and unmarshalling of the ValuesBucket vector.
+* @tc.experct: The marshalling operation should succeed, and the unmarshalling operation should correctly handle both
+    normal and abnormal cases.
+*/
+HWTEST_F(DatashareItypesUtilsTest, Marshal_MarshalValuesBucketVec_001, TestSize.Level0)
+{
+    ZLOGI("Marshal_ValuesBucketVec_001 starts");
+    MessageParcel parcel1;
+    std::vector<DataShareValuesBucket> buckets;
+    std::string str = "Marshal_ValuesBucketVec_001";
+    size_t size = str.size();
+    // size is over MAX_IPC_SIZE
+    size_t abnormalSize = 128 * 1024 * 1024 + 1;
+    // marshal wrong data to message parcel
+    bool ret = parcel1.WriteInt32(abnormalSize);
+    EXPECT_TRUE(ret);
+    ret = parcel1.WriteRawData(reinterpret_cast<const void *>(str.data()), size);
+    EXPECT_TRUE(ret);
+    // test unmarshal ValuesBucketVec abnormal func
+    ret = UnmarshalValuesBucketVec(buckets, parcel1);
+    EXPECT_FALSE(ret);
+    buckets.clear();
+
+    // test unmarshal ValuesBucketVec normal func
+    MessageParcel parcel2;
+    DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "dataShareTest006");
+    valuesBucket.Put("phoneNumber", 20.6);
+
+    buckets.push_back(valuesBucket);
+    ret = MarshalValuesBucketVec(buckets, parcel2);
+    EXPECT_TRUE(ret);
+    buckets.clear();
+    ret = UnmarshalValuesBucketVec(buckets, parcel2);
+    EXPECT_TRUE(ret);
+    ZLOGI("Marshal_ValuesBucketVec_001 ends");
+}
 } // namespace DataShare
 } // namespace OHOS

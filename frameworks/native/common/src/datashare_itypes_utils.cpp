@@ -1165,6 +1165,10 @@ bool UnmarshalPredicates(Predicates &predicates, MessageParcel &parcel)
         LOG_ERROR("Length of predicates is invalid.");
         return false;
     }
+    if (static_cast<size_t>(length) > MAX_IPC_SIZE) {
+        LOG_ERROR("Length of predicates is too large.");
+        return false;
+    }
     const char *buffer = reinterpret_cast<const char *>(parcel.ReadRawData(static_cast<size_t>(length)));
     if (buffer == nullptr) {
         LOG_ERROR("ReadRawData failed.");
@@ -1199,6 +1203,10 @@ bool UnmarshalValuesBucketVec(std::vector<DataShareValuesBucket> &values, Messag
     int32_t length = parcel.ReadInt32();
     if (length < 1) {
         LOG_ERROR("Length of ValuesBucketVec is invalid.");
+        return false;
+    }
+    if (static_cast<size_t>(length) > MAX_IPC_SIZE) {
+        LOG_ERROR("Length of ValuesBucketVec is too large.");
         return false;
     }
     const char *buffer = reinterpret_cast<const char *>(parcel.ReadRawData(static_cast<size_t>(length)));
