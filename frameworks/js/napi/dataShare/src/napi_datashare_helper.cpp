@@ -1030,7 +1030,7 @@ napi_value NapiDataShareHelper::Napi_Close(napi_env env, napi_callback_info info
             return;
         }
         context->proxy->SetHelper(nullptr);
-        LOG_INFO("Close dataShareHelper succeed.");
+        LOG_INFO("Close DsH");
         context->status = napi_ok;
     };
     context->SetAction(std::move(input), std::move(output));

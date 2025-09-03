@@ -396,11 +396,8 @@ napi_value DataShareResultSetProxy::GetColumnIndex(napi_env env, napi_callback_i
     std::string columnName = DataShareJSUtils::Convert2String(env, args[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
-        int errCode = innerResultSet->GetColumnIndex(columnName, columnIndex);
-        if (errCode != E_OK) {
-            LOG_ERROR("code:%{public}d idx: %{public}d.",
-                errCode, columnIndex);
-        }
+        // No need to catch error code because invalid column name will have columnIndex set to -1.
+        innerResultSet->GetColumnIndex(columnName, columnIndex);
     } else {
         LOG_ERROR("GetInnerResultSet failed.");
     }
