@@ -407,8 +407,8 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         ani_native_function {"beginWrap", nullptr, reinterpret_cast<void *>(BeginWrap)},
         ani_native_function {"greaterThan", nullptr, reinterpret_cast<void *>(GreaterThan)},
         ani_native_function {"groupBy", nullptr, reinterpret_cast<void *>(GroupBy)},
-        ani_native_function {"in", nullptr, reinterpret_cast<void *>(In)},
-        ani_native_function {"notIn", nullptr, reinterpret_cast<void *>(NotIn)},
+        ani_native_function {"inValues", nullptr, reinterpret_cast<void *>(In)},
+        ani_native_function {"notInValues", nullptr, reinterpret_cast<void *>(NotIn)},
     };
     if (ANI_OK != env->Class_BindNativeMethods(cls, methods.data(), methods.size())) {
         LOG_ERROR("Cannot bind native methods to %{public}s", className);
