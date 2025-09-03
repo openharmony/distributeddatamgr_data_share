@@ -56,7 +56,8 @@ struct NapiRdbObserverMapKey {
     }
 };
 
-class NapiRdbSubscriberManager : public NapiCallbacksManager<NapiRdbObserverMapKey, NapiRdbObserver> {
+class NapiRdbSubscriberManager : public NapiCallbacksManager<NapiRdbObserverMapKey, NapiRdbObserver>,
+                                 public std::enable_shared_from_this<NapiRdbSubscriberManager> {
 public:
     using Key = NapiRdbObserverMapKey;
     using Observer = NapiRdbObserver;
@@ -101,7 +102,8 @@ struct NapiPublishedObserverMapKey {
     }
 };
 
-class NapiPublishedSubscriberManager : public NapiCallbacksManager<NapiPublishedObserverMapKey, NapiPublishedObserver> {
+class NapiPublishedSubscriberManager : public NapiCallbacksManager<NapiPublishedObserverMapKey, NapiPublishedObserver>,
+                                       public std::enable_shared_from_this<NapiPublishedSubscriberManager> {
 public:
     using Key = NapiPublishedObserverMapKey;
     using Observer = NapiPublishedObserver;
