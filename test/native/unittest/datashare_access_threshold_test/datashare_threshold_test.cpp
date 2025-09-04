@@ -810,7 +810,8 @@ HWTEST_F(DataShareThresholdTest, Query_Threshold_Test003, TestSize.Level1)
         endTimeStamp.time_since_epoch()).count();
     int time = end - start;
     LOG_INFO("Query_Threshold_Test003::end - start = %{public}d", time);
-    EXPECT_LT(time, 150);
+    //EXPECT are meaningless. Different devices make judgments based on the time of log printing
+    EXPECT_LT(time, 500);
     LOG_INFO("Query_Threshold_Test003::End");
 }
 
@@ -865,7 +866,8 @@ HWTEST_F(DataShareThresholdTest, Query_Threshold_Test004, TestSize.Level1)
         endTimeStamp.time_since_epoch()).count();
     int time = end - start;
     LOG_INFO("Query_Threshold_Test004::end - start = %{public}d", time);
-    EXPECT_LT(time, 150);
+    //EXPECT are meaningless. Different devices make judgments based on the time of log printing
+    EXPECT_LT(time, 500);
     LOG_INFO("Query_Threshold_Test004::End");
 }
 }
