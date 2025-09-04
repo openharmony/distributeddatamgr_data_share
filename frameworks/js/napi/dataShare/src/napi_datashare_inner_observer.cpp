@@ -103,9 +103,7 @@ void NAPIInnerObserver::OnComplete(ObserverWorker* observerWorker)
 
 void NAPIInnerObserver::OnChange(const DataShareObserver::ChangeInfo& changeInfo, bool isNotifyDetails)
 {
-    auto time =
-        static_cast<uint64_t>(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
-    LOG_INFO("NAPIInnerObserver datashare callback start, times %{public}" PRIu64 ".", time);
+    LOG_INFO("NAPIObs DS CB start");
     if (ref_ == nullptr) {
         LOG_ERROR("ref_ is nullptr");
         return;
@@ -130,7 +128,7 @@ void NAPIInnerObserver::OnChange(const DataShareObserver::ChangeInfo& changeInfo
         LOG_ERROR("napi_send_event failed: %{public}d", ret);
         delete observerWorker;
     }
-    LOG_INFO("NAPIInnerObserver datashare callback end, times %{public}" PRIu64 ".", time);
+    LOG_INFO("NAPIObs DS CB end");
 }
 
 void NAPIInnerObserver::DeleteReference()
