@@ -429,6 +429,23 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_007, TestSize.L
 }
 
 /**
+* @tc.name: TryRegisterObserverExt_008
+* @tc.desc: test TryRegisterObserverExt normal func, test parent interface.
+* @tc.type: FUNC
+*/
+HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_008, TestSize.Level0)
+{
+    LOG_INFO("TryRegisterObserverExt_008 start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_NE(helper, nullptr);
+    Uri uri(DATA_SHARE_URI);
+    std::shared_ptr<MockDatashareObserver> dataObserver = nullptr;
+    auto ret1 = helper->DataShareHelper::TryRegisterObserverExt(uri, dataObserver, false);
+    EXPECT_EQ(ret1, E_UNIMPLEMENT);
+    LOG_INFO("TryRegisterObserverExt_008 end");
+}
+
+/**
  * @tc.name: TryUnregisterObserverExt_001
  * @tc.desc: test TryUnregisterObserverExt normal func, Insert.
  * @tc.type: FUNC
@@ -500,6 +517,23 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_003, TestSize
     auto ret2 = helper->TryUnregisterObserverExt(uri, dataObserver);
     EXPECT_EQ(ret2, E_NULL_OBSERVER);
     LOG_INFO("TryUnregisterObserverExt_003 end");
+}
+
+/**
+ * @tc.name: TryUnregisterObserverExt_004
+ * @tc.desc: test TryUnregisterObserverExt normal func, test parent interface.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_004, TestSize.Level0)
+{
+    LOG_INFO("TryUnregisterObserverExt_004 start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_NE(helper, nullptr);
+    Uri uri(DATA_SHARE_URI);
+    std::shared_ptr<MockDatashareObserver> dataObserver = nullptr;
+    auto ret2 = helper->DataShareHelper::TryUnregisterObserverExt(uri, dataObserver);
+    EXPECT_EQ(ret2, E_UNIMPLEMENT);
+    LOG_INFO("TryUnregisterObserverExt_004 end");
 }
 } // namespace DataShare
 } // namespace OHOS
