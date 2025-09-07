@@ -835,7 +835,7 @@ bool UnmarshalBasicTypeVecToBuffer(std::istringstream &iss, std::vector<T> &valu
         return false;
     }
     if (valSize > 0) {
-        if (valSize > MAX_IPC_SIZE) {
+        if (valSize > MAX_IPC_SIZE / sizeof(T)) {
             LOG_ERROR("valSize of BasicType is too large.");
             return false;
         }
