@@ -835,6 +835,10 @@ bool UnmarshalBasicTypeVecToBuffer(std::istringstream &iss, std::vector<T> &valu
         return false;
     }
     if (valSize > 0) {
+        if (valSize > MAX_IPC_SIZE / sizeof(T)) {
+            LOG_ERROR("valSize of BasicType is too large.");
+            return false;
+        }
         values.resize(valSize);
         iss.read(reinterpret_cast<char *>(values.data()), valSize * sizeof(T));
     }
@@ -850,6 +854,10 @@ bool UnmarshalStringToBuffer(std::istringstream &iss, std::string &value)
     }
     // Get string content
     if (len > 0) {
+        if (len > MAX_IPC_SIZE) {
+            LOG_ERROR("length of string is too large.");
+            return false;
+        }
         value.resize(len, '\0');
         iss.read(value.data(), len);
     }
@@ -1165,6 +1173,10 @@ bool UnmarshalPredicates(Predicates &predicates, MessageParcel &parcel)
         LOG_ERROR("Length of predicates is invalid.");
         return false;
     }
+    if (static_cast<size_t>(length) > MAX_IPC_SIZE) {
+        LOG_ERROR("Length of predicates is too large.");
+        return false;
+    }
     const char *buffer = reinterpret_cast<const char *>(parcel.ReadRawData(static_cast<size_t>(length)));
     if (buffer == nullptr) {
         LOG_ERROR("ReadRawData failed.");
@@ -1199,6 +1211,10 @@ bool UnmarshalValuesBucketVec(std::vector<DataShareValuesBucket> &values, Messag
     int32_t length = parcel.ReadInt32();
     if (length < 1) {
         LOG_ERROR("Length of ValuesBucketVec is invalid.");
+        return false;
+    }
+    if (static_cast<size_t>(length) > MAX_IPC_SIZE) {
+        LOG_ERROR("Length of ValuesBucketVec is too large.");
         return false;
     }
     const char *buffer = reinterpret_cast<const char *>(parcel.ReadRawData(static_cast<size_t>(length)));
