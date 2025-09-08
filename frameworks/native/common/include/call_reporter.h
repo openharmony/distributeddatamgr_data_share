@@ -16,8 +16,11 @@
 #ifndef DATASHARE_CALL_REPORTER_H
 #define DATASHARE_CALL_REPORTER_H
 
+#include <cinttypes>
 #include <concurrent_map.h>
 #include <string>
+
+#include "boot_time_adaptor.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -28,9 +31,10 @@ public:
         int count = 0;
         // total count for silent access threshold
         int totalCount = 0;
-        std::chrono::system_clock::time_point firstTime;
+        // start time of every 100 calls
+        int64_t firstTime = 0;
         // start time of ervery 30s
-        std::chrono::system_clock::time_point startTime;
+        int64_t startTime = 0;
         // print err log only once by using flag
         bool logPrintFlag = false;
     };
@@ -39,8 +43,9 @@ private:
     ConcurrentMap<std::string, CallInfo> callCounts_;
     static constexpr int RESET_COUNT_THRESHOLD = 100;
     static constexpr int ACCESS_COUNT_THRESHOLD = 3000; // silent access threshold
-    static constexpr std::chrono::milliseconds TIME_THRESHOLD = std::chrono::milliseconds(30000);
+    static constexpr int64_t TIME_THRESHOLD = 30000; // 30s
     void UpdateCallCounts(const std::string &funcName, int &overCount, int64_t &firstCallTime, bool &isOverThreshold);
+    BootTimeAdaptor bootTimeAdaptor_;
 };
 } // namespace DataShare
 } // namespace OHOS
