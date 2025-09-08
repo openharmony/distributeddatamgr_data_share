@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "rdb_subscriber_manager"
+
 #include "rdb_subscriber_manager.h"
 
 #include <cinttypes>

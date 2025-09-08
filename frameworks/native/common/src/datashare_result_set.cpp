@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#define LOG_TAG "datashare_result_set"
+
 #include "datashare_result_set.h"
 
 #include <securec.h>
@@ -475,4 +478,4 @@ std::shared_ptr<DataShareResultSet> DataShareResultSet::Unmarshal(MessageParcel 
     return DataShare::ISharedResultSet::ReadFromParcel(parcel);
 }
 }  // namespace DataShare
-}  // namespace OHOS
+}  // namespace OHOS

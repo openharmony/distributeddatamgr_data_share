@@ -13,6 +13,8 @@
 * limitations under the License.
 */
 
+#define LOG_TAG "call_reporter"
+
 #include "call_reporter.h"
 
 #include "datashare_log.h"

@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "datashare_stub_impl"
+
 #include "datashare_stub_impl.h"
 #include <string>
 

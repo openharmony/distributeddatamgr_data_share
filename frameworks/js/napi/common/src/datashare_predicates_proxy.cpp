@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "datashare_predicates_proxy"
+
 #include "datashare_predicates_proxy.h"
 
 #include <cinttypes>

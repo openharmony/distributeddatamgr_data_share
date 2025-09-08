@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "napi_dataproxy_handle"
+
 #include "napi_dataproxy_handle.h"
 #include "dataproxy_handle_common.h"
 #include "datashare_error_impl.h"

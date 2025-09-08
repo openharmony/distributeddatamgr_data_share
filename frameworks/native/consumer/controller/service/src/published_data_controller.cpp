@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "published_data_controller"
+
 #include "published_data_controller.h"
 
 #include "datashare_log.h"

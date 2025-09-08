@@ -13,6 +13,8 @@
 * limitations under the License.
 */
 
+#define LOG_TAG "datashare_block_writer_impl_test"
+
 #include <gtest/gtest.h>
 #include <unistd.h>
 

@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "datashare_proxy"
+
 #include "datashare_proxy.h"
 
 #include <string_ex.h>

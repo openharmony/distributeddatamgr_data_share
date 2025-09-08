@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "data_share_predicates"
+
 #include <ani.h>
 #include <array>
 #include <iostream>

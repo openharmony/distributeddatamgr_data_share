@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "published_data_subscriber_manager"
+
 #include "published_data_subscriber_manager.h"
 
 #include <cinttypes>

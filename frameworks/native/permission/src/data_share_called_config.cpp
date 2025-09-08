@@ -12,7 +12,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-#define LOG_TAG "DataShareCalledConfig"
+#define LOG_TAG "data_share_called_config"
 
 #include "data_share_called_config.h"
 

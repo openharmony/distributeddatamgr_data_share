@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "data_share_result_set"
+
 #include <ani_utils.h>
 #include <array>
 #include <iostream>

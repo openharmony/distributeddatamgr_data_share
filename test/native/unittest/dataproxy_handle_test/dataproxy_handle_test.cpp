@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#define LOG_TAG "dataproxy_handle_test"
+
 #include <gtest/gtest.h>
 #include <unistd.h>
 

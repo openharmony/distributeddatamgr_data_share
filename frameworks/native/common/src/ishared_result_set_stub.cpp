@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "ishared_result_set_stub"
+
 #include <cinttypes>
 #include "ishared_result_set_stub.h"
 #include "datashare_log.h"

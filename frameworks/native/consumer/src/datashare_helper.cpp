@@ -12,7 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define LOG_TAG "DataShareHelper"
+
+#define LOG_TAG "datashare_helper"
 
 #include "datashare_helper.h"
 #include "datashare_helper_impl.h"

@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#define LOG_TAG "datashare_threshold_test"
+
 #include "datashare_helper.h"
 
 #include <gtest/gtest.h>

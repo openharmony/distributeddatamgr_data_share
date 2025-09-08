@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "ani_utils"
+
 #include <cstdarg>
 #include <memory>
 #include <mutex>
@@ -23,6 +25,7 @@
 
 #include "datashare_log.h"
 #include "ani_utils.h"
+
 
 namespace OHOS::DataShare {
 ani_object AniObjectUtils::Create(ani_env *env, const char* nsName, const char* clsName, ...)

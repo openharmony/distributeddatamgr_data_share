@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#define LOG_TAG "datashare_block_writer_impl"
+
 #include "datashare_block_writer_impl.h"
 #include "datashare_log.h"
 #include "datashare_errno.h"

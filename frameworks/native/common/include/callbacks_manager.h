@@ -15,6 +15,7 @@
 
 #ifndef DATA_SHARE_CALLBACKS_MANAGER_H
 #define DATA_SHARE_CALLBACKS_MANAGER_H
+
 #include <map>
 #include <mutex>
 #include <vector>

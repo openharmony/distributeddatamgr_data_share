@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#define LOG_TAG "DataProxyHandle"
+#define LOG_TAG "dataproxy_handle"
 
 #include <utility>
 #include "dataproxy_handle.h"

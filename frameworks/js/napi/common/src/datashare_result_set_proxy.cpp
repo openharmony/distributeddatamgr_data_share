@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
+#define LOG_TAG "datashare_result_set_proxy"
 
 #include "datashare_result_set_proxy.h"
 

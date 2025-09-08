@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "napi_subscriber_manager"
+
 #include "napi_subscriber_manager.h"
 #include <memory>
 #include <vector>

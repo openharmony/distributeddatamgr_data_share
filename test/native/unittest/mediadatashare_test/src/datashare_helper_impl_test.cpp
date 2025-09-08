@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#define LOG_TAG "datashare_helper_impl_test"
+
 #include "datashare_helper_impl.h"
 #include "general_controller_service_impl.h"
 

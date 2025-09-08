@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "datashare_connection"
+
 #include <cinttypes>
 #include "datashare_connection.h"
 

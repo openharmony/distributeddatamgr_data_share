@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "js_datashare_ext_ability_context"
+
 #include "js_datashare_ext_ability_context.h"
 
 #include <cstdint>

@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#define LOG_TAG "ams_mgr_proxy"
+
 #include "ams_mgr_proxy.h"
 
 #include "datashare_log.h"

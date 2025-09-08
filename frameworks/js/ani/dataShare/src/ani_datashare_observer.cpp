@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define LOG_TAG "ANIDataShareObserver"
+#define LOG_TAG "ani_datashare_observer"
 
 #include "ani_datashare_observer.h"
 
