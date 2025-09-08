@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "datashare_connection_test"
+
 #include "datashare_connection.h"
 
 #include <gtest/gtest.h>

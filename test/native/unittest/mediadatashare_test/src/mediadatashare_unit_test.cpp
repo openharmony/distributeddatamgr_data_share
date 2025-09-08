@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "mediadatashare_unit_test"
+
 #include "mediadatashare_unit_test.h"
 
 #include <gtest/gtest.h>

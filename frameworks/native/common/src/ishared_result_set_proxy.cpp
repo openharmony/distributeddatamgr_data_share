@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "ishared_result_set_proxy"
+
 #include "ishared_result_set_proxy.h"
 
 #include "datashare_errno.h"

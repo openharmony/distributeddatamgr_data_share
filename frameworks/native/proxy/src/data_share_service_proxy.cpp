@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "data_share_service_proxy"
+
 #include "data_share_service_proxy.h"
 
 #include <cinttypes>

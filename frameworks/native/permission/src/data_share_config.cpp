@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#define LOG_TAG "data_share_config"
+
 #include <fstream>
 #include <mutex>
 #include "data_share_config.h"

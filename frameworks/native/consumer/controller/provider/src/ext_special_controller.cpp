@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "ext_special_controller"
+
 #include "ext_special_controller.h"
 #include "datashare_log.h"
 

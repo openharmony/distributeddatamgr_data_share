@@ -12,8 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#define LOG_TAG "data_share_permission"
+
 #include "datashare_uri_utils.h"
-#define LOG_TAG "DataSharePermission"
 
 #include "data_share_permission.h"
 

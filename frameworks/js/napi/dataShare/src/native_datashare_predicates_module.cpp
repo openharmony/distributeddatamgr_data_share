@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "native_datashare_predicates_module"
+
 #include "datashare_log.h"
 #include "datashare_predicates_proxy.h"
 #include "napi/native_api.h"

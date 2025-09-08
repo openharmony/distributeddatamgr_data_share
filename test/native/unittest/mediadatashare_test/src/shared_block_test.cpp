@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#define LOG_TAG "shared_block_test"
+
 #include "shared_block.h"
 
 #include <gtest/gtest.h>

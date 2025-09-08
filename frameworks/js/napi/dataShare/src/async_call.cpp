@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "async_call"
+
 #include "async_call.h"
 
 #include "datashare_log.h"

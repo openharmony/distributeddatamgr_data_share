@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "napi_datashare_values_bucket"
+
 #include "napi_datashare_values_bucket.h"
 
 #include "datashare_log.h"

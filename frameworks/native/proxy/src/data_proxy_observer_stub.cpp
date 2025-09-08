@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "data_proxy_observer_stub"
+
 #include "data_proxy_observer_stub.h"
 
 #include "dataproxy_handle_common.h"

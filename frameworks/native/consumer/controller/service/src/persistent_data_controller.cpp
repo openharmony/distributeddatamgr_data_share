@@ -12,6 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#define LOG_TAG "persistent_data_controller"
+
 #include "persistent_data_controller.h"
 
 #include "datashare_log.h"

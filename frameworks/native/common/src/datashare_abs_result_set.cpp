@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "datashare_abs_result_set"
+
 #include "datashare_abs_result_set.h"
 
 #include <algorithm>

@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "datashare_itypes_utils"
+
 #include "datashare_itypes_utils.h"
 
 #include <cstdint>

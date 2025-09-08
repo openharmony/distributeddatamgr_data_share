@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "datashare_proxy_test"
+
 #include "datashare_proxy.h"
 
 #include <gtest/gtest.h>

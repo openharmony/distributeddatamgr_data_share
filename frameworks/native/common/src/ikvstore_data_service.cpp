@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "ikvstore_data_service"
+
 #include "ikvstore_data_service.h"
 #include "datashare_itypes_utils.h"
 #include "datashare_log.h"

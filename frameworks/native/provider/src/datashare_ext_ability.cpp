@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "datashare_ext_ability"
+
 #include "datashare_ext_ability.h"
 
 #include "ability_loader.h"

@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "idata_share_client_death_observer"
+
 #include "idata_share_client_death_observer.h"
 #include "datashare_log.h"
 

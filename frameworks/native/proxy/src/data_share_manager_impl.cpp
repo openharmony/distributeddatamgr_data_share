@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "data_share_manager_impl"
+
 #include "data_share_manager_impl.h"
 
 #include <thread>

@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "datashare_stub_test"
+
 #include "datashare_stub.h"
 
 #include <gtest/gtest.h>

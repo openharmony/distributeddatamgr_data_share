@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "napi_datashare_inner_observer"
+
 #include "napi_datashare_observer.h"
 
 #include <memory>

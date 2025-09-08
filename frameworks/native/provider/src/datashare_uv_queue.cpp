@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "datashare_uv_queue"
+
 #include "datashare_uv_queue.h"
 #include <thread>
 #include <chrono>

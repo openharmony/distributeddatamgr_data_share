@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "napi_datashare_helper"
+
 #include "napi_datashare_helper.h"
 
 #include "data_proxy_observer_stub.h"

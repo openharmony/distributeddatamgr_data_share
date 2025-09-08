@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "datashare_js_utils"
+
 #include "datashare_js_utils.h"
 #include <cstdint>
 

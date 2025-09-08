@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "general_controller_provider_impl"
+
 #include "general_controller_provider_impl.h"
 
 #include "datashare_log.h"

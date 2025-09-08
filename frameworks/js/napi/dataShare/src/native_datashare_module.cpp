@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "native_datashare_module"
+
 #include "datashare_log.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"

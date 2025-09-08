@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "general_controller_service_impl"
+
 #include "general_controller_service_impl.h"
 #include <thread>
 

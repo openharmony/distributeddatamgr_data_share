@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "proxy_data_subscriber_manager"
+
 #include "proxy_data_subscriber_manager.h"
 
 #include <cinttypes>

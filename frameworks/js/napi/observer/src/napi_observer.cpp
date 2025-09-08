@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "napi_observer"
+
 #include "napi_observer.h"
 
 #include "dataproxy_handle_common.h"
