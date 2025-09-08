@@ -196,7 +196,6 @@ std::pair<int, std::string> DataSharePermission::GetExtensionUriPermission(Uri &
         permission = isRead ? permissionInfo.readPermission : permissionInfo.writePermission;
         return std::make_pair(E_OK, permission);
     }
-    return std::make_pair(E_URI_NOT_EXIST, "");
 
     AppExecFwk::ExtensionAbilityInfo extensionInfo;
     std::tie(isSuccess, extensionInfo) = DataShareCalledConfig::GetExtensionInfoFromBMS(uriStr, user);
