@@ -53,6 +53,10 @@ void DataShareConnection::OnAbilityConnectDone(
     {
         std::lock_guard<std::mutex> lock(mutex_);
         sptr<DataShareProxy> proxy = new (std::nothrow) DataShareProxy(remoteObject);
+        if (proxy == nullptr) {
+            LOG_ERROR("Create DataShareProxy failed");
+            return;
+        }
         dataShareProxy_ = std::shared_ptr<DataShareProxy>(proxy.GetRefPtr(), [holder = proxy](const auto *) {});
         condition_.condition.notify_all();
     }
