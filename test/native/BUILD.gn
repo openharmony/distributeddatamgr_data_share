@@ -43,6 +43,7 @@ group("unittest") {
     ":SlientSwitchTest",
     ":URIUtilsTest",
     ":ValueProxyTest",
+    ":DataShareResultSetTest",
     "resource/datashare_ext_bundle:datashare_ext",
     "resource/datashareproxy_bundle/proxydatas_with_permission:proxydatas_with_permission",
     "resource/errorcode_ext_bundle:errorcode_ext",
@@ -1009,5 +1010,32 @@ ohos_unittest("DataShareHelperImplRegisterTest") {
     "-fvisibility=hidden",
     "-Dprivate=public",
     "-Dprotected=public",
+  ]
+}
+
+ohos_unittest("DataShareResultSetTest") {
+  module_out_path = "data_share/data_share/inner_tests"
+
+  sources = [ "./unittest/mediadatashare_test/src/datashare_result_set_test.cpp" ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer",
+    "${datashare_innerapi_path}/common:datashare_common",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:dataobs_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
   ]
 }
