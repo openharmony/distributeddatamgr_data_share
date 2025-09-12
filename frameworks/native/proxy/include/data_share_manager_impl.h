@@ -30,6 +30,7 @@
 #include "idata_share_client_death_observer.h"
 #include "iremote_object.h"
 #include "refbase.h"
+#include "system_ability_load_callback_stub.h"
 #include "system_ability_status_change_stub.h"
 
 namespace OHOS {
@@ -82,6 +83,15 @@ public:
         }
     private:
         DataShareManagerImpl *owner_;
+    };
+
+    class ServiceProxyLoadCallback : public SystemAbilityLoadCallbackStub {
+    public:
+        ServiceProxyLoadCallback() = default;
+        virtual ~ServiceProxyLoadCallback() = default;
+
+        void OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject) override;
+        void OnLoadSystemAbilityFail(int32_t systemAbilityId) override;
     };
 
     void SetRegisterCallback(GeneralControllerServiceImpl* ptr, std::function<void()> registerCallback);
