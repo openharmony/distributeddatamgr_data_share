@@ -171,7 +171,7 @@ int DataShareResultSet::GoToRow(int position)
     }
 
     if (!result) {
-        rowPos_ = INITIAL_POS;
+        rowPos_ = rowCnt;
         startRowPos_ = INITIAL_POS;
         endRowPos_ = INITIAL_POS;
         return E_ERROR;

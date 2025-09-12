@@ -43,6 +43,18 @@ public:
     int GoToNextRow() override;
     int GoToPreviousRow() override;
     int IsAtFirstRow(bool &result) const override;
+    
+    /**
+     * @brief Checks whether the result set is positioned at the last row.
+     * If data in the database is deleted concurrently after the resultset is obtained,
+     * this interface may return an incorrect result.
+     * Advised to use GoToNextRow instead of using this API as a loop end condition.
+     *
+     * @param result Indicates whether the result set is positioned at the last row.
+     *
+     * @return Return 0 if successful.
+     */
+    [[deprecated("Use GoToNextRow() instead.")]]
     int IsAtLastRow(bool &result) override;
     int IsStarted(bool &result) const override;
     int IsEnded(bool &result) override;
