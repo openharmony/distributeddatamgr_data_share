@@ -70,7 +70,19 @@ sptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
     }
     auto remoteObject = manager->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
     if (remoteObject == nullptr) {
+        // check SA failed, try load SA
         LOG_ERROR("get distributed data manager failed");
+        // callbcak of load
+        sptr<ServiceProxyLoadCallback> loadCallback = new (std::nothrow) ServiceProxyLoadCallback();
+        if (loadCallback == nullptr) {
+            LOG_ERROR("Create load callback failed.");
+            return nullptr;
+        }
+        int32_t errCode = manager->LoadSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, loadCallback);
+        // satrt load fialed
+        if (errCode != ERR_OK) {
+            LOG_ERROR("load SA failed, err: %{public}d", errCode);
+        }
         return nullptr;
     }
     sptr<DataShareKvServiceProxy> proxy = new (std::nothrow)DataShareKvServiceProxy(remoteObject);
@@ -232,6 +244,24 @@ void DataShareManagerImpl::OnAddSystemAbility(int32_t systemAbilityId, const std
 bool DataShareManagerImpl::SetCallCount(const std::string &funcName, const std::string &uri)
 {
     return dataShareCallReporter_.Count(funcName, uri);
+}
+
+void DataShareManagerImpl::ServiceProxyLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
+    const sptr<IRemoteObject> &remoteObject)
+{
+    if (systemAbilityId != DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID) {
+        LOG_ERROR("Incorrect SA Id: %{public}d", systemAbilityId);
+        return;
+    }
+    if (remoteObject == nullptr) {
+        LOG_ERROR("remote object is nullptr");
+        return;
+    }
+}
+
+void DataShareManagerImpl::ServiceProxyLoadCallback::OnLoadSystemAbilityFail(int32_t systemAbilityId)
+{
+    LOG_ERROR("Load SA: %{public}d failed", systemAbilityId);
 }
 }
 }
