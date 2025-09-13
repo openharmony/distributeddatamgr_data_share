@@ -286,7 +286,7 @@ bool UnionAccessor::TryConvertArray<bool>(std::vector<bool> &value)
         }
 
         if (!IsInstanceOf("std.core.Boolean", static_cast<ani_object>(ref))) {
-            LOG_ERROR("Not found 'Lstd/core/Boolean;'");
+            LOG_ERROR("Not found 'std.core.Boolean'");
             return false;
         }
 
@@ -313,13 +313,13 @@ bool UnionAccessor::TryConvertArray<int>(std::vector<int> &value)
 
     for (int i = 0; i < int(length); i++) {
         ani_ref ref;
-        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &ref, (ani_int)i)) {
+        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "i:C{std.core.Object}", &ref, (ani_int)i)) {
             LOG_ERROR("Object_GetPropertyByName_Ref failed");
             return false;
         }
 
         if (!IsInstanceOf("std.core.Int", static_cast<ani_object>(ref))) {
-            LOG_ERROR("Not found 'Lstd/core/Double;'");
+            LOG_ERROR("Not found 'std.core.Int'");
             return false;
         }
 
@@ -352,7 +352,7 @@ bool UnionAccessor::TryConvertArray<double>(std::vector<double> &value)
         }
 
         if (!IsInstanceOf("std.core.Double", static_cast<ani_object>(ref))) {
-            LOG_ERROR("Not found 'Lstd/core/Double;'");
+            LOG_ERROR("Not found 'std.core.Double'");
             return false;
         }
 
@@ -410,7 +410,7 @@ bool UnionAccessor::TryConvertArray<std::string>(std::vector<std::string> &value
         }
 
         if (!IsInstanceOf("std.core.String", static_cast<ani_object>(ref))) {
-            LOG_ERROR("Not found 'Lstd/core/String;'");
+            LOG_ERROR("Not found 'std.core.String'");
             return false;
         }
 

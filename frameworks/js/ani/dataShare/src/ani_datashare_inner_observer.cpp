@@ -141,8 +141,8 @@ template<typename T>
 ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const std::vector<T> &values)
 {
     ani_class arrayCls;
-    if (ANI_OK != env->FindClass("C{escompat.Array}", &arrayCls)) {
-        LOG_ERROR("FindClass Lescompat/Array; Failed");
+    if (ANI_OK != env->FindClass("escompat.Array", &arrayCls)) {
+        LOG_ERROR("FindClass escompat.Array Failed");
         return nullptr;
     }
 

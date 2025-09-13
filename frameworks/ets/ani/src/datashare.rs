@@ -235,7 +235,7 @@ pub fn native_create<'local>(
             wrapper::ffi::DataShareNativeCreate(native_context, str_url, true, false);
     }
 
-    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"J:V\0") };
+    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"l:\0") };
     let datashare_class = env.find_class(DATA_SHARE).unwrap();
     let datashare_obj = env
         .new_object_with_signature(&datashare_class, ctor_signature, (datashare_helper_ptr,))

@@ -22,16 +22,16 @@ mod datashare_extension;
 
 const DATA_SHARE_PREDICATES: &CStr = unsafe {
     CStr::from_bytes_with_nul_unchecked(
-        b"L@ohos/data/dataSharePredicates/dataSharePredicates/DataSharePredicates;\0",
+        b"@ohos.data.dataSharePredicates.dataSharePredicates.DataSharePredicates\0",
     )
 };
 
 const DATA_SHARE: &CStr = unsafe {
-    CStr::from_bytes_with_nul_unchecked(b"L@ohos/data/dataShare/dataShare/DataShareHelperInner;\0")
+    CStr::from_bytes_with_nul_unchecked(b"@ohos.data.dataShare.dataShare.DataShareHelperInner\0")
 };
 
 const DATA_SHARE_EXTENSION_HELPER: &CStr = unsafe {
-    CStr::from_bytes_with_nul_unchecked(b"L@ohos/application/DataShareExtensionAbility/dataShareExtensionAbilityHelper/CallbackWrap;\0")
+    CStr::from_bytes_with_nul_unchecked(b"@ohos.application.DataShareExtensionAbility.dataShareExtensionAbilityHelper.CallbackWrap\0")
 };
 
 pub fn get_native_ptr<'local>(env: &AniEnv<'local>, obj: &AniObject) -> i64 {
@@ -40,7 +40,7 @@ pub fn get_native_ptr<'local>(env: &AniEnv<'local>, obj: &AniObject) -> i64 {
 }
 
 ani_constructor!(
-    class "L@ohos/data/DataShareResultSet/DataShareResultSetInner"
+    class "@ohos.data.DataShareResultSet.DataShareResultSetInner"
     [
         "goToFirstRow" : result_set::go_to_first_row,
         "goToLastRow" : result_set::go_to_last_row,
@@ -51,7 +51,7 @@ ani_constructor!(
         "close" : result_set::close,
     ]
 
-    class "L@ohos/data/dataSharePredicates/dataSharePredicates/DataSharePredicates"
+    class "@ohos.data.dataSharePredicates.dataSharePredicates.DataSharePredicates"
     [
         "create" : predicates::create,
         "equalTo" : predicates::native_equal_to,
@@ -76,7 +76,7 @@ ani_constructor!(
         "in" : predicates::native_in,
         "notIn" : predicates::native_not_in,
     ]
-    namespace "L@ohos/data/dataShare/dataShare"
+    namespace "@ohos.data.dataShare.dataShare"
     [
         "native_create": datashare::native_create,
         "native_query": datashare::native_query,
@@ -96,20 +96,20 @@ ani_constructor!(
         "native_off_rdb_data_change": datashare::native_off_rdb_data_change,
         "native_off_published_data_change": datashare::native_off_published_data_change,
     ]
-    class "L@ohos/data/dataShare/dataShare/DataShareHelperInner"
+    class "@ohos.data.dataShare.dataShare.DataShareHelperInner"
     [
         "addTemplate" : datashare::native_add_template,
         "delTemplate" : datashare::native_del_template,
     ]
-    class "L@ohos/data/dataSharePredicates/dataSharePredicates/Cleaner"
+    class "@ohos.data.dataSharePredicates.dataSharePredicates.Cleaner"
     [
         "native_clean" : predicates::native_clean,
     ]
-    class "L@ohos/data/dataShare/dataShare/Cleaner"
+    class "@ohos.data.dataShare.dataShare.Cleaner"
     [
         "native_clean" : datashare::native_clean,
     ]
-    namespace "L@ohos/application/DataShareExtensionAbility/dataShareExtensionAbilityHelper"
+    namespace "@ohos.application.DataShareExtensionAbility.dataShareExtensionAbilityHelper"
     [
         "nativeExtensionCallbackInt": datashare_extension::native_extension_callback_int,
         "nativeExtensionCallbackObject": datashare_extension::native_extension_callback_object,
