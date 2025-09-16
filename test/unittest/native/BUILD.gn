@@ -22,6 +22,7 @@ group("unittest") {
     "consumer:unittest",
     "common:unittest",
     "provider:unittest",
+    "proxy:unittest",
     "../../native/resource/datashare_ext_bundle:datashare_ext",
     "../../native/resource/datashareproxy_bundle/proxydatas_with_permission:proxydatas_with_permission",
     "../../native/resource/errorcode_ext_bundle:errorcode_ext",
