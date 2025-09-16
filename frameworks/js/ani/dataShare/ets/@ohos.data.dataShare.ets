@@ -27,7 +27,7 @@ import dataSharePredicates from '@ohos.data.dataSharePredicates'
 import { ValuesBucket } from '@ohos.data.ValuesBucket'
 
 export namespace dataShare {
-    loadLibrary("datashare_ani")
+    loadLibraryWithPermissionCheck("datashare_ani", "@ohos.data.dataShare")
 
     export interface DataShareHelperOptions {
         isProxy?: boolean;
