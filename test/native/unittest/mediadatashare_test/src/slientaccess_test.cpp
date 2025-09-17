@@ -708,6 +708,70 @@ HWTEST_F(SlientAccessTest, SlientAccess_Register_Test_001, TestSize.Level0)
 }
 
 /**
+* @tc.name: SlientAccess_Register_Test_002
+* @tc.desc: Test Observer Concurrent Notification in Silent Access Mode
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Create 10 IDataShareAbilityObserverTest instance and set initial name "zhangsan"
+* 2. Register 10 observer with SLIENT_ACCESS_URI
+* 3. Insert test data (name="lisi", age=25) using helper 20 times, 20 tasks are submited to the
+     queue for notification execution.
+* 4. Wait for observer notification
+* 5. Verify observer name changes to "OnChangeName"
+* 6. Delete test data and unregister observer
+* @tc.expect:
+* 1. Insert operation succeeds (retVal > 0)
+* 2. Observer is notified and name updates to "OnChangeName"
+* 3. Delete operation succeeds (retVal >= 0)
+*/
+HWTEST_F(SlientAccessTest, SlientAccess_Register_Test_002, TestSize.Level0)
+{
+    LOG_INFO("SlientAccess_Register_Test_002::Start");
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_URI);
+    int retVal;
+
+    std::vector<sptr<IDataShareAbilityObserverTest>> observerList;
+    for (int i = 0; i < 10; ++i) {
+        sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest());
+        dataObserver->SetName("zhangsan1");
+        retVal = helper->RegisterObserver(uri, dataObserver);
+        EXPECT_EQ(retVal, 0);
+        observerList.push_back(dataObserver);
+    }
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "lisi";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+
+    for (int i = 0; i < 20; ++i) {
+        retVal = helper->Insert(uri, valuesBucket);
+        EXPECT_EQ((retVal > 0), true);
+    }
+
+    for (int i = 0; i < 10; ++i) {
+        observerList[i]->data.Wait();
+        EXPECT_EQ(observerList[i]->GetName(), "OnChangeName");
+        observerList[i]->Clear();
+    }
+
+    DataShare::DataSharePredicates deletePredicates;
+    deletePredicates.EqualTo(TBL_STU_NAME, "lisi")->And()->EqualTo(TBL_STU_NAME, 25);
+    retVal = helper->Delete(uri, deletePredicates);
+    EXPECT_EQ((retVal >= 0), true);
+
+    for (int i = 0; i < 10; ++i) {
+        retVal = helper->UnregisterObserver(uri, observerList[i]);
+        EXPECT_EQ(retVal, 0);
+    }
+    LOG_INFO("SlientAccess_Register_Test_002::End");
+}
+
+/**
 * @tc.name: SlientAccess_RegisterErrorUri_Test_001
 * @tc.desc: Test observer registration with incorrect URI
 * @tc.type: FUNC
