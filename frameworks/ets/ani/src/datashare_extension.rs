@@ -91,7 +91,7 @@ pub fn call_arkts_update(
         .find_method(&helper_class, do_update_method_name)
         .unwrap();
 
-    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"J:V\0") };
+    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"l:\0") };
     let predicates_class = env.find_class(DATA_SHARE_PREDICATES).unwrap();
     let arg1 = env.serialize(&uri).unwrap();
     let arg2 = env
@@ -122,7 +122,7 @@ pub fn call_arkts_delete(
         .unwrap();
 
     let arg1 = env.serialize(&uri).unwrap();
-    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"J:V\0") };
+    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"l:\0") };
     let predicates_class = env.find_class(DATA_SHARE_PREDICATES).unwrap();
     let arg2 = env
         .new_object_with_signature(&predicates_class, ctor_signature, (predicates_ptr,))
@@ -153,7 +153,7 @@ pub fn call_arkts_query(
         .unwrap();
 
     let arg1 = env.serialize(&uri).unwrap();
-    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"J:V\0") };
+    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"l:\0") };
     let predicates_class = env.find_class(DATA_SHARE_PREDICATES).unwrap();
     let arg2 = env
         .new_object_with_signature(&predicates_class, ctor_signature, (predicates_ptr,))
