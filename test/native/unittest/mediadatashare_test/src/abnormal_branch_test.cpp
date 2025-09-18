@@ -689,8 +689,12 @@ HWTEST_F(AbnormalBranchTest, SetRegisterCallbackTest001, TestSize.Level0)
 {
     LOG_INFO("SetRegisterCallbackTest001::Start");
     auto datashareManager = DataShareManagerImpl::GetInstance();
+    size_t obsSize = datashareManager->observers_.Size();
+    ASSERT_NE(datashareManager, nullptr);
     std::function<void()> callback = [](){};
     datashareManager->SetRegisterCallback(nullptr, callback);
+    // observers_ size increased by 1
+    EXPECT_EQ(datashareManager->observers_.Size(), obsSize + 1);
     LOG_INFO("SetRegisterCallbackTest001::End");
 }
 
@@ -1030,6 +1034,7 @@ HWTEST_F(AbnormalBranchTest, GeneralControllerServiceImplNotifyChangeTest001, Te
     std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
     Uri uri(proxyUri);
     auto generalCtl = std::make_shared<GeneralControllerServiceImpl>(proxyUri);
+    ASSERT_NE(generalCtl, nullptr);
     generalCtl->NotifyChange(uri);
     LOG_INFO("GeneralControllerServiceImplNotifyChangeTest001::End");
 }
@@ -1049,7 +1054,12 @@ HWTEST_F(AbnormalBranchTest, GeneralControllerServiceImplSetRegisterCallbackTest
     LOG_INFO("GeneralControllerServiceImplSetRegisterCallbackTest001::Start");
     std::string proxyUri = "datashareproxy://com.acts.ohos.data.datasharetest/test";
     auto generalCtl = std::make_shared<GeneralControllerServiceImpl>(proxyUri);
+    ASSERT_NE(generalCtl, nullptr);
+    auto datashareManager = DataShareManagerImpl::GetInstance();
+    size_t obsSize = datashareManager->observers_.Size();
     generalCtl->SetRegisterCallback();
+    // size of dataShareManagerImpl observers_ increased by 1
+    EXPECT_EQ(datashareManager->observers_.Size(), obsSize + 1);
     LOG_INFO("GeneralControllerServiceImplSetRegisterCallbackTest001::End");
 }
 
