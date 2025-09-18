@@ -26,6 +26,7 @@ group("unittest") {
     ":DataShareBlockWriterImplTest",
     ":DataShareCommonTest",
     ":DataShareConnectionTest",
+    ":DataShareHelperImplRegisterTest",
     ":DataShareHelperImplTest",
     ":DataShareHelperTest",
     ":DataShareProxyTest",
@@ -915,6 +916,59 @@ ohos_unittest("DataProxyHandleTest") {
     cfi_vcall_icall_only = true
     blocklist = "../../cfi_blocklist.txt"
   }
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+ohos_unittest("DataShareHelperImplRegisterTest") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "../../cfi_blocklist.txt"
+  }
+
+  module_out_path = "data_share/data_share/inner_tests"
+
+  include_dirs = [
+    "${datashare_base_path}/frameworks/native/common/include/",
+    "${datashare_base_path}/test/unittest/native/consumer/include/",
+  ]
+
+  sources = [
+    "./unittest/mediadatashare_test/src/datashare_helper_impl_register_test.cpp"
+  ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_context",
+    "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "hitrace:libhitracechain",
+    "ipc:ipc_single",
+    "ipc:rpc",
+    "samgr:samgr_proxy",
+  ]
 
   cflags = [
     "-fvisibility=hidden",
