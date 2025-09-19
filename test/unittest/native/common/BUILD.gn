@@ -21,10 +21,12 @@ group("unittest") {
   deps += [
     ":DataShareAbsResultSetTest",
     ":DataShareBlockWriterImplTest",
+    ":DatashareItypesUtilsTest",
     ":DatashareResultSetTest",
     ":DataShareURIUtilsTest",
     ":ValueProxyTest",
     ":IsharedResultSetStubTest",
+    ":SharedBlockTest",
   ]
 }
 
@@ -121,6 +123,55 @@ ohos_unittest("DataShareBlockWriterImplTest") {
     "ipc:ipc_single",
     "kv_store:distributeddata_inner",
   ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+ohos_unittest("DatashareItypesUtilsTest") {
+  module_out_path = "data_share/data_share/native/common"
+
+  include_dirs = [
+    "${datashare_native_consumer_path}/include",
+    "${datashare_common_native_path}/include",
+    "${datashare_innerapi_path}/consumer/include",
+    "${datashare_innerapi_path}/common/include",
+    "${datashare_innerapi_path}/provider/include",
+    "${datashare_native_consumer_path}/controller/provider/include",
+    "${datashare_native_consumer_path}/controller/common",
+    "${datashare_native_consumer_path}/controller/service/include",
+    "${datashare_native_proxy_path}/include",
+  ]
+
+  sources = [
+    "${datashare_base_path}/test/unittest/native/common/src/datashare_itypes_utils_test.cpp",
+  ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+
+  external_deps = [
+    "ability_base:zuri",
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
+  ]
+
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+  }
 
   cflags = [
     "-fvisibility=hidden",
@@ -246,7 +297,30 @@ ohos_unittest("IsharedResultSetStubTest") {
     "ipc:ipc_core",
     "samgr:samgr_proxy",
   ]
- 
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+ohos_unittest("SharedBlockTest") {
+  module_out_path = "data_share/data_share/native/common"
+
+  include_dirs = [ "${datashare_common_native_path}/include" ]
+
+  sources = [ "${datashare_base_path}/test/unittest/native/common/src/shared_block_test.cpp" ]
+
+  deps = [ "${datashare_innerapi_path}/common:datashare_common_static" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+  ]
+
   cflags = [
     "-fvisibility=hidden",
     "-Dprivate=public",
