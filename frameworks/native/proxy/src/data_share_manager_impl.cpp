@@ -72,14 +72,14 @@ sptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
     if (remoteObject == nullptr) {
         // check SA failed, try load SA
         LOG_ERROR("get distributed data manager failed");
-        // callbcak of load
+        // callback of load
         sptr<ServiceProxyLoadCallback> loadCallback = new (std::nothrow) ServiceProxyLoadCallback();
         if (loadCallback == nullptr) {
             LOG_ERROR("Create load callback failed.");
             return nullptr;
         }
         int32_t errCode = manager->LoadSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, loadCallback);
-        // satrt load fialed
+        // start load failed
         if (errCode != ERR_OK) {
             LOG_ERROR("load SA failed, err: %{public}d", errCode);
         }
