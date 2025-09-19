@@ -22,7 +22,9 @@ config("public_ffi_config") {
 ohos_shared_library("cj_data_share_predicates_ffi") {
   branch_protector_ret = "pac_ret"
 
-  include_dirs = []
+  include_dirs = [
+    "${datashare_common_native_path}/include",
+  ]
 
   sanitize = {
     cfi = true
