@@ -80,6 +80,9 @@ private:
     std::shared_ptr<JsDataShareExtAbility> GetOwner();
     bool CheckCallingPermission(const std::string &permission);
     void GetCallingInfo(CallingInfo& callingInfo);
+    bool IsCallerSystemApp(const CallingInfo &callingInfo, const uint64_t fullTokenId);
+    void VerifyProvider(const CallingInfo &callingInfo, const uint64_t fullTokenId,
+        const std::string &uri = "");
     std::shared_ptr<JsDataShareExtAbility> extension_;
     std::shared_ptr<DataShare::DataShareUvQueue> uvQueue_;
     std::mutex mutex_;

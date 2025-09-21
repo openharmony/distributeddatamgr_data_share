@@ -37,10 +37,11 @@ public:
     static constexpr const char* extensionFailed = "EXT_FAILED";
     static constexpr const char* silentFailed = "SILENT_FAILED";
     static constexpr const char* trustsFailed = "TRUSTS_FAILED";
+    static constexpr const char* invalidProvider = "INVALID_PROVIDER";
     static void ReportDataFault(const DataShareFaultInfo &faultInfo);
     static std::pair<std::string, int> GetCallingName(uint32_t callingTokenid);
 };
 
 } // namespace DataShare
 } // namespace OHOS
-#endif // DATASHARESERVICE_HIVIEW_ADAPTER_H
+#endif // DATASHARESERVICE_HIVIEW_ADAPTER_H
