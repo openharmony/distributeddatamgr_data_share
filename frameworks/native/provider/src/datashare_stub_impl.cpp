@@ -28,6 +28,7 @@
 #include "datashare_string_utils.h"
 #include "hiview_datashare.h"
 #include "ipc_skeleton.h"
+#include "tokenid_kit.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -35,6 +36,13 @@ using OHOS::Security::AccessToken::AccessTokenKit;
 
 constexpr int DEFAULT_NUMBER = -1;
 constexpr int PERMISSION_ERROR_NUMBER = -2;
+const std::set<std::string> PROVIDER_LIST = {
+    "5765880207853551549",
+    "5765880207853570539",
+    "5765880207853771197",
+    "5765880207854616753"
+}; // Allowlist corresponds to datamgr_service providerIdentifiers list
+
 std::shared_ptr<JsDataShareExtAbility> DataShareStubImpl::GetOwner()
 {
     if (extension_ == nullptr) {
@@ -67,6 +75,50 @@ bool DataShareStubImpl::CheckCallingPermission(const std::string &permission)
     }
     LOG_WARN("permission not granted. permission %{public}s, token %{public}d", permission.c_str(), token);
     return false;
+}
+
+bool DataShareStubImpl::IsCallerSystemApp(const CallingInfo &callingInfo, const uint64_t fullTokenId)
+{
+    // GetTokenType use tokenId, and IsSystemApp use fullTokenId, these are different
+    Security::AccessToken::ATokenTypeEnum tokenType =
+        Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callingInfo.callingTokenId);
+    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP ||
+        tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
+        return true;
+    }
+    //  Actions inside IsSystemAppByFullTokenID do not require IPC
+    return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
+}
+
+void DataShareStubImpl::VerifyProvider(const CallingInfo &callingInfo, const uint64_t fullTokenId,
+    const std::string &uri)
+{
+    if (IsCallerSystemApp(callingInfo, fullTokenId)) {
+        return;
+    }
+
+    AppExecFwk::BundleInfo bundleInfo;
+    auto bmsHelper = DelayedSingleton<BundleMgrHelper>::GetInstance();
+    if (bmsHelper == nullptr) {
+        LOG_ERROR("BmsHelper is nullptr! uri: %{public}s", DataShareStringUtils::Anonymous(uri).c_str());
+        return;
+    }
+
+    bool ret = bmsHelper->GetBundleInfoForSelf(
+        (static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION) +
+            static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO)), bundleInfo);
+    if (!ret) {
+        LOG_ERROR("Get BundleInfo failed! uri: %{public}s", DataShareStringUtils::Anonymous(uri).c_str());
+        return;
+    }
+
+    if (PROVIDER_LIST.find(bundleInfo.signatureInfo.appIdentifier) == PROVIDER_LIST.end()) {
+        LOG_ERROR("Provider: %{public}s not in allow list visited by pid: %{public}d",
+            bundleInfo.applicationInfo.bundleName.c_str(), callingInfo.callingPid);
+        DataShareFaultInfo faultInfo{HiViewFaultAdapter::invalidProvider,
+            bundleInfo.applicationInfo.bundleName.c_str(), "", "", __FUNCTION__, -1, ""};
+        HiViewFaultAdapter::ReportDataFault(faultInfo);
+    }
 }
 
 std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
@@ -151,6 +203,8 @@ int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value
 {
     CallingInfo info;
     GetCallingInfo(info);
+    // Only log when check failed
+    VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
@@ -188,6 +242,8 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
 {
     CallingInfo info;
     GetCallingInfo(info);
+    // Only log when check failed
+    VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
@@ -224,6 +280,9 @@ int DataShareStubImpl::BatchUpdate(const UpdateOperations &operations, std::vect
 {
     CallingInfo info;
     GetCallingInfo(info);
+    // Only log when check failed
+    VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID());
+
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
     if (extension == nullptr) {
@@ -259,6 +318,8 @@ int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predica
 {
     CallingInfo info;
     GetCallingInfo(info);
+    // Only log when check failed
+    VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
@@ -295,6 +356,8 @@ std::pair<int32_t, int32_t> DataShareStubImpl::InsertEx(const Uri &uri, const Da
 {
     CallingInfo info;
     GetCallingInfo(info);
+    // Only log when check failed
+    VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
@@ -332,6 +395,8 @@ std::pair<int32_t, int32_t> DataShareStubImpl::UpdateEx(const Uri &uri, const Da
 {
     CallingInfo info;
     GetCallingInfo(info);
+    // Only log when check failed
+    VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
@@ -368,6 +433,8 @@ std::pair<int32_t, int32_t> DataShareStubImpl::DeleteEx(const Uri &uri, const Da
 {
     CallingInfo info;
     GetCallingInfo(info);
+    // Only log when check failed
+    VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
@@ -405,6 +472,9 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
 {
     CallingInfo info;
     GetCallingInfo(info);
+    // Only log when check failed
+    VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
+
     std::shared_ptr<DataShareResultSet> resultSet = nullptr;
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
@@ -474,6 +544,9 @@ int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareVa
 {
     CallingInfo info;
     GetCallingInfo(info);
+    // Only log when check failed
+    VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
+
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
     if (extension == nullptr) {
