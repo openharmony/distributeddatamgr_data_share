@@ -130,7 +130,6 @@ void NAPIInnerObserver::OnChange(const DataShareObserver::ChangeInfo& changeInfo
         LOG_ERROR("napi_send_event failed: %{public}d", ret);
         delete observerWorker;
     }
-    LOG_INFO("NAPIObs DS CB end");
 }
 
 void NAPIInnerObserver::DeleteReference()

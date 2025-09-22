@@ -73,7 +73,7 @@ __attribute__ ((no_sanitize("cfi"))) int AmsMgrProxy::Connect(
     want.SetUri(DataShareURIUtils::FormatUri(uri));
     std::lock_guard<std::mutex> lock(mutex_);
     if (ConnectSA()) {
-        LOG_INFO("connect start, uri = %{public}s", DataShareStringUtils::Change(uri).c_str());
+        LOG_INFO("uri = %{public}s", DataShareStringUtils::Change(uri).c_str());
         return proxy_->ConnectAbilityCommon(want, connect, callerToken, AppExecFwk::ExtensionAbilityType::DATASHARE,
             userId);
     }
