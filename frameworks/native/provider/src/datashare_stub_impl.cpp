@@ -104,11 +104,12 @@ void DataShareStubImpl::VerifyProvider(const CallingInfo &callingInfo, const uin
         return;
     }
 
-    bool ret = bmsHelper->GetBundleInfoForSelf(
+    auto ret = bmsHelper->GetBundleInfoForSelf(
         (static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION) +
             static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO)), bundleInfo);
-    if (!ret) {
-        LOG_ERROR("Get BundleInfo failed! uri: %{public}s", DataShareStringUtils::Anonymous(uri).c_str());
+    if (ret != E_OK) {
+        LOG_ERROR("Get BundleInfo failed! uri: %{public}s, ret: %{public}d",
+            DataShareStringUtils::Anonymous(uri).c_str(), ret);
         return;
     }
 
