@@ -42,7 +42,7 @@ const std::chrono::milliseconds TIME_THRESHOLD = std::chrono::milliseconds(200);
 void DataShareConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    LOG_INFO("on connect done, req uri:%{public}s, rev uri:%{public}s, ret=%{public}d",
+    LOG_INFO("req uri:%{public}s, rev uri:%{public}s, ret=%{public}d",
         DataShareStringUtils::Change(uri_.ToString()).c_str(),
         DataShareStringUtils::Change(element.GetURI()).c_str(), resultCode);
     if (remoteObject == nullptr) {
@@ -55,6 +55,7 @@ void DataShareConnection::OnAbilityConnectDone(
         sptr<DataShareProxy> proxy = new (std::nothrow) DataShareProxy(remoteObject);
         if (proxy == nullptr) {
             LOG_ERROR("Create DataShareProxy failed");
+            condition_.condition.notify_all();
             return;
         }
         dataShareProxy_ = std::shared_ptr<DataShareProxy>(proxy.GetRefPtr(), [holder = proxy](const auto *) {});
@@ -84,7 +85,7 @@ void DataShareConnection::OnAbilityConnectDone(
  */
 void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    LOG_INFO("on disconnect done, req uri:%{public}s, rev uri:%{public}s, ret=%{public}d",
+    LOG_INFO("req uri:%{public}s, rev uri:%{public}s, ret=%{public}d",
         DataShareStringUtils::Change(uri_.ToString()).c_str(),
         DataShareStringUtils::Change(element.GetURI()).c_str(), resultCode);
     std::string uri;
@@ -237,7 +238,7 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
         return nullptr;
     }
     ErrCode ret = instance->Connect(reqUri, this, token);
-    LOG_INFO("connect ability, uri = %{public}s. ret = %{public}d", DataShareStringUtils::Change(reqUri).c_str(), ret);
+    LOG_INFO("uri = %{public}s. ret = %{public}d", DataShareStringUtils::Change(reqUri).c_str(), ret);
     if (ret != ERR_OK) {
         return nullptr;
     }
@@ -279,7 +280,7 @@ void DataShareConnection::DisconnectDataShareExtAbility()
     }
 
     ErrCode ret = Disconnect();
-    LOG_INFO("disconnect uri:%{public}s, ret = %{public}d", DataShareStringUtils::Change(uri).c_str(), ret);
+    LOG_INFO("uri:%{public}s, ret = %{public}d", DataShareStringUtils::Change(uri).c_str(), ret);
     if (ret == E_OK) {
         return;
     }
