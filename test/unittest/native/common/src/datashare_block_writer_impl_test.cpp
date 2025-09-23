@@ -54,6 +54,27 @@ HWTEST_F(DataShareBlockWriterImplTest, AllocRowTest001, TestSize.Level0)
 }
 
 /**
+* @tc.name: FreeLastRowTest001
+* @tc.desc: test FreeLastRow function when shareBlock_ = nullptr
+* @tc.type: FUNC
+* @tc.require:issueIC413F
+* @tc.precon: None
+* @tc.step:
+    1.Create a DataShareBlockWriterImpl object and shareBlock_ = nullptr
+    2.call FreeLastRow function and check the result
+* @tc.experct: FreeLastRow failed and reutrn E_ERROR
+*/
+HWTEST_F(DataShareBlockWriterImplTest, FreeLastRowTest001, TestSize.Level0)
+{
+    LOG_INFO("DataShareBlockWriterImplTest FreeLastRowTest001::Start");
+    DataShareBlockWriterImpl dataShareBlockWriterImpl;
+    dataShareBlockWriterImpl.shareBlock_ = nullptr;
+    auto result = dataShareBlockWriterImpl.FreeLastRow();
+    EXPECT_EQ(result, E_ERROR);
+    LOG_INFO("DataShareBlockWriterImplTest FreeLastRowTest001::End");
+}
+
+/**
 * @tc.name: WriteTest001
 * @tc.desc: test Write function when shareBlock_ = nullptr
 * @tc.type: FUNC
