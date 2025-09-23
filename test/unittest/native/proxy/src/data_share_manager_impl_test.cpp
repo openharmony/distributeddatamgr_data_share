@@ -19,6 +19,7 @@
 
 #include "datashare_log.h"
 #include "idata_share_client_death_observer.h"
+#include "ikvstore_data_service.h"
 #include "iremote_object.h"
 #include "refbase.h"
 #include "system_ability_definition.h"
@@ -71,18 +72,13 @@ public:
 
 /**
  * @tc.name: ServiceProxyLoadCallback001
- * @tc.desc: test VerifyPermission function when permission is empty
+ * @tc.desc: test ServiceProxyLoadCallback normal func
  * @tc.type: FUNC
- * @tc.require:issueICU06G
- * @tc.precon: None
- * @tc.step:
-    1.define permission as empty
-    2.call VerifyPermission function and check the result
- * @tc.experct: VerifyPermission return true
  */
 HWTEST_F(DataShareManagerImplTest, ServiceProxyLoadCallback001, TestSize.Level0)
 {
     LOG_INFO("DataShareManagerImplTest ServiceProxyLoadCallback001::Start");
+
     // get callback sptr
     sptr<DataShareManagerImpl::ServiceProxyLoadCallback> loadCallback =
         new (std::nothrow) DataShareManagerImpl::ServiceProxyLoadCallback();
@@ -110,6 +106,56 @@ HWTEST_F(DataShareManagerImplTest, ServiceProxyLoadCallback001, TestSize.Level0)
     loadCallback->OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject);
 
     LOG_INFO("DataShareManagerImplTest ServiceProxyLoadCallback001::End");
+}
+
+/**
+ * @tc.name: GetDataShareServiceProxy001
+ * @tc.desc: test GetDataShareServiceProxy normal func
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareManagerImplTest, GetDataShareServiceProxy001, TestSize.Level0)
+{
+    LOG_INFO("DataShareManagerImplTest GetDataShareServiceProxy001::Start");
+
+    auto manager = DataShareManagerImpl::GetInstance();
+    ASSERT_NE(manager, nullptr);
+    // manager->dataMgrService_ is nullptr
+    manager->dataMgrService_ = nullptr;
+    auto proxy = manager->GetDataShareServiceProxy();
+    ASSERT_NE(proxy, nullptr);
+
+    // manager->dataMgrService_ is not nullptr
+    manager->dataMgrService_ = DataShareManagerImpl::GetDistributedDataManager();
+    ASSERT_NE(manager->dataMgrService_, nullptr);
+    proxy = manager->GetDataShareServiceProxy();
+    ASSERT_NE(proxy, nullptr);
+
+    LOG_INFO("DataShareManagerImplTest GetDataShareServiceProxy001::End");
+}
+
+/**
+ * @tc.name: GetProxy001
+ * @tc.desc: test GetProxy normal func
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareManagerImplTest, GetProxy001, TestSize.Level0)
+{
+    LOG_INFO("DataShareManagerImplTest GetProxy001::Start");
+
+    auto manager = DataShareManagerImpl::GetInstance();
+    ASSERT_NE(manager, nullptr);
+    // manager->dataMgrService_ is nullptr
+    manager->dataMgrService_ = nullptr;
+    auto proxy = manager->GetProxy();
+    ASSERT_NE(proxy, nullptr);
+
+    // manager->dataMgrService_ is not nullptr
+    manager->dataMgrService_ = DataShareManagerImpl::GetDistributedDataManager();
+    ASSERT_NE(manager->dataMgrService_, nullptr);
+    proxy = manager->GetProxy();
+    ASSERT_NE(proxy, nullptr);
+
+    LOG_INFO("DataShareManagerImplTest GetProxy001::End");
 }
 }
 }

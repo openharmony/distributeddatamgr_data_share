@@ -109,7 +109,7 @@ private:
 
     std::shared_ptr<DataShareServiceProxy> GetProxy();
 
-    void LinkToDeath(const sptr<IRemoteObject> remote);
+    bool LinkToDeath(const sptr<IRemoteObject> remote);
 
     sptr<DataShareServiceProxy> GetDataShareServiceProxy();
 
