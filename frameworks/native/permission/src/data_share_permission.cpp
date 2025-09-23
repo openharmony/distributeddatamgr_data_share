@@ -37,7 +37,6 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-static constexpr const char *NO_PERMISSION = "noPermission";
 
 void DataSharePermission::SubscribeCommonEvent()
 {
@@ -154,15 +153,15 @@ bool IsInExtensionTrusts(std::string& consumer, std::string& provider)
 
 int32_t DataSharePermission::UriIsTrust(Uri &uri)
 {
-    std::string schema = uri.GetScheme();
-    if (schema == SCHEMA_PREFERENCE ||  schema == SCHEMA_RDB || schema == SCHEMA_FILE) {
+    std::string scheme = uri.GetScheme();
+    if (scheme == SCHEME_PREFERENCE ||  scheme == SCHEME_RDB || scheme == SCHEME_FILE) {
         return E_OK;
     }
     if (IsInUriTrusts(uri)) {
         return E_OK;
     }
-    if (!schema.empty() && schema != SCHEMA_DATASHARE && schema != SCHEMA_DATASHARE_PROXY) {
-        LOG_ERROR("invalid uri %{public}s, schema %{public}s",
+    if (!scheme.empty() && scheme != SCHEME_DATASHARE && scheme != SCHEME_DATASHARE_PROXY) {
+        LOG_ERROR("invalid uri %{public}s, scheme %{public}s",
             uri.ToString().c_str(), uri.GetScheme().c_str());
         return E_DATASHARE_INVALID_URI;
     }
@@ -217,7 +216,7 @@ std::pair<int, std::string> DataSharePermission::GetExtensionUriPermission(Uri &
     return std::make_pair(E_OK, permission);
 }
 
-std::pair<int, std::string> DataSharePermission::GetUriPermission(Uri &uri, int32_t user, bool isRead, bool isExtension)
+std::pair<int, std::string> DataSharePermission::GetUriPermission(Uri &uri, int32_t user, bool isRead, bool &isSilent)
 {
     std::string uriStr = uri.ToString();
     if (uriStr.empty()) {
@@ -233,12 +232,17 @@ std::pair<int, std::string> DataSharePermission::GetUriPermission(Uri &uri, int3
     std::string uriWithoutQuery = uriStr;
     DataShareStringUtils::RemoveFromQuery(uriWithoutQuery);
     Uri formatUri(uriWithoutQuery);
-    if (isExtension) {
-        std::tie(ret, permission) = GetExtensionUriPermission(formatUri, user, isRead);
-    } else {
+    std::string scheme = uri.GetScheme();
+    if (scheme == SCHEME_DATASHARE_PROXY) {
         std::tie(ret, permission) = GetSilentUriPermission(formatUri, user, isRead);
+        if (ret == E_OK) {
+            isSilent = true;
+            return std::make_pair(E_OK, permission);
+        }
     }
+    std::tie(ret, permission) = GetExtensionUriPermission(formatUri, user, isRead);
     if (ret == E_OK) {
+        isSilent = false;
         return std::make_pair(E_OK, permission);
     }
     return std::make_pair(ret, "");
@@ -291,24 +295,6 @@ std::pair<int, std::string> DataSharePermission::GetSilentUriPermission(Uri &uri
     return std::make_pair(E_OK, permission);
 }
 
-int DataSharePermission::CheckExtensionTrusts(uint32_t consumerToken, uint32_t providerToken)
-{
-    auto [consumer, ret1] = HiViewFaultAdapter::GetCallingName(consumerToken);
-    auto [provider, ret2] = HiViewFaultAdapter::GetCallingName(providerToken);
-    if (ret1 != E_OK || ret2 != E_OK) {
-        LOG_ERROR("GetCallingName failed, consumer %{public}d %{public}s provider %{public}d "
-            "%{public}s", consumerToken, consumer.c_str(), providerToken, provider.c_str());
-        return E_GET_CALLER_NAME_FAILED;
-    }
-    if (IsInExtensionTrusts(consumer, provider)) {
-        return E_OK;
-    }
-    LOG_ERROR("CheckExtensionTrusts failed, consumer %{public}d %{public}s provider %{public}d "
-        "%{public}s", consumerToken, consumer.c_str(), providerToken, provider.c_str());
-    ReportExcuteFault(E_NOT_IN_TRUSTS, consumer, provider);
-    return E_NOT_IN_TRUSTS;
-}
-
 bool DataSharePermission::VerifyPermission(uint32_t tokenID, std::string &permission)
 {
     if (permission.empty() || permission == NO_PERMISSION) {
@@ -321,7 +307,7 @@ bool DataSharePermission::VerifyPermission(uint32_t tokenID, std::string &permis
     return true;
 }
 
-bool DataSharePermission::VerifyPermission(Uri &uri, uint32_t tokenID, std::string &permission, bool isExtension)
+bool DataSharePermission::VerifyPermission(Uri &uri, uint32_t tokenID, std::string &permission, bool isSilentUri)
 {
     if (permission == NO_PERMISSION) {
         return true;
@@ -335,11 +321,11 @@ bool DataSharePermission::VerifyPermission(Uri &uri, uint32_t tokenID, std::stri
     if (ret != E_OK) {
         LOG_WARN("GetCallingName failed, ret %{public}d", ret);
     }
-    if (permission.empty() && isExtension) {
+    if (permission.empty() && !isSilentUri) {
         return true;
     }
 
-    if (permission.empty() && !isExtension) {
+    if (permission.empty() && isSilentUri) {
         LOG_INFO("Permission empty! token: %{public}d", tokenID);
         Security::AccessToken::HapTokenInfo tokenInfo;
         auto result = Security::AccessToken::AccessTokenKit::GetHapTokenInfo(tokenID, tokenInfo);
@@ -385,6 +371,18 @@ int32_t DataSharePermission::IsExtensionValid(uint32_t tokenId, uint32_t fullTok
         }
     }
     return E_NOT_DATASHARE_EXTENSION;
+}
+
+bool DataSharePermission::IsDataShareUri(Uri &uri)
+{
+    std::string scheme = uri.GetScheme();
+    if (scheme == SCHEME_DATASHARE || scheme == SCHEME_DATASHARE_PROXY ||scheme == SCHEME_FILE) {
+        return true;
+    }
+    if (IsInUriTrusts(uri)) {
+        return true;
+    }
+    return false;
 }
 
 DataSharePermission::SysEventSubscriber::SysEventSubscriber(const EventFwk::CommonEventSubscribeInfo& info,

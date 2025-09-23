@@ -994,6 +994,8 @@ ohos_unittest("DataShareHelperImplRegisterTest") {
     "ability_runtime:app_context",
     "ability_runtime:dataobs_manager",
     "ability_runtime:extension_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libtoken_setproc",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "googletest:gmock_main",

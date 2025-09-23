@@ -216,7 +216,7 @@ int GeneralControllerServiceImpl::RegisterObserver(const Uri &uri,
         return E_DATA_OBS_NOT_READY;
     }
     bool isSystem = DataShareServiceProxy::IsSystem();
-    ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver, -1, AAFwk::DataObsOption(isSystem));
+    ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver, -1, AAFwk::DataObsOption(isSystem, true));
     LOG_INFO("Register silent observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
     return ret;
@@ -231,7 +231,7 @@ int GeneralControllerServiceImpl::UnregisterObserver(const Uri &uri,
         return E_DATA_OBS_NOT_READY;
     }
     bool isSystem = DataShareServiceProxy::IsSystem();
-    ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver, -1, AAFwk::DataObsOption(isSystem));
+    ErrCode ret = obsMgrClient->UnregisterObserver(uri, dataObserver, -1, AAFwk::DataObsOption(isSystem, true));
     LOG_INFO("Unregister silent observer ret: %{public}d, uri: %{public}s", ret,
         DataShareStringUtils::Anonymous(uri.ToString()).c_str());
     return ret;

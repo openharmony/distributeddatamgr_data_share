@@ -117,6 +117,33 @@
           "name": "dataProperties",
           "resource": "$profile:permission2"
         }
+      },
+      {
+        "uri": "datashareproxy://com.acts.datasharetest/noread",
+        "requiredReadPermission":"ohos.permission.SYSTEM_LIGHT_CONTROL",
+        "requiredWritePermission":"ohos.permission.GET_BUNDLE_INFO",
+        "metadata": {
+          "name": "dataProperties",
+          "resource": "$profile:test"
+        }
+      },
+      {
+        "uri": "datashareproxy://com.acts.datasharetest/nowrite",
+        "requiredReadPermission":"ohos.permission.GET_BUNDLE_INFO",
+        "requiredWritePermission":"ohos.permission.SYSTEM_LIGHT_CONTROL",
+        "metadata": {
+          "name": "dataProperties",
+          "resource": "$profile:test"
+        }
+      },
+      {
+        "uri": "datashareproxy://com.acts.datasharetest/noall",
+        "requiredReadPermission":"ohos.permission.SYSTEM_LIGHT_CONTROL",
+        "requiredWritePermission":"ohos.permission.SYSTEM_LIGHT_CONTROL",
+        "metadata": {
+          "name": "dataProperties",
+          "resource": "$profile:test"
+        }
       }
     ]
   }
