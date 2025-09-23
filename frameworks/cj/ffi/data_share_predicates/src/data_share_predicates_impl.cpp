@@ -14,8 +14,8 @@
  */
 
 #include "data_share_predicates_impl.h"
-
 #include "data_share_predicates_utils.h"
+#include "datashare_log.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -31,6 +31,10 @@ std::shared_ptr<DataSharePredicates> DataSharePredicatesImpl::GetPredicates()
 
 void DataSharePredicatesImpl::EqualTo(const char *field, CValueType value)
 {
+    if (field == nullptr) {
+        LOG_ERROR("field is nullptr");
+        return;
+    }
     std::string cField = field;
     SingleValue::Type valueObject = parseValueType(value);
     predicates_->EqualTo(cField, valueObject);
@@ -43,12 +47,20 @@ void DataSharePredicatesImpl::And()
 
 void DataSharePredicatesImpl::OrderByAsc(const char *field)
 {
+    if (field == nullptr) {
+        LOG_ERROR("field is nullptr");
+        return;
+    }
     std::string cField = field;
     predicates_->OrderByAsc(cField);
 }
 
 void DataSharePredicatesImpl::OrderByDesc(const char *field)
 {
+    if (field == nullptr) {
+        LOG_ERROR("field is nullptr");
+        return;
+    }
     std::string cField = field;
     predicates_->OrderByDesc(cField);
 }
@@ -60,6 +72,14 @@ void DataSharePredicatesImpl::Limit(const int32_t total, const int32_t offset)
 
 void DataSharePredicatesImpl::In(const char *field, CValueType *values, int64_t valuesSize)
 {
+    if (field == nullptr) {
+        LOG_ERROR("field is nullptr");
+        return;
+    }
+    if (values == nullptr) {
+        LOG_ERROR("values is nullptr");
+        return;
+    }
     std::string cField = field;
     auto valuesArray = parseValueTypeArray(values, valuesSize);
     predicates_->In(cField, valuesArray);
