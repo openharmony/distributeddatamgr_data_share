@@ -277,7 +277,7 @@ public:
      *
      * @return Return true if success. otherwise return false.
      */
-    bool NotifyChangeWithUser(const Uri &uri, int32_t userId);
+    bool NotifyChangeWithUser(const Uri &uri, int32_t userId, uint32_t callingToken, int32_t callingPid);
 
     /**
      * @brief Converts the given uri that refer to the Data ability into a normalized URI. A normalized URI can be used

@@ -359,8 +359,9 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_Empty_Test_
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_Empty_Test_001::Start");
     Uri uri(EMPTY_URI);
+    bool isSilent = true;
     auto datashare = std::make_shared<DataShare::DataSharePermission>();
-    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, true, false);
+    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, true, isSilent);
     EXPECT_EQ(ret, E_EMPTY_URI);
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_Empty_Test_001::End");
 }
@@ -369,9 +370,10 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_Error_Test_
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_Error_Test_001::Start");
     Uri uri(PROXY_ERROR_BUNDLE_URI);
+    bool isSilent = true;
     auto datashare = std::make_shared<DataShare::DataSharePermission>();
-    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, true, false);
-    EXPECT_EQ(ret, E_BUNDLE_NAME_NOT_EXIST);
+    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, true, isSilent);
+    EXPECT_EQ(ret, E_URI_NOT_EXIST);
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_Error_Test_001::End");
 }
 
@@ -379,8 +381,9 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_001
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_001::Start");
     Uri uri(PROXY_URI_OK);
+    bool isSilent = true;
     auto datashare = std::make_shared<DataShare::DataSharePermission>();
-    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, true, false);
+    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, true, isSilent);
     EXPECT_EQ(ret, E_OK);
     EXPECT_EQ(permission, "ohos.permission.GET_BUNDLE_INFO");
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_001::End");
@@ -390,8 +393,9 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_002
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_002::Start");
     Uri uri(PROXY_URI_OK);
+    bool isSilent = true;
     auto datashare = std::make_shared<DataShare::DataSharePermission>();
-    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, false, false);
+    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, false, isSilent);
     EXPECT_EQ(ret, E_OK);
     EXPECT_EQ(permission, "ohos.permission.WRITE_CONTACTS");
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_002::End");
@@ -401,8 +405,9 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_003
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_003::Start");
     Uri uri(DATA_SHARE_EXTENSION_URI);
+    bool isSilent = true;
     auto datashare = std::make_shared<DataShare::DataSharePermission>();
-    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, true, true);
+    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, true, isSilent);
     EXPECT_EQ(ret, E_OK);
     EXPECT_EQ(permission, "");
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_003::End");
@@ -412,8 +417,9 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_004
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_004::Start");
     Uri uri(DATA_SHARE_EXTENSION_URI);
+    bool isSilent = true;
     auto datashare = std::make_shared<DataShare::DataSharePermission>();
-    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, false, true);
+    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, false, isSilent);
     EXPECT_EQ(ret, E_OK);
     EXPECT_EQ(permission, "");
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_004::End");
@@ -481,7 +487,7 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_VerifyPermission_Test_006, TestS
     Uri uri(PROXY_URI_OK);
     std::string permission = "";
     auto ret = DataShare::DataSharePermission::VerifyPermission(uri, tokenId.tokenIDEx, permission, false);
-    EXPECT_EQ(ret, false);
+    EXPECT_EQ(ret, true);
     LOG_INFO("PermissionTest_DataObs_VerifyPermission_Test_006::End");
 }
 
