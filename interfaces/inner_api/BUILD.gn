@@ -74,6 +74,7 @@ datashare_consumer_sources = [
 datashare_consumer_external_deps = [
   "ability_base:want",
   "ability_base:zuri",
+  "ability_runtime:ability_connect_callback_stub",
   "ability_runtime:app_context",
   "ability_runtime:extension_manager",
   "bundle_framework:appexecfwk_core_headers",
