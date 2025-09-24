@@ -50,6 +50,16 @@ int DataShareBlockWriterImpl::AllocRow()
     return ConvertErrorCode(block->AllocRow());
 }
 
+int DataShareBlockWriterImpl::FreeLastRow()
+{
+    auto block = GetBlock();
+    if (block == nullptr) {
+        LOG_ERROR("shareBlock_ is nullptr");
+        return E_ERROR;
+    }
+    return ConvertErrorCode(block->FreeLastRow());
+}
+
 int DataShareBlockWriterImpl::Write(uint32_t column)
 {
     auto block = GetBlock();

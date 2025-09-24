@@ -49,6 +49,11 @@ public:
     int AllocRow() override;
 
     /**
+     * Free the last row.
+     */
+    int FreeLastRow() override;
+
+    /**
      * Write Null data to the shared block.
      */
     virtual int Write(uint32_t column) override;

@@ -251,5 +251,54 @@ HWTEST_F(DataShareResultSetTest, ResultSet_IsEnded_Test_001, TestSize.Level0)
     LOG_INFO("[ttt] ResultSet_IsEnded_Test_001::End");
 }
 
+/**
+* @tc.name: ResultSet_ShareBlock_Test_001
+* @tc.desc: Test the 2 MB shared memory is full.
+* @tc.type: FUNC
+* @tc.require: NA
+* @tc.precon: None
+* @tc.step:
+* 1. Insert test data (name=string value(200000, 'a'), age=25) into SLIENT_ACCESS_URI 20 times
+* 2. Call Query() to obtain resultSet with SLIENT_ACCESS_URI
+* 3. Read the string in the first column of resultSet.
+*    The data exceeds 2 MB, pages are turned in the shared memory.
+* 4. Delete test data. The database is empty.
+* @tc.expect: The read string is the same as the inserted string.
+*/
+HWTEST_F(DataShareResultSetTest, ResultSet_ShareBlock_Test_001, TestSize.Level0)
+{
+    LOG_INFO("[ttt]ResultSet_ShareBlock_Test_001::Start");
+    auto helper = g_datashareResultSetHelper;
+    Uri uri(SLIENT_ACCESS_URI);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+    std::string value(200000, 'a');
+    valuesBucket.Put(TBL_STU_NAME, value);
+    for (int i = 0; i < 20; ++i) {
+        auto [errCode, retVal] = helper->InsertEx(uri, valuesBucket);
+        EXPECT_EQ(errCode, 0);
+        EXPECT_GT(retVal, 0);
+    }
+
+    DataShare::DataSharePredicates predicates;
+    vector<string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    EXPECT_NE(resultSet, nullptr);
+
+    while (resultSet->GoToNextRow() == 0) {
+        std::string retValue;
+        int ret = resultSet->GetString(1, retValue);
+        EXPECT_EQ(ret, 0);
+        EXPECT_EQ(retValue, value);
+    }
+
+    auto [errCode2, retVal2] = helper->DeleteEx(uri, predicates);
+    EXPECT_EQ(errCode2, 0);
+    EXPECT_GT(retVal2, 0);
+    LOG_INFO("[ttt] ResultSet_ShareBlock_Test_001::End");
+}
+
 } // namespace DataShare
 } // namespace OHOS

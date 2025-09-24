@@ -234,7 +234,8 @@ int SharedBlock::FreeLastRow()
     if (mReadOnly) {
         return SHARED_BLOCK_INVALID_OPERATION;
     }
-
+    // The memory alloced by SharedBlock::Alloc doesn't need to be released.
+    // Because the shared memory is about to be clear in next OnGo.
     if (mHeader->rowNums > 0) {
         mHeader->rowNums--;
     }

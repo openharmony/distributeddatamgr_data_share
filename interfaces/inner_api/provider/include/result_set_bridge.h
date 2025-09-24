@@ -31,6 +31,11 @@ public:
         virtual int AllocRow() = 0;
 
         /**
+         * Free the last row.
+         */
+        virtual int FreeLastRow() = 0;
+
+        /**
          * Write Null data to the shared block.
          */
         virtual int Write(uint32_t column) = 0;
