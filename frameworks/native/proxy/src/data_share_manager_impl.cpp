@@ -93,18 +93,20 @@ sptr<DataShareKvServiceProxy> DataShareManagerImpl::GetDistributedDataManager()
     return proxy;
 }
 
-void DataShareManagerImpl::LinkToDeath(const sptr<IRemoteObject> remote)
+bool DataShareManagerImpl::LinkToDeath(const sptr<IRemoteObject> remote)
 {
     sptr<DataShareManagerImpl::ServiceDeathRecipient> deathRecipient = new (std::nothrow)
         DataShareManagerImpl::ServiceDeathRecipient(this);
     if (deathRecipient == nullptr) {
         LOG_ERROR("DataShareManagerImpl::LinkToDeath new ServiceDeathRecipient error.");
-        return;
+        return false;
     }
     if (!remote->AddDeathRecipient(deathRecipient)) {
         LOG_ERROR("add death recipient failed");
+        return false;
     }
     LOG_DEBUG("link to death success");
+    return true;
 }
 
 sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
@@ -119,6 +121,7 @@ sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
     auto remote = dataMgrService_->GetFeatureInterface("data_share");
     if (remote == nullptr) {
         LOG_ERROR("Get DataShare service failed!");
+        dataMgrService_ = nullptr;
         return nullptr;
     }
     RegisterClientDeathObserver();
@@ -171,7 +174,13 @@ std::shared_ptr<DataShareServiceProxy> DataShareManagerImpl::GetProxy()
         return nullptr;
     }
     sptr<IDataShareService> serviceBase = service;
-    LinkToDeath(serviceBase->AsObject().GetRefPtr());
+    bool ret = LinkToDeath(serviceBase->AsObject().GetRefPtr());
+    if (!ret) {
+        LOG_ERROR("LinkToDeath failed, clear service handle");
+        dataMgrService_ = nullptr;
+        dataShareService_ = nullptr;
+        return nullptr;
+    }
     dataShareService_ = std::shared_ptr<DataShareServiceProxy>(
             service.GetRefPtr(), [holder = service](const auto *) {});
     return dataShareService_;
