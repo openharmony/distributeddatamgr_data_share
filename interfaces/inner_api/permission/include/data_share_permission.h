@@ -48,24 +48,26 @@ public:
     std::pair<int, std::string> GetExtensionUriPermission(Uri &uri,
         int32_t user, bool isRead);
 
-    static int CheckExtensionTrusts(uint32_t consumerToken, uint32_t providerToken);
-
     static void ReportExtensionFault(int32_t errCode, uint32_t tokenId,
         std::string &uri, std::string &bussinessType);
 
     static bool VerifyPermission(uint32_t tokenId, std::string &permission);
 
-    static bool VerifyPermission(Uri &uri, uint32_t tokenId, std::string &permission, bool isExtension);
+    static bool VerifyPermission(Uri &uri, uint32_t tokenId, std::string &permission, bool isSilentUri);
 
     std::pair<int, std::string> GetSilentUriPermission(Uri &uri, int32_t user, bool isRead);
 
     static int32_t UriIsTrust(Uri &uri);
 
-    std::pair<int, std::string> GetUriPermission(Uri &uri, int32_t user, bool isRead, bool isExtension);
+    std::pair<int, std::string> GetUriPermission(Uri &uri, int32_t user, bool isRead, bool &isSilent);
 
     static int32_t IsExtensionValid(uint32_t tokenId, uint32_t fullToken, int32_t user);
 
     void DeleteCache(std::string bundleName);
+
+    static bool IsDataShareUri(Uri &uri);
+
+    static constexpr const char *NO_PERMISSION = "noPermission";
 private:
 
     class SysEventSubscriber : public EventFwk::CommonEventSubscriber {
@@ -109,11 +111,11 @@ private:
         }
     };
 
-    static constexpr const char *SCHEMA_DATASHARE = "datashare";
-    static constexpr const char *SCHEMA_DATASHARE_PROXY = "datashareproxy";
-    static constexpr const char *SCHEMA_PREFERENCE = "sharepreferences";
-    static constexpr const char *SCHEMA_RDB = "rdb";
-    static constexpr const char *SCHEMA_FILE = "file";
+    static constexpr const char *SCHEME_DATASHARE = "datashare";
+    static constexpr const char *SCHEME_DATASHARE_PROXY = "datashareproxy";
+    static constexpr const char *SCHEME_PREFERENCE = "sharepreferences";
+    static constexpr const char *SCHEME_RDB = "rdb";
+    static constexpr const char *SCHEME_FILE = "file";
 
     static void ReportExcuteFault(int32_t errCode, std::string &consumer, std::string &provider);
 

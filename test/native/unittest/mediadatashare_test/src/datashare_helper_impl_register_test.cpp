@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #define LOG_TAG "datashare_helper_impl_register_test"
 
 #include "datashare_helper_impl.h"
@@ -20,20 +19,33 @@
 #include <gtest/gtest.h>
 #include <memory>
 
+#include "accesstoken_kit.h"
 #include "datashare_helper.h"
 #include "datashare_log.h"
 #include "datashare_valuebucket_convert.h"
+#include "dataobs_mgr_errors.h"
 #include "gmock/gmock.h"
+#include "hap_token_info.h"
 #include "iservice_registry.h"
+#include "token_setproc.h"
 
 namespace OHOS {
 namespace DataShare {
 using namespace testing::ext;
-
+using namespace OHOS::Security::AccessToken;
 static constexpr int STORAGE_MANAGER_MANAGER_ID = 5003;
 static constexpr int64_t INTERVAL = 2;
 static const std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
+static const std::string DATA_SHARE_URI_SILENT = "datashareproxy://com.acts.datasharetest/test?Proxy=true";
+static const std::string REGISTER_URI = "datashareproxy://com.acts.datasharetest/test";
+static const std::string REGISTER_URI_NOREAD = "datashareproxy://com.acts.datasharetest/noread";
+static const std::string REGISTER_URI_NOWRITE = "datashareproxy://com.acts.datasharetest/nowrite";
+static const std::string REGISTER_URI_NOALL = "datashareproxy://com.acts.datasharetest/noall";
+static const std::string REGISTER_URI_INVALID = "abc";
+static const std::string TBL_STU_NAME = "name";
+static const std::string TBL_STU_AGE = "age";
 std::shared_ptr<DataShare::DataShareHelper> g_dataShareHelper;
+std::shared_ptr<DataShare::DataShareHelper> g_dataShareHelperSilent;
 
 class DataShareHelperImplRegisterTest : public testing::Test {
 public:
@@ -48,7 +60,7 @@ public:
     static std::shared_ptr<DataShareHelperImpl> GetInstance(std::shared_ptr<DataShareHelperImpl> instance = nullptr);
 };
 
-std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t systemAbilityId)
+std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t systemAbilityId, const std::string &uri)
 {
     LOG_INFO("CreateDataShareHelper start");
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -61,16 +73,76 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t system
         LOG_ERROR("GetSystemAbility service failed.");
         return nullptr;
     }
-    return DataShare::DataShareHelper::Creator(remoteObj, DATA_SHARE_URI);
+    return DataShare::DataShareHelper::Creator(remoteObj, uri);
+}
+
+std::vector<PermissionStateFull> GetPermissionStateFulls()
+{
+    std::vector<PermissionStateFull> permissionStateFulls = {
+        {
+            .permissionName = "ohos.permission.WRITE_CONTACTS",
+            .isGeneral = true,
+            .resDeviceID = { "local" },
+            .grantStatus = { PermissionState::PERMISSION_GRANTED },
+            .grantFlags = { 1 }
+        },
+        {
+            .permissionName = "ohos.permission.WRITE_CALL_LOG",
+            .isGeneral = true,
+            .resDeviceID = { "local" },
+            .grantStatus = { PermissionState::PERMISSION_GRANTED },
+            .grantFlags = { 1 }
+        },
+        {
+            .permissionName = "ohos.permission.GET_BUNDLE_INFO",
+            .isGeneral = true,
+            .resDeviceID = { "local" },
+            .grantStatus = { PermissionState::PERMISSION_GRANTED },
+            .grantFlags = { 1 }
+        }
+    };
+    return permissionStateFulls;
 }
 
 void DataShareHelperImplRegisterTest::SetUpTestCase(void)
 {
     LOG_INFO("SetUpTestCase invoked");
-    g_dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    g_dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
     ASSERT_TRUE(g_dataShareHelper != nullptr);
-    int sleepTime = 1;
+    int sleepTime = 2;
     sleep(sleepTime);
+    g_dataShareHelperSilent = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI_SILENT);
+    ASSERT_TRUE(g_dataShareHelperSilent != nullptr);
+
+    HapInfoParams info = {
+        .userID = 100,
+        .bundleName = "ohos.datashareclienttest.demo",
+        .instIndex = 0,
+        .appIDDesc = "ohos.datashareclienttest.demo"
+    };
+    auto permStateList = GetPermissionStateFulls();
+    HapPolicyParams policy = {
+        .apl = APL_NORMAL,
+        .domain = "test.domain",
+        .permList = {
+            {
+                .permissionName = "ohos.permission.test",
+                .bundleName = "ohos.datashareclienttest.demo",
+                .grantMode = 1,
+                .availableLevel = APL_NORMAL,
+                .label = "label",
+                .labelId = 1,
+                .description = "ohos.datashareclienttest.demo",
+                .descriptionId = 1
+            }
+        },
+        .permStateList = permStateList
+    };
+    AccessTokenKit::AllocHapToken(info, policy);
+    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenIDEx(
+        info.userID, info.bundleName, info.instIndex);
+    SetSelfTokenID(testTokenId.tokenIDEx);
+
     LOG_INFO("SetUpTestCase end");
 }
 
@@ -98,6 +170,13 @@ public:
         cv_.notify_one();
     }
 
+    void Notify()
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        isSet_ = true;
+        cv_.notify_one();
+    }
+
     T Wait()
     {
         std::unique_lock<std::mutex> lock(mutex_);
@@ -121,6 +200,38 @@ private:
     std::condition_variable cv_;
 };
 
+class IDataShareAbilityObserverTest : public AAFwk::DataAbilityObserverStub {
+public:
+    IDataShareAbilityObserverTest() =  default;
+
+    ~IDataShareAbilityObserverTest()
+    {}
+
+    void OnChange()
+    {
+        name = "OnChangeName";
+        data.Notify();
+    }
+
+    std::string GetName()
+    {
+        return name;
+    }
+
+    void SetName(std::string str)
+    {
+        this->name = str;
+    }
+	
+    void Clear()
+    {
+        data.Clear();
+    }
+    ConditionLock<std::string> data;
+private:
+    std::string name;
+};
+
 class MockDatashareObserver : public DataShare::DataShareObserver {
 public:
     MockDatashareObserver() {}
@@ -130,6 +241,7 @@ public:
     {
         changeInfo_ = changeInfo;
         data.Notify(changeInfo);
+        isNotify = true;
     }
 
     void Clear()
@@ -144,6 +256,7 @@ public:
 
     DataShareObserver::ChangeInfo changeInfo_;
     ConditionLock<DataShareObserver::ChangeInfo> data;
+    bool isNotify = false;
 };
 
 bool DataShareHelperImplRegisterTest::UrisEqual(std::list<Uri> uri1, std::list<Uri> uri2)
@@ -448,6 +561,39 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_008, TestSize.L
 }
 
 /**
+ * @tc.name: TryRegisterObserverExt_009
+ * @tc.desc: test TryRegisterObserverExt_009 normal func, use invalid uri.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_009, TestSize.Level0)
+{
+    LOG_INFO("TryRegisterObserverExt_008::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_NE(helper, nullptr);
+    Uri uri(REGISTER_URI_INVALID);
+    std::shared_ptr<MockDatashareObserver> dataObserver = std::make_shared<MockDatashareObserver>();
+    auto ret1 = helper->TryRegisterObserverExt(uri, dataObserver, true);
+    EXPECT_EQ(ret1, AAFwk::DATAOBS_INVALID_URI);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "TryRegisterObserverExt_009");
+
+    std::vector<DataShareValuesBucket> Buckets = { valuesBucket };
+    DataShareObserver::ChangeInfo::VBuckets extends;
+    extends = ValueProxy::Convert(std::move(Buckets));
+    DataShareObserver::ChangeInfo uriChanges = { DataShareObserver::ChangeType::INSERT, { uri }, nullptr, 0, extends };
+    helper->NotifyChangeExt(uriChanges);
+
+    dataObserver->data.Wait();
+    EXPECT_EQ(dataObserver->isNotify, false);
+    EXPECT_FALSE(ChangeInfoEqual(dataObserver->changeInfo_, uriChanges));
+    dataObserver->Clear();
+
+    helper->UnregisterObserverExt(uri, dataObserver);
+    LOG_INFO("TryRegisterObserverExt_008::End");
+}
+
+/**
  * @tc.name: TryUnregisterObserverExt_001
  * @tc.desc: test TryUnregisterObserverExt normal func, Insert.
  * @tc.type: FUNC
@@ -536,6 +682,446 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_004, TestSize
     auto ret2 = helper->DataShareHelper::TryUnregisterObserverExt(uri, dataObserver);
     EXPECT_EQ(ret2, E_UNIMPLEMENT);
     LOG_INFO("TryUnregisterObserverExt_004 end");
+}
+
+/**
+ * @tc.name: RegisterObserver_Register_Test_001
+ * @tc.desc: test RegisterObserver_Register_Test_001 normal func, success.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_001, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_Register_Test_001::Start");
+    auto helper = g_dataShareHelper;
+    Uri uri(REGISTER_URI);
+    sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest());
+    dataObserver->SetName("zhangsan");
+    helper->RegisterObserver(uri, dataObserver);
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+
+    helper->NotifyChange(uri);
+    dataObserver->data.Wait();
+    EXPECT_EQ(dataObserver->GetName(), "OnChangeName");
+    dataObserver->Clear();
+
+    helper->UnregisterObserver(uri, dataObserver);
+    dataObserver->SetName("zhangsan");
+    helper->NotifyChange(uri);
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+    LOG_INFO("RegisterObserver_Register_Test_001::End");
+}
+
+/**
+ * @tc.name: RegisterObserver_Register_Test_002
+ * @tc.desc: test RegisterObserver_Register_Test_002 normal func, RegisterObserver without read permission.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_002, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_Register_Test_002::Start");
+    auto helper = g_dataShareHelper;
+    Uri uri(REGISTER_URI_NOREAD);
+    sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest());
+    dataObserver->SetName("zhangsan");
+    helper->RegisterObserver(uri, dataObserver);
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+
+    helper->NotifyChange(uri);
+    dataObserver->data.Wait();
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+    dataObserver->Clear();
+
+    helper->UnregisterObserver(uri, dataObserver);
+    LOG_INFO("RegisterObserver_Register_Test_002::End");
+}
+
+/**
+ * @tc.name: RegisterObserver_Register_Test_003
+ * @tc.desc: test RegisterObserver_Register_Test_003 normal func, NotifyChange without write permission.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_003, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_Register_Test_003::Start");
+    auto helper = g_dataShareHelper;
+    Uri uri(REGISTER_URI_NOWRITE);
+    sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest());
+    dataObserver->SetName("zhangsan");
+    helper->RegisterObserver(uri, dataObserver);
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+
+    helper->NotifyChange(uri);
+    dataObserver->data.Wait();
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+    dataObserver->Clear();
+
+    helper->UnregisterObserver(uri, dataObserver);
+    LOG_INFO("RegisterObserver_Register_Test_003::End");
+}
+
+/**
+ * @tc.name: RegisterObserver_Register_Test_004
+ * @tc.desc: test RegisterObserver_Register_Test_004 normal func, RegisterObserver without read permission,
+ *           NotifyChange without write permission.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_004, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_Register_Test_004::Start");
+    auto helper = g_dataShareHelper;
+    Uri uri(REGISTER_URI_NOALL);
+    sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest());
+    dataObserver->SetName("zhangsan");
+    helper->RegisterObserver(uri, dataObserver);
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+
+    helper->NotifyChange(uri);
+    dataObserver->data.Wait();
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+    dataObserver->Clear();
+
+    helper->UnregisterObserver(uri, dataObserver);
+    LOG_INFO("RegisterObserver_Register_Test_004::End");
+}
+
+/**
+ * @tc.name: RegisterObserver_Register_Test_005
+ * @tc.desc: test RegisterObserver_Register_Test_005 normal func, RegisterObserver with invalid uri.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_005, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_Register_Test_005::Start");
+    auto helper = g_dataShareHelper;
+    Uri uri(REGISTER_URI_INVALID);
+    sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest());
+    dataObserver->SetName("zhangsan");
+    auto ret = helper->RegisterObserver(uri, dataObserver);
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+    EXPECT_EQ(ret, E_REGISTER_ERROR);
+
+    helper->NotifyChange(uri);
+    dataObserver->data.Wait();
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+    dataObserver->Clear();
+
+    helper->UnregisterObserver(uri, dataObserver);
+    LOG_INFO("RegisterObserver_Register_Test_005::End");
+}
+
+/**
+ * @tc.name: RegisterObserver_Register_Test_006
+ * @tc.desc: test RegisterObserver_Register_Test_006 normal func, RegisterObserver and insert silent success.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_006, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_Register_Test_006::Start");
+    auto helper = g_dataShareHelperSilent;
+    Uri uri(DATA_SHARE_URI_SILENT);
+    sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest());
+    dataObserver->SetName("zhangsan");
+    auto ret = helper->RegisterObserver(uri, dataObserver);
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+    EXPECT_EQ(ret, 0);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "lisi";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+    auto [errCode, retVal] = helper->InsertEx(uri, valuesBucket);
+    EXPECT_EQ(errCode, 0);
+    dataObserver->data.Wait();
+    EXPECT_EQ(dataObserver->GetName(), "OnChangeName");
+    dataObserver->Clear();
+
+    helper->UnregisterObserver(uri, dataObserver);
+    LOG_INFO("RegisterObserver_Register_Test_006::End");
+}
+
+/**
+ * @tc.name: RegisterObserver_Register_Test_007
+ * @tc.desc: test RegisterObserver_Register_Test_007 normal func, insert silent success.
+ *           But RegisterObserver without read permission.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_007, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_Register_Test_007::Start");
+    auto helper = g_dataShareHelperSilent;
+    Uri uri(REGISTER_URI_NOREAD);
+    sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest());
+    dataObserver->SetName("zhangsan");
+    auto ret = helper->RegisterObserver(uri, dataObserver);
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+    EXPECT_EQ(ret, AAFwk::DATAOBS_PERMISSION_DENY);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "lisi";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+    auto [errCode, retVal] = helper->InsertEx(uri, valuesBucket);
+    EXPECT_EQ(errCode, 0);
+    dataObserver->data.Wait();
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+    dataObserver->Clear();
+
+    helper->UnregisterObserver(uri, dataObserver);
+    LOG_INFO("RegisterObserver_Register_Test_007::End");
+}
+
+/**
+ * @tc.name: RegisterObserver_Register_Test_008
+ * @tc.desc: test RegisterObserver_Register_Test_008 normal func, invalid uri.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_008, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_Register_Test_008::Start");
+    auto helper = g_dataShareHelperSilent;
+    Uri uri(REGISTER_URI_INVALID);
+    sptr<IDataShareAbilityObserverTest> dataObserver(new (std::nothrow) IDataShareAbilityObserverTest());
+    dataObserver->SetName("zhangsan");
+    auto ret = helper->RegisterObserver(uri, dataObserver);
+    EXPECT_EQ(dataObserver->GetName(), "zhangsan");
+    EXPECT_EQ(ret, AAFwk::DATAOBS_INVALID_URI);
+
+    LOG_INFO("RegisterObserver_Register_Test_008::End");
+}
+
+/**
+ * @tc.name: RegisterObserver_RegisterExt_Test_001
+ * @tc.desc: test RegisterObserver_RegisterExt_Test_001 normal func, RegisterObserverExt success.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_001, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_RegisterExt_Test_001 start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_NE(helper, nullptr);
+    Uri uri(REGISTER_URI);
+    std::shared_ptr<MockDatashareObserver> dataObserver = std::make_shared<MockDatashareObserver>();
+    helper->RegisterObserverExt(uri, dataObserver, true);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "RegisterObserver_RegisterExt_Test_001");
+
+    std::vector<DataShareValuesBucket> Buckets = { valuesBucket };
+    DataShareObserver::ChangeInfo::VBuckets extends;
+    extends = ValueProxy::Convert(std::move(Buckets));
+    DataShareObserver::ChangeInfo uriChanges = { DataShareObserver::ChangeType::INSERT, { uri }, nullptr, 0, extends };
+    helper->NotifyChangeExt(uriChanges);
+
+    dataObserver->data.Wait();
+    EXPECT_TRUE(ChangeInfoEqual(dataObserver->changeInfo_, uriChanges));
+    dataObserver->Clear();
+
+    helper->UnregisterObserverExt(uri, dataObserver);
+    helper->NotifyChangeExt({ DataShareObserver::ChangeType::DELETE, { uri }, nullptr, 0, extends });
+
+    dataObserver->data.Wait();
+    EXPECT_FALSE(ChangeInfoEqual(dataObserver->changeInfo_, uriChanges));
+    dataObserver->Clear();
+    LOG_INFO("RegisterObserver_RegisterExt_Test_001 end");
+}
+
+/**
+ * @tc.name: RegisterObserver_RegisterExt_Test_002
+ * @tc.desc: test RegisterObserver_RegisterExt_Test_002 normal func, RegisterObserverExt without read permission.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_002, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_RegisterExt_Test_002 start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_NE(helper, nullptr);
+    Uri uri(REGISTER_URI_NOREAD);
+    std::shared_ptr<MockDatashareObserver> dataObserver = std::make_shared<MockDatashareObserver>();
+    helper->RegisterObserverExt(uri, dataObserver, true);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "RegisterObserver_RegisterExt_Test_002");
+
+    std::vector<DataShareValuesBucket> Buckets = { valuesBucket };
+    DataShareObserver::ChangeInfo::VBuckets extends;
+    extends = ValueProxy::Convert(std::move(Buckets));
+    DataShareObserver::ChangeInfo uriChanges = { DataShareObserver::ChangeType::INSERT, { uri }, nullptr, 0, extends };
+    helper->NotifyChangeExt(uriChanges);
+
+    dataObserver->data.Wait();
+    EXPECT_EQ(dataObserver->isNotify, false);
+    dataObserver->Clear();
+
+    helper->UnregisterObserverExt(uri, dataObserver);
+    LOG_INFO("RegisterObserver_RegisterExt_Test_002 end");
+}
+
+/**
+ * @tc.name: RegisterObserver_RegisterExt_Test_003
+ * @tc.desc: test RegisterObserver_RegisterExt_Test_003 normal func, NotifyChangeExt without write permission.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_003, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_RegisterExt_Test_003 start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_NE(helper, nullptr);
+    Uri uri(REGISTER_URI_NOWRITE);
+    std::shared_ptr<MockDatashareObserver> dataObserver = std::make_shared<MockDatashareObserver>();
+    helper->RegisterObserverExt(uri, dataObserver, true);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "RegisterObserver_RegisterExt_Test_003");
+
+    std::vector<DataShareValuesBucket> Buckets = { valuesBucket };
+    DataShareObserver::ChangeInfo::VBuckets extends;
+    extends = ValueProxy::Convert(std::move(Buckets));
+    DataShareObserver::ChangeInfo uriChanges = { DataShareObserver::ChangeType::INSERT, { uri }, nullptr, 0, extends };
+    helper->NotifyChangeExt(uriChanges);
+
+    dataObserver->data.Wait();
+    EXPECT_EQ(dataObserver->isNotify, false);
+    dataObserver->Clear();
+
+    helper->UnregisterObserverExt(uri, dataObserver);
+    LOG_INFO("RegisterObserver_RegisterExt_Test_003 end");
+}
+
+/**
+ * @tc.name: RegisterObserver_RegisterExt_Test_004
+ * @tc.desc: test RegisterObserver_RegisterExt_Test_004 normal func, without read and write permission.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_004, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_RegisterExt_Test_004 start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_NE(helper, nullptr);
+    Uri uri(REGISTER_URI_NOALL);
+    std::shared_ptr<MockDatashareObserver> dataObserver = std::make_shared<MockDatashareObserver>();
+    helper->RegisterObserverExt(uri, dataObserver, true);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "RegisterObserver_RegisterExt_Test_004");
+
+    std::vector<DataShareValuesBucket> Buckets = { valuesBucket };
+    DataShareObserver::ChangeInfo::VBuckets extends;
+    extends = ValueProxy::Convert(std::move(Buckets));
+    DataShareObserver::ChangeInfo uriChanges = { DataShareObserver::ChangeType::INSERT, { uri }, nullptr, 0, extends };
+    helper->NotifyChangeExt(uriChanges);
+
+    dataObserver->data.Wait();
+    EXPECT_EQ(dataObserver->isNotify, false);
+    dataObserver->Clear();
+
+    helper->UnregisterObserverExt(uri, dataObserver);
+    LOG_INFO("RegisterObserver_RegisterExt_Test_004 end");
+}
+
+/**
+ * @tc.name: RegisterObserver_RegisterExt_Test_005
+ * @tc.desc: test RegisterObserver_RegisterExt_Test_005 normal func, with invalid uri.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_005, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_RegisterExt_Test_005 start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_NE(helper, nullptr);
+    Uri uri(REGISTER_URI_INVALID);
+    std::shared_ptr<MockDatashareObserver> dataObserver = std::make_shared<MockDatashareObserver>();
+    helper->RegisterObserverExt(uri, dataObserver, true);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "RegisterObserver_RegisterExt_Test_005");
+
+    std::vector<DataShareValuesBucket> Buckets = { valuesBucket };
+    DataShareObserver::ChangeInfo::VBuckets extends;
+    extends = ValueProxy::Convert(std::move(Buckets));
+    DataShareObserver::ChangeInfo uriChanges = { DataShareObserver::ChangeType::INSERT, { uri },
+        nullptr, 0, extends };
+    helper->NotifyChangeExt(uriChanges);
+
+    dataObserver->data.Wait();
+    EXPECT_EQ(dataObserver->isNotify, false);
+    dataObserver->Clear();
+
+    helper->UnregisterObserverExt(uri, dataObserver);
+    LOG_INFO("RegisterObserver_RegisterExt_Test_005 end");
+}
+
+/**
+ * @tc.name: RegisterObserver_RegisterExt_Test_006
+ * @tc.desc: test RegisterObserver_RegisterExt_Test_006 normal func, RegisterObserverExt with valid and invalid uri.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_006, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_RegisterExt_Test_006 start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_NE(helper, nullptr);
+    Uri uri(REGISTER_URI);
+    Uri uri2(REGISTER_URI_NOREAD);
+    std::shared_ptr<MockDatashareObserver> dataObserver = std::make_shared<MockDatashareObserver>();
+    helper->RegisterObserverExt(uri, dataObserver, true);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "RegisterObserver_RegisterExt_Test_006");
+
+    std::vector<DataShareValuesBucket> Buckets = { valuesBucket };
+    DataShareObserver::ChangeInfo::VBuckets extends;
+    extends = ValueProxy::Convert(std::move(Buckets));
+    DataShareObserver::ChangeInfo uriChanges = { DataShareObserver::ChangeType::INSERT, { uri, uri2 },
+        nullptr, 0, extends };
+    helper->NotifyChangeExt(uriChanges);
+
+    DataShareObserver::ChangeInfo expectedUriChanges = { DataShareObserver::ChangeType::INSERT, { uri },
+        nullptr, 0, extends };
+    dataObserver->data.Wait();
+    EXPECT_EQ(dataObserver->isNotify, true);
+    EXPECT_TRUE(ChangeInfoEqual(dataObserver->changeInfo_, expectedUriChanges));
+    dataObserver->Clear();
+
+    helper->UnregisterObserverExt(uri, dataObserver);
+    LOG_INFO("RegisterObserver_RegisterExt_Test_006 end");
+}
+
+/**
+ * @tc.name: RegisterObserver_RegisterExt_Test_006
+ * @tc.desc: test RegisterObserver_RegisterExt_Test_006 normal func, NotifyChangeExt with valid and invalid uri.
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_007, TestSize.Level0)
+{
+    LOG_INFO("RegisterObserver_RegisterExt_Test_007 start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    ASSERT_NE(helper, nullptr);
+    Uri uri(REGISTER_URI);
+    Uri uri2(REGISTER_URI_NOWRITE);
+    std::shared_ptr<MockDatashareObserver> dataObserver = std::make_shared<MockDatashareObserver>();
+    helper->RegisterObserverExt(uri, dataObserver, true);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("name", "RegisterObserver_RegisterExt_Test_007");
+
+    std::vector<DataShareValuesBucket> Buckets = { valuesBucket };
+    DataShareObserver::ChangeInfo::VBuckets extends;
+    extends = ValueProxy::Convert(std::move(Buckets));
+    DataShareObserver::ChangeInfo uriChanges = { DataShareObserver::ChangeType::INSERT, { uri, uri2 },
+        nullptr, 0, extends };
+    helper->NotifyChangeExt(uriChanges);
+
+    DataShareObserver::ChangeInfo expectedUriChanges = { DataShareObserver::ChangeType::INSERT, { uri },
+        nullptr, 0, extends };
+    dataObserver->data.Wait();
+    EXPECT_EQ(dataObserver->isNotify, true);
+    EXPECT_TRUE(ChangeInfoEqual(dataObserver->changeInfo_, expectedUriChanges));
+    dataObserver->Clear();
+
+    helper->UnregisterObserverExt(uri, dataObserver);
+    LOG_INFO("RegisterObserver_RegisterExt_Test_007 end");
 }
 } // namespace DataShare
 } // namespace OHOS

@@ -829,8 +829,10 @@ bool JsDataShareExtAbility::RegisterObserver(const Uri &uri, const sptr<AAFwk::I
     uint32_t token = IPCSkeleton::GetCallingTokenID();
     DataObsOption opt;
     opt.SetFirstCallerTokenID(token);
+    opt.SetFirstCallerPid(IPCSkeleton::GetCallingPid());
+    opt.SetDataShare(true);
     Uri innerUri = uri;
-    ErrCode ret = obsMgrClient->RegisterObserverFromExtension(innerUri, dataObserver, callingUserId);
+    ErrCode ret = obsMgrClient->RegisterObserverFromExtension(innerUri, dataObserver, callingUserId, opt);
     if (ret != ERR_OK) {
         LOG_ERROR("obsMgrClient->RegisterObserver error return %{public}d", ret);
         return false;
@@ -873,15 +875,20 @@ bool JsDataShareExtAbility::NotifyChange(const Uri &uri)
     return true;
 }
 
-bool JsDataShareExtAbility::NotifyChangeWithUser(const Uri &uri, int32_t userId)
+bool JsDataShareExtAbility::NotifyChangeWithUser(const Uri &uri, int32_t userId, uint32_t callingToken,
+    int32_t callingPid)
 {
     auto obsMgrClient = DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
         LOG_ERROR("obsMgrClient is nullptr");
         return false;
     }
+    DataObsOption opt;
+    opt.SetFirstCallerTokenID(callingToken);
+    opt.SetFirstCallerPid(callingPid);
+    opt.SetDataShare(true);
     Uri innerUri = uri;
-    ErrCode ret = obsMgrClient->NotifyChangeFromExtension(innerUri, userId);
+    ErrCode ret = obsMgrClient->NotifyChangeFromExtension(innerUri, userId, opt);
     if (ret != ERR_OK) {
         LOG_ERROR("obsMgrClient->NotifyChange error return %{public}d", ret);
         return false;
