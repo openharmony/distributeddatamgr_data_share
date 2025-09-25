@@ -193,6 +193,9 @@ std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Ur
             DataShareStringUtils::GetRandomNumber(RANDOM_MIN, RANDOM_MAX)));
         resultSet = proxy->Query(uri, Uri(extUri_), predicates, columns, businessError);
     }
+    if (resultSet == nullptr) {
+        LOG_ERROR("resultSet is nullptr, err: %{public}d", businessError.GetCode());
+    }
     return resultSet;
 }
 

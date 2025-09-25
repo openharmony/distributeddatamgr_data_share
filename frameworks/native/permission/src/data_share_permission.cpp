@@ -21,6 +21,9 @@
 
 #include "access_token.h"
 #include "bundle_mgr_helper.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
+#include "concurrent_map.h"
 #include "data_share_called_config.h"
 #include "datashare_errno.h"
 #include "datashare_log.h"
@@ -33,6 +36,29 @@ namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
 static constexpr const char *NO_PERMISSION = "noPermission";
+
+void DataSharePermission::SubscribeCommonEvent()
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SANDBOX_PACKAGE_REMOVED);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo info(matchingSkills);
+
+    std::weak_ptr<DataSharePermission> ptr = weak_from_this();
+
+    auto subscriber = std::make_shared<SysEventSubscriber>(info, ptr);
+    if (subscriber == nullptr) {
+        LOG_ERROR("SubscribeCommonEvent is null");
+    }
+    auto succ = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
+    if (!succ) {
+        LOG_ERROR("SubscribeCommonEvent install event fail");
+        return;
+    }
+    subscriber_ = subscriber;
+}
+
 int DataSharePermission::VerifyPermission(Security::AccessToken::AccessTokenID tokenID, const Uri &uri, bool isRead)
 {
     if (uri.ToString().empty()) {
@@ -141,19 +167,52 @@ int32_t DataSharePermission::UriIsTrust(Uri &uri)
     return E_ERROR;
 }
 
+void DataSharePermission::DeleteCache(std::string bundleName)
+{
+    extensionCache_.EraseIf([&bundleName](const UriKey &key, Permission &value) {
+        if (value.bundleName == bundleName) {
+            return true;
+        }
+        return false;
+    });
+    silentCache_.EraseIf([&bundleName](const UriKey &key, Permission &value) {
+        if (value.bundleName == bundleName) {
+            return true;
+        }
+        return false;
+    });
+}
+
 std::pair<int, std::string> DataSharePermission::GetExtensionUriPermission(Uri &uri,
     int32_t user, bool isRead)
 {
     std::string uriStr = uri.ToString();
     std::string permission;
-    auto [isSuccess, extensionInfo] = DataShareCalledConfig::GetExtensionInfoFromBMS(uriStr, user);
+    Permission permissionInfo;
+    bool isSuccess;
+    UriKey uriKey(uriStr, user);
+    std::tie(isSuccess, permissionInfo) = extensionCache_.Find(uriKey);
     if (isSuccess) {
-        permission = isRead ? extensionInfo.readPermission : extensionInfo.writePermission;
-        LOG_ERROR("GetExtensionUriPermission uri %{public}s %{public}s %{public}s",
-            extensionInfo.uri.c_str(), extensionInfo.readPermission.c_str(), extensionInfo.writePermission.c_str());
+        permission = isRead ? permissionInfo.readPermission : permissionInfo.writePermission;
         return std::make_pair(E_OK, permission);
     }
-    return std::make_pair(E_URI_NOT_EXIST, "");
+
+    AppExecFwk::ExtensionAbilityInfo extensionInfo;
+    std::tie(isSuccess, extensionInfo) = DataShareCalledConfig::GetExtensionInfoFromBMS(uriStr, user);
+    if (!isSuccess) {
+        LOG_ERROR("GetExtensionInfoFromBMS failed! user:%{public}d, uri:%{public}s", user,
+            uri.ToString().c_str());
+        return std::make_pair(E_URI_NOT_EXIST, "");
+    }
+    permissionInfo.bundleName = extensionInfo.bundleName;
+    permissionInfo.readPermission = extensionInfo.readPermission;
+    permissionInfo.writePermission = extensionInfo.writePermission;
+    if (extensionCache_.Size() >= CACHE_SIZE) {
+        extensionCache_.Clear();
+    }
+    extensionCache_.Emplace(uriKey, permissionInfo);
+    permission = isRead ? extensionInfo.readPermission : extensionInfo.writePermission;
+    return std::make_pair(E_OK, permission);
 }
 
 std::pair<int, std::string> DataSharePermission::GetUriPermission(Uri &uri, int32_t user, bool isRead, bool isExtension)
@@ -169,10 +228,13 @@ std::pair<int, std::string> DataSharePermission::GetUriPermission(Uri &uri, int3
         return std::make_pair(E_DATASHARE_INVALID_URI, "");
     }
     std::string permission;
+    std::string uriWithoutQuery = uriStr;
+    DataShareStringUtils::RemoveFromQuery(uriWithoutQuery);
+    Uri formatUri(uriWithoutQuery);
     if (isExtension) {
-        std::tie(ret, permission) = GetExtensionUriPermission(uri, user, isRead);
+        std::tie(ret, permission) = GetExtensionUriPermission(formatUri, user, isRead);
     } else {
-        std::tie(ret, permission) = GetSilentUriPermission(uri, user, isRead);
+        std::tie(ret, permission) = GetSilentUriPermission(formatUri, user, isRead);
     }
     if (ret == E_OK) {
         return std::make_pair(E_OK, permission);
@@ -198,7 +260,16 @@ void DataSharePermission::ReportExtensionFault(int32_t errCode, uint32_t tokenId
 
 std::pair<int, std::string> DataSharePermission::GetSilentUriPermission(Uri &uri, int32_t user, bool isRead)
 {
+    Permission permissionInfo;
     std::string uriStr = uri.ToString();
+    std::string permission;
+    bool isSuccess;
+    UriKey uriKey(uriStr, user);
+    std::tie(isSuccess, permissionInfo) = silentCache_.Find(uriKey);
+    if (isSuccess) {
+        permission = isRead ? permissionInfo.readPermission : permissionInfo.writePermission;
+        return std::make_pair(E_OK, permission);
+    }
     DataShareCalledConfig calledConfig(uriStr);
 
     auto [errCode, providerInfo] = calledConfig.GetProviderInfo(user);
@@ -207,7 +278,14 @@ std::pair<int, std::string> DataSharePermission::GetSilentUriPermission(Uri &uri
             errCode, uri.ToString().c_str());
         return std::make_pair(errCode, "");
     }
-    auto permission = isRead ? providerInfo.readPermission : providerInfo.writePermission;
+    permissionInfo.bundleName = providerInfo.bundleName;
+    permissionInfo.readPermission = providerInfo.readPermission;
+    permissionInfo.writePermission = providerInfo.writePermission;
+    if (silentCache_.Size() >= CACHE_SIZE) {
+        silentCache_.Clear();
+    }
+    silentCache_.Emplace(uriKey, permissionInfo);
+    permission = isRead ? providerInfo.readPermission : providerInfo.writePermission;
     return std::make_pair(E_OK, permission);
 }
 
@@ -305,6 +383,48 @@ int32_t DataSharePermission::IsExtensionValid(uint32_t tokenId, uint32_t fullTok
         }
     }
     return E_NOT_DATASHARE_EXTENSION;
+}
+
+DataSharePermission::SysEventSubscriber::SysEventSubscriber(const EventFwk::CommonEventSubscribeInfo& info,
+    std::weak_ptr<DataSharePermission> permission):CommonEventSubscriber(info)
+{
+    callbacks_ = { { EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_REMOVED, &SysEventSubscriber::OnUninstall },
+        { EventFwk::CommonEventSupport::COMMON_EVENT_SANDBOX_PACKAGE_REMOVED, &SysEventSubscriber::OnUninstall },
+        { EventFwk::CommonEventSupport::COMMON_EVENT_PACKAGE_CHANGED, &SysEventSubscriber::OnUpdate }
+    };
+    permission_ = permission;
+}
+
+void DataSharePermission::SysEventSubscriber::OnUninstall(const std::string &bundleName)
+{
+    std::shared_ptr<DataSharePermission> permission = permission_.lock();
+    if (permission == nullptr) {
+        LOG_ERROR("permission nullptr");
+        return;
+    }
+    permission->DeleteCache(bundleName);
+}
+
+void DataSharePermission::SysEventSubscriber::OnUpdate(const std::string &bundleName)
+{
+    std::shared_ptr<DataSharePermission> permission = permission_.lock();
+    if (permission == nullptr) {
+        LOG_ERROR("permission nullptr");
+        return;
+    }
+    permission->DeleteCache(bundleName);
+}
+
+void DataSharePermission::SysEventSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &event)
+{
+    LOG_INFO("Action Rec");
+    Want want = event.GetWant();
+    std::string action = want.GetAction();
+    auto it = callbacks_.find(action);
+    if (it != callbacks_.end()) {
+        std::string bundleName = want.GetElement().GetBundleName();
+        (this->*(it->second))(bundleName);
+    }
 }
 
 } // namespace DataShare

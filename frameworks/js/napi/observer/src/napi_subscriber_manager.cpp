@@ -51,9 +51,15 @@ std::vector<OperationResult> NapiRdbSubscriberManager::AddObservers(napi_env env
             if (firstAddUris.empty()) {
                 return;
             }
+            std::weak_ptr<NapiRdbSubscriberManager> thisWp = weak_from_this();
             auto subResults =
-                datashareHelper->SubscribeRdbData(firstAddUris, templateId, [this](const RdbChangeNode &changeNode) {
-                    Emit(changeNode);
+                datashareHelper->SubscribeRdbData(firstAddUris, templateId, [thisWp](const RdbChangeNode &changeNode) {
+                    auto thisPtr = thisWp.lock();
+                    if (thisPtr == nullptr) {
+                        LOG_WARN("NapiRdbSubscriberManager::AddObservers: invalid this ptr in lambda");
+                        return;
+                    }
+                    thisPtr->Emit(changeNode);
                 });
             std::vector<Key> failedKeys;
             for (auto &subResult : subResults) {
@@ -154,9 +160,15 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::AddObservers(napi_e
             if (firstAddUris.empty()) {
                 return;
             }
+            std::weak_ptr<NapiPublishedSubscriberManager> thisWp = weak_from_this();
             auto subResults = dataShareHelper->SubscribePublishedData(firstAddUris, subscriberId,
-                [this](const PublishedDataChangeNode &changeNode) {
-                    Emit(changeNode);
+                [thisWp](const PublishedDataChangeNode &changeNode) {
+                    auto thisPtr = thisWp.lock();
+                    if (thisPtr == nullptr) {
+                        LOG_WARN("NapiPublishedSubscriberManager::AddObservers: invalid this ptr in lambda");
+                        return;
+                    }
+                    thisPtr->Emit(changeNode);
                 });
             std::vector<Key> failedKeys;
             for (auto &subResult : subResults) {
