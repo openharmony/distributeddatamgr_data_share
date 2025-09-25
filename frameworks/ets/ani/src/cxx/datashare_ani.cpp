@@ -23,13 +23,15 @@
 #include "ikvstore_data_service.h"
 #include "idata_share_service.h"
 #include "iservice_registry.h"
-#include "sts_datashare_ext_ability.h"
+#include "system_ability_definition.h"
+#include "datashare_result.h"
 #include "wrapper.rs.h"
+#include "js_proxy.h"
 #define UNIMPL_RET_CODE 0
 
 namespace OHOS {
 using namespace DataShare;
-
+using namespace DistributedShare::DataShare;
 namespace DataShareAni {
 
 std::mutex listMutex_{};
@@ -53,32 +55,54 @@ std::vector<uint8_t> convert_rust_vec_to_cpp_vector(const rust::Vec<uint8_t>& ru
 }
 
 // @ohos.data.DataShareResultSet.d.ets
+int32_t GetRowCount(int64_t resultSetPtr)
+{
+    int32_t count = -1;
+    reinterpret_cast<ResultSetHolder*>(resultSetPtr)->resultSetPtr_->GetRowCount(count);
+    return count;
+}
+
 bool GoToFirstRow(int64_t resultSetPtr)
 {
-    return reinterpret_cast<DataShareResultSet*>(resultSetPtr)->GoToFirstRow();
+    int errCode = reinterpret_cast<ResultSetHolder*>(resultSetPtr)->resultSetPtr_->GoToFirstRow();
+    if (errCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errCode);
+        return false;
+    }
+    return true;
 }
 
 bool GoToLastRow(int64_t resultSetPtr)
 {
-    return reinterpret_cast<DataShareResultSet*>(resultSetPtr)->GoToLastRow();
+    int errCode = reinterpret_cast<ResultSetHolder*>(resultSetPtr)->resultSetPtr_->GoToLastRow();
+    if (errCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errCode);
+        return false;
+    }
+    return true;
 }
 
 bool GoToNextRow(int64_t resultSetPtr)
 {
-    return reinterpret_cast<DataShareResultSet*>(resultSetPtr)->GoToNextRow();
+    int errCode = reinterpret_cast<ResultSetHolder*>(resultSetPtr)->resultSetPtr_->GoToNextRow();
+    if (errCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errCode);
+        return false;
+    }
+    return true;
 }
 
 rust::String GetString(int64_t resultSetPtr, int columnIndex)
 {
     std::string strValue;
-    reinterpret_cast<DataShareResultSet*>(resultSetPtr)->GetString(columnIndex, strValue);
+    reinterpret_cast<ResultSetHolder*>(resultSetPtr)->resultSetPtr_->GetString(columnIndex, strValue);
     return rust::String(strValue);
 }
 
 int64_t GetLong(int64_t resultSetPtr, int columnIndex)
 {
     int64_t value = -1;
-    int errorCode = reinterpret_cast<DataShareResultSet*>(resultSetPtr)->GetLong(columnIndex, value);
+    int errorCode = reinterpret_cast<ResultSetHolder*>(resultSetPtr)->resultSetPtr_->GetLong(columnIndex, value);
     if (errorCode != E_OK) {
         LOG_ERROR("failed code:%{public}d", errorCode);
     }
@@ -87,14 +111,14 @@ int64_t GetLong(int64_t resultSetPtr, int columnIndex)
 
 void Close(int64_t resultSetPtr)
 {
-    reinterpret_cast<DataShareResultSet*>(resultSetPtr)->Close();
+    reinterpret_cast<ResultSetHolder*>(resultSetPtr)->resultSetPtr_->Close();
 }
 
 int GetColumnIndex(int64_t resultSetPtr, rust::String columnName)
 {
     std::string name = std::string(columnName);
     int32_t columnIndex = -1;
-    int errorCode = reinterpret_cast<DataShareResultSet*>(resultSetPtr)->GetColumnIndex(name, columnIndex);
+    int errorCode = reinterpret_cast<ResultSetHolder*>(resultSetPtr)->resultSetPtr_->GetColumnIndex(name, columnIndex);
     if (errorCode != E_OK) {
         LOG_ERROR("failed code:%{public}d columnIndex:%{public}d", errorCode, columnIndex);
     }
@@ -373,7 +397,7 @@ void DataSharePredicatesOrderByDesc(int64_t predicatesPtr, rust::String field)
     (void)(*reinterpret_cast<DataSharePredicates*>(predicatesPtr)->OrderByDesc(std::string(field)));
 }
 
-void DataSharePredicatesLimit(int64_t predicatesPtr, double total, double offset)
+void DataSharePredicatesLimit(int64_t predicatesPtr, int total, int offset)
 {
     (void)(*reinterpret_cast<DataSharePredicates*>(predicatesPtr)->Limit(total, offset));
 }
@@ -463,12 +487,17 @@ int64_t DataShareNativeCreate(int64_t context, rust::String strUri,
         };
         dataShareHelper = DataShareHelper::Creator(stdStrUri, options);
     }
-    return reinterpret_cast<long long>(dataShareHelper.get());
+    if (dataShareHelper == nullptr) {
+        LOG_ERROR("create dataShareHelper failed.");
+        return 0;
+    }
+    auto helperHolder = new SharedPtrHolder(dataShareHelper);
+    return reinterpret_cast<long long>(helperHolder);
 }
 
 void DataShareNativeClean(int64_t dataShareHelperPtr)
 {
-    delete reinterpret_cast<DataShareHelper*>(dataShareHelperPtr);
+    delete reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
 }
 
 int64_t DataShareNativeQuery(int64_t dataShareHelperPtr, rust::String strUri,
@@ -478,7 +507,8 @@ int64_t DataShareNativeQuery(int64_t dataShareHelperPtr, rust::String strUri,
     std::vector<std::string> std_vector = convert_rust_vec_to_cpp_vector(columns);
     DatashareBusinessError businessError;
     Uri uri(stdStrUri);
-    std::shared_ptr<DataShareResultSet> resultSet = reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->Query(uri,
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    std::shared_ptr<DataShareResultSet> resultSet = helperHolder->datashareHelper_->Query(uri,
         *reinterpret_cast<DataSharePredicates*>(dataSharePredicatesPtr), std_vector, &businessError);
     if (resultSet == nullptr) {
         LOG_ERROR("query failed, resultSet is null!");
@@ -489,7 +519,8 @@ int64_t DataShareNativeQuery(int64_t dataShareHelperPtr, rust::String strUri,
         LOG_ERROR("query falied, errorCode: %{public}d", businessError.GetCode());
         return {};
     }
-    return reinterpret_cast<long long>(resultSet.get());
+    auto resultSetHolder = new ResultSetHolder(resultSet);
+    return reinterpret_cast<long long>(resultSetHolder);
 }
 
 int DataShareNativeUpdate(int64_t dataShareHelperPtr, rust::String strUri,
@@ -535,7 +566,8 @@ int DataShareNativeUpdate(int64_t dataShareHelperPtr, rust::String strUri,
     }
 
     Uri uri(stdStrUri);
-    int resultNumber = reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->Update(uri,
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    int resultNumber = helperHolder->datashareHelper_->Update(uri,
         *reinterpret_cast<DataSharePredicates*>(dataSharePredicatesPtr), valuesBucket);
     if (resultNumber < 0) {
         LOG_ERROR("Update failed");
@@ -550,7 +582,7 @@ void DataShareNativePublish(int64_t dataShareHelperPtr, rust::Vec<PublishedItem>
     Data PublishData;
     for (PublishedItem& item : data) {
         rust::String key = published_item_get_key(item);
-        std::string strKey = std::string(published_item_get_data_string(item));
+        std::string strKey = std::string(key);
         rust::String subscriberId = published_item_get_subscriber_id(item);
         std::string strSubscriberId = std::string(published_item_get_subscriber_id(item));
         int64_t llSubscriberId = atoll(strSubscriberId.c_str());
@@ -558,12 +590,12 @@ void DataShareNativePublish(int64_t dataShareHelperPtr, rust::Vec<PublishedItem>
         switch (data_type) {
             case EnumType::StringType: {
                 rust::String data_str = published_item_get_data_string(item);
-                std::string stdStr = std::string(data_str);
-                PublishData.datas_.emplace_back(strKey, llSubscriberId, stdStr);
+                std::string strData = std::string(data_str);
+                PublishData.datas_.emplace_back(strKey, llSubscriberId, strData);
                 break;
             }
             case EnumType::ArrayBufferType: {
-                rust::Slice<const uint8_t> data_arraybuffer = published_item_get_data_arraybuffer(item);
+                rust::Vec<uint8_t> data_arraybuffer = published_item_get_data_arraybuffer(item);
                 std::vector<uint8_t> std_vec;
                 for (const auto &dataItem : data_arraybuffer) {
                     std_vec.push_back(dataItem);
@@ -577,8 +609,8 @@ void DataShareNativePublish(int64_t dataShareHelperPtr, rust::Vec<PublishedItem>
         }
     }
 
-    std::vector<OperationResult> results = reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->Publish(PublishData,
-        stdBundleName);
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    std::vector<OperationResult> results = helperHolder->datashareHelper_->Publish(PublishData, stdBundleName);
     for (const auto &result : results) {
         publish_sret_push(sret, rust::String(result.key_), result.errCode_);
     }
@@ -589,8 +621,8 @@ void DataShareNativeGetPublishedData(int64_t dataShareHelperPtr, rust::String bu
 {
     std::string stdBundleName = std::string(bundleName);
     int errorCode = 0;
-    Data publishData = reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->GetPublishedData(stdBundleName,
-        errorCode);
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    Data publishData = helperHolder->datashareHelper_->GetPublishedData(stdBundleName, errorCode);
     for (const auto &data : publishData.datas_) {
         DataShare::PublishedDataItem::DataType dataItem = data.GetData();
         if (dataItem.index() == 0) {
@@ -625,7 +657,8 @@ void DataShareNativeAddTemplate(int64_t dataShareHelperPtr, rust::String uri,
     std::string tplUri = std::string(uri);
     int64_t llSubscriberId = atoll(std::string(subscriberId).c_str());
     DataShare::Template tpl(std::string(update), stdPredicates, std::string(scheduler));
-    auto result = reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->AddQueryTemplate(tplUri, llSubscriberId, tpl);
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    auto result = helperHolder->datashareHelper_->AddQueryTemplate(tplUri, llSubscriberId, tpl);
     if (result != E_OK) {
         LOG_ERROR("AddTemplate failed, result: %{public}d", result);
     }
@@ -635,7 +668,8 @@ void DataShareNativeDelTemplate(int64_t dataShareHelperPtr, rust::String uri, ru
 {
     std::string tplUri = std::string(uri);
     int64_t llSubscriberId = atoll(std::string(subscriberId).c_str());
-    auto result = reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->DelQueryTemplate(tplUri, llSubscriberId);
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    auto result = helperHolder->datashareHelper_->DelQueryTemplate(tplUri, llSubscriberId);
     if (result != E_OK) {
         LOG_ERROR("AddTemplate failed, result: %{public}d", result);
     }
@@ -684,7 +718,8 @@ int DataShareNativeInsert(int64_t dataShareHelperPtr, rust::String strUri,
 
     Uri uri(std::string(strUri).c_str());
     int resultNumber = 0;
-    resultNumber = reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->Insert(uri, valuesBucket);
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    resultNumber = helperHolder->datashareHelper_->Insert(uri, valuesBucket);
     if (resultNumber < 0) {
         LOG_ERROR("Insert failed");
     }
@@ -694,7 +729,6 @@ int DataShareNativeInsert(int64_t dataShareHelperPtr, rust::String strUri,
 int DataShareNativeBatchInsert(int64_t dataShareHelperPtr, rust::String strUri,
                                rust::Vec<ValuesBucketWrap> buckets)
 {
-    std::string stdStrUri = std::string(strUri);
     std::vector<DataShareValuesBucket> valuesBuckets;
     for (ValuesBucketWrap& wrapBuckets : buckets) {
         rust::Vec<ValuesBucketKvItem> const &bucket = values_bucket_wrap_inner(wrapBuckets);
@@ -738,7 +772,8 @@ int DataShareNativeBatchInsert(int64_t dataShareHelperPtr, rust::String strUri,
 
     Uri uri(std::string(strUri).c_str());
     int resultNumber = 0;
-    resultNumber = reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->BatchInsert(uri, valuesBuckets);
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    resultNumber = helperHolder->datashareHelper_->BatchInsert(uri, valuesBuckets);
     if (resultNumber < 0) {
         LOG_ERROR("BatchInsert failed");
     }
@@ -749,7 +784,8 @@ int DataShareNativeDelete(int64_t dataShareHelperPtr, rust::String strUri, int64
 {
     int resultNumber = 0;
     Uri uri(std::string(strUri).c_str());
-    resultNumber = reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->Delete(uri,
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    resultNumber = helperHolder->datashareHelper_->Delete(uri,
         *reinterpret_cast<DataSharePredicates*>(dataSharePredicatesPtr));
     if (resultNumber < 0) {
         LOG_ERROR("BatchInsert failed");
@@ -759,54 +795,56 @@ int DataShareNativeDelete(int64_t dataShareHelperPtr, rust::String strUri, int64
 
 void DataShareNativeClose(int64_t dataShareHelperPtr)
 {
-    reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->Release();
+    reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr)->datashareHelper_->Release();
 }
 
-void ANIRegisterObserver(const std::string &strUri, long long dataShareHelperPtr, long long envPtr,
-    long long callbackPtr, bool isNotifyDetails)
+void ANIRegisterObserver(const std::string &strUri, long long dataShareHelperPtr,
+    rust::Box<DataShareCallback> &callback, bool isNotifyDetails)
 {
     std::lock_guard<std::mutex> lck(listMutex_);
     observerMap_.try_emplace(strUri);
     auto &list = observerMap_.find(strUri)->second;
     for (const auto &item : list) {
-        if (callbackPtr == item->observer_->GetCallback()) {
+        if (callback_is_equal(*callback, *(item->observer_->GetCallback()))) {
             LOG_ERROR("observer has already subscribed.");
             return;
         }
     }
 
-    auto innerObserver = std::make_shared<ANIInnerDataShareObserver>(envPtr, callbackPtr);
+    auto innerObserver = std::make_shared<ANIInnerDataShareObserver>(std::move(callback));
     sptr<ANIDataShareObserver> observer(new (std::nothrow) ANIDataShareObserver(innerObserver));
     if (observer == nullptr) {
         LOG_ERROR("observer is nullptr");
         return;
     }
     Uri uri(strUri);
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
     if (!isNotifyDetails) {
-        reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->RegisterObserver(uri, observer);
+        helperHolder->datashareHelper_->RegisterObserver(uri, observer);
     } else {
-        reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->RegisterObserverExt(uri,
+        helperHolder->datashareHelper_->RegisterObserverExt(uri,
             std::shared_ptr<DataShareObserver>(observer.GetRefPtr(), [holder = observer](const auto*) {}), false);
     }
     list.push_back(observer);
 }
 
-void ANIUnRegisterObserver(const std::string &strUri, long long dataShareHelperPtr, long long envPtr,
-    long long callbackPtr, bool isNotifyDetails)
+void ANIUnRegisterObserver(const std::string &strUri, long long dataShareHelperPtr,
+    rust::Box<DataShareCallback> &callback, bool isNotifyDetails)
 {
     std::lock_guard<std::mutex> lck(listMutex_);
     auto &list = observerMap_.find(strUri)->second;
     auto it = list.begin();
     Uri uri(strUri);
     while (it != list.end()) {
-        if (callbackPtr != (*it)->observer_->GetCallback()) {
+        if (!callback_is_equal(*callback, *((*it)->observer_->GetCallback()))) {
             ++it;
             continue;
         }
+        auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
         if (!isNotifyDetails) {
-            reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->UnregisterObserver(uri, *it);
+            helperHolder->datashareHelper_->UnregisterObserver(uri, *it);
         } else {
-            reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->UnregisterObserverExt(uri,
+            helperHolder->datashareHelper_->UnregisterObserverExt(uri,
                 std::shared_ptr<DataShareObserver>((*it).GetRefPtr(), [holder = *it](const auto*) {}));
         }
         it = list.erase(it);
@@ -817,18 +855,18 @@ void ANIUnRegisterObserver(const std::string &strUri, long long dataShareHelperP
     }
 }
 
-void ANIUnRegisterObserver(const std::string &strUri, long long dataShareHelperPtr, long long envPtr,
-    bool isNotifyDetails)
+void ANIUnRegisterObserver(const std::string &strUri, long long dataShareHelperPtr, bool isNotifyDetails)
 {
     std::lock_guard<std::mutex> lck(listMutex_);
     auto &list = observerMap_.find(strUri)->second;
     auto it = list.begin();
     Uri uri(strUri);
     while (it != list.end()) {
+        auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
         if (!isNotifyDetails) {
-            reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->UnregisterObserver(uri, *it);
+            helperHolder->datashareHelper_->UnregisterObserver(uri, *it);
         } else {
-            reinterpret_cast<DataShareHelper*>(dataShareHelperPtr)->UnregisterObserverExt(uri,
+            helperHolder->datashareHelper_->UnregisterObserverExt(uri,
                 std::shared_ptr<DataShareObserver>((*it).GetRefPtr(), [holder = *it](const auto*) {}));
         }
         it = list.erase(it);
@@ -836,21 +874,18 @@ void ANIUnRegisterObserver(const std::string &strUri, long long dataShareHelperP
     observerMap_.erase(strUri);
 }
 
-void DataShareNativeOn(EnvPtrWrap envPtrWrap, rust::String strType, rust::String strUri)
+void DataShareNativeOn(PtrWrap ptrWrap, rust::String strType, rust::String strUri)
 {
-    ANIRegisterObserver(std::string(strUri), envPtrWrap.dataShareHelperPtr, envPtrWrap.envPtr, envPtrWrap.callbackPtr);
+    ANIRegisterObserver(std::string(strUri), ptrWrap.dataShareHelperPtr, ptrWrap.callback);
 }
 
-void DataShareNativeOnChangeinfo(EnvPtrWrap envPtrWrap, rust::String event,
-                                 int32_t arktype, rust::String strUri)
+void DataShareNativeOnChangeinfo(PtrWrap ptrWrap, rust::String event, int32_t arktype, rust::String strUri)
 {
-    ANIRegisterObserver(std::string(strUri),
-        envPtrWrap.dataShareHelperPtr, envPtrWrap.envPtr, envPtrWrap.callbackPtr, true);
+    ANIRegisterObserver(std::string(strUri), ptrWrap.dataShareHelperPtr, ptrWrap.callback, true);
 }
 
-void DataShareNativeOnRdbDataChange(EnvPtrWrap envPtrWrap, rust::String arktype,
-                                    rust::Vec<rust::String> uris, const TemplateId& templateId,
-                                    PublishSretParam& sret)
+void DataShareNativeOnRdbDataChange(PtrWrap ptrWrap, rust::String arktype, rust::Vec<rust::String> uris,
+    const TemplateId& templateId, PublishSretParam& sret)
 {
     std::vector<OperationResult> results;
     std::vector<std::string> stdUris;
@@ -860,21 +895,21 @@ void DataShareNativeOnRdbDataChange(EnvPtrWrap envPtrWrap, rust::String arktype,
     DataShare::TemplateId tplId;
     tplId.subscriberId_ = atoll(std::string(template_id_get_subscriber_id(templateId)).c_str());
     tplId.bundleName_ = std::string(template_id_get_bundle_name_of_owner(templateId));
-    std::shared_ptr<AniRdbSubscriberManager> jsRdbObsManager =
-        std::make_shared<AniRdbSubscriberManager>(reinterpret_cast<DataShareHelper*>(envPtrWrap.dataShareHelperPtr));
-    if (jsRdbObsManager == nullptr) {
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(ptrWrap.dataShareHelperPtr);
+    helperHolder->jsRdbObsManager_ =
+        std::make_shared<AniRdbSubscriberManager>(helperHolder->datashareHelper_);
+    if (helperHolder->jsRdbObsManager_ == nullptr) {
         LOG_ERROR("OnRdbDataChange failed, jsRdbObsManager is null");
         return;
     }
-    results = jsRdbObsManager->AddObservers(envPtrWrap.envPtr, envPtrWrap.callbackPtr, stdUris, tplId);
+    results = helperHolder->jsRdbObsManager_->AddObservers(ptrWrap.callback, stdUris, tplId);
     for (const auto &result : results) {
         publish_sret_push(sret, rust::String(result.key_), result.errCode_);
     }
 }
 
-void DataShareNativeOnPublishedDataChange(EnvPtrWrap envPtrWrap, rust::String arktype,
-                                          rust::Vec<rust::String> uris, rust::String subscriberId,
-                                          PublishSretParam& sret)
+void DataShareNativeOnPublishedDataChange(PtrWrap ptrWrap, rust::String arktype, rust::Vec<rust::String> uris,
+    rust::String subscriberId, PublishSretParam& sret)
 {
     std::vector<OperationResult> results;
     std::vector<std::string> stdUris;
@@ -883,40 +918,42 @@ void DataShareNativeOnPublishedDataChange(EnvPtrWrap envPtrWrap, rust::String ar
     }
 
     int64_t innerSubscriberId = atoll(std::string(subscriberId).c_str());
-    auto jsPublishedObsManager = std::make_shared<AniPublishedSubscriberManager>(
-        reinterpret_cast<DataShareHelper*>(envPtrWrap.dataShareHelperPtr));
-    if (jsPublishedObsManager == nullptr) {
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(ptrWrap.dataShareHelperPtr);
+    helperHolder->jsPublishedObsManager_ =
+        std::make_shared<AniPublishedSubscriberManager>(helperHolder->datashareHelper_);
+    if (helperHolder->jsPublishedObsManager_ == nullptr) {
         LOG_ERROR("OnPublishedDataChange failed, jsPublishedObsManager is null");
         return;
     }
-    results = jsPublishedObsManager->AddObservers(envPtrWrap.envPtr,
-        envPtrWrap.callbackPtr, stdUris, innerSubscriberId);
+    results = helperHolder->jsPublishedObsManager_->AddObservers(ptrWrap.callback, stdUris, innerSubscriberId);
     for (const auto &result : results) {
         publish_sret_push(sret, rust::String(result.key_), result.errCode_);
     }
 }
 
-void DataShareNativeOff(EnvPtrWrap envPtrWrap, rust::String strType, rust::String strUri)
+void DataShareNativeOff(PtrWrap ptrWrap, rust::String strType, rust::String strUri)
 {
-    if (envPtrWrap.callbackPtr != 0) {
-        ANIUnRegisterObserver(std::string(strUri), envPtrWrap.dataShareHelperPtr,
-            envPtrWrap.envPtr, envPtrWrap.callbackPtr);
-    }
-    ANIUnRegisterObserver(std::string(strUri), envPtrWrap.dataShareHelperPtr, envPtrWrap.envPtr);
+    ANIUnRegisterObserver(std::string(strUri), ptrWrap.dataShareHelperPtr, ptrWrap.callback, false);
 }
 
-void DataShareNativeOffChangeinfo(EnvPtrWrap envPtrWrap, rust::String event,
-                                  int32_t arktype, rust::String strUri)
+void DataShareNativeOffNone(int64_t dataShareHelperPtr, rust::String strType, rust::String strUri)
 {
-    if (envPtrWrap.callbackPtr != 0) {
-        ANIUnRegisterObserver(std::string(strUri), envPtrWrap.dataShareHelperPtr,
-            envPtrWrap.envPtr, envPtrWrap.callbackPtr, true);
-    }
-    ANIUnRegisterObserver(std::string(strUri), envPtrWrap.dataShareHelperPtr, envPtrWrap.envPtr, true);
+    ANIUnRegisterObserver(std::string(strUri), dataShareHelperPtr, false);
 }
 
-void DataShareNativeOffRdbDataChange(EnvPtrWrap envPtrWrap, rust::String arktype, rust::Vec<rust::String> uris,
-                                     const TemplateId& templateId, PublishSretParam& sret)
+void DataShareNativeOffChangeinfo(PtrWrap ptrWrap, rust::String event, int32_t arktype, rust::String strUri)
+{
+    ANIUnRegisterObserver(std::string(strUri), ptrWrap.dataShareHelperPtr, ptrWrap.callback, true);
+}
+
+void DataShareNativeOffChangeinfoNone(int64_t dataShareHelperPtr, rust::String event, int32_t arktype,
+    rust::String strUri)
+{
+    ANIUnRegisterObserver(std::string(strUri), dataShareHelperPtr, true);
+}
+
+void DataShareNativeOffRdbDataChange(PtrWrap ptrWrap, rust::String arktype, rust::Vec<rust::String> uris,
+    const TemplateId& templateId, PublishSretParam& sret)
 {
     std::vector<OperationResult> results;
     std::vector<std::string> stdUris;
@@ -926,22 +963,40 @@ void DataShareNativeOffRdbDataChange(EnvPtrWrap envPtrWrap, rust::String arktype
     DataShare::TemplateId tplId;
     tplId.subscriberId_ = atoll(std::string(template_id_get_subscriber_id(templateId)).c_str());
     tplId.bundleName_ = std::string(template_id_get_bundle_name_of_owner(templateId));
-    std::shared_ptr<AniRdbSubscriberManager> jsRdbObsManager =
-        std::make_shared<AniRdbSubscriberManager>(reinterpret_cast<DataShareHelper*>(envPtrWrap.dataShareHelperPtr));
-    if (jsRdbObsManager == nullptr) {
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(ptrWrap.dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->jsRdbObsManager_ == nullptr) {
         LOG_ERROR("OffRdbDataChange failed, jsRdbObsManager is null");
         return;
     }
-    if (envPtrWrap.callbackPtr == 0) {
-        results = jsRdbObsManager->DelObservers(envPtrWrap.envPtr, 0, stdUris, tplId);
-    }
-    results = jsRdbObsManager->DelObservers(envPtrWrap.envPtr, envPtrWrap.callbackPtr, stdUris, tplId);
+    results = helperHolder->jsRdbObsManager_->DelObservers(ptrWrap.callback, stdUris, tplId);
     for (const auto &result : results) {
         publish_sret_push(sret, rust::String(result.key_), result.errCode_);
     }
 }
 
-void DataShareNativeOffPublishedDataChange(EnvPtrWrap envPtrWrap, rust::String arktype,
+void DataShareNativeOffRdbDataChangeNone(int64_t dataShareHelperPtr, rust::String arktype, rust::Vec<rust::String> uris,
+    const TemplateId& templateId, PublishSretParam& sret)
+{
+    std::vector<OperationResult> results;
+    std::vector<std::string> stdUris;
+    for (const auto &uri : uris) {
+        stdUris.push_back(std::string(uri));
+    }
+    DataShare::TemplateId tplId;
+    tplId.subscriberId_ = atoll(std::string(template_id_get_subscriber_id(templateId)).c_str());
+    tplId.bundleName_ = std::string(template_id_get_bundle_name_of_owner(templateId));
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->jsRdbObsManager_ == nullptr) {
+        LOG_ERROR("OffRdbDataChange failed, jsRdbObsManager is null");
+        return;
+    }
+    results = helperHolder->jsRdbObsManager_->DelObservers(stdUris, tplId);
+    for (const auto &result : results) {
+        publish_sret_push(sret, rust::String(result.key_), result.errCode_);
+    }
+}
+
+void DataShareNativeOffPublishedDataChange(PtrWrap ptrWrap, rust::String arktype,
                                            rust::Vec<rust::String> uris, rust::String subscriberId,
                                            PublishSretParam& sret)
 {
@@ -951,17 +1006,33 @@ void DataShareNativeOffPublishedDataChange(EnvPtrWrap envPtrWrap, rust::String a
         stdUris.push_back(std::string(uri));
     }
     int64_t innerSubscriberId = atoll(std::string(subscriberId).c_str());
-    auto jsPublishedObsManager = std::make_shared<AniPublishedSubscriberManager>(
-        reinterpret_cast<DataShareHelper*>(envPtrWrap.dataShareHelperPtr));
-    if (jsPublishedObsManager == nullptr) {
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(ptrWrap.dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->jsPublishedObsManager_ == nullptr) {
         LOG_ERROR("OffPublishedDataChange failed, jsPublishedObsManager is null");
         return;
     }
-    if (envPtrWrap.callbackPtr == 0) {
-        results = jsPublishedObsManager->DelObservers(envPtrWrap.envPtr, 0, stdUris, innerSubscriberId);
+    results = helperHolder->jsPublishedObsManager_->DelObservers(ptrWrap.callback, stdUris, innerSubscriberId);
+    for (const auto &result : results) {
+        publish_sret_push(sret, rust::String(result.key_), result.errCode_);
     }
-    results = jsPublishedObsManager->DelObservers(envPtrWrap.envPtr,
-        envPtrWrap.callbackPtr, stdUris, innerSubscriberId);
+}
+
+void DataShareNativeOffPublishedDataChangeNone(int64_t dataShareHelperPtr, rust::String arktype,
+                                               rust::Vec<rust::String> uris, rust::String subscriberId,
+                                               PublishSretParam& sret)
+{
+    std::vector<OperationResult> results;
+    std::vector<std::string> stdUris;
+    for (const auto &uri : uris) {
+        stdUris.push_back(std::string(uri));
+    }
+    int64_t innerSubscriberId = atoll(std::string(subscriberId).c_str());
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->jsPublishedObsManager_ == nullptr) {
+        LOG_ERROR("OffPublishedDataChange failed, jsPublishedObsManager is null");
+        return;
+    }
+    results = helperHolder->jsPublishedObsManager_->DelObservers(stdUris, innerSubscriberId);
     for (const auto &result : results) {
         publish_sret_push(sret, rust::String(result.key_), result.errCode_);
     }
@@ -969,17 +1040,17 @@ void DataShareNativeOffPublishedDataChange(EnvPtrWrap envPtrWrap, rust::String a
 
 void DataShareNativeExtensionCallbackInt(double errorCode, rust::string errorMsg, int32_t data, int64_t nativePtr)
 {
-    AsyncCallBackPoint* point = static_cast<AsyncCallBackPoint*>(nativePtr);
+    AsyncCallBackPoint* point = reinterpret_cast<AsyncCallBackPoint*>(nativePtr);
     if (point == nullptr) {
         LOG_ERROR("AsyncCallBackPoint is nullptr.");
         return;
     }
     auto jsResult = point->result;
-    if (result == nullptr) {
+    if (jsResult == nullptr) {
         LOG_ERROR("JsResult is nullptr.");
         return;
     }
-    jsResult->callbackResultNumber_ = value;
+    jsResult->callbackResultNumber_ = data;
     DatashareBusinessError businessError;
     businessError.SetCode((int)errorCode);
     businessError.SetMessage(std::string(errorMsg));
@@ -989,23 +1060,25 @@ void DataShareNativeExtensionCallbackInt(double errorCode, rust::string errorMsg
 
 void DataShareNativeExtensionCallbackObject(double errorCode, rust::string errorMsg, int64_t ptr, int64_t nativePtr)
 {
-    if (ptr == nullptr) {
-        LOG_ERROR("Result ptr is nullptr.");
-        return;
-    }
-    AsyncCallBackPoint* point = static_cast<AsyncCallBackPoint*>(nativePtr);
+    AsyncCallBackPoint* point = reinterpret_cast<AsyncCallBackPoint*>(nativePtr);
     if (point == nullptr) {
         LOG_ERROR("AsyncCallBackPoint is nullptr.");
         return;
     }
     auto jsResult = point->result;
-    if (result == nullptr) {
+    if (jsResult == nullptr) {
         LOG_ERROR("JsResult is nullptr.");
         return;
     }
-    ResultSetBridge *objPtr = reinterpret_cast<ResultSetBridge *>(ptr);
-    std::shared_ptr<ResultSetBridge> resultPtr(objPtr);
+
+    JSProxy::JSCreator<ResultSetBridge> *proxy = reinterpret_cast<JSProxy::JSCreator<ResultSetBridge> *>(ptr);
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr.");
+        return;
+    }
+    std::shared_ptr<ResultSetBridge> resultPtr = proxy->Create();
     jsResult->callbackResultObject_ = std::make_shared<DataShareResultSet>(resultPtr);
+    DatashareBusinessError businessError;
     businessError.SetCode((int)errorCode);
     businessError.SetMessage(std::string(errorMsg));
     jsResult->businessError_= businessError;
@@ -1047,7 +1120,7 @@ void DataShareNativeExtensionCallbackVoid(double errorCode, rust::string errorMs
         MessageParcel data;
         MessageParcel reply;
         MessageOption option(MessageOption::TF_ASYNC);
-        if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        if (!data.WriteInterfaceToken(DataShare::IDataShareService::GetDescriptor())) {
             LOG_ERROR("Write descriptor failed!");
             return;
         }

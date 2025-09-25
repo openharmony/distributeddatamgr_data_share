@@ -16,6 +16,7 @@
 import { ValueType } from "@ohos.data.ValuesBucket"
 
 export default namespace dataSharePredicates{
+loadLibrary("datashare_ani_rs")
 class Cleaner {
   private nativePtr: long = 0
   constructor(ptr:long) {
@@ -27,16 +28,17 @@ class Cleaner {
 let destroyRegister = new FinalizationRegistry<Cleaner>((cleaner: Cleaner) => {cleaner.native_clean()})
 let unregisterToken = new object()
 
+export native function native_create(): long
 export class DataSharePredicates {
 
-  static { loadLibrary("datashare_ani") }
+  static { loadLibrary("datashare_ani_rs") }
 
   private nativePtr:long = 0;
   private cleaner: Cleaner | null = null;
 
   constructor() {
       if (this.nativePtr == 0) {
-          this.nativePtr = DataSharePredicates.create();
+          this.nativePtr = native_create();
       }
       this.registerCleaner(this.nativePtr)
   }
@@ -60,8 +62,6 @@ export class DataSharePredicates {
   unregisterCleaner(): void {
     destroyRegister.unregister(unregisterToken);
   }
-
-  native static create(): long;
 
   native equalTo(field: string, value: ValueType): DataSharePredicates;
 
@@ -97,7 +97,7 @@ export class DataSharePredicates {
 
   native orderByDesc(field: string): DataSharePredicates;
 
-  native limit(total: double, offset: double): DataSharePredicates;
+  native limit(total: int, offset: int): DataSharePredicates;
 
   native groupBy(fields: Array<string>): DataSharePredicates;
 

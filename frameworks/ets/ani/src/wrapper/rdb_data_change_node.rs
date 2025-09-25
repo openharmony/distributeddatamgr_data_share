@@ -36,9 +36,3 @@ pub fn rust_create_rdb_data_change_node(
 pub fn rdb_data_change_node_push_data(node: &mut RdbDataChangeNode, data_item: String) {
     node.push_data(data_item);
 }
-
-pub fn execute_callback_rdb_data_change(callback_ptr: i64, env_ptr: i64, node: &RdbDataChangeNode) {
-    let env = AniEnv::from_raw(env_ptr as _);
-    let callback = AniFnObject::from_raw(callback_ptr as _);
-    callback.execute_local(&env, (node,)).unwrap();
-}

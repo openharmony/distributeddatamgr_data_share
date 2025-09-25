@@ -13,19 +13,19 @@
 
 use std::collections::HashMap;
 
-use ani_rs::{objects::AniFnObject, typed_array::Uint8Array, AniEnv};
+use ani_rs::{objects::{AniFnObject, AniAsyncCallback}, typed_array::Uint8Array, AniEnv};
 
 use crate::datashare::{BucketValue, ChangeInfo, ChangeType};
 
-pub fn rust_create_change_info(change_index: i32, uri: String) -> Box<ChangeInfo<'static>> {
+pub fn rust_create_change_info(change_index: i32, uri: String) -> Box<ChangeInfo> {
     let change_info = ChangeInfo::new(ChangeType::from_i32(change_index), uri);
     Box::new(change_info)
 }
 
-fn change_info_push_kv<'a>(
-    change_info: &mut ChangeInfo<'a>,
+fn change_info_push_kv(
+    change_info: &mut ChangeInfo,
     key: String,
-    value: BucketValue<'a>,
+    value: BucketValue,
     new_hashmap: bool,
 ) {
     if new_hashmap || change_info.values.is_empty() {
@@ -68,13 +68,13 @@ pub fn change_info_push_kv_boolean(
     change_info_push_kv(change_info, key, value, new_hashmap);
 }
 
-pub fn change_info_push_kv_uint8array<'a>(
-    change_info: &mut ChangeInfo<'a>,
+pub fn change_info_push_kv_uint8array(
+    change_info: &mut ChangeInfo,
     key: String,
-    value: &'a [u8],
+    value: Vec<u8>,
     new_hashmap: bool,
 ) {
-    let arr = Uint8Array::new(value);
+    let arr = Uint8Array::new_with_vec(value);
     let value = BucketValue::Uint8Array(arr);
     change_info_push_kv(change_info, key, value, new_hashmap);
 }
@@ -82,18 +82,4 @@ pub fn change_info_push_kv_uint8array<'a>(
 pub fn change_info_push_kv_null(change_info: &mut ChangeInfo, key: String, new_hashmap: bool) {
     let value = BucketValue::Null(());
     change_info_push_kv(change_info, key, value, new_hashmap);
-}
-
-pub fn execute_callback_changeinfo(callback_ptr: i64, env_ptr: i64, change_info: &ChangeInfo) {
-    let env = AniEnv::from_raw(env_ptr as _);
-    let callback = AniFnObject::from_raw(callback_ptr as _);
-    callback.execute_local(&env, (change_info,)).unwrap();
-}
-
-pub fn execute_callback(callback_ptr: i64, env_ptr: i64) {
-    let env = AniEnv::from_raw(env_ptr as _);
-
-    let callback = AniFnObject::from_raw(callback_ptr as _);
-
-    callback.execute_local(&env, ((),)).unwrap();
 }

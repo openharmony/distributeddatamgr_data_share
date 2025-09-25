@@ -19,13 +19,13 @@ use crate::datashare::BucketValue;
 
 use super::ffi;
 
-pub struct ValuesBucketKvItem<'a> {
+pub struct ValuesBucketKvItem {
     key: String,
-    value: BucketValue<'a>,
+    value: BucketValue,
 }
 
-impl<'a> ValuesBucketKvItem<'a> {
-    pub fn new(key: String, value: BucketValue<'a>) -> Self {
+impl ValuesBucketKvItem {
+    pub fn new(key: String, value: BucketValue) -> Self {
         Self { key, value }
     }
 }
@@ -76,23 +76,23 @@ pub fn value_bucket_get_bool(kv: &ValuesBucketKvItem) -> bool {
 // called by c++, if BucketValue is uint8array, get uint8array.
 pub fn value_bucket_get_uint8array(kv: &ValuesBucketKvItem) -> Vec<u8> {
     if let BucketValue::Uint8Array(a) = &kv.value {
-        return a.as_slice().to_vec();
+        return a.to_vec();
     }
 
     panic!("Not Array Type!!!");
 }
 
-pub struct ValuesBucketWrap<'a>(pub Vec<ValuesBucketKvItem<'a>>);
+pub struct ValuesBucketWrap(pub Vec<ValuesBucketKvItem>);
 
-pub fn values_bucket_wrap_inner<'a>(kv: &'a ValuesBucketWrap) -> &'a Vec<ValuesBucketKvItem<'a>> {
+pub fn values_bucket_wrap_inner(kv: &ValuesBucketWrap) -> &Vec<ValuesBucketKvItem> {
     &kv.0
 }
 
-pub struct ValuesBucketHashWrap<'a> {
-    value_bucket: HashMap<String, BucketValue<'a>>,
+pub struct ValuesBucketHashWrap {
+    value_bucket: HashMap<String, BucketValue>,
 }
 
-impl<'a> ValuesBucketHashWrap<'a> {
+impl ValuesBucketHashWrap {
     pub fn new() -> Self {
         Self {
             value_bucket: HashMap::new()
@@ -104,15 +104,15 @@ impl<'a> ValuesBucketHashWrap<'a> {
     }
 }
 
-pub fn rust_create_values_bucket() -> Box<ValuesBucketHashWrap<'static>> {
+pub fn rust_create_values_bucket() -> Box<ValuesBucketHashWrap> {
     let value_bucket = ValuesBucketHashWrap::new();
     Box::new(value_bucket)
 }
 
-fn values_bucket_push_kv<'a>(
-    value_bucket: &mut ValuesBucketHashWrap<'a>,
+fn values_bucket_push_kv(
+    value_bucket: &mut ValuesBucketHashWrap,
     key: String,
-    value: BucketValue<'a>,
+    value: BucketValue,
 ) {
     value_bucket.value_bucket.insert(key, value);
 }
@@ -144,12 +144,12 @@ pub fn value_bucket_push_kv_boolean(
     values_bucket_push_kv(value_bucket, key, value);
 }
 
-pub fn value_bucket_push_kv_uint8array<'a>(
-    value_bucket: &mut ValuesBucketHashWrap<'a>,
+pub fn value_bucket_push_kv_uint8array(
+    value_bucket: &mut ValuesBucketHashWrap,
     key: String,
-    value: &'a [u8],
+    value: Vec<u8>,
 ) {
-    let arr = Uint8Array::new(value);
+    let arr = Uint8Array::new_with_vec(value);
     let value = BucketValue::Uint8Array(arr);
     values_bucket_push_kv(value_bucket, key, value);
 }
@@ -159,31 +159,31 @@ pub fn value_bucket_push_kv_null(value_bucket: &mut ValuesBucketHashWrap, key: S
     values_bucket_push_kv(value_bucket, key, value);
 }
 
-pub struct ValuesBucketArrayWrap<'a> {
-    value_buckets: Vec<HashMap<String, BucketValue<'a>>>,
+pub struct ValuesBucketArrayWrap {
+    value_buckets: Vec<HashMap<String, BucketValue>>,
 }
 
-impl<'a> ValuesBucketArrayWrap<'a> {
+impl ValuesBucketArrayWrap {
     pub fn new() -> Self {
         Self {
             value_buckets: Vec::new()
         }
     }
 
-    pub fn as_ref(&self) -> &Vec<HashMap<String, BucketValue<'a>>> {
+    pub fn as_ref(&self) -> &Vec<HashMap<String, BucketValue>> {
         &self.value_buckets
     }
 }
 
-pub fn rust_create_values_bucket_array() -> Box<ValuesBucketArrayWrap<'static>> {
+pub fn rust_create_values_bucket_array() -> Box<ValuesBucketArrayWrap> {
     let value_buckets = ValuesBucketArrayWrap::new();
     Box::new(value_buckets)
 }
 
-fn values_bucket_array_push_kv<'a>(
-    value_buckets: &mut ValuesBucketArrayWrap<'a>,
+fn values_bucket_array_push_kv(
+    value_buckets: &mut ValuesBucketArrayWrap,
     key: String,
-    value: BucketValue<'a>,
+    value: BucketValue,
     new_hashmap: bool,
 ) {
     if new_hashmap || value_buckets.value_buckets.is_empty() {
@@ -226,13 +226,13 @@ pub fn values_bucket_array_push_kv_boolean(
     values_bucket_array_push_kv(value_buckets, key, value, new_hashmap);
 }
 
-pub fn values_bucket_array_push_kv_uint8array<'a>(
-    value_buckets: &mut ValuesBucketArrayWrap<'a>,
+pub fn values_bucket_array_push_kv_uint8array(
+    value_buckets: &mut ValuesBucketArrayWrap,
     key: String,
-    value: &'a [u8],
+    value: Vec<u8>,
     new_hashmap: bool,
 ) {
-    let arr = Uint8Array::new(value);
+    let arr = Uint8Array::new_with_vec(value);
     let value = BucketValue::Uint8Array(arr);
     values_bucket_array_push_kv(value_buckets, key, value, new_hashmap);
 }

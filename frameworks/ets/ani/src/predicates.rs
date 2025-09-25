@@ -238,8 +238,8 @@ pub fn native_order_by_desc<'local>(
 pub fn native_limit<'local>(
     env: AniEnv<'local>,
     ani_this: AniRef<'local>,
-    total: f64,
-    offset: f64,
+    total: i32,
+    offset: i32,
 ) -> AniRef<'local> {
     let predicates_ptr = get_native_ptr(&env, &ani_this.clone().into());
 

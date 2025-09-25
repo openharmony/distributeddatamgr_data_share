@@ -14,14 +14,14 @@
  */
 
 import { BusinessError } from '@ohos.base'
-import type { AsyncCallback, Callback } from '@ohos.base';
+import type { AsyncCallback } from '@ohos.base';
 import Context from 'application.Context';
 import DataShareResultSet from './@ohos.data.DataShareResultSet';
 import dataSharePredicates from './@ohos.data.dataSharePredicates';
 import { ValuesBucket } from '@ohos.data.ValuesBucket';
 
 export namespace dataShare {
-  loadLibrary("datashare_ani")
+  loadLibrary("datashare_ani_rs")
 
   class Cleaner {
     private nativePtr: long = 0
@@ -92,13 +92,13 @@ export namespace dataShare {
   }
 
   export interface DataShareHelper {
-    on(type: 'dataChange', uri: string, callback: Callback<void>): void;
+    on(type: 'dataChange', uri: string, callback: AsyncCallback<void>): void;
 
-    off(type: 'dataChange', uri: string, callback?: Callback<void>): void;
+    off(type: 'dataChange', uri: string, callback?: AsyncCallback<void>): void;
 
-    on(event: 'dataChange', type: SubscriptionType, uri: string, callback: Callback<ChangeInfo>): void;
+    on(event: 'dataChange', type: SubscriptionType, uri: string, callback: AsyncCallback<ChangeInfo>): void;
 
-    off(event: 'dataChange', type: SubscriptionType, uri: string, callback?: Callback<ChangeInfo>): void;
+    off(event: 'dataChange', type: SubscriptionType, uri: string, callback?: AsyncCallback<ChangeInfo>): void;
 
     addTemplate(uri: string, subscriberId: string, template: Template): void;
 
@@ -108,28 +108,28 @@ export namespace dataShare {
       type: 'rdbDataChange',
       uris: Array<string>,
       templateId: TemplateId,
-      callback: Callback<RdbDataChangeNode>
+      callback: AsyncCallback<RdbDataChangeNode>
     ): Array<OperationResult>;
 
     off(
       type: 'rdbDataChange',
       uris: Array<string>,
       templateId: TemplateId,
-      callback?: Callback<RdbDataChangeNode>
+      callback?: AsyncCallback<RdbDataChangeNode>
     ): Array<OperationResult>;
 
     on(
       type: 'publishedDataChange',
       uris: Array<string>,
       subscriberId: string,
-      callback: Callback<PublishedDataChangeNode>
+      callback: AsyncCallback<PublishedDataChangeNode>
     ): Array<OperationResult>;
 
     off(
       type: 'publishedDataChange',
       uris: Array<string>,
       subscriberId: string,
-      callback?: Callback<PublishedDataChangeNode>
+      callback?: AsyncCallback<PublishedDataChangeNode>
     ): Array<OperationResult>;
 
     publish(
@@ -197,22 +197,22 @@ export namespace dataShare {
   export native function native_batch_insert(obj: DataShareHelper, uri: string, values: Array<ValuesBucket>): int
   export native function native_delete(obj: DataShareHelper, uri: string, predicates: dataSharePredicates.DataSharePredicates): int
   export native function native_close(obj: DataShareHelper):void
-  export native function native_on(obj: DataShareHelper, type: string, uri: string, callback: Callback<void>): void
-  export native function native_off(obj: DataShareHelper, type: string, uri: string, callback?: Callback<void>): void
-  export native function native_on_changeinfo(obj: DataShareHelper, event: string, type: SubscriptionType, uri: string, callback: Callback<ChangeInfo>): void
-  export native function native_off_changeinfo(obj: DataShareHelper, event: string, type: SubscriptionType, uri: string, callback?: Callback<ChangeInfo>): void
-  export native function native_on_rdb_data_change(obj: DataShareHelper, type: string, uris: Array<string>, templateId: TemplateId, callback: Callback<RdbDataChangeNode>): Array<OperationResult>
-  export native function native_off_rdb_data_change(obj: DataShareHelper, type: string, uris: Array<string>, templateId: TemplateId, callback?: Callback<RdbDataChangeNode>): Array<OperationResult>
-  export native function native_on_published_data_change(obj: DataShareHelper, type: string, uris: Array<string>, subscriberId: string, callback: Callback<PublishedDataChangeNode>): Array<OperationResult>
-  export native function native_off_published_data_change(obj: DataShareHelper, type: string, uris: Array<string>, subscriberId: string, callback?: Callback<PublishedDataChangeNode>): Array<OperationResult>
+  export native function native_on(obj: DataShareHelper, type: string, uri: string, callback: AsyncCallback<void>): void
+  export native function native_off(obj: DataShareHelper, type: string, uri: string, callback?: AsyncCallback<void>): void
+  export native function native_on_changeinfo(obj: DataShareHelper, event: string, type: SubscriptionType, uri: string, callback: AsyncCallback<ChangeInfo>): void
+  export native function native_off_changeinfo(obj: DataShareHelper, event: string, type: SubscriptionType, uri: string, callback?: AsyncCallback<ChangeInfo>): void
+  export native function native_on_rdb_data_change(obj: DataShareHelper, type: string, uris: Array<string>, templateId: TemplateId, callback: AsyncCallback<RdbDataChangeNode>): Array<OperationResult>
+  export native function native_off_rdb_data_change(obj: DataShareHelper, type: string, uris: Array<string>, templateId: TemplateId, callback?: AsyncCallback<RdbDataChangeNode>): Array<OperationResult>
+  export native function native_on_published_data_change(obj: DataShareHelper, type: string, uris: Array<string>, subscriberId: string, callback: AsyncCallback<PublishedDataChangeNode>): Array<OperationResult>
+  export native function native_off_published_data_change(obj: DataShareHelper, type: string, uris: Array<string>, subscriberId: string, callback?: AsyncCallback<PublishedDataChangeNode>): Array<OperationResult>
 
   export function createDataShareHelper(context: Context, uri: string, callback: AsyncCallback<DataShareHelper>): void {
         let p = taskpool.execute(native_create, context, uri, undefined)
-        p.then((e: NullishType) => {
-            let r = e as DataShareHelper
-            let err: BusinessError<void>
-            callback(err, r)
-        })
+        p.then((r: NullishType) => {
+            callback(null, r as DataShareHelper);
+        }, (err: Error): void => {
+            callback(err as BusinessError, undefined);
+        });
   }
 
   export function createDataShareHelper(
@@ -222,11 +222,11 @@ export namespace dataShare {
     callback: AsyncCallback<DataShareHelper>
   ): void {
         let p = taskpool.execute(native_create, context, uri, options)
-        p.then((e: NullishType) => {
-            let r = e as DataShareHelper
-            let err: BusinessError<void>
-            callback(err, r)
-        })
+        p.then((r: NullishType) => {
+            callback(null, r as DataShareHelper);
+        }, (err: Error): void => {
+            callback(err as BusinessError, undefined);
+        });
   }
 
   export function createDataShareHelper(
@@ -270,11 +270,11 @@ export namespace dataShare {
 
     query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>, callback: AsyncCallback<DataShareResultSet>): void {
         let p = taskpool.execute(native_query, this, uri, predicates, columns)
-        p.then((e: NullishType) => {
-            let r = e as DataShareResultSet
-            let err: BusinessError<void>
-            callback(err, r)
-        })
+        p.then((r: NullishType) => {
+            callback(null, r as DataShareResultSet);
+        }, (err: Error): void => {
+            callback(err as BusinessError, undefined);
+        });
     }
 
     query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>): Promise<DataShareResultSet> {
@@ -296,11 +296,11 @@ export namespace dataShare {
       callback: AsyncCallback<int>
     ): void {
         let p = taskpool.execute(native_update, this, uri, predicates, value)
-        p.then((e: NullishType) => {
-            let r = e as int
-            let err: BusinessError<void>
-            callback(err, r)
-        })
+        p.then((r: NullishType) => {
+            callback(null, r as int);
+        }, (err: Error): void => {
+            callback(err as BusinessError, undefined);
+        });
     }
 
     update(uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket): Promise<int> {
@@ -322,11 +322,11 @@ export namespace dataShare {
       callback: AsyncCallback<Array<OperationResult>>
     ): void {
         let p = taskpool.execute(native_publish, this, data, bundleName, version)
-        p.then((e: NullishType) => {
-            let r = e as Array<OperationResult>
-            let err: BusinessError<void>
-            callback(err, r)
-        })
+        p.then((r: NullishType) => {
+            callback(null, r as Array<OperationResult>);
+        }, (err: Error): void => {
+            callback(err as BusinessError, undefined);
+        });
     }
 
     publish(
@@ -335,11 +335,11 @@ export namespace dataShare {
       callback: AsyncCallback<Array<OperationResult>>
     ): void {
         let p = taskpool.execute(native_publish, this, data, bundleName, undefined)
-        p.then((e: NullishType) => {
-            let r = e as Array<OperationResult>
-            let err: BusinessError<void>
-            callback(err, r)
-        })
+        p.then((r: NullishType) => {
+            callback(null, r as Array<OperationResult>);
+        }, (err: Error): void => {
+            callback(err as BusinessError, undefined);
+        });
     }
 
     publish(data: Array<PublishedItem>, bundleName: string, version?: int): Promise<Array<OperationResult>> {
@@ -356,11 +356,11 @@ export namespace dataShare {
 
     getPublishedData(bundleName: string, callback: AsyncCallback<Array<PublishedItem>>): void {
         let p = taskpool.execute(native_get_published_data, this, bundleName)
-        p.then((e: NullishType) => {
-            let r = e as Array<PublishedItem>
-            let err: BusinessError<void>
-            callback(err, r)
-        })
+        p.then((r: NullishType) => {
+            callback(null, r as Array<PublishedItem>);
+        }, (err: Error): void => {
+            callback(err as BusinessError, undefined);
+        });
     }
 
     getPublishedData(bundleName: string): Promise<Array<PublishedItem>> {
@@ -377,11 +377,11 @@ export namespace dataShare {
 
     insert(uri: string, value: ValuesBucket, callback: AsyncCallback<int>): void {
         let p = taskpool.execute(native_insert, this, uri, value)
-        p.then((e: NullishType) => {
-            let r = e as int
-            let err: BusinessError<void>
-            callback(err, r)
-        })
+        p.then((r: NullishType) => {
+            callback(null, r as int);
+        }, (err: Error): void => {
+            callback(err as BusinessError, undefined);
+        });
     }
 
     insert(uri: string, value: ValuesBucket): Promise<int> {
@@ -398,11 +398,11 @@ export namespace dataShare {
 
     batchInsert(uri: string, values: Array<ValuesBucket>, callback: AsyncCallback<int>): void {
         let p = taskpool.execute(native_batch_insert, this, uri, values)
-        p.then((e: NullishType) => {
-            let r = e as int
-            let err: BusinessError<void>
-            callback(err, r)
-        })
+        p.then((r: NullishType) => {
+            callback(null, r as int);
+        }, (err: Error): void => {
+            callback(err as BusinessError, undefined);
+        });
     }
 
     batchInsert(uri: string, values: Array<ValuesBucket>): Promise<int> {
@@ -419,11 +419,11 @@ export namespace dataShare {
 
     delete(uri: string, predicates: dataSharePredicates.DataSharePredicates, callback: AsyncCallback<int>): void {
         let p = taskpool.execute(native_delete, this, uri, predicates)
-        p.then((e: NullishType) => {
-            let r = e as int
-            let err: BusinessError<void>
-            callback(err, r)
-        })
+        p.then((r: NullishType) => {
+            callback(null, r as int);
+        }, (err: Error): void => {
+            callback(err as BusinessError, undefined);
+        });
     }
 
     delete(uri: string, predicates: dataSharePredicates.DataSharePredicates): Promise<int> {
@@ -449,19 +449,19 @@ export namespace dataShare {
         })
     }
 
-    on(type: 'dataChange', uri: string, callback: Callback<void>): void {
+    on(type: 'dataChange', uri: string, callback: AsyncCallback<void>): void {
         native_on(this, type, uri, callback)
     }
 
-    off(type: 'dataChange', uri: string, callback?: Callback<void>): void {
+    off(type: 'dataChange', uri: string, callback?: AsyncCallback<void>): void {
         native_off(this, type, uri, callback)
     }
 
-    on(event: 'dataChange', type: SubscriptionType, uri: string, callback: Callback<ChangeInfo>): void {
+    on(event: 'dataChange', type: SubscriptionType, uri: string, callback: AsyncCallback<ChangeInfo>): void {
         native_on_changeinfo(this, event, type, uri, callback)
     }
 
-    off(event: 'dataChange', type: SubscriptionType, uri: string, callback?: Callback<ChangeInfo>): void {
+    off(event: 'dataChange', type: SubscriptionType, uri: string, callback?: AsyncCallback<ChangeInfo>): void {
         native_off_changeinfo(this, event, type, uri, callback)
     }
 
@@ -469,7 +469,7 @@ export namespace dataShare {
       type: 'rdbDataChange',
       uris: Array<string>,
       templateId: TemplateId,
-      callback: Callback<RdbDataChangeNode>
+      callback: AsyncCallback<RdbDataChangeNode>
     ): Array<OperationResult> {
         return native_on_rdb_data_change(this, type, uris, templateId, callback);
     }
@@ -478,7 +478,7 @@ export namespace dataShare {
       type: 'rdbDataChange',
       uris: Array<string>,
       templateId: TemplateId,
-      callback?: Callback<RdbDataChangeNode>
+      callback?: AsyncCallback<RdbDataChangeNode>
     ): Array<OperationResult> {
         return native_off_rdb_data_change(this, type, uris, templateId, callback);
     }
@@ -487,7 +487,7 @@ export namespace dataShare {
       type: 'publishedDataChange',
       uris: Array<string>,
       subscriberId: string,
-      callback: Callback<PublishedDataChangeNode>
+      callback: AsyncCallback<PublishedDataChangeNode>
     ): Array<OperationResult> {
         return native_on_published_data_change(this, type, uris, subscriberId, callback)
     }
@@ -496,7 +496,7 @@ export namespace dataShare {
       type: 'publishedDataChange',
       uris: Array<string>,
       subscriberId: string,
-      callback?: Callback<PublishedDataChangeNode>
+      callback?: AsyncCallback<PublishedDataChangeNode>
     ): Array<OperationResult> {
         return native_off_published_data_change(this, type, uris, subscriberId, callback)
     }

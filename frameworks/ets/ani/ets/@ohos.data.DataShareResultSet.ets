@@ -25,10 +25,7 @@ export default interface DataShareResultSet {
 }
 
 class DataShareResultSetInner implements DataShareResultSet {
-
-  rowCount: int;
-
-  static { loadLibrary("datashare_ani") }
+  static { loadLibrary("datashare_ani_rs") }
 
   private nativePtr: long = 0;
 
@@ -38,6 +35,16 @@ class DataShareResultSetInner implements DataShareResultSet {
 
   constructor(nativePtr: long) {
       this.nativePtr = nativePtr;
+  }
+
+  native getRowCount(): int;
+
+  get rowCount(): int {
+    return this.getRowCount();
+  }
+
+  set rowCount(value: int) {
+    this.rowCount = value;
   }
 
   native goToFirstRow(): boolean;

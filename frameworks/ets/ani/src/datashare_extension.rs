@@ -16,7 +16,8 @@ use std::ffi::CStr;
 use ani_rs::{business_error::BusinessError, objects::AniObject, AniEnv};
 
 use crate::{
-    get_native_ptr, wrapper::{self, ValuesBucketArrayWrap, ValuesBucketHashWrap}, DATA_SHARE_EXTENSION_HELPER, DATA_SHARE_PREDICATES
+    get_native_ptr, wrapper::{self, ValuesBucketArrayWrap, ValuesBucketHashWrap}, DATA_SHARE_EXTENSION_HELPER,
+    DATA_SHARE_PREDICATES, datashare_error
 };
 
 pub fn call_arkts_insert(
@@ -40,8 +41,12 @@ pub fn call_arkts_insert(
 
     let arg1 = env.serialize(&uri).unwrap();
     let arg2 = env.serialize(value_bucket.as_ref()).unwrap();
-    env.call_method(&instance, &do_insert_method, (arg1, arg2))
-        .unwrap();
+    let err = env.call_method(&instance, &do_insert_method, (arg1, arg2));
+    if err.is_err() {
+        if env.exist_unhandled_error().unwrap() {
+            env.describe_error().unwrap();
+        }
+    }
 }
 
 pub fn call_arkts_batch_insert(
@@ -188,15 +193,44 @@ pub fn native_extension_callback_int(error_code: f64, error_msg: String, data: i
     Ok(())
 }
 
-pub fn native_extension_callback_object<'local>(
-    env: AniEnv<'local>,
+#[ani_rs::native]
+pub fn native_extension_callback_object(
+    env: &AniEnv,
     error_code: f64,
     error_msg: String,
     data: AniObject,
     native_ptr: i64,
-) {
-    let object_ptr = get_native_ptr(&env, &data);
-    wrapper::ffi::DataShareNativeExtensionCallbackObject(error_code, error_msg, object_ptr, native_ptr);
+) -> Result<(), BusinessError> {
+    let rdb_cls_name = unsafe { 
+        CStr::from_bytes_with_nul_unchecked(b"@ohos.data.relationalStore.relationalStore._taihe_ResultSet_inner\0")
+    };
+    let rdb_cls = env.find_class(rdb_cls_name).ok();
+    let kv_cls_name = unsafe {
+        CStr::from_bytes_with_nul_unchecked(b"@ohos.data.distributedKVStore.distributedKVStore._taihe_KVStoreResultSet_inner\0")
+    };
+    let kv_cls = env.find_class(kv_cls_name).ok();
+
+    let cls = if rdb_cls.is_some() && env.instance_of(&data, rdb_cls.as_ref().unwrap()).unwrap() {
+        rdb_cls
+    } else if kv_cls.is_some() && env.instance_of(&data, kv_cls.as_ref().unwrap()).unwrap() {
+        kv_cls
+    } else {
+        None
+    };
+
+    if let Some(cls) = cls {
+        let get_inner_method_name = unsafe { CStr::from_bytes_with_nul_unchecked(b"getProxy\0") };
+        let get_inner_method = env
+            .find_method(&cls, get_inner_method_name)
+            .unwrap();
+        let object_ptr = env
+            .call_method_long(&data, &get_inner_method, ())
+            .unwrap_or(0);
+        wrapper::ffi::DataShareNativeExtensionCallbackObject(error_code, error_msg, object_ptr, native_ptr);
+    } else {
+        datashare_error!("Panic occurred: data does not match any available class");
+    }
+    Ok(())
 }
 
 #[ani_rs::native]

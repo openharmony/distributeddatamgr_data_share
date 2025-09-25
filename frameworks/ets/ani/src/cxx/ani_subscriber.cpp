@@ -22,7 +22,7 @@ using namespace DataShare;
 namespace DataShareAni {
 bool AniObserver::operator==(const AniObserver &rhs) const
 {
-    return callbackPtr_ == rhs.callbackPtr_;
+    return callback_is_equal(*callback_, *(rhs.callback_));
 }
 
 bool AniObserver::operator!=(const AniObserver &rhs) const
@@ -33,10 +33,6 @@ bool AniObserver::operator!=(const AniObserver &rhs) const
 void AniRdbObserver::OnChange(const RdbChangeNode &changeNode)
 {
     LOG_DEBUG("AniRdbObserver onchange Start");
-    if (callbackPtr_ == 0) {
-        LOG_ERROR("callbackPtr_ is nullptr");
-        return;
-    }
 
     rust::Box<DataShareAni::RdbDataChangeNode> node = rust_create_rdb_data_change_node(rust::String(changeNode.uri_),
         rust::String(std::to_string(changeNode.templateId_.subscriberId_)),
@@ -46,16 +42,12 @@ void AniRdbObserver::OnChange(const RdbChangeNode &changeNode)
             rdb_data_change_node_push_data(*node, rust::String(data));
         }
     }
-    execute_callback_rdb_data_change(envPtr_, callbackPtr_, *node);
+    callback_->execute_callback_rdb_data_change(*node);
 }
 
 void AniPublishedObserver::OnChange(DataShare::PublishedDataChangeNode &changeNode)
 {
     LOG_DEBUG("AniPublishedObserver onchange Start");
-    if (callbackPtr_ == 0) {
-        LOG_ERROR("callbackPtr_ is nullptr");
-        return;
-    }
 
     rust::Box<PublishedDataChangeNode> node = rust_create_published_data_change_node(
         rust::String(changeNode.ownerBundleName_));
@@ -63,16 +55,19 @@ void AniPublishedObserver::OnChange(DataShare::PublishedDataChangeNode &changeNo
         DataShare::PublishedDataItem::DataType dataItem = data.GetData();
         if (dataItem.index() == 0) {
             std::vector std_vec = std::get<std::vector<uint8_t>>(dataItem);
-            rust::Slice<const uint8_t> slice(std_vec.data(), std_vec.size());
+            rust::Vec<uint8_t> vec;
+            for (auto data: std_vec) {
+                vec.push_back(data);
+            }
             published_data_change_node_push_item_arraybuffer(*node, rust::String(data.key_),
-                slice, rust::String(std::to_string(data.subscriberId_)));
+                vec, rust::String(std::to_string(data.subscriberId_)));
         } else {
             std::string strData = std::get<std::string>(dataItem);
             published_data_change_node_push_item_str(*node, rust::String(data.key_),
                 rust::String(strData), rust::String(std::to_string(data.subscriberId_)));
         }
     }
-    execute_callback_published_data_change(envPtr_, callbackPtr_, *node);
+    callback_->execute_callback_published_data_change(*node);
 }
 } // namespace DataShareAni
 } // namespace OHOS

@@ -14,8 +14,8 @@
 use std::{collections::HashMap, ffi::CStr};
 
 use ani_rs::{
-    objects::{AniFnObject, AniObject, AniRef},
-    typed_array::Uint8Array,
+    objects::{AniFnObject, AniAsyncCallback, AniObject, AniRef, GlobalRefAsyncCallback},
+    typed_array::{Uint8Array, ArrayBuffer},
     AniEnv,
 };
 
@@ -23,61 +23,58 @@ use crate::{
     get_native_ptr,
     wrapper::{
         self,
-        ffi::{EnvPtrWrap, VersionWrap},
-        GetPublishedDataSretParam, PublishSretParam, ValuesBucketKvItem, ValuesBucketWrap,
+        ffi::{PtrWrap, VersionWrap},
+        GetPublishedDataSretParam, PublishSretParam, ValuesBucketKvItem, ValuesBucketWrap, CallbackFlavor,
+        DataShareCallback,
     },
     DATA_SHARE,
 };
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/DataShareHelperOptionsInner")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.DataShareHelperOptionsInner")]
 #[derive(Debug)]
 struct DataShareHelperOptions {
     is_proxy: Option<bool>,
 }
 
-#[ani_rs::ani(path = "L@ohos/data/DataShareResultSet/DataShareResultSetInner")]
+#[ani_rs::ani(path = "@ohos.data.DataShareResultSet.DataShareResultSetInner")]
 #[derive(Debug)]
 struct DataShareResultSet {
-    row_count: i32,
     native_ptr: i64,
 }
 
 impl DataShareResultSet {
     fn new(native_ptr: i64) -> Self {
         Self {
-            row_count: 0,
             native_ptr,
         }
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize)]
-pub enum BucketValue<'a> {
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
+pub enum BucketValue {
     S(String),
     F64(f64),
     Boolean(bool),
-    #[serde(borrow)]
-    Uint8Array(Uint8Array<'a>),
+    Uint8Array(Uint8Array),
     Null(()),
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub enum PublishedItemData<'a> {
+#[derive(serde::Serialize, serde::Deserialize, Clone)]
+pub enum PublishedItemData {
     S(String),
-    ArrayBuffer(&'a [u8]),
+    ArrayBuffer(ArrayBuffer),
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/PublishedItemInner")]
-#[derive(Debug)]
-pub struct PublishedItem<'a> {
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.PublishedItemInner")]
+#[derive(Clone)]
+pub struct PublishedItem {
     pub key: String,
-    #[serde(borrow)]
-    pub data: PublishedItemData<'a>,
+    pub data: PublishedItemData,
     pub subscriber_id: String,
 }
 
-impl<'a> PublishedItem<'a> {
-    pub fn new(key: String, data: PublishedItemData<'a>, subscriber_id: String) -> Self {
+impl PublishedItem {
+    pub fn new(key: String, data: PublishedItemData, subscriber_id: String) -> Self {
         Self {
             key,
             data,
@@ -86,7 +83,7 @@ impl<'a> PublishedItem<'a> {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/OperationResultInner")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.OperationResultInner")]
 #[derive(Debug)]
 pub struct OperationResult {
     key: String,
@@ -99,7 +96,7 @@ impl OperationResult {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/TemplateInner")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.TemplateInner")]
 #[derive(Debug)]
 pub struct Template {
     pub predicates: HashMap<String, String>,
@@ -107,8 +104,8 @@ pub struct Template {
     pub update: Option<String>,
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/ChangeType")]
-#[derive(Debug)]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.ChangeType")]
+#[derive(Clone)]
 pub enum ChangeType {
     Insert = 0,
     Delete = 1,
@@ -126,21 +123,21 @@ impl ChangeType {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/SubscriptionType")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.SubscriptionType")]
 #[derive(Debug)]
 pub enum SubscriptionType {
     SubscriptionTypeExactUri = 0,
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/ChangeInfoInner")]
-pub struct ChangeInfo<'a> {
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.ChangeInfoInner")]
+#[derive(Clone)]
+pub struct ChangeInfo {
     pub change_type: ChangeType,
     pub uri: String,
-    #[serde(borrow)]
-    pub values: Vec<HashMap<String, BucketValue<'a>>>,
+    pub values: Vec<HashMap<String, BucketValue>>,
 }
 
-impl<'a> ChangeInfo<'a> {
+impl ChangeInfo {
     pub fn new(change_type: ChangeType, uri: String) -> Self {
         Self {
             change_type,
@@ -150,8 +147,8 @@ impl<'a> ChangeInfo<'a> {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/TemplateIdInner")]
-#[derive(Debug)]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.TemplateIdInner")]
+#[derive(Clone)]
 pub struct TemplateId {
     pub subscriber_id: String,
     pub bundle_name_of_owner: String,
@@ -166,8 +163,8 @@ impl TemplateId {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/RdbDataChangeNodeInner")]
-#[derive(Debug)]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.RdbDataChangeNodeInner")]
+#[derive(Clone)]
 pub struct RdbDataChangeNode {
     uri: String,
     template_id: TemplateId,
@@ -188,15 +185,14 @@ impl RdbDataChangeNode {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/PublishedDataChangeNodeInner")]
-#[derive(Debug)]
-pub struct PublishedDataChangeNode<'a> {
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.PublishedDataChangeNodeInner")]
+#[derive(Clone)]
+pub struct PublishedDataChangeNode {
     bundle_name: String,
-    #[serde(borrow)]
-    data: Vec<PublishedItem<'a>>,
+    data: Vec<PublishedItem>,
 }
 
-impl<'a> PublishedDataChangeNode<'a> {
+impl PublishedDataChangeNode {
     pub fn new(bundle_name: String) -> Self {
         Self {
             bundle_name,
@@ -204,7 +200,7 @@ impl<'a> PublishedDataChangeNode<'a> {
         }
     }
 
-    pub fn push_data(&mut self, data_item: PublishedItem<'a>) {
+    pub fn push_data(&mut self, data_item: PublishedItem) {
         self.data.push(data_item);
     }
 }
@@ -439,14 +435,17 @@ pub fn native_on<'local>(
     datashare_helper: AniObject<'local>,
     arktype: AniObject<'local>,
     uri: AniObject<'local>,
-    callback: AniFnObject<'local>,
+    callback: AniAsyncCallback<'local>,
 ) {
     let datashare_helper_ptr = get_native_ptr(&env, &datashare_helper);
     let str_type: String = env.deserialize(arktype).unwrap();
     let str_uri: String = env.deserialize(uri).unwrap();
-    let callback_ptr = callback.as_raw() as i64;
-    let env_ptr = env.inner as i64;
-    let ptr_wrap = EnvPtrWrap::new(datashare_helper_ptr, callback_ptr, env_ptr);
+    // let callback_ptr = callback.as_raw() as i64;
+    // let env_ptr = env.inner as i64;
+    // let ptr_wrap = EnvPtrWrap::new(datashare_helper_ptr, callback_ptr, env_ptr);
+    let callback_global = callback.into_global_callback(&env).unwrap();
+    let datashare_callback = DataShareCallback::new(CallbackFlavor::DataChange(callback_global));
+    let ptr_wrap = PtrWrap::new(datashare_helper_ptr, Box::new(datashare_callback));
     wrapper::ffi::DataShareNativeOn(ptr_wrap, str_type, str_uri);
 }
 
@@ -456,17 +455,21 @@ pub fn native_on_changeinfo<'local>(
     event: AniObject<'local>,
     arktype: AniObject<'local>,
     uri: AniObject<'local>,
-    callback: AniFnObject<'local>,
+    callback: AniAsyncCallback<'local>,
 ) {
     let datashare_helper_ptr = get_native_ptr(&env, &datashare_helper);
     let str_event: String = env.deserialize(event).unwrap();
     let str_uri: String = env.deserialize(uri).unwrap();
-    let callback_ptr = callback.as_raw() as i64;
-    let env_ptr = env.inner as i64;
     let type_inner: SubscriptionType = env.deserialize(arktype).unwrap();
-    let ptr_wrap = EnvPtrWrap::new(datashare_helper_ptr, callback_ptr, env_ptr);
+    let callback_global = callback.into_global_callback(&env).unwrap();
+    let datashare_callback = DataShareCallback::new(CallbackFlavor::DataChangeInfo(callback_global));
+    let ptr_wrap = PtrWrap::new(datashare_helper_ptr, Box::new(datashare_callback));
 
-    wrapper::ffi::DataShareNativeOnChangeinfo(ptr_wrap, str_event, type_inner as i32, str_uri);
+    wrapper::ffi::DataShareNativeOnChangeinfo(
+        ptr_wrap,
+        str_event, type_inner as i32,
+        str_uri,
+    );
 }
 
 pub fn native_on_rdb_data_change<'local>(
@@ -475,15 +478,15 @@ pub fn native_on_rdb_data_change<'local>(
     arktype: AniObject<'local>,
     uris: AniObject<'local>,
     template_id: AniObject<'local>,
-    callback: AniFnObject<'local>,
+    callback: AniAsyncCallback<'local>,
 ) -> AniRef<'local> {
     let datashare_helper_ptr = get_native_ptr(&env, &datashare_helper);
     let type_inner: String = env.deserialize(arktype).unwrap();
     let uris_inner: Vec<String> = env.deserialize(uris).unwrap();
     let template_id_inner: TemplateId = env.deserialize(template_id).unwrap();
-    let callback_ptr = callback.as_raw() as i64;
-    let env_ptr = env.inner as i64;
-    let ptr_wrap = EnvPtrWrap::new(datashare_helper_ptr, callback_ptr, env_ptr);
+    let callback_global = callback.into_global_callback(&env).unwrap();
+    let datashare_callback = DataShareCallback::new(CallbackFlavor::RdbDataChange(callback_global));
+    let ptr_wrap = PtrWrap::new(datashare_helper_ptr, Box::new(datashare_callback));
 
     let mut sret_param = PublishSretParam::new();
     wrapper::ffi::DataShareNativeOnRdbDataChange(
@@ -504,15 +507,15 @@ pub fn native_on_published_data_change<'local>(
     arktype: AniObject<'local>,
     uris: AniObject<'local>,
     subscriber_id: AniObject<'local>,
-    callback: AniFnObject<'local>,
+    callback: AniAsyncCallback<'local>,
 ) -> AniRef<'local> {
     let datashare_helper_ptr = get_native_ptr(&env, &datashare_helper);
     let type_inner: String = env.deserialize(arktype).unwrap();
     let uris_inner: Vec<String> = env.deserialize(uris).unwrap();
     let subscriber_id_inner: String = env.deserialize(subscriber_id).unwrap();
-    let callback_ptr = callback.as_raw() as i64;
-    let env_ptr = env.inner as i64;
-    let ptr_wrap = EnvPtrWrap::new(datashare_helper_ptr, callback_ptr, env_ptr);
+    let callback_global = callback.into_global_callback(&env).unwrap();
+    let datashare_callback = DataShareCallback::new(CallbackFlavor::PublishedDataChange(callback_global));
+    let ptr_wrap = PtrWrap::new(datashare_helper_ptr, Box::new(datashare_callback));
 
     let mut sret_param = PublishSretParam::new();
     wrapper::ffi::DataShareNativeOnPublishedDataChange(
@@ -532,21 +535,20 @@ pub fn native_off<'local>(
     datashare_helper: AniObject<'local>,
     arktype: AniObject<'local>,
     uri: AniObject<'local>,
-    callback: AniFnObject<'local>,
+    callback: AniAsyncCallback<'local>,
 ) {
     let datashare_helper_ptr = get_native_ptr(&env, &datashare_helper);
     let str_type: String = env.deserialize(arktype).unwrap();
     let str_uri: String = env.deserialize(uri).unwrap();
-
-    let callback_ptr = if env.is_undefined(&callback).unwrap() {
-        0
+    if env.is_undefined(&callback).unwrap() {
+        wrapper::ffi::DataShareNativeOffNone(datashare_helper_ptr, str_type, str_uri);
     } else {
-        callback.as_raw() as i64
+        let callback_global = callback.into_global_callback(&env).unwrap();
+        let datashare_callback = DataShareCallback::new(CallbackFlavor::DataChange(callback_global));
+        let ptr_wrap = PtrWrap::new(datashare_helper_ptr, Box::new(datashare_callback));
+        wrapper::ffi::DataShareNativeOff(ptr_wrap, str_type, str_uri);
     };
-
-    let env_ptr = env.inner as i64;
-    let ptr_wrap = EnvPtrWrap::new(datashare_helper_ptr, callback_ptr, env_ptr);
-    wrapper::ffi::DataShareNativeOff(ptr_wrap, str_type, str_uri);
+    
 }
 
 pub fn native_off_changeinfo<'local>(
@@ -555,21 +557,20 @@ pub fn native_off_changeinfo<'local>(
     event: AniObject<'local>,
     arktype: AniObject<'local>,
     uri: AniObject<'local>,
-    callback: AniFnObject<'local>,
+    callback: AniAsyncCallback<'local>,
 ) {
     let datashare_helper_ptr = get_native_ptr(&env, &datashare_helper);
     let str_event: String = env.deserialize(event).unwrap();
     let str_uri: String = env.deserialize(uri).unwrap();
-    let callback_ptr = if env.is_undefined(&callback).unwrap() {
-        0
-    } else {
-        callback.as_raw() as i64
-    };
-    let env_ptr = env.inner as i64;
     let type_inner: SubscriptionType = env.deserialize(arktype).unwrap();
-    let ptr_wrap = EnvPtrWrap::new(datashare_helper_ptr, callback_ptr, env_ptr);
-
-    wrapper::ffi::DataShareNativeOffChangeinfo(ptr_wrap, str_event, type_inner as i32, str_uri);
+    if env.is_undefined(&callback).unwrap() {
+        wrapper::ffi::DataShareNativeOffChangeinfoNone(datashare_helper_ptr, str_event, type_inner as i32, str_uri);
+    } else {
+        let callback_global = callback.into_global_callback(&env).unwrap();
+        let datashare_callback = DataShareCallback::new(CallbackFlavor::DataChangeInfo(callback_global));
+        let ptr_wrap = PtrWrap::new(datashare_helper_ptr, Box::new(datashare_callback));
+        wrapper::ffi::DataShareNativeOffChangeinfo(ptr_wrap, str_event, type_inner as i32, str_uri);
+    };
 }
 
 pub fn native_off_rdb_data_change<'local>(
@@ -578,29 +579,34 @@ pub fn native_off_rdb_data_change<'local>(
     arktype: AniObject<'local>,
     uris: AniObject<'local>,
     template_id: AniObject<'local>,
-    callback: AniFnObject<'local>,
+    callback: AniAsyncCallback<'local>,
 ) -> AniRef<'local> {
     let datashare_helper_ptr = get_native_ptr(&env, &datashare_helper);
     let type_inner: String = env.deserialize(arktype).unwrap();
     let uris_inner: Vec<String> = env.deserialize(uris).unwrap();
     let template_id_inner: TemplateId = env.deserialize(template_id).unwrap();
-    let callback_ptr = if env.is_undefined(&callback).unwrap() {
-        0
-    } else {
-        callback.as_raw() as i64
-    };
-    let env_ptr = env.inner as i64;
-    let ptr_wrap = EnvPtrWrap::new(datashare_helper_ptr, callback_ptr, env_ptr);
-
     let mut sret_param = PublishSretParam::new();
-    wrapper::ffi::DataShareNativeOffRdbDataChange(
-        ptr_wrap,
-        type_inner,
-        uris_inner,
-        &template_id_inner,
-        &mut sret_param,
-    );
-
+    if env.is_undefined(&callback).unwrap() {
+        wrapper::ffi::DataShareNativeOffRdbDataChangeNone(
+            datashare_helper_ptr,
+            type_inner,
+            uris_inner,
+            &template_id_inner,
+            &mut sret_param,
+        );
+    } else {
+        let callback_global = callback.into_global_callback(&env).unwrap();
+        let datashare_callback = DataShareCallback::new(CallbackFlavor::RdbDataChange(callback_global));
+        let ptr_wrap = PtrWrap::new(datashare_helper_ptr, Box::new(datashare_callback));
+        wrapper::ffi::DataShareNativeOffRdbDataChange(
+            ptr_wrap,
+            type_inner,
+            uris_inner,
+            &template_id_inner,
+            &mut sret_param,
+        );
+    };
+    
     let ret = sret_param.into_inner();
     env.serialize(&ret).unwrap()
 }
@@ -611,28 +617,33 @@ pub fn native_off_published_data_change<'local>(
     arktype: AniObject<'local>,
     uris: AniObject<'local>,
     subscriber_id: AniObject<'local>,
-    callback: AniFnObject<'local>,
+    callback: AniAsyncCallback<'local>,
 ) -> AniRef<'local> {
     let datashare_helper_ptr = get_native_ptr(&env, &datashare_helper);
     let type_inner: String = env.deserialize(arktype).unwrap();
     let uris_inner: Vec<String> = env.deserialize(uris).unwrap();
     let subscriber_id_inner: String = env.deserialize(subscriber_id).unwrap();
-    let callback_ptr = if env.is_undefined(&callback).unwrap() {
-        0
-    } else {
-        callback.as_raw() as i64
-    };
-    let env_ptr = env.inner as i64;
-    let ptr_wrap = EnvPtrWrap::new(datashare_helper_ptr, callback_ptr, env_ptr);
-
     let mut sret_param = PublishSretParam::new();
-    wrapper::ffi::DataShareNativeOffPublishedDataChange(
-        ptr_wrap,
-        type_inner,
-        uris_inner,
-        subscriber_id_inner,
-        &mut sret_param,
-    );
+    if env.is_undefined(&callback).unwrap() {
+        wrapper::ffi::DataShareNativeOffPublishedDataChangeNone(
+            datashare_helper_ptr,
+            type_inner,
+            uris_inner,
+            subscriber_id_inner,
+            &mut sret_param,
+        );
+    } else {
+        let callback_global = callback.into_global_callback(&env).unwrap();
+        let datashare_callback = DataShareCallback::new(CallbackFlavor::PublishedDataChange(callback_global));
+        let ptr_wrap = PtrWrap::new(datashare_helper_ptr, Box::new(datashare_callback));
+        wrapper::ffi::DataShareNativeOffPublishedDataChange(
+            ptr_wrap,
+            type_inner,
+            uris_inner,
+            subscriber_id_inner,
+            &mut sret_param,
+        );
+    };
 
     let ret = sret_param.into_inner();
     env.serialize(&ret).unwrap()

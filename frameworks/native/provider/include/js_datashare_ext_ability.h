@@ -25,66 +25,11 @@
 #include "napi/native_common.h"
 #include "napi/native_node_api.h"
 #include "datashare_business_error.h"
+#include "datashare_result.h"
 
 namespace OHOS {
 namespace DataShare {
 using namespace AbilityRuntime;
-class JsResult {
-public:
-    JsResult() = default;
-    bool GetRecvReply() const
-    {
-        return isRecvReply_;
-    }
-
-    void GetResult(int &value)
-    {
-        value = callbackResultNumber_;
-    }
-
-    void GetResult(std::string &value)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        value = callbackResultString_;
-    }
-
-    void GetResult(std::vector<std::string> &value)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        value = callbackResultStringArr_;
-    }
-
-    void GetResult(std::vector<BatchUpdateResult> &results)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        results = updateResults_;
-    }
-
-    void GetResultSet(std::shared_ptr<DataShareResultSet> &value)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        value = callbackResultObject_;
-    }
-
-    void GetBusinessError(DatashareBusinessError &businessError)
-    {
-        std::lock_guard<std::mutex> lock(asyncLock_);
-        businessError = businessError_;
-    }
-
-    void SetAsyncResult(napi_env env, DatashareBusinessError &businessError, napi_value result);
-    void CheckAndSetAsyncResult(napi_env env);
-private:
-    bool UnwrapBatchUpdateResult(napi_env env, napi_value &info, std::vector<BatchUpdateResult> &results);
-    bool isRecvReply_ = false;
-    int callbackResultNumber_ = -1;
-    std::string callbackResultString_ = "";
-    std::vector<std::string> callbackResultStringArr_ = {};
-    std::mutex asyncLock_;
-    std::shared_ptr<DataShareResultSet> callbackResultObject_ = nullptr;
-    DatashareBusinessError businessError_;
-    std::vector<BatchUpdateResult> updateResults_ = {};
-};
 /**
  * @brief Basic datashare extension ability components.
  */
@@ -277,7 +222,7 @@ public:
      *
      * @return Return true if success. otherwise return false.
      */
-    bool NotifyChangeWithUser(const Uri &uri, int32_t userId);
+    bool NotifyChangeWithUser(const Uri &uri, int32_t userId) override;
 
     /**
      * @brief Converts the given uri that refer to the Data ability into a normalized URI. A normalized URI can be used
@@ -306,17 +251,9 @@ public:
      */
     Uri DenormalizeUri(const Uri &uri) override;
 
-    void InitResult(std::shared_ptr<JsResult> result);
-    struct AsyncContext {
-        bool isNeedNotify_ = false;
-    };
+    void InitResult(std::shared_ptr<JsResult> result) override;
+
 private:
-    struct AsyncPoint {
-        std::shared_ptr<AsyncContext> context;
-    };
-    struct AsyncCallBackPoint {
-        std::shared_ptr<JsResult> result;
-    };
     napi_value CallObjectMethod(const char *name, napi_value const *argv = nullptr, size_t argc = 0,
         bool isAsync = true);
     napi_value CallObjectMethod(

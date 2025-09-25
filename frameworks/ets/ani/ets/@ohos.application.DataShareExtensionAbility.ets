@@ -26,7 +26,7 @@ import dataSharePredicates from './@ohos.data.dataSharePredicates';
 import { ValuesBucket } from '@ohos.data.ValuesBucket';
 
 export namespace dataShareExtensionAbilityHelper {
-    loadLibrary("datashare_ani")
+    loadLibrary("datashare_ani_rs")
 
     export native function nativeExtensionCallbackInt(errorCode: double, errMsg: string, data: int, nativePtr: long): void;
 
@@ -36,27 +36,48 @@ export namespace dataShareExtensionAbilityHelper {
 
     export class CallbackWrap {
         private nativeObject: DataShareExtensionAbility
-        private nativePtr:long
+        private nativePtr: long
 
         constructor(nativeObject: DataShareExtensionAbility, nativePtr: long) {
             this.nativeObject = nativeObject;
             this.nativePtr = nativePtr;
         }
 
-        doExtensionCallbackInt(err: BusinessError, data: int) {
-            nativeExtensionCallbackInt(err.code, err.message, data, this.nativePtr)
+        doExtensionCallbackInt(err: BusinessError|null, data: int|undefined) {
+            if ((err instanceof BusinessError) && (data instanceof int)) {
+                let error: BusinessError = err as BusinessError
+                let dataVal: int = data as int
+                nativeExtensionCallbackInt(error.code, error.message, dataVal, this.nativePtr)
+            } else {
+                console.info(`invalid type param`)
+            }
         }
 
-        doExtensionCallbackObject(err: BusinessError, data: Object) {
-            nativeExtensionCallbackObject(err.code, err.message, data, this.nativePtr)
+        doExtensionCallbackObject(err: BusinessError|null, data: Object|undefined) {
+            if ((err instanceof BusinessError) && (data instanceof Object)) {
+                let error: BusinessError = err as BusinessError
+                let dataVal: Object = data as Object
+                nativeExtensionCallbackObject(error.code, error.message, dataVal, this.nativePtr)
+            } else {
+                console.info(`invalid type param`)
+            }
         }
 
-        doExtensionCallbackVoid(err: BusinessError) {
-            nativeExtensionCallbackVoid(err.code, err.message, this.nativePtr)
+        doExtensionCallbackVoid(err: BusinessError|null) {
+            if (err instanceof BusinessError) {
+                let error: BusinessError = err as BusinessError
+                nativeExtensionCallbackVoid(error.code, error.message, this.nativePtr)
+            } else {
+                console.info(`invalid type param`)
+            }
         }
 
         doInsert(uri: string, valueBucket: ValuesBucket): void {
-            this.nativeObject.insert(uri, valueBucket, this.doExtensionCallbackInt);
+            if (this.nativeObject.insert != undefined) {
+                this.nativeObject.insert!(uri, valueBucket, this.doExtensionCallbackInt);
+            } else {
+                console.error(`insert is undefined.`);
+            }
         }
 
         doUpdate(
@@ -64,11 +85,19 @@ export namespace dataShareExtensionAbilityHelper {
             predicates: dataSharePredicates.DataSharePredicates,
             valueBucket: ValuesBucket,
         ): void {
-            this.nativeObject.update(uri, predicates, valueBucket, this.doExtensionCallbackInt);
+            if (this.nativeObject.update != undefined) {
+                this.nativeObject.update!(uri, predicates, valueBucket, this.doExtensionCallbackInt);
+            } else {
+                console.error(`update is undefined.`);
+            }
         }
 
         doDelete(uri: string, predicates: dataSharePredicates.DataSharePredicates): void {
-            this.nativeObject.delete(uri, predicates, this.doExtensionCallbackInt);
+            if (this.nativeObject.delete != undefined) {
+                this.nativeObject.delete!(uri, predicates, this.doExtensionCallbackInt);
+            } else {
+                console.error(`delete is undefined.`);
+            }
         }
 
         doQuery(
@@ -76,18 +105,56 @@ export namespace dataShareExtensionAbilityHelper {
             predicates: dataSharePredicates.DataSharePredicates,
             columns: Array<string>,
         ): void {
-            this.nativeObject.query(uri, predicates, columns, this.doExtensionCallbackObject);
+            if (this.nativeObject.query != undefined) {
+                this.nativeObject.query!(uri, predicates, columns, this.doExtensionCallbackObject);
+            } else {
+                console.error(`query is undefined.`);
+            }
         }
 
         doBatchInsert(uri: string, valueBuckets: Array<ValuesBucket>): void {
-            this.nativeObject.batchInsert(uri, valueBuckets, this.doExtensionCallbackInt);
+            if (this.nativeObject.batchInsert != undefined) {
+                this.nativeObject.batchInsert!(uri, valueBuckets, this.doExtensionCallbackInt);
+            } else {
+                console.error(`batchInsert is undefined.`);
+            }
         }
 
         doOnCreate(want: Want): void {
-            this.nativeObject.onCreate(want, this.doExtensionCallbackVoid);
+            if (this.nativeObject.onCreate != undefined) {
+                this.nativeObject.onCreate!(want, this.doExtensionCallbackVoid);
+            } else {
+                console.error(`onCreate is undefined.`);
+            }
         }
     }
 }
+
+type OnCreateFn = (want: Want, callback: AsyncCallback<void>) => void;
+
+type InsertFn = (uri: string, valueBucket: ValuesBucket, callback: AsyncCallback<int>) => void;
+
+type UpdateFn = (
+  uri: string,
+  predicates: dataSharePredicates.DataSharePredicates,
+  valueBucket: ValuesBucket,
+  callback: AsyncCallback<int>
+) => void;
+
+type DeleteFn = (
+  uri: string,
+  predicates: dataSharePredicates.DataSharePredicates,
+  callback: AsyncCallback<int>
+) => void;
+
+type QueryFn = (
+  uri: string,
+  predicates: dataSharePredicates.DataSharePredicates,
+  columns: Array<string>,
+  callback: AsyncCallback<Object>
+) => void;
+
+type BatchInsertFn = (uri: string, valueBuckets: Array<ValuesBucket>, callback: AsyncCallback<int>) => void;
 
 export default class DataShareExtensionAbility {
 
@@ -97,37 +164,15 @@ export default class DataShareExtensionAbility {
         this.context = context;
     }
 
-    onCreate(want: Want, callback: AsyncCallback<void>): void {
-        console.info("basic onCreate");
-    }
+    onCreate?: OnCreateFn;
 
-    insert(uri: string, valueBucket: ValuesBucket, callback: AsyncCallback<int>): void {
-        console.info("basic insert");
-    }
+    insert?: InsertFn;
 
-    update(
-        uri: string,
-        predicates: dataSharePredicates.DataSharePredicates,
-        valueBucket: ValuesBucket,
-        callback: AsyncCallback<int>
-    ): void {
-        console.info("basic update");
-    }
+    update?: UpdateFn;
 
-    delete(uri: string, predicates: dataSharePredicates.DataSharePredicates, callback: AsyncCallback<int>): void {
-        console.info("basic delete");
-    }
+    delete?: DeleteFn;
 
-    query(
-        uri: string,
-        predicates: dataSharePredicates.DataSharePredicates,
-        columns: Array<string>,
-        callback: AsyncCallback<Object>
-    ): void {
-        console.info("basic query");
-    }
+    query?: QueryFn;
 
-    batchInsert(uri: string, valueBuckets: Array<ValuesBucket>, callback: AsyncCallback<int>): void {
-        console.info("basic batchInsert");
-    }
+    batchInsert?: BatchInsertFn;
 }

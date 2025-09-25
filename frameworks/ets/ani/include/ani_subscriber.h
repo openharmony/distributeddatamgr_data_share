@@ -17,30 +17,31 @@
 #define ANI_SUBSCRIBER_H
 
 #include "datashare_template.h"
+#include "cxx.h"
 
 namespace OHOS {
 using namespace DataShare;
 namespace DataShareAni {
+struct DataShareCallback;
 class AniObserver {
 public:
-    AniObserver(long long envPtr, long long callbackPtr) : envPtr_(envPtr), callbackPtr_(callbackPtr) {};
+    AniObserver(rust::Box<DataShareCallback> &&callback) : callback_(std::move(callback)) {};
     virtual bool operator==(const AniObserver &rhs) const;
     virtual bool operator!=(const AniObserver &rhs) const;
     AniObserver& operator=(AniObserver &&rhs) = default;
 protected:
-    long long envPtr_ = 0;
-    long long callbackPtr_ = 0;
+    rust::Box<DataShareCallback> callback_;
 };
 
 class AniRdbObserver final: public AniObserver, public std::enable_shared_from_this<AniRdbObserver> {
 public:
-    AniRdbObserver(long long envPtr, long long callbackPtr) : AniObserver(envPtr, callbackPtr) {};
+    AniRdbObserver(rust::Box<DataShareCallback> &&callback) : AniObserver(std::move(callback)) {};
     void OnChange(const RdbChangeNode &changeNode);
 };
 
 class AniPublishedObserver final: public AniObserver, public std::enable_shared_from_this<AniPublishedObserver> {
 public:
-    AniPublishedObserver(long long envPtr, long long callbackPtr) : AniObserver(envPtr, callbackPtr) {};
+    AniPublishedObserver(rust::Box<DataShareCallback> &&callback) : AniObserver(std::move(callback)) {};
     void OnChange(DataShare::PublishedDataChangeNode &changeNode);
 };
 } // namespace DataShareAni
