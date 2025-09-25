@@ -27,7 +27,7 @@ static constexpr int32_t URI_MAX_COUNT = 32;
 static constexpr int32_t PROXY_DATA_MAX_COUNT = 32;
 static constexpr int32_t ALLOW_LIST_MAX_COUNT = 256;
 constexpr const char* ALLOW_ALL = "all";
-constexpr const char* DATA_PROXY_SCHEME = "datashareproxy://";
+constexpr const char* DATA_PROXY_SCHEMA = "datashareproxy://";
 
 enum DataProxyErrorCode {
     SUCCESS = 0,
