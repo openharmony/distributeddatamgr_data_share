@@ -39,8 +39,8 @@ DataShareCalledConfig::DataShareCalledConfig(const std::string &uri)
 {
     providerInfo_.uri = uri;
     Uri uriTemp(providerInfo_.uri);
-    providerInfo_.scheme = uriTemp.GetScheme();
-    auto isProxyData = PROXY_URI_SCHEME == providerInfo_.scheme;
+    providerInfo_.schema = uriTemp.GetScheme();
+    auto isProxyData = PROXY_URI_SCHEMA == providerInfo_.schema;
     std::string bundleName = uriTemp.GetAuthority();
     if (!isProxyData) {
         std::vector<std::string> pathSegments;
@@ -84,7 +84,14 @@ int DataShareCalledConfig::GetFromProxyData()
     }
     std::string uriWithoutQuery = providerInfo_.uri;
     DataShareStringUtils::RemoveFromQuery(uriWithoutQuery);
-
+    size_t schemePos = uriWithoutQuery.find(Constants::PARAM_URI_SEPARATOR);
+    if (schemePos != uriWithoutQuery.npos) {
+        uriWithoutQuery.replace(schemePos, Constants::PARAM_URI_SEPARATOR_LEN, Constants::URI_SEPARATOR);
+    }
+    schemePos = uriWithoutQuery.find(EXT_URI_SCHEMA_SEPARATOR);
+    if (schemePos != uriWithoutQuery.npos) {
+        uriWithoutQuery.replace(schemePos, strlen(EXT_URI_SCHEMA_SEPARATOR), PROXY_URI_SCHEMA_SEPARATOR);
+    }
     for (auto &hapModuleInfo : bundleInfo.hapModuleInfos) {
         for (auto &data : hapModuleInfo.proxyDatas) {
             if (data.uri.length() > uriWithoutQuery.length() ||
@@ -167,11 +174,6 @@ std::pair<bool, ExtensionAbilityInfo> DataShareCalledConfig::GetExtensionInfoFro
     if (!ret) {
         LOG_ERROR("QueryExtensionAbilityInfoByUri failed! uri:%{public}s, userId:%{public}d",
             uri.c_str(), user);
-        return std::make_pair(false, info);
-    }
-    if (info.type != ExtensionAbilityType::DATASHARE) {
-        LOG_ERROR("QueryExtensionAbilityInfoByUri type invalid! uri:%{public}s, userId:%{public}d, type:%{public}d",
-            uri.c_str(), user, info.type);
         return std::make_pair(false, info);
     }
     return std::make_pair(true, info);

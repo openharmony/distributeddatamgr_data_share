@@ -232,7 +232,7 @@ void DataShareHelper::NotifyChangeExt(const DataShareObserver::ChangeInfo &chang
     }
 
     ErrCode ret = obsMgrClient->NotifyChangeExt(ObserverImpl::ConvertInfo(changeInfo),
-        AAFwk::DataObsOption(isSystem, true));
+        AAFwk::DataObsOption(isSystem));
     LOG_INFO("Notify changeExt, ret:%{public}d", ret);
 }
 

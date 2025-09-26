@@ -32,7 +32,7 @@ public:
 
     struct ProviderInfo {
         std::string uri;
-        std::string scheme;
+        std::string schema;
         std::string bundleName;
         std::string moduleName;
         std::string readPermission;
@@ -47,9 +47,9 @@ public:
     std::string BundleName();
 private:
     int GetFromProxyData();
-    static constexpr const char *PROXY_URI_SCHEME = "datashareproxy";
-    static constexpr const char *PROXY_URI_SCHEME_SEPARATOR = "datashareproxy://";
-    static constexpr const char *EXT_URI_SCHEME_SEPARATOR = "datashare://";
+    static constexpr const char *PROXY_URI_SCHEMA = "datashareproxy";
+    static constexpr const char *PROXY_URI_SCHEMA_SEPARATOR = "datashareproxy://";
+    static constexpr const char *EXT_URI_SCHEMA_SEPARATOR = "datashare://";
     ProviderInfo providerInfo_;
 };
 } // namespace DataShare

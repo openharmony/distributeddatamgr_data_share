@@ -758,7 +758,7 @@ int TryRegisterObserverExtInner(const Uri &uri, std::shared_ptr<DataShareObserve
         return E_NULL_OBSERVER;
     }
 
-    ErrCode ret = obsMgrClient->RegisterObserverExt(uri, obs, isDescendants, AAFwk::DataObsOption(isSystem, true));
+    ErrCode ret = obsMgrClient->RegisterObserverExt(uri, obs, isDescendants, AAFwk::DataObsOption(isSystem));
     if (ret != ERR_OK) {
         ObserverImpl::DeleteObserver(uri, dataObserver);
     }
@@ -804,7 +804,7 @@ int TryUnregisterObserverExtInner(const Uri &uri, std::shared_ptr<DataShareObser
         return E_NULL_OBSERVER;
     }
 
-    ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, obs, AAFwk::DataObsOption(isSystem, true));
+    ErrCode ret = obsMgrClient->UnregisterObserverExt(uri, obs, AAFwk::DataObsOption(isSystem));
     LOG_INFO("Unregister observerExt, ret:%{public}d, uri:%{public}s",
         ret, DataShareStringUtils::Anonymous(uri.ToString()).c_str());
     if (ret != ERR_OK) {

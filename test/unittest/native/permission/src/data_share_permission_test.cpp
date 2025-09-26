@@ -67,6 +67,27 @@ HWTEST_F(DataSharePermissionTest, VerifyPermissionTest001, TestSize.Level0)
 }
 
 /**
+ * @tc.name: CheckExtensionTrusts001
+ * @tc.desc: test CheckExtensionTrusts function when consumerToken and providerToken do not have corresponding haps
+ * @tc.type: FUNC
+ * @tc.require:issueICU06G
+ * @tc.precon: None
+ * @tc.step:
+    1.Create False consumerToken and providerToken
+    2.call CheckExtensionTrusts function and check the result
+ * @tc.experct: CheckExtensionTrusts reutrn nullptr
+ */
+HWTEST_F(DataSharePermissionTest, CheckExtensionTrusts001, TestSize.Level0)
+{
+    LOG_INFO("DataSharePermissionTest CheckExtensionTrusts001::Start");
+    uint32_t consumerToken = 123;
+    uint32_t providerToken = 123;
+    int result = DataSharePermission::CheckExtensionTrusts(consumerToken, providerToken);
+    EXPECT_EQ(result, DataShare::E_GET_CALLER_NAME_FAILED);
+    LOG_INFO("DataSharePermissionTest CheckExtensionTrusts001::End");
+}
+
+/**
  * @tc.name: Init001
  * @tc.desc: test Init function
  * @tc.type: FUNC
