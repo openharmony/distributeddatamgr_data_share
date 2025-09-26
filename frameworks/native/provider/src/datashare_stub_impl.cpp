@@ -67,7 +67,7 @@ bool DataShareStubImpl::IsCallerSystemApp(const CallingInfo &callingInfo, const 
     // GetTokenType use tokenId, and IsSystemApp use fullTokenId, these are different
     Security::AccessToken::ATokenTypeEnum tokenType =
         Security::AccessToken::AccessTokenKit::GetTokenTypeFlag(callingInfo.callingTokenId);
-    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_HAP ||
+    if (tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_NATIVE ||
         tokenType == Security::AccessToken::ATokenTypeEnum::TOKEN_SHELL) {
         return true;
     }
