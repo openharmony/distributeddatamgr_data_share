@@ -197,6 +197,9 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
             LOG_ERROR("napi new instance failed. napi_status: %{public}d uri: %{public}s",
                 status, ctxInfo->strUri.c_str());
         }
+        if (helperProxy == nullptr) {
+            LOG_ERROR("new instance of helperProxy fail uri %{public}s", ctxInfo->strUri.c_str());
+        }
         NAPI_ASSERT_CALL_ERRCODE(env, helperProxy != nullptr && status == napi_ok,
             ctxInfo->error = std::make_shared<DataShareHelperInitError>(), napi_generic_failure);
         napi_create_reference(env, helperProxy, 1, &(ctxInfo->ref));
@@ -207,10 +210,16 @@ napi_value NapiDataShareHelper::Napi_CreateDataShareHelper(napi_env env, napi_ca
         NAPI_ASSERT_CALL_ERRCODE(env, ctxInfo->dataShareHelper != nullptr,
             ctxInfo->error = std::make_shared<DataShareHelperInitError>(), napi_generic_failure);
         napi_status status = napi_get_reference_value(env, ctxInfo->ref, result);
+        if (result == nullptr) {
+            LOG_ERROR("get value of dshelper fail uri %{public}s", ctxInfo->strUri.c_str());
+        }
         NAPI_ASSERT_CALL_ERRCODE(env, result != nullptr,
             ctxInfo->error = std::make_shared<DataShareHelperInitError>(), napi_generic_failure);
         NapiDataShareHelper *proxy = nullptr;
         status = napi_unwrap(env, *result, reinterpret_cast<void **>(&proxy));
+        if (proxy == nullptr) {
+            LOG_ERROR("unwrap napi dshelper fail uri %{public}s", ctxInfo->strUri.c_str());
+        }
         NAPI_ASSERT_CALL_ERRCODE(env, proxy != nullptr, ctxInfo->error = std::make_shared<DataShareHelperInitError>(),
             status);
         proxy->jsRdbObsManager_ = std::make_shared<NapiRdbSubscriberManager>(ctxInfo->dataShareHelper);
