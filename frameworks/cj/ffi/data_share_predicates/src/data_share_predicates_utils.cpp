@@ -14,6 +14,7 @@
  */
 
 #include "data_share_predicates_utils.h"
+#include "datashare_log.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -48,6 +49,10 @@ SingleValue::Type parseValueType(const CValueType &value)
 MutliValue::Type parseValueTypeArray(const CValueType *array, int64_t size)
 {
     MutliValue::Type ret;
+    if (array == nullptr) {
+        LOG_ERROR("array is nullptr");
+        return ret;
+    }
     CValueType value = array[0];
     switch (static_cast<int32_t>(value.tag)) {
         case DataShareValueObjectType::TYPE_INT: {

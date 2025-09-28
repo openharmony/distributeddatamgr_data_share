@@ -91,7 +91,6 @@
                     "name": "//foundation/distributeddatamgr/data_share/frameworks/cj/ffi/data_share_predicates:cj_data_share_predicates_ffi",
                     "header": {
                         "header_files": [
-                            "data_share_predicates_ffi.h",
                             "data_share_predicates_impl.h",
                             "data_share_predicates_utils.h"
                         ],
