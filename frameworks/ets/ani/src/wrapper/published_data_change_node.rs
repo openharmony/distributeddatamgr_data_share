@@ -11,13 +11,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use ani_rs::{objects::AniFnObject, AniEnv};
+use ani_rs::{
+    objects::AniFnObject,
+    typed_array::ArrayBuffer,
+    AniEnv,
+};
 
 use crate::datashare::{PublishedDataChangeNode, PublishedItem, PublishedItemData};
 
 pub fn rust_create_published_data_change_node(
     bundle_name: String,
-) -> Box<PublishedDataChangeNode<'static>> {
+) -> Box<PublishedDataChangeNode> {
     let node = PublishedDataChangeNode::new(bundle_name);
     Box::new(node)
 }
@@ -32,23 +36,13 @@ pub fn published_data_change_node_push_item_str(
     node.push_data(item);
 }
 
-pub fn published_data_change_node_push_item_arraybuffer<'a>(
-    node: &mut PublishedDataChangeNode<'a>,
+pub fn published_data_change_node_push_item_arraybuffer(
+    node: &mut PublishedDataChangeNode,
     key: String,
-    data: &'a [u8],
+    data: Vec<u8>,
     subscriber_id: String,
 ) {
-    let item = PublishedItem::new(key, PublishedItemData::ArrayBuffer(data), subscriber_id);
+    let arr = ArrayBuffer::new_with_vec(data);
+    let item = PublishedItem::new(key, PublishedItemData::ArrayBuffer(arr), subscriber_id);
     node.push_data(item);
-}
-
-pub fn execute_callback_published_data_change(
-    callback_ptr: i64,
-    env_ptr: i64,
-    node: &PublishedDataChangeNode,
-) {
-    let env = AniEnv::from_raw(env_ptr as _);
-
-    let callback = AniFnObject::from_raw(callback_ptr as _);
-    callback.execute_local(&env, (node,)).unwrap();
 }

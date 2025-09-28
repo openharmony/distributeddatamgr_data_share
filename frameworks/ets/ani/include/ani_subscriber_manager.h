@@ -27,6 +27,7 @@
 namespace OHOS {
 using namespace DataShare;
 namespace DataShareAni {
+struct DataShareCallback;
 struct AniRdbObserverMapKey {
     std::string uri_;
     DataShare::TemplateId templateId_;
@@ -58,17 +59,16 @@ public:
     using Key = AniRdbObserverMapKey;
     using Observer = AniRdbObserver;
     using AniBaseCallbacks = OHOS::DataShareAni::AniCallbacksManager<AniRdbObserverMapKey, AniRdbObserver>;
-    explicit AniRdbSubscriberManager(DataShareHelper* dataShareHelperPtr)
+    explicit AniRdbSubscriberManager(std::shared_ptr<DataShareHelper> dataShareHelperPtr)
     {
-        std::shared_ptr<DataShareHelper> sharedPtr(dataShareHelperPtr, [](DataShareHelper* ptr) {
-            delete ptr;
-        });
-        dataShareHelper_ = std::weak_ptr<DataShareHelper>(sharedPtr);
+        dataShareHelper_ = std::weak_ptr<DataShareHelper>(dataShareHelperPtr);
     }
-    std::vector<OperationResult> AddObservers(long long envPtr, long long callbackPtr,
+    std::vector<OperationResult> AddObservers(rust::Box<DataShareCallback> &callback,
         const std::vector<std::string> &uris, const DataShare::TemplateId &templateId);
-    std::vector<OperationResult> DelObservers(long long envPtr, long long callbackPtr,
+    std::vector<OperationResult> DelObservers(rust::Box<DataShareCallback> &callback,
         const std::vector<std::string> &uris, const DataShare::TemplateId &templateId);
+    std::vector<OperationResult> DelObservers(const std::vector<std::string> &uris,
+        const DataShare::TemplateId &templateId);
     void Emit(const RdbChangeNode &changeNode);
 
 private:
@@ -109,17 +109,15 @@ public:
     using Key = AniPublishedObserverMapKey;
     using Observer = AniPublishedObserver;
     using AniBaseCallbacks = OHOS::DataShareAni::AniCallbacksManager<AniPublishedObserverMapKey, AniPublishedObserver>;
-    explicit AniPublishedSubscriberManager(DataShareHelper* dataShareHelperPtr)
+    explicit AniPublishedSubscriberManager(std::shared_ptr<DataShareHelper> dataShareHelperPtr)
     {
-        std::shared_ptr<DataShareHelper> sharedPtr(dataShareHelperPtr, [](DataShareHelper* ptr) {
-            delete ptr;
-        });
-        dataShareHelper_ = std::weak_ptr<DataShareHelper>(sharedPtr);
+        dataShareHelper_ = std::weak_ptr<DataShareHelper>(dataShareHelperPtr);
     }
-    std::vector<OperationResult> AddObservers(long long envPtr, long long callbackPtr,
+    std::vector<OperationResult> AddObservers(rust::Box<DataShareCallback> &callback,
         const std::vector<std::string> &uris, int64_t subscriberId);
-    std::vector<OperationResult> DelObservers(long long envPtr, long long callbackPtr,
+    std::vector<OperationResult> DelObservers(rust::Box<DataShareCallback> &callback,
         const std::vector<std::string> &uris, int64_t subscriberId);
+    std::vector<OperationResult> DelObservers(const std::vector<std::string> &uris, int64_t subscriberId);
     void Emit(const DataShare::PublishedDataChangeNode &changeNode);
 
 private:

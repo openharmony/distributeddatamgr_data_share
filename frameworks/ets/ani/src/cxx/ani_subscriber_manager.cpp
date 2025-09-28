@@ -20,7 +20,7 @@
 namespace OHOS {
 using namespace DataShare;
 namespace DataShareAni {
-std::vector<OperationResult> AniRdbSubscriberManager::AddObservers(long long envPtr, long long callbackPtr,
+std::vector<OperationResult> AniRdbSubscriberManager::AddObservers(rust::box<DataShareCallback> &callback,
     const std::vector<std::string> &uris, const DataShare::TemplateId &templateId)
 {
     auto datashareHelper = dataShareHelper_.lock();
@@ -34,7 +34,7 @@ std::vector<OperationResult> AniRdbSubscriberManager::AddObservers(long long env
         keys.emplace_back(uri, templateId);
     });
     return AniRdbSubscriberManager::AniBaseCallbacks::AddObservers(
-        keys, std::make_shared<Observer>(envPtr, callbackPtr),
+        keys, std::make_shared<Observer>(std::move(callback)),
         [this](const std::vector<Key> &localRegisterKeys, const std::shared_ptr<Observer> observer) {
             Emit(localRegisterKeys, observer);
         },
@@ -65,7 +65,7 @@ std::vector<OperationResult> AniRdbSubscriberManager::AddObservers(long long env
         });
 }
 
-std::vector<OperationResult> AniRdbSubscriberManager::DelObservers(long long envPtr, long long callbackPtr,
+std::vector<OperationResult> AniRdbSubscriberManager::DelObservers(rust::Box<DataShareCallback> &callback,
     const std::vector<std::string> &uris, const DataShare::TemplateId &templateId)
 {
     auto dataShareHelper = dataShareHelper_.lock();
@@ -78,7 +78,35 @@ std::vector<OperationResult> AniRdbSubscriberManager::DelObservers(long long env
         keys.emplace_back(uri, templateId);
     });
     return AniRdbSubscriberManager::AniBaseCallbacks::DelObservers(keys,
-        callbackPtr == 0 ? 0 : std::make_shared<Observer>(envPtr, callbackPtr),
+        std::make_shared<Observer>(std::move(callback)),
+        [&dataShareHelper, &templateId, this](const std::vector<Key> &lastDelKeys,
+            const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
+            std::vector<std::string> lastDelUris;
+            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
+                lastChangeNodeMap_.Erase(result);
+                lastDelUris.emplace_back(result);
+            });
+            if (lastDelUris.empty()) {
+                return;
+            }
+            auto unsubResult = dataShareHelper->UnsubscribeRdbData(lastDelUris, templateId);
+            opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
+        });
+}
+
+std::vector<OperationResult> AniRdbSubscriberManager::DelObservers(const std::vector<std::string> &uris,
+    const DataShare::TemplateId &templateId)
+{
+    auto dataShareHelper = dataShareHelper_.lock();
+    if (dataShareHelper == nullptr) {
+        LOG_ERROR("nativeManager is nullptr");
+        return std::vector<OperationResult>();
+    }
+    std::vector<Key> keys;
+    std::for_each(uris.begin(), uris.end(), [&keys, &templateId](auto &uri) {
+        keys.emplace_back(uri, templateId);
+    });
+    return AniRdbSubscriberManager::AniBaseCallbacks::DelObservers(keys, nullptr,
         [&dataShareHelper, &templateId, this](const std::vector<Key> &lastDelKeys,
             const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
@@ -130,7 +158,7 @@ void AniRdbSubscriberManager::Emit(const std::vector<Key> &keys, const std::shar
     }
 }
 
-std::vector<OperationResult> AniPublishedSubscriberManager::AddObservers(long long envPtr, long long callbackPtr,
+std::vector<OperationResult> AniPublishedSubscriberManager::AddObservers(rust::Box<DataShareCallback> &callback,
     const std::vector<std::string> &uris, int64_t subscriberId)
 {
     auto dataShareHelper = dataShareHelper_.lock();
@@ -144,7 +172,7 @@ std::vector<OperationResult> AniPublishedSubscriberManager::AddObservers(long lo
         keys.emplace_back(uri, subscriberId);
     });
     return AniPublishedSubscriberManager::AniBaseCallbacks::AddObservers(
-        keys, std::make_shared<Observer>(envPtr, callbackPtr),
+        keys, std::make_shared<Observer>(std::move(callback)),
         [this](const std::vector<Key> &localRegisterKeys, const std::shared_ptr<Observer> observer) {
             Emit(localRegisterKeys, observer);
         },
@@ -175,7 +203,7 @@ std::vector<OperationResult> AniPublishedSubscriberManager::AddObservers(long lo
         });
 }
 
-std::vector<OperationResult> AniPublishedSubscriberManager::DelObservers(long long envPtr, long long callbackPtr,
+std::vector<OperationResult> AniPublishedSubscriberManager::DelObservers(rust::Box<DataShareCallback> &callback,
     const std::vector<std::string> &uris, int64_t subscriberId)
 {
     auto dataShareHelper = dataShareHelper_.lock();
@@ -188,8 +216,36 @@ std::vector<OperationResult> AniPublishedSubscriberManager::DelObservers(long lo
         keys.emplace_back(uri, subscriberId);
     });
     return AniPublishedSubscriberManager::AniBaseCallbacks::DelObservers(keys,
-        callbackPtr == 0 ? 0 : std::make_shared<Observer>(envPtr, callbackPtr),
-        [&dataShareHelper, &subscriberId, &callbackPtr, &uris, this](const std::vector<Key> &lastDelKeys,
+        std::make_shared<Observer>(std::move(callback)),
+        [&dataShareHelper, &subscriberId, this](const std::vector<Key> &lastDelKeys,
+            const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
+            std::vector<std::string> lastDelUris;
+            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
+                lastChangeNodeMap_.Erase(result);
+                lastDelUris.emplace_back(result);
+            });
+            if (lastDelUris.empty()) {
+                return;
+            }
+            auto unsubResult = dataShareHelper->UnsubscribePublishedData(lastDelUris, subscriberId);
+            opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
+        });
+}
+
+std::vector<OperationResult> AniPublishedSubscriberManager::DelObservers(const std::vector<std::string> &uris,
+    int64_t subscriberId)
+{
+    auto dataShareHelper = dataShareHelper_.lock();
+    if (dataShareHelper == nullptr) {
+        LOG_ERROR("nativeManager is nullptr");
+        return std::vector<OperationResult>();
+    }
+    std::vector<Key> keys;
+    std::for_each(uris.begin(), uris.end(), [&keys, &subscriberId](auto &uri) {
+        keys.emplace_back(uri, subscriberId);
+    });
+    return AniPublishedSubscriberManager::AniBaseCallbacks::DelObservers(keys, nullptr,
+        [&dataShareHelper, &subscriberId, this](const std::vector<Key> &lastDelKeys,
             const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {

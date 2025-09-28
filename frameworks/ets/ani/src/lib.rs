@@ -19,6 +19,7 @@ mod predicates;
 mod result_set;
 mod wrapper;
 mod datashare_extension;
+mod log;
 
 const DATA_SHARE_PREDICATES: &CStr = unsafe {
     CStr::from_bytes_with_nul_unchecked(
@@ -42,6 +43,7 @@ pub fn get_native_ptr<'local>(env: &AniEnv<'local>, obj: &AniObject) -> i64 {
 ani_constructor!(
     class "@ohos.data.DataShareResultSet.DataShareResultSetInner"
     [
+        "getRowCount" : result_set::get_row_count,
         "goToFirstRow" : result_set::go_to_first_row,
         "goToLastRow" : result_set::go_to_last_row,
         "goToNextRow" : result_set::go_to_next_row,
@@ -50,10 +52,8 @@ ani_constructor!(
         "getColumnIndex" : result_set::get_column_index,
         "close" : result_set::close,
     ]
-
     class "@ohos.data.dataSharePredicates.dataSharePredicates.DataSharePredicates"
     [
-        "create" : predicates::create,
         "equalTo" : predicates::native_equal_to,
         "notEqualTo" : predicates::native_not_equal_to,
         "beginWrap" : predicates::native_begin_wrap,
@@ -73,8 +73,12 @@ ani_constructor!(
         "orderByDesc" : predicates::native_order_by_desc,
         "limit" : predicates::native_limit,
         "groupBy" : predicates::native_group_by,
-        "in" : predicates::native_in,
-        "notIn" : predicates::native_not_in,
+        "inValues" : predicates::native_in,
+        "notInValues" : predicates::native_not_in,
+    ]
+    namespace "@ohos.data.dataSharePredicates.dataSharePredicates"
+    [
+        "native_create" : predicates::create,
     ]
     namespace "@ohos.data.dataShare.dataShare"
     [
@@ -116,3 +120,21 @@ ani_constructor!(
         "nativeExtensionCallbackVoid": datashare_extension::native_extension_callback_void,
     ]
 );
+
+const LOG_LABEL: hilog_rust::HiLogLabel = hilog_rust::HiLogLabel {
+    log_type: hilog_rust::LogType::LogCore,
+    domain: 0xD001651,
+    tag: "DataShare",
+};
+ 
+#[used]
+#[link_section = ".init_array"]
+static G_DATASHARE_PANIC_HOOK: extern "C" fn() = {
+    #[link_section = ".text.startup"]
+    extern "C" fn init() {
+        std::panic::set_hook(Box::new(|info| {
+            datashare_error!("Panic occurred: {:?}", info);
+        }));
+    }
+    init
+};

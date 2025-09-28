@@ -11,6 +11,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use ani_rs::typed_array::ArrayBuffer;
+
 use crate::datashare::{OperationResult, PublishedItem, PublishedItemData};
 
 use super::ffi;
@@ -33,17 +35,17 @@ pub fn publish_sret_push(sret: &mut PublishSretParam, key: String, result: i32) 
 }
 
 // called by c++, get PublishedItem key.
-pub fn published_item_get_key(item: &PublishedItem<'_>) -> String {
+pub fn published_item_get_key(item: &PublishedItem) -> String {
     item.key.clone()
 }
 
 // called by c++, get PublishedItem subscriber_id.
-pub fn published_item_get_subscriber_id(item: &PublishedItem<'_>) -> String {
+pub fn published_item_get_subscriber_id(item: &PublishedItem) -> String {
     item.subscriber_id.clone()
 }
 
 // called by c++, get PublishedItem data's type.
-pub fn published_item_get_data_type(item: &PublishedItem<'_>) -> ffi::EnumType {
+pub fn published_item_get_data_type(item: &PublishedItem) -> ffi::EnumType {
     match &item.data {
         PublishedItemData::S(_) => ffi::EnumType::StringType,
         PublishedItemData::ArrayBuffer(_) => ffi::EnumType::ArrayBufferType,
@@ -51,7 +53,7 @@ pub fn published_item_get_data_type(item: &PublishedItem<'_>) -> ffi::EnumType {
 }
 
 // called by c++, if PublishedItem data's type is String, get String.
-pub fn published_item_get_data_string(item: &PublishedItem<'_>) -> String {
+pub fn published_item_get_data_string(item: &PublishedItem) -> String {
     if let PublishedItemData::S(s) = &item.data {
         return s.clone();
     }
@@ -60,9 +62,9 @@ pub fn published_item_get_data_string(item: &PublishedItem<'_>) -> String {
 }
 
 // called by c++, if PublishedItem data's type is ArrayBuffer, get ArrayBuffer.
-pub fn published_item_get_data_arraybuffer<'a>(item: &'a PublishedItem<'_>) -> &'a [u8] {
-    if let PublishedItemData::ArrayBuffer(arr) = item.data {
-        return arr;
+pub fn published_item_get_data_arraybuffer(item: &PublishedItem) -> Vec<u8> {
+    if let PublishedItemData::ArrayBuffer(arr) = &item.data {
+        return arr.to_vec();
     }
 
     panic!("Not arraybuffer Type!!!");
@@ -99,7 +101,7 @@ impl GetPublishedDataSretParam {
                     PublishedItem {
                         key: help.key.clone(),
                         data: PublishedItemData::ArrayBuffer(
-                            help.data_arr.as_ref().unwrap().as_slice(),
+                            ArrayBuffer::new_with_vec(help.data_arr.as_ref().unwrap().clone()),
                         ),
                         subscriber_id: help.subscriber_id.clone(),
                     }

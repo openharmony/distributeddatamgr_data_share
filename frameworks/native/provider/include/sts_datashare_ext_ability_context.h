@@ -20,6 +20,8 @@
 
 #include "ability_connect_callback.h"
 #include "datashare_ext_ability_context.h"
+#include "ohos_application.h"
+#include "ani.h"
 
 namespace OHOS {
 namespace DataShare {

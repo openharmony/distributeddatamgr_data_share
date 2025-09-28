@@ -18,6 +18,11 @@ use ani_rs::{
 
 use crate::{get_native_ptr, wrapper};
 
+pub fn get_row_count<'local>(env: AniEnv<'local>, ani_this: AniRef<'local>) -> i32 {
+    let result_set_ptr = get_native_ptr(&env, &ani_this.into());
+    wrapper::ffi::GetRowCount(result_set_ptr)
+}
+
 pub fn go_to_first_row<'local>(env: AniEnv<'local>, ani_this: AniRef<'local>) -> bool {
     let result_set_ptr = get_native_ptr(&env, &ani_this.into());
     wrapper::ffi::GoToFirstRow(result_set_ptr)

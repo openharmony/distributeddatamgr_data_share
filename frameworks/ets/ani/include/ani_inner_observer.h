@@ -24,15 +24,17 @@
 namespace OHOS {
 using namespace DataShare;
 namespace DataShareAni {
-    class ANIInnerDataShareObserver : public std::enable_shared_from_this<ANIInnerDataShareObserver> {
-    public:
-        ANIInnerDataShareObserver(long long envPtr, long long callbackPtr);
-        void OnChange(const DataShareObserver::ChangeInfo &changeInfo = {}, bool isNotifyDetails = false);
-        long long GetCallback();
-    private:
-        long long envPtr_;
-        long long callbackPtr_;
-    };
+struct DataShareCallback;
+class ANIInnerDataShareObserver : public std::enable_shared_from_this<ANIInnerDataShareObserver> {
+public:
+    ANIInnerDataShareObserver(rust::Box<DataShareCallback> &&callback);
+    bool operator==(const ANIInnerDataShareObserver &rhs) const;
+    void OnChange(const DataShareObserver::ChangeInfo &changeInfo, bool isNotifyDetails);
+    void OnChange();
+    rust::Box<DataShareCallback> &GetCallback();
+private:
+    rust::Box<DataShareCallback> callback_;
+};
 }  // namespace DataShareAni
 }  // namespace OHOS
 #endif //ANI_DATASHARE_INNER_OBSERVER_H

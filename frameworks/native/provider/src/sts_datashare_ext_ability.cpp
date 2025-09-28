@@ -14,11 +14,13 @@
  */
 
 #include "sts_datashare_ext_ability.h"
-#include "ability_context.h"
+#include "sts_datashare_ext_ability_context.h"
+#include "datashare_stub_impl.h"
 #include "datashare_log.h"
 #include "datashare_predicates_proxy.h"
-#include "datashare_stub_impl.h"
-#include "sts_runtime.h"
+#include "dataobs_mgr_client.h"
+#include "ability_context.h"
+#include "ets_runtime.h"
 #include "ani_common_want.h"
 #include "wrapper.rs.h"
 
@@ -27,22 +29,27 @@ using namespace OHOS::DistributedShare::DataShare;
 namespace OHOS {
 namespace DataShare {
 using namespace AbilityRuntime;
-using namespace OHOS::AppExecFwk;
-using DataObsMgrClient = OHOS::AAFwk::DataObsMgrClient;
+using namespace AppExecFwk;
+using namespace DataShareAni;
+using DataObsMgrClient = AAFwk::DataObsMgrClient;
+
+namespace {
+constexpr int INVALID_VALUE = -1;
+}
 
 StsDataShareExtAbility* StsDataShareExtAbility::Create(const std::unique_ptr<Runtime>& runtime)
 {
-    return new StsDataShareExtAbility(static_cast<STSRuntime&>(*runtime));
+    return new StsDataShareExtAbility(static_cast<ETSRuntime&>(*runtime));
 }
 
-StsDataShareExtAbility::StsDataShareExtAbility(STSRuntime& stsRuntime) : stsRuntime_(stsRuntime) {}
+StsDataShareExtAbility::StsDataShareExtAbility(ETSRuntime& stsRuntime) : stsRuntime_(stsRuntime) {}
 
 StsDataShareExtAbility::~StsDataShareExtAbility()
 {
     LOG_DEBUG("Js datashare extension destructor.");
 }
 
-void StsDataShareExtAbility::ResetEnv(ani_env* env)
+void StsDataShareExtAbility::ResetEnv(ani_env *env)
 {
     env->DescribeError();
     env->ResetError();
@@ -63,10 +70,10 @@ void StsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &rec
 
     std::string moduleName(Extension::abilityInfo_->moduleName);
     moduleName.append("::").append(abilityInfo_->name);
-    LOG_DEBUG("module:%{public}s, srcPath:%{public}s.", moduleName.c_str(), srcPath.c_str());
     
     stsObj_ = stsRuntime_.LoadModule(
-        moduleName, srcPath, abilityInfo_->hapPath, abilityInfo_->compileMode == CompileMode::ES_MODULE);
+        moduleName, srcPath, abilityInfo_->hapPath, abilityInfo_->compileMode == CompileMode::ES_MODULE, false,
+        abilityInfo_->srcEntrance);
     if (stsObj_ == nullptr) {
         LOG_ERROR("Failed to get stsObj_, moduleName:%{public}s.", moduleName.c_str());
         return;
@@ -84,7 +91,7 @@ void StsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &rec
         return;
     }
 
-    ani_object contextObj = CreateStsDataShareExtAbilityContext(env, context);
+    ani_object contextObj = CreateStsDataShareExtAbilityContext(env, context, application);
     if (contextObj == nullptr) {
         LOG_ERROR("Failed to get contextObj");
         return;
@@ -113,7 +120,7 @@ void StsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &rec
 void StsDataShareExtAbility::OnStart(const AAFwk::Want &want)
 {
     Extension::OnStart(want);
-    ani_env env = stsRuntime_.GetAniEnv();
+    ani_env *env = stsRuntime_.GetAniEnv();
     if (env == nullptr) {
         LOG_ERROR("OnUpdate failed, env is null");
         return;
@@ -126,7 +133,8 @@ void StsDataShareExtAbility::OnStart(const AAFwk::Want &want)
         return;
     }
     point->context = asyncContext;
-    ani_object aniWant = OHOS::AppExecFwk::WrapWant(env, want);
+    ani_object aniWant = WrapWant(env, want);
+
     call_arkts_on_create(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
         reinterpret_cast<int64_t>(aniWant), reinterpret_cast<int64_t>(point));
 }
@@ -135,8 +143,7 @@ sptr<IRemoteObject> StsDataShareExtAbility::OnConnect(const AAFwk::Want &want)
 {
     Extension::OnConnect(want);
     sptr<DataShareStubImpl> remoteObject = new (std::nothrow) DataShareStubImpl(
-        std::static_pointer_cast<StsDataShareExtAbility>(shared_from_this()),
-        stsRuntime_.GetAniEnv());
+        std::static_pointer_cast<StsDataShareExtAbility>(shared_from_this()));
     if (remoteObject == nullptr) {
         LOG_ERROR("No memory allocated for DataShareStubImpl");
         return nullptr;
@@ -144,83 +151,91 @@ sptr<IRemoteObject> StsDataShareExtAbility::OnConnect(const AAFwk::Want &want)
     return remoteObject->AsObject();
 }
 
-void PushBucket(rust::Box<ValuesBucketHashWrap> &valuesBucket, const DataShareValuesBucket &value)
+void PushBucket(rust::Box<ValuesBucketHashWrap> &valuesBucket, const DataShareValuesBucket &inputVal)
 {
-    const auto &valuesMap = value.valuesMap;
+    const auto &valuesMap = inputVal.valuesMap;
     for (auto it = valuesMap.begin(); it != valuesMap.end(); ++it) {
         std::string key = it->first;
         auto rawValue = it->second;
-        auto index = value.index();
-        switch (index) {
-            case TYPE_NULL:
-                auto value = std::get<std::monostate>(rawValue);
-                value_bucket_push_kv_null(*valuesBucket, rust::String(key));
-                break;
-            case TYPE_INT:
-                auto value = std::get<int64_t>(rawValue);
-                value_bucket_push_kv_f64(*valuesBucket, rust::String(key), (double)value);
-                break;
-            case TYPE_DOUBLE:
-                auto value = std::get<double>(rawValue);
-                value_bucket_push_kv_f64(*valuesBucket, rust::String(key), value);
-                break;
-            case TYPE_STRING:
-                auto value = std::get<std::string>(rawValue);
-                value_bucket_push_kv_str(*valuesBucket, rust::String(key), rust::String(value));
-                break;
-            case TYPE_BOOL:
-                auto value = std::get<bool>(rawValue);
-                value_bucket_push_kv_boolean(*valuesBucket, rust::String(key), value);
-                break;
-            case TYPE_BLOB:
-                auto value = std::get<std::vector<uint8_t>>(rawValue);
-                rust::Slice<const uint8_t> slice(value.data(), value.size());
-                value_bucket_push_kv_uint8array(*valuesBucket, rust::String(key), slice);
-                break;
-            default:
-                LOG_ERROR("Value type not supported.");
-                break;s
+        auto index = rawValue.index();
+        if (index == TYPE_NULL) {
+            value_bucket_push_kv_null(*valuesBucket, rust::String(key));
+            continue;
         }
+        if (index == TYPE_INT) {
+            auto value = std::get<int64_t>(rawValue);
+            value_bucket_push_kv_f64(*valuesBucket, rust::String(key), value);
+            continue;
+        }
+        if (index == TYPE_DOUBLE) {
+            auto value = std::get<double>(rawValue);
+            value_bucket_push_kv_f64(*valuesBucket, rust::String(key), value);
+            continue;
+        }
+        if (index == TYPE_STRING) {
+            auto value = std::get<std::string>(rawValue);
+            value_bucket_push_kv_str(*valuesBucket, rust::String(key), rust::String(value));
+            continue;
+        }
+        if (index == TYPE_BOOL) {
+            auto value = std::get<bool>(rawValue);
+            value_bucket_push_kv_boolean(*valuesBucket, rust::String(key), value);
+            continue;
+        }
+        if (index == TYPE_BLOB) {
+            auto value = std::get<std::vector<uint8_t>>(rawValue);
+            rust::Vec<uint8_t> vec;
+            for (auto val: value) {
+                vec.push_back(val);
+            }
+            value_bucket_push_kv_uint8array(*valuesBucket, rust::String(key), vec);
+            continue;
+        }
+        LOG_ERROR("Value type not supported.");
     }
 }
 
-void PushBucketsArray(rust::Box<ValuesBucketArrayWrap> &valueBucketsArray, const DataShareValuesBucket &value)
+void PushBucketsArray(rust::Box<ValuesBucketArrayWrap> &valueBucketsArray, const DataShareValuesBucket &inputVal)
 {
-    const auto &valuesMap = value.valuesMap;
+    const auto &valuesMap = inputVal.valuesMap;
     for (auto it = valuesMap.begin(); it != valuesMap.end(); ++it) {
         std::string key = it->first;
         auto rawValue = it->second;
-        auto index = value.index();
-        switch (index) {
-            case TYPE_NULL:
-                auto value = std::get<std::monostate>(rawValue);
-                values_bucket_array_push_kv_null(*valueBucketsArray, rust::String(key), false);
-                break;
-            case TYPE_INT:
-                auto value = std::get<int64_t>(rawValue);
-                values_bucket_array_push_kv_f64(*valueBucketsArray, rust::String(key), (double)value, false);
-                break;
-            case TYPE_DOUBLE:
-                auto value = std::get<double>(rawValue);
-                values_bucket_array_push_kv_f64(*valueBucketsArray, rust::String(key), value, false);
-                break;
-            case TYPE_STRING:
-                auto value = std::get<std::string>(rawValue);
-                values_bucket_array_push_kv_str(*valueBucketsArray, rust::String(key), rust::String(value), false);
-                break;
-            case TYPE_BOOL:
-                auto value = std::get<bool>(rawValue);
-                values_bucket_array_push_kv_boolean(*valueBucketsArray, rust::String(key), value, false);
-                break;
-            case TYPE_BLOB:
-                auto value = std::get<std::vector<uint8_t>>(rawValue);
-                rust::Slice<const uint8_t> slice(value.data(), value.size());
-                values_bucket_array_push_kv_uint8array(*valueBucketsArray, rust::String(key), slice, false);
-                break;
-            default:
-                LOG_ERROR("Value type not supported.");
-                break;
+        auto index = rawValue.index();
+        if (index == TYPE_NULL) {
+            values_bucket_array_push_kv_null(*valueBucketsArray, rust::String(key), false);
+            continue;
         }
+        if (index == TYPE_INT) {
+            auto value = std::get<int64_t>(rawValue);
+            values_bucket_array_push_kv_f64(*valueBucketsArray, rust::String(key), (double)value, false);
+            continue;
+        }
+        if (index == TYPE_DOUBLE) {
+            auto value = std::get<double>(rawValue);
+            values_bucket_array_push_kv_f64(*valueBucketsArray, rust::String(key), value, false);
+            continue;
+        }
+        if (index == TYPE_STRING) {
+            auto value = std::get<std::string>(rawValue);
+            values_bucket_array_push_kv_str(*valueBucketsArray, rust::String(key), rust::String(value), false);
+            continue;
+        }
+        if (index == TYPE_BOOL) {
+            auto value = std::get<bool>(rawValue);
+            values_bucket_array_push_kv_boolean(*valueBucketsArray, rust::String(key), value, false);
+            continue;
+        }
+        if (index == TYPE_BLOB) {
+            auto value = std::get<std::vector<uint8_t>>(rawValue);
+            rust::Vec<uint8_t> vec;
+            for (auto val: value) {
+                vec.push_back(val);
+            }
+            values_bucket_array_push_kv_uint8array(*valueBucketsArray, rust::String(key), vec, false);
+            continue;
+        }
+        LOG_ERROR("Value type not supported.");
     }
 }
 
@@ -228,7 +243,7 @@ int StsDataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &
 {
     int ret = INVALID_VALUE;
     ret = DataShareExtAbility::Insert(uri, value);
-    ani_env env = stsRuntime_.GetAniEnv();
+    ani_env *env = stsRuntime_.GetAniEnv();
     if (env == nullptr) {
         LOG_ERROR("Insert failed, env is null");
         return ret;
@@ -243,8 +258,8 @@ int StsDataShareExtAbility::Insert(const Uri &uri, const DataShareValuesBucket &
         return ret;
     }
     point->result = std::move(result_);
-    call_arkts_insert(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env), rust::String(uri),
-        *valuesBucket, reinterpret_cast<int64_t>(point));
+    call_arkts_insert(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
+        rust::String(uri.ToString()), *valuesBucket, reinterpret_cast<int64_t>(point));
     return ret;
 }
 
@@ -253,13 +268,13 @@ int StsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pr
 {
     int ret = INVALID_VALUE;
     ret = DataShareExtAbility::Update(uri, predicates, value);
-    ani_env env = stsRuntime_.GetAniEnv();
+    ani_env *env = stsRuntime_.GetAniEnv();
     if (env == nullptr) {
         LOG_ERROR("Update failed, env is null");
         return ret;
     }
 
-    std::shared_ptr<DataSharePredicates> predicatesPtr = std::make_shared<DataSharePredicates>(predicates);
+    DataSharePredicates *predicatesPtr = new (std::nothrow)DataSharePredicates(predicates);
 
     rust::Box<ValuesBucketHashWrap> valuesBucket = rust_create_values_bucket();
     PushBucket(valuesBucket, value);
@@ -271,8 +286,9 @@ int StsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pr
     }
     point->result = std::move(result_);
 
-    call_arkts_update(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env), rust::String(uri),
-        reinterpret_cast<int64_t>(predicatesPtr), *valuesBucket, reinterpret_cast<int64_t>(point));
+    call_arkts_update(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
+        rust::String(uri.ToString()), reinterpret_cast<int64_t>(predicatesPtr), *valuesBucket,
+        reinterpret_cast<int64_t>(point));
     return ret;
 }
 
@@ -280,13 +296,13 @@ int StsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &pr
 {
     int ret = INVALID_VALUE;
     ret = DataShareExtAbility::Delete(uri, predicates);
-    ani_env env = stsRuntime_.GetAniEnv();
+    ani_env *env = stsRuntime_.GetAniEnv();
     if (env == nullptr) {
         LOG_ERROR("Delete failed, env is null");
         return ret;
     }
 
-    std::shared_ptr<DataSharePredicates> predicatesPtr = std::make_shared<DataSharePredicates>(predicates);
+    DataSharePredicates *predicatesPtr = new (std::nothrow)DataSharePredicates(predicates);
 
     AsyncCallBackPoint *point = new (std::nothrow)AsyncCallBackPoint();
     if (point == nullptr) {
@@ -294,8 +310,8 @@ int StsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &pr
         return ret;
     }
     point->result = std::move(result_);
-    call_arkts_delete(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env), rust::String(uri),
-        reinterpret_cast<int64_t>(predicatesPtr), reinterpret_cast<int64_t>(point));
+    call_arkts_delete(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
+        rust::String(uri.ToString()), reinterpret_cast<int64_t>(predicatesPtr), reinterpret_cast<int64_t>(point));
     return ret;
 }
 
@@ -304,13 +320,13 @@ std::shared_ptr<DataShareResultSet> StsDataShareExtAbility::Query(const Uri &uri
 {
     std::shared_ptr<DataShareResultSet> ret;
     ret = DataShareExtAbility::Query(uri, predicates, columns, businessError);
-    ani_env env = stsRuntime_.GetAniEnv();
+    ani_env *env = stsRuntime_.GetAniEnv();
     if (env == nullptr) {
         LOG_ERROR("Query failed, env is null");
         return ret;
     }
 
-    std::shared_ptr<DataSharePredicates> predicatesPtr = std::make_shared<DataSharePredicates>(predicates);
+    DataSharePredicates *predicatesPtr = new (std::nothrow)DataSharePredicates(predicates);
 
     rust::Vec<rust::String> rustColumns;
     for (const auto &col : columns) {
@@ -323,8 +339,9 @@ std::shared_ptr<DataShareResultSet> StsDataShareExtAbility::Query(const Uri &uri
         return ret;
     }
     point->result = std::move(result_);
-    call_arkts_query(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env), rust::String(uri),
-        reinterpret_cast<int64_t>(predicatesPtr), rustColumns, reinterpret_cast<int64_t>(point));
+    call_arkts_query(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
+        rust::String(uri.ToString()), reinterpret_cast<int64_t>(predicatesPtr), rustColumns,
+        reinterpret_cast<int64_t>(point));
     return ret;
 }
 
@@ -332,7 +349,7 @@ int StsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataSh
 {
     int ret = INVALID_VALUE;
     ret = DataShareExtAbility::BatchInsert(uri, values);
-    ani_env env = stsRuntime_.GetAniEnv();
+    ani_env *env = stsRuntime_.GetAniEnv();
     if (env == nullptr) {
         LOG_ERROR("BatchInsert failed, env is null");
         return ret;
@@ -350,7 +367,7 @@ int StsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataSh
     }
     point->result = std::move(result_);
     call_arkts_batch_insert(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
-        rust::String(uri), *valueBucketsArray, reinterpret_cast<int64_t>(point));
+        rust::String(uri.ToString()), *valueBucketsArray, reinterpret_cast<int64_t>(point));
     return ret;
 }
 
@@ -406,12 +423,27 @@ bool StsDataShareExtAbility::NotifyChange(const Uri &uri)
     return true;
 }
 
+bool StsDataShareExtAbility::NotifyChangeWithUser(const Uri &uri, int32_t userId)
+{
+    auto obsMgrClient = DataObsMgrClient::GetInstance();
+    if (obsMgrClient == nullptr) {
+        LOG_ERROR("obsMgrClient is nullptr");
+        return false;
+    }
+    ErrCode ret = obsMgrClient->NotifyChange(uri, userId);
+    if (ret != ERR_OK) {
+        LOG_ERROR("obsMgrClient->NotifyChange error return %{public}d", ret);
+        return false;
+    }
+    return true;
+}
+
 void StsDataShareExtAbility::InitResult(std::shared_ptr<JsResult> result)
 {
     result_ = result;
 }
 
-void StsDataShareExtAbility::SaveNewCallingInfo(ani_env &env)
+void StsDataShareExtAbility::SaveNewCallingInfo(ani_env *env)
 {
     // todo
 }

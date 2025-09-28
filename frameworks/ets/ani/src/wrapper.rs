@@ -16,6 +16,8 @@ use crate::datashare::{
 };
 use crate::datashare_extension::*;
 use crate::predicates::ValueType;
+use ani_rs::objects::GlobalRefAsyncCallback;
+use std::sync::Arc;
 
 mod change_info;
 pub use change_info::*;
@@ -43,10 +45,9 @@ pub mod ffi {
         ArrayBufferType = 5,
     }
 
-    struct EnvPtrWrap {
+    struct PtrWrap {
         dataShareHelperPtr: i64,
-        callbackPtr: i64,
-        envPtr: i64,
+        callback: Box<DataShareCallback>,
     }
 
     struct VersionWrap {
@@ -55,7 +56,7 @@ pub mod ffi {
     }
 
     extern "Rust" {
-        type ValuesBucketKvItem<'a>;
+        type ValuesBucketKvItem;
         fn value_bucket_get_key(kv: &ValuesBucketKvItem) -> String;
         fn value_bucket_get_vtype(kv: &ValuesBucketKvItem) -> EnumType;
         fn value_bucket_get_string(kv: &ValuesBucketKvItem) -> String;
@@ -69,14 +70,14 @@ pub mod ffi {
         fn value_type_get_f64(v: &ValueType) -> f64;
         fn value_type_get_bool(v: &ValueType) -> bool;
 
-        type PublishedItem<'a>;
+        type PublishedItem;
         type PublishSretParam;
         fn publish_sret_push(sret: &mut PublishSretParam, key: String, result: i32);
-        fn published_item_get_key(item: &PublishedItem<'_>) -> String;
-        fn published_item_get_subscriber_id(item: &PublishedItem<'_>) -> String;
-        fn published_item_get_data_type(item: &PublishedItem<'_>) -> EnumType;
-        fn published_item_get_data_string(item: &PublishedItem<'_>) -> String;
-        unsafe fn published_item_get_data_arraybuffer<'a>(item: &'a PublishedItem<'_>) -> &'a [u8];
+        fn published_item_get_key(item: &PublishedItem) -> String;
+        fn published_item_get_subscriber_id(item: &PublishedItem) -> String;
+        fn published_item_get_data_type(item: &PublishedItem) -> EnumType;
+        fn published_item_get_data_string(item: &PublishedItem) -> String;
+        unsafe fn published_item_get_data_arraybuffer(item: &PublishedItem) -> Vec<u8>;
 
         type GetPublishedDataSretParam;
         fn published_data_sret_push_str(
@@ -101,14 +102,13 @@ pub mod ffi {
         fn template_predicates_get_key(kv: &TemplatePredicatesKvItem) -> &String;
         fn template_predicates_get_value(kv: &TemplatePredicatesKvItem) -> &String;
 
-        type ValuesBucketWrap<'a>;
-        unsafe fn values_bucket_wrap_inner<'a>(
-            kv: &'a ValuesBucketWrap,
-        ) -> &'a Vec<ValuesBucketKvItem<'a>>;
-        fn execute_callback(callback_ptr: i64, env_ptr: i64);
+        type ValuesBucketWrap;
+        unsafe fn values_bucket_wrap_inner(
+            kv: &ValuesBucketWrap,
+        ) -> &Vec<ValuesBucketKvItem>;
 
-        type ChangeInfo<'a>;
-        fn rust_create_change_info(change_index: i32, uri: String) -> Box<ChangeInfo<'static>>;
+        type ChangeInfo;
+        fn rust_create_change_info(change_index: i32, uri: String) -> Box<ChangeInfo>;
         fn change_info_push_kv_str(
             change_info: &mut ChangeInfo,
             key: String,
@@ -127,14 +127,13 @@ pub mod ffi {
             value: bool,
             new_hashmap: bool,
         );
-        unsafe fn change_info_push_kv_uint8array<'a>(
-            change_info: &mut ChangeInfo<'a>,
+        unsafe fn change_info_push_kv_uint8array(
+            change_info: &mut ChangeInfo,
             key: String,
-            value: &'a [u8],
+            value: Vec<u8>,
             new_hashmap: bool,
         );
         fn change_info_push_kv_null(change_info: &mut ChangeInfo, key: String, new_hashmap: bool);
-        fn execute_callback_changeinfo(callback_ptr: i64, env_ptr: i64, change_info: &ChangeInfo);
 
         type TemplateId;
         type RdbDataChangeNode;
@@ -146,35 +145,45 @@ pub mod ffi {
             bundle_name_of_owner: String,
         ) -> Box<RdbDataChangeNode>;
         fn rdb_data_change_node_push_data(node: &mut RdbDataChangeNode, data_item: String);
-        fn execute_callback_rdb_data_change(
-            callback_ptr: i64,
-            env_ptr: i64,
-            node: &RdbDataChangeNode,
-        );
 
-        type PublishedDataChangeNode<'a>;
+        type PublishedDataChangeNode;
         fn rust_create_published_data_change_node(
             bundle_name: String,
-        ) -> Box<PublishedDataChangeNode<'static>>;
+        ) -> Box<PublishedDataChangeNode>;
         fn published_data_change_node_push_item_str(
             node: &mut PublishedDataChangeNode,
             key: String,
             data: String,
             subscriber_id: String,
         );
-        unsafe fn published_data_change_node_push_item_arraybuffer<'a>(
-            node: &mut PublishedDataChangeNode<'a>,
+        unsafe fn published_data_change_node_push_item_arraybuffer(
+            node: &mut PublishedDataChangeNode,
             key: String,
-            data: &'a [u8],
+            data: Vec<u8>,
             subscriber_id: String,
         );
+
+        type DataShareCallback;
+        fn execute_callback(self: &DataShareCallback);
+        fn execute_callback_changeinfo(
+            self: &DataShareCallback,
+            change_info: &ChangeInfo,
+        );
+        fn execute_callback_rdb_data_change(
+            self: &DataShareCallback,
+            node: &RdbDataChangeNode,
+        );
         fn execute_callback_published_data_change(
-            callback_ptr: i64,
-            env_ptr: i64,
+            self: &DataShareCallback,
             node: &PublishedDataChangeNode,
         );
+        fn callback_is_equal(
+            org_callback: &DataShareCallback,
+            new_callback: &DataShareCallback,
+        ) -> bool;
 
-        type ValuesBucketHashWrap<'a>;
+
+        type ValuesBucketHashWrap;
         fn call_arkts_insert(
             extension_ability_ptr: i64,
             env_ptr: i64,
@@ -182,7 +191,7 @@ pub mod ffi {
             value_bucket: &ValuesBucketHashWrap,
             native_ptr: i64,
         );
-        fn rust_create_values_bucket() -> Box<ValuesBucketHashWrap<'static>>;
+        fn rust_create_values_bucket() -> Box<ValuesBucketHashWrap>;
         fn value_bucket_push_kv_str(
             value_bucket: &mut ValuesBucketHashWrap,
             key: String,
@@ -198,14 +207,14 @@ pub mod ffi {
             key: String,
             value: bool,
         );
-        unsafe fn value_bucket_push_kv_uint8array<'a>(
-            value_bucket: &mut ValuesBucketHashWrap<'a>,
+        unsafe fn value_bucket_push_kv_uint8array(
+            value_bucket: &mut ValuesBucketHashWrap,
             key: String,
-            value: &'a [u8],
+            value: Vec<u8>,
         );
         fn value_bucket_push_kv_null(value_bucket: &mut ValuesBucketHashWrap, key: String);
 
-        type ValuesBucketArrayWrap<'a>;
+        type ValuesBucketArrayWrap;
         fn call_arkts_batch_insert(
             extension_ability_ptr: i64,
             env_ptr: i64,
@@ -213,7 +222,7 @@ pub mod ffi {
             value_buckets: &ValuesBucketArrayWrap,
             native_ptr: i64,
         );
-        fn rust_create_values_bucket_array() -> Box<ValuesBucketArrayWrap<'static>>;
+        fn rust_create_values_bucket_array() -> Box<ValuesBucketArrayWrap>;
         fn values_bucket_array_push_kv_str(
             value_buckets: &mut ValuesBucketArrayWrap,
             key: String,
@@ -232,10 +241,10 @@ pub mod ffi {
             value: bool,
             new_hashmap: bool,
         );
-        unsafe fn values_bucket_array_push_kv_uint8array<'a>(
-            value_buckets: &mut ValuesBucketArrayWrap<'a>,
+        unsafe fn values_bucket_array_push_kv_uint8array(
+            value_buckets: &mut ValuesBucketArrayWrap,
             key: String,
-            value: &'a [u8],
+            value: Vec<u8>,
             new_hashmap: bool,
         );
         fn values_bucket_array_push_kv_null(
@@ -277,6 +286,7 @@ pub mod ffi {
     unsafe extern "C++" {
         include!("datashare_ani.h");
 
+        fn GetRowCount(resultSetPtr: i64) -> i32;
         fn GoToFirstRow(resultSetPtr: i64) -> bool;
         fn GoToLastRow(resultSetPtr: i64) -> bool;
         fn GoToNextRow(resultSetPtr: i64) -> bool;
@@ -317,7 +327,7 @@ pub mod ffi {
         fn DataSharePredicatesLessThan(predicatesPtr: i64, field: String, value: &ValueType);
         fn DataSharePredicatesOrderByAsc(predicatesPtr: i64, field: String);
         fn DataSharePredicatesOrderByDesc(predicatesPtr: i64, field: String);
-        fn DataSharePredicatesLimit(predicatesPtr: i64, total: f64, offset: f64);
+        fn DataSharePredicatesLimit(predicatesPtr: i64, total: i32, offset: i32);
         fn DataSharePredicatesGroupBy(predicatesPtr: i64, field: Vec<String>);
         fn DataSharePredicatesIn(predicatesPtr: i64, field: String, value: Vec<ValueType>);
         fn DataSharePredicatesNotIn(predicatesPtr: i64, field: String, value: Vec<ValueType>);
@@ -376,7 +386,7 @@ pub mod ffi {
         fn DataShareNativeBatchInsert(
             dataShareHelperPtr: i64,
             strUri: String,
-            buckets: Vec<ValuesBucketWrap<'_>>,
+            buckets: Vec<ValuesBucketWrap>,
         ) -> i32;
 
         fn DataShareNativeDelete(
@@ -387,17 +397,17 @@ pub mod ffi {
 
         fn DataShareNativeClose(dataShareHelperPtr: i64);
 
-        fn DataShareNativeOn(ptrWrap: EnvPtrWrap, strType: String, strUri: String);
+        fn DataShareNativeOn(ptrWrap: PtrWrap, strType: String, strUri: String);
 
         fn DataShareNativeOnChangeinfo(
-            ptrWrap: EnvPtrWrap,
+            ptrWrap: PtrWrap,
             event: String,
             arktype: i32,
             strUri: String,
         );
 
         fn DataShareNativeOnRdbDataChange(
-            ptrWrap: EnvPtrWrap,
+            ptrWrap: PtrWrap,
             arktype: String,
             uris: Vec<String>,
             templateId: &TemplateId,
@@ -405,24 +415,41 @@ pub mod ffi {
         );
 
         fn DataShareNativeOnPublishedDataChange(
-            ptrWrap: EnvPtrWrap,
+            ptrWrap: PtrWrap,
             arktype: String,
             uris: Vec<String>,
             subscriberId: String,
             sret: &mut PublishSretParam,
         );
 
-        fn DataShareNativeOff(ptrWrap: EnvPtrWrap, strType: String, strUri: String);
+        fn DataShareNativeOff(ptrWrap: PtrWrap, strType: String, strUri: String);
+
+        fn DataShareNativeOffNone(dataShareHelperPtr: i64, strType: String, strUri: String);
 
         fn DataShareNativeOffChangeinfo(
-            ptrWrap: EnvPtrWrap,
+            ptrWrap: PtrWrap,
+            event: String,
+            arktype: i32,
+            strUri: String,
+        );
+
+        fn DataShareNativeOffChangeinfoNone(
+            dataShareHelperPtr: i64,
             event: String,
             arktype: i32,
             strUri: String,
         );
 
         fn DataShareNativeOffRdbDataChange(
-            ptrWrap: EnvPtrWrap,
+            ptrWrap: PtrWrap,
+            arktype: String,
+            uris: Vec<String>,
+            templateId: &TemplateId,
+            sret: &mut PublishSretParam,
+        );
+
+        fn DataShareNativeOffRdbDataChangeNone(
+            dataShareHelperPtr: i64,
             arktype: String,
             uris: Vec<String>,
             templateId: &TemplateId,
@@ -430,7 +457,15 @@ pub mod ffi {
         );
 
         fn DataShareNativeOffPublishedDataChange(
-            ptrWrap: EnvPtrWrap,
+            ptrWrap: PtrWrap,
+            arktype: String,
+            uris: Vec<String>,
+            subscriberId: String,
+            sret: &mut PublishSretParam,
+        );
+
+        fn DataShareNativeOffPublishedDataChangeNone(
+            dataShareHelperPtr: i64,
             arktype: String,
             uris: Vec<String>,
             subscriberId: String,
@@ -439,18 +474,69 @@ pub mod ffi {
 
         fn DataShareNativeExtensionCallbackInt(error_code: f64, error_msg: String, data: i32, native_ptr: i64);
 
-        fn DataShareNativeExtensionCallbackObject(error_code: f64, error_msg: String, ptr: i64, native_ptr: i64);
+        fn DataShareNativeExtensionCallbackObject(
+            error_code: f64,
+            error_msg: String,
+            ptr: i64,
+            native_ptr: i64,
+        );
 
         fn DataShareNativeExtensionCallbackVoid(error_code: f64, error_msg: String, native_ptr: i64);
     }
 }
 
-impl ffi::EnvPtrWrap {
-    pub fn new(datashare_helper_ptr: i64, callback_ptr: i64, env_ptr: i64) -> Self {
+#[derive(PartialEq, Eq)]
+pub enum CallbackFlavor {
+    DataChange(GlobalRefAsyncCallback<()>),
+    DataChangeInfo(GlobalRefAsyncCallback<(ChangeInfo,)>),
+    RdbDataChange(GlobalRefAsyncCallback<(RdbDataChangeNode,)>),
+    PublishedDataChange(GlobalRefAsyncCallback<(PublishedDataChangeNode,)>),
+}
+
+#[derive(PartialEq, Eq)]
+pub struct DataShareCallback {
+    inner: CallbackFlavor,
+}
+
+pub fn callback_is_equal(org_callback: &DataShareCallback, new_callback: &DataShareCallback) -> bool {
+    return org_callback == new_callback;
+}
+
+impl DataShareCallback {
+    pub fn new(flavor: CallbackFlavor) -> Self {
+        Self { inner: flavor }
+    }
+
+    pub fn execute_callback(&self) {
+        if let CallbackFlavor::DataChange(callback) = &self.inner {
+            callback.execute(None, ());
+        }
+    }
+
+    pub fn execute_callback_changeinfo(&self, change_info: &ChangeInfo) {
+        if let CallbackFlavor::DataChangeInfo(callback) = &self.inner {
+            callback.execute(None, (change_info.clone(),));
+        }
+    }
+    
+    pub fn execute_callback_rdb_data_change(&self, node: &RdbDataChangeNode) {
+        if let CallbackFlavor::RdbDataChange(callback) = &self.inner {
+            callback.execute(None, (node.clone(),));
+        }
+    }
+
+    pub fn execute_callback_published_data_change(&self, node: &PublishedDataChangeNode) {
+        if let CallbackFlavor::PublishedDataChange(callback) = &self.inner {
+            callback.execute(None, (node.clone(),));
+        }
+    }
+}
+
+impl ffi::PtrWrap {
+    pub fn new(datashare_helper_ptr: i64, datashare_callback: Box<DataShareCallback>) -> Self {
         Self {
             dataShareHelperPtr: datashare_helper_ptr,
-            callbackPtr: callback_ptr,
-            envPtr: env_ptr,
+            callback: datashare_callback,
         }
     }
 }

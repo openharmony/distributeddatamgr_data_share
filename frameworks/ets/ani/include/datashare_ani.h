@@ -20,12 +20,13 @@
 #include "ani_observer.h"
 #include "ani_subscriber_manager.h"
 #include "datashare_helper.h"
+#include "cxx.h"
 namespace OHOS {
 using namespace DataShare;
 
 namespace DataShareAni {
 
-struct EnvPtrWrap;
+struct PtrWrap;
 struct VersionWrap;
 struct ValuesBucketKvItem;
 struct ValueType;
@@ -39,7 +40,31 @@ struct ChangeInfo;
 struct TemplateId;
 struct RdbDataChangeNode;
 struct PublishedDataChangeNode;
+struct DataShareCallback;
 
+class SharedPtrHolder {
+public:
+    SharedPtrHolder(const std::shared_ptr<DataShareHelper> &datashareHelper) : datashareHelper_(datashareHelper)
+    {
+    }
+
+public:
+    std::shared_ptr<DataShareHelper> datashareHelper_ = nullptr;
+    std::shared_ptr<AniRdbSubscriberManager> jsRdbObsManager_ = nullptr;
+    std::shared_ptr<AniPublishedSubscriberManager> jsPublishedObsManager_ = nullptr;
+};
+
+class ResultSetHolder {
+public:
+    ResultSetHolder(const std::shared_ptr<DataShareResultSet> &resultSetPtr) : resultSetPtr_(resultSetPtr)
+    {
+    }
+
+public:
+    std::shared_ptr<DataShareResultSet> resultSetPtr_ = nullptr;
+};
+
+int32_t GetRowCount(int64_t resultSetPtr);
 bool GoToFirstRow(int64_t resultSetPtr);
 bool GoToLastRow(int64_t resultSetPtr);
 bool GoToNextRow(int64_t resultSetPtr);
@@ -68,7 +93,7 @@ void DataSharePredicatesLessThanOrEqualTo(int64_t predicatesPtr, rust::String fi
 void DataSharePredicatesLessThan(int64_t predicatesPtr, rust::String field, const ValueType& value);
 void DataSharePredicatesOrderByAsc(int64_t predicatesPtr, rust::String field);
 void DataSharePredicatesOrderByDesc(int64_t predicatesPtr, rust::String field);
-void DataSharePredicatesLimit(int64_t predicatesPtr, double total, double offset);
+void DataSharePredicatesLimit(int64_t predicatesPtr, int total, int offset);
 void DataSharePredicatesGroupBy(int64_t predicatesPtr, rust::Vec<rust::String> field);
 void DataSharePredicatesIn(int64_t predicatesPtr, rust::String field, rust::Vec<ValueType> value);
 void DataSharePredicatesNotIn(int64_t predicatesPtr, rust::String field, rust::Vec<ValueType> value);
@@ -102,45 +127,53 @@ int DataShareNativeDelete(int64_t dataShareHelperPtr, rust::String strUri, int64
 
 void DataShareNativeClose(int64_t dataShareHelperPtr);
 
-void DataShareNativeOn(EnvPtrWrap envPtrWrap, rust::String strType, rust::String strUri);
+void DataShareNativeOn(PtrWrap ptrWrap, rust::String strType, rust::String strUri);
 
-void DataShareNativeOnChangeinfo(EnvPtrWrap envPtrWrap, rust::String event,
-                                 int32_t arktype, rust::String strUri);
+void DataShareNativeOnChangeinfo(PtrWrap ptrWrap, rust::String event, int32_t arktype, rust::String strUri);
 
-void DataShareNativeOnRdbDataChange(EnvPtrWrap envPtrWrap, rust::String arktype,
-                                    rust::Vec<rust::String> uris, const TemplateId& templateId,
-                                    PublishSretParam& sret);
+void DataShareNativeOnRdbDataChange(PtrWrap ptrWrap, rust::String arktype, rust::Vec<rust::String> uris,
+                                    const TemplateId& templateId, PublishSretParam& sret);
 
-void DataShareNativeOnPublishedDataChange(EnvPtrWrap envPtrWrap, rust::String arktype,
-                                          rust::Vec<rust::String> uris, rust::String subscriberId,
-                                          PublishSretParam& sret);
+void DataShareNativeOnPublishedDataChange(PtrWrap ptrWrap, rust::String arktype, rust::Vec<rust::String> uris,
+                                          rust::String subscriberId, PublishSretParam& sret);
 
-void DataShareNativeOff(EnvPtrWrap envPtrWrap, rust::String strType, rust::String strUri);
+void DataShareNativeOff(PtrWrap ptrWrap, rust::String strType, rust::String strUri);
 
-void DataShareNativeOffChangeinfo(EnvPtrWrap envPtrWrap, rust::String event, int32_t arktype, rust::String strUri);
+void DataShareNativeOffNone(int64_t dataShareHelperPtr, rust::String strType, rust::String strUri);
+
+void DataShareNativeOffChangeinfo(PtrWrap ptrWrap, rust::String event, int32_t arktype, rust::String strUri);
+
+void DataShareNativeOffChangeinfoNone(int64_t dataShareHelperPtr, rust::String event, int32_t arktype,
+                                      rust::String strUri);
+
+void DataShareNativeOffRdbDataChange(PtrWrap ptrWrap, rust::String arktype, rust::Vec<rust::String> uris,
+                                     const TemplateId& templateId, PublishSretParam& sret);
+
+void DataShareNativeOffRdbDataChangeNone(int64_t dataShareHelperPtr, rust::String arktype,
+                                         rust::Vec<rust::String> uris, const TemplateId& templateId,
+                                         PublishSretParam& sret);
                                           
-void DataShareNativeOffRdbDataChange(EnvPtrWrap envPtrWrap, rust::String arktype,
-                                     rust::Vec<rust::String> uris, const TemplateId& templateId,
-                                     PublishSretParam& sret);
-                                          
-void DataShareNativeOffPublishedDataChange(EnvPtrWrap envPtrWrap, rust::String arktype,
+void DataShareNativeOffPublishedDataChange(PtrWrap PtrWrap, rust::String arktype,
                                            rust::Vec<rust::String> uris, rust::String subscriberId,
                                            PublishSretParam& sret);
+
+void DataShareNativeOffPublishedDataChangeNone(int64_t dataShareHelperPtr, rust::String arktype,
+                                               rust::Vec<rust::String> uris, rust::String subscriberId,
+                                               PublishSretParam& sret);
+
+void ANIRegisterObserver(const std::string &uri, long long dataShareHelperPtr, rust::Box<DataShareCallback> &callback,
+    bool isNotifyDetails = false);
+
+void ANIUnRegisterObserver(const std::string &uri, long long dataShareHelperPtr, bool isNotifyDetails = false);
+
+void ANIUnRegisterObserver(const std::string &uri, long long dataShareHelperPtr,
+    rust::Box<DataShareCallback> &callback, bool isNotifyDetails = false);
 
 void DataShareNativeExtensionCallbackInt(double errorCode, rust::string errorMsg, int32_t data, int64_t nativePtr);
 
 void DataShareNativeExtensionCallbackObject(double errorCode, rust::string errorMsg, int64_t ptr, int64_t nativePtr);
 
 void DataShareNativeExtensionCallbackVoid(double errorCode, rust::string errorMsg, int64_t nativePtr);
-
-void ANIRegisterObserver(const std::string &uri, long long dataShareHelperPtr, long long envPtr,
-    long long callbackPtr, bool isNotifyDetails = false);
-
-void ANIUnRegisterObserver(const std::string &uri, long long dataShareHelperPtr, long long envPtr,
-    bool isNotifyDetails = false);
-
-void ANIUnRegisterObserver(const std::string &uri, long long dataShareHelperPtr, long long envPtr,
-    long long callbackPtr, bool isNotifyDetails = false);
 
 static std::map<std::string, std::list<sptr<ANIDataShareObserver>>> observerMap_;
 

@@ -24,6 +24,7 @@
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
 #include "datashare_operation_statement.h"
+#include "datashare_result.h"
 
 namespace OHOS {
 namespace AAFwk {
@@ -226,6 +227,15 @@ public:
     virtual bool NotifyChange(const Uri &uri);
 
     /**
+     * @brief Notifies the registered observers of a change to the data resource specified by Uri.
+     *
+     * @param uri, Indicates the path of the data to operate.
+     *
+     * @return Return true if success. otherwise return false.
+     */
+    virtual bool NotifyChangeWithUser(const Uri &uri, int32_t userId);
+
+    /**
      * @brief Registers an observer to DataObsMgr specified by the given Uri.
      * Return true, need override by users.
      *
@@ -280,6 +290,8 @@ public:
      * be found in the current environment.
      */
     virtual Uri DenormalizeUri(const Uri &uri);
+
+    virtual void InitResult(std::shared_ptr<JsResult> result);
 
     /**
      * @brief Set a creator function.

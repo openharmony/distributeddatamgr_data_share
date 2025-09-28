@@ -13,10 +13,11 @@
  * limitations under the License.
  */
 #include "sts_datashare_ext_ability_context.h"
-#include "ui_extension_context.h"
+
+#include "datashare_log.h"
 #include "ability_manager_client.h"
-#include "sts_context_utils.h"
-#include "sts_error_utils.h"
+#include "ets_context_utils.h"
+#include "ets_error_utils.h"
 #include "ets_extension_context.h"
 
 namespace OHOS {
@@ -43,31 +44,30 @@ ani_object CreateStsDataShareExtAbilityContext(ani_env *env, std::shared_ptr<Dat
         LOG_ERROR("Failed to create sts extension ability context, env is null");
         return nullptr;
     }
-
-    ani_class cls = nullptr;
-    ani_object contextObj = nullptr;
-    ani_field field = nullptr;
     ani_status status = ANI_ERROR;
+    ani_class cls = nullptr;
     if ((env->FindClass(CONTEXT_CLASS_NAME, &cls)) != ANI_OK) {
         LOG_ERROR("Failed to find class %{public}s, status: %{public}d", CONTEXT_CLASS_NAME, status);
         return nullptr;
     }
-
+    ani_method method = nullptr;
     if ((status = env->Class_FindMethod(cls, "<ctor>", ":", &method)) != ANI_OK) {
         LOG_ERROR("Failed to find constructor of %{public}s, status: %{public}d", CONTEXT_CLASS_NAME, status);
         return nullptr;
     }
+    ani_object contextObj = nullptr;
     if ((status = env->Object_New(cls, method, &contextObj)) != ANI_OK) {
         LOG_ERROR("Failed to create context object, status: %{public}d", status);
         return nullptr;
     }
+    ani_field field = nullptr;
     if ((status = env->Class_FindField(cls, "nativeContext", &field)) != ANI_OK) {
         LOG_ERROR("Failed to find field nativeContext, status: %{public}d", status);
         return nullptr;
     }
-    std::unique_ptr<StsDataShareExtAbilityContext> stsContext =
-        std::make_unique<StsDataShareExtAbilityContext>(context);
-    ani_long nativeContextLong = (ani_long)stsContext.get();
+    
+    StsDataShareExtAbilityContext* stsContext = new (std::nothrow)StsDataShareExtAbilityContext(context);
+    ani_long nativeContextLong = (ani_long)stsContext;
     if ((status = env->Object_SetField_Long(contextObj, field, nativeContextLong)) != ANI_OK) {
         LOG_ERROR("Failed to set field, status: %{public}d", status);
         return nullptr;
@@ -76,8 +76,8 @@ ani_object CreateStsDataShareExtAbilityContext(ani_env *env, std::shared_ptr<Dat
         LOG_ERROR("Failed to create sts extension ability context, application is null");
         return nullptr;
     }
-    ContextUtil::StsCreatContext(env, cls, contextObj, application->GetApplicationCtxObjRef(), context);
-    CreatEtsExtensionContext(env, cls, contextObj, context, context->GetAbilityInfo());
+    OHOS::AbilityRuntime::ContextUtil::CreateEtsBaseContext(env, cls, contextObj, context);
+    OHOS::AbilityRuntime::CreateEtsExtensionContext(env, cls, contextObj, context, context->GetAbilityInfo());
     return contextObj;
 }
 }  // namespace DataShare

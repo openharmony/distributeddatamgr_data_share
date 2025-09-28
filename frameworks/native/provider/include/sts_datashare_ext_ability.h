@@ -20,32 +20,22 @@
 #include "datashare_result_set.h"
 #include "datashare_predicates.h"
 #include "datashare_ext_ability.h"
-#include "sts_runtime.h"
-#include "sts_ui_extension_content_session.h"
+#include "ets_runtime.h"
+#include "ets_native_reference.h"
 #include "datashare_business_error.h"
+#include "datashare_result.h"
+#include "ani.h"
 
 namespace OHOS {
 namespace DataShare {
 using namespace AbilityRuntime;
-
-struct AsyncContext {
-    bool isNeedNotify_ = false;
-};
-
-struct AsyncPoint {
-    std::shared_ptr<AsyncContext> context;
-};
-
-struct AsyncCallBackPoint {
-    std::shared_ptr<JsResult> result;
-};
 
 /**
  * @brief Sts datashare extension ability components.
  */
 class StsDataShareExtAbility : public DataShareExtAbility {
 public:
-    explicit StsDataShareExtAbility(STSRuntime& stsRuntime);
+    explicit StsDataShareExtAbility(ETSRuntime& stsRuntime);
     virtual ~StsDataShareExtAbility() override;
 
     /**
@@ -168,14 +158,23 @@ public:
      */
     bool NotifyChange(const Uri &uri) override;
 
+    /**
+     * @brief Notifies the registered observers of a change to the data resource specified by Uri.
+     *
+     * @param uri, Indicates the path of the data to operate.
+     *
+     * @return Return true if success. otherwise return false.
+     */
+    bool NotifyChangeWithUser(const Uri &uri, int32_t userId) override;
+
     void InitResult(std::shared_ptr<JsResult> result) override;
 
 private:
-    void SaveNewCallingInfo(ani_env &env);
+    void SaveNewCallingInfo(ani_env *env);
     void ResetEnv(ani_env *env);
 
-    STSRuntime& stsRuntime_;
-    std::shared_ptr<STSNativeReference> stsObj_ = nullptr;
+    ETSRuntime& stsRuntime_;
+    std::shared_ptr<ETSNativeReference> stsObj_ = nullptr;
     std::shared_ptr<JsResult> result_;
 };
 

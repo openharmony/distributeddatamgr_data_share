@@ -764,12 +764,14 @@ ohos_unittest("DataShareStubTest") {
     "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
+    "ability_runtime:ani_common",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "relational_store:rdb_data_ability_adapter",
+    "runtime_core:ani",
     "samgr:samgr_proxy",
   ]
 
