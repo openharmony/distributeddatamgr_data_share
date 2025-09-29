@@ -16,6 +16,8 @@
 #ifndef DATA_SHARE_HELPER_IMPL_H
 #define DATA_SHARE_HELPER_IMPL_H
 
+#include <shared_mutex>
+
 #include "concurrent_map.h"
 #include "data_ability_observer_stub.h"
 #include "datashare_helper.h"
@@ -54,6 +56,10 @@ public:
     ~DataShareHelperImpl() override;
 
     bool Release() override;
+
+    std::shared_ptr<GeneralController> GetGeneralCtl();
+
+    std::shared_ptr<ExtSpecialController> GetExtSpCtl();
 
     std::vector<std::string> GetFileTypes(Uri &uri, const string &mimeTypeFilter) override;
 
@@ -170,6 +176,7 @@ public:
         bool isSystem = false) override;
 
 private:
+    std::shared_mutex mutex_;
     std::shared_ptr<ExtSpecialController> extSpCtl_ = nullptr;
     std::shared_ptr<GeneralController> generalCtl_ = nullptr;
     std::shared_ptr<PersistentDataController> persistentDataCtl_ = nullptr;

@@ -59,8 +59,21 @@ DataShareHelperImpl::~DataShareHelperImpl()
     }
 }
 
+std::shared_ptr<GeneralController> DataShareHelperImpl::GetGeneralCtl()
+{
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    return generalCtl_;
+}
+
+std::shared_ptr<ExtSpecialController> DataShareHelperImpl::GetExtSpCtl()
+{
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    return extSpCtl_;
+}
+
 bool DataShareHelperImpl::Release()
 {
+    std::unique_lock<std::shared_mutex> lock(mutex_);
     extSpCtl_ = nullptr;
     generalCtl_ = nullptr;
     return true;
@@ -68,7 +81,7 @@ bool DataShareHelperImpl::Release()
 
 std::vector<std::string> DataShareHelperImpl::GetFileTypes(Uri &uri, const std::string &mimeTypeFilter)
 {
-    auto extSpCtl = extSpCtl_;
+    auto extSpCtl = GetExtSpCtl();
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
         return std::vector<std::string>();
@@ -78,7 +91,7 @@ std::vector<std::string> DataShareHelperImpl::GetFileTypes(Uri &uri, const std::
 
 int DataShareHelperImpl::OpenFile(Uri &uri, const std::string &mode)
 {
-    auto extSpCtl = extSpCtl_;
+    auto extSpCtl = GetExtSpCtl();
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
         return DATA_SHARE_ERROR;
@@ -88,7 +101,7 @@ int DataShareHelperImpl::OpenFile(Uri &uri, const std::string &mode)
 
 int DataShareHelperImpl::OpenFileWithErrCode(Uri &uri, const std::string &mode, int32_t &errCode)
 {
-    auto extSpCtl = extSpCtl_;
+    auto extSpCtl = GetExtSpCtl();
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
         return DATA_SHARE_ERROR;
@@ -98,7 +111,7 @@ int DataShareHelperImpl::OpenFileWithErrCode(Uri &uri, const std::string &mode, 
 
 int DataShareHelperImpl::OpenRawFile(Uri &uri, const std::string &mode)
 {
-    auto extSpCtl = extSpCtl_;
+    auto extSpCtl = GetExtSpCtl();
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
         return DATA_SHARE_ERROR;
@@ -109,7 +122,7 @@ int DataShareHelperImpl::OpenRawFile(Uri &uri, const std::string &mode)
 int DataShareHelperImpl::Insert(Uri &uri, const DataShareValuesBucket &value)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
-    auto generalCtl = generalCtl_;
+    auto generalCtl = GetGeneralCtl();
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl_ is nullptr");
         return DATA_SHARE_ERROR;
@@ -123,7 +136,7 @@ int DataShareHelperImpl::Insert(Uri &uri, const DataShareValuesBucket &value)
 int DataShareHelperImpl::InsertExt(Uri &uri, const DataShareValuesBucket &value, std::string &result)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
-    auto extSpCtl = extSpCtl_;
+    auto extSpCtl = GetExtSpCtl();
     if (extSpCtl == nullptr) {
         LOG_ERROR("providerSpCtl is nullptr");
         return DATA_SHARE_ERROR;
@@ -134,7 +147,7 @@ int DataShareHelperImpl::InsertExt(Uri &uri, const DataShareValuesBucket &value,
 int DataShareHelperImpl::Update(Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
-    auto generalCtl = generalCtl_;
+    auto generalCtl = GetGeneralCtl();
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
         return DATA_SHARE_ERROR;
@@ -147,7 +160,7 @@ int DataShareHelperImpl::Update(Uri &uri, const DataSharePredicates &predicates,
 
 int DataShareHelperImpl::BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results)
 {
-    auto extSpCtl = extSpCtl_;
+    auto extSpCtl = GetExtSpCtl();
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
         return DATA_SHARE_ERROR;
@@ -158,7 +171,7 @@ int DataShareHelperImpl::BatchUpdate(const UpdateOperations &operations, std::ve
 int DataShareHelperImpl::Delete(Uri &uri, const DataSharePredicates &predicates)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
-    auto generalCtl = generalCtl_;
+    auto generalCtl = GetGeneralCtl();
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
         return DATA_SHARE_ERROR;
@@ -172,7 +185,7 @@ int DataShareHelperImpl::Delete(Uri &uri, const DataSharePredicates &predicates)
 std::pair<int32_t, int32_t> DataShareHelperImpl::InsertEx(Uri &uri, const DataShareValuesBucket &value)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
-    auto generalCtl = generalCtl_;
+    auto generalCtl = GetGeneralCtl();
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl_ is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
@@ -190,7 +203,7 @@ std::pair<int32_t, int32_t> DataShareHelperImpl::UpdateEx(
     Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
-    auto generalCtl = generalCtl_;
+    auto generalCtl = GetGeneralCtl();
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
@@ -207,7 +220,7 @@ std::pair<int32_t, int32_t> DataShareHelperImpl::UpdateEx(
 std::pair<int32_t, int32_t> DataShareHelperImpl::DeleteEx(Uri &uri, const DataSharePredicates &predicates)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
-    auto generalCtl = generalCtl_;
+    auto generalCtl = GetGeneralCtl();
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
@@ -225,7 +238,7 @@ std::shared_ptr<DataShareResultSet> DataShareHelperImpl::Query(Uri &uri, const D
     std::vector<std::string> &columns, DatashareBusinessError *businessError)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
-    auto generalCtl = generalCtl_;
+    auto generalCtl = GetGeneralCtl();
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
         return nullptr;
@@ -245,7 +258,7 @@ std::shared_ptr<DataShareResultSet> DataShareHelperImpl::Query(Uri &uri, const D
     std::vector<std::string> &columns, DataShareOption &option, DatashareBusinessError *businessError)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
-    auto generalCtl = generalCtl_;
+    auto generalCtl = GetGeneralCtl();
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
         return nullptr;
@@ -262,7 +275,7 @@ std::shared_ptr<DataShareResultSet> DataShareHelperImpl::Query(Uri &uri, const D
 
 std::string DataShareHelperImpl::GetType(Uri &uri)
 {
-    auto extSpCtl = extSpCtl_;
+    auto extSpCtl = GetExtSpCtl();
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
         return "";
@@ -273,7 +286,7 @@ std::string DataShareHelperImpl::GetType(Uri &uri)
 int DataShareHelperImpl::BatchInsert(Uri &uri, const std::vector<DataShareValuesBucket> &values)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
-    auto extSpCtl = extSpCtl_;
+    auto extSpCtl = GetExtSpCtl();
     if (extSpCtl == nullptr) {
         LOG_ERROR("providerSepOperator is nullptr");
         return DATA_SHARE_ERROR;
@@ -283,7 +296,7 @@ int DataShareHelperImpl::BatchInsert(Uri &uri, const std::vector<DataShareValues
 
 int DataShareHelperImpl::ExecuteBatch(const std::vector<OperationStatement> &statements, ExecResultSet &result)
 {
-    auto extSpCtl = extSpCtl_;
+    auto extSpCtl = GetExtSpCtl();
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
         return DATA_SHARE_ERROR;
@@ -300,7 +313,7 @@ int DataShareHelperImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDat
         report.SetError(RadarReporter::EMPTY_OBSERVER_ERROR);
         return E_NULL_OBSERVER;
     }
-    auto generalCtl = generalCtl_;
+    auto generalCtl = GetGeneralCtl();
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
@@ -321,7 +334,7 @@ int DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::ID
         report.SetError(RadarReporter::EMPTY_OBSERVER_ERROR);
         return E_NULL_OBSERVER;
     }
-    auto generalCtl = generalCtl_;
+    auto generalCtl = GetGeneralCtl();
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
         report.SetError(RadarReporter::DATA_SHARE_DIED_ERROR);
@@ -336,7 +349,7 @@ int DataShareHelperImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::ID
 void DataShareHelperImpl::NotifyChange(const Uri &uri)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
-    auto generalCtl = generalCtl_;
+    auto generalCtl = GetGeneralCtl();
     if (generalCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
         return;
@@ -367,7 +380,7 @@ int DataShareHelperImpl::RegisterObserverExtProvider(const Uri &uri, std::shared
         LOG_ERROR("new ObserverImpl failed");
         return E_NULL_OBSERVER;
     }
-    auto generalCtl = generalCtl_;
+    auto generalCtl = GetGeneralCtl();
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
         return E_HELPER_DIED;
@@ -406,7 +419,7 @@ int DataShareHelperImpl::UnregisterObserverExtProvider(const Uri &uri, std::shar
         LOG_ERROR("new ObserverImpl failed");
         return E_NULL_OBSERVER;
     }
-    auto generalCtl = generalCtl_;
+    auto generalCtl = GetGeneralCtl();
     if (generalCtl == nullptr) {
         LOG_ERROR("generalCtl is nullptr");
         return E_HELPER_DIED;
@@ -430,7 +443,7 @@ int DataShareHelperImpl::UnregisterObserverExtProvider(const Uri &uri, std::shar
  */
 void DataShareHelperImpl::NotifyChangeExtProvider(const DataShareObserver::ChangeInfo &changeInfo)
 {
-    auto generalCtl = generalCtl_;
+    auto generalCtl = GetGeneralCtl();
     if (generalCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
         return;
@@ -446,7 +459,7 @@ void DataShareHelperImpl::NotifyChangeExtProvider(const DataShareObserver::Chang
 Uri DataShareHelperImpl::NormalizeUri(Uri &uri)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
-    auto extSpCtl = extSpCtl_;
+    auto extSpCtl = GetExtSpCtl();
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
         return Uri("");
@@ -457,7 +470,7 @@ Uri DataShareHelperImpl::NormalizeUri(Uri &uri)
 Uri DataShareHelperImpl::DenormalizeUri(Uri &uri)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
-    auto extSpCtl = extSpCtl_;
+    auto extSpCtl = GetExtSpCtl();
     if (extSpCtl == nullptr) {
         LOG_ERROR("extSpCtl is nullptr");
         return Uri("");
@@ -685,7 +698,7 @@ int32_t DataShareHelperImpl::UserDefineFunc(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     DISTRIBUTED_DATA_HITRACE(std::string(LOG_TAG) + "::" + std::string(__FUNCTION__));
-    auto extSpCtl = extSpCtl_;
+    auto extSpCtl = GetExtSpCtl();
     if (extSpCtl == nullptr) {
         LOG_ERROR("providerSpCtl is nullptr");
         return DATA_SHARE_ERROR;
