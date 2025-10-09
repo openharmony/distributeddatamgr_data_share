@@ -67,6 +67,8 @@ public:
 
     static bool IsDataShareUri(Uri &uri);
 
+    static bool IsSingletonTrustUri(const Uri &uri);
+
     static constexpr const char *NO_PERMISSION = "noPermission";
 private:
 
