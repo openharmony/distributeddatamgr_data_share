@@ -99,8 +99,7 @@ void DataShareStubImpl::VerifyProvider(const CallingInfo &callingInfo, const uin
     }
 
     if (PROVIDER_LIST.find(bundleInfo.signatureInfo.appIdentifier) == PROVIDER_LIST.end()) {
-        LOG_ERROR("Provider: %{public}s not in allow list visited by pid: %{public}d",
-            bundleInfo.applicationInfo.bundleName.c_str(), callingInfo.callingPid);
+        // No need to print since app not in AppGallery do not have appIdentifier.
         DataShareFaultInfo faultInfo{HiViewFaultAdapter::invalidProvider,
             bundleInfo.applicationInfo.bundleName.c_str(), "", "", __FUNCTION__, -1, ""};
         HiViewFaultAdapter::ReportDataFault(faultInfo);
