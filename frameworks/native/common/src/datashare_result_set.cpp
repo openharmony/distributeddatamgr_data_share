@@ -416,6 +416,7 @@ void DataShareResultSet::ClosedBlockAndBridge()
     std::unique_lock<std::shared_mutex> lock(mutex_);
     sharedBlock_ = nullptr;
     bridge_ = nullptr;
+    blockWriter_ = nullptr;
 }
 
 void DataShareResultSet::Finalize()
