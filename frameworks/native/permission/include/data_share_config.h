@@ -42,6 +42,7 @@ public:
     std::vector<std::string> dataShareExtNames;
     std::vector<std::string> uriTrusts;
     std::vector<ConsumerProvider> extensionObsTrusts;
+    std::vector<std::string> singletonUriTrusts;
 };
 
 class GlobalConfig final : public Serializable {
@@ -68,4 +69,4 @@ private:
 };
 } // namespace DistributedData
 } // namespace OHOS
-#endif // OHOS_DISTRIBUTED_DATA_SERVICES_CONFIG_CONFIG_FACTORY_H
+#endif // OHOS_DISTRIBUTED_DATA_SERVICES_CONFIG_CONFIG_FACTORY_H

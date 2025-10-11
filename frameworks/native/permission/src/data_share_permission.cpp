@@ -373,6 +373,23 @@ int32_t DataSharePermission::IsExtensionValid(uint32_t tokenId, uint32_t fullTok
     return E_NOT_DATASHARE_EXTENSION;
 }
 
+bool DataSharePermission::IsSingletonTrustUri(const Uri &uri)
+{
+    auto config = ConfigFactory::GetInstance().GetDataShareConfig();
+    if (config == nullptr) {
+        LOG_ERROR("GetDataShareConfig null");
+        return false;
+    }
+    std::string uriStr = uri.ToString();
+    DataShareStringUtils::RemoveFromQuery(uriStr);
+    for (std::string& item : config->singletonUriTrusts) {
+        if (item == uriStr) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool DataSharePermission::IsDataShareUri(Uri &uri)
 {
     std::string scheme = uri.GetScheme();
