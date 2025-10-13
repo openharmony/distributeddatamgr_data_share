@@ -25,6 +25,7 @@ group("unittest") {
     "permission:unittest",
     "proxy:unittest",
     "resource/datashare_ext_bundle:datashare_ext",
+    "resource/errorcode_ext_bundle:errorcode_ext",
     "resource/ohos_test:copy_ohos_test",
   ]
 }

@@ -23,4 +23,13 @@
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
         </cleaner>
     </target>
+<target name="DataShareHelperErrorCodeTest">
+        <preparer>
+            <option name="push" value="errorcode_ext_bundle/errorcode_ext.hap -> /data/test/resource/datashare/errortest" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/errortest/errorcode_ext.hap"/>
+        </preparer>
+        <cleaner>
+            <option name="shell" value="bm uninstall -n com.acts.errorcodetest"/>
+        </cleaner>
+    </target>
 </configuration>
