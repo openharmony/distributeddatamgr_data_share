@@ -88,6 +88,10 @@ void DataShareUvQueue::JsSyncCall(VoidFunc func, BoolFunc retFunc)
 void DataShareUvQueue::StsSyncCall(VoidFunc func, BoolFunc retFunc)
 {
     auto *taskEntry = new TaskEntry {std::move(func), false, {}, {}, std::atomic<int>(1)};
+    if (taskEntry == nullptr) {
+        LOG_ERROR("invalid taskEntry.");
+        return;
+    }
     {
         std::unique_lock<std::mutex> lock(taskEntry->mutex);
         taskEntry->count.fetch_add(1);
@@ -97,11 +101,15 @@ void DataShareUvQueue::StsSyncCall(VoidFunc func, BoolFunc retFunc)
         std::shared_ptr<OHOS::AppExecFwk::EventRunner> runner = OHOS::AppExecFwk::EventRunner::GetMainEventRunner();
         if (runner == nullptr) {
             LOG_ERROR("Get main event runner failed");
+            delete taskEntry;
+            taskEntry = nullptr;
             return;
         }
         auto mainHandler = std::make_shared<OHOS::AppExecFwk::EventHandler>(runner);
         if (mainHandler == nullptr) {
             LOG_ERROR("Get main handler failed");
+            delete taskEntry;
+            taskEntry = nullptr;
             return;
         }
         if (!mainHandler->PostTask(task)) {

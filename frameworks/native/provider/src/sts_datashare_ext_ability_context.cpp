@@ -67,13 +67,19 @@ ani_object CreateStsDataShareExtAbilityContext(ani_env *env, std::shared_ptr<Dat
     }
     
     StsDataShareExtAbilityContext* stsContext = new (std::nothrow)StsDataShareExtAbilityContext(context);
+    if (stsContext == nullptr) {
+        LOG_ERROR("Get stsContext failed");
+        return nullptr;
+    }
     ani_long nativeContextLong = (ani_long)stsContext;
     if ((status = env->Object_SetField_Long(contextObj, field, nativeContextLong)) != ANI_OK) {
         LOG_ERROR("Failed to set field, status: %{public}d", status);
+        delete stsContext;
         return nullptr;
     }
     if (application == nullptr) {
         LOG_ERROR("Failed to create sts extension ability context, application is null");
+        delete stsContext;
         return nullptr;
     }
     OHOS::AbilityRuntime::ContextUtil::CreateEtsBaseContext(env, cls, contextObj, context);

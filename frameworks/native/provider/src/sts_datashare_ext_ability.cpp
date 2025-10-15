@@ -275,6 +275,10 @@ int StsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pr
     }
 
     DataSharePredicates *predicatesPtr = new (std::nothrow)DataSharePredicates(predicates);
+    if (predicatesPtr == nullptr) {
+        LOG_ERROR("Get predicatesPtr failed");
+        return ret;
+    }
 
     rust::Box<ValuesBucketHashWrap> valuesBucket = rust_create_values_bucket();
     PushBucket(valuesBucket, value);
@@ -282,6 +286,7 @@ int StsDataShareExtAbility::Update(const Uri &uri, const DataSharePredicates &pr
     AsyncCallBackPoint *point = new (std::nothrow)AsyncCallBackPoint();
     if (point == nullptr) {
         LOG_ERROR("New AsyncCallBackPoint error.");
+        delete predicatesPtr;
         return ret;
     }
     point->result = std::move(result_);
@@ -303,10 +308,15 @@ int StsDataShareExtAbility::Delete(const Uri &uri, const DataSharePredicates &pr
     }
 
     DataSharePredicates *predicatesPtr = new (std::nothrow)DataSharePredicates(predicates);
+    if (predicatesPtr == nullptr) {
+        LOG_ERROR("Get predicatesPtr failed");
+        return ret;
+    }
 
     AsyncCallBackPoint *point = new (std::nothrow)AsyncCallBackPoint();
     if (point == nullptr) {
         LOG_ERROR("New AsyncCallBackPoint error.");
+        delete predicatesPtr;
         return ret;
     }
     point->result = std::move(result_);
@@ -327,6 +337,10 @@ std::shared_ptr<DataShareResultSet> StsDataShareExtAbility::Query(const Uri &uri
     }
 
     DataSharePredicates *predicatesPtr = new (std::nothrow)DataSharePredicates(predicates);
+    if (predicatesPtr == nullptr) {
+        LOG_ERROR("Get predicatesPtr failed");
+        return ret;
+    }
 
     rust::Vec<rust::String> rustColumns;
     for (const auto &col : columns) {
@@ -336,6 +350,7 @@ std::shared_ptr<DataShareResultSet> StsDataShareExtAbility::Query(const Uri &uri
     AsyncCallBackPoint *point = new (std::nothrow)AsyncCallBackPoint();
     if (point == nullptr) {
         LOG_ERROR("New AsyncCallBackPoint error.");
+        delete predicatesPtr;
         return ret;
     }
     point->result = std::move(result_);
