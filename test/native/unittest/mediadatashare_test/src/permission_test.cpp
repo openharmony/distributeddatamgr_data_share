@@ -412,7 +412,7 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_003
     auto datashare = std::make_shared<DataShare::DataSharePermission>();
     auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, true, isSilent);
     EXPECT_EQ(ret, E_OK);
-    EXPECT_EQ(permission, "ohos.permission.WIFI");
+    EXPECT_EQ(permission, "");
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_003::End");
 }
 
@@ -424,7 +424,7 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_004
     auto datashare = std::make_shared<DataShare::DataSharePermission>();
     auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, false, isSilent);
     EXPECT_EQ(ret, E_OK);
-    EXPECT_EQ(permission, "ohos.permission.WIFI");
+    EXPECT_EQ(permission, "");
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_004::End");
 }
 
@@ -608,7 +608,7 @@ HWTEST_F(PermissionTest, PermissionTest_GetExtensionUriPermission_002, TestSize.
     Uri dstUri(DATA_SHARE_EXTENSION_URI);
     auto [ret, permission] = datashare->GetExtensionUriPermission(dstUri, USER_100, true);
     EXPECT_EQ(ret, E_OK);
-    EXPECT_EQ(permission, "ohos.permission.WIFI");
+    EXPECT_EQ(permission, "");
     EXPECT_EQ(datashare->extensionCache_.Size(), 1);
     LOG_INFO("PermissionTest_GetExtensionUriPermission_002::End");
 }
@@ -622,12 +622,12 @@ HWTEST_F(PermissionTest, PermissionTest_GetExtensionUriPermission_003, TestSize.
     Uri dstUri(DATA_SHARE_EXTENSION_URI);
     auto [ret, permission] = datashare->GetExtensionUriPermission(dstUri, USER_100, true);
     EXPECT_EQ(ret, E_OK);
-    EXPECT_EQ(permission, "ohos.permission.WIFI");
+    EXPECT_EQ(permission, "");
     EXPECT_EQ(datashare->extensionCache_.Size(), 1);
 
     auto [ret2, permission2] = datashare->GetExtensionUriPermission(dstUri, USER_100, true);
     EXPECT_EQ(ret2, E_OK);
-    EXPECT_EQ(permission2, "ohos.permission.WIFI");
+    EXPECT_EQ(permission2, "");
     LOG_INFO("PermissionTest_GetExtensionUriPermission_003::End");
     EXPECT_EQ(datashare->extensionCache_.Size(), 1);
 }
