@@ -167,5 +167,28 @@ HWTEST_F(DatashareResultSetTest, MarshallingTest001, TestSize.Level0)
     EXPECT_FALSE(result);
     LOG_INFO("DatashareResultSetTest MarshallingTest001::End");
 }
+
+/**
+* @tc.name: CloseResulteSetTest001
+* @tc.desc: test close resultSet function
+* @tc.type: FUNC
+* @tc.require:
+* @tc.precon: None
+* @tc.step:
+    1.Creat a DataShareResultSet object
+    2.Call close resultSet function
+* @tc.experct: All pointer member of DataShareResult is nullptr
+*/
+HWTEST_F(DatashareResultSetTest, CloseResulteSetTest001, TestSize.Level0)
+{
+    LOG_INFO("DatashareResultSetTest CloseResulteSetTest001::Start");
+    DataShareResultSet dataShareResultSet;
+    auto result = dataShareResultSet.Close();
+    EXPECT_EQ(result, E_OK);
+    ASSERT_EQ(dataShareResultSet.sharedBlock_, nullptr);
+    ASSERT_EQ(dataShareResultSet.blockWriter_, nullptr);
+    ASSERT_EQ(dataShareResultSet.bridge_, nullptr);
+    LOG_INFO("DatashareResultSetTest CloseResulteSetTest001::End");
+}
 }
 }
