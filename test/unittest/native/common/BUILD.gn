@@ -27,6 +27,7 @@ group("unittest") {
     ":ValueProxyTest",
     ":IsharedResultSetStubTest",
     ":SharedBlockTest",
+    ":IkvStoreDataServiceTest",
   ]
 }
 
@@ -319,6 +320,49 @@ ohos_unittest("SharedBlockTest") {
     "googletest:gmock_main",
     "hilog:libhilog",
     "ipc:ipc_single",
+  ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+ohos_unittest("IkvStoreDataServiceTest") {
+  module_out_path = "data_share/data_share/native/common"
+
+  include_dirs = [
+    "//foundation/distributeddatamgr/data_share/frameworks/native/proxy/include/",
+    "//foundation/distributeddatamgr/data_share/frameworks/native/common/include/",
+    "${datashare_native_proxy_path}/include",
+    "${datashare_base_path}/test/native/unittest/mock",
+  ]
+
+  sources = [ "${datashare_base_path}/test/unittest/native/common/src/ikvstore_data_service_test.cpp" ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_single",
+    "relational_store:rdb_data_ability_adapter",
+    "samgr:samgr_proxy",
   ]
 
   cflags = [
