@@ -212,5 +212,39 @@ HWTEST_F(DataShareBlockWriterImplTest, GetCurrentRowIndexTest001, TestSize.Level
     LOG_INFO("DataShareBlockWriterImplTest GetCurrentRowIndexTest001::End");
 }
 
+/**
+ * @tc.name: DataShareBlockWriterImplTest_shareBlock_Null_Test_001
+ * @tc.desc: Verify operations on DataShareBlockWriterImpl when share block is null
+ * @tc.type: FUNC
+ * @tc.precon: None
+ * @tc.step:
+    1. Create DataShareBlockWriterImpl instance
+    2. Call various write operations (AllocRow, Write with different types)
+    3. Check return values of all operations
+ * @tc.expect:
+    1. All operations return E_ERROR
+ */
+HWTEST_F(DataShareBlockWriterImplTest, ShareBlock_Null_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ShareBlock_Null_Test_001::Start");
+    DataShareBlockWriterImpl impl;
+    int result = impl.AllocRow();
+    EXPECT_EQ(result, E_ERROR);
+    result = impl.Write(1);
+    EXPECT_EQ(result, E_ERROR);
+    int64_t intValue = 0;
+    result = impl.Write(1, intValue);
+    EXPECT_EQ(result, E_ERROR);
+    double doubleValue = 0.0;
+    result = impl.Write(1, doubleValue);
+    EXPECT_EQ(result, E_ERROR);
+    uint8_t *unitValue = nullptr;
+    result = impl.Write(1, unitValue, 0);
+    EXPECT_EQ(result, E_ERROR);
+    char *charValue = nullptr;
+    result = impl.Write(1, charValue, 0);
+    EXPECT_EQ(result, E_ERROR);
+    LOG_INFO("ShareBlock_Null_Test_001::End");
+}
 } // namespace DataShare
 } // namespace OHOS

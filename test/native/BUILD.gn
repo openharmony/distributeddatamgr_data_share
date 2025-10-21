@@ -82,6 +82,8 @@ ohos_unittest("NativeDataShareTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_base_path}/test/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [
@@ -118,6 +120,9 @@ ohos_unittest("PermissionTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_permission",
     "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_base_path}/test/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/native/resource/datashareproxy_bundle/proxydatas_with_permission:proxydatas_with_permission",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [
@@ -151,6 +156,8 @@ ohos_unittest("SlientAccessTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_base_path}/test/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [
@@ -178,6 +185,8 @@ ohos_unittest("SlientTimeoutTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_base_path}/test/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [
@@ -205,6 +214,8 @@ ohos_unittest("SlientSwitchTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_base_path}/test/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [
@@ -231,6 +242,8 @@ ohos_unittest("ErrorCodeTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_base_path}/test/native/resource/errorcode_ext_bundle:errorcode_ext",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [
@@ -257,6 +270,8 @@ ohos_unittest("JoinTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_base_path}/test/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [
@@ -284,6 +299,8 @@ ohos_unittest("ProxyDatasTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_base_path}/test/native/resource/datashareproxy_bundle/proxydatas_with_permission:proxydatas_with_permission",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [
@@ -598,6 +615,8 @@ ohos_unittest("DataShareHelperTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_consumer_static",
     "${datashare_innerapi_path}/common:datashare_common_static",
+    "${datashare_base_path}/test/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [
@@ -693,6 +712,8 @@ ohos_unittest("DataShareProxyTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_consumer_static",
     "${datashare_innerapi_path}/common:datashare_common_static",
+    "${datashare_base_path}/test/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [
@@ -885,6 +906,8 @@ ohos_unittest("DataShareAccessThresholdTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_base_path}/test/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [
@@ -920,6 +943,8 @@ ohos_unittest("DataProxyHandleTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_base_path}/test/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [
@@ -985,6 +1010,8 @@ ohos_unittest("DataShareHelperImplRegisterTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_consumer_static",
     "${datashare_innerapi_path}/common:datashare_common_static",
+    "${datashare_base_path}/test/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [
@@ -1023,6 +1050,8 @@ ohos_unittest("DataShareResultSetTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_base_path}/test/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [

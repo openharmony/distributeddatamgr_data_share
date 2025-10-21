@@ -35,6 +35,8 @@ ohos_unittest("ConcurrentTest") {
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
     "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_base_path}/test/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/native/resource/ohos_test:copy_ohos_test",
   ]
 
   external_deps = [
