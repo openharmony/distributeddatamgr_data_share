@@ -274,5 +274,28 @@ HWTEST_F(IsharedResultSetStubTest, HandleOnGoRequestTest002, TestSize.Level0)
     EXPECT_EQ(result, NO_ERROR);
     LOG_INFO("IsharedResultSetStubTest HandleOnGoRequestTest002::End");
 }
+
+/**
+ * @tc.name: IsharedResultSetStubTest_ResultSetStubNull_Test_001
+ * @tc.desc: Verify ISharedResultSetStub behavior when input parameters are null
+ * @tc.type: FUNC
+ * @tc.precon: None
+ * @tc.step:
+    1. Create ISharedResultSetStub instance with null parameter
+    2. Call CreateStub method with null result and valid parcel
+    3. Check returned ISharedResultSet pointer
+ * @tc.expect:
+    1. CreateStub returns nullptr
+ */
+HWTEST_F(IsharedResultSetStubTest, ResultSetStubNull_Test_001, TestSize.Level0)
+{
+    LOG_INFO("IsharedResultSetStubTest ResultSetStubNull_Test_001::Start");
+    ISharedResultSetStub stub(nullptr);
+    std::shared_ptr<DataShareResultSet> result = nullptr;
+    OHOS::MessageParcel parcel;
+    sptr<ISharedResultSet> resultSet = stub.CreateStub(result, parcel);
+    EXPECT_EQ(resultSet, nullptr);
+    LOG_INFO("IsharedResultSetStubTest ResultSetStubNull_Test_001::End");
+}
 }
 }
