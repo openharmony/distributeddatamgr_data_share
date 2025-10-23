@@ -100,6 +100,7 @@ void SetAsyncResult(std::shared_ptr<JsResult> jsResult, napi_env env, DatashareB
         napi_unwrap(env, result, reinterpret_cast<void **>(&proxy));
         if (proxy == nullptr) {
             if (UnwrapBatchUpdateResult(env, result, jsResult->updateResults_)) {
+                jsResult->callbackResultNumber_ = E_OK;
                 jsResult->isRecvReply_ = true;
                 return;
             }
