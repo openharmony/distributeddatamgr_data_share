@@ -237,7 +237,12 @@ int DataShareResultSet::GetString(int columnIndex, std::string &value)
     int type = cellUnit->type;
     if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_STRING) {
         size_t sizeIncludingNull;
-        value = std::string(block->GetCellUnitValueString(cellUnit, &sizeIncludingNull));
+        const char *valueTemp = block->GetCellUnitValueString(cellUnit, &sizeIncludingNull);
+        if (valueTemp == nullptr) {
+            LOG_ERROR("valueTemp is null");
+            return E_ERROR;
+        }
+        value = std::string(valueTemp);
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_NULL) {
         return E_OK;
