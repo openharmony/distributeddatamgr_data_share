@@ -327,10 +327,33 @@ bool DataShareHelperImplRegisterTest::ChangeInfoEqual(const DataShareObserver::C
 
 
 /**
-* @tc.name: TryRegisterObserverExt_001
-* @tc.desc: test TryRegisterObserverExt normal func, Insert.
-* @tc.type: FUNC
-*/
+ * @tc.name: TryRegisterObserverExt_001
+ * @tc.desc: Test the normal function of TryRegisterObserverExt interface,
+ *           verifying observer notification after INSERT operation
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. Valid DATA_SHARE_URI is predefined
+    3. MockDatashareObserver class is implemented to monitor change notifications
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance and verify it is not null
+    2. Create a Uri object with DATA_SHARE_URI and a MockDatashareObserver instance
+    3. Call TryRegisterObserverExt with the Uri, observer and isDescendants=true, verify return value is ERR_OK
+    4. Create a DataShareValuesBucket, insert data with key "name" and call Insert interface, verify return value > 0
+    5. Create INSERT-type ChangeInfo, call NotifyChangeExt to send notification
+    6. Wait for observer's notification, verify the received ChangeInfo matches the sent one, then clear observer data
+    7. Repeat steps 4-6 with a descendant Uri (DATA_SHARE_URI + "/com.ohos.example")
+    8. Use DataSharePredicates to delete the inserted data, call Delete interface and verify return value > 0
+    9. Create DELETE-type ChangeInfo with custom data, call NotifyChangeExt and verify observer receives
+       correct notification
+    10. Call TryUnregisterObserverExt to unregister the observer, verify return value is ERR_OK
+ * @tc.expect:
+    1. All interface calls (TryRegisterObserverExt, Insert, Delete, TryUnregisterObserverExt) return expected values
+    2. Observer correctly receives INSERT notifications for both the main Uri and its descendant Uri
+    3. Observer correctly receives the DELETE notification with custom data
+    4. No null pointer exceptions or unexpected crashes occur during execution
+ */
 HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_001, TestSize.Level0)
 {
     LOG_INFO("TryRegisterObserverExt_001 start");
@@ -380,10 +403,31 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_001, TestSize.L
 }
 
 /**
-* @tc.name: TryRegisterObserverExt_002
-* @tc.desc: test TryRegisterObserverExt normal func, BatchInsert.
-* @tc.type: FUNC
-*/
+ * @tc.name: TryRegisterObserverExt_002
+ * @tc.desc: Test the normal function of TryRegisterObserverExt interface, verifying observer
+ *           notification after BatchInsert operation
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. Valid DATA_SHARE_URI is predefined
+    3. MockDatashareObserver class and ValueProxy::Convert method are implemented
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance and verify it is not null
+    2. Create a Uri object with DATA_SHARE_URI and a MockDatashareObserver instance
+    3. Call TryRegisterObserverExt with the Uri, observer and isDescendants=false, verify return value is ERR_OK
+    4. Create two DataShareValuesBucket objects with different "name" values, add them to a vector
+    5. Call BatchInsert interface with the Uri and vector, verify return value > 0
+    6. Use ValueProxy::Convert to convert the vector to VBuckets, create INSERT-type ChangeInfo
+    7. Call NotifyChangeExt to send the ChangeInfo, wait for observer's notification
+    8. Verify the received ChangeInfo matches the sent one, then clear observer data
+    9. Call TryUnregisterObserverExt to unregister the observer, verify return value is ERR_OK
+ * @tc.expect:
+    1. TryRegisterObserverExt and TryUnregisterObserverExt return ERR_OK
+    2. BatchInsert returns a value greater than 0, indicating successful batch insertion
+    3. Observer correctly receives the INSERT notification with VBuckets data
+    4. No unexpected errors or crashes occur during the test
+ */
 HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_002, TestSize.Level0)
 {
     LOG_INFO("TryRegisterObserverExt_002 start");
@@ -415,10 +459,33 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_002, TestSize.L
 }
 
 /**
-* @tc.name: TryRegisterObserverExt_003
-* @tc.desc: test TryRegisterObserverExt normal func, Update.
-* @tc.type: FUNC
-*/
+ * @tc.name: TryRegisterObserverExt_003
+ * @tc.desc: Test the normal function of TryRegisterObserverExt interface, verifying observer
+ *           notification after Update operation
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. Valid DATA_SHARE_URI is predefined
+    3. MockDatashareObserver class and ValueProxy::Convert method are implemented
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance and verify it is not null
+    2. Create a Uri object with DATA_SHARE_URI and a MockDatashareObserver instance
+    3. Call TryRegisterObserverExt with the Uri, observer and isDescendants=false, verify return value is ERR_OK
+    4. Create a DataShareValuesBucket with "name" = "TryRegisterObserverExt_003", call Insert and verify return
+       value > 0
+    5. Create another DataShareValuesBucket with "name" = "TryRegisterObserverExt_003_2"
+    6. Create DataSharePredicates to filter data by the original "name", call Update and verify return value > 0
+    7. Convert the update bucket to VBuckets, create UPDATE-type ChangeInfo
+    8. Call NotifyChangeExt to send the ChangeInfo, wait for observer's notification
+    9. Verify the received ChangeInfo matches the sent one, then clear observer data
+    10. Call TryUnregisterObserverExt to unregister the observer, verify return value is ERR_OK
+ * @tc.expect:
+    1. Insert and Update operations return values greater than 0, indicating success
+    2. TryRegisterObserverExt and TryUnregisterObserverExt return ERR_OK
+    3. Observer correctly receives the UPDATE notification with VBuckets data
+    4. No data inconsistency or unexpected crashes occur
+ */
 HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_003, TestSize.Level0)
 {
     LOG_INFO("TryRegisterObserverExt_003 start");
@@ -454,10 +521,32 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_003, TestSize.L
 }
 
 /**
-* @tc.name: TryRegisterObserverExt_004
-* @tc.desc: test TryRegisterObserverExt normal func, Delete.
-* @tc.type: FUNC
-*/
+ * @tc.name: TryRegisterObserverExt_004
+ * @tc.desc: Test the normal function of TryRegisterObserverExt interface, verifying observer notification
+ *           after Delete operation
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. Valid DATA_SHARE_URI is predefined
+    3. MockDatashareObserver class and ValueProxy::Convert method are implemented
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance and verify it is not null
+    2. Create a Uri object with DATA_SHARE_URI and a MockDatashareObserver instance
+    3. Call TryRegisterObserverExt with the Uri, observer and isDescendants=false, verify return value is ERR_OK
+    4. Create a DataShareValuesBucket with "name" = "Datashare_TryRegisterObserverExt_Test004", call Insert and verify
+       return value > 0
+    5. Create DataSharePredicates to filter data by the inserted "name", call Delete and verify return value > 0
+    6. Add the inserted bucket to a vector, convert to VBuckets, create DELETE-type ChangeInfo
+    7. Call NotifyChangeExt to send the ChangeInfo, wait for observer's notification
+    8. Verify the received ChangeInfo matches the sent one, then clear observer data
+    9. Call TryUnregisterObserverExt to unregister the observer, verify return value is ERR_OK
+ * @tc.expect:
+    1. Insert and Delete operations return values greater than 0, indicating success
+    2. TryRegisterObserverExt and TryUnregisterObserverExt return ERR_OK
+    3. Observer correctly receives the DELETE notification with VBuckets data
+    4. The test executes without unexpected errors or crashes
+ */
 HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_004, TestSize.Level0)
 {
     LOG_INFO("TryRegisterObserverExt_004 start");
@@ -493,10 +582,23 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_004, TestSize.L
 }
 
 /**
-* @tc.name: TryRegisterObserverExt_005
-* @tc.desc: test TryRegisterObserverExt normal func, uri is "".
-* @tc.type: FUNC
-*/
+ * @tc.name: TryRegisterObserverExt_005
+ * @tc.desc: Test the function of TryRegisterObserverExt interface with empty Uri, verifying error handling
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. MockDatashareObserver class is implemented
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance and verify it is not null
+    2. Create an empty Uri object ("") and a MockDatashareObserver instance
+    3. Call TryRegisterObserverExt with the empty Uri, observer and isDescendants=false
+    4. Verify the return value is not ERR_OK (indicating failure for empty Uri)
+ * @tc.expect:
+    1. The DataShareHelper instance is not null
+    2. TryRegisterObserverExt returns a value other than ERR_OK, correctly handling the empty Uri
+    3. No null pointer exceptions occur during the test
+ */
 HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_005, TestSize.Level0)
 {
     LOG_INFO("TryRegisterObserverExt_005 start");
@@ -510,10 +612,23 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_005, TestSize.L
 }
 
 /**
-* @tc.name: TryRegisterObserverExt_006
-* @tc.desc: test TryRegisterObserverExt normal func, dataObserver is nullptr.
-* @tc.type: FUNC
-*/
+ * @tc.name: TryRegisterObserverExt_006
+ * @tc.desc: Test the function of TryRegisterObserverExt interface with null observer, verifying error handling
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. Valid DATA_SHARE_URI is predefined
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance and verify it is not null
+    2. Create a Uri object with DATA_SHARE_URI and set dataObserver to nullptr
+    3. Call TryRegisterObserverExt with the Uri, null observer and isDescendants=false
+    4. Verify the return value equals E_NULL_OBSERVER
+ * @tc.expect:
+    1. The DataShareHelper instance is not null
+    2. TryRegisterObserverExt returns E_NULL_OBSERVER, correctly handling the null observer
+    3. No crash or undefined behavior occurs with a null observer input
+ */
 HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_006, TestSize.Level0)
 {
     LOG_INFO("TryRegisterObserverExt_006 start");
@@ -527,10 +642,24 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_006, TestSize.L
 }
 
 /**
-* @tc.name: TryRegisterObserverExt_007
-* @tc.desc: test TryRegisterObserverExt normal func, isSystem is true.
-* @tc.type: FUNC
-*/
+ * @tc.name: TryRegisterObserverExt_007
+ * @tc.desc: Test the function of TryRegisterObserverExt interface with isSystem=true, verifying permission handling
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. Valid DATA_SHARE_URI is predefined
+    3. MockDatashareObserver class is implemented
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance and verify it is not null
+    2. Create a Uri object with DATA_SHARE_URI and a MockDatashareObserver instance
+    3. Call TryRegisterObserverExt with the Uri, observer, isDescendants=false, and isSystem=true
+    4. Verify the return value is not ERR_OK
+ * @tc.expect:
+    1. The DataShareHelper instance is not null
+    2. TryRegisterObserverExt returns an error code (not ERR_OK) when isSystem=true
+    3. No unexpected behavior occurs during system-level registration attempt
+ */
 HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_007, TestSize.Level0)
 {
     LOG_INFO("TryRegisterObserverExt_007 start");
@@ -544,10 +673,24 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_007, TestSize.L
 }
 
 /**
-* @tc.name: TryRegisterObserverExt_008
-* @tc.desc: test TryRegisterObserverExt normal func, test parent interface.
-* @tc.type: FUNC
-*/
+ * @tc.name: TryRegisterObserverExt_008
+ * @tc.desc: Test the parent class implementation of TryRegisterObserverExt interface, verifying unimplemented behavior
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. Valid DATA_SHARE_URI is predefined
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance and verify it is not null
+    2. Create a Uri object with DATA_SHARE_URI and set dataObserver to nullptr
+    3. Explicitly call the parent class method DataShareHelper::TryRegisterObserverExt with the Uri,
+       null observer and isDescendants=false
+    4. Verify the return value equals E_UNIMPLEMENT (expected for unimplemented parent method)
+ * @tc.expect:
+    1. The DataShareHelper instance is not null
+    2. The parent class TryRegisterObserverExt returns E_UNIMPLEMENT, indicating it is unimplemented
+    3. No crash occurs when calling the unimplemented parent method
+ */
 HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_008, TestSize.Level0)
 {
     LOG_INFO("TryRegisterObserverExt_008 start");
@@ -562,8 +705,27 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_008, TestSize.L
 
 /**
  * @tc.name: TryRegisterObserverExt_009
- * @tc.desc: test TryRegisterObserverExt_009 normal func, use invalid uri.
+ * @tc.desc: Test the function of TryRegisterObserverExt interface with invalid Uri, verifying notification behavior
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. Invalid REGISTER_URI_INVALID is predefined
+    3. MockDatashareObserver class and ValueProxy::Convert method are implemented
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance and verify it is not null
+    2. Create a Uri object with REGISTER_URI_INVALID and a MockDatashareObserver instance
+    3. Call TryRegisterObserverExt with the invalid Uri, observer and isDescendants=true, verify return value
+       equals AAFwk::DATAOBS_INVALID_URI
+    4. Create a DataShareValuesBucket, add to a vector, convert to VBuckets via ValueProxy::Convert
+    5. Create INSERT-type ChangeInfo with the invalid Uri, call NotifyChangeExt to send notification
+    6. Wait for observer's notification, verify observer is not notified (isNotify=false) and ChangeInfo does not match
+    7. Clear observer data and unregister the observer
+ * @tc.expect:
+    1. TryRegisterObserverExt returns AAFwk::DATAOBS_INVALID_URI for invalid Uri
+    2. Observer does not receive notification (isNotify=false) after NotifyChangeExt
+    3. The received ChangeInfo does not match the sent one
+    4. No unexpected errors occur during the test
  */
 HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_009, TestSize.Level0)
 {
@@ -595,8 +757,29 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_009, TestSize.L
 
 /**
  * @tc.name: TryUnregisterObserverExt_001
- * @tc.desc: test TryUnregisterObserverExt normal func, Insert.
+ * @tc.desc: Test the normal function of TryUnregisterObserverExt interface, verifying notification stops
+ *           after unregistration
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. Valid DATA_SHARE_URI is predefined
+    3. MockDatashareObserver class and ValueProxy::Convert method are implemented
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance and verify it is not null
+    2. Create a Uri object with DATA_SHARE_URI and a MockDatashareObserver instance
+    3. Call TryRegisterObserverExt with the Uri, observer and isDescendants=true, verify return value is ERR_OK
+    4. Create a DataShareValuesBucket, insert data via Insert interface, verify return value > 0
+    5. Convert the bucket to VBuckets, create INSERT-type ChangeInfo, call NotifyChangeExt
+    6. Wait for observer's notification, verify ChangeInfo matches, then clear observer data
+    7. Call TryUnregisterObserverExt to unregister the observer, verify return value is ERR_OK
+    8. Send another DELETE-type notification via NotifyChangeExt
+    9. Wait for observer's notification, verify ChangeInfo does not match
+ * @tc.expect:
+    1. TryRegisterObserverExt and TryUnregisterObserverExt return ERR_OK
+    2. Observer receives and matches the first (INSERT) notification before unregistration
+    3. Observer does not match the second (DELETE) notification after unregistration
+    4. Insert operation returns a value > 0, indicating success
  */
 HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_001, TestSize.Level0)
 {
@@ -634,8 +817,21 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_001, TestSize
 
 /**
  * @tc.name: TryUnregisterObserverExt_002
- * @tc.desc: test TryUnregisterObserverExt normal func, dataObserver is nullptr.
+ * @tc.desc: Test the function of TryUnregisterObserverExt interface with null observer, verifying error handling
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. Valid DATA_SHARE_URI is predefined
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance and verify it is not null
+    2. Create a Uri object with DATA_SHARE_URI and set dataObserver to nullptr
+    3. Call TryUnregisterObserverExt with the Uri and null observer
+    4. Verify the return value equals E_NULL_OBSERVER
+ * @tc.expect:
+    1. The DataShareHelper instance is not null
+    2. TryUnregisterObserverExt returns E_NULL_OBSERVER, correctly handling the null observer
+    3. No crash occurs when unregistering a null observer
  */
 HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_002, TestSize.Level0)
 {
@@ -651,8 +847,23 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_002, TestSize
 
 /**
  * @tc.name: TryUnregisterObserverExt_003
- * @tc.desc: test TryUnregisterObserverExt normal func, observer not exit.
+ * @tc.desc: Test the function of TryUnregisterObserverExt interface with unregistered observer,
+ *           verifying error handling
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. Valid DATA_SHARE_URI is predefined
+    3. MockDatashareObserver class is implemented
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance and verify it is not null
+    2. Create a Uri object with DATA_SHARE_URI and a MockDatashareObserver instance (not registered)
+    3. Call TryUnregisterObserverExt with the Uri and unregistered observer
+    4. Verify the return value equals E_NULL_OBSERVER (expected error for unregistered observer)
+ * @tc.expect:
+    1. The DataShareHelper instance is not null
+    2. TryUnregisterObserverExt returns E_NULL_OBSERVER when unregistering an unregistered observer
+    3. No unexpected behavior occurs during the test
  */
 HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_003, TestSize.Level0)
 {
@@ -669,8 +880,22 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_003, TestSize
 
 /**
  * @tc.name: TryUnregisterObserverExt_004
- * @tc.desc: test TryUnregisterObserverExt normal func, test parent interface.
+ * @tc.desc: Test the parent class implementation of TryUnregisterObserverExt interface, verifying
+ *           unimplemented behavior
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. Valid DATA_SHARE_URI is predefined
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance and verify it is not null
+    2. Create a Uri object with DATA_SHARE_URI and set dataObserver to nullptr
+    3. Explicitly call the parent class method DataShareHelper::TryUnregisterObserverExt with the Uri and null observer
+    4. Verify the return value equals E_UNIMPLEMENT (expected for unimplemented parent method)
+ * @tc.expect:
+    1. The DataShareHelper instance is not null
+    2. The parent class TryUnregisterObserverExt returns E_UNIMPLEMENT, indicating it is unimplemented
+    3. No crash occurs when calling the unimplemented parent method
  */
 HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_004, TestSize.Level0)
 {
@@ -686,8 +911,27 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_004, TestSize
 
 /**
  * @tc.name: RegisterObserver_Register_Test_001
- * @tc.desc: test RegisterObserver_Register_Test_001 normal func, success.
+ * @tc.desc: Test the normal function of RegisterObserver interface, verifying successful registration and notification
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance is initialized and not null
+    2. Valid REGISTER_URI is predefined
+    3. IDataShareAbilityObserverTest class is implemented (with SetName, GetName, and Clear methods)
+ * @tc.step:
+    1. Obtain the DataShareHelper instance and verify it is not null
+    2. Create a Uri object with REGISTER_URI and an IDataShareAbilityObserverTest instance, set observer name
+       to "zhangsan"
+    3. Call RegisterObserver with the Uri and observer, verify observer name remains "zhangsan"
+    4. Call NotifyChange with the Uri, wait for observer's notification
+    5. Verify observer name changes to "OnChangeName" (indicating notification received), then clear observer data
+    6. Call UnregisterObserver with the Uri and observer, reset observer name to "zhangsan"
+    7. Call NotifyChange again, verify observer name remains "zhangsan"
+ * @tc.expect:
+    1. RegisterObserver successfully registers the observer without errors
+    2. Observer receives notification (name changes to "OnChangeName") before unregistration
+    3. Observer does not receive notification (name remains "zhangsan") after unregistration
+    4. No unexpected behavior or crashes occur during registration/unregistration
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_001, TestSize.Level0)
 {
@@ -713,8 +957,25 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_001, Te
 
 /**
  * @tc.name: RegisterObserver_Register_Test_002
- * @tc.desc: test RegisterObserver_Register_Test_002 normal func, RegisterObserver without read permission.
+ * @tc.desc: Test RegisterObserver interface with insufficient read permission, verifying notification restriction
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance is initialized and not null
+    2. REGISTER_URI_NOREAD (Uri without read permission) is predefined
+    3. IDataShareAbilityObserverTest class is implemented
+ * @tc.step:
+    1. Obtain the DataShareHelper instance and verify it is not null
+    2. Create a Uri object with REGISTER_URI_NOREAD and an IDataShareAbilityObserverTest instance, set name to
+       "zhangsan"
+    3. Call RegisterObserver with the Uri and observer, verify observer name remains "zhangsan"
+    4. Call NotifyChange with the Uri, wait for observer's notification
+    5. Verify observer name remains "zhangsan" (no notification due to missing read permission)
+    6. Clear observer data and unregister the observer
+ * @tc.expect:
+    1. RegisterObserver executes without crash (even with insufficient permission)
+    2. Observer does not receive notification (name remains "zhangsan") due to missing read permission
+    3. Unregistration completes without errors
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_002, TestSize.Level0)
 {
@@ -737,8 +998,25 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_002, Te
 
 /**
  * @tc.name: RegisterObserver_Register_Test_003
- * @tc.desc: test RegisterObserver_Register_Test_003 normal func, NotifyChange without write permission.
+ * @tc.desc: Test RegisterObserver with sufficient read permission but NotifyChange with insufficient write permission
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance is initialized and not null
+    2. REGISTER_URI_NOWRITE (Uri without write permission) is predefined
+    3. IDataShareAbilityObserverTest class is implemented
+ * @tc.step:
+    1. Obtain the DataShareHelper instance and verify it is not null
+    2. Create a Uri object with REGISTER_URI_NOWRITE and an IDataShareAbilityObserverTest instance, set name to
+       "zhangsan"
+    3. Call RegisterObserver with the Uri and observer, verify observer name remains "zhangsan"
+    4. Call NotifyChange with the Uri (which lacks write permission), wait for observer's notification
+    5. Verify observer name remains "zhangsan" (no notification due to missing write permission)
+    6. Clear observer data and unregister the observer
+ * @tc.expect:
+    1. RegisterObserver executes without crash (read permission is sufficient for registration)
+    2. Observer does not receive notification (name remains "zhangsan") because NotifyChange lacks write permission
+    3. Unregistration completes without errors
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_003, TestSize.Level0)
 {
@@ -761,9 +1039,26 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_003, Te
 
 /**
  * @tc.name: RegisterObserver_Register_Test_004
- * @tc.desc: test RegisterObserver_Register_Test_004 normal func, RegisterObserver without read permission,
- *           NotifyChange without write permission.
+ * @tc.desc: Test RegisterObserver interface with neither read permission nor write permission for NotifyChange,
+ *           verifying notification restriction
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. REGISTER_URI_NOALL (Uri without read and write permissions) is predefined
+    3. IDataShareAbilityObserverTest class is implemented (supports SetName, GetName, Clear methods)
+ * @tc.step:
+    1. Obtain the DataShareHelper instance and verify it is not null
+    2. Create a Uri object with REGISTER_URI_NOALL and an IDataShareAbilityObserverTest instance, set observer
+       name to "zhangsan"
+    3. Call RegisterObserver with the Uri and observer, verify observer name remains "zhangsan"
+    4. Call NotifyChange with the Uri (lacks both read and write permissions), wait for observer's notification
+    5. Verify observer name remains "zhangsan" (no notification due to insufficient permissions)
+    6. Clear observer data and call UnregisterObserver to unregister the observer
+ * @tc.expect:
+    1. RegisterObserver and UnregisterObserver execute without crashes, even with insufficient permissions
+    2. Observer does not receive notification (name stays "zhangsan") because of missing read/write permissions
+    3. No unexpected errors occur during the entire test flow
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_004, TestSize.Level0)
 {
@@ -786,8 +1081,27 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_004, Te
 
 /**
  * @tc.name: RegisterObserver_Register_Test_005
- * @tc.desc: test RegisterObserver_Register_Test_005 normal func, RegisterObserver with invalid uri.
+ * @tc.desc: Test RegisterObserver interface with invalid Uri, verifying error handling and notification behavior
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. REGISTER_URI_INVALID (invalid Uri) is predefined
+    3. IDataShareAbilityObserverTest class is implemented
+    4. Error code E_REGISTER_ERROR is predefined for registration failures
+ * @tc.step:
+    1. Obtain the DataShareHelper instance and verify it is not null
+    2. Create a Uri object with REGISTER_URI_INVALID and an IDataShareAbilityObserverTest instance, set name to
+       "zhangsan"
+    3. Call RegisterObserver with the Uri and observer, save the return value
+    4. Verify observer name remains "zhangsan" and return value equals E_REGISTER_ERROR
+    5. Call NotifyChange with the invalid Uri, wait for observer's notification
+    6. Verify observer name remains "zhangsan" (no notification for invalid Uri)
+    7. Clear observer data and call UnregisterObserver to unregister the observer
+ * @tc.expect:
+    1. RegisterObserver returns E_REGISTER_ERROR, correctly handling the invalid Uri
+    2. Observer does not receive notification (name stays "zhangsan") due to invalid Uri
+    3. UnregisterObserver executes without crashes, even for a failed registration
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_005, TestSize.Level0)
 {
@@ -811,8 +1125,30 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_005, Te
 
 /**
  * @tc.name: RegisterObserver_Register_Test_006
- * @tc.desc: test RegisterObserver_Register_Test_006 normal func, RegisterObserver and insert silent success.
+ * @tc.desc: Test RegisterObserver interface in silent mode, verifying successful registration and notification
+ *           after InsertEx
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global silent-mode DataShareHelper instance g_dataShareHelperSilent is initialized and not null
+    2. DATA_SHARE_URI_SILENT (valid Uri for silent mode) is predefined
+    3. IDataShareAbilityObserverTest class is implemented
+    4. Table columns TBL_STU_NAME and TBL_STU_AGE are predefined
+ * @tc.step:
+    1. Obtain g_dataShareHelperSilent instance and verify it is not null
+    2. Create a Uri object with DATA_SHARE_URI_SILENT and an IDataShareAbilityObserverTest instance, set name to
+       "zhangsan"
+    3. Call RegisterObserver with the Uri and observer, save the return value, verify return value is 0 (success)
+       and name remains "zhangsan"
+    4. Create a DataShareValuesBucket, add "lisi" to TBL_STU_NAME and 25 to TBL_STU_AGE
+    5. Call InsertEx with the Uri and bucket, verify the returned errCode is 0 (insert success)
+    6. Wait for observer's notification, verify observer name changes to "OnChangeName"
+    7. Clear observer data and call UnregisterObserver to unregister the observer
+ * @tc.expect:
+    1. RegisterObserver returns 0, indicating successful registration in silent mode
+    2. InsertEx returns errCode 0, indicating successful data insertion
+    3. Observer receives notification (name changes to "OnChangeName") after InsertEx
+    4. No unexpected errors occur in silent-mode operations
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_006, TestSize.Level0)
 {
@@ -842,9 +1178,30 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_006, Te
 
 /**
  * @tc.name: RegisterObserver_Register_Test_007
- * @tc.desc: test RegisterObserver_Register_Test_007 normal func, insert silent success.
- *           But RegisterObserver without read permission.
+ * @tc.desc: Test RegisterObserver interface in silent mode with insufficient read permission, verifying registration
+ *           failure and notification restriction
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global silent-mode DataShareHelper instance g_dataShareHelperSilent is initialized and not null
+    2. REGISTER_URI_NOREAD (Uri without read permission) is predefined
+    3. IDataShareAbilityObserverTest class is implemented
+    4. Error code AAFwk::DATAOBS_PERMISSION_DENY is predefined for permission failures
+    5. Table columns TBL_STU_NAME and TBL_STU_AGE are predefined
+ * @tc.step:
+    1. Obtain g_dataShareHelperSilent instance and verify it is not null
+    2. Create a Uri object with REGISTER_URI_NOREAD and an IDataShareAbilityObserverTest instance, set name to
+       "zhangsan"
+    3. Call RegisterObserver with the Uri and observer, save the return value
+    4. Verify observer name remains "zhangsan" and return value equals AAFwk::DATAOBS_PERMISSION_DENY
+    5. Create a DataShareValuesBucket, add "lisi" to TBL_STU_NAME and 25 to TBL_STU_AGE
+    6. Call InsertEx with the Uri and bucket, verify the returned errCode is 0
+    7. Wait for observer's notification, verify observer name remains "zhangsan"
+    8. Clear observer data and call UnregisterObserver to unregister the observer
+ * @tc.expect:
+    1. RegisterObserver returns AAFwk::DATAOBS_PERMISSION_DENY, correctly handling missing read permission
+    2. InsertEx returns errCode 0, indicating data insertion is not blocked by observer permission issues
+    3. Observer does not receive notification (name stays "zhangsan") due to failed registration
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_007, TestSize.Level0)
 {
@@ -874,8 +1231,25 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_007, Te
 
 /**
  * @tc.name: RegisterObserver_Register_Test_008
- * @tc.desc: test RegisterObserver_Register_Test_008 normal func, invalid uri.
+ * @tc.desc: Test RegisterObserver interface in silent mode with invalid Uri, verifying error handling
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global silent-mode DataShareHelper instance g_dataShareHelperSilent is initialized and not null
+    2. REGISTER_URI_INVALID (invalid Uri) is predefined
+    3. IDataShareAbilityObserverTest class is implemented
+    4. Error code AAFwk::DATAOBS_INVALID_URI is predefined for invalid Uri
+ * @tc.step:
+    1. Obtain g_dataShareHelperSilent instance and verify it is not null
+    2. Create a Uri object with REGISTER_URI_INVALID and an IDataShareAbilityObserverTest instance, set name to
+       "zhangsan"
+    3. Call RegisterObserver with the Uri and observer, save the return value
+    4. Verify observer name remains "zhangsan" and return value equals AAFwk::DATAOBS_INVALID_URI (registration fails)
+ * @tc.expect:
+    1. The DataShareHelper instance is not null
+    2. RegisterObserver returns AAFwk::DATAOBS_INVALID_URI, correctly handling the invalid Uri in silent mode
+    3. Observer name remains "zhangsan" (no state change from failed registration)
+    4. No crashes occur during the test
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_008, TestSize.Level0)
 {
@@ -893,8 +1267,31 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_008, Te
 
 /**
  * @tc.name: RegisterObserver_RegisterExt_Test_001
- * @tc.desc: test RegisterObserver_RegisterExt_Test_001 normal func, RegisterObserverExt success.
+ * @tc.desc: Test the normal function of RegisterObserverExt interface, verifying successful registration,
+ *           notification, and unregistration
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. Valid REGISTER_URI is predefined
+    3. MockDatashareObserver class (with isNotify, changeInfo_, Clear method) and ValueProxy::Convert are implemented
+    4. ChangeInfoEqual function is implemented to compare ChangeInfo objects
+ * @tc.step:
+    1. Obtain the DataShareHelper instance and verify it is not null
+    2. Create a Uri object with REGISTER_URI and a MockDatashareObserver instance
+    3. Call RegisterObserverExt with the Uri, observer and isDescendants=true
+    4. Create a DataShareValuesBucket with "name" = "RegisterObserver_RegisterExt_Test_001", add to a vector
+    5. Convert the vector to VBuckets via ValueProxy::Convert, create INSERT-type ChangeInfo
+    6. Call NotifyChangeExt with the ChangeInfo, wait for observer's notification
+    7. Verify ChangeInfoEqual returns true (received matches sent) and clear observer data
+    8. Call UnregisterObserverExt to unregister the observer
+    9. Send a DELETE-type ChangeInfo via NotifyChangeExt, wait for observer's notification
+    10. Verify ChangeInfoEqual returns false (no notification after unregistration) and clear observer data
+ * @tc.expect:
+    1. RegisterObserverExt and UnregisterObserverExt execute without errors
+    2. Observer receives and matches the INSERT notification before unregistration
+    3. Observer does not match the DELETE notification after unregistration
+    4. No unexpected crashes or data inconsistencies occur
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_001, TestSize.Level0)
 {
@@ -929,8 +1326,31 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_001,
 
 /**
  * @tc.name: RegisterObserver_RegisterExt_Test_002
- * @tc.desc: test RegisterObserver_RegisterExt_Test_002 normal func, RegisterObserverExt without read permission.
+ * @tc.desc: Test RegisterObserverExt interface with insufficient read permission, verifying notification restriction
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. REGISTER_URI_NOREAD (Uri without read permission) is predefined
+    3. MockDatashareObserver class (with isNotify flag and Clear method) and ValueProxy::Convert are implemented
+ * @tc.step:
+    1. Obtain the DataShareHelper instance and verify it is not null (use ASSERT_NE to ensure validity)
+    2. Create a Uri object with REGISTER_URI_NOREAD and a MockDatashareObserver instance
+    3. Call RegisterObserverExt with the Uri, observer and isDescendants=true
+    4. Create a DataShareValuesBucket, set "name" to "RegisterObserver_RegisterExt_Test_002"
+    5. Add the bucket to a vector, convert the vector to VBuckets via ValueProxy::Convert
+    6. Create an INSERT-type ChangeInfo with the Uri and VBuckets
+    7. Call NotifyChangeExt to send the ChangeInfo to the observer
+    8. Wait for the observer's notification signal (via data.Wait())
+    9. Verify the observer's isNotify flag is false (no notification received due to missing read permission)
+    10. Call Clear() on the observer to reset its state
+    11. Call UnregisterObserverExt to unregister the observer from the Uri
+ * @tc.expect:
+    1. The DataShareHelper instance is confirmed not null (ASSERT_NE passes)
+    2. RegisterObserverExt executes without crashing, even with insufficient read permission
+    3. After NotifyChangeExt, the observer's isNotify remains false (no notification delivered)
+    4. UnregisterObserverExt completes without errors, and observer state is successfully reset via Clear()
+    5. No memory leaks or unexpected exceptions occur during the test flow
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_002, TestSize.Level0)
 {
@@ -960,8 +1380,32 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_002,
 
 /**
  * @tc.name: RegisterObserver_RegisterExt_Test_003
- * @tc.desc: test RegisterObserver_RegisterExt_Test_003 normal func, NotifyChangeExt without write permission.
+ * @tc.desc: Test RegisterObserverExt with sufficient read permission but NotifyChangeExt with insufficient write
+ *           permission
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. REGISTER_URI_NOWRITE (Uri with read permission but no write permission) is predefined
+    3. MockDatashareObserver class (with isNotify flag and Clear method) and ValueProxy::Convert are implemented
+ * @tc.step:
+    1. Obtain the DataShareHelper instance and use ASSERT_NE to confirm it is not null
+    2. Create a Uri object with REGISTER_URI_NOWRITE and initialize a MockDatashareObserver instance
+    3. Call RegisterObserverExt with the Uri, observer and isDescendants=true
+    4. Create a DataShareValuesBucket, set "name" to "RegisterObserver_RegisterExt_Test_003"
+    5. Add the bucket to a vector, convert the vector to VBuckets using ValueProxy::Convert
+    6. Construct an INSERT-type ChangeInfo containing the Uri and VBuckets
+    7. Call NotifyChangeExt to send the ChangeInfo (write permission is required for notification delivery)
+    8. Wait for the observer's notification signal (data.Wait())
+    9. Check the observer's isNotify flag and verify it is false (notification blocked by missing write permission)
+    10. Reset the observer's state by calling Clear()
+    11. Unregister the observer from the Uri via UnregisterObserverExt
+ * @tc.expect:
+    1. ASSERT_NE passes, confirming the DataShareHelper instance is valid
+    2. RegisterObserverExt succeeds (no error) because the Uri has read permission
+    3. NotifyChangeExt executes without crashing, but no notification is delivered (isNotify remains false)
+    4. UnregisterObserverExt and Clear() complete normally, resetting the test environment
+    5. No unexpected behavior (e.g., null pointer exceptions) occurs during permission checks
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_003, TestSize.Level0)
 {
@@ -991,8 +1435,31 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_003,
 
 /**
  * @tc.name: RegisterObserver_RegisterExt_Test_004
- * @tc.desc: test RegisterObserver_RegisterExt_Test_004 normal func, without read and write permission.
+ * @tc.desc: Test RegisterObserverExt interface with neither read nor write permission, verifying notification block
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. REGISTER_URI_NOALL (Uri without read or write permission) is predefined
+    3. MockDatashareObserver class (with isNotify flag and Clear method) and ValueProxy::Convert are implemented
+ * @tc.step:
+    1. Obtain the DataShareHelper instance and use ASSERT_NE to ensure it is not null
+    2. Create a Uri object with REGISTER_URI_NOALL and a MockDatashareObserver instance
+    3. Call RegisterObserverExt with the Uri, observer and isDescendants=true
+    4. Create a DataShareValuesBucket, set "name" to "RegisterObserver_RegisterExt_Test_004"
+    5. Add the bucket to a vector, convert the vector to VBuckets via ValueProxy::Convert
+    6. Create an INSERT-type ChangeInfo with the Uri and VBuckets
+    7. Invoke NotifyChangeExt to send the ChangeInfo to the observer
+    8. Wait for the observer's notification signal (data.Wait())
+    9. Verify the observer's isNotify flag is false (no notification due to missing read/write permissions)
+    10. Call Clear() on the observer to reset its state
+    11. Unregister the observer using UnregisterObserverExt
+ * @tc.expect:
+    1. ASSERT_NE confirms the DataShareHelper instance is valid (no null pointer)
+    2. RegisterObserverExt executes without crashing, even with no permissions
+    3. NotifyChangeExt does not deliver the notification (isNotify remains false) due to missing permissions
+    4. UnregisterObserverExt and Clear() complete successfully, leaving no residual state
+    5. The test completes without memory leaks or unexpected exceptions
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_004, TestSize.Level0)
 {
@@ -1022,8 +1489,31 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_004,
 
 /**
  * @tc.name: RegisterObserver_RegisterExt_Test_005
- * @tc.desc: test RegisterObserver_RegisterExt_Test_005 normal func, with invalid uri.
+ * @tc.desc: Test RegisterObserverExt interface with invalid Uri, verifying notification block and error handling
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. REGISTER_URI_INVALID (malformed/invalid Uri) is predefined
+    3. MockDatashareObserver class (with isNotify flag and Clear method) and ValueProxy::Convert are implemented
+ * @tc.step:
+    1. Obtain the DataShareHelper instance and use ASSERT_NE to confirm it is not null
+    2. Create a Uri object with REGISTER_URI_INVALID and initialize a MockDatashareObserver instance
+    3. Call RegisterObserverExt with the invalid Uri, observer and isDescendants=true (registration attempt)
+    4. Create a DataShareValuesBucket, set "name" to "RegisterObserver_RegisterExt_Test_005"
+    5. Add the bucket to a vector, convert the vector to VBuckets using ValueProxy::Convert
+    6. Build an INSERT-type ChangeInfo that includes the invalid Uri and VBuckets
+    7. Call NotifyChangeExt to send the ChangeInfo to the observer
+    8. Wait for the observer's notification signal (data.Wait())
+    9. Check the observer's isNotify flag and verify it is false (no notification for invalid Uri)
+    10. Reset the observer's state by calling Clear()
+    11. Unregister the observer from the invalid Uri via UnregisterObserverExt
+ * @tc.expect:
+    1. ASSERT_NE passes, ensuring the DataShareHelper instance is valid
+    2. RegisterObserverExt does not crash when given an invalid Uri (graceful error handling)
+    3. NotifyChangeExt does not deliver the notification (isNotify remains false) because the Uri is invalid
+    4. UnregisterObserverExt completes without errors, even for an invalid Uri
+    5. No unexpected exceptions (e.g., Uri parsing errors) are thrown during the test
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_005, TestSize.Level0)
 {
@@ -1054,8 +1544,38 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_005,
 
 /**
  * @tc.name: RegisterObserver_RegisterExt_Test_006
- * @tc.desc: test RegisterObserver_RegisterExt_Test_006 normal func, RegisterObserverExt with valid and invalid uri.
+ * @tc.desc: Test RegisterObserverExt with mixed valid and invalid (no read permission) Uris, verifying selective
+ *           notification
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. REGISTER_URI (valid, with full permissions) and REGISTER_URI_NOREAD (invalid for notifications) are predefined
+    3. MockDatashareObserver class and ValueProxy::Convert are implemented
+    4. ChangeInfoEqual function is available to compare ChangeInfo objects
+ * @tc.step:
+    1. Obtain the DataShareHelper instance and use ASSERT_NE to confirm it is not null
+    2. Create two Uri objects: uri (REGISTER_URI, valid) and uri2 (REGISTER_URI_NOREAD, no read permission)
+    3. Initialize a MockDatashareObserver instance
+    4. Call RegisterObserverExt to register the observer to the valid uri (not uri2) with isDescendants=true
+    5. Create a DataShareValuesBucket, set "name" to "RegisterObserver_RegisterExt_Test_006"
+    6. Add the bucket to a vector, convert the vector to VBuckets via ValueProxy::Convert
+    7. Create an INSERT-type ChangeInfo that includes both uris (valid + no read permission) and VBuckets
+    8. Call NotifyChangeExt to send the mixed-uri ChangeInfo
+    9. Wait for the observer's notification signal (data.Wait())
+    10. Create an expected ChangeInfo that only includes the valid uri (excludes uri2) with the same VBuckets
+    11. Verify two conditions:
+        a. The observer's isNotify flag is true (notification received)
+        b. ChangeInfoEqual returns true between the observer's changeInfo_ and the expected ChangeInfo
+    12. Call Clear() on the observer to reset its state
+    13. Unregister the observer from the valid uri using UnregisterObserverExt
+ * @tc.expect:
+    1. ASSERT_NE passes, confirming the DataShareHelper instance is valid
+    2. The observer is only registered to the valid uri (uri), not uri2
+    3. After NotifyChangeExt, isNotify is true (notification delivered)
+    4. ChangeInfoEqual confirms the observer only receives the valid uri's ChangeInfo (uri2 is filtered out)
+    5. Clear() and UnregisterObserverExt complete without errors, resetting the test environment
+    6. No unexpected filtering or incorrect Uri delivery occurs
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_006, TestSize.Level0)
 {
@@ -1089,9 +1609,43 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_006,
 }
 
 /**
- * @tc.name: RegisterObserver_RegisterExt_Test_006
- * @tc.desc: test RegisterObserver_RegisterExt_Test_006 normal func, NotifyChangeExt with valid and invalid uri.
+ * @tc.name: RegisterObserver_RegisterExt_Test_007
+ * @tc.desc: Test RegisterObserverExt with mixed valid Uri and Uri without write permission, verifying selective
+ *           notification delivery
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: 
+    1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
+    2. REGISTER_URI (valid Uri with full permissions) and REGISTER_URI_NOWRITE are predefined
+    3. MockDatashareObserver class is implemented, including:
+        - isNotify flag to track notification receipt
+        - changeInfo_ to store received change information
+        - Clear() method to reset state
+        - data.Wait() method to wait for notification signals
+    4. ValueProxy::Convert method is available to convert DataShareValuesBucket vector to VBuckets
+    5. ChangeInfoEqual function is implemented to compare ChangeInfo objects for equality
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance and verify it is not null using ASSERT_NE
+    2. Initialize a MockDatashareObserver instance via std::make_shared
+    3. Register the observer to the valid uri using RegisterObserverExt with isDescendants=true
+    4. Create a DataShareValuesBucket and set "name" to "RegisterObserver_RegisterExt_Test_007"
+    5. Add the valuesBucket to a vector<DataShareValuesBucket> named Buckets
+    6. Convert the Buckets vector to DataShareObserver::ChangeInfo::VBuckets using ValueProxy::Convert
+    7. Call NotifyChangeExt with uriChanges to send the mixed notification
+    8. Wait for the observer to receive the notification using dataObserver->data.Wait()
+    9. Verify two conditions:
+        a. dataObserver->isNotify is true (notification was received)
+        b. ChangeInfoEqual(dataObserver->changeInfo_, expectedUriChanges) returns true
+    10. Reset the observer's state using dataObserver->Clear()
+    11. Unregister the observer from uri using UnregisterObserverExt
+ * @tc.expect:
+    1. The DataShareHelper instance is confirmed not null (ASSERT_NE passes)
+    2. RegisterObserverExt successfully registers the observer to the valid uri
+    3. After NotifyChangeExt, the observer's isNotify flag is true (notification is received)
+    4. The observer's received changeInfo_ matches expectedUriChanges
+    5. Clear() resets the observer's state without errors
+    6. UnregisterObserverExt completes successfully, removing the observer from the valid uri
+    7. No unexpected crashes, memory leaks, or incorrect Uri filtering occur during the test
  */
 HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_007, TestSize.Level0)
 {
