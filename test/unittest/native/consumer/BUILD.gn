@@ -28,6 +28,7 @@ group("unittest") {
     ":GeneralControllerServiceImplTest",
     ":DataShareHelperErrorCodeTest",
     ":DataShareHelperJoinTest",
+    ":DataShareHelperImplRegisterTest",
     ":DataShareHelperThresholdTest",
   ]
 }
@@ -479,6 +480,59 @@ ohos_unittest("DataShareHelperJoinTest") {
     "hilog:libhilog",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
+  ]
+}
+
+ohos_unittest("DataShareHelperImplRegisterTest") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "${datashare_base_path}/cfi_blocklist.txt"
+  }
+
+  module_out_path = "data_share/data_share/native/consumer"
+
+  include_dirs = [
+    "${datashare_base_path}/frameworks/native/common/include/",
+    "${datashare_base_path}/test/unittest/native/consumer/include/",
+  ]
+
+  sources = [ "${datashare_base_path}/test/unittest/native/consumer/src/datashare_helper_impl_register_test.cpp" ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+    "${datashare_base_path}/test/unittest/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/unittest/native/resource/ohos_test:copy_ohos_test",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_context",
+    "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "hitrace:libhitracechain",
+    "ipc:ipc_single",
+    "ipc:rpc",
+    "samgr:samgr_proxy",
+  ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 }
 

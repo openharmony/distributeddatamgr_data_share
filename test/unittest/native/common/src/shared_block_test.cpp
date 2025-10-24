@@ -501,5 +501,50 @@ HWTEST_F(SharedBlockTest, SetRawDataTest001, TestSize.Level0)
     EXPECT_EQ(sharedBlock->Clear(), SharedBlock::SHARED_BLOCK_OK);
     LOG_INFO("SetRawDataTest001::End");
 }
+
+/**
+ * @tc.name: AbnormalBranchTest_mReadOnlyInvalid_Test_001
+ * @tc.desc: Verify invalid operations on read-only SharedBlock
+ * @tc.type: FUNC
+ * @tc.precon: None
+ * @tc.step:
+    1. Create read-only SharedBlock instance
+    2. Attempt modification operations (Clear, SetColumnNum, AllocRow, etc.)
+    3. Check return values of all operations
+ * @tc.expect:
+    1. All modification operations return SHARED_BLOCK_INVALID_OPERATION
+    2. Init operation succeeds
+ */
+HWTEST_F(SharedBlockTest, MReadOnlyInvalid_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MReadOnlyInvalid_Test_001::Start");
+    std::string name = "Test Shared\0";
+    bool readOnly = true;
+    int32_t size = 1024;
+    sptr<Ashmem> ashmem = Ashmem::CreateAshmem(name.c_str(), size);
+    ashmem->MapReadAndWriteAshmem();
+    AppDataFwk::SharedBlock temp(name, ashmem, size, readOnly);
+    int result = temp.Init();
+    EXPECT_TRUE(result);
+    result = temp.Clear();
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    result = temp.SetColumnNum(1);
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    result = temp.AllocRow();
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    result = temp.FreeLastRow();
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    int64_t intValue = 0;
+    result = temp.PutLong(1, 1, intValue);
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    double doubleValue = 0.0;
+    result = temp.PutDouble(1, 1, doubleValue);
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    result = temp.PutNull(1, 1);
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    result = temp.SetRawData(nullptr, 0);
+    EXPECT_EQ(result, AppDataFwk::SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    LOG_INFO("MReadOnlyInvalid_Test_001::End");
+}
 } // namespace DataShare
 } // namespace OHOS
