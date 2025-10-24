@@ -168,13 +168,15 @@ HWTEST_F(SharedBlockTest, ReadMessageParcelTest001, TestSize.Level0)
 * @tc.expect:
     - Clear() returns SHARED_BLOCK_INVALID_OPERATION when read-only
     - Clear() returns SHARED_BLOCK_BAD_VALUE when size is insufficient
+    - Clear() returns SHARED_BLOCK_BAD_VALUE when in read-write mode with invalid size
     - Clear() returns SHARED_BLOCK_OK when in read-write mode with valid size
 */
 HWTEST_F(SharedBlockTest, ClearTest001, TestSize.Level0)
 {
     LOG_INFO("ClearTest001::Start");
     AppDataFwk::SharedBlock *sharedBlock = nullptr;
-    EXPECT_EQ(SharedBlock::Create("name", sizeof(SharedBlock) + sizeof(SharedBlock::SharedBlockHeader), sharedBlock),
+    EXPECT_EQ(SharedBlock::Create("name",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, sharedBlock),
         SharedBlock::SHARED_BLOCK_OK);
     EXPECT_NE(sharedBlock, nullptr);
     sharedBlock->mReadOnly = true;
@@ -182,7 +184,9 @@ HWTEST_F(SharedBlockTest, ClearTest001, TestSize.Level0)
     sharedBlock->mReadOnly = false;
     sharedBlock->mSize = sizeof(SharedBlock::SharedBlockHeader);
     EXPECT_EQ(sharedBlock->Clear(), SharedBlock::SHARED_BLOCK_BAD_VALUE);
-    sharedBlock->mSize = sizeof(SharedBlock) + sizeof(SharedBlock::SharedBlockHeader);
+    sharedBlock->mSize = sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader);
+    EXPECT_EQ(sharedBlock->Clear(), SharedBlock::SHARED_BLOCK_BAD_VALUE);
+    sharedBlock->mSize = sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1;
     EXPECT_EQ(sharedBlock->Clear(), SharedBlock::SHARED_BLOCK_OK);
     LOG_INFO("ClearTest001::End");
 }
@@ -209,7 +213,8 @@ HWTEST_F(SharedBlockTest, SetColumnNumTest001, TestSize.Level0)
 {
     LOG_INFO("SetColumnNumTest001::Start");
     AppDataFwk::SharedBlock *sharedBlock = nullptr;
-    EXPECT_EQ(SharedBlock::Create("name", sizeof(SharedBlock) + sizeof(SharedBlock::SharedBlockHeader), sharedBlock),
+    EXPECT_EQ(SharedBlock::Create("name",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, sharedBlock),
         SharedBlock::SHARED_BLOCK_OK);
     EXPECT_NE(sharedBlock, nullptr);
     sharedBlock->mReadOnly = true;
@@ -260,7 +265,8 @@ HWTEST_F(SharedBlockTest, AllocRow, TestSize.Level0)
 {
     LOG_INFO("AllocRowTest001::Start");
     AppDataFwk::SharedBlock *sharedBlock = nullptr;
-    EXPECT_EQ(SharedBlock::Create("name", sizeof(SharedBlock) + sizeof(SharedBlock::SharedBlockHeader), sharedBlock),
+    EXPECT_EQ(SharedBlock::Create("name",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, sharedBlock),
         SharedBlock::SHARED_BLOCK_OK);
     EXPECT_NE(sharedBlock, nullptr);
     sharedBlock->mReadOnly = true;
@@ -268,7 +274,7 @@ HWTEST_F(SharedBlockTest, AllocRow, TestSize.Level0)
     sharedBlock->mReadOnly = false;
     sharedBlock->mSize = 0;
     EXPECT_EQ(sharedBlock->AllocRow(), SharedBlock::SHARED_BLOCK_NO_MEMORY);
-    sharedBlock->mSize = sizeof(SharedBlock) + sizeof(SharedBlock::SharedBlockHeader);
+    sharedBlock->mSize = sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) +1;
     EXPECT_EQ(sharedBlock->Clear(), SharedBlock::SHARED_BLOCK_OK);
     LOG_INFO("AllocRowTest001::End");
 }
@@ -295,7 +301,8 @@ HWTEST_F(SharedBlockTest, FreeLastRowTest001, TestSize.Level0)
 {
     LOG_INFO("FreeLastRowTest001::Start");
     AppDataFwk::SharedBlock *sharedBlock = nullptr;
-    EXPECT_EQ(SharedBlock::Create("name", sizeof(SharedBlock) + sizeof(SharedBlock::SharedBlockHeader), sharedBlock),
+    EXPECT_EQ(SharedBlock::Create("name",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, sharedBlock),
         SharedBlock::SHARED_BLOCK_OK);
     EXPECT_NE(sharedBlock, nullptr);
     sharedBlock->mReadOnly = true;
@@ -329,7 +336,8 @@ HWTEST_F(SharedBlockTest, AllocRowOffsetTest001, TestSize.Level0)
 {
     LOG_INFO("AllocRowOffsetTest001::Start");
     AppDataFwk::SharedBlock *sharedBlock = nullptr;
-    EXPECT_EQ(SharedBlock::Create("name", sizeof(SharedBlock) + sizeof(SharedBlock::SharedBlockHeader), sharedBlock),
+    EXPECT_EQ(SharedBlock::Create("name",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, sharedBlock),
         SharedBlock::SHARED_BLOCK_OK);
     EXPECT_NE(sharedBlock, nullptr);
     auto temp = sharedBlock->mSize;
@@ -360,7 +368,8 @@ HWTEST_F(SharedBlockTest, GetCellUnitTest001, TestSize.Level0)
 {
     LOG_INFO("GetCellUnitTest001::Start");
     AppDataFwk::SharedBlock *sharedBlock = nullptr;
-    EXPECT_EQ(SharedBlock::Create("name", sizeof(SharedBlock) + sizeof(SharedBlock::SharedBlockHeader), sharedBlock),
+    EXPECT_EQ(SharedBlock::Create("name",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, sharedBlock),
         SharedBlock::SHARED_BLOCK_OK);
     EXPECT_NE(sharedBlock, nullptr);
     auto rowTemp = sharedBlock->mHeader->rowNums;
@@ -399,7 +408,8 @@ HWTEST_F(SharedBlockTest, PutBlobOrStringTest001, TestSize.Level0)
 {
     LOG_INFO("PutBlobOrStringTest001::Start");
     AppDataFwk::SharedBlock *sharedBlock = nullptr;
-    EXPECT_EQ(SharedBlock::Create("name", sizeof(SharedBlock) + sizeof(SharedBlock::SharedBlockHeader), sharedBlock),
+    EXPECT_EQ(SharedBlock::Create("name",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, sharedBlock),
         SharedBlock::SHARED_BLOCK_OK);
     EXPECT_NE(sharedBlock, nullptr);
     sharedBlock->mReadOnly = true;
@@ -433,7 +443,8 @@ HWTEST_F(SharedBlockTest, PutLongTest001, TestSize.Level0)
 {
     LOG_INFO("PutLongTest001::Start");
     AppDataFwk::SharedBlock *sharedBlock = nullptr;
-    EXPECT_EQ(SharedBlock::Create("name", sizeof(SharedBlock) + sizeof(SharedBlock::SharedBlockHeader), sharedBlock),
+    EXPECT_EQ(SharedBlock::Create("name",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, sharedBlock),
         SharedBlock::SHARED_BLOCK_OK);
     EXPECT_NE(sharedBlock, nullptr);
     int64_t temp = 0;
@@ -466,7 +477,8 @@ HWTEST_F(SharedBlockTest, PutDoubleTest001, TestSize.Level0)
 {
     LOG_INFO("PutDoubleTest001::Start");
     AppDataFwk::SharedBlock *sharedBlock = nullptr;
-    EXPECT_EQ(SharedBlock::Create("name", sizeof(SharedBlock) + sizeof(SharedBlock::SharedBlockHeader), sharedBlock),
+    EXPECT_EQ(SharedBlock::Create("name",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, sharedBlock),
         SharedBlock::SHARED_BLOCK_OK);
     EXPECT_NE(sharedBlock, nullptr);
     double temp = 0;
@@ -499,7 +511,8 @@ HWTEST_F(SharedBlockTest, PutNullTest001, TestSize.Level0)
 {
     LOG_INFO("PutNullTest001::Start");
     AppDataFwk::SharedBlock *sharedBlock = nullptr;
-    EXPECT_EQ(SharedBlock::Create("name", sizeof(SharedBlock) + sizeof(SharedBlock::SharedBlockHeader), sharedBlock),
+    EXPECT_EQ(SharedBlock::Create("name",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, sharedBlock),
         SharedBlock::SHARED_BLOCK_OK);
     EXPECT_NE(sharedBlock, nullptr);
     sharedBlock->mReadOnly = true;
@@ -533,7 +546,8 @@ HWTEST_F(SharedBlockTest, SetRawDataTest001, TestSize.Level0)
 {
     LOG_INFO("SetRawDataTest001::Start");
     AppDataFwk::SharedBlock *sharedBlock = nullptr;
-    EXPECT_EQ(SharedBlock::Create("name", sizeof(SharedBlock) + sizeof(SharedBlock::SharedBlockHeader), sharedBlock),
+    EXPECT_EQ(SharedBlock::Create("name",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, sharedBlock),
         SharedBlock::SHARED_BLOCK_OK);
     EXPECT_NE(sharedBlock, nullptr);
     auto sizeTemp = sharedBlock->mSize;

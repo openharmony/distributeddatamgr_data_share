@@ -309,7 +309,7 @@ private:
         if (offset >= mSize) {
             return nullptr;
         }
-        if (offset + bufferSize > mSize) {
+        if (offset + bufferSize >= mSize) {
             return nullptr;
         }
         return static_cast<uint8_t *>(mData) + offset;
