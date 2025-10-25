@@ -134,20 +134,36 @@ void DataShareStubTest::SetUp(void) {}
 void DataShareStubTest::TearDown(void) {}
 
 /**
-* @tc.name: DataShareStub_CmdRegisterObserverExtProvider_Test_001
-* @tc.desc: Verify functionality of CMD_REGISTER_OBSERVEREXT_PROVIDER command handling
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create test URI and IDataAbilityObserverTest instance
-    2. Prepare message parcel with interface token and parameters
-    3. Call OnRemoteRequest with REGISTER_OBSERVEREXT_PROVIDER command
-    4. Check returned error code and unmarshal result
-* @tc.expect:
-    1. All objects are successfully initialized
-    2. OnRemoteRequest returns 0 (success)
-    3. Unmarshaled result code is 0 (E_OK)
-*/
+ * @tc.name: DataShareStub_CmdRegisterObserverExtProvider_Test_001
+ * @tc.desc: Verify the handling functionality of the CMD_REGISTER_OBSERVEREXT_PROVIDER command in DataShareStub,
+ *           focusing on parameter marshaling, remote request execution, and result unmarshaling.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of Uri, IDataAbilityObserverTest, MessageParcel, MessageOption,
+       and RegisterOption objects without initialization errors.
+    2. Predefined constants are valid: DATA_SHARE_URI (test target URI), InterfaceToken (interface token for
+       parcel writing), and IDataShareInterfaceCode::CMD_REGISTER_OBSERVEREXT_PROVIDER (command code).
+    3. The ITypesUtil class provides valid Marshal and Unmarshal methods for Uri, IRemoteObject, bool,
+       RegisterOption, and int types.
+    4. The global dataShareStub instance is properly initialized (non-null) before the test.
+ * @tc.step:
+    1. Create a test Uri using the DATA_SHARE_URI constant, then instantiate an IDataAbilityObserverTest object
+       via new (std::nothrow) and verify it is non-null.
+    2. Convert the CMD_REGISTER_OBSERVEREXT_PROVIDER command code to uint32_t type, then create a MessageParcel
+       (data) and write the InterfaceToken to it using WriteInterfaceToken.
+    3. Instantiate a RegisterOption object, then call ITypesUtil::Marshal to serialize the Uri, IRemoteObject
+       (from dataObserver->AsObject()), bool (true), and RegisterOption into the 'data' parcel; verify marshaling
+       succeeds (returns true).
+    4. Create empty MessageParcel (reply) and default MessageOption (option), then call dataShareStub->OnRemoteRequest
+       with the command code, 'data' parcel, 'reply' parcel, and 'option'; record the returned error code.
+    5. Call ITypesUtil::Unmarshal to deserialize the error code from the 'reply' parcel; verify unmarshaling succeeds
+       (returns true) and check the error code value.
+ * @tc.expect:
+    1. All initialized objects (IDataAbilityObserverTest, MessageParcel, etc.) are non-null and valid.
+    2. The OnRemoteRequest method returns 0 (indicating successful command handling).
+    3. The unmarshaled error code from the 'reply' parcel is 0 (E_OK, indicating no execution errors).
+ */
 HWTEST_F(DataShareStubTest, DataShareStub_CmdRegisterObserverExtProvider_Test_001, TestSize.Level0)
 {
     LOG_INFO("DataShareStub_CmdRegisterObserverExtProvider_Test_001::Start");
@@ -177,20 +193,34 @@ HWTEST_F(DataShareStubTest, DataShareStub_CmdRegisterObserverExtProvider_Test_00
 }
 
 /**
-* @tc.name: DataShareStub_CmdUnregisterObserverExtProvider_Test_001
-* @tc.desc: Verify functionality of CMD_UNREGISTER_OBSERVEREXT_PROVIDER command handling
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create test URI and IDataAbilityObserverTest instance
-    2. Prepare message parcel with interface token and parameters
-    3. Call OnRemoteRequest with UNREGISTER_OBSERVEREXT_PROVIDER command
-    4. Check returned error code and unmarshal result
-* @tc.expect:
-    1. All objects are successfully initialized
-    2. OnRemoteRequest returns 0 (success)
-    3. Unmarshaled result code is 0 (E_OK)
-*/
+ * @tc.name: DataShareStub_CmdUnregisterObserverExtProvider_Test_001
+ * @tc.desc: Verify the handling functionality of the CMD_UNREGISTER_OBSERVEREXT_PROVIDER command in DataShareStub,
+ *           focusing on parameter marshaling, remote request execution, and result unmarshaling.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of Uri, IDataAbilityObserverTest, MessageParcel, and
+       MessageOption objects without initialization errors.
+    2. Predefined constants are valid: DATA_SHARE_URI (test target URI), InterfaceToken (interface token for
+       parcel writing), and IDataShareInterfaceCode::CMD_UNREGISTER_OBSERVEREXT_PROVIDER (command code).
+    3. The ITypesUtil class provides valid Marshal and Unmarshal methods for Uri, IRemoteObject, and int types.
+    4. The global dataShareStub instance is properly initialized (non-null) before the test.
+ * @tc.step:
+    1. Create a test Uri using the DATA_SHARE_URI constant, then instantiate an IDataAbilityObserverTest object
+       via new (std::nothrow) and verify it is non-null.
+    2. Convert the CMD_UNREGISTER_OBSERVEREXT_PROVIDER command code to uint32_t type, then create a MessageParcel
+       (data) and write the InterfaceToken to it using WriteInterfaceToken.
+    3. Call ITypesUtil::Marshal to serialize the Uri and IRemoteObject (from dataObserver->AsObject()) into the
+       'data' parcel; verify marshaling succeeds (returns true).
+    4. Create empty MessageParcel (reply) and default MessageOption (option), then call dataShareStub->OnRemoteRequest
+       with the command code, 'data' parcel, 'reply' parcel, and 'option'; record the returned error code.
+    5. Call ITypesUtil::Unmarshal to deserialize the error code from the 'reply' parcel; verify unmarshaling succeeds
+       (returns true) and check the error code value.
+ * @tc.expect:
+    1. All initialized objects (IDataAbilityObserverTest, MessageParcel, etc.) are non-null and valid.
+    2. The OnRemoteRequest method returns 0 (indicating successful command handling).
+    3. The unmarshaled error code from the 'reply' parcel is 0 (E_OK, indicating no execution errors).
+ */
 HWTEST_F(DataShareStubTest, DataShareStub_CmdUnregisterObserverExtProvider_Test_001, TestSize.Level0)
 {
     LOG_INFO("DataShareStub_CmdUnregisterObserverExtProvider_Test_001::Start");
@@ -218,20 +248,35 @@ HWTEST_F(DataShareStubTest, DataShareStub_CmdUnregisterObserverExtProvider_Test_
 }
 
 /**
-* @tc.name: DataShareStub_CmdNotifyChangeExtProvider_Test_001
-* @tc.desc: Verify functionality of CMD_NOTIFY_CHANGEEXT_PROVIDER command handling
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create test URI and ChangeInfo object
-    2. Prepare message parcel with interface token and marshaled ChangeInfo
-    3. Call OnRemoteRequest with NOTIFY_CHANGEEXT_PROVIDER command
-    4. Check returned error code and unmarshal result
-* @tc.expect:
-    1. All objects are successfully initialized
-    2. OnRemoteRequest returns 0 (success)
-    3. Unmarshaled result code is 0 (E_OK)
-*/
+ * @tc.name: DataShareStub_CmdNotifyChangeExtProvider_Test_001
+ * @tc.desc: Verify the handling functionality of the CMD_NOTIFY_CHANGEEXT_PROVIDER command in DataShareStub,
+ *           focusing on ChangeInfo marshaling, remote request execution, and result unmarshaling.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of Uri, ChangeInfo, MessageParcel, and MessageOption objects
+       without initialization errors.
+    2. Predefined constants are valid: DATA_SHARE_URI (test target URI), InterfaceToken (interface token for
+       parcel writing), and IDataShareInterfaceCode::CMD_NOTIFY_CHANGEEXT_PROVIDER (command code).
+    3. The ChangeInfo class provides a valid Marshalling static method; the ITypesUtil class provides a valid
+       Unmarshal method for int types.
+    4. The global dataShareStub instance is properly initialized (non-null) before the test.
+ * @tc.step:
+    1. Create a test Uri using the DATA_SHARE_URI constant, then instantiate a ChangeInfo object: set its ChangeType
+       to INSERT and assign a vector containing the test Uri to its 'uris' member.
+    2. Convert the CMD_NOTIFY_CHANGEEXT_PROVIDER command code to uint32_t type, then create a MessageParcel (data)
+       and write the InterfaceToken to it using WriteInterfaceToken.
+    3. Call ChangeInfo::Marshalling to serialize the ChangeInfo object into the 'data' parcel; verify marshaling
+       succeeds (returns true).
+    4. Create empty MessageParcel (reply) and default MessageOption (option), then call dataShareStub->OnRemoteRequest
+       with the command code, 'data' parcel, 'reply' parcel, and 'option'; record the returned error code.
+    5. Call ITypesUtil::Unmarshal to deserialize the error code from the 'reply' parcel; verify unmarshaling succeeds
+       (returns true) and check the error code value.
+ * @tc.expect:
+    1. All initialized objects (ChangeInfo, MessageParcel, etc.) are non-null and valid.
+    2. The OnRemoteRequest method returns 0 (indicating successful command handling).
+    3. The unmarshaled error code from the 'reply' parcel is 0 (E_OK, indicating no execution errors).
+ */
 HWTEST_F(DataShareStubTest, DataShareStub_CmdNotifyChangeExtProvider_Test_001, TestSize.Level0)
 {
     LOG_INFO("DataShareStub_CmdNotifyChangeExtProvider_Test_001::Start");

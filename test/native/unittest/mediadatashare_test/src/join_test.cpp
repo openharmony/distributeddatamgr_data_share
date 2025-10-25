@@ -208,20 +208,36 @@ int JoinTest::ResultSize(std::shared_ptr<DataShareResultSet> &resultSet)
 }
 
 /**
-* @tc.name: Join_CrossJoin_001
-* @tc.desc: Verify cross join operation returns correct results
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create cross join predicate with "user.userId = book.userId" condition
-    2. Execute query on user table with join predicate
-    3. Verify row count is 3
-    4. Check first row data matches expected values
-* @tc.experct:
-    1. Query returns 3 rows
-    2. First row contains correct user and book data for userId = 1
-*/
+ * @tc.name: Join_CrossJoin_001
+ * @tc.desc: Verify that the cross join operation between the user table and book table (with the join condition
+ *           "user.userId = book.userId") returns correct results, including the expected row count and first row data.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports the CrossJoin and On methods of DataSharePredicates to define cross join
+       conditions.
+    2. The global g_slientAccessHelper is properly initialized (non-null) and can access the user table via USER_URI.
+    3. The user table and book table contain preset test data: the join condition "user.userId = book.userId" matches
+       exactly 3 rows of combined data, with the first row corresponding to userId = 1.
+    4. The USER_URI constant is valid and points to the user table; the DataShareResultSet's GetRowCount, GoToFirstRow,
+       GetInt, GetString, and GetDouble methods work normally.
+ * @tc.step:
+    1. Create a DataSharePredicates object, call its CrossJoin method with "book" (target join table), then call On
+       with a vector containing the condition "user.userId = book.userId" to set the join clause.
+    2. Initialize an empty std::vector<std::string> (columns) to specify query columns, then get the user table's URI
+       via USER_URI.
+    3. Call g_slientAccessHelper->Query with USER_URI, the created predicates, and columns to execute the cross join
+       query,
+       and obtain the returned DataShareResultSet.
+    4. Call GetRowCount on the result set to get the total row count, then verify it equals 3.
+    5. Call GoToFirstRow to move to the first row of the result set, then check the values of columns (userId,
+       firstName, lastName, age, balance, book.id, book.name, book.userId) to confirm they match the expected values
+       for userId = 1.
+ * @tc.expect:
+    1. The query returns a DataShareResultSet with a row count of 3.
+    2. The first row of the result set contains the correct data: userId = 1, firstName = "Zhang", lastName = "San",
+       age = 29, balance = 100.51, book.id = 1, book.name = "SanGuo", book.userId = 1.
+ */
 HWTEST_F(JoinTest, Join_CrossJoin_001, TestSize.Level0)
 {
     auto helper = g_slientAccessHelper;
@@ -272,21 +288,35 @@ HWTEST_F(JoinTest, Join_CrossJoin_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: Join_InnerJoin_001
-* @tc.require: None
-* @tc.desc: Verify inner join with filter returns correct single result
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create inner join predicate with "user.userId = book.userId" condition
-    2. Add filter for book.name = "SanGuo"
-    3. Execute query on user table with join predicate
-    4. Verify row count is 1
-    5. Check row data matches expected values for "SanGuo" book
-* @tc.experct:
-    1. Query returns 1 row
-    2. Row contains correct user and book data for "SanGuo" book
-*/
+ * @tc.name: Join_InnerJoin_001
+ * @tc.desc: Verify that the inner join between the user table and book table (with the join condition "user.userId
+ *           = book.userId" and filter "book.name = 'SanGuo'") returns a single correct result row.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports the InnerJoin, On, and EqualTo methods of DataSharePredicates to define inner join
+       conditions and filters.
+    2. The global g_slientAccessHelper is properly initialized (non-null) and can access the user table via USER_URI.
+    3. The user table and book table contain preset data: only one row matches both the inner join condition
+       "user.userId = book.userId" and the filter "book.name = 'SanGuo'".
+    4. The USER_URI constant is valid; the DataShareResultSet's row and column access methods (GetRowCount,
+       GoToFirstRow, GetInt, etc.) work.
+ * @tc.step:
+    1. Create a DataSharePredicates object, call its InnerJoin method with "book", then call On with a vector
+       containing "user.userId = book.userId" to set the join condition.
+    2. Call the EqualTo method on the predicates to add a filter: "book.name" equals "SanGuo".
+    3. Initialize an empty std::vector<std::string> (columns) for query columns, then get the user table's URI via
+       USER_URI.
+    4. Execute the query using g_slientAccessHelper->Query with USER_URI, predicates, and columns, then obtain the
+       DataShareResultSet.
+    5. Verify the result set's row count is 1 by calling GetRowCount.
+    6. Move to the first row via GoToFirstRow, then check the values of all columns (user and book fields) to confirm
+       they match the expected data for the "SanGuo" book.
+ * @tc.expect:
+    1. The query returns a DataShareResultSet with a row count of 1.
+    2. The single row contains correct data: userId = 1, firstName = "Zhang", lastName = "San", age = 29,
+       balance = 100.51, book.id = 1, book.name = "SanGuo", book.userId = 1.
+ */
 HWTEST_F(JoinTest, Join_InnerJoin_001, TestSize.Level0)
 {
     auto helper = g_slientAccessHelper;
@@ -338,21 +368,35 @@ HWTEST_F(JoinTest, Join_InnerJoin_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: Join_LeftOuterJoin_001
-* @tc.desc: Verify left outer join with Using clause returns correct result
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create left outer join predicate using "userId" column
-    2. Add filter for name = "SanGuo"
-    3. Execute query on user table with join predicate
-    4. Verify row count is 1
-    5. Check row data matches expected values
-* @tc.experct:
-    1. Query returns 1 row
-    2. Row contains correct user and book data for matching record
-*/
+ * @tc.name: Join_LeftOuterJoin_001
+ * @tc.desc: Verify that the left outer join between the user table and book table (using the "userId" column via the
+ *           Using clause and filtering for "name = 'SanGuo'") returns a single correct result row.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports the LeftOuterJoin and Using methods of DataSharePredicates, allowing join
+       conditions to be set via the Using clause with a vector of shared columns.
+    2. The global g_slientAccessHelper is properly initialized (non-null) and can access the user table via USER_URI.
+    3. The user table and book table have preset data: only one row matches the left outer join (on userId) and the
+       filter "name = 'SanGuo'".
+    4. The USER_URI is valid; the DataShareResultSet's methods for row/column access and row count checking work
+       normally.
+ * @tc.step:
+    1. Create a DataSharePredicates object, call its LeftOuterJoin method with "book" (target join table).
+    2. Create a std::vector<std::string> (fields) containing "userId", then call the Using method on the predicates to
+       set the shared join column.
+    3. Add a filter to the predicates via EqualTo: "name" equals "SanGuo".
+    4. Initialize an empty std::vector<std::string> (columns) for query columns, then get the user table's URI via
+       USER_URI.
+    5. Execute the query using g_slientAccessHelper->Query with USER_URI, predicates, and columns, then obtain the
+       DataShareResultSet.
+    6. Verify the result set's row count is 1, then move to the first row and check all column values against the
+       expected data.
+ * @tc.expect:
+    1. The query returns a DataShareResultSet with a row count of 1.
+    2. The single row contains correct data: userId = 1, firstName = "Zhang", lastName = "San", age = 29,
+       balance = 100.51, book.id = 1, book.name = "SanGuo".
+ */
 HWTEST_F(JoinTest, Join_LeftOuterJoin_001, TestSize.Level0)
 {
     auto helper = g_slientAccessHelper;
@@ -400,19 +444,34 @@ HWTEST_F(JoinTest, Join_LeftOuterJoin_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: Join_LeftOuterJoin_002
-* @tc.desc: Verify left outer join returns all user records with matching books
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create left outer join predicate with "user.userId = book.userId" condition
-    2. Execute query on user table with join predicate
-    3. Verify row count is 5 (all users including those without books)
-* @tc.experct:
-    1. Query returns 5 rows
-    2. All user records are included in results
-*/
+ * @tc.name: Join_LeftOuterJoin_002
+ * @tc.desc: Verify that the left outer join between the user table and book table (with the condition
+ *           "user.userId = book.userId") returns all user records (including those without matching books), resulting
+ *           in a total of 5 rows.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports the LeftOuterJoin and On methods of DataSharePredicates to define left outer join
+       conditions.
+    2. The global g_slientAccessHelper is properly initialized (non-null) and can access the user table via USER_URI.
+    3. The user table contains enough preset records such that a left outer join with the book table
+       (on "user.userId = book.userId") results in exactly 5 rows (including users with no matching books).
+    4. The USER_URI is valid; the DataShareResultSet's GetRowCount method works correctly to return the total number of
+       rows.
+ * @tc.step:
+    1. Create a DataSharePredicates object, call its LeftOuterJoin method with "book" (target join table).
+    2. Call the On method on the predicates with a vector containing the condition "user.userId = book.userId" to set
+       the join clause.
+    3. Initialize an empty std::vector<std::string> (columns) for query columns, then get the user table's URI via
+       USER_URI.
+    4. Execute the query using g_slientAccessHelper->Query with USER_URI, predicates, and columns, then obtain the
+       DataShareResultSet.
+    5. Call GetRowCount on the result set to get the total number of rows, then verify the count equals 5.
+ * @tc.expect:
+    1. The query returns a DataShareResultSet with a row count of 5.
+    2. All user records from the user table are included in the result set (including users with no matching entries in
+       the book table).
+ */
 HWTEST_F(JoinTest, Join_LeftOuterJoin_002, TestSize.Level0)
 {
     auto helper = g_slientAccessHelper;
