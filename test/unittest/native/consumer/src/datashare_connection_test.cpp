@@ -110,10 +110,30 @@ void DataShareConnectionTest::SetUp(void) {}
 void DataShareConnectionTest::TearDown(void) {}
 
 /**
-* @tc.name: DataShareConnection_UpdateObserverExtsProviderMap_Test_001
-* @tc.desc: test UpdateObserverExtsProviderMap normal func
-* @tc.type: FUNC
-*/
+ * @tc.name: DataShareConnection_UpdateObserverExtsProviderMap_Test_001
+ * @tc.desc: Verify the normal functionality of the UpdateObserverExtsProviderMap method in DataShareConnection,
+ *           focusing on whether observers can be correctly added to the observer map and the map size is
+ *           updated accordingly.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment is properly set up, supporting the instantiation and operation of DataShareConnection
+       and related classes.
+    2. Valid test URIs (DATA_SHARE_URI and DATA_SHARE_URI1) are predefined and accessible.
+    3. The IRemoteObject and IDataAbilityObserverTest classes can be normally instantiated without initialization
+       errors.
+ * @tc.step:
+    1. Create a DataShareConnection object using the test URI (DATA_SHARE_URI) and a valid IRemoteObject token.
+    2. Verify that the observerExtsProvider_ map in the created DataShareConnection is initially empty.
+    3. Create the first IDataAbilityObserverTest instance with DATA_SHARE_URI, and add it to the map using
+       UpdateObserverExtsProviderMap with the "true" flag.
+    4. Create the second IDataAbilityObserverTest instance with DATA_SHARE_URI1, and add it to the map using
+       UpdateObserverExtsProviderMap with the "true" flag.
+    5. Check the size of the observerExtsProvider_ map after adding the two observers.
+ * @tc.expect:
+    1. The observerExtsProvider_ map is empty before adding any observers.
+    2. After adding the two observers, the size of the observerExtsProvider_ map is 2.
+ */
 HWTEST_F(DataShareConnectionTest, DataShareConnection_UpdateObserverExtsProviderMap_Test_001, TestSize.Level0)
 {
     LOG_INFO("DataShareConnection_UpdateObserverExtsProviderMap_Test_001::Start");
@@ -145,10 +165,29 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_UpdateObserverExtsProvider
 }
 
 /**
-* @tc.name: DataShareConnection_DeleteObserverExtsProviderMap_001
-* @tc.desc: test DeleteObserverExtsProviderMap default func
-* @tc.type: FUNC
-*/
+ * @tc.name: DataShareConnection_DeleteObserverExtsProviderMap_001
+ * @tc.desc: Verify the functionality of the DeleteObserverExtsProviderMap method in DataShareConnection, including
+ *           correctly removing valid observers and leaving the map unchanged when removing invalid observers.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports the creation of DataShareConnection, IRemoteObject, and IDataAbilityObserverTest
+       instances.
+    2. Two distinct test URIs (DATA_SHARE_URI and DATA_SHARE_URI1) are available for observer initialization.
+    3. The UpdateObserverExtsProviderMap method can successfully add observers to the observerExtsProvider_ map.
+ * @tc.step:
+    1. Create a DataShareConnection object with the test URI (DATA_SHARE_URI) and a valid IRemoteObject token.
+    2. Add two observers to the observerExtsProvider_ map using UpdateObserverExtsProviderMap: one with DATA_SHARE_URI
+       and another with DATA_SHARE_URI1.
+    3. Verify that the initial size of the observerExtsProvider_ map is 2 after adding the observers.
+    4. Call DeleteObserverExtsProviderMap to remove the observer associated with DATA_SHARE_URI1, then check the map
+       size.
+    5. Call DeleteObserverExtsProviderMap again to attempt removing an invalid observer (mismatched URI and observer),
+       then check the map size.
+ * @tc.expect:
+    1. After deleting the valid observer (DATA_SHARE_URI1), the size of the observerExtsProvider_ map is 1.
+    2. After attempting to delete the invalid observer, the size of the observerExtsProvider_ map remains 1.
+ */
 HWTEST_F(DataShareConnectionTest, DataShareConnection_DeleteObserverExtsProviderMap_001, TestSize.Level0)
 {
     LOG_INFO("DataShareConnection_DeleteObserverExtsProviderMap_001::Start");
@@ -186,10 +225,28 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_DeleteObserverExtsProvider
 }
 
 /**
-* @tc.name: DataShareConnection_ReRegisterObserverExtProvider_Test_001
-* @tc.desc: test ReRegisterObserverExtProvider default func
-* @tc.type: FUNC
-*/
+ * @tc.name: DataShareConnection_ReRegisterObserverExtProvider_Test_001
+ * @tc.desc: Verify that the ReRegisterObserverExtProvider method in DataShareConnection can successfully re-register
+ *           existing observers, ensuring the observer map remains populated after re-registration.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment allows instantiation of DataShareConnection, DataShareProxy, IRemoteObject, and
+       IDataAbilityObserverTest objects.
+    2. A valid DataShareProxy instance can be associated with the DataShareConnection's dataShareProxy_ member.
+    3. The UpdateObserverExtsProviderMap method works correctly to add observers to the map.
+ * @tc.step:
+    1. Create a DataShareConnection object with the test URI (DATA_SHARE_URI) and a valid IRemoteObject token.
+    2. Create a DataShareProxy instance using the token and assign it to the dataShareProxy_ member of the
+       DataShareConnection.
+    3. Add two observers to the observerExtsProvider_ map using UpdateObserverExtsProviderMap (with DATA_SHARE_URI and
+       DATA_SHARE_URI1 respectively).
+    4. Verify that the observerExtsProvider_ map is not empty and has a size of 2 after adding the observers.
+    5. Call the ReRegisterObserverExtProvider method of the DataShareConnection.
+    6. Check whether the observerExtsProvider_ map remains non-empty after re-registration.
+ * @tc.expect:
+    1. The observerExtsProvider_ map remains non-empty after calling ReRegisterObserverExtProvider.
+ */
 HWTEST_F(DataShareConnectionTest, DataShareConnection_ReRegisterObserverExtProvider_Test_001, TestSize.Level0)
 {
     LOG_INFO("DataShareConnection_ReRegisterObserverExtProvider_Test_001::Start");
@@ -229,10 +286,29 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ReRegisterObserverExtProvi
 }
 
 /**
-* @tc.name: DataShareConnection_OnAbilityConnectDone_Test_001
-* @tc.desc: test ReRegisterObserverExtProvider default func
-* @tc.type: FUNC
-*/
+ * @tc.name: DataShareConnection_OnAbilityConnectDone_Test_001
+ * @tc.desc: Verify that the OnAbilityConnectDone method in DataShareConnection correctly handles reconnection (when
+ *           isReconnect_ is true) and ensures the observer map remains intact after the connection is established.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports creating DataShareConnection, DataShareProxy, IRemoteObject,
+       IDataAbilityObserverTest, and AppExecFwk::ElementName instances.
+    2. The isReconnect_ member of DataShareConnection can be set to true via the store method.
+    3. Observers can be successfully added to the observerExtsProvider_ map using UpdateObserverExtsProviderMap.
+ * @tc.step:
+    1. Create a DataShareConnection object with the test URI (DATA_SHARE_URI) and a valid IRemoteObject token.
+    2. Create a DataShareProxy instance using the token and assign it to the dataShareConnection's dataShareProxy_
+       member.
+    3. Add two observers to the observerExtsProvider_ map (with DATA_SHARE_URI and DATA_SHARE_URI1 respectively) using
+       UpdateObserverExtsProviderMap.
+    4. Set the isReconnect_ flag of the DataShareConnection to true using isReconnect_.store(true).
+    5. Create an AppExecFwk::ElementName instance with test parameters and a resultCode of 0.
+    6. Call the OnAbilityConnectDone method with the ElementName, token, and resultCode as parameters.
+    7. Check whether the observerExtsProvider_ map remains non-empty after the connection is done.
+ * @tc.expect:
+    1. The observerExtsProvider_ map remains non-empty after the OnAbilityConnectDone method is executed.
+ */
 HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityConnectDone_Test_001, TestSize.Level0)
 {
     LOG_INFO("DataShareConnection_OnAbilityConnectDone_Test_001::Start");
@@ -279,17 +355,26 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityConnectDone_Test_
 }
 
 /**
-* @tc.name: DataShareConnection_OnAbilityDisconnectDone_Test_001
-* @tc.desc: Verify thread name is correctly set after disconnection
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection and set isReconnect_ to true
-    2. Call OnAbilityDisconnectDone with test parameters
-    3. Check that the thread name in the connection pool is correct
-* @tc.expect:
-    1. Thread name is set to "DShare_Connect"
-*/
+ * @tc.name: DataShareConnection_OnAbilityDisconnectDone_Test_001
+ * @tc.desc: Verify that the thread name in the connection pool of DataShareConnection is correctly set to the expected
+ *           value after the OnAbilityDisconnectDone method is called during reconnection.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment allows instantiation of DataShareConnection, IRemoteObject, and ElementName objects.
+    2. The isReconnect_ member of DataShareConnection can be set to true, and the connection pool is properly
+       initialized.
+    3. The expected thread name is predefined and accessible.
+ * @tc.step:
+    1. Create a DataShareConnection object with the test URI (DATA_SHARE_URI) and a valid IRemoteObject token.
+    2. Set the isReconnect_ flag of the DataShareConnection to true using isReconnect_.store(true).
+    3. Create an AppExecFwk::ElementName instance with test parameters and a resultCode of 0.
+    4. Call the OnAbilityDisconnectDone method with the ElementName and resultCode as parameters.
+    5. Check the threadName_ member of the connection pool's pool_ in the DataShareConnection.
+ * @tc.expect:
+    1. The threadName_ of the connection pool's pool_ is set to DATASHARE_EXECUTOR_NAME after
+       OnAbilityDisconnectDone is called.
+ */
 HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityDisconnectDone_Test_001, TestSize.Level1)
 {
     LOG_INFO("DataShareConnection_OnAbilityDisconnectDone_Test_001::Start");
