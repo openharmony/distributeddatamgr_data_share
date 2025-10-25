@@ -112,17 +112,28 @@ void PermissionTest::SetUp(void) {}
 void PermissionTest::TearDown(void) {}
 
 /**
-* @tc.name: PermissionTest_Uri_Empty_Test_001
-* @tc.desc: Verify permission check with empty URI returns error
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create empty URI object
-    2. Call VerifyPermission with empty URI and read operation
-    3. Check returned error code
-* @tc.experct: VerifyPermission returns ERR_INVALID_VALUE
-*/
+ * @tc.name: PermissionTest_Uri_Empty_Test_001
+ * @tc.desc: Verify that the VerifyPermission method in DataSharePermission returns an error when checking
+ *           permissions with an empty URI and a read operation.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a valid token ID (tokenIDEx)
+       with the specified user (USER_100), bundle name ("ohos.datashareclienttest.demo"), and app ID (0).
+    2. The EMPTY_URI constant is predefined as an empty string, enabling the creation of an empty Uri object.
+    3. The DataShare::DataSharePermission class provides a valid VerifyPermission static method that accepts
+       parameters: uint64_t (tokenIDEx), Uri, and bool (isRead, indicating read operation).
+    4. The ERR_INVALID_VALUE constant is predefined as the expected error code for invalid URI scenarios.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to obtain
+       a token ID object, then extract its tokenIDEx member.
+    2. Create an empty Uri object using the predefined EMPTY_URI constant.
+    3. Call DataShare::DataSharePermission::VerifyPermission, passing the extracted tokenIDEx, empty Uri,
+       and true (indicating read operation).
+    4. Check the error code returned by the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns ERR_INVALID_VALUE.
+ */
 HWTEST_F(PermissionTest, PermissionTest_Uri_Empty_Test_001, TestSize.Level0)
 {
     LOG_INFO("PermissionTest_Uri_Scheme_Error_Test_001::Start");
@@ -134,17 +145,29 @@ HWTEST_F(PermissionTest, PermissionTest_Uri_Empty_Test_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: PermissionTest_Bundle_Name_Error_Test_001
-* @tc.desc: Verify permission check with invalid bundle name in URI returns error
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create URI with invalid bundle name
-    2. Call VerifyPermission with this URI and read operation
-    3. Check returned error code
-* @tc.experct: VerifyPermission returns E_BUNDLE_NAME_NOT_EXIST
-*/
+ * @tc.name: PermissionTest_Bundle_Name_Error_Test_001
+ * @tc.desc: Verify that the VerifyPermission method in DataSharePermission returns an error when checking
+ *           permissions with a URI containing an invalid bundle name and a read operation.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a valid tokenIDEx with
+       USER_100, "ohos.datashareclienttest.demo", and 0.
+    2. The PROXY_ERROR_BUNDLE_URI constant is predefined as a URI string containing an invalid bundle name,
+       enabling the creation of a valid Uri object.
+    3. The DataShare::DataSharePermission::VerifyPermission method is valid and accepts tokenIDEx, Uri, and bool
+       (isRead).
+    4. The E_BUNDLE_NAME_NOT_EXIST constant is predefined as the expected error code for invalid bundle name scenarios.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to get
+       a token ID object, then extract its tokenIDEx.
+    2. Create a Uri object using the predefined PROXY_ERROR_BUNDLE_URI (with invalid bundle name).
+    3. Call DataShare::DataSharePermission::VerifyPermission, passing tokenIDEx, the created Uri, and true (read
+       operation).
+    4. Check the returned error code of the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns E_BUNDLE_NAME_NOT_EXIST.
+ */
 HWTEST_F(PermissionTest, PermissionTest_Bundle_Name_Error_Test_001, TestSize.Level0)
 {
     LOG_INFO("PermissionTest_Bundle_Name_Error_Test_001::Start");
@@ -156,17 +179,29 @@ HWTEST_F(PermissionTest, PermissionTest_Bundle_Name_Error_Test_001, TestSize.Lev
 }
 
 /**
-* @tc.name: PermissionTest_Uri_Diff_ProxyData_Test_001
-* @tc.desc: Verify permission check with non-existent proxy data URI returns error
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create URI pointing to non-existent proxy data
-    2. Call VerifyPermission with this URI and read operation
-    3. Check returned error code
-* @tc.experct: VerifyPermission returns E_URI_NOT_EXIST
-*/
+ * @tc.name: PermissionTest_Uri_Diff_ProxyData_Test_001
+ * @tc.desc: Verify that the VerifyPermission method in DataSharePermission returns a success code when checking
+ *           permissions with a URI pointing to non-existent proxy data and a read operation.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a valid tokenIDEx with
+       USER_100, "ohos.datashareclienttest.demo", and 0.
+    2. The URI_DIFF_PROXY_DATA constant is predefined as a URI string pointing to non-existent proxy data,
+       enabling the creation of a valid Uri object.
+    3. The DataShare::DataSharePermission::VerifyPermission method is valid and accepts tokenIDEx, Uri, and bool
+       (isRead).
+    4. The E_OK constant is predefined as the expected success code for the permission check.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to obtain
+       a token ID object, then extract its tokenIDEx.
+    2. Create a Uri object using the predefined URI_DIFF_PROXY_DATA (non-existent proxy data).
+    3. Call DataShare::DataSharePermission::VerifyPermission, passing tokenIDEx, the created Uri, and true (read
+       operation).
+    4. Check the returned error code of the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns E_OK.
+ */
 HWTEST_F(PermissionTest, PermissionTest_Uri_Diff_ProxyData_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_Uri_Diff_ProxyData_Test_001::Start");
@@ -178,17 +213,29 @@ HWTEST_F(PermissionTest, PermissionTest_Uri_Diff_ProxyData_Test_001, TestSize.Le
 }
 
 /**
-* @tc.name: PermissionTest_ProxyUri_OK_Test_001
-* @tc.desc: Verify permission check with valid proxy URI for read operation succeeds
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create valid proxy URI
-    2. Call VerifyPermission with this URI and read operation
-    3. Check returned error code
-* @tc.experct: VerifyPermission returns E_OK
-*/
+ * @tc.name: PermissionTest_ProxyUri_OK_Test_001
+ * @tc.desc: Verify that the VerifyPermission method in DataSharePermission returns a success code when checking
+ *           permissions with a valid proxy URI and a read operation.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a valid tokenIDEx with
+       USER_100, "ohos.datashareclienttest.demo", and 0.
+    2. The PROXY_URI_OK constant is predefined as a valid proxy URI string, enabling the creation of a valid Uri
+       object.
+    3. The DataShare::DataSharePermission::VerifyPermission method is valid and accepts tokenIDEx, Uri, and bool
+       (isRead).
+    4. The E_OK constant is predefined as the expected success code for successful permission checks.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to get
+       a token ID object, then extract its tokenIDEx.
+    2. Create a Uri object using the predefined PROXY_URI_OK (valid proxy URI).
+    3. Call DataShare::DataSharePermission::VerifyPermission, passing tokenIDEx, the created Uri, and true (read
+       operation).
+    4. Check the returned error code of the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns E_OK.
+ */
 HWTEST_F(PermissionTest, PermissionTest_ProxyUri_OK_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_ProxyUri_OK_Test_001::Start");
@@ -200,17 +247,30 @@ HWTEST_F(PermissionTest, PermissionTest_ProxyUri_OK_Test_001, TestSize.Level1)
 }
 
 /**
-* @tc.name: PermissionTest_ProxyUri_OK_Write_Permission_Error_Test_001
-* @tc.desc: Verify permission check with valid proxy URI for write operation without permission fails
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create valid proxy URI
-    2. Call VerifyPermission with this URI and write operation
-    3. Check returned error code
-* @tc.experct: VerifyPermission returns ERR_PERMISSION_DENIED
-*/
+ * @tc.name: PermissionTest_ProxyUri_OK_Write_Permission_Error_Test_001
+ * @tc.desc: Verify that the VerifyPermission method in DataSharePermission returns a permission-denied error when
+ *           checking permissions with a valid proxy URI and a write operation (without required write permission).
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a valid tokenIDEx with
+       USER_100, "ohos.datashareclienttest.demo", and 0 (this token lacks write permission for the valid proxy URI).
+    2. The PROXY_URI_OK constant is predefined as a valid proxy URI string, enabling the creation of a valid Uri
+       object.
+    3. The DataShare::DataSharePermission::VerifyPermission method is valid and accepts tokenIDEx, Uri, and bool
+       (isRead,
+       false indicating write operation).
+    4. The ERR_PERMISSION_DENIED constant is predefined as the expected error code for insufficient write permission.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to obtain
+       a token ID object, then extract its tokenIDEx.
+    2. Create a Uri object using the predefined PROXY_URI_OK (valid proxy URI).
+    3. Call DataShare::DataSharePermission::VerifyPermission, passing tokenIDEx, the created Uri, and false (indicating
+       write operation).
+    4. Check the returned error code of the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns ERR_PERMISSION_DENIED.
+ */
 HWTEST_F(PermissionTest, PermissionTest_ProxyUri_OK_Write_Permission_Error_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_ProxyUri_OK_Write_Permission_Error_Test_001::Start");
@@ -223,17 +283,29 @@ HWTEST_F(PermissionTest, PermissionTest_ProxyUri_OK_Write_Permission_Error_Test_
 }
 
 /**
-* @tc.name: PermissionTest_Error_Bundle_Name_Test_001
-* @tc.desc: Verify permission check with invalid bundle name in datashare URI returns error
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create datashare URI with invalid bundle name
-    2. Call VerifyPermission with this URI and read operation
-    3. Check returned error code
-* @tc.experct: VerifyPermission returns E_BUNDLE_NAME_NOT_EXIST
-*/
+ * @tc.name: PermissionTest_Error_Bundle_Name_Test_001
+ * @tc.desc: Verify that the VerifyPermission method in DataSharePermission returns an error when checking
+ *           permissions for a datashare URI containing an invalid bundle name and a read operation.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a valid token ID (tokenIDEx)
+       with the specified user (USER_100), bundle name ("ohos.datashareclienttest.demo"), and app ID (0).
+    2. The DATA_SHARE_ERROR_BUNDLE_URI constant is predefined as a datashare URI string containing an invalid
+       bundle name, enabling the creation of a valid Uri object.
+    3. The DataShare::DataSharePermission class provides a valid VerifyPermission static method that accepts
+       parameters: uint64_t (tokenIDEx), Uri, and bool (isRead, indicating read operation).
+    4. The E_BUNDLE_NAME_NOT_EXIST constant is predefined as the expected error code for invalid bundle name scenarios.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to obtain
+       a token ID object, then extract its tokenIDEx member.
+    2. Create a Uri object using the predefined DATA_SHARE_ERROR_BUNDLE_URI (datashare URI with invalid bundle name).
+    3. Call DataShare::DataSharePermission::VerifyPermission, passing the extracted tokenIDEx, created Uri,
+       and true (indicating read operation).
+    4. Check the error code returned by the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns E_BUNDLE_NAME_NOT_EXIST.
+ */
 HWTEST_F(PermissionTest, PermissionTest_Error_Bundle_Name_Test_001, TestSize.Level0)
 {
     LOG_INFO("PermissionTest_Error_Bundle_Name_Test_001::Start");
@@ -245,17 +317,31 @@ HWTEST_F(PermissionTest, PermissionTest_Error_Bundle_Name_Test_001, TestSize.Lev
 }
 
 /**
-* @tc.name: PermissionTest_No_Read_Permission_Test_001
-* @tc.desc: Verify permission check for read operation without required permission fails
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create valid datashare URI requiring specific read permission
-    2. Call VerifyPermission with this URI and read operation
-    3. Check returned error code
-* @tc.experct: VerifyPermission returns ERR_PERMISSION_DENIED
-*/
+ * @tc.name: PermissionTest_No_Read_Permission_Test_001
+ * @tc.desc: Verify that the VerifyPermission method in DataSharePermission returns a permission-denied error when
+ *           checking permissions for a read operation on a valid datashare URI, where the token lacks the required
+ *           read permission.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a token ID (tokenIDEx) with
+       USER_100, "ohos.datashareclienttest.demo", and 0—this token does NOT have the required read permission
+       (ohos.permission.READ_CALL_LOG) for the target URI.
+    2. The DATA_SHARE_URI constant is predefined as a valid datashare URI whose associated proxyData requires
+       the "ohos.permission.READ_CALL_LOG" read permission.
+    3. The DataShare::DataSharePermission::VerifyPermission method is valid and accepts tokenIDEx, Uri, and bool
+       (isRead).
+    4. The ERR_PERMISSION_DENIED constant is predefined as the expected error code for insufficient read permission.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to get
+       a token ID object, then extract its tokenIDEx.
+    2. Create a Uri object using the predefined DATA_SHARE_URI (valid datashare URI requiring read permission).
+    3. Call DataShare::DataSharePermission::VerifyPermission, passing tokenIDEx, the created Uri, and true (read
+       operation).
+    4. Check the returned error code of the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns ERR_PERMISSION_DENIED.
+ */
 HWTEST_F(PermissionTest, PermissionTest_No_Read_Permission_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_No_Read_Permission_Test_001::Start");
@@ -268,17 +354,32 @@ HWTEST_F(PermissionTest, PermissionTest_No_Read_Permission_Test_001, TestSize.Le
 }
 
 /**
-* @tc.name: PermissionTest_Have_Write_Permission_Test_001
-* @tc.desc: Verify permission check for write operation with required permission succeeds
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create valid datashare URI requiring specific write permission
-    2. Call VerifyPermission with this URI and write operation
-    3. Check returned error code
-* @tc.experct: VerifyPermission returns E_OK
-*/
+ * @tc.name: PermissionTest_Have_Write_Permission_Test_001
+ * @tc.desc: Verify that the VerifyPermission method in DataSharePermission returns a success code when checking
+ *           permissions for a write operation on a valid datashare URI, where the token has the required write
+ *           permission.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a token ID (tokenIDEx) with
+       USER_100, "ohos.datashareclienttest.demo", and 0—this token HAS the required write permission
+       (ohos.permission.WRITE_CALL_LOG) for the target URI.
+    2. The DATA_SHARE_WRITEURI constant is predefined as a valid datashare URI whose associated proxyData requires
+       the "ohos.permission.WRITE_CALL_LOG" write permission.
+    3. The DataShare::DataSharePermission::VerifyPermission method is valid and accepts tokenIDEx, Uri, and bool
+       (isRead,
+       false indicating write operation).
+    4. The E_OK constant is predefined as the expected success code for sufficient write permission.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to obtain
+       a token ID object, then extract its tokenIDEx.
+    2. Create a Uri object using the predefined DATA_SHARE_WRITEURI (valid datashare URI requiring write permission).
+    3. Call DataShare::DataSharePermission::VerifyPermission, passing tokenIDEx, the created Uri, and false (write
+       operation).
+    4. Check the returned error code of the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns E_OK.
+ */
 HWTEST_F(PermissionTest, PermissionTest_Have_Write_Permission_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_HAVA_WRITE_PERMISSION_Test_001::Start");
@@ -291,17 +392,30 @@ HWTEST_F(PermissionTest, PermissionTest_Have_Write_Permission_Test_001, TestSize
 }
 
 /**
-* @tc.name: PermissionTest_Empty_Read_Permission_Test_001
-* @tc.desc: Verify permission check for read operation with unconfigured read permission fails
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create datashare URI with unconfigured read permission
-    2. Call VerifyPermission with this URI and read operation
-    3. Check returned error code
-* @tc.experct: VerifyPermission returns ERR_PERMISSION_DENIED
-*/
+ * @tc.name: PermissionTest_Empty_Read_Permission_Test_001
+ * @tc.desc: Verify that the VerifyPermission method in DataSharePermission returns a permission-denied error when
+ *           checking permissions for a read operation on a datashare URI whose associated proxyData has no configured
+ *           read permission.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a valid tokenIDEx with
+       USER_100, "ohos.datashareclienttest.demo", and 0.
+    2. The DATA_SHARE_WRITEURI constant is predefined as a datashare URI whose associated proxyData does NOT have
+       any configured required read permission (requiredReadPermission is unconfigured).
+    3. The DataShare::DataSharePermission::VerifyPermission method is valid and accepts tokenIDEx, Uri, and bool
+       (isRead).
+    4. The ERR_PERMISSION_DENIED constant is predefined as the expected error code for unconfigured read permission.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to get
+       a token ID object, then extract its tokenIDEx.
+    2. Create a Uri object using the predefined DATA_SHARE_WRITEURI (datashare URI with unconfigured read permission).
+    3. Call DataShare::DataSharePermission::VerifyPermission, passing tokenIDEx, the created Uri, and true
+       (read operation).
+    4. Check the returned error code of the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns ERR_PERMISSION_DENIED.
+ */
 HWTEST_F(PermissionTest, PermissionTest_Empty_Read_Permission_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_Empty_Read_Permission_Test_001::Start");
@@ -314,17 +428,31 @@ HWTEST_F(PermissionTest, PermissionTest_Empty_Read_Permission_Test_001, TestSize
 }
 
 /**
-* @tc.name: PermissionTest_Empty_Write_Permission_Test_001
-* @tc.desc: Verify permission check for write operation with unconfigured write permission fails
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create datashare URI with unconfigured write permission
-    2. Call VerifyPermission with this URI and write operation
-    3. Check returned error code
-* @tc.expected: VerifyPermission returns ERR_PERMISSION_DENIED
-*/
+ * @tc.name: PermissionTest_Empty_Write_Permission_Test_001
+ * @tc.desc: Verify that the VerifyPermission method in DataSharePermission returns a permission-denied error when
+ *           checking permissions for a write operation on a datashare URI whose associated proxyData has no configured
+ *           write permission.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a valid token ID (tokenIDEx)
+       with USER_100, "ohos.datashareclienttest.demo", and 0.
+    2. The DATA_SHARE_URI constant is predefined as a valid datashare URI whose associated proxyData does NOT have
+       any configured required write permission (requiredWritePermission is unconfigured).
+    3. The DataShare::DataSharePermission::VerifyPermission method is valid and accepts parameters: uint64_t
+       (tokenIDEx),
+       Uri, and bool (isRead, false indicating write operation).
+    4. The ERR_PERMISSION_DENIED constant is predefined as the expected error code for unconfigured write permission.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to obtain a
+       token ID object, then extract its tokenIDEx member.
+    2. Create a Uri object using the predefined DATA_SHARE_URI (datashare URI with unconfigured write permission).
+    3. Call DataShare::DataSharePermission::VerifyPermission, passing tokenIDEx, the created Uri, and false (indicating
+       write operation).
+    4. Check the error code returned by the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns ERR_PERMISSION_DENIED.
+ */
 HWTEST_F(PermissionTest, PermissionTest_Empty_Write_Permission_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_Empty_Write_Permission_Test_001::Start");
@@ -337,17 +465,29 @@ HWTEST_F(PermissionTest, PermissionTest_Empty_Write_Permission_Test_001, TestSiz
 }
 
 /**
-* @tc.name: PermissionTest_Have_Query_Param_001
-* @tc.desc: Verify permission check with URI containing query parameters succeeds
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create valid proxy URI with query parameters
-    2. Call VerifyPermission with this URI and read operation
-    3. Check returned error code
-* @tc.expected: VerifyPermission returns E_OK
-*/
+ * @tc.name: PermissionTest_Have_Query_Param_001
+ * @tc.desc: Verify that the VerifyPermission method in DataSharePermission returns a success code when checking
+ *           permissions for a read operation on a valid proxy URI that contains query parameters.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a valid tokenIDEx with
+       USER_100, "ohos.datashareclienttest.demo", and 0—this token has the required read permission for the target URI.
+    2. The PROXY_URI_HAVA_QUERY constant is predefined as a valid proxy URI string that includes query parameters,
+       enabling the creation of a valid Uri object.
+    3. The DataShare::DataSharePermission::VerifyPermission method is valid and accepts tokenIDEx, Uri, and bool
+       (isRead).
+    4. The E_OK constant is predefined as the expected success code for successful permission checks.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to get a
+       token ID object, then extract its tokenIDEx.
+    2. Create a Uri object using the predefined PROXY_URI_HAVA_QUERY (valid proxy URI with query parameters).
+    3. Call DataShare::DataSharePermission::VerifyPermission, passing tokenIDEx, the created Uri, and true (read
+       operation).
+    4. Check the error code returned by the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns E_OK.
+ */
 HWTEST_F(PermissionTest, PermissionTest_Have_Query_Param_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_Have_Query_Param_001::Start");
@@ -358,6 +498,28 @@ HWTEST_F(PermissionTest, PermissionTest_Have_Query_Param_001, TestSize.Level1)
     LOG_INFO("PermissionTest_Have_Query_Param_001::End");
 }
 
+/**
+ * @tc.name: PermissionTest_DataObs_GetUriPermission_Uri_Empty_Test_001
+ * @tc.desc: Verify that the GetUriPermission method in DataSharePermission returns an empty URI error when called
+ *           with an empty URI, a specified user, read operation flag, and silent access flag.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of the DataShare::DataSharePermission class via std::make_shared.
+    2. The EMPTY_URI constant is predefined as an empty string, enabling the creation of an empty Uri object.
+    3. The GetUriPermission method of DataSharePermission is valid and accepts parameters: Uri, int (userID), bool
+       (isRead), bool (isSilent), returning a std::pair<int, std::string> (error code, permission).
+    4. The E_EMPTY_URI constant is predefined as the expected error code for empty URI scenarios.
+ * @tc.step:
+    1. Create an empty Uri object using the predefined EMPTY_URI constant.
+    2. Define a bool variable isSilent and initialize it to true (silent access mode).
+    3. Use std::make_shared to create a DataShare::DataSharePermission instance (datashare).
+    4. Call datashare->GetUriPermission, passing the empty Uri, USER_100, true (read operation), and isSilent;
+       store the returned std::pair<int, std::string> (ret, permission).
+    5. Check the error code (ret) from the returned pair.
+ * @tc.expect:
+    1. The error code (ret) returned by GetUriPermission is E_EMPTY_URI.
+ */
 HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_Empty_Test_001, TestSize.Level0)
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_Empty_Test_001::Start");
@@ -369,6 +531,30 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_Empty_Test_
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_Empty_Test_001::End");
 }
 
+/**
+ * @tc.name: PermissionTest_DataObs_GetUriPermission_Uri_Error_Test_001
+ * @tc.desc: Verify that the GetUriPermission method in DataSharePermission returns a URI-not-exist error when called
+ *           with an invalid proxy URI (PROXY_ERROR_BUNDLE_URI), specified user, read operation flag, and silent access
+ *           flag.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShare::DataSharePermission via std::make_shared.
+    2. The PROXY_ERROR_BUNDLE_URI constant is predefined as an invalid proxy URI string (non-existent), enabling
+       the creation of a Uri object.
+    3. The DataSharePermission::GetUriPermission method is valid, accepts Uri, int (userID), bool (isRead), bool
+       (isSilent), and returns a std::pair<int, std::string> (error code, permission).
+    4. The E_URI_NOT_EXIST constant is predefined as the expected error code for non-existent URI scenarios.
+ * @tc.step:
+    1. Create a Uri object using the predefined PROXY_ERROR_BUNDLE_URI (invalid/non-existent proxy URI).
+    2. Define a bool variable isSilent and initialize it to true.
+    3. Create a DataShare::DataSharePermission instance (datashare) via std::make_shared.
+    4. Call datashare->GetUriPermission with the invalid Uri, USER_100, true (read operation), and isSilent;
+       store the returned (ret, permission) pair.
+    5. Check the error code (ret) from the pair.
+ * @tc.expect:
+    1. The error code (ret) returned by GetUriPermission is E_URI_NOT_EXIST.
+ */
 HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_Error_Test_001, TestSize.Level0)
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_Error_Test_001::Start");
@@ -380,6 +566,33 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_Error_Test_
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_Error_Test_001::End");
 }
 
+/**
+ * @tc.name: PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_001
+ * @tc.desc: Verify that the GetUriPermission method in DataSharePermission returns a success code and the correct
+ *           permission when called with a valid proxy URI (PROXY_URI_OK), specified user, read operation flag, and
+ *           silent access flag.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShare::DataSharePermission via std::make_shared.
+    2. The PROXY_URI_OK constant is predefined as a valid proxy URI string, whose associated permission is
+       "ohos.permission.GET_BUNDLE_INFO".
+    3. The DataSharePermission::GetUriPermission method is valid, accepts Uri, int (userID), bool (isRead), bool
+       (isSilent),
+       and returns a std::pair<int, std::string> (error code, permission).
+    4. The E_OK constant is predefined as the expected success code; the target permission
+       "ohos.permission.GET_BUNDLE_INFO" is predefined and valid.
+ * @tc.step:
+    1. Create a Uri object using the predefined PROXY_URI_OK (valid proxy URI).
+    2. Define a bool variable isSilent and initialize it to true.
+    3. Create a DataShare::DataSharePermission instance (datashare) via std::make_shared.
+    4. Call datashare->GetUriPermission with the valid Uri, USER_100, true (read operation), and isSilent;
+       store the returned (ret, permission) pair.
+    5. Check both the error code (ret) and the permission string from the pair.
+ * @tc.expect:
+    1. The error code (ret) returned by GetUriPermission is E_OK.
+    2. The permission string returned by GetUriPermission is "ohos.permission.GET_BUNDLE_INFO".
+ */
 HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_001::Start");
@@ -392,6 +605,31 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_001
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_001::End");
 }
 
+/**
+ * @tc.name: PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_002
+ * @tc.desc: Verify that the GetUriPermission method in DataSharePermission returns a success code and the correct
+ *           write permission when called with a valid proxy URI (PROXY_URI_OK), specified user, write operation flag
+ *           (isRead=false), and silent access flag.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of the DataShare::DataSharePermission class via std::make_shared.
+    2. The PROXY_URI_OK constant is predefined as a valid proxy URI string, whose associated write permission is
+       "ohos.permission.WRITE_CONTACTS".
+    3. The GetUriPermission method of DataSharePermission is valid and accepts parameters: Uri, int (userID), bool
+       (isRead), bool (isSilent), returning a std::pair<int, std::string> (error code, permission).
+    4. The E_OK constant is predefined as the expected success code for valid operations.
+ * @tc.step:
+    1. Create a Uri object using the predefined PROXY_URI_OK (valid proxy URI for write operation).
+    2. Define a bool variable isSilent and initialize it to true (silent access mode).
+    3. Use std::make_shared to create a DataShare::DataSharePermission instance (datashare).
+    4. Call datashare->GetUriPermission, passing the valid Uri, USER_100, false (write operation), and isSilent;
+       store the returned std::pair<int, std::string> (ret, permission).
+    5. Check both the error code (ret) and the permission string from the returned pair.
+ * @tc.expect:
+    1. The error code (ret) returned by GetUriPermission is E_OK.
+    2. The permission string returned by GetUriPermission is "ohos.permission.WRITE_CONTACTS".
+ */
 HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_002, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_002::Start");
@@ -404,6 +642,30 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_002
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_002::End");
 }
 
+/**
+ * @tc.name: PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_003
+ * @tc.desc: Verify that the GetUriPermission method in DataSharePermission returns a success code and an empty
+ *           permission string when called with a valid DATA_SHARE_EXTENSION_URI, specified user, read operation flag,
+ *           and silent access flag.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShare::DataSharePermission via std::make_shared.
+    2. The DATA_SHARE_EXTENSION_URI constant is predefined as a valid URI string with no configured read permission.
+    3. The DataSharePermission::GetUriPermission method is valid and returns a std::pair<int, std::string> (error code,
+       permission) for the input parameters.
+    4. The E_OK constant is predefined as the expected success code for valid URI processing.
+ * @tc.step:
+    1. Create a Uri object using the predefined DATA_SHARE_EXTENSION_URI (valid URI with no read permission).
+    2. Define a bool variable isSilent and initialize it to true.
+    3. Create a DataShare::DataSharePermission instance (datashare) via std::make_shared.
+    4. Call datashare->GetUriPermission with the URI, USER_100, true (read operation), and isSilent; store the
+       returned (ret, permission) pair.
+    5. Check the error code (ret) and the permission string from the pair.
+ * @tc.expect:
+    1. The error code (ret) returned by GetUriPermission is E_OK.
+    2. The permission string returned by GetUriPermission is empty ("").
+ */
 HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_003, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_003::Start");
@@ -416,6 +678,30 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_003
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_003::End");
 }
 
+/**
+ * @tc.name: PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_004
+ * @tc.desc: Verify that the GetUriPermission method in DataSharePermission returns a success code and an empty
+ *           permission string when called with a valid DATA_SHARE_EXTENSION_URI, specified user, write operation flag,
+ *           and silent access flag.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShare::DataSharePermission via std::make_shared.
+    2. The DATA_SHARE_EXTENSION_URI constant is predefined as a valid URI string with no configured write permission.
+    3. The DataSharePermission::GetUriPermission method is valid and returns a std::pair<int, std::string> (error code,
+       permission) for the input parameters.
+    4. The E_OK constant is predefined as the expected success code for valid URI processing.
+ * @tc.step:
+    1. Create a Uri object using the predefined DATA_SHARE_EXTENSION_URI (valid URI with no write permission).
+    2. Define a bool variable isSilent and initialize it to true.
+    3. Create a DataShare::DataSharePermission instance (datashare) via std::make_shared.
+    4. Call datashare->GetUriPermission with the URI, USER_100, false (write operation), and isSilent; store the
+       returned (ret, permission) pair.
+    5. Check the error code (ret) and the permission string from the pair.
+ * @tc.expect:
+    1. The error code (ret) returned by GetUriPermission is E_OK.
+    2. The permission string returned by GetUriPermission is empty ("").
+ */
 HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_004, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_004::Start");
@@ -428,6 +714,31 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_004
     LOG_INFO("PermissionTest_DataObs_GetUriPermission_Uri_OK_Test_004::End");
 }
 
+/**
+ * @tc.name: PermissionTest_DataObs_VerifyPermission_Test_001
+ * @tc.desc: Verify that the static VerifyPermission method in DataSharePermission returns true when checking a valid
+ *           proxy URI (PROXY_URI_OK), a valid token ID, and the required permission ("ohos.permission.GET_BUNDLE_INFO")
+ *           for a read operation.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a valid token ID (tokenIDEx)
+       with USER_100, "ohos.datashareclienttest.demo", and 0—this token has the "ohos.permission.GET_BUNDLE_INFO"
+       permission.
+    2. The PROXY_URI_OK constant is predefined as a valid proxy URI string that matches the permission check logic.
+    3. The DataShare::DataSharePermission::VerifyPermission static method is valid and accepts parameters: Uri,
+       uint64_t (tokenIDEx), std::string (permission), bool (isRead), returning a bool (permission check result).
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to obtain a
+       token ID object, then extract its tokenIDEx member.
+    2. Create a Uri object using the predefined PROXY_URI_OK (valid proxy URI).
+    3. Define a std::string variable permission and initialize it to "ohos.permission.GET_BUNDLE_INFO".
+    4. Call DataShare::DataSharePermission::VerifyPermission, passing the Uri, tokenIDEx, permission, and true (read
+       operation).
+    5. Check the boolean return value of the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns true (permission check passes).
+ */
 HWTEST_F(PermissionTest, PermissionTest_DataObs_VerifyPermission_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_DataObs_VerifyPermission_Test_001::Start");
@@ -439,6 +750,31 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_VerifyPermission_Test_001, TestS
     LOG_INFO("PermissionTest_DataObs_VerifyPermission_Test_001::End");
 }
 
+/**
+ * @tc.name: PermissionTest_DataObs_VerifyPermission_Test_002
+ * @tc.desc: Verify that the static VerifyPermission method in DataSharePermission returns false when checking a valid
+ *           proxy URI (PROXY_URI_OK), a valid token ID, and an unowned permission ("ohos.permission.WIFI") for a read
+ *           operation.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a valid token ID (tokenIDEx)
+       with USER_100, "ohos.datashareclienttest.demo", and 0—this token DOES NOT have the "ohos.permission.WIFI"
+       permission.
+    2. The PROXY_URI_OK constant is predefined as a valid proxy URI string that matches the permission check logic.
+    3. The DataShare::DataSharePermission::VerifyPermission static method is valid and accepts parameters: Uri,
+       uint64_t (tokenIDEx), std::string (permission), bool (isRead), returning a bool (permission check result).
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to obtain a
+       token ID object, then extract its tokenIDEx member.
+    2. Create a Uri object using the predefined PROXY_URI_OK (valid proxy URI).
+    3. Define a std::string variable permission and initialize it to "ohos.permission.WIFI".
+    4. Call DataShare::DataSharePermission::VerifyPermission, passing the Uri, tokenIDEx, permission, and true (read
+       operation).
+    5. Check the boolean return value of the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns false (permission check fails).
+ */
 HWTEST_F(PermissionTest, PermissionTest_DataObs_VerifyPermission_Test_002, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_DataObs_VerifyPermission_Test_002::Start");
@@ -450,6 +786,30 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_VerifyPermission_Test_002, TestS
     LOG_INFO("PermissionTest_DataObs_VerifyPermission_Test_002::End");
 }
 
+/**
+ * @tc.name: PermissionTest_DataObs_VerifyPermission_Test_003
+ * @tc.desc: Verify that the static VerifyPermission method in DataSharePermission returns true when checking a valid
+ *           DATA_SHARE_SELF_URI, a valid token ID, and an empty permission string for a write operation.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a valid token ID (tokenIDEx)
+       with USER_100, "ohos.datashareclienttest.demo", and 0.
+    2. The DATA_SHARE_SELF_URI constant is predefined as a valid URI string that requires no specific permission (empty
+       permission string is acceptable) for write operations.
+    3. The DataShare::DataSharePermission::VerifyPermission static method is valid and accepts parameters: Uri,
+       uint64_t (tokenIDEx), std::string (permission), bool (isRead), returning a bool (permission check result).
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to obtain a
+       token ID object, then extract its tokenIDEx member.
+    2. Create a Uri object using the predefined DATA_SHARE_SELF_URI (valid URI with no required permission).
+    3. Define a std::string variable permission and initialize it to an empty string ("").
+    4. Call DataShare::DataSharePermission::VerifyPermission, passing the Uri, tokenIDEx, permission, and false (write
+       operation).
+    5. Check the boolean return value of the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns true (permission check passes with empty permission).
+ */
 HWTEST_F(PermissionTest, PermissionTest_DataObs_VerifyPermission_Test_003, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_DataObs_VerifyPermission_Test_003::Start");
@@ -461,6 +821,30 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_VerifyPermission_Test_003, TestS
     LOG_INFO("PermissionTest_DataObs_VerifyPermission_Test_003::End");
 }
 
+/**
+ * @tc.name: PermissionTest_DataObs_VerifyPermission_Test_004
+ * @tc.desc: Verify that the static VerifyPermission method in DataSharePermission returns true when checking a valid
+ *           DATA_SHARE_SELF_URI, a valid token ID, and an empty permission string for a read operation.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling AccessTokenKit::GetHapTokenIDEx to obtain a valid token ID (tokenIDEx)
+       with USER_100, "ohos.datashareclienttest.demo", and 0.
+    2. The DATA_SHARE_SELF_URI constant is predefined as a valid URI string that requires no specific permission (empty
+       permission string is acceptable) for read operations.
+    3. The DataShare::DataSharePermission::VerifyPermission static method is valid and accepts parameters: Uri,
+       uint64_t (tokenIDEx), std::string (permission), bool (isRead), returning a bool (permission check result).
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to obtain a
+       token ID object, then extract its tokenIDEx member.
+    2. Create a Uri object using the predefined DATA_SHARE_SELF_URI (valid URI with no required permission).
+    3. Define a std::string variable permission and initialize it to an empty string ("").
+    4. Call DataShare::DataSharePermission::VerifyPermission, passing the Uri, tokenIDEx, permission, and true (read
+       operation).
+    5. Check the boolean return value of the VerifyPermission method.
+ * @tc.expect:
+    1. The VerifyPermission method returns true (permission check passes with empty permission).
+ */
 HWTEST_F(PermissionTest, PermissionTest_DataObs_VerifyPermission_Test_004, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_DataObs_VerifyPermission_Test_004::Start");
@@ -472,6 +856,27 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_VerifyPermission_Test_004, TestS
     LOG_INFO("PermissionTest_DataObs_VerifyPermission_Test_004::End");
 }
 
+/**
+ * @tc.name: PermissionTest_DataObs_VerifyPermission_Test_005
+ * @tc.desc: Verify the behavior of DataSharePermission::VerifyPermission when using DATA_SHARE_SELF_URI, an empty
+ *           permission string, and a valid HAP token ID (from "ohos.datashareclienttest.demo" under USER_100).
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The AccessTokenKit::GetHapTokenIDEx method can successfully obtain a valid token ID for USER_100 and the
+       bundle name "ohos.datashareclienttest.demo".
+    2. The predefined constant DATA_SHARE_SELF_URI is a valid Uri string and accessible.
+    3. The DataSharePermission::VerifyPermission method accepts Uri, token ID, permission string, and bool as
+       parameters and returns a boolean result.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to get the token ID.
+    2. Create a Uri instance using the DATA_SHARE_SELF_URI constant.
+    3. Define an empty std::string for the permission parameter.
+    4. Call DataShare::DataSharePermission::VerifyPermission with the created Uri, token ID, empty permission,
+       and false (the last bool parameter).
+    5. Check the boolean return value of the VerifyPermission method.
+ * @tc.expect:
+    1. The DataSharePermission::VerifyPermission method returns true.
+ */
 HWTEST_F(PermissionTest, PermissionTest_DataObs_VerifyPermission_Test_005, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_DataObs_VerifyPermission_Test_005::Start");
@@ -483,6 +888,27 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_VerifyPermission_Test_005, TestS
     LOG_INFO("PermissionTest_DataObs_VerifyPermission_Test_005::End");
 }
 
+/**
+ * @tc.name: PermissionTest_DataObs_VerifyPermission_Test_006
+ * @tc.desc: Verify the behavior of DataSharePermission::VerifyPermission when using PROXY_URI_OK, an empty
+ *           permission string, and a valid HAP token ID (from "ohos.datashareclienttest.demo" under USER_100).
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The AccessTokenKit::GetHapTokenIDEx method can successfully obtain a valid token ID for USER_100 and the
+       bundle name "ohos.datashareclienttest.demo".
+    2. The predefined constant PROXY_URI_OK is a valid Uri string and accessible.
+    3. The DataSharePermission::VerifyPermission method accepts Uri, token ID, permission string, and bool as
+       parameters and returns a boolean result.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "ohos.datashareclienttest.demo", and 0 to get the token ID.
+    2. Create a Uri instance using the PROXY_URI_OK constant.
+    3. Define an empty std::string for the permission parameter.
+    4. Call DataShare::DataSharePermission::VerifyPermission with the created Uri, token ID, empty permission,
+       and false (the last bool parameter).
+    5. Check the boolean return value of the VerifyPermission method.
+ * @tc.expect:
+    1. The DataSharePermission::VerifyPermission method returns true.
+ */
 HWTEST_F(PermissionTest, PermissionTest_DataObs_VerifyPermission_Test_006, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_DataObs_VerifyPermission_Test_006::Start");
@@ -494,6 +920,26 @@ HWTEST_F(PermissionTest, PermissionTest_DataObs_VerifyPermission_Test_006, TestS
     LOG_INFO("PermissionTest_DataObs_VerifyPermission_Test_006::End");
 }
 
+/**
+ * @tc.name: PermissionTest_IsExtensionValid_001
+ * @tc.desc: Verify the behavior of DataSharePermission::IsExtensionValid when using a valid token ID from the
+ *           "com.acts.datasharetest" bundle (under USER_100), with matching caller and callee token IDs.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The AccessTokenKit::GetHapTokenIDEx method can successfully obtain a valid token ID for USER_100 and the
+       bundle name "com.acts.datasharetest".
+    2. Predefined error codes (E_OK) are valid and accessible.
+    3. The DataSharePermission::IsExtensionValid method accepts caller token ID, callee token ID, and user ID as
+       parameters and returns an integer error code.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "com.acts.datasharetest", and 0 to get the token ID.
+    2. Extract the tokenIDEx from the obtained token ID (to use as both caller and callee token IDs).
+    3. Call DataShare::DataSharePermission::IsExtensionValid with the extracted tokenIDEx (caller and callee),
+       and USER_100.
+    4. Check the integer return code of the IsExtensionValid method.
+ * @tc.expect:
+    1. The DataSharePermission::IsExtensionValid method returns E_OK.
+ */
 HWTEST_F(PermissionTest, PermissionTest_IsExtensionValid_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_IsExtensionValid_001::Start");
@@ -503,6 +949,27 @@ HWTEST_F(PermissionTest, PermissionTest_IsExtensionValid_001, TestSize.Level1)
     LOG_INFO("PermissionTest_IsExtensionValid_001::End");
 }
 
+/**
+ * @tc.name: PermissionTest_IsExtensionValid_002
+ * @tc.desc: Verify the behavior of DataSharePermission::IsExtensionValid when using a token ID from the
+ *           "com.acts.ohos.data.datasharetest" bundle (under USER_100), which is not a DataShare extension.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The AccessTokenKit::GetHapTokenIDEx method can successfully obtain a token ID for USER_100 and the
+       bundle name "com.acts.ohos.data.datasharetest".
+    2. Predefined error codes (E_NOT_DATASHARE_EXTENSION) are valid and accessible.
+    3. The DataSharePermission::IsExtensionValid method accepts caller token ID, callee token ID, and user ID as
+       parameters and returns an integer error code.
+ * @tc.step:
+    1. Call AccessTokenKit::GetHapTokenIDEx with USER_100, "com.acts.ohos.data.datasharetest", and 0 to get the
+       token ID.
+    2. Extract the tokenIDEx from the obtained token ID (to use as both caller and callee token IDs).
+    3. Call DataShare::DataSharePermission::IsExtensionValid with the extracted tokenIDEx (caller and callee),
+       and USER_100.
+    4. Check the integer return code of the IsExtensionValid method.
+ * @tc.expect:
+    1. The DataSharePermission::IsExtensionValid method returns E_NOT_DATASHARE_EXTENSION.
+ */
 HWTEST_F(PermissionTest, PermissionTest_IsExtensionValid_002, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_IsExtensionValid_002::Start");
@@ -512,6 +979,31 @@ HWTEST_F(PermissionTest, PermissionTest_IsExtensionValid_002, TestSize.Level1)
     LOG_INFO("PermissionTest_IsExtensionValid_002::End");
 }
 
+/**
+ * @tc.name: PermissionTest_GetSilentUriPermission_001
+ * @tc.desc: Verify the behavior of DataSharePermission::GetSilentUriPermission when the silentCache_ already
+ *           contains the target URI (PROXY_URI_OK) and permission information for USER_100.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The DataSharePermission class can be instantiated as a shared pointer, and its silentCache_ (a cache structure)
+       supports the Emplace method to add UriKey-permission pairs.
+    2. Predefined constants (TEST_BUNDLE_NAME, TEST_PERMISSION, PROXY_URI_OK, USER_100) are valid and accessible.
+    3. The DataSharePermission::UriKey structure can be initialized with a URI string and user ID;
+       GetSilentUriPermission returns a pair of (integer error code, std::string permission).
+ * @tc.step:
+    1. Create a shared pointer of DataSharePermission (datashare) using std::make_shared.
+    2. Initialize a DataSharePermission::Permission object: set bundleName to TEST_BUNDLE_NAME and readPermission to
+       TEST_PERMISSION.
+    3. Create a DataSharePermission::UriKey with PROXY_URI_OK (as string) and USER_100, then call
+       datashare->silentCache_.Emplace to add the UriKey and Permission pair to the cache.
+    4. Create a Uri instance (dstUri) using PROXY_URI_OK.
+    5. Call datashare->GetSilentUriPermission with dstUri, USER_100, and true; record the returned (ret, permission)
+       pair.
+    6. Check the return code (ret) and permission string.
+ * @tc.expect:
+    1. The GetSilentUriPermission method returns E_OK as the error code.
+    2. The returned permission string matches TEST_PERMISSION.
+ */
 HWTEST_F(PermissionTest, PermissionTest_GetSilentUriPermission_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_GetSilentUriPermission_001::Start");
@@ -531,6 +1023,33 @@ HWTEST_F(PermissionTest, PermissionTest_GetSilentUriPermission_001, TestSize.Lev
     LOG_INFO("PermissionTest_GetSilentUriPermission_001::End");
 }
 
+/**
+ * @tc.name: PermissionTest_GetSilentUriPermission_002
+ * @tc.desc: Verify the behavior of DataSharePermission::GetSilentUriPermission when silentCache_ is filled to
+ *           DataSharePermission::CACHE_SIZE, then querying a new URI (PROXY_URI_OK) for USER_100.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The DataSharePermission class can be instantiated as a shared pointer; silentCache_ supports Emplace and Size
+       methods, with a maximum capacity of DataSharePermission::CACHE_SIZE.
+    2. Predefined constants (TEST_PERMISSION, PROXY_URI_OK, USER_100, DataSharePermission::CACHE_SIZE) are valid and
+       accessible.
+    3. GetSilentUriPermission returns a pair of (integer error code, std::string permission).
+ * @tc.step:
+    1. Create a shared pointer of DataSharePermission (datashare) using std::make_shared.
+    2. Loop from 0 to DataSharePermission::CACHE_SIZE - 1:
+        a. Create a DataSharePermission::Permission object and set readPermission to TEST_PERMISSION.
+        b. Convert the loop index to a string as the URI, then create a UriKey with this URI and USER_100.
+        c. Call datashare->silentCache_.Emplace to add the UriKey-Permission pair to the cache.
+    3. Verify that datashare->silentCache_.Size() equals DataSharePermission::CACHE_SIZE.
+    4. Create a Uri instance (dstUri) using PROXY_URI_OK.
+    5. Call datashare->GetSilentUriPermission with dstUri, USER_100, and true; record the returned (ret, permission)
+       pair.
+    6. Check the return code (ret), permission string, and new size of silentCache_.
+ * @tc.expect:
+    1. The GetSilentUriPermission method returns E_OK as the error code.
+    2. The returned permission string matches TEST_PERMISSION.
+    3. After the query, datashare->silentCache_.Size() is 1.
+ */
 HWTEST_F(PermissionTest, PermissionTest_GetSilentUriPermission_002, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_GetSilentUriPermission_002::Start");
@@ -553,6 +1072,29 @@ HWTEST_F(PermissionTest, PermissionTest_GetSilentUriPermission_002, TestSize.Lev
     LOG_INFO("PermissionTest_GetSilentUriPermission_002::End");
 }
 
+/**
+ * @tc.name: PermissionTest_GetSilentUriPermission_003
+ * @tc.desc: Verify the behavior of DataSharePermission::GetSilentUriPermission when silentCache_ is initially empty,
+ *           then querying the same URI (PROXY_URI_OK) twice for USER_100.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The DataSharePermission class can be instantiated as a shared pointer; silentCache_ supports Size method and
+       auto-populates when querying a new URI.
+    2. Predefined constants (TEST_PERMISSION, PROXY_URI_OK, USER_100) are valid and accessible.
+    3. GetSilentUriPermission returns a pair of (integer error code, std::string permission).
+ * @tc.step:
+    1. Create a shared pointer of DataSharePermission (datashare) using std::make_shared.
+    2. Verify that datashare->silentCache_.Size() is 0 (initially empty).
+    3. Create a Uri instance (dstUri) using PROXY_URI_OK.
+    4. First call: datashare->GetSilentUriPermission with dstUri, USER_100, and true; record (ret, permission) and
+       check silentCache_ size.
+    5. Second call: datashare->GetSilentUriPermission with the same parameters; record (ret2, permission2) and check
+       silentCache_ size again.
+ * @tc.expect:
+    1. Both calls to GetSilentUriPermission return E_OK as the error code.
+    2. Both returned permission strings match TEST_PERMISSION.
+    3. After the first call, datashare->silentCache_.Size() is 1; after the second call, it remains 1.
+ */
 HWTEST_F(PermissionTest, PermissionTest_GetSilentUriPermission_003, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_GetSilentUriPermission_003::Start");
@@ -572,6 +1114,33 @@ HWTEST_F(PermissionTest, PermissionTest_GetSilentUriPermission_003, TestSize.Lev
     LOG_INFO("PermissionTest_GetSilentUriPermission_003::End");
 }
 
+/**
+ * @tc.name: PermissionTest_GetExtensionUriPermission_001
+ * @tc.desc: Verify the behavior of DataSharePermission::GetExtensionUriPermission when the extensionCache_ already
+ *           contains the target URI (DATA_SHARE_EXTENSION_URI) and permission info for USER_100.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The DataSharePermission class can be instantiated as a shared pointer; its extensionCache_ supports the Emplace
+       method to add UriKey-permission pairs.
+    2. Predefined constants (TEST_BUNDLE_NAME, TEST_PERMISSION, DATA_SHARE_EXTENSION_URI, USER_100) are valid and
+       accessible.
+    3. The DataSharePermission::UriKey structure initializes with a URI string and user ID; GetExtensionUriPermission
+       returns a pair of (integer error code, std::string permission).
+ * @tc.step:
+    1. Create a shared pointer of DataSharePermission (datashare) using std::make_shared.
+    2. Initialize a DataSharePermission::Permission object: set bundleName to TEST_BUNDLE_NAME and readPermission to
+       TEST_PERMISSION.
+    3. Create a DataSharePermission::UriKey with DATA_SHARE_EXTENSION_URI (as string) and USER_100, then call
+       datashare->extensionCache_.Emplace to add the pair to the cache.
+    4. Create a Uri instance (dstUri) using DATA_SHARE_EXTENSION_URI.
+    5. Call datashare->GetExtensionUriPermission with dstUri, USER_100, and true; record the returned (ret, permission)
+       pair.
+    6. Check the error code (ret) and permission string against expected values.
+ * @tc.expect:
+    1. The GetExtensionUriPermission method returns E_OK as the error code.
+    2. The returned permission string matches TEST_PERMISSION.
+ */
 HWTEST_F(PermissionTest, PermissionTest_GetExtensionUriPermission_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_GetExtensionUriPermission_001::Start");
@@ -591,6 +1160,34 @@ HWTEST_F(PermissionTest, PermissionTest_GetExtensionUriPermission_001, TestSize.
     LOG_INFO("PermissionTest_GetExtensionUriPermission_001::End");
 }
 
+/**
+ * @tc.name: PermissionTest_GetExtensionUriPermission_002
+ * @tc.desc: Verify the behavior of DataSharePermission::GetExtensionUriPermission when extensionCache_ is filled to
+ *           DataSharePermission::CACHE_SIZE, then querying a new URI (DATA_SHARE_EXTENSION_URI) for USER_100.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The DataSharePermission class can be instantiated as a shared pointer; extensionCache_ supports Emplace/Size
+       methods, with a maximum capacity of DataSharePermission::CACHE_SIZE.
+    2. Predefined constants (TEST_PERMISSION, DATA_SHARE_EXTENSION_URI, USER_100, DataSharePermission::CACHE_SIZE) are
+       valid.
+    3. GetExtensionUriPermission returns a pair of (integer error code, std::string permission).
+ * @tc.step:
+    1. Create a shared pointer of DataSharePermission (datashare) using std::make_shared.
+    2. Loop from 0 to DataSharePermission::CACHE_SIZE - 1:
+        a. Create a DataSharePermission::Permission object and set readPermission to TEST_PERMISSION.
+        b. Convert the loop index to a string as the URI, then create a UriKey with this URI and USER_100.
+        c. Call datashare->extensionCache_.Emplace to add the UriKey-Permission pair to the cache.
+    3. Verify that datashare->extensionCache_.Size() equals DataSharePermission::CACHE_SIZE.
+    4. Create a Uri instance (dstUri) using DATA_SHARE_EXTENSION_URI.
+    5. Call datashare->GetExtensionUriPermission with dstUri, USER_100, and true; record the returned (ret, permission)
+       pair.
+    6. Check the error code, permission string, and new size of extensionCache_.
+ * @tc.expect:
+    1. The GetExtensionUriPermission method returns E_OK as the error code.
+    2. The returned permission string is empty ("").
+    3. After the query, datashare->extensionCache_.Size() is 1.
+ */
 HWTEST_F(PermissionTest, PermissionTest_GetExtensionUriPermission_002, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_GetExtensionUriPermission_002::Start");
@@ -613,6 +1210,30 @@ HWTEST_F(PermissionTest, PermissionTest_GetExtensionUriPermission_002, TestSize.
     LOG_INFO("PermissionTest_GetExtensionUriPermission_002::End");
 }
 
+/**
+ * @tc.name: PermissionTest_GetExtensionUriPermission_003
+ * @tc.desc: Verify the behavior of DataSharePermission::GetExtensionUriPermission when extensionCache_ is initially
+ *           empty, then querying the same URI (DATA_SHARE_EXTENSION_URI) twice for USER_100.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The DataSharePermission class can be instantiated as a shared pointer; extensionCache_ supports Size method and
+       auto-populates when querying a new URI.
+    2. Predefined constants (DATA_SHARE_EXTENSION_URI, USER_100) are valid and accessible.
+    3. GetExtensionUriPermission returns a pair of (integer error code, std::string permission).
+ * @tc.step:
+    1. Create a shared pointer of DataSharePermission (datashare) using std::make_shared.
+    2. Verify that datashare->extensionCache_.Size() is 0 (initially empty).
+    3. Create a Uri instance (dstUri) using DATA_SHARE_EXTENSION_URI.
+    4. First call: Call datashare->GetExtensionUriPermission with dstUri, USER_100, and true; record (ret, permission)
+       and check extensionCache_ size.
+    5. Second call: Call the method again with the same parameters; record (ret2, permission2) and check
+       extensionCache_ size.
+ * @tc.expect:
+    1. Both calls to GetExtensionUriPermission return E_OK as the error code.
+    2. Both returned permission strings are empty ("").
+    3. After both calls, datashare->extensionCache_.Size() remains 1.
+ */
 HWTEST_F(PermissionTest, PermissionTest_GetExtensionUriPermission_003, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_GetExtensionUriPermission_003::Start");
@@ -633,20 +1254,35 @@ HWTEST_F(PermissionTest, PermissionTest_GetExtensionUriPermission_003, TestSize.
 }
 
 /**
-* @tc.name: PermissionTest_Have_Write_Test_001
-* @tc.desc: Verify permission check for write operation with correct permission succeeds
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create new HAP info with write permission configuration
-    2. Allocate access token with required write permission
-    3. Set the new token as current process token
-    4. Call VerifyPermission with valid URI and write operation
-    5. Check returned error code
-    6. Clean up the created token
-* @tc.expected: VerifyPermission returns E_OK
-*/
+ * @tc.name: PermissionTest_Have_Write_Test_001
+ * @tc.desc: Verify that the DataSharePermission::VerifyPermission method succeeds (returns E_OK) for a write operation
+ *           when the process has the correct write permission ("ohos.permission.WRITE_CONTACTS") via a valid access
+ *           token.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of HapInfoParams and HapPolicyParams, and AccessTokenKit methods
+       (AllocHapToken, GetHapTokenIDEx, DeleteToken) work normally.
+    2. The SetSelfTokenID function can set the current process's token ID; predefined constants (USER_100,
+       PROXY_URI_OK, APL_SYSTEM_CORE, PermissionState::PERMISSION_GRANTED, E_OK) are valid.
+    3. DataSharePermission::VerifyPermission accepts token ID, Uri, and bool (write operation flag) as parameters and
+       returns an integer error code.
+ * @tc.step:
+    1. Initialize HapInfoParams (info) with USER_100, bundle name "ohos.permission.write.demo", and other required
+       fields.
+    2. Initialize HapPolicyParams (policy) with APL_SYSTEM_CORE, and include "ohos.permission.WRITE_CONTACTS" (granted)
+       in permStateList.
+    3. Call AccessTokenKit::AllocHapToken with info and policy to allocate an access token.
+    4. Get the token ID via AccessTokenKit::GetHapTokenIDEx (using info's userID, bundleName, instIndex), then call
+       SetSelfTokenID to set it as the current process token.
+    5. Create a Uri instance using PROXY_URI_OK, then call DataShare::DataSharePermission::VerifyPermission with the
+       token ID, Uri, and false (write operation flag).
+    6. Check the returned error code; call AccessTokenKit::DeleteToken to clean up the allocated token.
+ * @tc.expect:
+    1. The DataSharePermission::VerifyPermission method returns E_OK for the write operation.
+    2. All AccessTokenKit operations (AllocHapToken, GetHapTokenIDEx, DeleteToken) and SetSelfTokenID execute without
+       errors.
+ */
 HWTEST_F(PermissionTest, PermissionTest_Have_Write_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_Have_Write_Test_001::Start");
@@ -691,20 +1327,34 @@ HWTEST_F(PermissionTest, PermissionTest_Have_Write_Test_001, TestSize.Level1)
 }
 
 /**
-* @tc.name: PermissionTest_Hava_Read_Permission_Test_001
-* @tc.desc: Verify permission check for read operation with correct permission succeeds
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create new HAP info with read permission configuration
-    2. Allocate access token with required read permission
-    3. Set the new token as current process token
-    4. Call VerifyPermission with valid URI and read operation
-    5. Check returned error code
-    6. Clean up the created token
-* @tc.expected: VerifyPermission returns E_OK
-*/
+ * @tc.name: PermissionTest_Hava_Read_Permission_Test_001
+ * @tc.desc: Verify that the DataSharePermission::VerifyPermission method succeeds (returns E_OK) for a read operation
+ *           when the process has the correct read permission ("ohos.permission.READ_CALL_LOG") via a valid access
+ *           token.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of HapInfoParams and HapPolicyParams, and AccessTokenKit methods
+       (AllocHapToken, GetHapTokenIDEx, DeleteToken) work normally.
+    2. The SetSelfTokenID function can set the current process's token ID; predefined constants (USER_100,
+       DATA_SHARE_URI, APL_SYSTEM_CORE, PermissionState::PERMISSION_GRANTED, E_OK) are valid.
+    3. DataSharePermission::VerifyPermission accepts token ID, Uri, and bool (read operation flag) as parameters and
+       returns an integer error code.
+ * @tc.step:
+    1. Initialize HapInfoParams (info) with USER_100, bundle name "ohos.permission.demo", and other required fields.
+    2. Initialize HapPolicyParams (policy) with APL_SYSTEM_CORE, and include "ohos.permission.READ_CALL_LOG" (granted)
+       in permStateList.
+    3. Call AccessTokenKit::AllocHapToken with info and policy to allocate an access token.
+    4. Get the token ID via AccessTokenKit::GetHapTokenIDEx (using info's userID, bundleName, instIndex), then call
+       SetSelfTokenID to set it as the current process token.
+    5. Create a Uri instance using DATA_SHARE_URI, then call DataShare::DataSharePermission::VerifyPermission with the
+       token ID, Uri, and true (read operation flag).
+    6. Check the returned error code; call AccessTokenKit::DeleteToken to clean up the allocated token.
+ * @tc.expect:
+    1. The DataSharePermission::VerifyPermission method returns E_OK for the read operation.
+    2. All AccessTokenKit operations (AllocHapToken, GetHapTokenIDEx, DeleteToken) and SetSelfTokenID execute without
+       errors.
+ */
 HWTEST_F(PermissionTest, PermissionTest_Hava_Read_Permission_Test_001, TestSize.Level1)
 {
     LOG_INFO("PermissionTest_Hava_Read_Permission_Test_001::Start");
