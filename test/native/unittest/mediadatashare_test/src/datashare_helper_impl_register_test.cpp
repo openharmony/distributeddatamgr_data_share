@@ -332,7 +332,7 @@ bool DataShareHelperImplRegisterTest::ChangeInfoEqual(const DataShareObserver::C
  *           verifying observer notification after INSERT operation
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. Valid DATA_SHARE_URI is predefined
     3. MockDatashareObserver class is implemented to monitor change notifications
@@ -408,7 +408,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_001, TestSize.L
  *           notification after BatchInsert operation
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. Valid DATA_SHARE_URI is predefined
     3. MockDatashareObserver class and ValueProxy::Convert method are implemented
@@ -464,7 +464,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_002, TestSize.L
  *           notification after Update operation
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. Valid DATA_SHARE_URI is predefined
     3. MockDatashareObserver class and ValueProxy::Convert method are implemented
@@ -526,7 +526,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_003, TestSize.L
  *           after Delete operation
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. Valid DATA_SHARE_URI is predefined
     3. MockDatashareObserver class and ValueProxy::Convert method are implemented
@@ -586,7 +586,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_004, TestSize.L
  * @tc.desc: Test the function of TryRegisterObserverExt interface with empty Uri, verifying error handling
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. MockDatashareObserver class is implemented
  * @tc.step:
@@ -616,7 +616,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_005, TestSize.L
  * @tc.desc: Test the function of TryRegisterObserverExt interface with null observer, verifying error handling
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. Valid DATA_SHARE_URI is predefined
  * @tc.step:
@@ -646,7 +646,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_006, TestSize.L
  * @tc.desc: Test the function of TryRegisterObserverExt interface with isSystem=true, verifying permission handling
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. Valid DATA_SHARE_URI is predefined
     3. MockDatashareObserver class is implemented
@@ -677,7 +677,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_007, TestSize.L
  * @tc.desc: Test the parent class implementation of TryRegisterObserverExt interface, verifying unimplemented behavior
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. Valid DATA_SHARE_URI is predefined
  * @tc.step:
@@ -708,7 +708,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_008, TestSize.L
  * @tc.desc: Test the function of TryRegisterObserverExt interface with invalid Uri, verifying notification behavior
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. Invalid REGISTER_URI_INVALID is predefined
     3. MockDatashareObserver class and ValueProxy::Convert method are implemented
@@ -761,7 +761,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_009, TestSize.L
  *           after unregistration
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. Valid DATA_SHARE_URI is predefined
     3. MockDatashareObserver class and ValueProxy::Convert method are implemented
@@ -820,7 +820,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_001, TestSize
  * @tc.desc: Test the function of TryUnregisterObserverExt interface with null observer, verifying error handling
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. Valid DATA_SHARE_URI is predefined
  * @tc.step:
@@ -851,7 +851,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_002, TestSize
  *           verifying error handling
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. Valid DATA_SHARE_URI is predefined
     3. MockDatashareObserver class is implemented
@@ -884,7 +884,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_003, TestSize
  *           unimplemented behavior
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. Valid DATA_SHARE_URI is predefined
  * @tc.step:
@@ -914,7 +914,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryUnregisterObserverExt_004, TestSize
  * @tc.desc: Test the normal function of RegisterObserver interface, verifying successful registration and notification
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance is initialized and not null
     2. Valid REGISTER_URI is predefined
     3. IDataShareAbilityObserverTest class is implemented (with SetName, GetName, and Clear methods)
@@ -960,7 +960,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_001, Te
  * @tc.desc: Test RegisterObserver interface with insufficient read permission, verifying notification restriction
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance is initialized and not null
     2. REGISTER_URI_NOREAD (Uri without read permission) is predefined
     3. IDataShareAbilityObserverTest class is implemented
@@ -1001,7 +1001,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_002, Te
  * @tc.desc: Test RegisterObserver with sufficient read permission but NotifyChange with insufficient write permission
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance is initialized and not null
     2. REGISTER_URI_NOWRITE (Uri without write permission) is predefined
     3. IDataShareAbilityObserverTest class is implemented
@@ -1043,7 +1043,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_003, Te
  *           verifying notification restriction
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. REGISTER_URI_NOALL (Uri without read and write permissions) is predefined
     3. IDataShareAbilityObserverTest class is implemented (supports SetName, GetName, Clear methods)
@@ -1129,7 +1129,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_005, Te
  *           after InsertEx
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global silent-mode DataShareHelper instance g_dataShareHelperSilent is initialized and not null
     2. DATA_SHARE_URI_SILENT (valid Uri for silent mode) is predefined
     3. IDataShareAbilityObserverTest class is implemented
@@ -1182,7 +1182,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_006, Te
  *           failure and notification restriction
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global silent-mode DataShareHelper instance g_dataShareHelperSilent is initialized and not null
     2. REGISTER_URI_NOREAD (Uri without read permission) is predefined
     3. IDataShareAbilityObserverTest class is implemented
@@ -1234,7 +1234,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_007, Te
  * @tc.desc: Test RegisterObserver interface in silent mode with invalid Uri, verifying error handling
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global silent-mode DataShareHelper instance g_dataShareHelperSilent is initialized and not null
     2. REGISTER_URI_INVALID (invalid Uri) is predefined
     3. IDataShareAbilityObserverTest class is implemented
@@ -1271,7 +1271,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_Register_Test_008, Te
  *           notification, and unregistration
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. Valid REGISTER_URI is predefined
     3. MockDatashareObserver class (with isNotify, changeInfo_, Clear method) and ValueProxy::Convert are implemented
@@ -1329,7 +1329,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_001,
  * @tc.desc: Test RegisterObserverExt interface with insufficient read permission, verifying notification restriction
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. REGISTER_URI_NOREAD (Uri without read permission) is predefined
     3. MockDatashareObserver class (with isNotify flag and Clear method) and ValueProxy::Convert are implemented
@@ -1384,7 +1384,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_002,
  *           permission
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. REGISTER_URI_NOWRITE (Uri with read permission but no write permission) is predefined
     3. MockDatashareObserver class (with isNotify flag and Clear method) and ValueProxy::Convert are implemented
@@ -1438,7 +1438,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_003,
  * @tc.desc: Test RegisterObserverExt interface with neither read nor write permission, verifying notification block
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. REGISTER_URI_NOALL (Uri without read or write permission) is predefined
     3. MockDatashareObserver class (with isNotify flag and Clear method) and ValueProxy::Convert are implemented
@@ -1492,7 +1492,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_004,
  * @tc.desc: Test RegisterObserverExt interface with invalid Uri, verifying notification block and error handling
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. REGISTER_URI_INVALID (malformed/invalid Uri) is predefined
     3. MockDatashareObserver class (with isNotify flag and Clear method) and ValueProxy::Convert are implemented
@@ -1548,7 +1548,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_005,
  *           notification
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. REGISTER_URI (valid, with full permissions) and REGISTER_URI_NOREAD (invalid for notifications) are predefined
     3. MockDatashareObserver class and ValueProxy::Convert are implemented
@@ -1614,7 +1614,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, RegisterObserver_RegisterExt_Test_006,
  *           notification delivery
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: 
+ * @tc.precon:
     1. Global DataShareHelper instance g_dataShareHelper is initialized and not null
     2. REGISTER_URI (valid Uri with full permissions) and REGISTER_URI_NOWRITE are predefined
     3. MockDatashareObserver class is implemented, including:
