@@ -96,16 +96,20 @@ void ProxyHandleTest::TearDown(void)
  * @tc.desc: Verify DataProxyHandle successfully publishing string data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
- * @tc.precon: None
+ * @tc.precon:
+    1. TEST_URI1 (valid URI for data operation) is predefined
+    2. DataProxyType::SHARED_CONFIG is a supported configuration type
+    3. DataShare::DataProxyHandle::Create() method is implemented
  * @tc.step:
-    1. Create a DataProxyHandle instance
-    2. Configure the publish parameters to SHARED_CONFIG type
-    3. Prepare string-type test data and publish it
-    4. Retrieve the data via the same URI
+    1. Create a DataProxyHandle instance via DataShare::DataProxyHandle::Create()
+    2. Initialize DataProxyConfig, set its type to DataProxyType::SHARED_CONFIG
+    3. Prepare string test data "hello", wrap it with TEST_URI1 into DataShareProxyData
+    4. Add the DataShareProxyData to a vector and call PublishProxyData
+    5. Create a URI vector with TEST_URI1, call GetProxyData to retrieve data
  * @tc.expect:
-    1. The DataProxyHandle is created successfully
-    2. The data publish operation returns a SUCCESS status code
-    3. The retrieved data matches the originally published data
+    1. DataProxyHandle creation returns E_OK and non-null handle
+    2. PublishProxyData returns DataProxyErrorCode::SUCCESS
+    3. Retrieved data matches the published string "hello"
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_001, TestSize.Level0)
 {
@@ -141,16 +145,20 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_001, TestSize.Level0)
  * @tc.desc: Verify DataProxyHandle successfully publishing integer data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
- * @tc.precon: None
+ * @tc.precon:
+    1. TEST_URI1 (valid URI for data operation) is predefined
+    2. DataProxyValue supports integer-type assignment
+    3. DataProxyType::SHARED_CONFIG supports integer data transmission
  * @tc.step:
-    1. Create a DataProxyHandle instance
-    2. Configure the publish parameters to SHARED_CONFIG type
-    3. Prepare integer-type test data and publish it
-    4. Retrieve the data via the same URI
+    1. Create a DataProxyHandle instance via DataShare::DataProxyHandle::Create()
+    2. Set DataProxyConfig's type to DataProxyType::SHARED_CONFIG
+    3. Prepare integer test data 123456, bind it with TEST_URI1 into DataShareProxyData
+    4. Add the DataShareProxyData to a vector and call PublishProxyData
+    5. Use TEST_URI1 to call GetProxyData and retrieve the data
  * @tc.expect:
-    1. The DataProxyHandle is created successfully
-    2. The data publish operation returns a SUCCESS status code
-    3. The retrieved data matches the originally published data
+    1. DataProxyHandle creation returns E_OK
+    2. PublishProxyData returns DataProxyErrorCode::SUCCESS
+    3. Retrieved data equals the published integer 123456
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_002, TestSize.Level0)
 {
@@ -180,19 +188,23 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_002, TestSize.Level0)
 
 /**
  * @tc.name: ProxyHandleTest_Publish_Test_003
- * @tc.desc: Verify DataProxyHandle successfully
+ * @tc.desc: Verify DataProxyHandle successfully publishing double-precision floating-point data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
- * @tc.precon: None
+ * @tc.precon:
+    1. TEST_URI1 (valid URI for data operation) is predefined
+    2. DataProxyValue supports double-type assignment
+    3. DataProxyType::SHARED_CONFIG supports double data transmission
  * @tc.step:
-    1. Create a DataProxyHandle instance
-    2. Configure the publish parameters to SHARED_CONFIG type
-    3. Prepare double-precision floating-point test data and publish it
-    4. Retrieve the data via the same URI
+    1. Create a DataProxyHandle instance via DataShare::DataProxyHandle::Create()
+    2. Configure DataProxyConfig to DataProxyType::SHARED_CONFIG
+    3. Prepare double test data 123456.123456, wrap with TEST_URI1 into DataShareProxyData
+    4. Add to a vector and call PublishProxyData
+    5. Call GetProxyData with TEST_URI1 to retrieve the data
  * @tc.expect:
-    1. The DataProxyHandle is created successfully
-    2. The data publish operation returns a SUCCESS status code
-    3. The retrieved data matches the originally published data
+    1. DataProxyHandle creation returns E_OK
+    2. PublishProxyData returns DataProxyErrorCode::SUCCESS
+    3. Retrieved data matches the published double 123456.123456
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_003, TestSize.Level0)
 {
@@ -225,16 +237,20 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_003, TestSize.Level0)
  * @tc.desc: Verify DataProxyHandle successfully publishing boolean data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
- * @tc.precon: None
+ * @tc.precon:
+    1. TEST_URI1 (valid URI for data operation) is predefined
+    2. DataProxyValue supports boolean-type assignment
+    3. DataProxyType::SHARED_CONFIG supports boolean data transmission
  * @tc.step:
-    1. Create a DataProxyHandle instance
-    2. Configure the publish parameters to SHARED_CONFIG type
-    3. Prepare boolean-type test data and publish it
-    4. Retrieve the data via the same URI
+    1. Create a DataProxyHandle instance via DataShare::DataProxyHandle::Create()
+    2. Set DataProxyConfig's type to DataProxyType::SHARED_CONFIG
+    3. Prepare boolean test data true, bind with TEST_URI1 into DataShareProxyData
+    4. Add to a vector and call PublishProxyData
+    5. Use TEST_URI1 to call GetProxyData and retrieve the data
  * @tc.expect:
-    1. The DataProxyHandle is created successfully
-    2. The data publish operation returns a SUCCESS status code
-    3. The retrieved data matches the originally published data
+    1. DataProxyHandle creation returns E_OK
+    2. PublishProxyData returns DataProxyErrorCode::SUCCESS
+    3. Retrieved data equals the published boolean true
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_004, TestSize.Level0)
 {
@@ -267,14 +283,18 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_004, TestSize.Level0)
  * @tc.desc: Verify that DataProxyHandle fails to publish data from another bundlename
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
- * @tc.precon: None
+ * @tc.precon:
+    1. TEST_URI2 (URI belonging to another bundle) is predefined
+    2. Current test process has no permission to access TEST_URI2's bundle
+    3. DataProxyType::SHARED_CONFIG enforces bundle permission checks
  * @tc.step:
-    1. Create a DataProxyHandle instance
-    2. Configure the publish parameters to SHARED_CONFIG type
-    3. Prepare test data pointing to another application's bundlename and attempt to publish it
+    1. Create a DataProxyHandle instance via DataShare::DataProxyHandle::Create()
+    2. Configure DataProxyConfig to DataProxyType::SHARED_CONFIG
+    3. Prepare boolean data true, wrap with TEST_URI2 into DataShareProxyData
+    4. Add to a vector and call PublishProxyData to attempt publishing
  * @tc.expect:
-    1. The DataProxyHandle is created successfully
-    2. The data publish operation returns a NO_PERMISSION status code
+    1. DataProxyHandle creation returns E_OK and non-null handle
+    2. PublishProxyData returns DataProxyErrorCode::NO_PERMISSION
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_005, TestSize.Level0)
 {
@@ -303,19 +323,21 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_005, TestSize.Level0)
  * @tc.desc: Verify the functionality of DataProxyHandle successfully deleting published data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
- * @tc.precon: None
+ * @tc.precon:
+    1. TEST_URI1 (valid URI for data operation) is predefined
+    2. DataProxyType::SHARED_CONFIG supports publish, get, delete operations
+    3. DataProxyErrorCode includes SUCCESS and URI_NOT_EXIST
  * @tc.step:
-    1. Create a DataProxyHandle instance
-    2. Configure the operation parameters to SHARED_CONFIG type
-    3. Publish test data
-    4. Verify that the data can be retrieved normally
-    5. Delete the published data
-    6. Attempt to retrieve the deleted data again
+    1. Create a DataProxyHandle instance via DataShare::DataProxyHandle::Create()
+    2. Set DataProxyConfig's type to DataProxyType::SHARED_CONFIG
+    3. Publish boolean data true to TEST_URI1 via PublishProxyData
+    4. Call GetProxyData with TEST_URI1 to verify publish success
+    5. Call DeleteProxyData with TEST_URI1 to delete the data
+    6. Call GetProxyData again to check deletion result
  * @tc.expect:
-    1. The data publish operation returns a SUCCESS status code
-    2. The data retrieval operation returns data that matches the published data
-    3. The data deletion operation returns a SUCCESS status code
-    4. Attempting to retrieve the data after deletion returns a URI_NOT_EXIST status code
+    1. Publish and Delete operations return DataProxyErrorCode::SUCCESS
+    2. Initial GetProxyData retrieves the published boolean true
+    3. Post-deletion GetProxyData returns DataProxyErrorCode::URI_NOT_EXIST
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_001, TestSize.Level0)
 {
@@ -356,14 +378,18 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_001, TestSize.Level0)
  * @tc.desc: Verify that DataProxyHandle fails to delete data from another bundlename
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
- * @tc.precon: None
+ * @tc.precon:
+    1. TEST_URI2 (URI belonging to another bundle) is predefined
+    2. Current test process has no permission to delete TEST_URI2's data
+    3. DataProxyType::SHARED_CONFIG checks permissions for delete operations
  * @tc.step:
-    1. Create a DataProxyHandle instance
-    2. Configure the operation parameters to SHARED_CONFIG type
-    3. Attempt to delete test data pointing to another application's bundle name
+    1. Create a DataProxyHandle instance via DataShare::DataProxyHandle::Create()
+    2. Configure DataProxyConfig to DataProxyType::SHARED_CONFIG
+    3. Create a URI vector with TEST_URI2
+    4. Call DeleteProxyData with the URI vector to attempt deletion
  * @tc.expect:
-    1. The DataProxyHandle is created successfully
-    2. The data deletion operation returns a NO_PERMISSION status code
+    1. DataProxyHandle creation returns E_OK and non-null handle
+    2. DeleteProxyData returns DataProxyErrorCode::NO_PERMISSION
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_002, TestSize.Level0)
 {
@@ -389,14 +415,18 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_002, TestSize.Level0)
  * @tc.desc: Verify that DataProxyHandle fails to delete unpublished data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
- * @tc.precon: None
+ * @tc.precon:
+    1. TEST_UNUSED_URI (URI with no published data) is predefined
+    2. DataProxyType::SHARED_CONFIG checks data existence for delete operations
+    3. DataProxyErrorCode includes URI_NOT_EXIST
  * @tc.step:
-    1. Create a DataProxyHandle instance
-    2. Configure the operation parameters to SHARED_CONFIG type
-    3. Attempt to delete unpublished test data
+    1. Create a DataProxyHandle instance via DataShare::DataProxyHandle::Create()
+    2. Set DataProxyConfig's type to DataProxyType::SHARED_CONFIG
+    3. Create a URI vector with TEST_UNUSED_URI
+    4. Call DeleteProxyData with the URI vector to attempt deletion
  * @tc.expect:
-    1. The DataProxyHandle is created successfully
-    2. The data deletion operation returns a URI_NOT_EXIST status code
+    1. DataProxyHandle creation returns E_OK and non-null handle
+    2. DeleteProxyData returns DataProxyErrorCode::URI_NOT_EXIST
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_003, TestSize.Level0)
 {
@@ -422,14 +452,18 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_003, TestSize.Level0)
  * @tc.desc: Verify that DataProxyHandle fails to retrieve unpublished data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
- * @tc.precon: None
+ * @tc.precon:
+    1. TEST_UNUSED_URI (URI with no published data) is predefined
+    2. DataProxyType::SHARED_CONFIG supports data retrieval operations
+    3. DataProxyErrorCode includes URI_NOT_EXIST
  * @tc.step:
-    1. Create a DataProxyHandle instance
-    2. Configure the operation parameters to SHARED_CONFIG type
-    3. Attempt to retrieve unpublished test data
+    1. Create a DataProxyHandle instance via DataShare::DataProxyHandle::Create()
+    2. Configure DataProxyConfig to DataProxyType::SHARED_CONFIG
+    3. Create a URI vector with TEST_UNUSED_URI
+    4. Call GetProxyData with the URI vector to attempt retrieval
  * @tc.expect:
-    1. The DataProxyHandle is created successfully
-    2. The data retrieval operation returns a URI_NOT_EXIST status code
+    1. DataProxyHandle creation returns E_OK and non-null handle
+    2. GetProxyData returns DataProxyErrorCode::URI_NOT_EXIST
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Get_Test_001, TestSize.Level0)
 {
@@ -455,18 +489,20 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Get_Test_001, TestSize.Level0)
  * @tc.desc: Verify the functionality of DataProxyHandle successfully subscribing
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
- * @tc.precon: None
+ * @tc.precon:
+    1. TEST_URI1 (valid URI for data operation) is predefined
+    2. DataProxyType::SHARED_CONFIG supports subscription to data changes
+    3. Global variable g_callbackTimes is used to count callback triggers
  * @tc.step:
-    1. Create a DataProxyHandle instance
-    2. Configure the operation parameters to SHARED_CONFIG type
-    3. Publish initial test data
-    4. Subscribe to data change events
-    5. Update the subscribed data
+    1. Create a DataProxyHandle instance via DataShare::DataProxyHandle::Create()
+    2. Configure DataProxyConfig to DataProxyType::SHARED_CONFIG
+    3. Publish initial string data "hello" to TEST_URI1
+    4. Subscribe to TEST_URI1 with a callback function
+    5. Update data to "world" and publish again
  * @tc.expect:
-    1. The data publish operation returns a SUCCESS status code
-    2. The data subscription operation returns a SUCCESS status code
-    3. The callback function is triggered once after the data is updated
-    4. The number of change notifications received by the callback function is correct
+    1. Publish and subscription operations return DataProxyErrorCode::SUCCESS
+    2. Callback function is triggered once after data update
+    3. g_callbackTimes equals 1 after update
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Subscribe_Test_001, TestSize.Level0)
 {
@@ -510,14 +546,19 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Subscribe_Test_001, TestSize.Level0)
  * @tc.desc: Verify that DataProxyHandle fails to subscribe to unpublished data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
- * @tc.precon: None
+ * @tc.precon:
+    1. TEST_UNUSED_URI (URI with no published data) is predefined
+    2. DataProxyType::SHARED_CONFIG checks data existence for subscriptions
+    3. DataProxyErrorCode includes URI_NOT_EXIST
  * @tc.step:
-    1. Create a DataProxyHandle instance
-    2. Configure the operation parameters to SHARED_CONFIG type
-    3. Attempt to subscribe to unpublished test data
+    1. Create a DataProxyHandle instance via DataShare::DataProxyHandle::Create()
+    2. Configure DataProxyConfig to DataProxyType::SHARED_CONFIG
+    3. Create a URI vector with TEST_UNUSED_URI
+    4. Attempt to subscribe to the URI with a callback function
  * @tc.expect:
-    1. The DataProxyHandle is created successfully
-    2. The data subscription operation returns a URI_NOT_EXIST status code
+    1. DataProxyHandle creation returns E_OK and non-null handle
+    2. Subscription operation returns DataProxyErrorCode::URI_NOT_EXIST
+    3. Callback function is not triggered (g_callbackTimes remains 0)
  */
 HWTEST_F(ProxyHandleTest, ProxyHandleTest_Subscribe_Test_002, TestSize.Level0)
 {
