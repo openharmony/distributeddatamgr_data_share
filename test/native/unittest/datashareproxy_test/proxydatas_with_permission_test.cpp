@@ -105,17 +105,24 @@ void ProxyDatasTest::TearDown(void)
 
 /**
  * @tc.name: ProxyDatasTest_Insert_Test_001
- * @tc.desc: Verify the functionality of DataShareHelper successfully inserting data into the data share proxy
+ * @tc.desc: Verify that the DataShareHelper can successfully insert string-type data into the data share proxy
+ *           by calling the Insert method, focusing on return value validation.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. The DATA_SHARE_PROXY_URI constant is a valid URI for accessing the data share proxy.
+    3. TBL_NAME0 and TBL_NAME1 are valid column names in the data source pointed to by DATA_SHARE_PROXY_URI.
  * @tc.step:
-    1. Obtain the DataShareHelper instance
-    2. Create a Uri object using the data share proxy URI
-    3. Prepare a DataShareValuesBucket and add string data to it
-    4. Call the Insert method of DataShareHelper with the Uri and ValuesBucket
+    1. Obtain the pre-initialized DataShareHelper instance by assigning dataShareHelper to a local variable (helper).
+    2. Create a Uri object using the DATA_SHARE_PROXY_URI constant.
+    3. Create a DataShareValuesBucket object, then call Put to add two key-value pairs: TBL_NAME0 = "wang" and
+       TBL_NAME1 = "wu".
+    4. Call the Insert method of the helper with the created Uri and DataShareValuesBucket, and record the return
+       value.
+    5. Check whether the return value of the Insert method is greater than 0.
  * @tc.expect:
-    1. The return value of the Insert method is greater than 0, indicating successful data insertion
+    1. The return value of the DataShareHelper::Insert method is greater than 0, indicating successful data insertion.
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Insert_Test_001, TestSize.Level1)
 {
@@ -134,21 +141,28 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Insert_Test_001, TestSize.Level1)
 }
 
 /**
-* @tc.name: ProxyDatasTest_QUERY_Test_001
-* @tc.desc: Verify basic query functionality with specific equality condition
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: Test data containing record with TBL_NAME0 value "wang" exists
-* @tc.step:
-    1. Obtain the DataShareHelper instance
-    2. Create URI for proxy data access using DATA_SHARE_PROXY_URI
-    3. Create DataSharePredicates with condition: TBL_NAME0 equals "wang"
-    4. Execute query with empty columns list
-    5. Check the returned result set and its row count
-* @tc.expect:
-    1. Query returns a non-null result set
-    2. Result set contains exactly 1 record (row count = 1)
-*/
+ * @tc.name: ProxyDatasTest_QUERY_Test_001
+ * @tc.desc: Verify the basic query functionality of the DataShareHelper for the data share proxy, using an equality
+ *           condition (TBL_NAME0 = "wang") to check the validity of the returned result set.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. The DATA_SHARE_PROXY_URI constant is a valid URI for the data share proxy.
+    3. The test data source contains exactly one record where the value of TBL_NAME0 is "wang".
+    4. The DataShareResultSet supports the GetRowCount method to obtain the number of rows.
+ * @tc.step:
+    1. Obtain the DataShareHelper instance by assigning dataShareHelper to a local variable (helper).
+    2. Create a Uri object using DATA_SHARE_PROXY_URI.
+    3. Create a DataSharePredicates object and call the EqualTo method to set the condition: TBL_NAME0 equals "wang".
+    4. Initialize an empty vector<string> for query columns, then call helper->Query with the Uri, predicates, and
+       columns.
+    5. Check whether the returned DataShareResultSet is non-null.
+    6. Call GetRowCount on the result set to get the number of rows and verify the count.
+ * @tc.expect:
+    1. The Query method returns a non-null DataShareResultSet.
+    2. The number of rows obtained via GetRowCount is exactly 1.
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_QUERY_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_QUERY_Test_001::Start");
@@ -166,22 +180,28 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QUERY_Test_001, TestSize.Level1)
 }
 
 /**
-* @tc.name: ProxyDatasTest_QueryTimout_Test_001
-* @tc.desc: Verify query timeout functionality with zero timeout configuration
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: Test data containing record with TBL_NAME0 value "wang" exists
-* @tc.step:
-    1. Obtain the DataShareHelper instance
-    2. Create URI for proxy data access using DATA_SHARE_PROXY_URI
-    3. Create DataSharePredicates with condition: TBL_NAME0 equals "wang"
-    4. Configure DataShareOption with timeout set to 0
-    5. Execute QueryTimeout with specified parameters and business error pointer
-    6. Verify result set and error code
-* @tc.expect:
-    1. Query returns a non-null result set
-    2. Business error code is E_OK (success status)
-*/
+ * @tc.name: ProxyDatasTest_QueryTimeout_Test_001
+ * @tc.desc: Verify the query timeout functionality of the DataShareHelper for the data share proxy when the timeout
+ *           is configured to 0ms, checking the result set and business error code.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. DATA_SHARE_PROXY_URI is a valid URI for the data share proxy.
+    3. The test data source contains at least one record where TBL_NAME0 equals "wang".
+    4. The DatashareBusinessError class supports the GetCode method to retrieve the error code (E_OK is predefined).
+ * @tc.step:
+    1. Obtain the DataShareHelper instance by assigning dataShareHelper to a local variable (helper).
+    2. Create a Uri object using DATA_SHARE_PROXY_URI.
+    3. Create a DataSharePredicates object and set the condition: TBL_NAME0 equals "wang" via EqualTo.
+    4. Initialize an empty vector<string> for columns; create a DataShareOption object and set its timeout to 0ms.
+    5. Declare a DatashareBusinessError object, then call helper->Query with Uri, predicates, columns, option, and
+       the error object.
+    6. Check the result set and the error code from the DatashareBusinessError object.
+ * @tc.expect:
+    1. The Query method returns a non-null DataShareResultSet.
+    2. The error code obtained via DatashareBusinessError::GetCode is E_OK (success status).
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_001, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_001::Start");
@@ -200,25 +220,31 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_001, TestSize.Level1)
 }
 
 /**
-* @tc.name: ProxyDatasTest_QueryTimeout_Test_002
-* @tc.desc: Verify query timeout stability and performance with multiple executions
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: Test data containing record with TBL_NAME0 value "wang" exists
-* @tc.step:
-    1. Obtain the DataShareHelper instance
-    2. Create URI for proxy data access using DATA_SHARE_PROXY_URI
-    3. Create DataSharePredicates with condition: TBL_NAME0 equals "wang"
-    4. Configure DataShareOption with 4000ms timeout
-    5. Execute QueryTimeout 100 times in sequence
-    6. Measure execution time for each query
-    7. Verify result set, error code and row count for each execution
-* @tc.expect:
-    1. Each query returns a non-null result set
-    2. Each query completes within 1000ms
-    3. Each query returns business error code E_OK
-    4. Each result set contains exactly 1 record
-*/
+ * @tc.name: ProxyDatasTest_QueryTimeout_Test_002
+ * @tc.desc: Verify the stability and performance of the DataShareHelper's query timeout function for the data share
+ *           proxy by executing 100 sequential queries with a 4000ms timeout, checking execution time and results.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. DATA_SHARE_PROXY_URI is a valid URI for the data share proxy.
+    3. The test data source has exactly one record where TBL_NAME0 equals "wang".
+    4. The test environment supports std::chrono for measuring execution time (milliseconds).
+ * @tc.step:
+    1. Obtain the DataShareHelper instance (helper) from dataShareHelper; create a Uri via DATA_SHARE_PROXY_URI.
+    2. Create a DataSharePredicates object and set TBL_NAME0 = "wang" using EqualTo; initialize an empty column vector.
+    3. Create a DataShareOption object and set its timeout to 4000ms; define limitTime (1000ms) and repeatTimes (100).
+    4. Loop 100 times:
+        a. Record the start time using std::chrono::steady_clock.
+        b. Call helper->Query with Uri, predicates, columns, option, and a DatashareBusinessError object.
+        c. Record the end time and calculate the execution duration.
+        d. Check the result set, execution duration, error code, and row count.
+ * @tc.expect:
+    1. Each query returns a non-null DataShareResultSet.
+    2. Each query’s execution duration is less than 1000ms.
+    3. Each query’s DatashareBusinessError code is E_OK.
+    4. Each result set’s row count (via GetRowCount) is 1.
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_002, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_002::Start");
@@ -248,27 +274,30 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_002, TestSize.Level1)
 }
 
 /**
-* @tc.name: ProxyDatasTest_QueryTimeout_Test_003
-* @tc.desc: Verify query timeout stability under multi-threaded concurrent access
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: Test data containing record with TBL_NAME0 value "wang" exists
-* @tc.step:
-    1. Obtain the DataShareHelper instance
-    2. Create URI for proxy data access using DATA_SHARE_PROXY_URI
-    3. Create DataSharePredicates with condition: TBL_NAME0 equals "wang"
-    4. Configure DataShareOption with 4000ms timeout
-    5. Define query function that executes QueryTimeout 100 times
-    6. Create 10 threads to run the query function concurrently
-    7. Wait for all threads to complete execution
-    8. Verify each query's execution time, result set and error code
-* @tc.expect:
-    1. All threads complete without execution errors
-    2. Each query returns a non-null result set
-    3. Each query completes within 1000ms
-    4. Each query returns business error code E_OK
-    5. Each result set contains exactly 1 record
-*/
+ * @tc.name: ProxyDatasTest_QueryTimeout_Test_003
+ * @tc.desc: Verify the stability of the DataShareHelper's query timeout function for the data share proxy under
+ *           multi-threaded concurrent access (10 threads, 100 queries each), checking consistency of results and time.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is thread-safe for concurrent queries.
+    2. DATA_SHARE_PROXY_URI is a valid URI for the data share proxy; test data has one record with TBL_NAME0 = "wang".
+    3. The test environment supports std::thread for multi-threading and std::chrono for time measurement.
+    4. DatashareBusinessError and DataShareResultSet work normally in concurrent scenarios.
+ * @tc.step:
+    1. Obtain helper from dataShareHelper; create Uri (DATA_SHARE_PROXY_URI), predicates (TBL_NAME0 = "wang"), and
+       empty columns.
+    2. Configure DataShareOption (timeout = 4000ms), limitTime (1000ms), repeatTimes (100), and threadNum (10).
+    3. Define a lambda function: loop 100 times, execute query, measure time, and verify result set/error/row count.
+    4. Create 10 std::thread objects, each running the lambda function.
+    5. Call join() on all threads to wait for their completion.
+ * @tc.expect:
+    1. All threads complete execution without crashes or exceptions.
+    2. Every query returns a non-null DataShareResultSet.
+    3. Every query’s execution time is less than 1000ms.
+    4. Every query’s DatashareBusinessError code is E_OK.
+    5. Every result set’s row count is 1.
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_003, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_003::Start");
@@ -371,16 +400,27 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_004, TestSize.Level1)
 }
 
 /**
-* @tc.name: ProxyDatasTest_QueryTimeout_Test_005
-* @tc.desc: test QueryTimeout function
-* @tc.type: FUNC
-* @tc.require: issueICS05H
-* @tc.precon: None
-* @tc.step:
-    1.Creat a DataShareHelper class
-    2.call QueryTimeout function
-* @tc.experct: QueryTimeout return nullptr when The function of the parent class was called
-*/
+ * @tc.name: ProxyDatasTest_QueryTimeout_Test_005
+ * @tc.desc: Verify the behavior of the Query function (inherited from the parent class of DataShareHelper) when
+ *           called directly, focusing on whether it returns nullptr as expected.
+ * @tc.type: FUNC
+ * @tc.require: issueICS05H
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. DATA_SHARE_PROXY_URI is a valid URI for the data share proxy.
+    3. The parent class of DataShareHelper has a Query method that returns nullptr when called directly.
+    4. DataShareOption and DatashareBusinessError can be instantiated normally.
+ * @tc.step:
+    1. Obtain the DataShareHelper instance (helper) by assigning dataShareHelper to a local variable.
+    2. Create a Uri object using DATA_SHARE_PROXY_URI.
+    3. Create a DataSharePredicates object and set TBL_NAME0 = "wang" via EqualTo; initialize an empty column vector.
+    4. Create a DataShareOption object and set its timeout to 0ms (timeout is meaningless for the parent class method).
+    5. Declare a DatashareBusinessError object, then call the parent class’s Query method directly:
+       helper->DataShareHelper::Query.
+    6. Check whether the returned DataShareResultSet is nullptr.
+ * @tc.expect:
+    1. The parent class’s Query method (called directly) returns a nullptr DataShareResultSet.
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_005, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_QueryTimeout_Test_005::Start");
@@ -451,20 +491,28 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_001, TestSize.Level1)
 }
 
 /**
-* @tc.name: ProxyDatasTest_ResultSet_Test_002
-* @tc.desc: Verify result set functionality and error handling for invalid operations
-* @tc.type: FUNC
-* @tc.precon: Test query fail while result set is full
-* @tc.step:
-    1. Obtain the DataShareHelper instance
-    2. Create URI for proxy data access using DATA_SHARE_PROXY_URI
-    3. Execute query to get result set for TBL_NAME0 equals "wang" for 32 times and success
-    4. Query for 33rd times
-    5. Close all the result set
-* @tc.expect:
-    1. Query returns non-null result set in the early 32 times
-    2. Query returns null result set in the 33rd time and errCode is E_RESULTSET_BUSY
-*/
+ * @tc.name: ProxyDatasTest_ResultSet_Test_002
+ * @tc.desc: Verify that the data share proxy returns a null result set with E_RESULTSET_BUSY when the maximum number
+ *           of concurrent result sets (32) is exceeded, including result set cleanup.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. DATA_SHARE_PROXY_URI is valid; test data has one record with TBL_NAME0 = "wang".
+    3. The data share proxy limits concurrent result sets to 32; E_RESULTSET_BUSY is a predefined error code.
+    4. The ResultSet’s Close method returns E_OK on success.
+ * @tc.step:
+    1. Obtain helper from dataShareHelper; create Uri (DATA_SHARE_PROXY_URI) and predicates (TBL_NAME0 = "wang").
+    2. Initialize a vector to store 32 result sets: loop 32 times, call Query, verify each result set is non-null,
+       and save it.
+    3. Execute the 33rd Query with a DatashareBusinessError object; check if the result set is null.
+    4. Retrieve the error code from the DatashareBusinessError object and verify it is E_RESULTSET_BUSY.
+    5. Loop through the vector of 32 result sets, call Close on each, and verify Close returns E_OK.
+ * @tc.expect:
+    1. The first 32 queries return non-null result sets.
+    2. The 33rd query returns a null result set.
+    3. The 33rd query’s DatashareBusinessError code is E_RESULTSET_BUSY.
+    4. All 32 result sets return E_OK when Close is called.
+ */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_002, TestSize.Level1)
 {
     LOG_INFO("ProxyDatasTest_ResultSet_Test_002::Start");
@@ -495,19 +543,27 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_ResultSet_Test_002, TestSize.Level1)
 
 /**
  * @tc.name: ProxyDatasTest_Template_Test_001
- * @tc.desc: Verify the functionality of adding and deleting query templates in the data share proxy
+ * @tc.desc: Verify the functionality of adding and deleting query templates in the data share proxy, focusing on
+ *           the success of template registration and removal via AddQueryTemplate and DelQueryTemplate.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. The DATA_SHARE_PROXY_URI constant is a valid URI for the data share proxy; SUBSCRIBER_ID is a valid
+       subscriber ID.
+    3. The PredicateTemplateNode and Template classes can be instantiated normally with SQL query parameters.
  * @tc.step:
-    1. Obtain the DataShareHelper instance
-    2. Create PredicateTemplateNode objects with SQL queries
-    3. Assemble the nodes into a Template object
-    4. Call AddQueryTemplate to register the template with the proxy URI and subscriber ID
-    5. Call DelQueryTemplate to remove the registered template
+    1. Obtain the DataShareHelper instance by assigning dataShareHelper to a local variable (helper).
+    2. Create two PredicateTemplateNode objects: node1 ("p1", "select name0 as name from TBL00") and
+       node2 ("p2", "select name1 as name from TBL00").
+    3. Assemble the nodes into a vector<PredicateTemplateNode>, then create a Template object with this vector and
+       the SQL "select name1 as name from TBL00".
+    4. Call helper->AddQueryTemplate with DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, and the Template, record the return
+       value.
+    5. Call helper->DelQueryTemplate with the same URI and SUBSCRIBER_ID, record the return value.
  * @tc.expect:
-    1. AddQueryTemplate returns 0, indicating successful template registration
-    2. DelQueryTemplate returns 0, indicating successful template deletion
+    1. The return value of AddQueryTemplate is 0, indicating successful template registration.
+    2. The return value of DelQueryTemplate is 0, indicating successful template deletion.
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_001, TestSize.Level1)
 {
@@ -529,18 +585,24 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_001, TestSize.Level1)
 
 /**
  * @tc.name: ProxyDatasTest_Template_Test_002
- * @tc.desc: Verify that adding and deleting query templates with an invalid URI fails as expected
+ * @tc.desc: Verify that adding and deleting query templates with an invalid URI in the data share proxy fails as
+ *           expected, returning the E_URI_NOT_EXIST error code.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. SUBSCRIBER_ID is a valid subscriber ID; E_URI_NOT_EXIST is a predefined invalid URI error code.
+    3. PredicateTemplateNode and Template can be instantiated normally with valid SQL queries.
  * @tc.step:
-    1. Obtain the DataShareHelper instance
-    2. Create PredicateTemplateNode objects and assemble them into a Template
-    3. Call AddQueryTemplate with an invalid URI and subscriber ID
-    4. Call DelQueryTemplate with the same invalid URI and subscriber ID
+    1. Obtain the DataShareHelper instance (helper) from dataShareHelper.
+    2. Create two PredicateTemplateNode objects (node1: "p1", "select name0 as name from TBL00"; node2: "p2",
+       "select name1 as name from TBL00"), assemble them into a vector, and create a Template object.
+    3. Define an invalid URI (errorUri = "datashareproxy://com.acts.ohos.data.datasharetest").
+    4. Call helper->AddQueryTemplate with errorUri, SUBSCRIBER_ID, and the Template, check the return value.
+    5. Call helper->DelQueryTemplate with errorUri and SUBSCRIBER_ID, check the return value.
  * @tc.expect:
-    1. AddQueryTemplate returns E_URI_NOT_EXIST, indicating failure due to invalid URI
-    2. DelQueryTemplate returns E_URI_NOT_EXIST, indicating failure due to invalid URI
+    1. The return value of AddQueryTemplate is E_URI_NOT_EXIST, indicating failure due to invalid URI.
+    2. The return value of DelQueryTemplate is E_URI_NOT_EXIST, indicating failure due to invalid URI.
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_002, TestSize.Level1)
 {
@@ -563,21 +625,29 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_002, TestSize.Level1)
 
 /**
  * @tc.name: ProxyDatasTest_Template_Test_003
- * @tc.desc: Verify the update functionality of query templates in the data share proxy
+ * @tc.desc: Verify the update functionality of query templates in the data share proxy, including template
+ *           registration, RDB data subscription, update triggering via data insertion, and result verification.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. DATA_SHARE_PROXY_URI is valid; TBL_NAME0 is a valid column in the data source.
+    3. The SubscribeRdbData and UnsubscribeRdbData methods support template-based data change listening.
+    4. E_OK is a predefined success error code.
  * @tc.step:
-    1. Create a Template with an update SQL statement and register it via AddQueryTemplate
-    2. Subscribe to RDB data changes using the template ID
-    3. Insert new data that triggers the template's update condition
-    4. Query the data to verify the update was applied
-    5. Unsubscribe from RDB data changes
+    1. Create a PredicateTemplateNode ("p1", "select name0 as name from TBL00"), assemble it into a vector, then
+       create a Template with an update SQL: "update TBL00 set name0 = 'updatetest' where name0 = 'name00'".
+    2. Call AddQueryTemplate with DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, and the Template; verify return value is 0.
+    3. Create a URI vector (containing DATA_SHARE_PROXY_URI) and a TemplateId (subscriberId_ = SUBSCRIBER_ID,
+       bundleName_ = "ohos.datashareproxyclienttest.demo"), call SubscribeRdbData and check errCode_ is E_OK.
+    4. Insert a record (TBL_NAME0 = "name00") via Insert, verify return value > 0.
+    5. Query with predicates (TBL_NAME0 = "updatetest") to check if the result set has 1 row.
+    6. Call UnsubscribeRdbData with the URI vector and TemplateId, verify errCode_ is E_OK.
  * @tc.expect:
-    1. Template registration returns 0 (success)
-    2. Subscription and unsubscription operations return 0 (success)
-    3. Insert operation succeeds (return value > 0)
-    4. Query returns a result set with 1 row, confirming the update was applied
+    1. AddQueryTemplate returns 0 (successful template registration).
+    2. SubscribeRdbData and UnsubscribeRdbData return errCode_ = E_OK (successful subscription/unsubscription).
+    3. The Insert method returns a value > 0 (successful data insertion).
+    4. The query result set has 1 row (update applied successfully).
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level1)
 {
@@ -631,18 +701,25 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level1)
 
 /**
  * @tc.name: ProxyDatasTest_Template_Test_004
- * @tc.desc: Verify adding and deleting query templates with parameterized update functions
+ * @tc.desc: Verify the functionality of adding and deleting query templates with parameterized update functions in
+ *           the data share proxy, including two rounds of template registration and removal.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. DATA_SHARE_PROXY_URI is a valid URI for the data share proxy; SUBSCRIBER_ID is a valid subscriber ID.
+    3. The Template class supports instantiation with and without explicit update SQL parameters.
  * @tc.step:
-    1. Create a Template with predicate nodes and register it via AddQueryTemplate
-    2. Delete the registered template via DelQueryTemplate
-    3. Create another Template with an explicit update SQL statement and register it
-    4. Delete the second template
+    1. Create two PredicateTemplateNodes: node1 ("p1", "select name0 as name from TBL00"), node2 ("p2",
+       "select name1 as name from TBL00"), assemble them into a vector.
+    2. Create Template1 with the node vector and SQL "select name1 as name from TBL00"; call AddQueryTemplate
+       and DelQueryTemplate, verify both return 0.
+    3. Create Template2 with an explicit update SQL ("update TBL00 set name0 = 'update'"), the same node vector,
+       and SQL "select name1 as name from TBL00".
+    4. Call AddQueryTemplate and DelQueryTemplate with Template2, verify both return 0.
  * @tc.expect:
-    1. All AddQueryTemplate calls return 0 (success)
-    2. All DelQueryTemplate calls return 0 (success)
+    1. All AddQueryTemplate calls return 0 (successful template registration).
+    2. All DelQueryTemplate calls return 0 (successful template deletion).
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_004, TestSize.Level1)
 {
@@ -670,17 +747,24 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_004, TestSize.Level1)
 
 /**
  * @tc.name: ProxyDatasTest_Template_Test_005
- * @tc.desc: Verify that adding a template with an invalid parameterized update function (non-update SQL) fails
+ * @tc.desc: Verify that adding a query template with an invalid parameterized update function (insert SQL instead of
+ *           update SQL) fails, and deleting the unregistered template succeeds in the data share proxy.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. DATA_SHARE_PROXY_URI and SUBSCRIBER_ID are valid; the Template class rejects non-update SQL as update functions.
+    3. DelQueryTemplate returns 0 even if the template does not exist (no error on deletion of non-existent entry).
  * @tc.step:
-    1. Create a Template with an insert SQL statement as the update function
-    2. Attempt to register the template via AddQueryTemplate
-    3. Attempt to delete the (unregistered) template via DelQueryTemplate
+    1. Create two PredicateTemplateNodes (node1: "p1", "select name0 as name from TBL00"; node2: "p2",
+       "select name1 as name from TBL00"), assemble them into a vector.
+    2. Create a Template with an invalid update SQL (insert: "insert into TBL00 (name0) values ('test')"), the node
+       vector, and SQL "select name1 as name from TBL00".
+    3. Call helper->AddQueryTemplate with DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, and the Template; check return value.
+    4. Call helper->DelQueryTemplate with the same URI and SUBSCRIBER_ID; check return value.
  * @tc.expect:
-    1. AddQueryTemplate returns -1 (failure) due to invalid update SQL
-    2. DelQueryTemplate returns 0 (success) (no error if template does not exist)
+    1. AddQueryTemplate returns -1 (failure due to invalid update SQL).
+    2. DelQueryTemplate returns 0 (success, no error for unregistered template).
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_005, TestSize.Level1)
 {
@@ -702,17 +786,24 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_005, TestSize.Level1)
 
 /**
  * @tc.name: ProxyDatasTest_Template_Test_006
- * @tc.desc: Verify adding and deleting query templates using a URI with a user ID parameter
+ * @tc.desc: Verify the functionality of adding and deleting query templates using a URI with a user ID parameter
+ *           ("?user=100") in the data share proxy.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. DATA_SHARE_PROXY_URI is a valid base URI; appending "?user=100" forms a valid parameterized URI.
+    3. SUBSCRIBER_ID is a valid subscriber ID; E_OK is a predefined success error code.
  * @tc.step:
-    1. Create a URI by appending "?user=100" to the base data share proxy URI
-    2. Create a Template with predicate nodes and register it using the new URI
-    3. Delete the registered template using the same URI
+    1. Create two PredicateTemplateNodes: node1 ("p1", "select name0 as name from TBL00"), node2 ("p2",
+       "select name1 as name from TBL00"), assemble them into a vector, then create a Template with the vector
+       and SQL "select name1 as name from TBL00".
+    2. Create a parameterized URI by appending "?user=100" to DATA_SHARE_PROXY_URI.
+    3. Call helper->AddQueryTemplate with the parameterized URI, SUBSCRIBER_ID, and the Template; check return value.
+    4. Call helper->DelQueryTemplate with the same parameterized URI and SUBSCRIBER_ID; check return value.
  * @tc.expect:
-    1. AddQueryTemplate returns E_OK (success)
-    2. DelQueryTemplate returns E_OK (success)
+    1. AddQueryTemplate returns E_OK (successful template registration with parameterized URI).
+    2. DelQueryTemplate returns E_OK (successful template deletion with parameterized URI).
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_006, TestSize.Level1)
 {
@@ -735,19 +826,27 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_006, TestSize.Level1)
 
 /**
  * @tc.name: ProxyDatasTest_Publish_Test_001
- * @tc.desc: Verify the functionality of publishing string data via the data share proxy and retrieving it
+ * @tc.desc: Verify the functionality of publishing string-type data via the data share proxy and retrieving the
+ *           published data using GetPublishedData, ensuring data consistency.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. The Data class supports storing data entries (URI, subscriber ID, string value); OperationResult returns
+       errCode_ for publish status.
+    3. The target bundle name ("com.acts.ohos.data.datasharetest") is valid and exists.
  * @tc.step:
-    1. Create a Data object containing a URI, subscriber ID, and string value
-    2. Publish the data using Publish method with the target bundle name
-    3. Retrieve the published data using GetPublishedData
-    4. Verify the retrieved data matches the published data
+    1. Define a valid bundle name: "com.acts.ohos.data.datasharetest".
+    2. Create a Data object, add a data entry to its datas_: URI
+       ("datashareproxy://com.acts.ohos.data.datasharetest/test"), SUBSCRIBER_ID, string value ("value1").
+    3. Call helper->Publish with the Data object and bundle name; check each OperationResult.errCode_ is 0.
+    4. Call helper->GetPublishedData with the bundle name, record the errCode_ and retrieved Data (getData).
+    5. Verify the size, subscriber ID, key (URI), and string value of getData.datas_ match the published data.
  * @tc.expect:
-    1. Publish returns OperationResult with errCode_ 0 (success)
-    2. GetPublishedData returns errCode_ 0 (success)
-    3. Retrieved data has the same size, subscriber ID, key, and value as published data
+    1. The Publish method returns OperationResult with errCode_ = 0 (successful data publishing).
+    2. The GetPublishedData method returns errCode_ = 0 (successful data retrieval).
+    3. The retrieved data has the same size as published data, and each entry matches in subscriber ID, key (URI),
+       and string value ("value1").
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level1)
 {
@@ -779,17 +878,24 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level1)
 
 /**
  * @tc.name: ProxyDatasTest_Publish_Test_002
- * @tc.desc: Verify that publishing data with a non-existent bundle name fails as expected
+ * @tc.desc: Verify that publishing data to a non-existent bundle name and retrieving data from the same invalid
+ *           bundle name fail, returning E_BUNDLE_NAME_NOT_EXIST in the data share proxy.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. The non-existent bundle name ("com.acts.ohos.error") is predefined; E_BUNDLE_NAME_NOT_EXIST is a predefined
+       error code for non-existent bundles.
+    3. The Data class can be instantiated with a data entry (URI, subscriber ID, string value).
  * @tc.step:
-    1. Create a Data object with a URI, subscriber ID, and string value
-    2. Attempt to publish the data using a non-existent bundle name
-    3. Attempt to retrieve published data using the same invalid bundle name
+    1. Define a non-existent bundle name: "com.acts.ohos.error".
+    2. Create a Data object, add a data entry to its datas_: URI ("datashareproxy://com.acts.ohos.error"),
+       SUBSCRIBER_ID, string value ("value1").
+    3. Call helper->Publish with the Data object and non-existent bundle name; check each OperationResult.errCode_.
+    4. Call helper->GetPublishedData with the same non-existent bundle name, record the errCode_.
  * @tc.expect:
-    1. Publish returns OperationResult with errCode_ E_BUNDLE_NAME_NOT_EXIST (failure)
-    2. GetPublishedData returns errCode_ E_BUNDLE_NAME_NOT_EXIST (failure)
+    1. The Publish method returns OperationResult with errCode_ = E_BUNDLE_NAME_NOT_EXIST.
+    2. The GetPublishedData method returns errCode_ = E_BUNDLE_NAME_NOT_EXIST (failure due to invalid bundle).
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_002, TestSize.Level1)
 {
@@ -812,19 +918,27 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_002, TestSize.Level1)
 
 /**
  * @tc.name: ProxyDatasTest_Publish_Test_003
- * @tc.desc: Verify the functionality of publishing binary data (ashmem) via the data share proxy and retrieving it
+ * @tc.desc: Verify the functionality of publishing binary data (vector<uint8_t>) via the data share proxy and
+ *           retrieving it using GetPublishedData, ensuring binary content consistency.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. The Data class supports storing binary data entries; the IsAshmem method identifies binary data, and GetData
+       retrieves the binary content.
+    3. The target bundle name ("com.acts.ohos.data.datasharetest") is valid and exists.
  * @tc.step:
-    1. Create a Data object containing a URI, subscriber ID, and binary buffer
-    2. Publish the data using Publish method with the target bundle name
-    3. Retrieve the published data using GetPublishedData
-    4. Verify the retrieved binary data matches the published data
+    1. Define a valid bundle name: "com.acts.ohos.data.datasharetest".
+    2. Create a binary buffer (vector<uint8_t> buffer = {10, 20, 30}).
+    3. Create a Data object, add a data entry to its datas_: URI
+       ("datashareproxy://com.acts.ohos.data.datasharetest/test"), SUBSCRIBER_ID, and the binary buffer.
+    4. Call helper->Publish with the Data object and bundle name; check each OperationResult.errCode_ is 0.
+    5. Call helper->GetPublishedData with the bundle name, record errCode_ and retrieved Data (getData).
+    6. Verify getData.datas_ matches the published data in size, subscriber ID, and binary content.
  * @tc.expect:
-    1. Publish returns OperationResult with errCode_ 0 (success)
-    2. GetPublishedData returns errCode_ 0 (success)
-    3. Retrieved data has the same size, subscriber ID, and binary content as published data
+    1. The Publish method returns OperationResult with errCode_ = 0 (successful binary data publishing).
+    2. The GetPublishedData method returns errCode_ = 0 (successful binary data retrieval).
+    3. The retrieved data has the same size as published data; each entry’s binary content matches.
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_003, TestSize.Level1)
 {
@@ -856,21 +970,32 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_003, TestSize.Level1)
 
 /**
  * @tc.name: ProxyDatasTest_CombinationRdbData_Test_001
- * @tc.desc: Verify combination functionality of RDB data subscription, enabling/disabling, and unsubscription
+ * @tc.desc: Verify the combination functionality of RDB data subscription, enabling/disabling subscriptions, and
+ *           unsubscription in the data share proxy, including callback triggering verification via data insertion.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. DATA_SHARE_PROXY_URI is a valid URI; SUBSCRIBER_ID is a valid subscriber ID for RDB subscriptions.
+    3. The global callback counter (g_callbackTimes) is initialized to 0 before the test starts.
+    4. TBL_NAME1 is a valid column in the data source pointed to by DATA_SHARE_PROXY_URI.
  * @tc.step:
-    1. Register a query template and subscribe to RDB data changes with a callback
-    2. Enable RDB subscriptions
-    3. Insert data to trigger the subscription callback
-    4. Verify the callback is invoked the expected number of times
-    5. Unsubscribe from RDB data changes and insert more data
+    1. Create a PredicateTemplateNode ("p1", "select name0 as name from TBL00"), assemble it into a vector, then
+       create a Template object with the vector and SQL "select name1 as name from TBL00".
+    2. Call helper->AddQueryTemplate with DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, and the Template; verify return value
+       is 0.
+    3. Create a URI vector (containing DATA_SHARE_PROXY_URI) and a TemplateId (subscriberId_ = SUBSCRIBER_ID,
+       bundleName_ = "ohos.datashareproxyclienttest.demo"), then call SubscribeRdbData with a callback that increments
+       g_callbackTimes; check each OperationResult.errCode_ is 0.
+    4. Call helper->EnableRdbSubs with the URI vector and TemplateId; verify each errCode_ is 0.
+    5. Insert two records (TBL_NAME1 = "wu" and "liu") via Insert; check each return value > 0 and g_callbackTimes = 2.
+    6. Call helper->UnsubscribeRdbData with the URI vector and TemplateId; verify each errCode_ is 0.
+    7. Insert another record; verify g_callbackTimes remains 2 (no additional callback).
  * @tc.expect:
-    1. Template registration, subscription, and enabling return 0 (success)
-    2. Insert operations return values > 0 (success)
-    3. Callback is invoked 2 times before unsubscription
-    4. No additional callback invocations after unsubscription
+    1. AddQueryTemplate, SubscribeRdbData, EnableRdbSubs, and UnsubscribeRdbData return errCode_ = 0 (success).
+    2. All Insert operations return values > 0 (successful data insertion).
+    3. The callback is invoked 2 times before unsubscription (g_callbackTimes = 2).
+    4. No additional callback invocations occur after unsubscription (g_callbackTimes remains 2).
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Level1)
 {
@@ -925,19 +1050,32 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Le
 
 /**
  * @tc.name: ProxyDatasTest_CombinationRdbData_Test_002
- * @tc.desc: Verify combination functionality of RDB data subscription, multiple disable operations, and re-enable
+ * @tc.desc: Verify the combination functionality of RDB data subscription (with two helpers), multiple disable
+ *           operations, re-enable, and unsubscription in the data share proxy, focusing on callback count consistency.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. Two pre-initialized DataShareHelper instances (dataShareHelper and dataShareHelper2) are available and non-null.
+    2. DATA_SHARE_PROXY_URI and SUBSCRIBER_ID are valid; the data source supports concurrent subscriptions from
+       multiple helpers.
+    3. TBL_NAME1 is a valid column; std::mutex and std::condition_variable work for thread-safe callback counting.
  * @tc.step:
-    1. Register a template and subscribe to RDB data changes with two helpers
-    2. Disable subscriptions, insert data, and disable again
-    3. Re-enable subscriptions and verify callback behavior
-    4. Unsubscribe from both helpers
+    1. Create an empty vector<PredicateTemplateNode>, then create a Template with the vector and SQL
+       "select name1 as name from TBL00".
+    2. Call dataShareHelper->AddQueryTemplate with DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, and the Template;
+       verify return value is 0.
+    3. Create a URI vector (containing DATA_SHARE_PROXY_URI) and a TemplateId (subscriberId_ = SUBSCRIBER_ID,
+       bundleName_ = "ohos.datashareproxyclienttest.demo").
+    4. Subscribe with dataShareHelper (callback increments atomic counter) and dataShareHelper2; verify
+       all OperationResult.errCode_ are 0.
+    5. Wait for initial callback (counter = 1), then call DisableRdbSubs with dataShareHelper; verify errCode_ = 0.
+    6. Insert a record (TBL_NAME1 = 1) via Insert; check return value > 0.
+    7. Call DisableRdbSubs again (no error), then EnableRdbSubs; verify errCode_ = 0 and counter = 2.
+    8. Unsubscribe from RDB data changes using both helpers.
  * @tc.expect:
-    1. Template registration, subscriptions, disable/enable return 0 (success)
-    2. Insert operation returns value > 0 (success)
-    3. Callback is invoked 2 times total (1 before disable, 1 after re-enable)
+    1. AddQueryTemplate, subscriptions, disable/enable, and unsubscription return errCode_ = 0 (success).
+    2. The Insert operation returns a value > 0 (successful data insertion).
+    3. The callback is invoked 2 times total (1 before disable, 1 after re-enable).
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_002, TestSize.Level1)
 {
@@ -994,18 +1132,31 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_002, TestSize.Le
 
 /**
  * @tc.name: ProxyDatasTest_CombinationRdbData_Test_003
- * @tc.desc: Verify combination functionality of RDB data subscription, disable, re-enable, and unsubscription
+ * @tc.desc: Verify the combination functionality of RDB data subscription, disable, re-enable, and unsubscription
+ *           in the data share proxy, ensuring no unexpected callback invocations after disable/re-enable.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, and E_OK (predefined success code) are valid.
+    3. An atomic callback counter (callbackTimes) and thread synchronization tools (mutex, condition_variable) are
+       initialized for safe callback counting.
  * @tc.step:
-    1. Register a template and subscribe to RDB data changes with a callback
-    2. Disable subscriptions, then re-enable them
-    3. Unsubscribe from RDB data changes
+    1. Create an empty vector<PredicateTemplateNode>, then create a Template with the vector and SQL
+       "select name1 as name from TBL00".
+    2. Call helper->AddQueryTemplate with DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, and the Template; verify return value
+       is E_OK.
+    3. Create a URI vector (containing DATA_SHARE_PROXY_URI) and a TemplateId (subscriberId_ = SUBSCRIBER_ID,
+       bundleName_ = "ohos.datashareproxyclienttest.demo").
+    4. Call SubscribeRdbData with a callback that increments callbackTimes; verify each OperationResult.errCode_
+       is E_OK.
+    5. Wait for the initial callback (callbackTimes = 1) using condition_variable with a 2-second timeout.
+    6. Call DisableRdbSubs, then EnableRdbSubs with the URI vector and TemplateId; verify each errCode_ is 0.
+    7. Verify callbackTimes remains 1 (no unexpected invocations), then call UnsubscribeRdbData; check each errCode_
+       is E_OK.
  * @tc.expect:
-    1. Template registration, subscription, disable/enable, and unsubscription return 0 (success)
-    2. Callback is invoked 1 time (initial subscription)
-    3. No additional callback invocations after disable/re-enable
+    1. AddQueryTemplate, SubscribeRdbData, DisableRdbSubs, EnableRdbSubs, and UnsubscribeRdbData return success.
+    2. The callback is invoked 1 time (only initial subscription, no invocations after disable/re-enable).
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_003, TestSize.Level1)
 {
@@ -1059,18 +1210,28 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_003, TestSize.Le
 
 /**
  * @tc.name: ProxyDatasTest_CombinationPublishedData_Test_001
- * @tc.desc: Verify combination functionality of published data subscription, disable, re-enable, and unsubscription
+ * @tc.desc: Verify the combination functionality of published data subscription (two helpers), disable, re-enable,
+ *           and unsubscription in the data share proxy, including republish verification.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. Two pre-initialized DataShareHelper instances (dataShareHelper and dataShareHelper2) are available and non-null.
+    2. The target bundle name ("com.acts.ohos.data.datasharetest") and DATA_SHARE_PROXY_URI are valid.
+    3. The Data class supports storing published data entries; an atomic callback counter and thread synchronization
+       tools are initialized.
  * @tc.step:
-    1. Publish data and subscribe to published data changes with two helpers
-    2. Disable subscriptions, republish data, then disable again
-    3. Re-enable subscriptions and verify callback behavior
-    4. Unsubscribe from both helpers
+    1. Create a Data object, add a data entry (DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, "value1") to its datas_; call
+       helper->Publish with the Data and bundle name; verify each OperationResult.errCode_ is 0.
+    2. Create a URI vector (containing DATA_SHARE_PROXY_URI); subscribe to published data with dataShareHelper
+       (callback increments counter) and dataShareHelper2 (empty callback); check all errCode_ are 0.
+    3. Wait for initial callback (counter = 1) with a 2-second timeout, then call helper->DisablePubSubs; verify
+       errCode_ = 0.
+    4. Republish the same Data object; verify Publish returns errCode_ = 0 (no callback during disable).
+    5. Call DisablePubSubs again (no error), then EnablePubSubs; verify errCode_ = 0 and counter = 2.
+    6. Unsubscribe from published data using both helpers.
  * @tc.expect:
-    1. Publish, subscription, disable/enable return 0 (success)
-    2. Callback is invoked 2 times total (1 before disable, 1 after re-enable)
+    1. Publish, SubscribePublishedData, DisablePubSubs, EnablePubSubs, and unsubscription return errCode_ = 0.
+    2. The callback is invoked 2 times total (1 before disable, 1 after re-enable).
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationPublishedData_Test_001, TestSize.Level1)
 {
@@ -1125,16 +1286,25 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationPublishedData_Test_001, TestS
 
 /**
  * @tc.name: ProxyDatasTest_SubscribePublishedData_Test_001
- * @tc.desc: Verify the functionality of subscribing to published data changes
+ * @tc.desc: Verify the basic functionality of subscribing to published data changes in the data share proxy,
+ *           focusing on subscription success and callback verification.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. DATA_SHARE_PROXY_URI and SUBSCRIBER_ID are valid for published data subscriptions.
+    3. The expected owner bundle name ("ohos.datashareproxyclienttest.demo") is predefined and matches the callback’s
+       verification logic.
  * @tc.step:
-    1. Create a list of URIs to subscribe to
-    2. Call SubscribePublishedData with the URIs, subscriber ID, and a verification callback
+    1. Create a vector<std::string> (uris) and add DATA_SHARE_PROXY_URI to it.
+    2. Call helper->SubscribePublishedData with uris, SUBSCRIBER_ID, and a callback that verifies
+       changeNode.ownerBundleName_ equals "ohos.datashareproxyclienttest.demo".
+    3. Check the size of the returned OperationResult vector matches the size of uris.
+    4. Verify each OperationResult.errCode_ in the vector is 0.
  * @tc.expect:
-    1. Subscription returns OperationResult with errCode_ 0 (success)
-    2. Callback verifies the owner bundle name when triggered
+    1. The size of the OperationResult vector is equal to the size of the uris vector.
+    2. Each OperationResult.errCode_ is 0 (successful subscription).
+    3. When triggered, the callback correctly verifies that ownerBundleName_ matches the expected value.
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribePublishedData_Test_001, TestSize.Level1)
 {
@@ -1155,15 +1325,21 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_SubscribePublishedData_Test_001, TestSiz
 
 /**
  * @tc.name: ProxyDatasTest_DisablePubSubs_Test_001
- * @tc.desc: Verify the functionality of disabling published data subscriptions
+ * @tc.desc: Verify the basic functionality of disabling active published data subscriptions in the data share proxy.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. DATA_SHARE_PROXY_URI and SUBSCRIBER_ID are valid, and there are active published data subscriptions
+       for the specified uris and subscriber ID.
+    3. The DisablePubSubs method returns OperationResult objects to indicate disable status.
  * @tc.step:
-    1. Create a list of URIs with active subscriptions
-    2. Call DisablePubSubs with the URIs and subscriber ID
+    1. Create a vector<std::string> (uris) and add DATA_SHARE_PROXY_URI (with active subscriptions) to it.
+    2. Call helper->DisablePubSubs with the uris vector and SUBSCRIBER_ID.
+    3. Iterate through the returned vector of OperationResult objects.
+    4. Check the errCode_ of each OperationResult to verify disable success.
  * @tc.expect:
-    1. DisablePubSubs returns OperationResult with errCode_ 0 (success)
+    1. Each OperationResult.errCode_ in the returned vector is 0 (successful disabling of subscriptions).
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_DisablePubSubs_Test_001, TestSize.Level1)
 {
@@ -1180,15 +1356,21 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_DisablePubSubs_Test_001, TestSize.Level1
 
 /**
  * @tc.name: ProxyDatasTest_EnablePubSubs_Test_001
- * @tc.desc: Verify the functionality of enabling published data subscriptions
+ * @tc.desc: Verify the basic functionality of enabling disabled published data subscriptions in the data share proxy.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. DATA_SHARE_PROXY_URI and SUBSCRIBER_ID are valid, and the published data subscriptions for the specified
+       uris and subscriber ID are currently disabled.
+    3. The EnablePubSubs method returns OperationResult objects to indicate enable status.
  * @tc.step:
-    1. Create a list of URIs with disabled subscriptions
-    2. Call EnablePubSubs with the URIs and subscriber ID
+    1. Create a vector<std::string> (uris) and add DATA_SHARE_PROXY_URI (with disabled subscriptions) to it.
+    2. Call helper->EnablePubSubs with the uris vector and SUBSCRIBER_ID.
+    3. Iterate through the returned vector of OperationResult objects.
+    4. Check the errCode_ of each OperationResult to verify enable success.
  * @tc.expect:
-    1. EnablePubSubs returns OperationResult with errCode_ 0 (success)
+    1. Each OperationResult.errCode_ in the returned vector is 0 (successful enabling of subscriptions).
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_EnablePubSubs_Test_001, TestSize.Level1)
 {
@@ -1205,15 +1387,23 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_EnablePubSubs_Test_001, TestSize.Level1)
 
 /**
  * @tc.name: ProxyDatasTest_UnsubscribePublishedData_Test_001
- * @tc.desc: Verify the functionality of unsubscribing from published data changes
+ * @tc.desc: Verify the basic functionality of unsubscribing from active published data changes in the data
+ *           share proxy.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null.
+    2. DATA_SHARE_PROXY_URI and SUBSCRIBER_ID are valid, and there are active published data subscriptions
+       for the specified uris and subscriber ID.
+    3. The UnsubscribePublishedData method returns OperationResult objects to indicate unsubscription status.
  * @tc.step:
-    1. Create a list of URIs with active subscriptions
-    2. Call UnsubscribePublishedData with the URIs and subscriber ID
+    1. Create a vector<std::string> (uris) and add DATA_SHARE_PROXY_URI (with active subscriptions) to it.
+    2. Call helper->UnsubscribePublishedData with the uris vector and SUBSCRIBER_ID.
+    3. Check the size of the returned OperationResult vector matches the size of the uris vector.
+    4. Verify each OperationResult.errCode_ in the vector is 0.
  * @tc.expect:
-    1. UnsubscribePublishedData returns OperationResult with errCode_ 0 (success)
+    1. The size of the OperationResult vector is equal to the size of the uris vector.
+    2. Each OperationResult.errCode_ is 0 (successful unsubscription).
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_UnsubscribePublishedData_Test_001, TestSize.Level1)
 {
@@ -1231,18 +1421,24 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_UnsubscribePublishedData_Test_001, TestS
 
 /**
  * @tc.name: ProxyDatasTest_extSpCtl_Null_Test_001
- * @tc.desc: Verify extended special control operations after releasing the helper
+ * @tc.desc: Verify the behavior of extended special control operations (GetFileTypes, OpenFile, OpenRawFile) in the
+ *           data share proxy after releasing the DataShareHelper instance.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null before release.
+    2. The Release method of DataShareHelper returns a boolean to indicate release status.
+    3. Empty Uri ("") and empty string are valid inputs for the tested extended operations.
  * @tc.step:
-    1. Release the DataShareHelper instance
-    2. Call GetFileTypes with an empty URI and string
-    3. Call OpenFile and OpenRawFile with an empty URI and string
+    1. Call helper->Release() to release the DataShareHelper instance; verify the return value is true.
+    2. Create an empty Uri (uri) and an empty string (str).
+    3. Call helper->GetFileTypes(uri, str) and check the size of the returned vector<std::string>.
+    4. Call helper->OpenFile(uri, str) and record the return value (error code).
+    5. Call helper->OpenRawFile(uri, str) and record the return value (error code).
  * @tc.expect:
-    1. Release returns true (success)
-    2. GetFileTypes returns an empty list
-    3. OpenFile and OpenRawFile return -1 (failure)
+    1. The Release method returns true (successful release of the helper).
+    2. GetFileTypes returns an empty vector<std::string> (size = 0).
+    3. Both OpenFile and OpenRawFile return -1 (operation failure after release).
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_001, TestSize.Level1)
 {
@@ -1263,16 +1459,24 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_001, TestSize.Level1)
 
 /**
  * @tc.name: ProxyDatasTest_extSpCtl_Null_Test_002
- * @tc.desc: Verify NormalizeUri and DenormalizeUri operations after releasing the helper
+ * @tc.desc: Verify the behavior of NormalizeUri and DenormalizeUri operations in the data share proxy after
+ *           releasing the DataShareHelper instance.
  * @tc.type: FUNC
  * @tc.require: None
- * @tc.precon: None
+ * @tc.precon:
+    1. The pre-initialized DataShareHelper instance (dataShareHelper) is available and non-null before release.
+    2. The Release method of DataShareHelper returns a boolean to indicate release status.
+    3. The Uri class supports equality comparison (==) to verify unchanged output.
  * @tc.step:
-    1. Release the DataShareHelper instance
-    2. Call NormalizeUri and DenormalizeUri with an empty URI
+    1. Call helper->Release() to release the DataShareHelper instance; verify the return value is true.
+    2. Create an empty Uri (inputUri) to use as the input for NormalizeUri and DenormalizeUri.
+    3. Call helper->NormalizeUri(inputUri) and store the result in uriResult1.
+    4. Call helper->DenormalizeUri(inputUri) and store the result in uriResult2.
+    5. Compare uriResult1 and uriResult2 with inputUri to check if they are unchanged.
  * @tc.expect:
-    1. Release returns true (success)
-    2. NormalizeUri and DenormalizeUri return the input empty URI unchanged
+    1. The Release method returns true (successful release of the helper).
+    2. The result of NormalizeUri (uriResult1) is equal to the input empty Uri.
+    3. The result of DenormalizeUri (uriResult2) is equal to the input empty Uri.
  */
 HWTEST_F(ProxyDatasTest, ProxyDatasTest_extSpCtl_Null_Test_002, TestSize.Level1)
 {

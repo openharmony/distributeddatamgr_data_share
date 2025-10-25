@@ -148,19 +148,36 @@ void DataShareResultSetTest::SetUp(void) {}
 void DataShareResultSetTest::TearDown(void) {}
 
 /**
-* @tc.name: ResultSet_IsAtLastRow_Test_001
-* @tc.desc: Test uses IsAtLastRow as the loop end condition.
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Insert test data (name="lisi", age=25) into SLIENT_ACCESS_URI
-* 2. Create predicates to select inserted record
-* 3. Call Query() to obtain resultSet with SLIENT_ACCESS_URI
-* 4. Delete test data. The database is empty.
-* 5. uses IsAtLastRow as the loop end condition.
-* @tc.expect: The database compilation cycle ends normally.
-*/
+ * @tc.name: ResultSet_IsAtLastRow_Test_001
+ * @tc.desc: Test traversing the ResultSet using IsAtLastRow as the loop end condition, verifying the normal end of the
+ *           database compilation cycle after inserting, querying, and deleting test data.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global DataShareHelper instance g_datashareResultSetHelper is properly initialized and non-null.
+    2. The test environment supports DataShareValuesBucket, DataSharePredicates, and ResultSet operations (IsAtLastRow,
+       GoToNextRow, GetString).
+    3. The SLIENT_ACCESS_URI is valid and points to an existing data table; TBL_STU_NAME (string type) and TBL_STU_AGE
+       (int type) are valid columns of the table.
+    4. The InsertEx, DeleteEx, and Query methods of DataShareHelper can be normally called without initialization
+       errors.
+ * @tc.step:
+    1. Create a DataShareValuesBucket, add TBL_STU_NAME ("lisi") and TBL_STU_AGE (25) to it, then call InsertEx with
+       SLIENT_ACCESS_URI to insert the test data.
+    2. Create a DataSharePredicates instance, call EqualTo to set the condition: TBL_STU_NAME = "lisi".
+    3. Call Query with SLIENT_ACCESS_URI, the created predicates, and an empty column vector to obtain a ResultSet,
+       then verify the ResultSet is non-null.
+    4. Call DeleteEx with SLIENT_ACCESS_URI and the predicates to delete the inserted test data, verifying the deletion
+       is successful (errCode = 0, retVal > 0).
+    5. Initialize a boolean variable isAtLastRow to false; if the ResultSet is non-null, use IsAtLastRow as the loop
+       end condition to traverse the ResultSet (call GoToNextRow in the loop).
+ * @tc.expect:
+    1. The InsertEx method returns (errCode = 0, retVal > 0) (insertion success).
+    2. The Query method returns a non-null ResultSet.
+    3. The DeleteEx method returns (errCode = 0, retVal > 0) (deletion success).
+    4. The ResultSet traversal using IsAtLastRow completes normally, and the database compilation cycle ends without
+       errors.
+ */
 HWTEST_F(DataShareResultSetTest, ResultSet_IsAtLastRow_Test_001, TestSize.Level0)
 {
     LOG_INFO("[ttt]ResultSet_IsAtLastRow_Test_001::Start");
@@ -201,19 +218,34 @@ HWTEST_F(DataShareResultSetTest, ResultSet_IsAtLastRow_Test_001, TestSize.Level0
 }
 
 /**
-* @tc.name: ResultSet_IsEnded_Test_001
-* @tc.desc: Test uses IsEnded as the loop end condition.
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Insert test data (name="lisi", age=25) into SLIENT_ACCESS_URI
-* 2. Create predicates to select inserted record
-* 3. Call Query() to obtain resultSet with SLIENT_ACCESS_URI
-* 4. Delete test data. The database is empty.
-* 5. uses IsEnded as the loop end condition.
-* @tc.expect: The database compilation cycle ends normally.
-*/
+ * @tc.name: ResultSet_IsEnded_Test_001
+ * @tc.desc: Test traversing the ResultSet using IsEnded as the loop end condition, ensuring the database compilation
+ *           cycle ends normally after inserting, querying, and deleting test data.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global DataShareHelper instance g_datashareResultSetHelper is properly initialized and non-null.
+    2. The test environment supports DataShareValuesBucket, DataSharePredicates, and ResultSet operations (IsEnded,
+       GoToNextRow).
+    3. The SLIENT_ACCESS_URI is valid and maps to an existing table; TBL_STU_NAME (string) and TBL_STU_AGE (int) are
+       valid columns of the table.
+    4. The InsertEx, DeleteEx, and Query methods of DataShareHelper can be invoked normally.
+ * @tc.step:
+    1. Create a DataShareValuesBucket, add TBL_STU_NAME ("lisi") and TBL_STU_AGE (25) to it, then call InsertEx with
+       SLIENT_ACCESS_URI to insert the test data.
+    2. Create a DataSharePredicates instance, set the condition to TBL_STU_NAME = "lisi" via the EqualTo method.
+    3. Call Query with SLIENT_ACCESS_URI, the predicates, and an empty column vector to get a ResultSet, then verify
+       the ResultSet is non-null.
+    4. Call DeleteEx with SLIENT_ACCESS_URI and the predicates to delete the test data, checking that the deletion
+       succeeds (errCode = 0, retVal > 0).
+    5. Initialize a boolean variable isEnded to false; if the ResultSet is non-null, use IsEnded as the loop end
+       condition to traverse the ResultSet (call GoToNextRow in the loop).
+ * @tc.expect:
+    1. InsertEx returns (errCode = 0, retVal > 0) (successful insertion).
+    2. Query returns a non-null ResultSet.
+    3. DeleteEx returns (errCode = 0, retVal > 0) (successful deletion).
+    4. The ResultSet traversal using IsEnded finishes normally, and the database compilation cycle ends without errors.
+ */
 HWTEST_F(DataShareResultSetTest, ResultSet_IsEnded_Test_001, TestSize.Level0)
 {
     LOG_INFO("[ttt]ResultSet_IsEnded_Test_001::Start");
@@ -252,19 +284,32 @@ HWTEST_F(DataShareResultSetTest, ResultSet_IsEnded_Test_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: ResultSet_ShareBlock_Test_001
-* @tc.desc: Test the 2 MB shared memory is full.
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Insert test data (name=string value(200000, 'a'), age=25) into SLIENT_ACCESS_URI 20 times
-* 2. Call Query() to obtain resultSet with SLIENT_ACCESS_URI
-* 3. Read the string in the first column of resultSet.
-*    The data exceeds 2 MB, pages are turned in the shared memory.
-* 4. Delete test data. The database is empty.
-* @tc.expect: The read string is the same as the inserted string.
-*/
+ * @tc.name: ResultSet_ShareBlock_Test_001
+ * @tc.desc: Test the scenario where 2 MB shared memory is full when reading large data from ResultSet, verifying that
+ *           shared memory page turning works correctly and the read data matches the inserted data.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global DataShareHelper instance g_datashareResultSetHelper is properly initialized and non-null.
+    2. The test environment supports creating large strings (200000 'a' characters) and handles shared memory up to 2MB
+       with page turning.
+    3. The SLIENT_ACCESS_URI is valid; TBL_STU_NAME (supports large strings) and TBL_STU_AGE (int) are valid table
+       columns.
+    4. InsertEx, Query (handling large result sets), GetString, and DeleteEx methods work normally.
+ * @tc.step:
+    1. Create a DataShareValuesBucket: add TBL_STU_AGE (25) and a large string (200000 'a' characters) to TBL_STU_NAME.
+    2. Loop 20 times: call InsertEx with SLIENT_ACCESS_URI and the bucket each time to insert 20 pieces of test data.
+    3. Call Query with SLIENT_ACCESS_URI, an empty DataSharePredicates, and empty column vector to obtain a ResultSet;
+       verify the ResultSet is non-null.
+    4. Traverse the ResultSet via GoToNextRow: for each row, call GetString to read the value of the first column
+       (TBL_STU_NAME), and compare it with the inserted large string.
+    5. Call DeleteEx with SLIENT_ACCESS_URI and empty predicates to delete all inserted test data.
+ * @tc.expect:
+    1. All 20 InsertEx calls return (errCode = 0, retVal > 0) (all insertions succeed).
+    2. Query returns a non-null ResultSet, and shared memory page turning occurs normally when reading large data.
+    3. Every string read via GetString matches the inserted large string (200000 'a' characters).
+    4. DeleteEx returns (errCode = 0, retVal > 0) (all test data is deleted successfully).
+ */
 HWTEST_F(DataShareResultSetTest, ResultSet_ShareBlock_Test_001, TestSize.Level0)
 {
     LOG_INFO("[ttt]ResultSet_ShareBlock_Test_001::Start");
