@@ -161,20 +161,30 @@ void DataShareHelperThresholdTest::TearDown(void) {}
 
 /**
  * @tc.name: Insert_Threshold_Test001
- * @tc.desc: Verify silent access Insert operation behavior when exceeding and not exceeding the threshold
+ * @tc.desc: Verify the behavior of the silent access Insert operation in DataShareHelper when the operation count does
+ *           not exceed and exceeds the preset threshold, focusing on return value consistency.
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
- * @tc.precon: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShareHelper and DataShareValuesBucket, with no initialization
+       errors.
+    2. Predefined constants are valid: STORAGE_MANAGER_MANAGER_ID (for helper creation), SLIENT_ACCESS_URI,
+       TBL_STU_NAME/TBL_STU_AGE (table columns), and DATA_SHARE_ERROR (-1) is correctly defined.
+    3. The CreateDataShareHelper function can successfully generate a non-null DataShareHelper instance with silent
+       access config.
  * @tc.step:
-    1. Create a DataShareHelper instance with silent access configuration
-    2. Prepare test data (name and age) in a DataShareValuesBucket
-    3. Perform initial Insert operation and verify success
-    4. Perform 2998 additional Insert operations (not exceeding threshold) and verify success
-    5. Perform 10 more Insert operations (exceeding threshold) and check results
+    1. Call CreateDataShareHelper with STORAGE_MANAGER_MANAGER_ID and SLIENT_ACCESS_URI to create a
+       DataShareHelper instance.
+    2. Create a DataShareValuesBucket, then call Put to add TBL_STU_NAME and TBL_STU_AGE (18) as test data.
+    3. Call the Insert method of the helper with SLIENT_ACCESS_URI and the bucket, then verify the return value is
+       positive.
+    4. Modify the bucket to set TBL_STU_NAME ("lisi") and TBL_STU_AGE (25), then perform 2998 additional Insert
+       operations, checking each return value is positive.
+    5. Perform 10 more Insert operations with the same bucket, then check each return value.
  * @tc.expect:
-    1. DataShareHelper is created successfully (not nullptr)
-    2. All Insert operations before threshold return positive values (success)
-    3. All Insert operations after threshold return DATA_SHARE_ERROR(-1)
+    1. The created DataShareHelper instance is not nullptr.
+    2. All Insert operations before exceeding the threshold return positive values (indicating success).
+    3. All Insert operations after exceeding the threshold return DATA_SHARE_ERROR (-1).
  */
 HWTEST_F(DataShareHelperThresholdTest, Insert_Threshold_Test001, TestSize.Level1)
 {
@@ -212,22 +222,28 @@ HWTEST_F(DataShareHelperThresholdTest, Insert_Threshold_Test001, TestSize.Level1
 }
 
 /**
-* @tc.name: Update_Threshold_Test001
-* @tc.desc: Verify silent access Update operation behavior when exceeding and not exceeding the threshold
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShareHelper instance with silent access configuration
-    2. Define update predicates to target specific data
-    3. Prepare update data in a DataShareValuesBucket
-    4. Perform 2999 Update operations (not exceeding threshold) and verify success
-    5. Perform 10 more Update operations (exceeding threshold) and check results
-* @tc.expect:
-    1. DataShareHelper is created successfully (not nullptr)
-    2. All Update operations before threshold return 1 (success)
-    3. All Update operations after threshold return DATA_SHARE_ERROR(-1)
-*/
+ * @tc.name: Update_Threshold_Test001
+ * @tc.desc: Verify the behavior of the silent access Update operation in DataShareHelper when the operation count
+ *           does not exceed and exceeds the preset threshold, focusing on return value correctness.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The test environment supports DataShareHelper, DataSharePredicates, and DataShareValuesBucket instantiation.
+    2. Predefined constants are valid: STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI, TBL_STU_NAME/TBL_STU_AGE, and
+       DATA_SHARE_ERROR (-1) is defined.
+    3. The CreateDataShareHelper function can generate a non-null silent access DataShareHelper instance.
+ * @tc.step:
+    1. Create a DataShareHelper instance using CreateDataShareHelper with STORAGE_MANAGER_MANAGER_ID and
+       SLIENT_ACCESS_URI.
+    2. Create a DataSharePredicates instance, then call SetWhereClause to set the condition.
+    3. Create a DataShareValuesBucket and call Put to add TBL_STU_AGE (10) as the update data.
+    4. Perform 2999 Update operations with the URI, predicates, and bucket, checking each return value.
+    5. Perform 10 more Update operations with the same parameters, then check each return value.
+ * @tc.expect:
+    1. The DataShareHelper instance is not nullptr.
+    2. All Update operations before exceeding the threshold return 1 (indicating successful update).
+    3. All Update operations after exceeding the threshold return DATA_SHARE_ERROR (-1).
+ */
 HWTEST_F(DataShareHelperThresholdTest, Update_Threshold_Test001, TestSize.Level1)
 {
     LOG_INFO("Update_Threshold_Test001::Start");
@@ -257,21 +273,30 @@ HWTEST_F(DataShareHelperThresholdTest, Update_Threshold_Test001, TestSize.Level1
 }
 
 /**
-* @tc.name: Query_Threshold_Test001
-* @tc.desc: Verify silent access Query operation behavior when exceeding and not exceeding the threshold
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShareHelper instance with silent access configuration
-    2. Define query predicates to target specific data
-    3. Perform 2999 Query operations (not exceeding threshold) and verify results
-    4. Perform 10 more Query operations (exceeding threshold) and check results
-* @tc.expect:
-    1. DataShareHelper is created successfully (not nullptr)
-    2. All Query operations before threshold return valid result sets with 1 row
-    3. All Query operations after threshold return nullptr (DATA_SHARE_ERROR)
-*/
+ * @tc.name: Query_Threshold_Test001
+ * @tc.desc: Verify the behavior of the silent access Query operation in DataShareHelper when the operation count
+ *           does not exceed and exceeds the preset threshold, focusing on result set validity.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The test environment supports DataShareHelper, DataSharePredicates, and ResultSet operations (including
+       GetRowCount/Close).
+    2. Predefined constants are valid: STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI, TBL_STU_NAME, and
+       DATA_SHARE_ERROR (-1) is defined.
+    3. The target data (TBL_STU_NAME = "zhangsan") exists in the data source pointed to by SLIENT_ACCESS_URI.
+ * @tc.step:
+    1. Create a DataShareHelper instance via CreateDataShareHelper with STORAGE_MANAGER_MANAGER_ID and
+       SLIENT_ACCESS_URI.
+    2. Create a DataSharePredicates instance and call EqualTo to set the condition: TBL_STU_NAME = "zhangsan".
+    3. Initialize an empty vector<string> for query columns, then declare an int variable to store the row count.
+    4. Perform 2999 Query operations with the URI, predicates, and columns: for each, verify the ResultSet is non-null,
+       get the row count (expect 1), then call Close.
+    5. Perform 10 more Query operations with the same parameters, then check each ResultSet.
+ * @tc.expect:
+    1. The DataShareHelper instance is not nullptr.
+    2. All Query operations before exceeding the threshold return a valid non-null ResultSet with 1 row.
+    3. All Query operations after exceeding the threshold return nullptr (indicating DATA_SHARE_ERROR).
+ */
 HWTEST_F(DataShareHelperThresholdTest, Query_Threshold_Test001, TestSize.Level1)
 {
     LOG_INFO("Query_Threshold_Test001::Start");
@@ -303,21 +328,28 @@ HWTEST_F(DataShareHelperThresholdTest, Query_Threshold_Test001, TestSize.Level1)
 }
 
 /**
-* @tc.name: Delete_Threshold_Test001
-* @tc.desc: Verify silent access Delete operation behavior when exceeding and not exceeding the threshold
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShareHelper instance with silent access configuration
-    2. Define delete predicates targeting non-existent data
-    3. Perform 2999 Delete operations (not exceeding threshold) and verify results
-    4. Perform 10 more Delete operations (exceeding threshold) and check results
-* @tc.expect:
-    1. DataShareHelper is created successfully (not nullptr)
-    2. All Delete operations before threshold return 0 (no data deleted)
-    3. All Delete operations after threshold return DATA_SHARE_ERROR(-1)
-*/
+ * @tc.name: Delete_Threshold_Test001
+ * @tc.desc: Verify the behavior of the silent access Delete operation in DataShareHelper when the operation count
+ *           does not exceed and exceeds the preset threshold, especially for non-existent target data.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The test environment supports DataShareHelper, DataSharePredicates instantiation, and Delete operation
+       execution.
+    2. Predefined constants are valid: STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI, TBL_STU_NAME, and
+       DATA_SHARE_ERROR (-1) is defined.
+    3. The target data (TBL_STU_NAME = "lisan") does not exist in the data source pointed to by SLIENT_ACCESS_URI.
+ * @tc.step:
+    1. Create a DataShareHelper instance using CreateDataShareHelper with STORAGE_MANAGER_MANAGER_ID and
+       SLIENT_ACCESS_URI.
+    2. Create a DataSharePredicates instance, then call SetWhereClause to set the condition.
+    3. Perform 2999 Delete operations with the URI and predicates, checking each return value.
+    4. Perform 10 more Delete operations with the same parameters, then check each return value.
+ * @tc.expect:
+    1. The DataShareHelper instance is not nullptr.
+    2. All Delete operations before exceeding the threshold return 0 (indicating no data deleted).
+    3. All Delete operations after exceeding the threshold return DATA_SHARE_ERROR (-1).
+ */
 HWTEST_F(DataShareHelperThresholdTest, Delete_Threshold_Test001, TestSize.Level1)
 {
     LOG_INFO("Delete_Threshold_Test001::Start");
@@ -345,21 +377,29 @@ HWTEST_F(DataShareHelperThresholdTest, Delete_Threshold_Test001, TestSize.Level1
 }
 
 /**
-* @tc.name: InsertEx_Threshold_Test001
-* @tc.desc: Verify silent access InsertEx operation behavior when exceeding and not exceeding the threshold
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShareHelper instance with silent access configuration
-    2. Prepare test data (name and age) in a DataShareValuesBucket
-    3. Perform 2999 InsertEx operations (not exceeding threshold) and verify success
-    4. Perform 10 more InsertEx operations (exceeding threshold) and check results
-* @tc.expect:
-    1. DataShareHelper is created successfully (not nullptr)
-    2. All InsertEx operations before threshold return (0, positive value) indicating success
-    3. All InsertEx operations after threshold return (DATA_SHARE_ERROR(-1), 0)
-*/
+ * @tc.name: InsertEx_Threshold_Test001
+ * @tc.desc: Verify the behavior of the silent access InsertEx operation in DataShareHelper when the operation count
+ *           does not exceed and exceeds the preset threshold, focusing on the pair-type return value.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The test environment supports DataShareHelper and DataShareValuesBucket instantiation, and handles the
+       (errorCode, retVal) pair returned by InsertEx.
+    2. Predefined constants are valid: STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI, TBL_STU_NAME/TBL_STU_AGE, and
+       DATA_SHARE_ERROR (-1) is defined.
+    3. The CreateDataShareHelper function can generate a non-null silent access DataShareHelper instance.
+ * @tc.step:
+    1. Call CreateDataShareHelper with STORAGE_MANAGER_MANAGER_ID and SLIENT_ACCESS_URI to create a DataShareHelper
+       instance.
+    2. Create a DataShareValuesBucket, then call Put to add TBL_STU_NAME ("lisi") and TBL_STU_AGE (25) as test data.
+    3. Perform 2999 InsertEx operations with the URI and bucket: for each, get the (errorCode, retVal) pair and
+       verify validity.
+    4. Perform 10 more InsertEx operations with the same parameters: for each, get the pair and check values.
+ * @tc.expect:
+    1. The DataShareHelper instance is not nullptr.
+    2. All InsertEx operations before exceeding the threshold return (0, positive value) (indicating success).
+    3. All InsertEx operations after exceeding the threshold return (DATA_SHARE_ERROR (-1), 0).
+ */
 HWTEST_F(DataShareHelperThresholdTest, InsertEx_Threshold_Test001, TestSize.Level1)
 {
     LOG_INFO("InsertEx_Threshold_Test001::Start");
@@ -390,22 +430,29 @@ HWTEST_F(DataShareHelperThresholdTest, InsertEx_Threshold_Test001, TestSize.Leve
 }
 
 /**
-* @tc.name: UpdateEx_Threshold_Test001
-* @tc.desc: Verify silent access UpdateEx operation behavior when exceeding and not exceeding the threshold
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShareHelper instance with silent access configuration
-    2. Define update predicates to target specific data
-    3. Prepare update data in a DataShareValuesBucket
-    4. Perform 2999 UpdateEx operations (not exceeding threshold) and verify success
-    5. Perform 10 more UpdateEx operations (exceeding threshold) and check results
-* @tc.expect:
-    1. DataShareHelper is created successfully (not nullptr)
-    2. All UpdateEx operations before threshold return (0, 1) indicating success
-    3. All UpdateEx operations after threshold return (DATA_SHARE_ERROR(-1), 0)
-*/
+ * @tc.name: UpdateEx_Threshold_Test001
+ * @tc.desc: Verify the behavior of the silent access UpdateEx operation in DataShareHelper when the operation count
+ *           does not exceed and exceeds the preset threshold, focusing on the pair-type return value.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The test environment supports DataShareHelper, DataSharePredicates, DataShareValuesBucket instantiation, and
+       handles the (errorCode, retVal) pair returned by UpdateEx.
+    2. Predefined constants are valid: STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI, TBL_STU_NAME/TBL_STU_AGE, and
+       DATA_SHARE_ERROR (-1) is defined.
+    3. The target data (TBL_STU_NAME = "zhangsan") exists in the data source pointed to by SLIENT_ACCESS_URI.
+ * @tc.step:
+    1. Create a DataShareHelper instance using CreateDataShareHelper with STORAGE_MANAGER_MANAGER_ID and
+       SLIENT_ACCESS_URI.
+    2. Create a DataSharePredicates instance, call SetWhereClause to set TBL_STU_NAME + " = 'zhangsan'".
+    3. Create a DataShareValuesBucket and call Put to add TBL_STU_AGE (10) as update data.
+    4. Perform 2999 UpdateEx operations with the URI, predicates, and bucket: check each (errorCode, retVal) pair.
+    5. Perform 10 more UpdateEx operations with the same parameters: check each pair.
+ * @tc.expect:
+    1. The DataShareHelper instance is not nullptr.
+    2. All UpdateEx operations before exceeding the threshold return (0, 1) (indicating successful update).
+    3. All UpdateEx operations after exceeding the threshold return (DATA_SHARE_ERROR (-1), 0).
+ */
 HWTEST_F(DataShareHelperThresholdTest, UpdateEx_Threshold_Test001, TestSize.Level1)
 {
     LOG_INFO("UpdateEx_Threshold_Test001::Start");
@@ -438,21 +485,28 @@ HWTEST_F(DataShareHelperThresholdTest, UpdateEx_Threshold_Test001, TestSize.Leve
 }
 
 /**
-* @tc.name: DeleteEx_Threshold_Test001
-* @tc.desc: Verify silent access DeleteEx operation behavior when exceeding and not exceeding the threshold
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShareHelper instance with silent access configuration
-    2. Define delete predicates targeting non-existent data
-    3. Perform 2999 DeleteEx operations (not exceeding threshold) and verify results
-    4. Perform 10 more DeleteEx operations (exceeding threshold) and check results
-* @tc.expect:
-    1. DataShareHelper is created successfully (not nullptr)
-    2. All DeleteEx operations before threshold return (0, 0) indicating no data deleted
-    3. All DeleteEx operations after threshold return (DATA_SHARE_ERROR(-1), 0)
-*/
+ * @tc.name: DeleteEx_Threshold_Test001
+ * @tc.desc: Verify the behavior of the silent access DeleteEx operation in DataShareHelper when the operation count
+ *           does not exceed and exceeds the preset threshold, especially for non-existent target data.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The test environment supports DataShareHelper, DataSharePredicates instantiation, and handles the
+       (errorCode, retVal) pair returned by DeleteEx.
+    2. Predefined constants are valid: STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI, TBL_STU_NAME, and
+       DATA_SHARE_ERROR (-1) is defined.
+    3. The target data (TBL_STU_NAME = "lisan") does not exist in the data source pointed to by SLIENT_ACCESS_URI.
+ * @tc.step:
+    1. Create a DataShareHelper instance via CreateDataShareHelper with STORAGE_MANAGER_MANAGER_ID and
+       SLIENT_ACCESS_URI.
+    2. Create a DataSharePredicates instance, call SetWhereClause to set TBL_STU_NAME + " = 'lisan'".
+    3. Perform 2999 DeleteEx operations with the URI and predicates: check each (errorCode, retVal) pair.
+    4. Perform 10 more DeleteEx operations with the same parameters: check each pair.
+ * @tc.expect:
+    1. The DataShareHelper instance is not nullptr.
+    2. All DeleteEx operations before exceeding the threshold return (0, 0) (indicating no data deleted).
+    3. All DeleteEx operations after exceeding the threshold return (DATA_SHARE_ERROR (-1), 0).
+ */
 HWTEST_F(DataShareHelperThresholdTest, DeleteEx_Threshold_Test001, TestSize.Level1)
 {
     LOG_INFO("DeleteEx_Threshold_Test001::Start");
@@ -482,19 +536,27 @@ HWTEST_F(DataShareHelperThresholdTest, DeleteEx_Threshold_Test001, TestSize.Leve
 }
 
 /**
-* @tc.name: Insert_Threshold_Test002
-* @tc.desc: Verify non-silent access Insert operation behavior when exceeding the threshold
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Prepare test data (name and age) in a DataShareValuesBucket
-    2. Perform 2999 Insert operations (not exceeding threshold) and verify success
-    3. Perform 10 more Insert operations (exceeding threshold) and check results
-* @tc.expect:
-    1. All Insert operations before and after threshold return positive values (success)
-    2. No failure occurs when exceeding threshold for non-silent access
-*/
+ * @tc.name: Insert_Threshold_Test002
+ * @tc.desc: Verify the behavior of the non-silent access Insert operation when the operation count
+ *           exceeds the preset threshold, focusing on no failure occurrence.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The global DataShareHelper instance g_exHelper is pre-initialized (non-null) and configured for non-silent
+       access.
+    2. Predefined constants are valid: DATA_SHARE_URI (non-silent access target URI) and TBL_STU_NAME/TBL_STU_AGE
+       (table columns).
+    3. The Insert operation of g_exHelper can normally return positive values for valid data in non-silent mode.
+ * @tc.step:
+    1. Create a DataShareValuesBucket, call Put to add TBL_STU_NAME ("lisi") and TBL_STU_AGE (25) as test data.
+    2. Perform 2999 Insert operations using g_exHelper with DATA_SHARE_URI and the bucket, checking each return
+       value is positive.
+    3. Perform 10 more Insert operations with the same parameters, checking each return value.
+ * @tc.expect:
+    1. All Insert operations (before and after exceeding the threshold) return positive values (indicating success).
+    2. No Insert operation fails (i.e., no return of DATA_SHARE_ERROR) when exceeding the threshold in non-silent
+       access.
+ */
 HWTEST_F(DataShareHelperThresholdTest, Insert_Threshold_Test002, TestSize.Level1)
 {
     LOG_INFO("Insert_Threshold_Test002::Start");
@@ -520,20 +582,28 @@ HWTEST_F(DataShareHelperThresholdTest, Insert_Threshold_Test002, TestSize.Level1
 }
 
 /**
-* @tc.name: Update_Threshold_Test002
-* @tc.desc: Verify non-silent access Update operation behavior when exceeding the threshold
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Define update predicates to target specific data
-    2. Prepare update data in a DataShareValuesBucket
-    3. Perform 2999 Update operations (not exceeding threshold) and verify success
-    4. Perform 10 more Update operations (exceeding threshold) and check results
-* @tc.expect:
-    1. All Update operations before and after threshold return 1 (success)
-    2. No failure occurs when exceeding threshold for non-silent access
-*/
+ * @tc.name: Update_Threshold_Test002
+ * @tc.desc: Verify the behavior of the non-silent access Update operation when the operation count
+ *           exceeds the preset threshold, focusing on no failure occurrence.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The global DataShareHelper instance g_exHelper is pre-initialized (non-null) and configured for non-silent
+       access.
+    2. Predefined constants are valid: DATA_SHARE_URI (non-silent access target URI) and TBL_STU_NAME/TBL_STU_AGE
+       (table columns).
+    3. The target data (TBL_STU_NAME = "zhangsan") exists in the data source pointed to by DATA_SHARE_URI.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call SetWhereClause to set TBL_STU_NAME + " = 'zhangsan'".
+    2. Create a DataShareValuesBucket, call Put to add TBL_STU_AGE (10) as update data.
+    3. Perform 2999 Update operations using g_exHelper with DATA_SHARE_URI, predicates, and the bucket, checking
+       each return value is 1.
+    4. Perform 10 more Update operations with the same parameters, checking each return value.
+ * @tc.expect:
+    1. All Update operations (before and after exceeding the threshold) return 1 (indicating success).
+    2. No Update operation fails (i.e., no return of DATA_SHARE_ERROR) when exceeding the threshold in non-silent
+       access.
+ */
 HWTEST_F(DataShareHelperThresholdTest, Update_Threshold_Test002, TestSize.Level1)
 {
     LOG_INFO("Update_Threshold_Test002::Start");
@@ -560,19 +630,27 @@ HWTEST_F(DataShareHelperThresholdTest, Update_Threshold_Test002, TestSize.Level1
 }
 
 /**
-* @tc.name: Query_Threshold_Test002
-* @tc.desc: Verify non-silent access Query operation behavior when exceeding the threshold
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Define query predicates to target specific data
-    2. Perform 2999 Query operations (not exceeding threshold) and verify results
-    3. Perform 10 more Query operations (exceeding threshold) and check results
-* @tc.expect:
-    1. All Query operations before and after threshold return valid result sets with 1 row
-    2. No failure occurs when exceeding threshold for non-silent access
-*/
+ * @tc.name: Query_Threshold_Test002
+ * @tc.desc: Verify the behavior of the non-silent access Query operation (using global g_exHelper) when the operation
+ *           count exceeds the preset threshold, focusing on result set validity and no failure occurrence.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The global DataShareHelper instance g_exHelper is pre-initialized (non-null) and configured for non-silent
+       access.
+    2. Predefined constants are valid: DATA_SHARE_URI (non-silent access target URI) and TBL_STU_NAME (table column).
+    3. The target data (TBL_STU_NAME = "zhangsan") exists in the data source pointed to by DATA_SHARE_URI.
+    4. The ResultSet's GetRowCount and Close methods work normally in the test environment.
+ * @tc.step:
+    1. Create a DataSharePredicates instance and call EqualTo to set the condition: TBL_STU_NAME = "zhangsan".
+    2. Initialize an empty vector<string> for query columns and declare an int variable to store the row count.
+    3. Perform 2999 Query operations using g_exHelper with DATA_SHARE_URI, predicates, and columns: for each, verify
+       the ResultSet is non-null, get the row count (expect 1), then call Close.
+    4. Perform 10 more Query operations with the same parameters: check each ResultSet's validity and row count.
+ * @tc.expect:
+    1. All Query operations (before and after exceeding the threshold) return a valid non-null ResultSet with 1 row.
+    2. No Query operation fails (i.e., no return of nullptr) when exceeding the threshold in non-silent access.
+ */
 HWTEST_F(DataShareHelperThresholdTest, Query_Threshold_Test002, TestSize.Level1)
 {
     LOG_INFO("Query_Threshold_Test002::Start");
@@ -604,19 +682,27 @@ HWTEST_F(DataShareHelperThresholdTest, Query_Threshold_Test002, TestSize.Level1)
 }
 
 /**
-* @tc.name: Delete_Threshold_Test002
-* @tc.desc: Verify non-silent access Delete operation behavior when exceeding the threshold
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Define delete predicates targeting non-existent data
-    2. Perform 2999 Delete operations (not exceeding threshold) and verify results
-    3. Perform 10 more Delete operations (exceeding threshold) and check results
-* @tc.expect:
-    1. All Delete operations before and after threshold return 0 (no data deleted)
-    2. No failure occurs when exceeding threshold for non-silent access
-*/
+ * @tc.name: Delete_Threshold_Test002
+ * @tc.desc: Verify the behavior of the non-silent access Delete operation when the operation count
+ *           exceeds the preset threshold, especially for non-existent target data and no failure occurrence.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The global DataShareHelper instance g_exHelper is pre-initialized (non-null) and configured for non-silent
+       access.
+    2. Predefined constants are valid: DATA_SHARE_URI (non-silent access target URI) and TBL_STU_NAME (table column).
+    3. The target data (TBL_STU_NAME = "lisan") does not exist in the data source pointed to by DATA_SHARE_URI.
+    4. The Delete method of g_exHelper can normally return 0 for non-existent data in non-silent mode.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, then call SetWhereClause to set the condition.
+    2. Perform 2999 Delete operations using g_exHelper with DATA_SHARE_URI and the predicates, checking each return
+       value is 0.
+    3. Perform 10 more Delete operations with the same parameters, checking each return value.
+ * @tc.expect:
+    1. All Delete operations (before and after exceeding the threshold) return 0 (indicating no data deleted).
+    2. No Delete operation fails (i.e., no return of DATA_SHARE_ERROR) when exceeding the threshold in non-silent
+       access.
+ */
 HWTEST_F(DataShareHelperThresholdTest, Delete_Threshold_Test002, TestSize.Level1)
 {
     LOG_INFO("Delete_Threshold_Test002::Start");
@@ -642,19 +728,28 @@ HWTEST_F(DataShareHelperThresholdTest, Delete_Threshold_Test002, TestSize.Level1
 }
 
 /**
-* @tc.name: InsertEx_Threshold_Test002
-* @tc.desc: Verify non-silent access InsertEx operation behavior when exceeding the threshold
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Prepare test data (name and age) in a DataShareValuesBucket
-    2. Perform 2999 InsertEx operations (not exceeding threshold) and verify success
-    3. Perform 10 more InsertEx operations (exceeding threshold) and check results
-* @tc.expect:
-    1. All InsertEx operations before and after threshold return (0, positive value) indicating success
-    2. No failure occurs when exceeding threshold for non-silent access
-*/
+ * @tc.name: InsertEx_Threshold_Test002
+ * @tc.desc: Verify the behavior of the non-silent access InsertEx operation when the operation count
+ *           exceeds the preset threshold, focusing on the pair-type return value and no failure occurrence.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The global DataShareHelper instance g_exHelper is pre-initialized (non-null) and configured for non-silent
+       access.
+    2. Predefined constants are valid: DATA_SHARE_URI (non-silent access target URI) and TBL_STU_NAME/TBL_STU_AGE
+       (table columns).
+    3. The test environment can correctly handle the (errorCode, retVal) pair returned by the InsertEx method.
+    4. The InsertEx method of g_exHelper returns (0, positive value) for valid data in non-silent mode.
+ * @tc.step:
+    1. Create a DataShareValuesBucket, then call Put to add TBL_STU_NAME ("lisi") and TBL_STU_AGE (25) as test data.
+    2. Perform 2999 InsertEx operations using g_exHelper with DATA_SHARE_URI and the bucket: for each, check the
+       (errorCode, retVal) pair is (0, positive value).
+    3. Perform 10 more InsertEx operations with the same parameters: verify each pair's validity.
+ * @tc.expect:
+    1. All InsertEx operations (before and after exceeding the threshold) return (0, positive value).
+    2. No InsertEx operation fails (i.e., no return of (DATA_SHARE_ERROR, 0)) when exceeding the threshold in
+       non-silent access.
+ */
 HWTEST_F(DataShareHelperThresholdTest, InsertEx_Threshold_Test002, TestSize.Level1)
 {
     LOG_INFO("InsertEx_Threshold_Test002::Start");
@@ -682,20 +777,29 @@ HWTEST_F(DataShareHelperThresholdTest, InsertEx_Threshold_Test002, TestSize.Leve
 }
 
 /**
-* @tc.name: UpdateEx_Threshold_Test002
-* @tc.desc: Verify non-silent access UpdateEx operation behavior when exceeding the threshold
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Define update predicates to target specific data
-    2. Prepare update data in a DataShareValuesBucket
-    3. Perform 2999 UpdateEx operations (not exceeding threshold) and verify success
-    4. Perform 10 more UpdateEx operations (exceeding threshold) and check results
-* @tc.expect:
-    1. All UpdateEx operations before and after threshold return (0, 1) indicating success
-    2. No failure occurs when exceeding threshold for non-silent access
-*/
+ * @tc.name: UpdateEx_Threshold_Test002
+ * @tc.desc: Verify the behavior of the non-silent access UpdateEx operation when the operation count
+ *           exceeds the preset threshold, focusing on the pair-type return value and no failure occurrence.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The global DataShareHelper instance g_exHelper is pre-initialized (non-null) and configured for non-silent
+       access.
+    2. Predefined constants are valid: DATA_SHARE_URI (non-silent access target URI) and TBL_STU_NAME/TBL_STU_AGE
+       (table columns).
+    3. The target data (TBL_STU_NAME = "zhangsan") exists in the data source pointed to by DATA_SHARE_URI.
+    4. The test environment can correctly handle the (errorCode, retVal) pair returned by the UpdateEx method.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call SetWhereClause to set the condition: TBL_STU_NAME + " = 'zhangsan'".
+    2. Create a DataShareValuesBucket and call Put to add TBL_STU_AGE (10) as update data.
+    3. Perform 2999 UpdateEx operations using g_exHelper with DATA_SHARE_URI, predicates, and the bucket: check each
+       pair is (0, 1).
+    4. Perform 10 more UpdateEx operations with the same parameters: verify each pair's validity.
+ * @tc.expect:
+    1. All UpdateEx operations (before and after exceeding the threshold) return (0, 1) (indicating successful update).
+    2. No UpdateEx operation fails (i.e., no return of (DATA_SHARE_ERROR, 0)) when exceeding the threshold in
+       non-silent access.
+ */
 HWTEST_F(DataShareHelperThresholdTest, UpdateEx_Threshold_Test002, TestSize.Level1)
 {
     LOG_INFO("UpdateEx_Threshold_Test002::Start");
@@ -724,19 +828,27 @@ HWTEST_F(DataShareHelperThresholdTest, UpdateEx_Threshold_Test002, TestSize.Leve
 }
 
 /**
-* @tc.name: DeleteEx_Threshold_Test002
-* @tc.desc: Verify non-silent access DeleteEx operation behavior when exceeding the threshold
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Define delete predicates targeting non-existent data
-    2. Perform 2999 DeleteEx operations (not exceeding threshold) and verify results
-    3. Perform 10 more DeleteEx operations (exceeding threshold) and check results
-* @tc.expect:
-    1. All DeleteEx operations before and after threshold return (0, 0) indicating no data deleted
-    2. No failure occurs when exceeding threshold for non-silent access
-*/
+ * @tc.name: DeleteEx_Threshold_Test002
+ * @tc.desc: Verify the behavior of the non-silent access DeleteEx operation (using global g_exHelper) when the
+ *           operation count exceeds the preset threshold, especially for non-existent data and no failure occurrence.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The global DataShareHelper instance g_exHelper is pre-initialized (non-null) and configured for non-silent
+       access.
+    2. Predefined constants are valid: DATA_SHARE_URI (non-silent access target URI) and TBL_STU_NAME (table column).
+    3. The target data (TBL_STU_NAME = "lisan") does not exist in the data source pointed to by DATA_SHARE_URI.
+    4. The test environment can correctly handle the (errorCode, retVal) pair returned by the DeleteEx method.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call SetWhereClause to set the condition: TBL_STU_NAME + " = 'lisan'".
+    2. Perform 2999 DeleteEx operations using g_exHelper with DATA_SHARE_URI and the predicates: check each pair is
+       (0, 0).
+    3. Perform 10 more DeleteEx operations with the same parameters: verify each pair's validity.
+ * @tc.expect:
+    1. All DeleteEx operations (before and after exceeding the threshold) return (0, 0) (indicating no data deleted).
+    2. No DeleteEx operation fails (i.e., no return of (DATA_SHARE_ERROR, 0)) when exceeding the threshold in
+       non-silent access.
+ */
 HWTEST_F(DataShareHelperThresholdTest, DeleteEx_Threshold_Test002, TestSize.Level1)
 {
     LOG_INFO("DeleteEx_Threshold_Test002::Start");
@@ -763,17 +875,31 @@ HWTEST_F(DataShareHelperThresholdTest, DeleteEx_Threshold_Test002, TestSize.Leve
 }
 
 /**
-* @tc.name: Query_Threshold_Test003
-* @tc.desc: Verify that the time consumed for traversing 1000 string-type data result sets does not exceed 150ms
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Insert 1000 pieces of string type data, with 10 attributes for each piece
-    2. query 1000 pieces of data，return resultSet
-    3. Traverse the resultSet
-* @tc.expect: The time consumed for traversal does not exceed 30ms
-*/
+ * @tc.name: Query_Threshold_Test003
+ * @tc.desc: Verify that the time consumed for traversing a result set of 1000 string-type data
+ *           does not exceed the preset threshold (30ms) in silent access mode.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The test environment supports DataShareHelper, DataShareValuesBucket, and ResultSet operations (GoToRow,
+       GetString, GetRowCount, etc.).
+    2. Predefined constants are valid: STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI, and TBL_STU_NAME (string-type
+       table column).
+    3. The CreateDataShareHelper function can generate a non-null silent access DataShareHelper instance.
+    4. The test environment supports std::chrono for time measurement (to calculate traversal duration).
+ * @tc.step:
+    1. Create a DataShareHelper instance via CreateDataShareHelper with STORAGE_MANAGER_MANAGER_ID and
+       SLIENT_ACCESS_URI.
+    2. Create a DataShareValuesBucket and call Put 10 times to add TBL_STU_NAME ("wangwu") (10 attributes per data).
+    3. Perform 1000 Insert operations with the bucket and SLIENT_ACCESS_URI to insert 1000 pieces of string-type data.
+    4. Create a DataSharePredicates instance (EqualTo(TBL_STU_NAME, "wangwu")), then call Query to get the result set.
+    5. Use std::chrono to record the start time, then traverse the result set (GoToRow + GetString for all columns),
+       and record the end time.
+    6. Calculate the traversal duration (end time - start time) and check if it meets the threshold.
+ * @tc.expect:
+    1. The DataShareHelper instance and result set are both non-null during the test.
+    2. The time consumed for traversing the result set does not exceed 30ms.
+ */
 HWTEST_F(DataShareHelperThresholdTest, Query_Threshold_Test003, TestSize.Level1)
 {
     LOG_INFO("Query_Threshold_Test003::Start");
@@ -819,17 +945,31 @@ HWTEST_F(DataShareHelperThresholdTest, Query_Threshold_Test003, TestSize.Level1)
 }
 
 /**
-* @tc.name: Query_Threshold_Test004
-* @tc.desc: Verify that the time consumed for traversing 1000 int-type data result sets does not exceed 150ms
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: None
-* @tc.step:
-    1. Insert 1000 pieces of int type data, with 10 attributes for each piece
-    2. query 1000 pieces of data，return resultSet
-    3. Traverse the resultSet
-* @tc.expect: The time consumed for traversal does not exceed 30ms
-*/
+ * @tc.name: Query_Threshold_Test004
+ * @tc.desc: Verify that the time consumed for traversing a result set of 1000 int-type data (each with 10 attributes)
+ *           does not exceed the preset threshold (30ms) in silent access mode.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The test environment supports DataShareHelper, DataShareValuesBucket, and ResultSet operations (GoToRow,
+       GetInt, GetRowCount, etc.).
+    2. Predefined constants are valid: STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI, and TBL_STU_AGE (int-type
+       table column).
+    3. The CreateDataShareHelper function can generate a non-null silent access DataShareHelper instance.
+    4. The test environment supports std::chrono for time measurement (to calculate traversal duration).
+ * @tc.step:
+    1. Create a DataShareHelper instance via CreateDataShareHelper with STORAGE_MANAGER_MANAGER_ID and
+       SLIENT_ACCESS_URI.
+    2. Create a DataShareValuesBucket and call Put 10 times to add TBL_STU_AGE (20) (10 attributes per data).
+    3. Perform 1000 Insert operations with the bucket and SLIENT_ACCESS_URI to insert 1000 pieces of int-type data.
+    4. Create a DataSharePredicates instance (EqualTo(TBL_STU_AGE, 20)), then call Query to get the result set.
+    5. Use std::chrono to record the start time, then traverse the result set (GoToRow + GetInt for all columns),
+       and record the end time.
+    6. Calculate the traversal duration (end time - start time) and check if it meets the threshold.
+ * @tc.expect:
+    1. The DataShareHelper instance and result set are both non-null during the test.
+    2. The time consumed for traversing the result set does not exceed 30ms.
+ */
 HWTEST_F(DataShareHelperThresholdTest, Query_Threshold_Test004, TestSize.Level1)
 {
     LOG_INFO("Query_Threshold_Test004::Start");
