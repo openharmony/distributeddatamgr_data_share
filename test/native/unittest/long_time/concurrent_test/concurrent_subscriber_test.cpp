@@ -148,24 +148,30 @@ void RdbSubscriberManagerTest::DelObservers(
 
 /**
  * @tc.name: ConcurrentRdbObserverTest
- * @tc.desc: Verify concurrent SubscribeRdbData and UnsubscribeRdbData operations
+ * @tc.desc: Verify the functionality and stability of concurrent SubscribeRdbData and UnsubscribeRdbData operations,
+ *           focusing on crash prevention, deadlock avoidance, and consistency of observer management.
  * @tc.type: concurrent
  * @tc.require: None
- * @tc.precon: RdbSubscriberManager is properly initialized
+ * @tc.precon:
+    1. The RdbSubscriberManager is properly initialized and in a functional state before the test starts.
+    2. The RdbSubscriberManagerTest class provides valid AddObservers and DelObservers methods to manage RDB observers.
+    3. The test environment supports multi-threaded operations with std::thread, std::atomic, and thread
+       synchronization.
  * @tc.step:
-    1. Create an instance of RdbSubscriberManagerTest
-    2. Define two URIs and two bundle names for testing
-    3. Create four threads to concurrently perform:
-        - Add observers for URI0 with bundleName0
-        - Delete observers for URI0 with bundleName0
-        - Add observers for URI1 with bundleName1
-        - Delete observers for URI1 with bundleName1
-    4. Run the concurrent operations for a specified test duration
-    5. Stop all threads and wait for their completion
+    1. Create an instance of RdbSubscriberManagerTest for observer management operations.
+    2. Define two test URIs (uri0 = "uri0", uri1 = "uri1") and two bundle names (bundleName0 = "bundleName0",
+       bundleName1 = "bundleName1").
+    3. Create four threads to perform concurrent operations:
+        - Thread 1: Call AddObservers for uri0 with bundleName0 (controlled by a stop flag).
+        - Thread 2: Call DelObservers for uri0 with bundleName0 (controlled by a stop flag).
+        - Thread 3: Call AddObservers for uri1 with bundleName1 (controlled by a stop flag).
+        - Thread 4: Call DelObservers for uri1 with bundleName1 (controlled by a stop flag).
+    4. Run the concurrent operations for a specified test duration (TEST_TIME).
+    5. Set the stop flag to true, then join all threads to wait for their completion.
  * @tc.expect:
-    1. All concurrent operations complete without crashes
-    2. No deadlocks occur during concurrent subscription management
-    3. Observer management maintains internal consistency
+    1. All concurrent add/delete observer operations complete without crashes or exceptions.
+    2. No deadlocks occur during the entire test duration.
+    3. The RdbSubscriberManager maintains internal consistency in observer management (no corrupted states).
  */
 HWTEST_F(ConcurrentSubscriberTest, ConcurrentRdbObserverTest, TestSize.Level0)
 {
@@ -273,25 +279,33 @@ void PublishedDataSubscriberManagerTest::DelObservers(int64_t subscriberId, std:
 
 /**
  * @tc.name: ConcurrentPublishObserverTest
- * @tc.desc: Verify concurrent SubscribePublishedData and UnsubscribePublishedData operations
+ * @tc.desc: Verify the functionality and stability of concurrent SubscribePublishedData and
+ *           UnsubscribePublishedData operations, focusing on crash prevention, deadlock avoidance,
+ *           and consistency of published data observer management.
  * @tc.type: concurrent
  * @tc.require: None
- * @tc.precon: PublishedDataSubscriberManager is properly initialized
+ * @tc.precon:
+    1. The PublishedDataSubscriberManager is properly initialized and in a functional state before
+       the test starts.
+    2. The PublishedDataSubscriberManagerTest class provides valid AddObservers and DelObservers
+       methods to manage published data observers.
+    3. The test environment supports multi-threaded operations with std::thread, std::atomic, and
+       thread synchronization mechanisms.
  * @tc.step:
-    1. Create an instance of PublishedDataSubscriberManagerTest
-    2. Define two URIs for testing
-    3. Create four threads to concurrently perform:
-        - Add observers for URI0 with subscriber ID 0
-        - Delete observers for URI0 with subscriber ID 0
-        - Add observers for URI1 with subscriber ID 1
-        - Delete observers for URI1 with subscriber ID 1
-    4. Run the concurrent operations for a specified test duration
-    5. Stop all threads and wait for their completion
+    1. Create an instance of PublishedDataSubscriberManagerTest for managing published data observers.
+    2. Define two test URIs: uri0 = "uri0" and uri1 = "uri1".
+    3. Create four threads to perform concurrent operations:
+        - Thread 1: Call AddObservers with subscriber ID 0 and uri0 (controlled by a stop flag).
+        - Thread 2: Call DelObservers with subscriber ID 0 and uri0 (controlled by a stop flag).
+        - Thread 3: Call AddObservers with subscriber ID 1 and uri1 (controlled by a stop flag).
+        - Thread 4: Call DelObservers with subscriber ID 1 and uri1 (controlled by a stop flag).
+    4. Run the concurrent operations for a specified test duration (TEST_TIME).
+    5. Set the stop flag to true, then join all threads to wait for their completion.
  * @tc.expect:
-    1. All concurrent operations complete without crashes
-    2. No deadlocks occur during concurrent subscription management
-    3. Published data observer map maintains internal consistency
-    4. Change node data is properly managed during concurrent access
+    1. All concurrent add/delete observer operations complete without crashes or exceptions.
+    2. No deadlocks occur during the entire test duration.
+    3. The published data observer map maintains internal consistency (no corrupted states).
+    4. Change node data is properly managed and remains consistent during concurrent access.
  */
 HWTEST_F(ConcurrentSubscriberTest, ConcurrentPublishObserverTest, TestSize.Level0)
 {
