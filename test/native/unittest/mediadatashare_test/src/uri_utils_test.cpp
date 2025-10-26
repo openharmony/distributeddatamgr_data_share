@@ -33,19 +33,23 @@ public:
 };
 
 /**
-* @tc.name: GetUserFromUri_001
-* @tc.desc: Test getting user from URI without user parameter
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: NA
-* @tc.step:
-* 1. Create URI "datashare:///com.acts.datasharetest" without user parameter
-* 2. Call DataShareURIUtils::GetUserFromUri() with the URI
-* 3. Check the return result and user value
-* @tc.expect:
-* 1. The result is true
-* 2. The user value is -1 (default)
-*/
+ * @tc.name: GetUserFromUri_001
+ * @tc.desc: Test the DataShareURIUtils::GetUserFromUri method to retrieve the user ID from a URI that does not contain
+ *           a "user" query parameter.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The DataShareURIUtils::GetUserFromUri method is available and returns a pair of (bool, int), where the first
+       element indicates operation success and the second is the retrieved user ID.
+    2. The test URI string ("datashare:///com.acts.datasharetest") is a valid DataShare URI format.
+ * @tc.step:
+    1. Define a test URI string as "datashare:///com.acts.datasharetest" (no "user" query parameter).
+    2. Call DataShareURIUtils::GetUserFromUri with the test URI, and record the returned (res, user) pair.
+    3. Check the boolean result (res) and the integer user ID (user) against the expected values.
+ * @tc.expect:
+    1. The boolean result (res) returned by GetUserFromUri is true.
+    2. The retrieved user ID (user) is -1 (the default value when no "user" parameter exists).
+ */
 HWTEST_F(URIUtilsTest, GetUserFromUri_001, TestSize.Level0)
 {
     ZLOGI("GetUserFromUri_001 starts");
@@ -225,17 +229,24 @@ HWTEST_F(URIUtilsTest, GetUserFromUri_008, TestSize.Level0)
 }
 
 /**
-* @tc.name: GetQueryParams_001
-* @tc.desc: Test getting query parameters from URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: NA
-* @tc.step:
-* 1. Create URI "datashare:///com.acts.datasharetest?user=100&srcToken=12345" with query parameters
-* 2. Call DataShareURIUtils::GetQueryParams() with the URI
-* 3. Check if the result is not empty
-* @tc.expect:The returned query parameters are not empty
-*/
+ * @tc.name: GetQueryParams_001
+ * @tc.desc: Test the DataShareURIUtils::GetQueryParams method to retrieve query parameters from a URI that contains
+ *           multiple key-value pairs ("user=100" and "srcToken=12345").
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The DataShareURIUtils::GetQueryParams method returns a collection (e.g., map, list) of query parameters, which
+       supports checking if it is empty via the empty() method.
+    2. The test URI string ("datashare:///com.acts.datasharetest?user=100&srcToken=12345") is a valid DataShare URI
+       with query parameters.
+ * @tc.step:
+    1. Define a test URI string as "datashare:///com.acts.datasharetest?user=100&srcToken=12345" (with two query
+       parameters).
+    2. Call DataShareURIUtils::GetQueryParams with the test URI, and record the returned result (res).
+    3. Check if the returned result (res) is empty using the empty() method.
+ * @tc.expect:
+    1. The collection of query parameters returned by GetQueryParams is not empty (res.empty() returns false).
+ */
 HWTEST_F(URIUtilsTest, GetQueryParams_001, TestSize.Level0)
 {
     ZLOGI("GetQueryParams_001 starts");
@@ -270,17 +281,24 @@ HWTEST_F(URIUtilsTest, Strtoul_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: FormatUri_001
-* @tc.desc: Test formatting URI by removing query parameters
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: NA
-* @tc.step:
-* 1. Create URI "datashare:///com.acts.datasharetest?user=100&srcToken=12345" with query parameters
-* 2. Call DataShareURIUtils::FormatUri() with the URI
-* 3. Check the formatted URI
-* @tc.expect:The formatted URI is "datashare:///com.acts.datasharetest" without query parameters
-*/
+ * @tc.name: FormatUri_001
+ * @tc.desc: Test the DataShareURIUtils::FormatUri method to remove query parameters from a URI, returning only the
+ *           base URI without the "?" and subsequent key-value pairs.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The DataShareURIUtils::FormatUri method takes a URI string with query parameters and returns a new string
+       representing the base URI (without query parameters).
+    2. The test URI string ("datashare:///com.acts.datasharetest?user=100&srcToken=12345") is a valid DataShare URI
+       with query parameters.
+ * @tc.step:
+    1. Define a test URI string as "datashare:///com.acts.datasharetest?user=100&srcToken=12345" (with query
+       parameters).
+    2. Call DataShareURIUtils::FormatUri with the test URI, and record the returned formatted URI (res).
+    3. Compare the formatted URI (res) with the expected base URI string.
+ * @tc.expect:
+    1. The formatted URI returned by FormatUri is "datashare:///com.acts.datasharetest" (no query parameters).
+ */
 HWTEST_F(URIUtilsTest, FormatUri_001, TestSize.Level0)
 {
     ZLOGI("FormatUri_001 starts");
@@ -291,17 +309,22 @@ HWTEST_F(URIUtilsTest, FormatUri_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: FormatUri_002
-* @tc.desc: Test formatting URI without query parameters
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: NA
-* @tc.step:
-* 1. Create URI "datashare:///com.acts.datasharetest" without query parameters
-* 2. Call DataShareURIUtils::FormatUri() with the URI
-* 3. Check the formatted URI
-* @tc.expect:The formatted URI is the same as input "datashare:///com.acts.datasharetest"
-*/
+ * @tc.name: FormatUri_002
+ * @tc.desc: Test the DataShareURIUtils::FormatUri method to handle a URI that has no query parameters (returns the
+ *           original URI string unchanged).
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The DataShareURIUtils::FormatUri method returns the original URI string when there are no query parameters to
+       remove.
+    2. The test URI string ("datashare:///com.acts.datasharetest") is a valid DataShare URI without query parameters.
+ * @tc.step:
+    1. Define a test URI string as "datashare:///com.acts.datasharetest" (no query parameters).
+    2. Call DataShareURIUtils::FormatUri with the test URI, and record the returned formatted URI (res).
+    3. Compare the formatted URI (res) with the original test URI string.
+ * @tc.expect:
+    1. The formatted URI returned by FormatUri is identical to the input "datashare:///com.acts.datasharetest".
+ */
 HWTEST_F(URIUtilsTest, FormatUri_002, TestSize.Level0)
 {
     ZLOGI("FormatUri_002 starts");
