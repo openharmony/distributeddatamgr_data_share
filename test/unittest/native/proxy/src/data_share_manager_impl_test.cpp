@@ -72,8 +72,31 @@ public:
 
 /**
  * @tc.name: ServiceProxyLoadCallback001
- * @tc.desc: test ServiceProxyLoadCallback normal func
+ * @tc.desc: Test the normal functionality of DataShareManagerImpl::ServiceProxyLoadCallback, including
+ *           OnLoadSystemAbilitySuccess and OnLoadSystemAbilityFail under different parameter scenarios
+ *           (remoteObject as null/non-null, different systemAbilityId values).
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShareManagerImpl::ServiceProxyLoadCallback and
+       RemoteObjectTest (with std::u16string token) without initialization errors.
+    2. The predefined constant DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID is valid and equals 1301.
+    3. IRemoteObject pointers can be set to nullptr or assigned valid RemoteObjectTest instances.
+    4. The ServiceProxyLoadCallback’s OnLoad methods accept int32_t systemAbilityId and IRemoteObject* as parameters.
+ * @tc.step:
+    1. Create an sptr of DataShareManagerImpl::ServiceProxyLoadCallback (loadCallback) using new (std::nothrow).
+    2. Set IRemoteObject* remoteObject to nullptr and int32_t systemAbilityId to 0.
+    3. Call loadCallback->OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject) and
+       loadCallback->OnLoadSystemAbilityFail(systemAbilityId).
+    4. Set systemAbilityId to DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID (1301), then call the two OnLoad methods again
+       with remoteObject still as nullptr.
+    5. Verify that systemAbilityId matches DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID.
+    6. Create a RemoteObjectTest instance with token u"OHOS.DataShare.IDataShare", assign it to remoteObject,
+       then call OnLoadSystemAbilitySuccess(systemAbilityId, remoteObject).
+ * @tc.expect:
+    1. All calls to OnLoadSystemAbilitySuccess and OnLoadSystemAbilityFail execute without exceptions.
+    2. The systemAbilityId (1301) matches the predefined DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID.
+    3. The valid RemoteObjectTest instance is successfully passed to OnLoadSystemAbilitySuccess without errors.
  */
 HWTEST_F(DataShareManagerImplTest, ServiceProxyLoadCallback001, TestSize.Level0)
 {
@@ -110,8 +133,26 @@ HWTEST_F(DataShareManagerImplTest, ServiceProxyLoadCallback001, TestSize.Level0)
 
 /**
  * @tc.name: GetDataShareServiceProxy001
- * @tc.desc: test GetDataShareServiceProxy normal func
+ * @tc.desc: Test the normal functionality of DataShareManagerImpl::GetDataShareServiceProxy, verifying its return
+ *           value when the dataMgrService_ member is null and non-null.
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. DataShareManagerImpl can be obtained via GetInstance() and returns a non-null pointer.
+    2. DataShareManagerImpl::GetDistributedDataManager() returns a valid (non-null) dataMgrService_ instance.
+    3. The GetDataShareServiceProxy method returns a non-null proxy pointer under valid runtime conditions.
+    4. The dataMgrService_ member of DataShareManagerImpl can be explicitly set to nullptr or a valid instance.
+ * @tc.step:
+    1. Call DataShareManagerImpl::GetInstance() to get a manager instance, verify it is non-null.
+    2. Set manager->dataMgrService_ to nullptr.
+    3. Call manager->GetDataShareServiceProxy() and store the returned proxy, verify the proxy is non-null.
+    4. Assign manager->dataMgrService_ to the result of DataShareManagerImpl::GetDistributedDataManager(),
+       verify dataMgrService_ is non-null.
+    5. Call manager->GetDataShareServiceProxy() again, store the new proxy, verify it is non-null.
+ * @tc.expect:
+    1. The DataShareManagerImpl instance obtained via GetInstance() is non-null.
+    2. When dataMgrService_ is null, GetDataShareServiceProxy returns a non-null proxy.
+    3. When dataMgrService_ is non-null, GetDataShareServiceProxy returns a non-null proxy.
  */
 HWTEST_F(DataShareManagerImplTest, GetDataShareServiceProxy001, TestSize.Level0)
 {
@@ -135,8 +176,26 @@ HWTEST_F(DataShareManagerImplTest, GetDataShareServiceProxy001, TestSize.Level0)
 
 /**
  * @tc.name: GetProxy001
- * @tc.desc: test GetProxy normal func
+ * @tc.desc: Test the normal functionality of DataShareManagerImpl::GetProxy, verifying its return value when the
+ *           dataMgrService_ member is null and non-null.
  * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. DataShareManagerImpl can be obtained via GetInstance() and returns a non-null pointer.
+    2. DataShareManagerImpl::GetDistributedDataManager() returns a valid (non-null) dataMgrService_ instance.
+    3. The GetProxy method returns a non-null proxy pointer under valid runtime conditions.
+    4. The dataMgrService_ member of DataShareManagerImpl can be explicitly set to nullptr or a valid instance.
+ * @tc.step:
+    1. Call DataShareManagerImpl::GetInstance() to get a manager instance, verify it is non-null.
+    2. Set manager->dataMgrService_ to nullptr.
+    3. Call manager->GetProxy() and store the returned proxy, verify the proxy is non-null.
+    4. Assign manager->dataMgrService_ to the result of DataShareManagerImpl::GetDistributedDataManager(),
+       verify dataMgrService_ is non-null.
+    5. Call manager->GetProxy() again, store the new proxy, verify it is non-null.
+ * @tc.expect:
+    1. The DataShareManagerImpl instance obtained via GetInstance() is non-null.
+    2. When dataMgrService_ is null, GetProxy returns a non-null proxy.
+    3. When dataMgrService_ is non-null, GetProxy returns a non-null proxy.
  */
 HWTEST_F(DataShareManagerImplTest, GetProxy001, TestSize.Level0)
 {
