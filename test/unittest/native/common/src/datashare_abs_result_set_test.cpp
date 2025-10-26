@@ -55,16 +55,26 @@ public:
 };
 
 /**
-* @tc.name: GoToTest001
-* @tc.desc: test GoTo function when GoToRow return E_ERROR
-* @tc.type: FUNC
-* @tc.require: issueIC9GIH
-* @tc.precon: None
-* @tc.step:
-    1.Creat a MockDataShareAbsResultSet object
-    2.call GoTo function when GoToRow return E_ERROR and check the result
-* @tc.experct: GoTo failed and return E_ERROR
-*/
+ * @tc.name: GoToTest001
+ * @tc.desc: Verify the behavior of the GoTo function in DataShareAbsResultSet when the internal GoToRow method
+ *           returns E_ERROR, ensuring GoTo propagates the error correctly.
+ * @tc.type: FUNC
+ * @tc.require: issueIC9GIH
+ * @tc.precon:
+    1. The test environment supports instantiation of MockDataShareAbsResultSet (a mock implementation of
+       DataShareAbsResultSet).
+    2. MockDataShareAbsResultSet allows setting expectations for the GoToRow method (e.g., forcing it to return
+       E_ERROR).
+    3. The predefined error code E_ERROR is valid and accessible in the test environment.
+    4. The GoTo function accepts an integer offset parameter and returns an integer error code.
+ * @tc.step:
+    1. Create an instance of MockDataShareAbsResultSet named mockResultSet.
+    2. Set an expectation on mockResultSet: when GoToRow is called (with any parameter), it returns E_ERROR.
+    3. Define an integer offset with value 1, then call the GoTo function of mockResultSet with this offset.
+    4. Record the return value of the GoTo function and compare it with E_ERROR.
+ * @tc.expect:
+    1. The GoTo function execution fails and returns E_ERROR.
+ */
 HWTEST_F(DataShareAbsResultSetTest, GoToTest001, TestSize.Level0)
 {
     LOG_INFO("DataShareAbsResultSetTest GoToTest001::Start");
@@ -78,16 +88,23 @@ HWTEST_F(DataShareAbsResultSetTest, GoToTest001, TestSize.Level0)
 }
 
 /**
-* @tc.name: GoToTest002
-* @tc.desc: test GoTo function
-* @tc.type: FUNC
-* @tc.require: issueIC9GIH
-* @tc.precon: None
-* @tc.step:
-    1.Creat a MockDataShareAbsResultSet object
-    2.call GoTo function and check the result
-* @tc.experct: GoTo success and return E_OK
-*/
+ * @tc.name: GoToTest002
+ * @tc.desc: Verify the normal behavior of the GoTo function in the base DataShareAbsResultSet class (without mock),
+ *           ensuring it executes successfully and returns E_OK.
+ * @tc.type: FUNC
+ * @tc.require: issueIC9GIH
+ * @tc.precon:
+    1. The test environment supports instantiation of the base DataShareAbsResultSet class (no mock) without
+       initialization errors.
+    2. The predefined success code E_OK is valid and accessible in the test environment.
+    3. The GoTo function accepts an integer offset parameter and returns an integer error code.
+ * @tc.step:
+    1. Create an instance of DataShareAbsResultSet named dataShareAbsResultSet.
+    2. Define an integer offset with value 1, then call the GoTo function of dataShareAbsResultSet with this offset.
+    3. Record the return value of the GoTo function and compare it with E_OK.
+ * @tc.expect:
+    1. The GoTo function executes successfully and returns E_OK.
+ */
 HWTEST_F(DataShareAbsResultSetTest, GoToTest002, TestSize.Level0)
 {
     LOG_INFO("DataShareAbsResultSetTest GoToTest002::Start");
@@ -99,16 +116,28 @@ HWTEST_F(DataShareAbsResultSetTest, GoToTest002, TestSize.Level0)
 }
 
 /**
-* @tc.name: IsEndedTest001
-* @tc.desc: test IsEnded function when GetRowCount return E_ERROR
-* @tc.type: FUNC
-* @tc.require: issueIC9GIH
-* @tc.precon: None
-* @tc.step:
-    1.Creat a MockDataShareAbsResultSet object
-    2.call IsEnded function when GetRowCount return E_ERROR and check the result
-* @tc.experct: IsEnded failed and return E_ERROR
-*/
+ * @tc.name: IsEndedTest001
+ * @tc.desc: Verify the behavior of the IsEnded function in DataShareAbsResultSet when the internal GetRowCount method
+ *           returns E_ERROR, ensuring IsEnded propagates the error correctly.
+ * @tc.type: FUNC
+ * @tc.require: issueIC9GIH
+ * @tc.precon:
+    1. The test environment supports instantiation of MockDataShareAbsResultSet.
+    2. MockDataShareAbsResultSet allows setting expectations for the GetRowCount method (e.g., forcing it to return
+       E_ERROR).
+    3. The IsEnded function accepts a non-const boolean reference parameter (to store the "ended" state) and returns an
+       integer error code.
+    4. The predefined error code E_ERROR is valid and accessible.
+ * @tc.step:
+    1. Create an instance of MockDataShareAbsResultSet named mockResultSet.
+    2. Set an expectation on mockResultSet: when GetRowCount is called (with any integer reference parameter), it
+       returns E_ERROR.
+    3. Define a boolean variable test (initialized to true), then call the IsEnded function of mockResultSet, passing
+       test as the parameter.
+    4. Record the return value of the IsEnded function and compare it with E_ERROR.
+ * @tc.expect:
+    1. The IsEnded function execution fails and returns E_ERROR.
+ */
 HWTEST_F(DataShareAbsResultSetTest, IsEndedTest001, TestSize.Level0)
 {
     LOG_INFO("DataShareAbsResultSetTest IsEndedTest001::Start");
@@ -122,16 +151,24 @@ HWTEST_F(DataShareAbsResultSetTest, IsEndedTest001, TestSize.Level0)
 }
 
 /**
-* @tc.name: IsEndedTest002
-* @tc.desc: test IsEnded function
-* @tc.type: FUNC
-* @tc.require: issueIC9GIH
-* @tc.precon: None
-* @tc.step:
-    1.Creat a MockDataShareAbsResultSet object
-    2.call IsEnded function and check the result
-* @tc.experct: IsEnded success and return E_OK
-*/
+ * @tc.name: IsEndedTest002
+ * @tc.desc: Verify the normal behavior of the IsEnded function in the base DataShareAbsResultSet class (without mock),
+ *           ensuring it executes successfully and returns E_OK.
+ * @tc.type: FUNC
+ * @tc.require: issueIC9GIH
+ * @tc.precon:
+    1. The test environment supports instantiation of the base DataShareAbsResultSet class without initialization
+       errors.
+    2. The predefined success code E_OK is valid and accessible.
+    3. The IsEnded function accepts a non-const boolean reference parameter and returns an integer error code.
+ * @tc.step:
+    1. Create an instance of DataShareAbsResultSet named dataShareAbsResultSet.
+    2. Define a boolean variable test (initialized to true), then call the IsEnded function of dataShareAbsResultSet,
+       passing test.
+    3. Record the return value of the IsEnded function and compare it with E_OK.
+ * @tc.expect:
+    1. The IsEnded function executes successfully and returns E_OK.
+ */
 HWTEST_F(DataShareAbsResultSetTest, IsEndedTest002, TestSize.Level0)
 {
     LOG_INFO("DataShareAbsResultSetTest IsEndedTest002::Start");
@@ -143,16 +180,31 @@ HWTEST_F(DataShareAbsResultSetTest, IsEndedTest002, TestSize.Level0)
 }
 
 /**
-* @tc.name: GetColumnCountTest001
-* @tc.desc: test GetColumnCount function when GetAllColumnNames return E_ERROR
-* @tc.type: FUNC
-* @tc.require: issueIC9GIH
-* @tc.precon: None
-* @tc.step:
-    1.Creat a MockDataShareAbsResultSet2 object
-    2.call GetColumnCount function when GetAllColumnNames return E_ERROR and check the result
-* @tc.experct: GetColumnCount failed and return E_ERROR
-*/
+ * @tc.name: GetColumnCountTest001
+ * @tc.desc: Verify the behavior of the GetColumnCount function in MockDataShareAbsResultSet2 when the internal
+ *           GetAllColumnNames method returns E_ERROR, ensuring GetColumnCount propagates the error correctly.
+ * @tc.type: FUNC
+ * @tc.require: issueIC9GIH
+ * @tc.precon:
+    1. The test environment supports instantiation of MockDataShareAbsResultSet2 (a mock subclass of
+       DataShareAbsResultSet).
+    2. MockDataShareAbsResultSet2 allows setting expectations for the GetAllColumnNames method (e.g., forcing it to
+       return E_ERROR).
+    3. MockDataShareAbsResultSet2 has a public member variable count_ that can be explicitly assigned (e.g., to -1).
+    4. The GetColumnCount function accepts an integer reference parameter (to store the count) and returns an integer
+       error code.
+    5. The predefined error code E_ERROR is valid and accessible.
+ * @tc.step:
+    1. Create an instance of MockDataShareAbsResultSet2 named mockResultSet.
+    2. Assign the count_ member of mockResultSet to -1.
+    3. Set an expectation on mockResultSet: when GetAllColumnNames is called (with any vector<string> reference
+       parameter), it returns E_ERROR.
+    4. Define an integer offset (initialized to -1), then call the GetColumnCount function of mockResultSet, passing
+       offset.
+    5. Record the return value of GetColumnCount and compare it with E_ERROR.
+ * @tc.expect:
+    1. The GetColumnCount function execution fails and returns E_ERROR.
+ */
 HWTEST_F(DataShareAbsResultSetTest, GetColumnCountTest001, TestSize.Level0)
 {
     LOG_INFO("DataShareAbsResultSetTest GetColumnCountTest001::Start");
@@ -167,16 +219,30 @@ HWTEST_F(DataShareAbsResultSetTest, GetColumnCountTest001, TestSize.Level0)
 }
 
 /**
-* @tc.name: GetColumnName001
-* @tc.desc: test GetColumnName function when GetColumnCount return E_ERROR
-* @tc.type: FUNC
-* @tc.require: issueIC9GIH
-* @tc.precon: None
-* @tc.step:
-    1.Creat a MockDataShareAbsResultSet object
-    2.call GetColumnName function when GetColumnCount return E_ERROR and check the result
-* @tc.experct: GetColumnName failed and return E_ERROR
-*/
+ * @tc.name: GetColumnName001
+ * @tc.desc: Verify the behavior of the GetColumnName function in DataShareAbsResultSet when the internal
+ *           GetColumnCount method returns E_ERROR, ensuring GetColumnName propagates the error correctly.
+ * @tc.type: FUNC
+ * @tc.require: issueIC9GIH
+ * @tc.precon:
+    1. The test environment supports instantiation of MockDataShareAbsResultSet.
+    2. MockDataShareAbsResultSet allows setting expectations for the GetColumnCount method (e.g., forcing it to return
+       E_ERROR).
+    3. The GetColumnName function accepts an integer columnIndex (for the target column) and a string reference (to
+       store the name),
+       and returns an integer error code.
+    4. The predefined error code E_ERROR is valid and accessible.
+    5. The test uses a valid columnIndex (e.g., 1) and an empty string (for columnName) as input parameters.
+ * @tc.step:
+    1. Create an instance of MockDataShareAbsResultSet named mockResultSet.
+    2. Set an expectation on mockResultSet: when GetColumnCount is called (with any integer reference parameter), it
+       returns E_ERROR.
+    3. Define an integer columnIndex (value 1) and a string columnName (initialized to "test").
+    4. Call the GetColumnName function of mockResultSet, passing columnIndex and columnName as parameters.
+    5. Record the return value of GetColumnName and compare it with E_ERROR.
+ * @tc.expect:
+    1. The GetColumnName function execution fails and returns E_ERROR.
+ */
 HWTEST_F(DataShareAbsResultSetTest, GetColumnName001, TestSize.Level0)
 {
     LOG_INFO("DataShareAbsResultSetTest GetColumnName001::Start");
@@ -191,16 +257,27 @@ HWTEST_F(DataShareAbsResultSetTest, GetColumnName001, TestSize.Level0)
 }
 
 /**
-* @tc.name: GetColumnName002
-* @tc.desc: test GetColumnName function when columnIndex >= 0
-* @tc.type: FUNC
-* @tc.require: issueIC9GIH
-* @tc.precon: None
-* @tc.step:
-    1.Creat a MockDataShareAbsResultSet object
-    2.call GetColumnName function when columnIndex >= 0 and check the result
-* @tc.experct: GetColumnName failed and return E_INVALID_COLUMN_INDEX
-*/
+ * @tc.name: GetColumnName002
+ * @tc.desc: Verify the behavior of the GetColumnName function in the base DataShareAbsResultSet class when the
+ *           input columnIndex is ≥ 0 (but invalid, as no columns exist), ensuring it returns E_INVALID_COLUMN_INDEX.
+ * @tc.type: FUNC
+ * @tc.require: issueIC9GIH
+ * @tc.precon:
+    1. The test environment supports instantiation of the base DataShareAbsResultSet class without initialization
+       errors.
+    2. The base DataShareAbsResultSet has no predefined columns (so any columnIndex ≥ 0 is invalid).
+    3. The GetColumnName function accepts an integer columnIndex and a string reference, and returns an integer error
+       code.
+    4. The predefined error code E_INVALID_COLUMN_INDEX is valid and accessible.
+    5. The test uses a columnIndex of 1 (≥ 0, invalid) and a string columnName (initialized to "test") as input.
+ * @tc.step:
+    1. Create an instance of DataShareAbsResultSet named dataShareAbsResultSet.
+    2. Define an integer columnIndex (value 1) and a string columnName (initialized to "test").
+    3. Call the GetColumnName function of dataShareAbsResultSet, passing columnIndex and columnName as parameters.
+    4. Record the return value of GetColumnName and compare it with E_INVALID_COLUMN_INDEX.
+ * @tc.expect:
+    1. The GetColumnName function execution fails and returns E_INVALID_COLUMN_INDEX.
+ */
 HWTEST_F(DataShareAbsResultSetTest, GetColumnName002, TestSize.Level0)
 {
     LOG_INFO("DataShareAbsResultSetTest MarshallingTest002::Start");
@@ -213,16 +290,27 @@ HWTEST_F(DataShareAbsResultSetTest, GetColumnName002, TestSize.Level0)
 }
 
 /**
-* @tc.name: GetColumnName003
-* @tc.desc: test GetColumnName function when columnIndex < 0
-* @tc.type: FUNC
-* @tc.require: issueIC9GIH
-* @tc.precon: None
-* @tc.step:
-    1.Creat a MockDataShareAbsResultSet object
-    2.call GetColumnName function when columnIndex < 0 and check the result
-* @tc.experct: GetColumnName failed and return E_INVALID_COLUMN_INDEX
-*/
+ * @tc.name: GetColumnName003
+ * @tc.desc: Verify the behavior of the GetColumnName function in the base DataShareAbsResultSet class when the
+ *           input columnIndex is < 0 (invalid), ensuring it returns E_INVALID_COLUMN_INDEX.
+ * @tc.type: FUNC
+ * @tc.require: issueIC9GIH
+ * @tc.precon:
+    1. The test environment supports instantiation of the base DataShareAbsResultSet class without initialization
+       errors.
+    2. The GetColumnName function accepts an integer columnIndex and a string reference, and returns an integer
+       error code.
+    3. The predefined error code E_INVALID_COLUMN_INDEX is valid and accessible (for invalid column indices).
+    4. The test uses a columnIndex of -1 (< 0, explicitly invalid) and a string columnName (initialized to "test") as
+       input.
+ * @tc.step:
+    1. Create an instance of DataShareAbsResultSet named dataShareAbsResultSet.
+    2. Define an integer columnIndex (value -1) and a string columnName (initialized to "test").
+    3. Call the GetColumnName function of dataShareAbsResultSet, passing columnIndex and columnName as parameters.
+    4. Record the return value of GetColumnName and compare it with E_INVALID_COLUMN_INDEX.
+ * @tc.expect:
+    1. The GetColumnName function execution fails and returns E_INVALID_COLUMN_INDEX.
+ */
 HWTEST_F(DataShareAbsResultSetTest, GetColumnName003, TestSize.Level0)
 {
     LOG_INFO("DataShareAbsResultSetTest MarshallingTest002::Start");
