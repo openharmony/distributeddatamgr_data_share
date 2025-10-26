@@ -68,15 +68,22 @@ void IkvStoreDataServiceTest::TearDown(void)
 
 /**
  * @tc.name: RegisterClientDeathObserverNull_Test_001
- * @tc.desc: Verify RegisterClientDeathObserver with null observer
+ * @tc.desc: Verify the behavior of DataShareKvServiceProxy::RegisterClientDeathObserver when the proxy is initialized
+ *           with a null parameter, and called with an empty appId and null observer.
  * @tc.type: FUNC
- * @tc.precon: None
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShareKvServiceProxy with a null constructor parameter.
+    2. DataShareKvServiceProxy has the RegisterClientDeathObserver method, which accepts std::string (appId) and
+       IRemoteObject* (observer) as parameters, returning a uint32_t result.
+    3. The return code -1 is predefined as the indicator of operation failure for this method.
  * @tc.step:
-    1. Create DataShareKvServiceProxy with null parameter
-    2. Call RegisterClientDeathObserver with empty appId and null observer
-    3. Check return value
+    1. Instantiate a DataShareKvServiceProxy object using a null pointer in the constructor.
+    2. Define an empty std::string variable named appId.
+    3. Call the proxy's RegisterClientDeathObserver method with appId (empty) and a null IRemoteObject pointer.
+    4. Check the uint32_t return value of the method.
  * @tc.expect:
-    1. Method returns -1 (failure)
+    1. The RegisterClientDeathObserver method returns -1 (operation failure).
  */
 HWTEST_F(IkvStoreDataServiceTest, RegisterClientDeathObserverNull_Test_001, TestSize.Level0)
 {
@@ -89,16 +96,27 @@ HWTEST_F(IkvStoreDataServiceTest, RegisterClientDeathObserverNull_Test_001, Test
 }
 
 /**
-* @tc.name: RegisterClientDeathObserver001
-* @tc.desc: test RegisterClientDeathObserver function when observer = nullptr
-* @tc.type: FUNC
-* @tc.require: issueIC9GIH
-* @tc.precon: None
-* @tc.step:
-    1.Creat a MockDataShareAbsResultSet object when observer = nullptr
-    2.call RegisterClientDeathObserver function and check the result
-* @tc.experct: RegisterClientDeathObserver failed and return -1
-*/
+ * @tc.name: RegisterClientDeathObserver001
+ * @tc.desc: Test the behavior of DataShareKvServiceProxy::RegisterClientDeathObserver when the observer parameter
+ *           (IRemoteObject*) is set to nullptr.
+ * @tc.type: FUNC
+ * @tc.require: issueIC9GIH
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShareKvServiceProxy with an IRemoteObject pointer (including
+       null).
+    2. DataShareKvServiceProxy has the RegisterClientDeathObserver method, which accepts std::string (appId) and
+       IRemoteObject* (observer) as parameters, returning a uint32_t result.
+    3. The return code -1 is predefined as the indicator of operation failure for this method.
+    4. The string "testAppid" is a valid input for the appId parameter of the method.
+ * @tc.step:
+    1. Set an IRemoteObject pointer (observer) to nullptr.
+    2. Define a std::string appId and initialize it to "testAppid".
+    3. Instantiate a DataShareKvServiceProxy object using the null observer as the constructor parameter.
+    4. Call the proxy's RegisterClientDeathObserver method with appId and the null observer.
+    5. Check the uint32_t return value of the method.
+ * @tc.expect:
+    1. The RegisterClientDeathObserver method fails and returns -1.
+ */
 HWTEST_F(IkvStoreDataServiceTest, RegisterClientDeathObserver001, TestSize.Level0)
 {
     LOG_INFO("RegisterClientDeathObserver001::Start");

@@ -33,16 +33,24 @@ public:
 };
 
 /**
-* @tc.name: AllocRowTest001
-* @tc.desc: test AllocRow function when shareBlock_ = nullptr
-* @tc.type: FUNC
-* @tc.require:issueIC413F
-* @tc.precon: None
-* @tc.step:
-    1.Create a DataShareBlockWriterImpl object and shareBlock_ = nullptr
-    2.call AllocRow function and check the result
-* @tc.experct: AllocRow failed and reutrn E_ERROR
-*/
+ * @tc.name: AllocRowTest001
+ * @tc.desc: Verify the behavior of the AllocRow function in DataShareBlockWriterImpl when its member variable
+ *           shareBlock_ is set to nullptr, ensuring the function fails and returns the expected error code.
+ * @tc.type: FUNC
+ * @tc.require: issueIC413F
+ * @tc.precon:
+    1. The test environment supports instantiation of the DataShareBlockWriterImpl class without initialization errors.
+    2. The shareBlock_ member variable of DataShareBlockWriterImpl allows explicit assignment to nullptr.
+    3. The predefined constant E_ERROR (used to indicate operation failure) is correctly defined and accessible.
+    4. The AllocRow function of DataShareBlockWriterImpl is properly declared and can be called normally.
+ * @tc.step:
+    1. Instantiate a DataShareBlockWriterImpl object named dataShareBlockWriterImpl.
+    2. Explicitly set the shareBlock_ member variable of dataShareBlockWriterImpl to nullptr.
+    3. Call the AllocRow function of the dataShareBlockWriterImpl object.
+    4. Compare the return value of AllocRow with the predefined E_ERROR.
+ * @tc.expect:
+    1. The AllocRow function execution fails and returns E_ERROR.
+ */
 HWTEST_F(DataShareBlockWriterImplTest, AllocRowTest001, TestSize.Level0)
 {
     LOG_INFO("DataShareBlockWriterImplTest AllocRowTest001::Start");
@@ -54,16 +62,24 @@ HWTEST_F(DataShareBlockWriterImplTest, AllocRowTest001, TestSize.Level0)
 }
 
 /**
-* @tc.name: FreeLastRowTest001
-* @tc.desc: test FreeLastRow function when shareBlock_ = nullptr
-* @tc.type: FUNC
-* @tc.require:issueIC413F
-* @tc.precon: None
-* @tc.step:
-    1.Create a DataShareBlockWriterImpl object and shareBlock_ = nullptr
-    2.call FreeLastRow function and check the result
-* @tc.experct: FreeLastRow failed and reutrn E_ERROR
-*/
+ * @tc.name: FreeLastRowTest001
+ * @tc.desc: Verify the behavior of the FreeLastRow function in DataShareBlockWriterImpl when its member variable
+ *           shareBlock_ is set to nullptr, ensuring the function fails and returns the expected error code.
+ * @tc.type: FUNC
+ * @tc.require: issueIC413F
+ * @tc.precon:
+    1. The test environment supports instantiation of the DataShareBlockWriterImpl class without initialization errors.
+    2. The shareBlock_ member variable of DataShareBlockWriterImpl allows explicit assignment to nullptr.
+    3. The predefined constant E_ERROR (used to indicate operation failure) is correctly defined and accessible.
+    4. The FreeLastRow function of DataShareBlockWriterImpl is properly declared and can be called normally.
+ * @tc.step:
+    1. Instantiate a DataShareBlockWriterImpl object named dataShareBlockWriterImpl.
+    2. Explicitly set the shareBlock_ member variable of dataShareBlockWriterImpl to nullptr.
+    3. Call the FreeLastRow function of the dataShareBlockWriterImpl object.
+    4. Compare the return value of FreeLastRow with the predefined E_ERROR.
+ * @tc.expect:
+    1. The FreeLastRow function execution fails and returns E_ERROR.
+ */
 HWTEST_F(DataShareBlockWriterImplTest, FreeLastRowTest001, TestSize.Level0)
 {
     LOG_INFO("DataShareBlockWriterImplTest FreeLastRowTest001::Start");
@@ -75,16 +91,27 @@ HWTEST_F(DataShareBlockWriterImplTest, FreeLastRowTest001, TestSize.Level0)
 }
 
 /**
-* @tc.name: WriteTest001
-* @tc.desc: test Write function when shareBlock_ = nullptr
-* @tc.type: FUNC
-* @tc.require:issueIC413F
-* @tc.precon: None
-* @tc.step:
-    1.Create a DataShareBlockWriterImpl object and shareBlock_ = nullptr
-    2.call Write function and check the result
-* @tc.experct: Write failed and reutrn E_ERROR
-*/
+ * @tc.name: WriteTest001
+ * @tc.desc: Verify the behavior of the Write function (overload with uint32_t column parameter) in
+ *           DataShareBlockWriterImpl when its member variable shareBlock_ is set to nullptr, ensuring the function
+ *           fails and returns E_ERROR.
+ * @tc.type: FUNC
+ * @tc.require: issueIC413F
+ * @tc.precon:
+    1. The test environment supports instantiation of the DataShareBlockWriterImpl class without initialization errors.
+    2. The shareBlock_ member variable of DataShareBlockWriterImpl allows explicit assignment to nullptr.
+    3. The predefined constant E_ERROR and uint32_t type are valid and accessible in the test environment.
+    4. The Write function (overload with uint32_t column) of DataShareBlockWriterImpl is properly declared and
+       callable.
+ * @tc.step:
+    1. Instantiate a DataShareBlockWriterImpl object named dataShareBlockWriterImpl.
+    2. Set the shareBlock_ member variable of dataShareBlockWriterImpl to nullptr.
+    3. Define a uint32_t variable column and initialize it to 1.
+    4. Call the Write function of dataShareBlockWriterImpl, passing the column variable as the parameter.
+    5. Check if the return value of Write equals E_ERROR.
+ * @tc.expect:
+    1. The Write function execution fails and returns E_ERROR.
+ */
 HWTEST_F(DataShareBlockWriterImplTest, WriteTest001, TestSize.Level0)
 {
     LOG_INFO("DataShareBlockWriterImplTest WriteTest001::Start");
@@ -97,16 +124,26 @@ HWTEST_F(DataShareBlockWriterImplTest, WriteTest001, TestSize.Level0)
 }
 
 /**
-* @tc.name: WriteTest002
-* @tc.desc: test Write function when shareBlock_ = nullptr
-* @tc.type: FUNC
-* @tc.require:issueIC413F
-* @tc.precon: None
-* @tc.step:
-    1.Create a DataShareBlockWriterImpl object and shareBlock_ = nullptr
-    2.call Write function and check the result
-* @tc.experct: Write failed and reutrn E_ERROR
-*/
+ * @tc.name: WriteTest002
+ * @tc.desc: Verify the behavior of the Write function (overload with uint32_t column and int64_t value) in
+ *           DataShareBlockWriterImpl when its member variable shareBlock_ is set to nullptr, ensuring the function
+ *           fails and returns E_ERROR.
+ * @tc.type: FUNC
+ * @tc.require: issueIC413F
+ * @tc.precon:
+    1. The test environment supports instantiation of the DataShareBlockWriterImpl class without initialization errors.
+    2. The shareBlock_ member variable of DataShareBlockWriterImpl allows explicit assignment to nullptr.
+    3. The predefined constant E_ERROR, uint32_t, and int64_t types are valid and accessible.
+    4. The Write function (overload with uint32_t column and int64_t value) is properly declared and callable.
+ * @tc.step:
+    1. Instantiate a DataShareBlockWriterImpl object named dataShareBlockWriterImpl.
+    2. Set the shareBlock_ member variable of dataShareBlockWriterImpl to nullptr.
+    3. Define a uint32_t column (initialized to 1) and an int64_t value (initialized to 1).
+    4. Call the Write function of dataShareBlockWriterImpl, passing column and value as parameters.
+    5. Check if the return value of Write equals E_ERROR.
+ * @tc.expect:
+    1. The Write function execution fails and returns E_ERROR.
+ */
 HWTEST_F(DataShareBlockWriterImplTest, WriteTest002, TestSize.Level0)
 {
     LOG_INFO("DataShareBlockWriterImplTest WriteTest002::Start");
@@ -120,16 +157,26 @@ HWTEST_F(DataShareBlockWriterImplTest, WriteTest002, TestSize.Level0)
 }
 
 /**
-* @tc.name: WriteTest003
-* @tc.desc: test Write function when shareBlock_ = nullptr
-* @tc.type: FUNC
-* @tc.require:issueIC413F
-* @tc.precon: None
-* @tc.step:
-    1.Create a DataShareBlockWriterImpl object and shareBlock_ = nullptr
-    2.call Write function and check the result
-* @tc.experct: Write failed and reutrn E_ERROR
-*/
+ * @tc.name: WriteTest003
+ * @tc.desc: Verify the behavior of the Write function (overload with uint32_t column and double value) in
+ *           DataShareBlockWriterImpl when its member variable shareBlock_ is set to nullptr, ensuring the function
+ *           fails and returns E_ERROR.
+ * @tc.type: FUNC
+ * @tc.require: issueIC413F
+ * @tc.precon:
+    1. The test environment supports instantiation of the DataShareBlockWriterImpl class without initialization errors.
+    2. The shareBlock_ member variable of DataShareBlockWriterImpl allows explicit assignment to nullptr.
+    3. The predefined constant E_ERROR, uint32_t, and double types are valid and accessible.
+    4. The Write function (overload with uint32_t column and double value) is properly declared and callable.
+ * @tc.step:
+    1. Instantiate a DataShareBlockWriterImpl object named dataShareBlockWriterImpl.
+    2. Set the shareBlock_ member variable of dataShareBlockWriterImpl to nullptr.
+    3. Define a uint32_t column (initialized to 1) and a double value (initialized to 1.0).
+    4. Call the Write function of dataShareBlockWriterImpl, passing column and value as parameters.
+    5. Check if the return value of Write equals E_ERROR.
+ * @tc.expect:
+    1. The Write function execution fails and returns E_ERROR.
+ */
 HWTEST_F(DataShareBlockWriterImplTest, WriteTest003, TestSize.Level0)
 {
     LOG_INFO("DataShareBlockWriterImplTest WriteTest003::Start");
@@ -143,16 +190,27 @@ HWTEST_F(DataShareBlockWriterImplTest, WriteTest003, TestSize.Level0)
 }
 
 /**
-* @tc.name: WriteTest004
-* @tc.desc: test Write function when shareBlock_ = nullptr
-* @tc.type: FUNC
-* @tc.require:issueIC413F
-* @tc.precon: None
-* @tc.step:
-    1.Create a DataShareBlockWriterImpl object and shareBlock_ = nullptr
-    2.call Write function and check the result
-* @tc.experct: Write failed and reutrn E_ERROR
-*/
+ * @tc.name: WriteTest004
+ * @tc.desc: Verify the behavior of the Write function (overload with uint32_t column, uint8_t* value, size_t size) in
+ *           DataShareBlockWriterImpl when shareBlock_ is set to nullptr, ensuring the function fails and returns
+ *           E_ERROR.
+ * @tc.type: FUNC
+ * @tc.require: issueIC413F
+ * @tc.precon:
+    1. The test environment supports instantiation of the DataShareBlockWriterImpl class without initialization errors.
+    2. The shareBlock_ member variable of DataShareBlockWriterImpl allows explicit assignment to nullptr.
+    3. The predefined constant E_ERROR, uint32_t, uint8_t array, and size_t types are valid and accessible.
+    4. The Write function (overload with uint32_t column, uint8_t* value, size_t size) is properly declared and
+       callable.
+ * @tc.step:
+    1. Instantiate a DataShareBlockWriterImpl object named dataShareBlockWriterImpl.
+    2. Set the shareBlock_ member variable of dataShareBlockWriterImpl to nullptr.
+    3. Define a uint32_t column (1), a uint8_t array value[3] (initialized to {1}), and a size_t size (1).
+    4. Call the Write function of dataShareBlockWriterImpl, passing column, value, and size as parameters.
+    5. Check if the return value of Write equals E_ERROR.
+ * @tc.expect:
+    1. The Write function execution fails and returns E_ERROR.
+ */
 HWTEST_F(DataShareBlockWriterImplTest, WriteTest004, TestSize.Level0)
 {
     LOG_INFO("DataShareBlockWriterImplTest WriteTest004::Start");
@@ -167,16 +225,27 @@ HWTEST_F(DataShareBlockWriterImplTest, WriteTest004, TestSize.Level0)
 }
 
 /**
-* @tc.name: WriteTest005
-* @tc.desc: test Write function when shareBlock_ = nullptr
-* @tc.type: FUNC
-* @tc.require:issueIC413F
-* @tc.precon: None
-* @tc.step:
-    1.Create a DataShareBlockWriterImpl object and shareBlock_ = nullptr
-    2.call Write function and check the result
-* @tc.experct: Write failed and reutrn E_ERROR
-*/
+ * @tc.name: WriteTest005
+ * @tc.desc: Verify the behavior of the Write function (overload with uint32_t column, const char* value, size_t
+ *           sizeIncludingNull) in DataShareBlockWriterImpl when shareBlock_ is set to nullptr, ensuring the function
+ *           fails and returns E_ERROR.
+ * @tc.type: FUNC
+ * @tc.require: issueIC413F
+ * @tc.precon:
+    1. The test environment supports instantiation of the DataShareBlockWriterImpl class without initialization errors.
+    2. The shareBlock_ member variable of DataShareBlockWriterImpl allows explicit assignment to nullptr.
+    3. The predefined constant E_ERROR, uint32_t, const char*, and size_t types are valid and accessible.
+    4. The Write function (overload with const char* value) of DataShareBlockWriterImpl is properly declared and
+       callable.
+ * @tc.step:
+    1. Instantiate a DataShareBlockWriterImpl object named dataShareBlockWriterImpl.
+    2. Set the shareBlock_ member variable of dataShareBlockWriterImpl to nullptr.
+    3. Define a uint32_t column (1), a const char* value ("test"), and a size_t sizeIncludingNull (1).
+    4. Call the Write function of dataShareBlockWriterImpl, passing column, value, and sizeIncludingNull as parameters.
+    5. Check if the return value of Write equals E_ERROR.
+ * @tc.expect:
+    1. The Write function execution fails and returns E_ERROR.
+ */
 HWTEST_F(DataShareBlockWriterImplTest, WriteTest005, TestSize.Level0)
 {
     LOG_INFO("DataShareBlockWriterImplTest WriteTest005::Start");
@@ -191,16 +260,26 @@ HWTEST_F(DataShareBlockWriterImplTest, WriteTest005, TestSize.Level0)
 }
 
 /**
-* @tc.name: GetCurrentRowIndexTest001
-* @tc.desc: test GetCurrentRowIndex function when shareBlock_ = nullptr
-* @tc.type: FUNC
-* @tc.require:issueIC413F
-* @tc.precon: None
-* @tc.step:
-    1.Create a DataShareBlockWriterImpl object and shareBlock_ = nullptr
-    2.call GetCurrentRowIndex function and check the result
-* @tc.experct: GetCurrentRowIndex failed and reutrn false
-*/
+ * @tc.name: GetCurrentRowIndexTest001
+ * @tc.desc: Verify the behavior of the GetCurrentRowIndex function in DataShareBlockWriterImpl when its member
+ *           variable shareBlock_ is set to nullptr, ensuring the function fails and returns false.
+ * @tc.type: FUNC
+ * @tc.require: issueIC413F
+ * @tc.precon:
+    1. The test environment supports instantiation of the DataShareBlockWriterImpl class without initialization errors.
+    2. The shareBlock_ member variable of DataShareBlockWriterImpl allows explicit assignment to nullptr.
+    3. The uint32_t type is valid in the test environment, and the GetCurrentRowIndex function returns a bool.
+    4. The GetCurrentRowIndex function of DataShareBlockWriterImpl is properly declared and can be called with a
+       uint32_t reference.
+ * @tc.step:
+    1. Instantiate a DataShareBlockWriterImpl object named dataShareBlockWriterImpl.
+    2. Explicitly set the shareBlock_ member variable of dataShareBlockWriterImpl to nullptr.
+    3. Define a uint32_t variable rowIndex and initialize it to 1.
+    4. Call the GetCurrentRowIndex function of dataShareBlockWriterImpl, passing rowIndex as a reference parameter.
+    5. Check if the return value of GetCurrentRowIndex is false.
+ * @tc.expect:
+    1. The GetCurrentRowIndex function execution fails and returns false.
+ */
 HWTEST_F(DataShareBlockWriterImplTest, GetCurrentRowIndexTest001, TestSize.Level0)
 {
     LOG_INFO("DataShareBlockWriterImplTest GetCurrentRowIndexTest001::Start");
@@ -214,15 +293,33 @@ HWTEST_F(DataShareBlockWriterImplTest, GetCurrentRowIndexTest001, TestSize.Level
 
 /**
  * @tc.name: DataShareBlockWriterImplTest_shareBlock_Null_Test_001
- * @tc.desc: Verify operations on DataShareBlockWriterImpl when share block is null
+ * @tc.desc: Verify the behavior of multiple member functions (AllocRow and multiple Write overloads) in
+ *           DataShareBlockWriterImpl when its member variable shareBlock_ is set to nullptr, ensuring all operations
+ *           fail and return E_ERROR.
  * @tc.type: FUNC
- * @tc.precon: None
+ * @tc.precon:
+    1. The test environment supports instantiation of the DataShareBlockWriterImpl class without initialization errors.
+    2. The shareBlock_ member variable of DataShareBlockWriterImpl allows explicit assignment to nullptr (default if
+       uninitialized).
+    3. The predefined constant E_ERROR and types (uint32_t, int64_t, double, uint8_t*, const char*, size_t) are valid
+       and accessible.
+    4. The tested functions (AllocRow, Write with multiple overloads) of DataShareBlockWriterImpl are properly declared
+       and callable.
  * @tc.step:
-    1. Create DataShareBlockWriterImpl instance
-    2. Call various write operations (AllocRow, Write with different types)
-    3. Check return values of all operations
+    1. Instantiate a DataShareBlockWriterImpl object named impl (shareBlock_ is uninitialized, defaulting to nullptr).
+    2. Call the AllocRow function of impl and record its return value.
+    3. Call the Write function (overload with uint32_t column=1) of impl and record its return value.
+    4. Call the Write function (overload with uint32_t column=1 and int64_t value=0) of impl and record its return
+       value.
+    5. Call the Write function (overload with uint32_t column=1 and double value=0.0) of impl and record its return
+       value.
+    6. Call the Write function (overload with uint32_t column=1, uint8_t* value=nullptr, size_t size=0) of impl and
+       record its return value.
+    7. Call the Write function (overload with uint32_t column=1, const char* value=nullptr, size_t size=0) of impl and
+       record its return value.
+    8. Compare all recorded return values with E_ERROR.
  * @tc.expect:
-    1. All operations return E_ERROR
+    1. All tested functions (AllocRow and all Write overloads) execute fail and return E_ERROR.
  */
 HWTEST_F(DataShareBlockWriterImplTest, ShareBlock_Null_Test_001, TestSize.Level0)
 {
