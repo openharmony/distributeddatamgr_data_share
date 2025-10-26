@@ -89,20 +89,31 @@ void DataShareProxyTest::SetUp(void) {}
 void DataShareProxyTest::TearDown(void) {}
 
 /**
-* @tc.name: DataShareProxy_RegisterObserverExtProvider_Test_001
-* @tc.desc: Verify basic functionality of RegisterObserverExtProvider method
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with test URI and token
-    2. Initialize DataShareProxy and assign to connection
-    3. Get proxy instance and verify it's not null
-    4. Create test observer and call RegisterObserverExtProvider
-    5. Check returned result code
-* @tc.expect:
-    1. All objects are successfully initialized
-    2. RegisterObserverExtProvider returns 0 (E_OK)
-*/
+ * @tc.name: DataShareProxy_RegisterObserverExtProvider_Test_001
+ * @tc.desc: Verify the basic functionality of the RegisterObserverExtProvider method in DataShareProxy,
+ *           including successful object initialization and correct return of the success code (E_OK = 0).
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShareConnection, DataShareProxy, IRemoteObject
+       (RemoteObjectTest), and IDataAbilityObserverTest without initialization errors.
+    2. Predefined constants are valid: DATA_SHARE_URI (test URI), tokenString (u"OHOS.DataShare.IDataShare"),
+       and E_OK (0) is correctly defined as the success code.
+    3. The DataShareConnection class allows assignment of the 'dataShareProxy_' member and provides the
+       GetDataShareProxy method to retrieve the proxy instance.
+ * @tc.step:
+    1. Create an IRemoteObject instance (token) using RemoteObjectTest with the predefined tokenString.
+    2. Create a DataShareConnection instance using the test URI (DATA_SHARE_URI) and the 'token' from step 1.
+    3. Initialize a DataShareProxy instance (tokenProxy) with 'token', assign it to the 'dataShareProxy_'
+       member of the DataShareConnection.
+    4. Call DataShareConnection::GetDataShareProxy with DATA_SHARE_URI and 'token' to get the proxy instance,
+       then verify it is not nullptr.
+    5. Create an IDataAbilityObserverTest instance (dataObserver) and verify it is not nullptr.
+    6. Call RegisterObserverExtProvider on the proxy with DATA_SHARE_URI, dataObserver, 'true', and {false},
+       then record the return code.
+ * @tc.expect:
+    1. All created objects (token, DataShareConnection, tokenProxy, proxy, dataObserver) are not nullptr.
+    2. The RegisterObserverExtProvider method returns 0 (E_OK), indicating successful execution.
+ */
 HWTEST_F(DataShareProxyTest, DataShareProxy_RegisterObserverExtProvider_Test_001, TestSize.Level0)
 {
     LOG_INFO("DataShareProxy_RegisterObserverExtProvider_Test_001::Start");
@@ -135,20 +146,30 @@ HWTEST_F(DataShareProxyTest, DataShareProxy_RegisterObserverExtProvider_Test_001
 }
 
 /**
-* @tc.name: DataShareProxy_UnregisterObserverExtProvider_Test_001
-* @tc.desc: Verify basic functionality of UnregisterObserverExtProvider method
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with test URI and token
-    2. Initialize DataShareProxy and assign to connection
-    3. Get proxy instance and verify it's not null
-    4. Create test observer and call UnregisterObserverExtProvider
-    5. Check returned result code
-* @tc.expect:
-    1. All objects are successfully initialized
-    2. UnregisterObserverExtProvider returns 0 (E_OK)
-*/
+ * @tc.name: DataShareProxy_UnregisterObserverExtProvider_Test_001
+ * @tc.desc: Verify the basic functionality of the UnregisterObserverExtProvider method in DataShareProxy,
+ *           including successful object initialization and correct return of the success code (E_OK = 0).
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShareConnection, DataShareProxy, IRemoteObject
+       (RemoteObjectTest), and IDataAbilityObserverTest without initialization errors.
+    2. Predefined constants are valid: DATA_SHARE_URI (test URI), tokenString (u"OHOS.DataShare.IDataShare"),
+       and E_OK (0) is correctly defined as the success code.
+    3. The DataShareConnection class allows assignment of 'dataShareProxy_' and provides GetDataShareProxy
+       to retrieve the proxy instance.
+ * @tc.step:
+    1. Create an IRemoteObject instance (token) using RemoteObjectTest with the predefined tokenString.
+    2. Create a DataShareConnection instance using DATA_SHARE_URI and the 'token' from step 1.
+    3. Initialize a DataShareProxy instance (tokenProxy) with 'token', assign it to
+       DataShareConnection::dataShareProxy_.
+    4. Call GetDataShareProxy with DATA_SHARE_URI and 'token' to get the proxy instance, verify it is not nullptr.
+    5. Create an IDataAbilityObserverTest instance (dataObserver) and verify it is not nullptr.
+    6. Call UnregisterObserverExtProvider on the proxy with DATA_SHARE_URI and dataObserver, then record the return
+       code.
+ * @tc.expect:
+    1. All created objects (token, DataShareConnection, tokenProxy, proxy, dataObserver) are not nullptr.
+    2. The UnregisterObserverExtProvider method returns 0 (E_OK), indicating successful execution.
+ */
 HWTEST_F(DataShareProxyTest, DataShareProxy_UnregisterObserverExtProvider_Test_001, TestSize.Level0)
 {
     LOG_INFO("DataShareProxy_UnregisterObserverExtProvider_Test_001::Start");
@@ -179,20 +200,30 @@ HWTEST_F(DataShareProxyTest, DataShareProxy_UnregisterObserverExtProvider_Test_0
 }
 
 /**
-* @tc.name: DataShareProxy_NotifyChangeExtProvider_Test_001
-* @tc.desc: Verify basic functionality of NotifyChangeExtProvider method
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareConnection with test URI and token
-    2. Initialize DataShareProxy and assign to connection
-    3. Get proxy instance and verify it's not null
-    4. Create test ChangeInfo object and call NotifyChangeExtProvider
-    5. Check returned result code
-* @tc.expect:
-    1. All objects are successfully initialized
-    2. NotifyChangeExtProvider returns 0 (E_OK)
-*/
+ * @tc.name: DataShareProxy_NotifyChangeExtProvider_Test_001
+ * @tc.desc: Verify the basic functionality of the NotifyChangeExtProvider method in DataShareProxy,
+ *           including successful object initialization, ChangeInfo creation, and correct return of E_OK (0).
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShareConnection, DataShareProxy, IRemoteObject
+       (RemoteObjectTest), and ChangeInfo without initialization errors.
+    2. Predefined constants are valid: DATA_SHARE_URI (test URI), tokenString (u"OHOS.DataShare.IDataShare"),
+       and E_OK (0) is correctly defined as the success code.
+    3. The ChangeInfo class supports setting ChangeType (INSERT) and a URI list, and DataShareConnection
+       provides GetDataShareProxy to retrieve the proxy.
+ * @tc.step:
+    1. Create an IRemoteObject instance (token) using RemoteObjectTest with the predefined tokenString.
+    2. Create a DataShareConnection instance using DATA_SHARE_URI and the 'token' from step 1.
+    3. Initialize a DataShareProxy instance (tokenProxy) with 'token', assign it to
+       DataShareConnection::dataShareProxy_.
+    4. Call GetDataShareProxy with DATA_SHARE_URI and 'token' to get the proxy instance, verify it is not nullptr.
+    5. Create a ChangeInfo instance: set ChangeType to INSERT and URI list to {DATA_SHARE_URI}.
+    6. Call NotifyChangeExtProvider on the proxy with the created ChangeInfo, then record the return code.
+ * @tc.expect:
+    1. All created objects (token, DataShareConnection, tokenProxy, proxy, ChangeInfo) are valid (non-null where
+       applicable).
+    2. The NotifyChangeExtProvider method returns 0 (E_OK), indicating successful execution.
+ */
 HWTEST_F(DataShareProxyTest, DataShareProxy_NotifyChangeExtProvider_Test_001, TestSize.Level0)
 {
     LOG_INFO("DataShareProxy_NotifyChangeExtProvider_Test_001::Start");
