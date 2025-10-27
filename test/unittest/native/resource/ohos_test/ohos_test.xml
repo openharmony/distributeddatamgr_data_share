@@ -23,6 +23,24 @@
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
         </cleaner>
     </target>
+    <target name="DataShareStubImplSystemTest">
+        <preparer>
+            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
+        </preparer>
+        <cleaner>
+            <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
+        </cleaner>
+    </target>
+    <target name="DataShareNormalDfxTest">
+        <preparer>
+            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
+        </preparer>
+        <cleaner>
+            <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
+        </cleaner>
+    </target>
     <target name="DataShareHelperErrorCodeTest">
         <preparer>
             <option name="push" value="errorcode_ext_bundle/errorcode_ext.hap -> /data/test/resource/datashare/errortest" src="res"/>

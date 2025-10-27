@@ -75,18 +75,18 @@ bool DataShareStubImpl::IsCallerSystemApp(const CallingInfo &callingInfo, const 
     return Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(fullTokenId);
 }
 
-void DataShareStubImpl::VerifyProvider(const CallingInfo &callingInfo, const uint64_t fullTokenId,
+bool DataShareStubImpl::VerifyProvider(const CallingInfo &callingInfo, const uint64_t fullTokenId,
     const std::string &uri)
 {
     if (IsCallerSystemApp(callingInfo, fullTokenId)) {
-        return;
+        return true;
     }
 
     AppExecFwk::BundleInfo bundleInfo;
     auto bmsHelper = DelayedSingleton<BundleMgrHelper>::GetInstance();
     if (bmsHelper == nullptr) {
         LOG_ERROR("BmsHelper is nullptr! uri: %{public}s", DataShareStringUtils::Anonymous(uri).c_str());
-        return;
+        return false;
     }
 
     auto ret = bmsHelper->GetBundleInfoForSelf(
@@ -95,15 +95,19 @@ void DataShareStubImpl::VerifyProvider(const CallingInfo &callingInfo, const uin
     if (ret != E_OK) {
         LOG_ERROR("Get BundleInfo failed! uri: %{public}s, ret: %{public}d",
             DataShareStringUtils::Anonymous(uri).c_str(), ret);
-        return;
+        return false;
     }
 
     if (PROVIDER_LIST.find(bundleInfo.signatureInfo.appIdentifier) == PROVIDER_LIST.end()) {
         // No need to print since app not in AppGallery do not have appIdentifier.
-        DataShareFaultInfo faultInfo{HiViewFaultAdapter::invalidProvider,
-            bundleInfo.applicationInfo.bundleName.c_str(), "", "", __FUNCTION__, -1, ""};
+        DataShareFaultInfo faultInfo{HiViewFaultAdapter::unapprovedProvider,
+            bundleInfo.applicationInfo.bundleName.c_str(), "", "", __FUNCTION__, -1, "Non-Silent"};
         HiViewFaultAdapter::ReportDataFault(faultInfo);
+        // Provider not in allowlist
+        return false;
     }
+    // Provider in allowlist
+    return true;
 }
 
 std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
@@ -188,7 +192,7 @@ int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value
 {
     CallingInfo info;
     GetCallingInfo(info);
-    // Only log when check failed
+    // Only log when check failed. For ReportDataFault purpose.
     VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
     auto client = sptr<DataShareStubImpl>(this);
@@ -227,7 +231,7 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
 {
     CallingInfo info;
     GetCallingInfo(info);
-    // Only log when check failed
+    // Only log when check failed. For ReportDataFault purpose.
     VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
     auto client = sptr<DataShareStubImpl>(this);
@@ -265,7 +269,7 @@ int DataShareStubImpl::BatchUpdate(const UpdateOperations &operations, std::vect
 {
     CallingInfo info;
     GetCallingInfo(info);
-    // Only log when check failed
+    // Only log when check failed. For ReportDataFault purpose.
     VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID());
 
     auto client = sptr<DataShareStubImpl>(this);
@@ -303,7 +307,7 @@ int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predica
 {
     CallingInfo info;
     GetCallingInfo(info);
-    // Only log when check failed
+    // Only log when check failed. For ReportDataFault purpose.
     VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
     auto client = sptr<DataShareStubImpl>(this);
@@ -341,7 +345,7 @@ std::pair<int32_t, int32_t> DataShareStubImpl::InsertEx(const Uri &uri, const Da
 {
     CallingInfo info;
     GetCallingInfo(info);
-    // Only log when check failed
+    // Only log when check failed. For ReportDataFault purpose.
     VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
     auto client = sptr<DataShareStubImpl>(this);
@@ -380,7 +384,7 @@ std::pair<int32_t, int32_t> DataShareStubImpl::UpdateEx(const Uri &uri, const Da
 {
     CallingInfo info;
     GetCallingInfo(info);
-    // Only log when check failed
+    // Only log when check failed. For ReportDataFault purpose.
     VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
     auto client = sptr<DataShareStubImpl>(this);
@@ -418,7 +422,7 @@ std::pair<int32_t, int32_t> DataShareStubImpl::DeleteEx(const Uri &uri, const Da
 {
     CallingInfo info;
     GetCallingInfo(info);
-    // Only log when check failed
+    // Only log when check failed. For ReportDataFault purpose.
     VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
     auto client = sptr<DataShareStubImpl>(this);
@@ -457,7 +461,7 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
 {
     CallingInfo info;
     GetCallingInfo(info);
-    // Only log when check failed
+    // Only log when check failed. For ReportDataFault purpose.
     VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
     std::shared_ptr<DataShareResultSet> resultSet = nullptr;
@@ -529,7 +533,7 @@ int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareVa
 {
     CallingInfo info;
     GetCallingInfo(info);
-    // Only log when check failed
+    // Only log when check failed. For ReportDataFault purpose.
     VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
     auto client = sptr<DataShareStubImpl>(this);
