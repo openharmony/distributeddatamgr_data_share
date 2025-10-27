@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,7 +35,7 @@ std::string TEST_URI2 = "datashareproxy://com.acts.datasharetest.other/test1";
 std::string TEST_UNUSED_URI = "datashareproxy://com.acts.datasharetest/unused";
 std::atomic_int g_callbackTimes = 0;
 
-class ProxyHandleTest : public testing::Test {
+class DataProxyHandleTest : public testing::Test {
 public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
@@ -43,7 +43,7 @@ public:
     void TearDown();
 };
 
-void ProxyHandleTest::SetUpTestCase(void)
+void DataProxyHandleTest::SetUpTestCase(void)
 {
     LOG_INFO("SetUpTestCase invoked");
     int sleepTime = 1;
@@ -77,22 +77,22 @@ void ProxyHandleTest::SetUpTestCase(void)
     LOG_INFO("SetUpTestCase end");
 }
 
-void ProxyHandleTest::TearDownTestCase(void)
+void DataProxyHandleTest::TearDownTestCase(void)
 {
     auto tokenId = AccessTokenKit::GetHapTokenID(100, "com.acts.datasharetest", 0);
     AccessTokenKit::DeleteToken(tokenId);
 }
 
-void ProxyHandleTest::SetUp(void)
+void DataProxyHandleTest::SetUp(void)
 {
 }
 
-void ProxyHandleTest::TearDown(void)
+void DataProxyHandleTest::TearDown(void)
 {
 }
 
 /**
- * @tc.name: ProxyHandleTest_Publish_Test_001
+ * @tc.name: Publish_Test_001
  * @tc.desc: Verify DataProxyHandle successfully publishing string data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
@@ -111,9 +111,9 @@ void ProxyHandleTest::TearDown(void)
     2. PublishProxyData returns DataProxyErrorCode::SUCCESS
     3. Retrieved data matches the published string "hello"
  */
-HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_001, TestSize.Level0)
+HWTEST_F(DataProxyHandleTest, Publish_Test_001, TestSize.Level0)
 {
-    LOG_INFO("ProxyHandleTest_Publish_Test_001::Start");
+    LOG_INFO("DataProxyHandleTest_Publish_Test_001::Start");
     auto [ret, handle] = DataShare::DataProxyHandle::Create();
     EXPECT_EQ(ret, E_OK);
     EXPECT_NE(handle, nullptr);
@@ -137,11 +137,11 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_001, TestSize.Level0)
     auto ret3 = handle->GetProxyData(uris, proxyConfig);
     EXPECT_EQ(ret3[0].value_, value);
 
-    LOG_INFO("ProxyHandleTest_Publish_Test_001::End");
+    LOG_INFO("DataProxyHandleTest_Publish_Test_001::End");
 }
 
 /**
- * @tc.name: ProxyHandleTest_Publish_Test_002
+ * @tc.name: Publish_Test_002
  * @tc.desc: Verify DataProxyHandle successfully publishing integer data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
@@ -160,9 +160,9 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_001, TestSize.Level0)
     2. PublishProxyData returns DataProxyErrorCode::SUCCESS
     3. Retrieved data equals the published integer 123456
  */
-HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_002, TestSize.Level0)
+HWTEST_F(DataProxyHandleTest, Publish_Test_002, TestSize.Level0)
 {
-    LOG_INFO("ProxyHandleTest_Publish_Test_002::Start");
+    LOG_INFO("DataProxyHandleTest_Publish_Test_002::Start");
     auto [ret, handle] = DataShare::DataProxyHandle::Create();
     EXPECT_EQ(ret, E_OK);
 
@@ -183,11 +183,11 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_002, TestSize.Level0)
     auto ret3 = handle->GetProxyData(uris, proxyConfig);
     EXPECT_EQ(ret3[0].value_, value);
 
-    LOG_INFO("ProxyHandleTest_Publish_Test_002::End");
+    LOG_INFO("DataProxyHandleTest_Publish_Test_002::End");
 }
 
 /**
- * @tc.name: ProxyHandleTest_Publish_Test_003
+ * @tc.name: Publish_Test_003
  * @tc.desc: Verify DataProxyHandle successfully publishing double-precision floating-point data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
@@ -206,9 +206,9 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_002, TestSize.Level0)
     2. PublishProxyData returns DataProxyErrorCode::SUCCESS
     3. Retrieved data matches the published double 123456.123456
  */
-HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_003, TestSize.Level0)
+HWTEST_F(DataProxyHandleTest, Publish_Test_003, TestSize.Level0)
 {
-    LOG_INFO("ProxyHandleTest_Publish_Test_003::Start");
+    LOG_INFO("DataProxyHandleTest_Publish_Test_003::Start");
     auto [ret, handle] = DataShare::DataProxyHandle::Create();
     EXPECT_EQ(ret, E_OK);
 
@@ -229,11 +229,11 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_003, TestSize.Level0)
     auto ret3 = handle->GetProxyData(uris, proxyConfig);
     EXPECT_EQ(ret3[0].value_, value);
 
-    LOG_INFO("ProxyHandleTest_Publish_Test_003::End");
+    LOG_INFO("DataProxyHandleTest_Publish_Test_003::End");
 }
 
 /**
- * @tc.name: ProxyHandleTest_Publish_Test_004
+ * @tc.name: Publish_Test_004
  * @tc.desc: Verify DataProxyHandle successfully publishing boolean data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
@@ -252,9 +252,9 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_003, TestSize.Level0)
     2. PublishProxyData returns DataProxyErrorCode::SUCCESS
     3. Retrieved data equals the published boolean true
  */
-HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_004, TestSize.Level0)
+HWTEST_F(DataProxyHandleTest, Publish_Test_004, TestSize.Level0)
 {
-    LOG_INFO("ProxyHandleTest_Publish_Test_004::Start");
+    LOG_INFO("DataProxyHandleTest_Publish_Test_004::Start");
     auto [ret, handle] = DataShare::DataProxyHandle::Create();
     EXPECT_EQ(ret, E_OK);
 
@@ -275,11 +275,11 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_004, TestSize.Level0)
     auto ret3 = handle->GetProxyData(uris, proxyConfig);
     EXPECT_EQ(ret3[0].value_, value);
 
-    LOG_INFO("ProxyHandleTest_Publish_Test_004::End");
+    LOG_INFO("DataProxyHandleTest_Publish_Test_004::End");
 }
 
 /**
- * @tc.name: ProxyHandleTest_Publish_Test_005
+ * @tc.name: Publish_Test_005
  * @tc.desc: Verify that DataProxyHandle fails to publish data from another bundlename
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
@@ -296,9 +296,9 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_004, TestSize.Level0)
     1. DataProxyHandle creation returns E_OK and non-null handle
     2. PublishProxyData returns DataProxyErrorCode::NO_PERMISSION
  */
-HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_005, TestSize.Level0)
+HWTEST_F(DataProxyHandleTest, Publish_Test_005, TestSize.Level0)
 {
-    LOG_INFO("ProxyHandleTest_Publish_Test_005::Start");
+    LOG_INFO("DataProxyHandleTest_Publish_Test_005::Start");
     auto [ret, handle] = DataShare::DataProxyHandle::Create();
     EXPECT_EQ(ret, E_OK);
 
@@ -315,11 +315,11 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_005, TestSize.Level0)
     auto ret2 = handle->PublishProxyData(proxyData, proxyConfig);
     EXPECT_EQ(ret2[0].result_, DataProxyErrorCode::NO_PERMISSION);
 
-    LOG_INFO("ProxyHandleTest_Publish_Test_005::End");
+    LOG_INFO("DataProxyHandleTest_Publish_Test_005::End");
 }
 
 /**
- * @tc.name: ProxyHandleTest_Delete_Test_001
+ * @tc.name: Delete_Test_001
  * @tc.desc: Verify the functionality of DataProxyHandle successfully deleting published data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
@@ -339,9 +339,9 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Publish_Test_005, TestSize.Level0)
     2. Initial GetProxyData retrieves the published boolean true
     3. Post-deletion GetProxyData returns DataProxyErrorCode::URI_NOT_EXIST
  */
-HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_001, TestSize.Level0)
+HWTEST_F(DataProxyHandleTest, Delete_Test_001, TestSize.Level0)
 {
-    LOG_INFO("ProxyHandleTest_Delete_Test_001::Start");
+    LOG_INFO("DataProxyHandleTest_Delete_Test_001::Start");
     auto [ret, handle] = DataShare::DataProxyHandle::Create();
     EXPECT_EQ(ret, E_OK);
 
@@ -370,11 +370,11 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_001, TestSize.Level0)
     auto ret5 = handle->GetProxyData(uris, proxyConfig);
     EXPECT_EQ(ret5[0].result_, DataProxyErrorCode::URI_NOT_EXIST);
 
-    LOG_INFO("ProxyHandleTest_Delete_Test_001::End");
+    LOG_INFO("DataProxyHandleTest_Delete_Test_001::End");
 }
 
 /**
- * @tc.name: ProxyHandleTest_Delete_Test_002
+ * @tc.name: Delete_Test_002
  * @tc.desc: Verify that DataProxyHandle fails to delete data from another bundlename
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
@@ -391,9 +391,9 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_001, TestSize.Level0)
     1. DataProxyHandle creation returns E_OK and non-null handle
     2. DeleteProxyData returns DataProxyErrorCode::NO_PERMISSION
  */
-HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_002, TestSize.Level0)
+HWTEST_F(DataProxyHandleTest, Delete_Test_002, TestSize.Level0)
 {
-    LOG_INFO("ProxyHandleTest_Delete_Test_002::Start");
+    LOG_INFO("DataProxyHandleTest_Delete_Test_002::Start");
     auto [ret, handle] = DataShare::DataProxyHandle::Create();
     EXPECT_EQ(ret, E_OK);
 
@@ -407,11 +407,11 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_002, TestSize.Level0)
     auto ret4 = handle->DeleteProxyData(uris, proxyConfig);
     EXPECT_EQ(ret4[0].result_, DataProxyErrorCode::NO_PERMISSION);
 
-    LOG_INFO("ProxyHandleTest_Delete_Test_002::End");
+    LOG_INFO("DataProxyHandleTest_Delete_Test_002::End");
 }
 
 /**
- * @tc.name: ProxyHandleTest_Delete_Test_003
+ * @tc.name: Delete_Test_003
  * @tc.desc: Verify that DataProxyHandle fails to delete unpublished data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
@@ -428,9 +428,9 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_002, TestSize.Level0)
     1. DataProxyHandle creation returns E_OK and non-null handle
     2. DeleteProxyData returns DataProxyErrorCode::URI_NOT_EXIST
  */
-HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_003, TestSize.Level0)
+HWTEST_F(DataProxyHandleTest, Delete_Test_003, TestSize.Level0)
 {
-    LOG_INFO("ProxyHandleTest_Delete_Test_003::Start");
+    LOG_INFO("DataProxyHandleTest_Delete_Test_003::Start");
     auto [ret, handle] = DataShare::DataProxyHandle::Create();
     EXPECT_EQ(ret, E_OK);
 
@@ -444,11 +444,11 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_003, TestSize.Level0)
     auto ret4 = handle->DeleteProxyData(uris, proxyConfig);
     EXPECT_EQ(ret4[0].result_, DataProxyErrorCode::URI_NOT_EXIST);
 
-    LOG_INFO("ProxyHandleTest_Delete_Test_003::End");
+    LOG_INFO("DataProxyHandleTest_Delete_Test_003::End");
 }
 
 /**
- * @tc.name: ProxyHandleTest_Get_Test_001
+ * @tc.name: Get_Test_001
  * @tc.desc: Verify that DataProxyHandle fails to retrieve unpublished data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
@@ -465,9 +465,9 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Delete_Test_003, TestSize.Level0)
     1. DataProxyHandle creation returns E_OK and non-null handle
     2. GetProxyData returns DataProxyErrorCode::URI_NOT_EXIST
  */
-HWTEST_F(ProxyHandleTest, ProxyHandleTest_Get_Test_001, TestSize.Level0)
+HWTEST_F(DataProxyHandleTest, Get_Test_001, TestSize.Level0)
 {
-    LOG_INFO("ProxyHandleTest_Get_Test_001::Start");
+    LOG_INFO("DataProxyHandleTest_Get_Test_001::Start");
     auto [ret, handle] = DataShare::DataProxyHandle::Create();
     EXPECT_EQ(ret, E_OK);
 
@@ -481,11 +481,11 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Get_Test_001, TestSize.Level0)
     auto ret4 = handle->GetProxyData(uris, proxyConfig);
     EXPECT_EQ(ret4[0].result_, DataProxyErrorCode::URI_NOT_EXIST);
 
-    LOG_INFO("ProxyHandleTest_Get_Test_001::End");
+    LOG_INFO("DataProxyHandleTest_Get_Test_001::End");
 }
 
 /**
- * @tc.name: ProxyHandleTest_Subscribe_Test_001
+ * @tc.name: Subscribe_Test_001
  * @tc.desc: Verify the functionality of DataProxyHandle successfully subscribing
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
@@ -504,9 +504,9 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Get_Test_001, TestSize.Level0)
     2. Callback function is triggered once after data update
     3. g_callbackTimes equals 1 after update
  */
-HWTEST_F(ProxyHandleTest, ProxyHandleTest_Subscribe_Test_001, TestSize.Level0)
+HWTEST_F(DataProxyHandleTest, Subscribe_Test_001, TestSize.Level0)
 {
-    LOG_INFO("ProxyHandleTest_Subscribe_Test_001::Start");
+    LOG_INFO("DataProxyHandleTest_Subscribe_Test_001::Start");
     auto [ret, handle] = DataShare::DataProxyHandle::Create();
     EXPECT_EQ(ret, E_OK);
 
@@ -525,7 +525,7 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Subscribe_Test_001, TestSize.Level0)
     // subscribe data
     g_callbackTimes = 0;
     auto ret4 = handle->SubscribeProxyData(uris, [](const std::vector<DataProxyChangeInfo> &changeNode) {
-        LOG_INFO("ProxyHandleTest_Subscribe_Test_001::CallBack success");
+        LOG_INFO("DataProxyHandleTest_Subscribe_Test_001::CallBack success");
         g_callbackTimes++;
         EXPECT_EQ(changeNode.size(), 1);
     });
@@ -538,11 +538,11 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Subscribe_Test_001, TestSize.Level0)
     proxyData2.push_back(data2);
     handle->PublishProxyData(proxyData2, proxyConfig);
     EXPECT_EQ(g_callbackTimes, 1);
-    LOG_INFO("ProxyHandleTest_Subscribe_Test_001::End");
+    LOG_INFO("DataProxyHandleTest_Subscribe_Test_001::End");
 }
 
 /**
- * @tc.name: ProxyHandleTest_Subscribe_Test_002
+ * @tc.name: Subscribe_Test_002
  * @tc.desc: Verify that DataProxyHandle fails to subscribe to unpublished data
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
@@ -560,9 +560,9 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Subscribe_Test_001, TestSize.Level0)
     2. Subscription operation returns DataProxyErrorCode::URI_NOT_EXIST
     3. Callback function is not triggered (g_callbackTimes remains 0)
  */
-HWTEST_F(ProxyHandleTest, ProxyHandleTest_Subscribe_Test_002, TestSize.Level0)
+HWTEST_F(DataProxyHandleTest, Subscribe_Test_002, TestSize.Level0)
 {
-    LOG_INFO("ProxyHandleTest_Subscribe_Test_002::Start");
+    LOG_INFO("DataProxyHandleTest_Subscribe_Test_002::Start");
     auto [ret, handle] = DataShare::DataProxyHandle::Create();
     EXPECT_EQ(ret, E_OK);
 
@@ -574,17 +574,17 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Subscribe_Test_002, TestSize.Level0)
     // subscribe data
     g_callbackTimes = 0;
     auto ret4 = handle->SubscribeProxyData(uris, [](const std::vector<DataProxyChangeInfo> &changeNode) {
-        LOG_INFO("ProxyHandleTest_Subscribe_Test_002::CallBack success");
+        LOG_INFO("DataProxyHandleTest_Subscribe_Test_002::CallBack success");
         g_callbackTimes++;
         EXPECT_EQ(changeNode.size(), 1);
     });
     EXPECT_EQ(ret4[0].result_, DataProxyErrorCode::URI_NOT_EXIST);
 
-    LOG_INFO("ProxyHandleTest_Subscribe_Test_002::End");
+    LOG_INFO("DataProxyHandleTest_Subscribe_Test_002::End");
 }
 
 /**
- * @tc.name: ProxyHandleTest_Unsubscribe_Test_001
+ * @tc.name: Unsubscribe_Test_001
  * @tc.desc: Verify the functionality of DataProxyHandle successfully unsubscribing from data changes
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
@@ -604,9 +604,9 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Subscribe_Test_002, TestSize.Level0)
     4. The unsubscribe operation is successful
     5. The callback function is not triggered after the second data update
  */
-HWTEST_F(ProxyHandleTest, ProxyHandleTest_Unsubscribe_Test_001, TestSize.Level0)
+HWTEST_F(DataProxyHandleTest, Unsubscribe_Test_001, TestSize.Level0)
 {
-    LOG_INFO("ProxyHandleTest_Unsubscribe_Test_001::Start");
+    LOG_INFO("DataProxyHandleTest_Unsubscribe_Test_001::Start");
     auto [ret, handle] = DataShare::DataProxyHandle::Create();
     EXPECT_EQ(ret, E_OK);
 
@@ -625,7 +625,7 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Unsubscribe_Test_001, TestSize.Level0)
     // subscribe data
     g_callbackTimes = 0;
     auto ret4 = handle->SubscribeProxyData(uris, [](const std::vector<DataProxyChangeInfo> &changeNode) {
-        LOG_INFO("ProxyHandleTest_Unsubscribe_Test_001::CallBack success");
+        LOG_INFO("DataProxyHandleTest_Unsubscribe_Test_001::CallBack success");
         g_callbackTimes++;
         EXPECT_EQ(changeNode.size(), 1);
     });
@@ -644,11 +644,11 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Unsubscribe_Test_001, TestSize.Level0)
 
     // publish data and not do callback
     handle->PublishProxyData(proxyData2, proxyConfig);
-    LOG_INFO("ProxyHandleTest_Unsubscribe_Test_001::End");
+    LOG_INFO("DataProxyHandleTest_Unsubscribe_Test_001::End");
 }
 
 /**
- * @tc.name: ProxyHandleTest_Unsubscribe_Test_002
+ * @tc.name: Unsubscribe_Test_002
  * @tc.desc: Verify the functionality of DataProxyHandle successfully unsubscribing
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
@@ -668,9 +668,9 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Unsubscribe_Test_001, TestSize.Level0)
     4. The operation to unsubscribe from all subscriptions is successful
     5. The callback function is not triggered after the second data update
  */
-HWTEST_F(ProxyHandleTest, ProxyHandleTest_Unsubscribe_Test_002, TestSize.Level0)
+HWTEST_F(DataProxyHandleTest, Unsubscribe_Test_002, TestSize.Level0)
 {
-    LOG_INFO("ProxyHandleTest_Unsubscribe_Test_002::Start");
+    LOG_INFO("DataProxyHandleTest_Unsubscribe_Test_002::Start");
     auto [ret, handle] = DataShare::DataProxyHandle::Create();
     EXPECT_EQ(ret, E_OK);
 
@@ -689,7 +689,7 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Unsubscribe_Test_002, TestSize.Level0)
     // subscribe data
     g_callbackTimes = 0;
     auto ret4 = handle->SubscribeProxyData(uris, [](const std::vector<DataProxyChangeInfo> &changeNode) {
-        LOG_INFO("ProxyHandleTest_Unsubscribe_Test_002::CallBack success");
+        LOG_INFO("DataProxyHandleTest_Unsubscribe_Test_002::CallBack success");
         g_callbackTimes++;
         EXPECT_EQ(changeNode.size(), 1);
     });
@@ -708,7 +708,7 @@ HWTEST_F(ProxyHandleTest, ProxyHandleTest_Unsubscribe_Test_002, TestSize.Level0)
 
     // publish data and not do callback
     handle->PublishProxyData(proxyData2, proxyConfig);
-    LOG_INFO("ProxyHandleTest_Unsubscribe_Test_002::End");
+    LOG_INFO("DataProxyHandleTest_Unsubscribe_Test_002::End");
 }
 } // namespace DataShare
 } // namespace OHOS
