@@ -252,17 +252,28 @@ void MediaDataShareUnitTest::SetUp(void) {}
 void MediaDataShareUnitTest::TearDown(void) {}
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_001
-* @tc.desc: Verify query with Equals and Limit predicates returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with Equals("name", "dataShareTest003") and Limit(1, 0)
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 1 row
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_001
+ * @tc.desc: Verify that a query with combined Equals and Limit predicates returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates (EqualTo/Limit methods), DataShareHelper::Query,
+       and ResultSet::GetRowCount.
+    4. Test data with "name" = "dataShareTest003" is pre-inserted to ensure 1 matching row exists.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call EqualTo("name", "dataShareTest003") and Limit(1, 0) to set
+       conditions.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 1.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_001::Start");
@@ -282,17 +293,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_001, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_002
-* @tc.desc: Verify query with NotEqualTo predicate returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with NotEqualTo("name", "dataShareTest003")
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 2 rows
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_002
+ * @tc.desc: Verify that a query with the NotEqualTo predicate returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::NotEqualTo, DataShareHelper::Query, and
+       ResultSet::GetRowCount.
+    4. Test data is pre-inserted: 1 row with "name" = "dataShareTest003" and 2 rows with other "name" values.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call NotEqualTo("name", "dataShareTest003") to set the condition.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 2.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_002, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_002::Start");
@@ -311,17 +332,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_002, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_003
-* @tc.desc: Verify query with Contains predicate returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with Contains("name", "dataShareTest")
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 3 rows
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_003
+ * @tc.desc: Verify that a query with the Contains predicate returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::Contains, DataShareHelper::Query, and ResultSet::GetRowCount.
+    4. Test data is pre-inserted: 3 rows with "name" containing "dataShareTest" (e.g., "dataShareTest001",
+       "dataShareTest002", etc.).
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call Contains("name", "dataShareTest") to set the condition.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 3.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_003, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_003::Start");
@@ -340,17 +371,28 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_003, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_004
-* @tc.desc: Verify query with BeginsWith predicate returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with BeginsWith("name", "dataShare")
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 3 rows
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_004
+ * @tc.desc: Verify that a query with the BeginsWith predicate returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::BeginsWith, DataShareHelper::Query, and
+       ResultSet::GetRowCount.
+    4. Test data is pre-inserted: 3 rows with "name" beginning with "dataShare" (e.g., "dataShareTest001",
+       "dataShareTest002", etc.).
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call BeginsWith("name", "dataShare") to set the condition.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 3.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_004, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_004::Start");
@@ -369,17 +411,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_004, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_005
-* @tc.desc: Verify query with EndsWith predicate returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with EndsWith("name", "003")
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 1 row
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_005
+ * @tc.desc: Verify that a query with the EndsWith predicate returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::EndsWith, DataShareHelper::Query, and ResultSet::GetRowCount.
+    4. Test data is pre-inserted: 1 row with "name" ending with "003" (e.g., "dataShareTest003") and other rows with
+       different endings.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call EndsWith("name", "003") to set the condition.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 1.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_005, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_005::Start");
@@ -398,17 +450,26 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_005, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_006
-* @tc.desc: Verify query with IsNull predicate returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with IsNull("name")
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 0 rows
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_006
+ * @tc.desc: Verify that a query with the IsNull predicate returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::IsNull, DataShareHelper::Query, and ResultSet::GetRowCount.
+    4. All pre-inserted test data have non-null values for the "name" column.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call IsNull("name") to set the condition.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 0.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_006, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_006::Start");
@@ -427,17 +488,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_006, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_007
-* @tc.desc: Verify query with IsNotNull predicate returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with IsNotNull("name")
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 3 rows
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_007
+ * @tc.desc: Verify that a query with the IsNotNull predicate returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::IsNotNull, DataShareHelper::Query, and
+       ResultSet::GetRowCount.
+    4. Test data is pre-inserted: 3 rows with non-null "name" values (no null "name" rows exist).
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call IsNotNull("name") to set the condition.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 3.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_007, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_007::Start");
@@ -456,17 +527,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_007, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_008
-* @tc.desc: Verify query with Like predicate returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with Like("name", "%Test003")
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 1 row
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_008
+ * @tc.desc: Verify that a query with the Like predicate returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::Like, DataShareHelper::Query, and ResultSet::GetRowCount.
+    4. Test data is pre-inserted: 1 row with "name" matching "%Test003" (e.g., "dataShareTest003") and other
+       non-matching rows.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call Like("name", "%Test003") to set the condition.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 1.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_008, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_008::Start");
@@ -485,17 +566,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_008, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_009
-* @tc.desc: Verify query with Glob predicate returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with Glob("name", "dataShareTes?003")
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 1 row
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_009
+ * @tc.desc: Verify that a query with the Glob predicate returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::Glob, DataShareHelper::Query, and ResultSet::GetRowCount.
+    4. Test data is pre-inserted: 1 row with "name" matching "dataShareTes?003" (e.g., "dataShareTest003") and other
+       non-matching rows.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call Glob("name", "dataShareTes?003") to set the condition.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 1.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_009, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_009::Start");
@@ -514,17 +605,26 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_009, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_010
-* @tc.desc: Verify query with Between predicate returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with Between("age", "0", "999")
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 1 row
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_010
+ * @tc.desc: Verify that a query with the Between predicate returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::Between, DataShareHelper::Query, and ResultSet::GetRowCount.
+    4. Test data is pre-inserted: 1 row with "age" between "0" and "999", and other rows with "age" outside this range.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call Between("age", "0", "999") to set the condition.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 1.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_010, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_010::Start");
@@ -543,17 +643,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_010, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_011
-* @tc.desc: Verify query with NotBetween predicate returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with NotBetween("age", "0", "999")
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 2 rows
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_011
+ * @tc.desc: Verify that a query with the NotBetween predicate returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::NotBetween, DataShareHelper::Query, and
+       ResultSet::GetRowCount.
+    4. Test data is pre-inserted: 1 row with "age" between "0" and "999", and 2 rows with "age" outside this range.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call NotBetween("age", "0", "999") to set the condition.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 2.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_011, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_011::Start");
@@ -572,17 +682,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_011, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_012
-* @tc.desc: Verify query with GreaterThan predicate returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with GreaterThan("age", 999)
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 2 rows
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_012
+ * @tc.desc: Verify that a query with the GreaterThan predicate returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::GreaterThan, DataShareHelper::Query, and
+       ResultSet::GetRowCount.
+    4. Test data is pre-inserted: 2 rows with "age" > 999, and 1 row with "age" ≤ 999.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call GreaterThan("age", 999) to set the condition.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 2.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_012, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_012::Start");
@@ -601,17 +721,26 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_012, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_013
-* @tc.desc: Verify query with LessThan predicate returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with LessThan("age", 1000)
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 1 row
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_013
+ * @tc.desc: Verify that a query with the LessThan predicate returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::LessThan, DataShareHelper::Query, and ResultSet::GetRowCount.
+    4. Test data is pre-inserted: 1 row with "age" < 1000, and 2 rows with "age" ≥ 1000.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call LessThan("age", 1000) to set the condition.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 1.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_013, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_013::Start");
@@ -630,17 +759,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_013, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_014
-* @tc.desc: Verify query with GreaterThanOrEqualTo predicate returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with GreaterThanOrEqualTo("age", 1000)
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 2 rows
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_014
+ * @tc.desc: Verify that a query with the GreaterThanOrEqualTo predicate returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::GreaterThanOrEqualTo, DataShareHelper::Query, and
+       ResultSet::GetRowCount.
+    4. Test data is pre-inserted: 2 rows with "age" ≥ 1000, and 1 row with "age" < 1000.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call GreaterThanOrEqualTo("age", 1000) to set the condition.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 2.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_014, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_014::Start");
@@ -659,17 +798,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_014, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_015
-* @tc.desc: Verify query with LessThanOrEqualTo predicate returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with LessThanOrEqualTo("age", 1000)
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 2 rows
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_015
+ * @tc.desc: Verify that a query with the LessThanOrEqualTo predicate returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::LessThanOrEqualTo, DataShareHelper::Query, and
+       ResultSet::GetRowCount.
+    4. Test data is pre-inserted: 2 rows with "age" ≤ 1000, and 1 row with "age" > 1000.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call LessThanOrEqualTo("age", 1000) to set the condition.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 2.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_015, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_015::Start");
@@ -688,17 +837,29 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_015, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_016
-* @tc.desc: Verify query with combined predicates (AND/OR) returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create complex predicates with nested conditions
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 1 row
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_016
+ * @tc.desc: Verify that a query with combined nested predicates (AND/OR) returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports nested DataSharePredicates (BeginWrap/EndWrap/AND/OR), DataShareHelper::Query, and
+       ResultSet::GetRowCount.
+    4. Test data is pre-inserted: only 1 row matches "phoneNumber" = 20.08 AND ("name" = "dataShareTest004" OR
+       "age" = 1000).
+ * @tc.step:
+    1. Create a DataSharePredicates instance: call EqualTo("phoneNumber", 20.08), then BeginWrap(), EqualTo("name",
+       "dataShareTest004"), Or(), EqualTo("age", 1000), and EndWrap() to set nested conditions.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 1.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_016, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_016::Start");
@@ -722,17 +883,28 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_016, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_017
-* @tc.desc: Verify query with AND combined predicates returns correct result count
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates combining two EqualTo conditions with AND
-    2. Execute query with these predicates
-    3. Check the returned row count
-* @tc.expected: Query returns exactly 1 row
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_017
+ * @tc.desc: Verify that a query with two EqualTo conditions combined by AND returns the correct row count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::AND (chained conditions), DataShareHelper::Query, and
+       ResultSet::GetRowCount.
+    4. Test data is pre-inserted: only 1 row matches both "phoneNumber" = 20.08 and "name" = "dataShareTest004".
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call EqualTo("phoneNumber", 20.08)->And()->
+       EqualTo("name", "dataShareTest004") to set combined conditions.
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null, call `resultSet->GetRowCount(result)` to retrieve the row count.
+    5. Check if the retrieved row count matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The row count obtained from ResultSet::GetRowCount is exactly 1.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_017, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_017::Start");
@@ -751,17 +923,30 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_017, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_018
-* @tc.desc: Verify query with ascending order predicate returns correctly ordered results
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with OrderByAsc("age")
-    2. Execute query with these predicates
-    3. Check the name of the first row in results
-* @tc.expected: First row contains name "dataShareTest005"
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_018
+ * @tc.desc: Verify that a query with the OrderByAsc predicate returns results in the correct ascending order.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::OrderByAsc, DataShareHelper::Query, and
+       ResultSet::GoToFirstRow/GetColumnIndex/GetString.
+    4. Test data is pre-inserted: rows with "age" values sorted such that the smallest "age" corresponds to "name" =
+       "dataShareTest005".
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call OrderByAsc("age") to set ascending order by "age".
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null: call `resultSet->GoToFirstRow()`,
+       `resultSet->GetColumnIndex("name", columnIndex)`, and `resultSet->GetString(columnIndex, stringResult)` to get
+       the "name" of the first row.
+    5. Check if the retrieved "name" matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The "name" value of the first row in the ordered ResultSet is "dataShareTest005".
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_018, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_018::Start");
@@ -783,17 +968,30 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_018, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_019
-* @tc.desc: Verify query with descending order predicate returns correctly ordered results
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with OrderByDesc("phoneNumber")
-    2. Execute query with these predicates
-    3. Check the name of the first row in results
-* @tc.expected: First row contains name "dataShareTest005"
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_019
+ * @tc.desc: Verify that a query with the OrderByDesc predicate returns results in the correct descending order.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance `g_dataShareHelper` is pre-initialized and non-null.
+    2. The `MEDIALIBRARY_DATA_URI` is a valid target URI for data query.
+    3. The test environment supports DataSharePredicates::OrderByDesc, DataShareHelper::Query, and
+       ResultSet::GoToFirstRow/GetColumnIndex/GetString.
+    4. Test data is pre-inserted: rows with "phoneNumber" values sorted such that the largest "phoneNumber" corresponds
+       to "name" = "dataShareTest005".
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call OrderByDesc("phoneNumber") to set descending order by "phoneNumber".
+    2. Get the global `g_dataShareHelper` instance, define an empty vector<string> for columns, and set the target URI
+       to MEDIALIBRARY_DATA_URI.
+    3. Call `helper->Query(uri, predicates, columns)` to execute the query and get a ResultSet.
+    4. If the ResultSet is non-null: call `resultSet->GoToFirstRow()`, `resultSet->
+       GetColumnIndex("name", columnIndex)`, and `resultSet->GetString(columnIndex, stringResult)` to get the "name" of
+       the first row.
+    5. Check if the retrieved "name" matches the expected value.
+ * @tc.expect:
+    1. The ResultSet returned by Query is non-null.
+    2. The "name" value of the first row in the ordered ResultSet is "dataShareTest005".
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_019, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_019::Start");
@@ -815,17 +1013,24 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_019, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_020
-* @tc.desc: Verify predicate setting mode can be set and retrieved correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create empty predicates
-    2. Set setting mode to PREDICATES_METHOD
-    3. Retrieve and check the setting mode
-* @tc.expected: Retrieved setting mode matches PREDICATES_METHOD
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_020
+ * @tc.desc: Verify that the setting mode of DataSharePredicates can be correctly set and retrieved.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataSharePredicates.
+    2. The DataShare::SettingMode enum is defined, and PREDICATES_METHOD is a valid enumerator.
+    3. The DataSharePredicates class provides SetSettingMode (accepts SettingMode) and GetSettingMode (returns int16_t)
+       methods.
+ * @tc.step:
+    1. Create an empty DataSharePredicates instance.
+    2. Call `predicates.SetSettingMode(DataShare::SettingMode::PREDICATES_METHOD)` to set the setting mode.
+    3. Call `predicates.GetSettingMode()` to retrieve the set mode and store it in an int16_t variable.
+    4. Compare the retrieved setting mode with DataShare::SettingMode::PREDICATES_METHOD.
+ * @tc.expect:
+    1. The SetSettingMode method executes without errors.
+    2. The value returned by GetSettingMode is equal to DataShare::SettingMode::PREDICATES_METHOD.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_020, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_020::Start");
@@ -837,17 +1042,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_020, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_021
-* @tc.desc: Verify predicate operation list is correctly generated
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with Equals("name", "dataShareTest003")
-    2. Retrieve the operation list
-    3. Verify operation type and parameters
-* @tc.expected: Operation list contains correct type and parameters
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_021
+ * @tc.desc: Verify that the operation list of DataSharePredicates is correctly generated after setting an Equals
+ *           condition.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataSharePredicates.
+    2. The DataShare::OperationType enum (with EQUAL_TO) and OperationItem/SingleValue classes are defined.
+    3. DataSharePredicates provides GetOperationList (returns vector<OperationItem>) and EqualTo methods.
+ * @tc.step:
+    1. Create a DataSharePredicates instance, call `predicates.EqualTo("name", "dataShareTest003")` to add an Equals
+       condition.
+    2. Call `predicates.GetOperationList()` to retrieve the operation list and get the first OperationItem.
+    3. Check if the operation type of the first OperationItem is EQUAL_TO.
+    4. Retrieve the two SingleValue parameters from the OperationItem's singleParams vector, convert them to strings.
+    5. Check if the converted parameters are "name" (first) and "dataShareTest003" (second).
+ * @tc.expect:
+    1. The operation list returned by GetOperationList is non-empty (contains 1 OperationItem).
+    2. The OperationItem's operation is DataShare::OperationType::EQUAL_TO.
+    3. The two SingleValue parameters are "name" and "dataShareTest003" respectively.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_021, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_021::Start");
@@ -867,17 +1082,26 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_021, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_022
-* @tc.desc: Verify where clause can be set and retrieved correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create empty predicates
-    2. Set where clause to "`data2` > ?"
-    3. Retrieve and verify the where clause
-* @tc.expected: Retrieved where clause matches the set value
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_022
+ * @tc.desc: Verify that the where clause of DataSharePredicates can be correctly set and retrieved.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataSharePredicates.
+    2. DataSharePredicates provides SetWhereClause (accepts string, returns int) and GetWhereClause (returns string)
+       methods.
+    3. The target where clause "`data2` > ?" is a valid input for SetWhereClause.
+ * @tc.step:
+    1. Create an empty DataSharePredicates instance.
+    2. Call `predicates.SetWhereClause("`data2` > ?")` to set the where clause, and store the return value in an int
+       variable.
+    3. Call `predicates.GetWhereClause()` to retrieve the set clause and store it in a string variable.
+    4. Check if the return value of SetWhereClause is 0 (indicating success).
+    5. Compare the retrieved where clause with the set value "`data2` > ?".
+ * @tc.expect:
+    1. The SetWhereClause method returns 0 (success).
+    2. The string returned by GetWhereClause is exactly "`data2` > ?".
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_022, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_023::Start");
@@ -890,17 +1114,26 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_022, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_023
-* @tc.desc: Verify where arguments can be set and retrieved correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create empty predicates
-    2. Set where arguments with vector containing "-5"
-    3. Retrieve and verify the where arguments
-* @tc.expected: Retrieved where arguments match the set values
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_023
+ * @tc.desc: Verify that the where arguments of DataSharePredicates can be correctly set via SetWhereArgs and
+ *           retrieved via GetWhereArgs, including validating the success of the set operation.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShare::DataSharePredicates without initialization errors.
+    2. The SetWhereArgs method of DataSharePredicates accepts std::vector<std::string> and returns an integer
+       (0 for success), and the GetWhereArgs method returns std::vector<std::string>.
+ * @tc.step:
+    1. Create an empty DataShare::DataSharePredicates object.
+    2. Call the SetWhereArgs method of the predicates, passing a std::vector<std::string> containing "-5",
+       and record the return value.
+    3. Call the GetWhereArgs method of the predicates to retrieve the where arguments.
+    4. Verify the return value of SetWhereArgs and the retrieved where arguments.
+ * @tc.expect:
+    1. The SetWhereArgs method returns 0 (indicating successful setting of where arguments).
+    2. The retrieved where arguments (from GetWhereArgs) are consistent with the set value, i.e., the first
+       element is "-5".
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_023, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_024::Start");
@@ -913,17 +1146,24 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_023, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_Predicates_Test_024
-* @tc.desc: Verify order clause can be set and retrieved correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create empty predicates
-    2. Set order clause to "data3"
-    3. Retrieve and verify the order clause
-* @tc.expected: Retrieved order clause matches the set value
-*/
+ * @tc.name: MediaDataShare_Predicates_Test_024
+ * @tc.desc: Verify that the order clause of DataSharePredicates can be correctly set via SetOrder and
+ *           retrieved via GetOrder, including validating the success of the set operation.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShare::DataSharePredicates without initialization errors.
+    2. The SetOrder method of DataSharePredicates accepts a std::string and returns an integer (0 for success),
+       and the GetOrder method returns a std::string.
+ * @tc.step:
+    1. Create an empty DataShare::DataSharePredicates object.
+    2. Call the SetOrder method of the predicates, passing the std::string "data3", and record the return value.
+    3. Call the GetOrder method of the predicates to retrieve the order clause.
+    4. Verify the return value of SetOrder and the retrieved order clause.
+ * @tc.expect:
+    1. The SetOrder method returns 0 (indicating successful setting of the order clause).
+    2. The retrieved order clause (from GetOrder) is consistent with the set value, i.e., "data3".
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_024, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Predicates_Test_025::Start");
@@ -936,18 +1176,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Predicates_Test_024, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_ValuesBucket_Test_001
-* @tc.desc: Verify DataShareValuesBucket basic operations work correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create empty ValuesBucket and verify it's empty
-    2. Add a value and verify it's no longer empty
-    3. Retrieve and verify the value
-    4. Clear the bucket and verify it's empty again
-* @tc.expected: All operations work as expected with correct values
-*/
+ * @tc.name: MediaDataShare_ValuesBucket_Test_001
+ * @tc.desc: Verify the basic operations of DataShareValuesBucket, including checking emptiness, adding values,
+ *           retrieving values, and clearing values, to ensure each operation works as expected.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShare::DataShareValuesBucket without initialization errors.
+    2. The DataShareValuesBucket class provides functional methods: IsEmpty (returns bool), Put (accepts string key
+       and string value), Get (accepts key and bool reference for validity), and Clear (no return).
+ * @tc.step:
+    1. Create an empty DataShare::DataShareValuesBucket object, then call IsEmpty to verify it is empty.
+    2. Call the Put method to add a key-value pair: key "name" and value "dataShare_Test_001".
+    3. Call IsEmpty again to verify the bucket is no longer empty.
+    4. Call the Get method with key "name" to retrieve the value, and check the validity flag.
+    5. Call the Clear method to empty the bucket, then call IsEmpty to verify it is empty again.
+ * @tc.expect:
+    1. The first IsEmpty call returns true (bucket is initially empty).
+    2. The IsEmpty call after Put returns false (bucket contains data).
+    3. The Get method retrieves the value "dataShare_Test_001" and sets the validity flag to true.
+    4. The IsEmpty call after Clear returns true (bucket is empty again).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ValuesBucket_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ValuesBucket_Test_001::Start");
@@ -968,17 +1217,29 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ValuesBucket_Test_001, TestSize.
 }
 
 /**
-* @tc.name: MediaDataShare_ValueObject_Test_001
-* @tc.desc: Verify DataShareValueObject handles various data types correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create ValueObjects with different data types (int, int64, double, bool, vector)
-    2. Verify copy and move operations
-    3. Check that retrieved values match original values
-* @tc.expected: All value types are stored and retrieved correctly
-*/
+ * @tc.name: MediaDataShare_ValueObject_Test_001
+ * @tc.desc: Verify that DataShareValueObject correctly handles various data types (int, int64_t, double, bool,
+ *           std::vector<uint8_t>) and supports copy and move operations without data loss.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShare::DataShareValueObject with data types including
+       int, int64_t, double, bool, and std::vector<uint8_t>.
+    2. DataShareValueObject supports type conversion to the original data type (e.g., int value = valueObject)
+       and provides copy/move constructors.
+ * @tc.step:
+    1. Create a DataShareValueObject with an int value (100), then convert it back to int to verify consistency.
+    2. Create a DataShareValueObject with an int64_t value (100), then convert it back to int64_t to verify.
+    3. Create a DataShareValueObject with a double value (10.0), then convert it back to double to verify.
+    4. Create a DataShareValueObject with a bool value (true), then convert it back to bool to verify.
+    5. Create a DataShareValueObject with an empty std::vector<uint8_t>, then convert it back to vector to verify.
+    6. Create a copy of the int-type DataShareValueObject via copy constructor, then verify its value.
+    7. Create a new DataShareValueObject via move constructor from the int-type object, then verify its value.
+ * @tc.expect:
+    1. Each DataShareValueObject returns the original value when converted back to its data type.
+    2. The copy-constructed DataShareValueObject has the same value as the original int-type object (100).
+    3. The move-constructed DataShareValueObject has the same value as the original int-type object (100).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ValueObject_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ValueObject_Test_001::Start");
@@ -1020,17 +1281,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ValueObject_Test_001, TestSize.L
 }
 
 /**
-* @tc.name: MediaDataShare_batchInsert_Test_001
-* @tc.desc: Verify batch insert operation correctly inserts multiple records
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create two ValuesBuckets with test data
-    2. Perform batch insert with these buckets
-    3. Verify the number of inserted records
-* @tc.expected: Batch insert returns 2 indicating successful insertion of both records
-*/
+ * @tc.name: MediaDataShare_batchInsert_Test_001
+ * @tc.desc: Verify that the BatchInsert operation of DataShareHelper correctly inserts multiple DataShareValuesBucket
+ *           records and returns the number of successfully inserted records.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShare::DataShareHelper instance (g_dataShareHelper) is pre-initialized and not nullptr.
+    2. The MEDIALIBRARY_DATA_URI constant is predefined and points to a valid data source supporting BatchInsert.
+    3. The BatchInsert method of DataShareHelper accepts a Uri and std::vector<DataShareValuesBucket>, returning
+       an integer representing the number of inserted records.
+ * @tc.step:
+    1. Create the first DataShare::DataShareValuesBucket, add key-value pairs: "name" = "dataShareTest006" and
+       "phoneNumber" = 20.6.
+    2. Create the second DataShare::DataShareValuesBucket, add key-value pairs: "name" = "dataShareTest007" and
+       "phoneNumber" = 20.5.
+    3. Add the two buckets to a std::vector<DataShare::DataShareValuesBucket>.
+    4. Call the BatchInsert method of g_dataShareHelper with MEDIALIBRARY_DATA_URI and the vector, then record
+       the return value.
+ * @tc.expect:
+    1. The BatchInsert method returns 2 (indicating both records are successfully inserted).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_batchInsert_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_batchInsert_Test_001::Start");
@@ -1052,16 +1323,24 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_batchInsert_Test_001, TestSize.L
 }
 
 /**
-* @tc.name: MediaDataShare_NormalizeUri_Test_001
-* @tc.desc: Verify URI normalization function works correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Call NormalizeUri with media library URI
-    2. Compare result with expected normalized URI
-* @tc.expected: Normalized URI matches the expected value
-*/
+ * @tc.name: MediaDataShare_NormalizeUri_Test_001
+ * @tc.desc: Verify that the NormalizeUri method of DataShareHelper correctly converts the media library URI
+ *           to the expected normalized URI.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShare::DataShareHelper instance (g_dataShareHelper) is pre-initialized and not nullptr.
+    2. The MEDIALIBRARY_DATA_URI (source URI) and NORMALIZE_URI (expected normalized URI) constants are predefined
+       and valid.
+    3. The NormalizeUri method of DataShareHelper accepts a Uri and returns a normalized Uri.
+ * @tc.step:
+    1. Create a Uri object using the predefined MEDIALIBRARY_DATA_URI.
+    2. Call the NormalizeUri method of g_dataShareHelper, passing the created Uri, and record the returned
+       normalized Uri.
+    3. Compare the returned normalized Uri with the predefined NORMALIZE_URI.
+ * @tc.expect:
+    1. The normalized Uri returned by NormalizeUri is identical to the predefined NORMALIZE_URI.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NormalizeUri_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_NormalizeUri_Test_001::Start");
@@ -1074,16 +1353,24 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NormalizeUri_Test_001, TestSize.
 }
 
 /**
-* @tc.name: MediaDataShare_DenormalizeUri_Test_001
-* @tc.desc: Verify URI denormalization function works correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Call DenormalizeUri with media library URI
-    2. Compare result with expected denormalized URI
-* @tc.expected: Denormalized URI matches the expected value
-*/
+ * @tc.name: MediaDataShare_DenormalizeUri_Test_001
+ * @tc.desc: Verify that the DenormalizeUri method of DataShareHelper correctly converts the media library URI
+ *           to the expected denormalized URI.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShare::DataShareHelper instance (g_dataShareHelper) is pre-initialized and not nullptr.
+    2. The MEDIALIBRARY_DATA_URI (source URI) and DENORMALIZE_URI (expected denormalized URI) constants are
+       predefined and valid.
+    3. The DenormalizeUri method of DataShareHelper accepts a Uri and returns a denormalized Uri.
+ * @tc.step:
+    1. Create a Uri object using the predefined MEDIALIBRARY_DATA_URI.
+    2. Call the DenormalizeUri method of g_dataShareHelper, passing the created Uri, and record the returned
+       denormalized Uri.
+    3. Compare the returned denormalized Uri with the predefined DENORMALIZE_URI.
+ * @tc.expect:
+    1. The denormalized Uri returned by DenormalizeUri is identical to the predefined DENORMALIZE_URI.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_DenormalizeUri_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_DenormalizeUri_Test_001::Start");
@@ -1096,17 +1383,30 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_DenormalizeUri_Test_001, TestSiz
 }
 
 /**
-* @tc.name: MediaDataShare_SingleValue_Test_001
-* @tc.desc: Verify SingleValue handles various data types correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create SingleValue objects with different data types
-    2. Verify copy and move operations
-    3. Check that retrieved values match original values
-* @tc.expected: All value types are stored and retrieved correctly
-*/
+ * @tc.name: MediaDataShare_SingleValue_Test_001
+ * @tc.desc: Verify that DataShare::SingleValue correctly handles various data types (int, int64_t, double, bool,
+ *           std::string) and supports copy and move operations without data loss.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShare::SingleValue with data types including int, int64_t,
+       double, bool, and std::string.
+    2. SingleValue supports type conversion to the original data type (e.g., int value = singleValue) and provides
+       copy/move constructors.
+ * @tc.step:
+    1. Create a SingleValue with an int value (100), then convert it back to int to verify consistency.
+    2. Create a SingleValue with an int64_t value (100), then convert it back to int64_t to verify.
+    3. Create a SingleValue with a double value (10.0), then convert it back to double to verify (using
+       DOUBLE_EQ for precision).
+    4. Create a SingleValue with a bool value (true), then convert it back to bool to verify.
+    5. Create a SingleValue with a std::string value ("dataShare_Test_001"), then convert it back to string to verify.
+    6. Create a copy of the int-type SingleValue via copy constructor, then verify its value.
+    7. Create a new SingleValue via move constructor from the int-type object, then verify its value.
+ * @tc.expect:
+    1. Each SingleValue returns the original value when converted back to its data type.
+    2. The copy-constructed SingleValue has the same value as the original int-type object (100).
+    3. The move-constructed SingleValue has the same value as the original int-type object (100).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_SingleValue_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_SingleValue_Test_001::Start");
@@ -1146,17 +1446,33 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_SingleValue_Test_001, TestSize.L
 }
 
 /**
-* @tc.name: MediaDataShare_MutliValue_Test_001
-* @tc.desc: Verify MutliValue handles various collection types correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create MutliValue objects with different collection types
-    2. Verify copy and move operations
-    3. Check that retrieved values match original values
-* @tc.expected: All collections are stored and retrieved correctly
-*/
+ * @tc.name: MediaDataShare_MutliValue_Test_001
+ * @tc.desc: Verify that DataShare::MutliValue correctly handles various collection types (std::vector<int>,
+ *           std::vector<int64_t>, std::vector<double>, std::vector<std::string>) and supports copy/move operations.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShare::MutliValue with collection types including
+       std::vector<int>, std::vector<int64_t>, std::vector<double>, and std::vector<std::string>.
+    2. MutliValue supports conversion to the original collection type (e.g., vector<int> vec = mutliValue) and
+       provides copy/move constructors.
+ * @tc.step:
+    1. Create a std::vector<int> with element 100, use it to initialize a MutliValue, then convert back to vector
+       to verify the first element.
+    2. Create a std::vector<int64_t> with element 100, initialize a MutliValue, convert back to verify the first
+       element.
+    3. Create a std::vector<double> with element 10.0, initialize a MutliValue, convert back to verify
+       (using DOUBLE_EQ).
+    4. Create a std::vector<std::string> with element "dataShare_Test_001", initialize a MutliValue, convert back to
+       verify.
+    5. Create a copy of the int-vector MutliValue via copy constructor, convert back to vector to verify.
+    6. Create a new MutliValue via move constructor from the int-vector object, convert back to vector to verify.
+ * @tc.expect:
+    1. Each MutliValue returns the original collection when converted back, with the first element matching the set
+       value.
+    2. The copy-constructed MutliValue has the same int-vector content as the original (first element 100).
+    3. The move-constructed MutliValue has the same int-vector content as the original (first element 100).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_MutliValue_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_MutliValue_Test_001::Start");
@@ -1195,17 +1511,30 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_MutliValue_Test_001, TestSize.Le
 }
 
 /**
-* @tc.name: MediaDataShare_ResultSet_Test_001
-* @tc.desc: Verify default ResultSet behavior with no data
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create empty ResultSet
-    2. Attempt various operations (get columns, row count, move to row, get values)
-    3. Verify operations return appropriate error codes
-* @tc.expected: All operations on empty ResultSet return errors
-*/
+ * @tc.name: MediaDataShare_ResultSet_Test_001
+ * @tc.desc: Verify that operations on an empty DataShareResultSet (with no data) return appropriate error codes
+ *           or false values, indicating invalid operations.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShare::DataShareResultSet (empty) without initialization
+       errors.
+    2. The ResultSet provides methods: GetAllColumnNames (returns int error code), GetRowCount (returns int errorcode),
+       GoToRow (returns int error code), GetBlob (returns int error code), GetLong (returns int error code), GetDouble
+       (returns int error code), IsColumnNull (returns int error code), and OnGo (returns bool).
+ * @tc.step:
+    1. Create an empty DataShare::DataShareResultSet object.
+    2. Call GetAllColumnNames with an empty std::vector<std::string> and record the error code.
+    3. Call GetRowCount with an int variable and record the error code.
+    4. Call GoToRow(1) (attempt to move to a non-existent row) and record the error code.
+    5. Call GetBlob(0, empty vector), GetLong(0, int64_t var), GetDouble(0, double var), IsColumnNull(0, bool var),
+       and record each error code.
+    6. Call OnGo(0, 1) and record the return value.
+ * @tc.expect:
+    1. All methods returning int error codes (GetAllColumnNames, GetRowCount, GoToRow, GetBlob, GetLong, GetDouble,
+       IsColumnNull) return non-0 values (indicating errors).
+    2. The OnGo method returns false (indicating navigation failure on empty ResultSet).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ResultSet_Test_005::Start");
@@ -1240,18 +1569,28 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_001, TestSize.Lev
 }
 
 /**
-* @tc.name: MediaDataShare_ResultSet_Test_002
-* @tc.require: None
-* @tc.desc: Verify ResultSet column operations work correctly
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Query data for "dataShareTest003"
-    2. Verify column name retrieval
-    3. Check blob retrieval from result set
-    4. Verify all column names can be retrieved
-* @tc.expected: All column operations return valid results
-*/
+ * @tc.name: MediaDataShare_ResultSet_Test_002
+ * @tc.desc: Verify that column-related operations on a non-empty DataShareResultSet (querying "dataShareTest003")
+ *           work correctly, including column name retrieval and blob data retrieval.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShare::DataShareHelper instance (g_dataShareHelper) is pre-initialized and not nullptr.
+    2. The MEDIALIBRARY_DATA_URI points to a data source containing the record with "name" = "dataShareTest003".
+    3. The ResultSet supports methods: GoToFirstRow, GetColumnIndex, GetColumnName, GetBlob, and GetAllColumnNames.
+ * @tc.step:
+    1. Create a DataShare::DataSharePredicates object and call EqualTo("name", "dataShareTest003").
+    2. Call g_dataShareHelper->Query with MEDIALIBRARY_DATA_URI, predicates, and empty columns to get a ResultSet.
+    3. If the ResultSet is not nullptr: call GoToFirstRow, then GetColumnIndex("name", int columnIndex).
+    4. Call GetColumnName(columnIndex, std::string var) and verify the error code and column name.
+    5. Call GetBlob(columnIndex, std::vector<uint8_t> blob) and verify the error code and blob size.
+    6. Call GetAllColumnNames(std::vector<std::string> colNames) and verify the error code and colNames size.
+ * @tc.expect:
+    1. The Query method returns a non-null ResultSet (indicating successful data retrieval).
+    2. GetColumnName returns 0 (success) and the column name is "name".
+    3. GetBlob returns 0 (success) and the blob size is non-0 (indicating valid blob data).
+    4. GetAllColumnNames returns 0 (success) and the column name vector size is non-0 (indicating valid columns).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_002, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ResultSet_Test_002::Start");
@@ -1284,18 +1623,32 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_002, TestSize.Lev
 }
 
 /**
-* @tc.name: MediaDataShare_ResultSet_Test_003
-* @tc.desc: Verify ResultSet block operations work correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Query data for "dataShareTest003"
-    2. Check if result set has a block
-    3. Retrieve, set and fill block
-    4. Verify block operations maintain correct reference
-* @tc.expected: All block operations work as expected
-*/
+ * @tc.name: MediaDataShare_ResultSet_Test_003
+ * @tc.desc: Verify that block-related operations on a non-empty DataShareResultSet (querying "dataShareTest003")
+ *           work correctly, including checking block existence, retrieving, setting, and filling blocks.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShare::DataShareHelper instance (g_dataShareHelper) is pre-initialized and not nullptr.
+    2. The MEDIALIBRARY_DATA_URI points to a data source containing "dataShareTest003", and the ResultSet has a valid
+       block.
+    3. The ResultSet supports methods: HasBlock (returns bool), GetBlock (returns
+       std::shared_ptr<AppDataFwk::SharedBlock>), SetBlock (accepts SharedBlock*), and FillBlock
+       (accepts int and SharedBlock*).
+ * @tc.step:
+    1. Create a DataShare::DataSharePredicates object and call EqualTo("name", "dataShareTest003").
+    2. Call g_dataShareHelper->Query with MEDIALIBRARY_DATA_URI, predicates, and empty columns to get a non-null
+       ResultSet.
+    3. Call HasBlock to check if the ResultSet contains a block.
+    4. Call GetBlock to retrieve the shared block and record its pointer.
+    5. Call SetBlock with the retrieved block pointer, then call GetBlock again to verify consistency.
+    6. Call FillBlock(0, retrieved block pointer), then call GetBlock to verify the block reference remains the same.
+ * @tc.expect:
+    1. The HasBlock method returns true (indicating the ResultSet has a valid block).
+    2. The GetBlock method returns a non-null shared_ptr (indicating valid block retrieval).
+    3. After SetBlock and FillBlock, GetBlock still returns the same block pointer (indicating consistent block
+       reference).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_003, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ResultSet_Test_003::Start");
@@ -1321,17 +1674,26 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_003, TestSize.Lev
 }
 
 /**
-* @tc.name: MediaDataShare_ResultSet_Test_004
-* @tc.desc: Verify ResultSet navigation works correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Query data with names containing "dataShareTest"
-    2. Move to first row
-    3. Attempt navigation with OnGo method
-* @tc.expected: Navigation operation returns true indicating success
-*/
+ * @tc.name: MediaDataShare_ResultSet_Test_004
+ * @tc.desc: Verify that navigation operations (OnGo) on a non-empty DataShareResultSet (querying "dataShareTest")
+ *           work correctly, returning true to indicate successful navigation.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShare::DataShareHelper instance (g_dataShareHelper) is pre-initialized and not nullptr.
+    2. The MEDIALIBRARY_DATA_URI points to a data source containing multiple records with "name" containing
+       "dataShareTest".
+    3. The ResultSet supports methods: GoToFirstRow and OnGo (returns bool for navigation success).
+ * @tc.step:
+    1. Create a DataShare::DataSharePredicates object and call Contains("name", "dataShareTest").
+    2. Call g_dataShareHelper->Query with MEDIALIBRARY_DATA_URI, predicates, and empty columns to get a non-null
+       ResultSet.
+    3. Call GoToFirstRow to move to the first row of the ResultSet.
+    4. Call OnGo(0, 1) (attempt to navigate) and record the return value.
+ * @tc.expect:
+    1. The Query method returns a non-null ResultSet (indicating successful data retrieval).
+    2. The OnGo(0, 1) method returns true (indicating successful navigation on non-empty ResultSet).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_004, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ResultSet_Test_004::Start");
@@ -1351,17 +1713,28 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_004, TestSize.Lev
 }
 
 /**
-* @tc.name: MediaDataShare_ResultSet_Test_005
-* @tc.desc: Verify empty ResultSet operations return appropriate errors
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create empty ResultSet
-    2. Attempt various operations without data
-    3. Verify error codes and return values
-* @tc.expected: All operations on empty ResultSet return errors
-*/
+ * @tc.name: MediaDataShare_ResultSet_Test_005
+ * @tc.desc: Verify that operations on an empty DataShareResultSet (with no data) return appropriate error codes
+ *           or false values, consistent with invalid empty-state operations.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShare::DataShareResultSet (empty) without initialization
+       errors.
+    2. The ResultSet provides methods: GetAllColumnNames, GetRowCount, GoToRow, GetBlob, GetLong, GetDouble,
+       IsColumnNull (all return int error codes), and OnGo (returns bool).
+ * @tc.step:
+    1. Create an empty DataShare::DataShareResultSet object.
+    2. Call GetAllColumnNames with an empty vector and record the error code.
+    3. Call GetRowCount with an int variable and record the error code.
+    4. Call GoToRow(1) (non-existent row) and record the error code.
+    5. Call GetBlob(0, empty vector), GetLong(0, int64_t var), GetDouble(0, double var), IsColumnNull(0, bool var),
+       and record each error code.
+    6. Call OnGo(0, 1) and record the return value.
+ * @tc.expect:
+    1. All methods returning int error codes return non-0 values (indicating errors on empty ResultSet).
+    2. The OnGo method returns false (indicating navigation failure).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_005, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ResultSet_Test_005::Start");
@@ -1393,18 +1766,30 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_005, TestSize.Lev
 }
 
 /**
-* @tc.name: MediaDataShare_ResultSet_Test_006
-* @tc.desc: Verify ResultSet data type and value retrieval
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Insert test data with specific age value
-    2. Query for the inserted data
-    3. Verify data type and value match expectations
-    4. Clean up test data
-* @tc.expected: Data type is INTEGER and retrieved value matches inserted value
-*/
+ * @tc.name: MediaDataShare_ResultSet_Test_006
+ * @tc.desc: Verify that DataShareResultSet correctly identifies the data type of a column (age) and retrieves the
+ *           correct value, including inserting test data and cleaning up afterward.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShare::DataShareHelper instance (g_dataShareHelper) is pre-initialized and not nullptr.
+    2. The MEDIALIBRARY_DATA_URI points to a data source supporting Insert, Query, and Delete operations, and the
+       "age" column is of INTEGER type.
+    3. The ResultSet supports methods: GoToFirstRow, GetColumnIndex, GetDataType, and GetInt.
+ * @tc.step:
+    1. Create a DataShare::DataShareValuesBucket, add "age" = 1112, then call Insert with MEDIALIBRARY_DATA_URI
+       and record the return value.
+    2. Create a predicates object with EqualTo("age", 1112), call Query to get a non-null ResultSet.
+    3. Call ResultSet->GoToFirstRow, then GetColumnIndex("age", int columnIndex).
+    4. Call GetDataType(columnIndex, DataShare::DataType dt) to check the data type.
+    5. Call GetInt(columnIndex, int result) to retrieve the "age" value.
+    6. Create a delete predicates with EqualTo("age", 1112), call Delete to clean up the test data.
+ * @tc.expect:
+    1. The Insert method returns a positive integer (indicating successful insertion).
+    2. The GetDataType method returns DataShare::DataType::TYPE_INTEGER (matching the "age" column type).
+    3. The GetInt method retrieves the value 1112 (consistent with the inserted value).
+    4. The Delete method returns a non-negative integer (indicating successful cleanup).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_006, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ResultSet_Test_006::Start");
@@ -1440,16 +1825,23 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ResultSet_Test_006, TestSize.Lev
 }
 
 /**
-* @tc.name: Creator_IRemoteObjectNull_Test_001
-* @tc.desc: Verify Creator handles null remote object correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Attempt to create DataShareHelper with null IRemoteObject
-    2. Check if returned helper is null
-* @tc.expected: Creator returns nullptr when remote object is null
-*/
+ * @tc.name: Creator_IRemoteObjectNull_Test_001
+ * @tc.desc: Verify that the Creator method of DataShareHelper returns nullptr when passed a null IRemoteObject,
+ *           indicating failure to create a helper instance with invalid input.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports calling DataShare::DataShareHelper::Creator, which accepts sptr<IRemoteObject>
+       and Uri as parameters and returns std::shared_ptr<DataShareHelper>.
+    2. An sptr<IRemoteObject> can be initialized to nullptr.
+ * @tc.step:
+    1. Initialize an sptr<IRemoteObject> variable (remoteObjNull) to nullptr.
+    2. Call DataShare::DataShareHelper::Creator, passing remoteObjNull and MEDIALIBRARY_DATA_URI, and record the
+       returned std::shared_ptr<DataShareHelper>.
+    3. Check if the returned shared_ptr is nullptr.
+ * @tc.expect:
+    1. The Creator method returns a nullptr (indicating failure to create DataShareHelper with null IRemoteObject).
+ */
 HWTEST_F(MediaDataShareUnitTest, Creator_IRemoteObjectNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("Creator_IRemoteObjectNull_Test_001::Start");
@@ -1460,17 +1852,27 @@ HWTEST_F(MediaDataShareUnitTest, Creator_IRemoteObjectNull_Test_001, TestSize.Le
 }
 
 /**
-* @tc.name: Creator_UriError_Test_001
-* @tc.desc: Verify Creator handles invalid URI correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Get valid remote object from system ability manager
-    2. Attempt to create DataShareHelper with invalid URI
-    3. Check if returned helper is null
-* @tc.expected: Creator returns nullptr when URI is invalid
-*/
+ * @tc.name: Creator_UriError_Test_001
+ * @tc.desc: Verify that the Creator method of DataShareHelper returns nullptr when passed an invalid URI
+ *           (MEDIALIBRARY_DATA_URI_ERROR), even with a valid IRemoteObject.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The SystemAbilityManagerClient can retrieve a valid IRemoteObject for STORAGE_MANAGER_MANAGER_ID.
+    2. The MEDIALIBRARY_DATA_URI_ERROR constant is predefined as an invalid URI, and Creator accepts it as a parameter.
+    3. The Creator method returns std::shared_ptr<DataShareHelper>.
+ * @tc.step:
+    1. Get the SystemAbilityManager instance via SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager(),
+       verify it is not nullptr.
+    2. Call saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID) to get a valid IRemoteObject (remoteObj),
+       verify it is not nullptr.
+    3. Call DataShare::DataShareHelper::Creator, passing remoteObj and MEDIALIBRARY_DATA_URI_ERROR, and record the
+       returned shared_ptr.
+    4. Check if the returned shared_ptr is nullptr.
+ * @tc.expect:
+    1. The SystemAbilityManager and remoteObj are both non-null (indicating valid IRemoteObject retrieval).
+    2. The Creator method returns a nullptr (indicating failure to create DataShareHelper with invalid URI).
+ */
 HWTEST_F(MediaDataShareUnitTest, Creator_UriError_Test_001, TestSize.Level0)
 {
     LOG_INFO("Creator_UriError_Test_001::Start");
@@ -1484,18 +1886,28 @@ HWTEST_F(MediaDataShareUnitTest, Creator_UriError_Test_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: Insert_ConnectionNull_Test_001
-* @tc.desc: Verify operations fail correctly when connection is released
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create DataShareHelper and immediately release it
-    2. Attempt insert operation with released connection
-    3. Attempt get type operation
-    4. Verify error results
-* @tc.expected: Insert returns -1 and GetType returns empty string
-*/
+ * @tc.name: Insert_ConnectionNull_Test_001
+ * @tc.desc: Verify that DataShareHelper operations (Insert and GetType) fail correctly after the connection is
+ *           released (Release method called), returning error values.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The CreateDataShareHelper function (with STORAGE_MANAGER_MANAGER_ID) returns a non-null
+       std::shared_ptr<DataShareHelper>.
+    2. The DataShareHelper supports Release (returns bool), Insert (returns int), and GetType (returns std::string)
+       methods.
+    3. MEDIALIBRARY_DATA_URI is a valid URI for Insert and GetType.
+ * @tc.step:
+    1. Call CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID) to get a non-null helper instance.
+    2. Call helper->Release() to release the connection, verify the return value is true.
+    3. Create a DataShare::DataShareValuesBucket, add "phoneNumber" = 20.10, "name" = "dataShareTest006", "age" = 998.
+    4. Call helper->Insert with MEDIALIBRARY_DATA_URI and the bucket, record the return value.
+    5. Call helper->GetType with MEDIALIBRARY_DATA_URI, record the returned string.
+ * @tc.expect:
+    1. The Release method returns true (indicating successful connection release).
+    2. The Insert method returns -1 (indicating failure after connection release).
+    3. The GetType method returns an empty std::string (indicating failure after connection release).
+ */
 HWTEST_F(MediaDataShareUnitTest, Insert_ConnectionNull_Test_001, TestSize.Level0)
 {
     LOG_INFO("Insert_ConnectionNull_Test_001::Start");
@@ -1522,22 +1934,29 @@ HWTEST_F(MediaDataShareUnitTest, Insert_ConnectionNull_Test_001, TestSize.Level0
 }
 
 /**
-* @tc.name: MediaDataShare_CRUD_Test_001
-* @tc.desc: Verify basic CRUD operations (Create, Read, Update, Delete) work correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Insert a new record with name "Datashare_CRUD_Test001"
-    2. Update the record to name "Datashare_CRUD_Test002" using predicates
-    3. Query for the updated record to verify the change
-    4. Delete the record using predicates
-* @tc.expected:
-    1.Insert returns a positive ID indicating success
-    2.Update returns non-negative value indicating success
-    3.Query returns exactly 1 row for the updated record
-    4.Delete returns non-negative value indicating success
-*/
+ * @tc.name: MediaDataShare_CRUD_Test_001
+ * @tc.desc: Verify that basic CRUD operations (Create: Insert, Read: Query, Update: Update, Delete: Delete) of
+ *           DataShareHelper work correctly for a test record, including data consistency across operations.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShare::DataShareHelper instance (g_dataShareHelper) is pre-initialized and not nullptr.
+    2. The MEDIALIBRARY_DATA_URI points to a data source supporting Insert, Update, Query, and Delete operations.
+    3. The DataSharePredicates supports EqualTo method, and ResultSet supports GetRowCount.
+ * @tc.step:
+    1. Create a ValuesBucket with "name" = "Datashare_CRUD_Test001", call Insert and record the return value.
+    2. Create predicates with EqualTo("name", "Datashare_CRUD_Test001"), update the bucket to "name" =
+       "Datashare_CRUD_Test002", call Update and record the return value.
+    3. Create query predicates with EqualTo("name", "Datashare_CRUD_Test002"), call Query to get a ResultSet, then
+       GetRowCount to check the number of rows.
+    4. Create delete predicates with EqualTo("name", "Datashare_CRUD_Test002"), call Delete and record the return
+       value.
+ * @tc.expect:
+    1. The Insert method returns a positive integer (indicating successful record creation).
+    2. The Update method returns a non-negative integer (indicating successful record update).
+    3. The Query method returns a ResultSet with 1 row (indicating successful retrieval of the updated record).
+    4. The Delete method returns a non-negative integer (indicating successful record deletion).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUD_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_CRUD_Test_001::Start");
@@ -1575,22 +1994,35 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUD_Test_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: MediaDataShare_CRUDEX_Test_001
-* @tc.desc: Verify extended CRUD operations with error code returns work correctly
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Insert a new record using InsertEx and verify error code and return value
-    2. Update the record using UpdateEx with predicates and verify results
-    3. Query for the updated record to confirm changes
-    4. Delete the record using DeleteEx and verify results
-* @tc.expected:
-    1.InsertEx returns error code 0 and non-negative ID
-    2.UpdateEx returns error code 0 and non-negative affected rows
-    3.Query returns exactly 1 row for the updated record
-    4.DeleteEx returns error code 0 and non-negative affected rows
-*/
+ * @tc.name: MediaDataShare_CRUDEX_Test_001
+ * @tc.desc: Verify that the extended CRUD operations (InsertEx, UpdateEx, Query, DeleteEx) of MediaDataShare work
+ *           correctly, focusing on the accuracy of returned error codes and result values.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShareHelper (via global g_dataShareHelper),
+       DataShareValuesBucket, DataSharePredicates, and DataShareResultSet, with no initialization errors.
+    2. The MEDIALIBRARY_DATA_URI constant is predefined and accessible as the target URI for media library data
+       operations.
+    3. The InsertEx, UpdateEx, Query, and DeleteEx methods of DataShareHelper return valid (errorCode, retVal) pairs or
+       result sets as expected.
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance (g_dataShareHelper) and verify it is not nullptr; create a test URI
+       using MEDIALIBRARY_DATA_URI.
+    2. Create a DataShareValuesBucket, add the key-value pair "name" = "Datashare_CRUDEX_Test001", then call InsertEx
+       and record the returned (errorCode, retVal) pair.
+    3. Create a DataSharePredicates with the condition "name" = "Datashare_CRUDEX_Test001"; clear the bucket, add
+       "name" = "Datashare_CRUDEX_Test002", then call UpdateEx and record the result.
+    4. Create a new DataSharePredicates with "name" = "Datashare_CRUDEX_Test002", call Query with an empty column
+       vector, and get the row count of the returned result set.
+    5. Create a DataSharePredicates with "name" = "Datashare_CRUDEX_Test002'", call DeleteEx and record the returned
+       (errorCode, retVal) pair.
+ * @tc.expect:
+    1. InsertEx returns an error code of 0 and a non-negative retVal (ID).
+    2. UpdateEx returns an error code of 0 and a non-negative retVal (affected rows).
+    3. The Query operation returns a result set with exactly 1 row.
+    4. DeleteEx returns an error code of 0 and a non-negative retVal (affected rows).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUDEX_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_CRUDEX_Test_001::Start");
@@ -1629,21 +2061,31 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_CRUDEX_Test_001, TestSize.Level0
 }
 
 /**
-* @tc.name: MediaDataShare_ImplPredicates_Test_001
-* @tc.desc: Verify In predicate generates correct operation items
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with In("name", {1, 2, 3}) condition
-    2. Retrieve the operation items from predicates
-    3. Verify operation type, parameters, and values
-* @tc.expected:
-    1.Exactly 1 operation item is generated
-    2.Operation type is correct for In condition
-    3.Parameters contain "name" and the correct integer values
-    4.Variant indices match expected types (string and integer vector)
-*/
+ * @tc.name: MediaDataShare_ImplPredicates_Test_001
+ * @tc.desc: Verify that the In predicate of DataSharePredicates generates correct OperationItem objects, including
+ *           operation type, parameters, and values.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataSharePredicates and retrieval of OperationItem lists via
+       GetOperationList().
+    2. The DataSharePredicates::In method accepts a string column name and a vector<int> values as parameters.
+    3. The OperationItem class contains singleParams (variant type) and multiParams (variant type) to store predicate
+       parameters.
+ * @tc.step:
+    1. Create a DataSharePredicates instance; define a vector<int> with values {1, 2, 3}, then call the In method with
+       the column name "name" and the vector.
+    2. Call GetOperationList() on the predicates to obtain the vector<OperationItem> (operationItems).
+    3. Extract the singleParams[0] (cast to string) and multiParams[0] (cast to vector<int>) from the first
+       OperationItem.
+    4. Verify the size of operationItems, the column name in singleParams, and the values in multiParams.
+ * @tc.expect:
+    1. Exactly 1 OperationItem is generated in the operationItems vector.
+    2. The operation type of the OperationItem matches the expected type for the In condition.
+    3. singleParams[0] is the string "name", and multiParams[0] is the vector<int> {1, 2, 3}.
+    4. The variant indices of singleParams[0] (string type) and multiParams[0] (vector<int> type) match the expected
+       values.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ImplPredicates_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ImplPredicates_Test_001::Start");
@@ -1670,17 +2112,28 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ImplPredicates_Test_001, TestSiz
 }
 
 /**
-* @tc.name: MediaDataShare_NotImplPredicates_Test_001
-* @tc.desc: Verify multiple predicate combinations generate correct number of operation items
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create predicates with multiple conditions: In, NotIn, Unlike, GroupBy, Distinct, IndexedBy, KeyPrefix, InKeys
-    2. Retrieve the operation items from predicates
-    3. Verify the total number of operation items
-* @tc.expected: Exactly 8 operation items are generated matching the number of conditions
-*/
+ * @tc.name: MediaDataShare_NotImplPredicates_Test_001
+ * @tc.desc: Verify that combining multiple predicates (In, NotIn, Unlike, GroupBy, Distinct, IndexedBy, KeyPrefix,
+ *           InKeys) in DataSharePredicates generates the correct number of OperationItem objects.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataSharePredicates and all tested predicate methods (In, NotIn,
+       Unlike, etc.).
+    2. Each predicate method (when called) adds one corresponding OperationItem to the internal operation list.
+    3. The GetOperationList() method correctly returns all OperationItems generated by the added predicates.
+ * @tc.step:
+    1. Create a DataSharePredicates instance; define a vector<string> inColumn with {"dataShare_Test_001",
+       "dataShare_Test_002"}, then call In("name", inColumn).
+    2. Define a vector<string> notInColumn with {"dataShare_Test_003", "dataShare_Test_004"}, call NotIn("name",
+       notInColumn); call Unlike("name", "%Test003").
+    3. Define a vector<string> preV with {"name"}, call GroupBy(preV); call Distinct(), IndexedBy("name"),
+       KeyPrefix("%Test"), and InKeys(preV) in sequence.
+    4. Call GetOperationList() to obtain the vector<OperationItem>, then check its size.
+ * @tc.expect:
+    1. The vector<OperationItem> returned by GetOperationList() has exactly 8 items (matching the number of called
+       predicates).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotImplPredicates_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_NotImplPredicates_Test_001::Start");
@@ -1710,22 +2163,33 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotImplPredicates_Test_001, Test
 }
 
 /**
-* @tc.name: MediaDataShare_Observer_001
-* @tc.desc: Verify normal registration and operation of non-silent data observer
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Register a data observer for the media library URI
-    2. Insert a new record and trigger notification
-    3. Delete the record and trigger notification
-    4. Unregister the observer
-* @tc.expected:
-    1.Registration returns 0 indicating success
-    2.Insert returns positive ID and notification is triggered
-    3.Delete returns positive value and notification is triggered
-    4.Unregistration returns 0 indicating success
-*/
+ * @tc.name: MediaDataShare_Observer_001
+ * @tc.desc: Verify the normal registration, notification triggering, and unregistration processes of a non-silent data
+ *           observer for MediaDataShare operations.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShareHelper (via global g_dataShareHelper),
+       IDataAbilityObserverTest, DataShareValuesBucket, and DataSharePredicates.
+    2. The MEDIALIBRARY_DATA_URI constant is valid and accessible for observer registration and data operations.
+    3. The RegisterObserver, UnregisterObserver, Insert, Delete, and NotifyChange methods of DataShareHelper work as
+       expected.
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance (g_dataShareHelper) and verify it is not nullptr; create a test URI
+       using MEDIALIBRARY_DATA_URI.
+    2. Create an IDataAbilityObserverTest instance, call RegisterObserver with the test URI and observer, then check
+       the return value.
+    3. Create a DataShareValuesBucket with "name" = "Datashare_Observer_Test001", call Insert and verify the return
+       value is positive; call NotifyChange to trigger the observer.
+    4. Create a DataSharePredicates with "name" = "Datashare_Observer_Test001", call Delete and verify the return value
+       is positive; call NotifyChange again.
+    5. Call UnregisterObserver with the test URI and observer, then check the return value.
+ * @tc.expect:
+    1. The RegisterObserver method returns 0 (indicating successful registration).
+    2. The Insert method returns a positive ID, and the observer notification is triggered.
+    3. The Delete method returns a positive value, and the observer notification is triggered.
+    4. The UnregisterObserver method returns 0 (indicating successful unregistration).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Observer_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_Observer_001 start");
@@ -1753,22 +2217,34 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_Observer_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: MediaDataShare_ReregisterObserver_001
-* @tc.desc: Verify error handling when re-registering an existing observer
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Register a data observer for the media library URI
-    2. Attempt to register the same observer again
-    3. Perform insert and delete operations with notifications
-    4. Unregister the observer
-* @tc.expected:
-    1.First registration returns 0 indicating success
-    2.Second registration returns E_REGISTER_ERROR
-    3.Insert and delete operations complete successfully
-    4.Unregistration returns 0 indicating success
-*/
+ * @tc.name: MediaDataShare_ReregisterObserver_001
+ * @tc.desc: Verify the error handling of DataShareHelper when attempting to re-register an already registered
+ *           non-silent data observer, and ensure normal data operations still work.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShareHelper (via global g_dataShareHelper),
+       IDataAbilityObserverTest, DataShareValuesBucket, and DataSharePredicates.
+    2. The MEDIALIBRARY_DATA_URI constant is valid; the E_REGISTER_ERROR constant is predefined as the error code for
+       re-registration failures.
+    3. The RegisterObserver method returns E_REGISTER_ERROR when re-registering an existing observer.
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance (g_dataShareHelper) and verify it is not nullptr; create a test URI
+       using MEDIALIBRARY_DATA_URI.
+    2. Create an IDataAbilityObserverTest instance, call RegisterObserver for the first time and verify the return
+       value is 0.
+    3. Call RegisterObserver again with the same observer and URI, then check the return value (expected to be
+       E_REGISTER_ERROR).
+    4. Create a DataShareValuesBucket with "name" = "MediaDataShare_ReregisterObserver_001", call Insert and verify the
+       return value is positive; call NotifyChange.
+    5. Create a DataSharePredicates with the above name, call Delete and verify the return value is positive; call
+       NotifyChange; finally call UnregisterObserver and check it returns 0.
+ * @tc.expect:
+    1. The first RegisterObserver call returns 0 (successful registration).
+    2. The second RegisterObserver call returns E_REGISTER_ERROR (re-registration failure).
+    3. The Insert and Delete operations return positive values (normal execution).
+    4. The UnregisterObserver call returns 0 (successful unregistration).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ReregisterObserver_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ReregisterObserver_001 start");
@@ -1798,30 +2274,36 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ReregisterObserver_001, TestSize
 }
 
 /**
-* @tc.name: MediaDataShare_ObserverExt_001
-* @tc.desc: Verify observer extension functionality for data change notifications
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: DataShareHelper instance is properly initialized and MEDIALIBRARY_DATA_URI is accessible
-* @tc.step:
-    1. Get DataShareHelper instance and verify it's not null
-    2. Create test URI and DataShareObserverTest instance
-    3. Register observer extension with the URI
-    4. Insert test data and notify INSERT change
-    5. Verify observer receives correct INSERT change information
-    6. Insert data to descendant URI and notify INSERT change
-    7. Verify observer receives correct descendant INSERT change information
-    8. Delete test data and notify DELETE change with additional data
-    9. Verify observer receives correct DELETE change information
-    10. Unregister the observer
-* @tc.expect:
-    1. DataShareHelper instance is successfully obtained
-    2. Test data is inserted successfully (retVal > 0)
-    3. Observer receives accurate INSERT change information for main URI
-    4. Observer receives accurate INSERT change information for descendant URI
-    5. Observer receives accurate DELETE change information including additional data
-    6. All operations complete without errors
-*/
+ * @tc.name: MediaDataShare_ObserverExt_001
+ * @tc.desc: Verify the functionality of the observer extension (ObserverExt) for MediaDataShare, including receiving
+ *           accurate notifications for main URI, descendant URI, and DELETE operations with additional data.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The DataShareHelper instance (via global g_dataShareHelper) is properly initialized and not nullptr.
+    2. The MEDIALIBRARY_DATA_URI constant is accessible; the DataShareObserverTest class can be instantiated and has
+       methods to wait for and verify ChangeInfo.
+    3. The RegisterObserverExt, NotifyChangeExt, UnregisterObserverExt, Insert, and Delete methods of DataShareHelper
+       work as expected.
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance; create the main test URI (MEDIALIBRARY_DATA_URI) and a
+       DataShareObserverTest instance.
+    2. Call RegisterObserverExt with the main URI, observer, and "true" flag; create a DataShareValuesBucket with
+       "name" = "Datashare_Observer_Test001", call Insert and verify retVal > 0.
+    3. Create a ChangeInfo of type INSERT for the main URI, call NotifyChangeExt; wait for the observer to receive it
+       and verify the ChangeInfo matches.
+    4. Create a descendant URI (MEDIALIBRARY_DATA_URI + "/com.ohos.example"), call Insert; create an INSERT ChangeInfo
+       for the descendant URI, call NotifyChangeExt and verify the observer’s received data.
+    5. Create a DELETE ChangeInfo for the main URI (with additional data {0x01, 0x02, 0x03, 0x04, 0x05}), call Delete
+       and NotifyChangeExt; verify the observer’s received data, then call UnregisterObserverExt.
+ * @tc.expect:
+    1. The DataShareHelper instance is successfully obtained (not nullptr).
+    2. The Insert operations for both main and descendant URIs return retVal > 0 (successful insertion).
+    3. The observer receives accurate INSERT ChangeInfo for the main URI.
+    4. The observer receives accurate INSERT ChangeInfo for the descendant URI.
+    5. The observer receives accurate DELETE ChangeInfo including the additional data; all operations complete without
+       errors.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ObserverExt_001 start");
@@ -1868,27 +2350,33 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_001, TestSize.Level0
 }
 
 /**
-* @tc.name: MediaDataShare_UnregisterObserverExt_001
-* @tc.desc: Verify unregister functionality of observer extension
-* @tc.type: FUNC
-* @tc.require: issueIC8OCN
-* @tc.precon: DataShareHelper instance is properly initialized and MEDIALIBRARY_DATA_URI is accessible
-* @tc.step:
-    1. Get DataShareHelper instance and verify it's not null
-    2. Create test URI and DataShareObserverTest instance
-    3. Register observer extension with the URI
-    4. Insert test data and notify INSERT change
-    5. Verify observer receives correct change information
-    6. Unregister the observer from the URI
-    7. Notify another DELETE change
-    8. Verify observer no longer receives change information
-* @tc.expect:
-    1. DataShareHelper instance is successfully obtained
-    2. Test data is inserted successfully (retVal > 0)
-    3. Observer receives accurate change information before unregistration
-    4. After unregistration, observer does NOT receive change notifications
-    5. All operations complete without errors
-*/
+ * @tc.name: MediaDataShare_UnregisterObserverExt_001
+ * @tc.desc: Verify that the observer extension (ObserverExt) of MediaDataShare no longer receives notifications after
+ *           unregistration, while ensuring normal operations before unregistration work correctly.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+    1. The DataShareHelper instance (via global g_dataShareHelper) is properly initialized and not nullptr.
+    2. The MEDIALIBRARY_DATA_URI constant is accessible; the DataShareObserverTest class can wait for and compare
+       ChangeInfo.
+    3. The RegisterObserverExt, UnregisterObserverExt, Insert, and NotifyChangeExt methods work as expected.
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance; create the test URI (MEDIALIBRARY_DATA_URI) and a
+       DataShareObserverTest instance.
+    2. Call RegisterObserverExt with the test URI, observer, and "true" flag; create a DataShareValuesBucket with
+       "name" = "Datashare_Observer_Test001", call Insert and verify retVal > 0.
+    3. Create an INSERT ChangeInfo for the test URI, call NotifyChangeExt; wait for the observer and verify the
+       received ChangeInfo matches.
+    4. Call UnregisterObserverExt with the test URI and observer; call NotifyChangeExt again with a DELETE ChangeInfo
+       for the test URI.
+    5. Wait for the observer and verify it does not receive the DELETE ChangeInfo.
+ * @tc.expect:
+    1. The DataShareHelper instance is successfully obtained (not nullptr).
+    2. The Insert operation returns retVal > 0 (successful insertion).
+    3. The observer receives the correct INSERT ChangeInfo before unregistration.
+    4. The observer does NOT receive the DELETE ChangeInfo after unregistration.
+    5. All registration, operation, and unregistration processes complete without errors.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_UnregisterObserverExt_001 start");
@@ -1919,21 +2407,31 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_001, TestS
 }
 
 /**
-* @tc.name: MediaDataShare_ToAbsSharedResultSet_Test_001
-* @tc.desc: Test conversion of DataShare query result to AbsSharedResultSet
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Get the DataShare helper instance
-    2. Create predicates to filter data by name "dataShareTest003"
-    3. Query the media library URI with the predicates and empty columns
-    4. Convert the query result to AbsSharedResultSet using RdbDataAbilityUtils
-    5. Get the row count from the converted result set
-* @tc.expect:
-    1.The converted AbsSharedResultSet is not null
-    2.The row count of the result set is 1 (matches the expected test data)
-*/
+ * @tc.name: MediaDataShare_ToAbsSharedResultSet_Test_001
+ * @tc.desc: Verify the conversion of a DataShare Query result set (DataShareResultSet) to AbsSharedResultSet using
+ *           RdbDataAbilityUtils::ToAbsSharedResultSet, and check the correctness of the converted result set’s row
+ *           count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShareHelper (via global g_dataShareHelper),
+       DataSharePredicates, and access to RdbDataAbilityAdapter::RdbDataAbilityUtils.
+    2. The MEDIALIBRARY_DATA_URI constant is valid; test data with "name" = "dataShareTest003" exists in the media
+       library.
+    3. The ToAbsSharedResultSet method correctly converts DataShareResultSet to AbsSharedResultSet, and the GetRowCount
+       method of AbsSharedResultSet works.
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance; create a DataSharePredicates with the condition "name" =
+       "dataShareTest003" and an empty column vector.
+    2. Call the Query method with MEDIALIBRARY_DATA_URI, predicates, and columns to get a DataShareResultSet instance.
+    3. Call RdbDataAbilityAdapter::RdbDataAbilityUtils::ToAbsSharedResultSet to convert the DataShareResultSet to an
+       AbsSharedResultSet instance.
+    4. Call GetRowCount on the converted AbsSharedResultSet to get the row count.
+ * @tc.expect:
+    1. The converted AbsSharedResultSet instance is not nullptr.
+    2. The row count returned by GetRowCount is 1 (matching the pre-existing test data with "name" =
+       "dataShareTest003").
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ToAbsSharedResultSet_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ToAbsSharedResultSet_Test_001::Start");
@@ -1954,19 +2452,32 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ToAbsSharedResultSet_Test_001, T
 }
 
 /**
-* @tc.name: MediaDataShare_ExecuteBatch_Test_001
-* @tc.desc: Test batch execution of INSERT and DELETE operations via DataShare helper
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Get the DataShare helper instance
-    2. Create an INSERT operation statement with test data and predicates
-    3. Create a DELETE operation statement with test data and predicates
-    4. Add both statements to a batch list
-    5. Execute the batch operation using helper->ExecuteBatch()
-* @tc.expect: Batch execution returns 0 (success status)
-*/
+ * @tc.name: MediaDataShare_ExecuteBatch_Test_001
+ * @tc.desc: Verify the batch execution functionality of DataShareHelper by running a batch containing INSERT and
+ *           DELETE OperationStatement objects, ensuring the batch returns a successful status.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShareHelper (via global g_dataShareHelper),
+       OperationStatement, DataShareValuesBucket, and DataSharePredicates.
+    2. The Operation enum (with INSERT and DELETE types) and ExecResultSet class are valid; the ExecuteBatch method
+       returns 0 to indicate successful batch execution.
+    3. The ExecuteBatch method accepts a vector<OperationStatement> and an ExecResultSet as parameters.
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance; create an empty vector<OperationStatement> to store batch
+       operations.
+    2. Create the first OperationStatement (INSERT type): set URI to "datashare:///uri1", add a DataShareValuesBucket
+       with "DB_NUM" = 150 and "DB_TITLE" = "ExecuteBatch_Test002", set predicates with where clause "`DB_NUM` > 100",
+       and add it to the batch vector.
+    3. Create the second OperationStatement (DELETE type): set URI to "datashareproxy://com.uri2", add a bucket with
+       "DB_TITLE2" = "ExecuteBatch_Test002", set predicates with where clause "`DB_TITLE` = ExecuteBatch_Test002", and
+       add it to the batch vector.
+    4. Create an ExecResultSet instance, call ExecuteBatch with the batch vector and ExecResultSet, then check the
+       return value.
+ * @tc.expect:
+    1. The ExecuteBatch method returns 0 (indicating successful execution of the batch containing INSERT and DELETE
+       operations).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ExecuteBatch_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ExecuteBatch_Test_001::Start");
@@ -2003,18 +2514,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ExecuteBatch_Test_001, TestSize.
 }
 
 /**
-* @tc.name: MediaDataShare_InsertExt_Test_001
-* @tc.desc: Test extended insertion functionality (InsertExt) of DataShare helper
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Get the DataShare helper instance and verify it is not null
-    2. Create a URI for media library data
-    3. Create a ValuesBucket with test data (name="Datashare_CRUD_Test001")
-    4. Call InsertExt with the URI, ValuesBucket, and result string
-* @tc.expect: InsertExt returns 0 (success status)
-*/
+ * @tc.name: MediaDataShare_InsertExt_Test_001
+ * @tc.desc: Verify the functionality of the extended insertion method (InsertExt) of DataShareHelper for
+ *           MediaDataShare, focusing on whether it returns a successful status code.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of DataShareHelper (via global g_dataShareHelper) and
+       DataShareValuesBucket, with no initialization errors.
+    2. The MEDIALIBRARY_DATA_URI constant is predefined and accessible as the target URI for the insertion operation.
+    3. The InsertExt method of DataShareHelper accepts a URI, DataShareValuesBucket, and std::string (for result
+       storage) as parameters, and returns 0 for success.
+ * @tc.step:
+    1. Obtain the global DataShareHelper instance (g_dataShareHelper) and verify it is not nullptr.
+    2. Create a test URI using MEDIALIBRARY_DATA_URI; create a DataShareValuesBucket and add the key-value pair
+       "name" = "Datashare_CRUD_Test001".
+    3. Define an empty std::string to store the insertion result, call the InsertExt method with the URI, bucket, and
+       string, then check the return value.
+ * @tc.expect:
+    1. The DataShareHelper instance is not nullptr (successfully obtained).
+    2. The InsertExt method returns 0 (indicating successful extended insertion).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_InsertExt_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_InsertExt_Test_001::Start");
@@ -2030,21 +2550,31 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_InsertExt_Test_001, TestSize.Lev
 }
 
 /**
-* @tc.name: MediaDataShare_TransferUri_Test_001
-* @tc.desc: Test URI transfer functionality and DataShare helper creation for file data URI
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a file data URI
-    2. Get the SystemAbilityManager instance and verify it is not null
-    3. Get the Storage Manager system ability remote object and verify it is not null
-    4. Create a DataShare helper using the remote object and file data URI
-* @tc.expect:
-    1.SystemAbilityManager instance is not null
-    2.Storage Manager remote object is not null
-    3.DataShare helper instance is successfully created (not null)
-*/
+ * @tc.name: MediaDataShare_TransferUri_Test_001
+ * @tc.desc: Verify the URI transfer functionality and the creation of a DataShareHelper instance for a file data URI,
+ *           ensuring all dependent system services and instances are successfully obtained.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports accessing SystemAbilityManagerClient, SystemAbilityManager, and the Storage
+       Manager system ability (STORAGE_MANAGER_MANAGER_ID).
+    2. The FILE_DATA_URI constant is predefined as the target file data URI; the DataShareHelper::Creator method can
+       create a helper instance using a remote object and URI.
+    3. The GetSystemAbilityManager method returns a valid SystemAbilityManager instance, and GetSystemAbility returns a
+       valid remote object for STORAGE_MANAGER_MANAGER_ID.
+ * @tc.step:
+    1. Create a test URI using the FILE_DATA_URI constant.
+    2. Call SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager() to obtain the SystemAbilityManager
+       instance, and verify it is not nullptr.
+    3. Call GetSystemAbility on the SystemAbilityManager with STORAGE_MANAGER_MANAGER_ID to obtain the Storage
+       Manager’s remote object, and verify it is not nullptr.
+    4. Call DataShareHelper::Creator with the remote object and FILE_DATA_URI to create a DataShareHelper instance,
+       then verify it is not nullptr.
+ * @tc.expect:
+    1. The SystemAbilityManager instance obtained is not nullptr.
+    2. The remote object of the Storage Manager system ability is not nullptr.
+    3. The DataShareHelper instance created via Creator is not nullptr (successful creation).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_TransferUri_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_TransferUri_Test_001::Start");
@@ -2066,18 +2596,30 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_TransferUri_Test_001, TestSize.L
 }
 
 /**
-* @tc.name: ControllerTest_HelperInsertExtControllerNullTest_001
-* @tc.desc: Test InsertExt operation when DataShare controller is released (null)
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShare helper instance and verify it is not null
-    2. Create a test URI and release the helper's controller
-    3. Create a ValuesBucket with test data (phoneNumber=20.07, name="dataShareTest003", age=1001)
-    4. Call InsertExt with the URI, ValuesBucket, and result string
-* @tc.expect: InsertExt returns a negative value (failure due to released controller)
-*/
+ * @tc.name: ControllerTest_HelperInsertExtControllerNullTest_001
+ * @tc.desc: Test the behavior of the InsertExt operation in the DataShare helper when the internal DataShare
+ *           controller is released (set to null), verifying if the operation fails as expected.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The CreateDataShareHelper function can successfully generate a non-null DataShare helper instance with
+       STORAGE_MANAGER_MANAGER_ID.
+    2. The DataShare helper's Release() method can correctly release its internal controller, setting it to null.
+    3. The test environment supports instantiation of DataShareValuesBucket and Uri, and allows adding key-value pairs
+       (e.g., double, string, int) to the bucket.
+    4. The InsertExt method of the DataShare helper accepts Uri, DataShareValuesBucket, and std::string (for result)
+       as input parameters and returns an integer.
+ * @tc.step:
+    1. Call CreateDataShareHelper with STORAGE_MANAGER_MANAGER_ID to create a DataShare helper instance, and verify
+       the instance is not null.
+    2. Create a Uri instance using DATA_SHARE_URI, then call the helper's Release() method to release its internal
+       controller.
+    3. Create a DataShareValuesBucket, and add test key-value pairs: "phoneNumber" = 20.07 (double), "name" =
+       "dataShareTest003" (string), "age" = 1001 (int).
+    4. Define an empty std::string to store the operation result, then call the helper's InsertExt method with the
+       created Uri, ValuesBucket, and result string.
+ * @tc.expect:
+    1. The InsertExt operation returns a negative integer (indicating failure due to the released controller).
+ */
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperInsertExtControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperInsertExtControllerNullTest_001::Start");
@@ -2098,19 +2640,27 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperInsertExtControllerNullTes
 }
 
 /**
-* @tc.name: ControllerTest_HelperUpdateControllerNullTest_001
-* @tc.desc: Test Update operation when DataShare controller is released (null)
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShare helper instance and verify it is not null
-    2. Create a test URI and release the helper's controller
-    3. Create predicates to filter data by name "Datashare_CRUD_Test001"
-    4. Create a ValuesBucket to update name to "Datashare_CRUD_Test002"
-    5. Call Update with the URI, predicates, and ValuesBucket
-* @tc.expect: Update returns a negative value (failure due to released controller)
-*/
+ * @tc.name: ControllerTest_HelperUpdateControllerNullTest_001
+ * @tc.desc: Test the behavior of the Update operation in the DataShare helper when the internal DataShare controller
+ *           is released (set to null), verifying if the operation fails as expected.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The CreateDataShareHelper function can generate a non-null DataShare helper instance with
+       STORAGE_MANAGER_MANAGER_ID.
+    2. The helper's Release() method effectively releases the internal controller, setting it to null.
+    3. The test environment supports creating DataSharePredicates (with EqualTo condition) and DataShareValuesBucket
+       (for update data).
+    4. The Update method accepts Uri, DataSharePredicates, and DataShareValuesBucket, returning an integer result.
+ * @tc.step:
+    1. Create a DataShare helper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID) and confirm it is not
+       null.
+    2. Create a Uri with DATA_SHARE_URI, then call helper->Release() to release the internal controller.
+    3. Create a DataSharePredicates instance and set an EqualTo condition: "name" = "Datashare_CRUD_Test001".
+    4. Create a DataShareValuesBucket and add the update pair: "name" = "Datashare_CRUD_Test002".
+    5. Call the helper's Update method with the Uri, predicates, and ValuesBucket.
+ * @tc.expect:
+    1. The Update operation returns a negative integer (indicating failure due to the released controller).
+ */
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperUpdateControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperUpdateControllerNullTest_001::Start");
@@ -2128,18 +2678,25 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperUpdateControllerNullTest_0
 }
 
 /**
-* @tc.name: ControllerTest_HelperDeleteControllerNullTest_001
-* @tc.desc: Test Delete operation when DataShare controller is released (null)
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShare helper instance and verify it is not null
-    2. Create a test URI and release the helper's controller
-    3. Create predicates to filter data by age=1112
-    4. Call Delete with the URI and predicates
-* @tc.expect: Delete returns a negative value (failure due to released controller)
-*/
+ * @tc.name: ControllerTest_HelperDeleteControllerNullTest_001
+ * @tc.desc: Test the behavior of the Delete operation in the DataShare helper when the internal DataShare controller
+ *           is released (set to null), verifying if the operation fails as expected.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The CreateDataShareHelper function can produce a non-null DataShare helper instance using
+       STORAGE_MANAGER_MANAGER_ID.
+    2. The helper's Release() method successfully releases the internal controller, setting it to null.
+    3. The test environment supports creating DataSharePredicates with EqualTo condition (filtering by "age" = 1112).
+    4. The Delete method of the helper accepts Uri and DataSharePredicates, returning an integer result.
+ * @tc.step:
+    1. Create a DataShare helper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID) and verify it is not
+       null.
+    2. Create a Uri with DATA_SHARE_URI, then call helper->Release() to release the internal controller.
+    3. Create a DataSharePredicates instance and set an EqualTo condition: "age" = 1112.
+    4. Call the helper's Delete method with the created Uri and predicates.
+ * @tc.expect:
+    1. The Delete operation returns a negative integer (indicating failure due to the released controller).
+ */
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperDeleteControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperDeleteControllerNullTest_001::Start");
@@ -2155,18 +2712,28 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperDeleteControllerNullTest_0
 }
 
 /**
-* @tc.name: ControllerTest_HelperQueryControllerNullTest_001
-* @tc.desc: Test Query operation when DataShare controller is released (null)
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShare helper instance and verify it is not null
-    2. Create a test URI and release the helper's controller
-    3. Create predicates to filter data by name "dataShareTest003" with limit 1
-    4. Call Query with the URI, predicates, and empty columns
-* @tc.expect: Query returns a null result set (failure due to released controller)
-*/
+ * @tc.name: ControllerTest_HelperQueryControllerNullTest_001
+ * @tc.desc: Test the behavior of the Query operation in the DataShare helper when the internal DataShare controller
+ *           is released (set to null), verifying if the operation returns a null result set.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The CreateDataShareHelper function can generate a non-null DataShare helper instance with
+       STORAGE_MANAGER_MANAGER_ID.
+    2. The helper's Release() method releases the internal controller, setting it to null.
+    3. The test environment supports creating DataSharePredicates (with EqualTo and Limit conditions) and empty column
+       vectors.
+    4. The Query method returns a std::shared_ptr<ResultSet> (or similar) that can be checked for null.
+ * @tc.step:
+    1. Create a DataShare helper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID) and confirm it is not
+       null.
+    2. Create a Uri with DATA_SHARE_URI, then call helper->Release() to release the internal controller.
+    3. Create a DataSharePredicates instance: set EqualTo("name", "dataShareTest003") and Limit(1, 0) (limit 1 row,
+       offset 0).
+    4. Define an empty std::vector<std::string> for columns, then call the helper's Query method with the Uri,
+       predicates, and columns.
+ * @tc.expect:
+    1. The Query operation returns a null result set (indicating failure due to the released controller).
+ */
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperQueryControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperQueryControllerNullTest_001::Start");
@@ -2184,19 +2751,29 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperQueryControllerNullTest_00
 }
 
 /**
-* @tc.name: ControllerTest_HelperBatchInsertControllerNullTest_001
-* @tc.desc: Test BatchInsert operation when DataShare controller is released (null)
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShare helper instance and verify it is not null
-    2. Create a test URI and release the helper's controller
-    3. Create two ValuesBuckets with test data (name and phoneNumber)
-    4. Add both buckets to a batch list
-    5. Call BatchInsert with the URI and batch list
-* @tc.expect: BatchInsert returns a negative value (failure due to released controller)
-*/
+ * @tc.name: ControllerTest_HelperBatchInsertControllerNullTest_001
+ * @tc.desc: Test the behavior of the BatchInsert operation in the DataShare helper when the internal DataShare
+ *           controller is released (set to null), verifying if the operation fails as expected.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The CreateDataShareHelper function can produce a non-null DataShare helper instance using
+       STORAGE_MANAGER_MANAGER_ID.
+    2. The helper's Release() method effectively releases the internal controller, setting it to null.
+    3. The test environment supports creating multiple DataShareValuesBucket instances and adding them to a
+       std::vector.
+    4. The BatchInsert method accepts Uri and std::vector<DataShareValuesBucket>, returning an integer result.
+ * @tc.step:
+    1. Create a DataShare helper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID) and verify it is not
+       null.
+    2. Create a Uri with DATA_SHARE_URI, then call helper->Release() to release the internal controller.
+    3. Create two DataShareValuesBucket instances:
+       - Bucket 1: add "name" = "dataShareTest006", "phoneNumber" = 20.6 (double);
+       - Bucket 2: add "name" = "dataShareTest007", "phoneNumber" = 20.5 (double).
+    4. Add both buckets to a std::vector<DataShareValuesBucket>, then call the helper's BatchInsert method with the
+       Uri and the vector.
+ * @tc.expect:
+    1. The BatchInsert operation returns a negative integer (indicating failure due to the released controller).
+ */
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperBatchInsertControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperBatchInsertControllerNullTest_001::Start");
@@ -2219,20 +2796,34 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperBatchInsertControllerNullT
 }
 
 /**
-* @tc.name: ControllerTest_HelperExecuteBatchControllerNullTest_001
-* @tc.desc: Test ExecuteBatch operation when DataShare controller is released (null)
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShare helper instance and verify it is not null
-    2. Create a test URI and release the helper's controller
-    3. Create an INSERT operation statement with test data and predicates
-    4. Create a DELETE operation statement with test data and predicates
-    5. Add both statements to a batch list
-    6. Call ExecuteBatch with the batch list and result set
-* @tc.expect: ExecuteBatch returns a negative value (failure due to released controller)
-*/
+ * @tc.name: ControllerTest_HelperExecuteBatchControllerNullTest_001
+ * @tc.desc: Test the behavior of the ExecuteBatch operation in the DataShare helper when the internal DataShare
+ *           controller is released (set to null), verifying if the operation fails as expected.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The CreateDataShareHelper function can generate a non-null DataShare helper instance with
+       STORAGE_MANAGER_MANAGER_ID.
+    2. The helper's Release() method releases the internal controller, setting it to null.
+    3. The test environment supports creating OperationStatement instances (with INSERT/DELETE types, Uri,
+       ValuesBucket, and predicates) and ExecResultSet.
+    4. The ExecuteBatch method accepts std::vector<OperationStatement> and ExecResultSet, returning an integer result.
+ * @tc.step:
+    1. Create a DataShare helper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID) and confirm it is not
+       null.
+    2. Create a Uri with DATA_SHARE_URI, then call helper->Release() to release the internal controller.
+    3. Create an INSERT-type OperationStatement (statement1):
+       - Set operationType to Operation::INSERT, uri to "datashare:///uri1";
+       - Add "DB_NUM" = 150, "DB_TITLE" = "ExecuteBatch_Test002" to ValuesBucket;
+       - Set predicates with WhereClause "`DB_NUM` > 100", then add to the statement list.
+    4. Create a DELETE-type OperationStatement (statement2):
+       - Set operationType to Operation::DELETE, uri to "datashareproxy://com.uri2";
+       - Add "DB_TITLE2" = "ExecuteBatch_Test002" to ValuesBucket;
+       - Set predicates with WhereClause "`DB_TITLE` = ExecuteBatch_Test002", then add to the statement list.
+    5. Create an ExecResultSet instance, then call the helper's ExecuteBatch method with the statement list and
+       resultset.
+ * @tc.expect:
+    1. The ExecuteBatch operation returns a negative integer (indicating failure due to the released controller).
+ */
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperExecuteBatchControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperExecuteBatchControllerNullTest_001::Start");
@@ -2271,27 +2862,37 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperExecuteBatchControllerNull
 }
 
 /**
-* @tc.name: ControllerTest_HelperRegisterObserverControllerNullTest_001
-* @tc.desc: Test RegisterObserver, Insert, NotifyChange, Delete
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShare helper instance and verify it is not null
-    2. Create a media library URI and release the helper's controller
-    3. Create an IDataAbilityObserverTest instance
-    4. Call RegisterObserver with the URI and observer, check the return value
-    5. Insert test data into the URI and check the return value
-    6. Notify a change for the URI
-    7. Delete the test data using predicates and check the return value
-    8. Notify a change again for the URI
-    9. Call UnregisterObserver with the URI and observer, check the return value
-* @tc.expect:
-    1.RegisterObserver returns E_HELPER_DIED
-    2.Insert returns a negative value (failure)
-    3.Delete returns a negative value (failure)
-    4.UnregisterObserver returns E_HELPER_DIED
-*/
+ * @tc.name: ControllerTest_HelperRegisterObserverControllerNullTest_001
+ * @tc.desc: Test the behaviors of RegisterObserver, Insert, NotifyChange, Delete, and UnregisterObserver in the
+ *           DataShare helper when the internal controller is released (set to null).
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The CreateDataShareHelper function can produce a non-null DataShare helper instance with
+       STORAGE_MANAGER_MANAGER_ID.
+    2. The helper's Release() method effectively releases the internal controller, setting it to null.
+    3. The test environment supports creating IDataAbilityObserverTest instances, MEDIALIBRARY_DATA_URI (valid Uri),
+       and DataShareValuesBucket/Predicates.
+    4. Predefined error code E_HELPER_DIED is valid; helper methods (RegisterObserver/UnregisterObserver) return
+       integers.
+ * @tc.step:
+    1. Create a DataShare helper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID) and verify it is not
+       null.
+    2. Create a Uri with MEDIALIBRARY_DATA_URI, then call helper->Release() to release the internal controller.
+    3. Create an IDataAbilityObserverTest instance using new (std::nothrow).
+    4. Call helper->RegisterObserver with the Uri and observer, then check the return value.
+    5. Create a DataShareValuesBucket (add "name" = "Datashare_Observer_Test001"), call helper->Insert, and check the
+       return.
+    6. Call helper->NotifyChange with the Uri (no return check required).
+    7. Create a DataSharePredicates (EqualTo("name", "Datashare_Observer_Test001")), call helper->Delete, and check the
+       return.
+    8. Call helper->NotifyChange again with the Uri (no return check required).
+    9. Call helper->UnregisterObserver with the Uri and observer, then check the return value.
+ * @tc.expect:
+    1. RegisterObserver returns E_HELPER_DIED.
+    2. Insert returns a negative integer (failure).
+    3. Delete returns a negative integer (failure).
+    4. UnregisterObserver returns E_HELPER_DIED.
+ */
 HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperRegisterObserverControllerNullTest_001, TestSize.Level0)
 {
     LOG_INFO("ControllerTest_HelperRegisterObserverControllerNullTest_001 start");
@@ -2320,24 +2921,39 @@ HWTEST_F(MediaDataShareUnitTest, ControllerTest_HelperRegisterObserverController
 }
 
 /**
-* @tc.name: MediaDataShare_ObserverExt_002
-* @tc.desc: Test DataShare observer extension for batch INSERT operation notification with extended data
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Get the DataShare helper instance and verify it is not null
-    2. Create a media library URI and a DataShareObserverTest instance
-    3. Register the observer extension with the URI
-    4. Create two ValuesBuckets with test data and batch insert them
-    5. Convert the batch data to extended format for change info
-    6. Notify an INSERT change with the extended data
-    7. Wait for observer notification and verify the change info matches
-    8. Unregister the observer extension
-* @tc.expect:
-    1.Batch insertion returns a positive value (success)
-    2.Observer correctly receives and matches INSERT change info with extended data
-*/
+ * @tc.name: MediaDataShare_ObserverExt_002
+ * @tc.desc: Test the DataShare observer extension's ability to receive notification for batch INSERT operations
+ *           with extended data, verifying if the change info matches the sent data.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The global g_dataShareHelper is a pre-initialized, non-null std::shared_ptr<DataShareHelper>.
+    2. The test environment supports creating DataShareObserverTest instances, MEDIALIBRARY_DATA_URI (valid Uri),
+       and multiple DataShareValuesBucket instances.
+    3. The helper's RegisterObserverExt/UnregisterObserverExt methods work; ValueProxy::Convert can convert
+       std::vector<DataShareValuesBucket> to ChangeInfo::VBuckets.
+    4. The DataShareObserverTest has a data.Wait() method (for synchronization) and changeInfo_ member (to store
+       notifications).
+ * @tc.step:
+    1. Get the global g_dataShareHelper and confirm it is not null.
+    2. Create a Uri with MEDIALIBRARY_DATA_URI and a std::shared_ptr<DataShareObserverTest> instance.
+    3. Call helper->RegisterObserverExt with the Uri, observer, and false (third parameter), to register the observer
+       extension.
+    4. Create two DataShareValuesBucket instances: add "name" = "Datashare_Observer_Test001" to bucket1, and
+       "name" = "Datashare_Observer_Test002" to bucket2.
+    5. Add both buckets to a std::vector<DataShareValuesBucket>, call helper->BatchInsert with the Uri and vector,
+       and verify the return value is positive.
+    6. Use ValueProxy::Convert to convert the vector to ChangeInfo::VBuckets (extends), then create a ChangeInfo
+       instance: ChangeType::INSERT, URIs = {uri}, extends = the converted VBuckets.
+    7. Call helper->NotifyChangeExt with the ChangeInfo, then call dataObserver->data.Wait() to wait for the
+       notification.
+    8. Verify that dataObserver->changeInfo_ matches the created ChangeInfo using ChangeInfoEqual.
+    9. Call dataObserver->Clear() to reset the observer state, then call helper->UnregisterObserverExt with the Uri and
+       observer.
+ * @tc.expect:
+    1. The BatchInsert operation returns a positive integer (indicating success).
+    2. The observer correctly receives the INSERT change notification, and dataObserver->changeInfo_ matches the sent
+       ChangeInfo.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_002, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ObserverExt_002 start");
@@ -2367,25 +2983,38 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_002, TestSize.Level0
 }
 
 /**
-* @tc.name: MediaDataShare_ObserverExt_003
-* @tc.desc: Test DataShare observer extension for UPDATE operation notification with extended data
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Get the DataShare helper instance and verify it is not null
-    2. Create a media library URI and a DataShareObserverTest instance
-    3. Register the observer extension with the URI
-    4. Create a ValuesBucket with update data (name="Datashare_Observer_Test003")
-    5. Update existing data filtered by predicates (name="Datashare_Observer_Test002")
-    6. Convert the update data to extended format for change info
-    7. Notify an UPDATE change with the extended data
-    8. Wait for observer notification and verify the change info matches
-    9. Unregister the observer extension
-* @tc.expect:
-    1.Update operation returns a positive value (success)
-    2.Observer correctly receives and matches UPDATE change info with extended data
-*/
+ * @tc.name: MediaDataShare_ObserverExt_003
+ * @tc.desc: Test the DataShare observer extension's ability to receive notification for UPDATE operations
+ *           with extended data, verifying if the change info matches the sent data.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The global g_dataShareHelper is a pre-initialized, non-null std::shared_ptr<DataShareHelper>.
+    2. The test environment supports creating DataShareObserverTest instances, MEDIALIBRARY_DATA_URI,
+       DataShareValuesBucket,
+       and DataSharePredicates (with EqualTo condition).
+    3. The helper's RegisterObserverExt/UnregisterObserverExt/Update methods work; ValueProxy::Convert can convert
+       bucket vectors to ChangeInfo::VBuckets.
+    4. The DataShareObserverTest has data.Wait() and Clear() methods, and a changeInfo_ member.
+ * @tc.step:
+    1. Get the global g_dataShareHelper and confirm it is not null.
+    2. Create a Uri with MEDIALIBRARY_DATA_URI and a std::shared_ptr<DataShareObserverTest> instance.
+    3. Call helper->RegisterObserverExt with the Uri, observer, and false to register the observer extension.
+    4. Create a DataShareValuesBucket and add "name" = "Datashare_Observer_Test003" (update data).
+    5. Create a DataSharePredicates instance and set EqualTo("name", "Datashare_Observer_Test002") (filter for existing
+       data).
+    6. Call helper->Update with the Uri, predicates, and ValuesBucket, and verify the return value is positive.
+    7. Add the ValuesBucket to a std::vector<DataShareValuesBucket>, use ValueProxy::Convert to get
+       ChangeInfo::VBuckets (extends).
+    8. Create a ChangeInfo instance (ChangeType::UPDATE, URIs = {uri}, extends = extends), call helper->NotifyChangeExt
+       with it.
+    9. Call dataObserver->data.Wait() to wait for notification, then verify dataObserver->changeInfo_ matches using
+       ChangeInfoEqual.
+    10. Call dataObserver->Clear() and helper->UnregisterObserverExt with the Uri and observer.
+ * @tc.expect:
+    1. The Update operation returns a positive integer (indicating success).
+    2. The observer correctly receives the UPDATE change notification, and dataObserver->changeInfo_ matches the sent
+       ChangeInfo.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_003, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ObserverExt_003 start");
@@ -2415,25 +3044,37 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_003, TestSize.Level0
 }
 
 /**
-* @tc.name: MediaDataShare_ObserverExt_004
-* @tc.desc: Test DataShare observer extension for DELETE operation notification with extended data
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Get the DataShare helper instance and verify it is not null
-    2. Create a media library URI and a DataShareObserverTest instance
-    3. Register the observer extension with the URI
-    4. Create predicates to filter data by name "Datashare_Observer_Test003"
-    5. Delete the filtered data and verify success
-    6. Convert the deleted data info to extended format for change info
-    7. Notify a DELETE change with the extended data
-    8. Wait for observer notification and verify the change info matches
-    9. Unregister the observer extension
-* @tc.expect:
-    1.Delete operation returns a positive value (success)
-    2.Observer correctly receives and matches DELETE change info with extended data
-*/
+ * @tc.name: MediaDataShare_ObserverExt_004
+ * @tc.desc: Test the DataShare observer extension's ability to receive notification for DELETE operations
+ *           with extended data, verifying if the change info matches the sent data.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The global g_dataShareHelper is a pre-initialized, non-null std::shared_ptr<DataShareHelper>.
+    2. The test environment supports creating DataShareObserverTest instances, MEDIALIBRARY_DATA_URI,
+       DataShareValuesBucket, and DataSharePredicates (with EqualTo condition).
+    3. The helper's RegisterObserverExt/UnregisterObserverExt/Delete methods work; ValueProxy::Convert can convert
+       bucket vectors to ChangeInfo::VBuckets.
+    4. The DataShareObserverTest has data.Wait() and Clear() methods, and a changeInfo_ member.
+ * @tc.step:
+    1. Get the global g_dataShareHelper and confirm it is not null.
+    2. Create a Uri with MEDIALIBRARY_DATA_URI and a std::shared_ptr<DataShareObserverTest> instance.
+    3. Call helper->RegisterObserverExt with the Uri, observer, and false to register the observer extension.
+    4. Create a DataSharePredicates instance and set EqualTo("name", "Datashare_Observer_Test003") (filter for target
+       data).
+    5. Create a DataShareValuesBucket and add "name" = "Datashare_Observer_Test003" (to represent deleted data).
+    6. Call helper->Delete with the Uri and predicates, and verify the return value is positive.
+    7. Add the ValuesBucket to a std::vector<DataShareValuesBucket>, use ValueProxy::Convert to get
+       ChangeInfo::VBuckets (extends).
+    8. Create a ChangeInfo instance (ChangeType::DELETE, URIs = {uri}, extends = extends), call helper->NotifyChangeExt
+       with it.
+    9. Call dataObserver->data.Wait() to wait for notification, then verify dataObserver->changeInfo_ matches using
+       ChangeInfoEqual.
+    10. Call dataObserver->Clear() and helper->UnregisterObserverExt with the Uri and observer.
+ * @tc.expect:
+    1. The Delete operation returns a positive integer (indicating success).
+    2. The observer correctly receives the DELETE change notification, and dataObserver->changeInfo_ matches the sent
+       ChangeInfo.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_004, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_ObserverExt_004 start");
@@ -2463,25 +3104,39 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_ObserverExt_004, TestSize.Level0
 }
 
 /**
-* @tc.name: MediaDataShare_UnregisterObserverExt_002
-* @tc.desc: Test that unregistered DataShare observer no longer receives notifications with extended data
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Get the DataShare helper instance and verify it is not null
-    2. Create a media library URI and a DataShareObserverTest instance
-    3. Register the observer extension with the URI
-    4. Insert test data into the URI and verify success
-    5. Convert the inserted data to extended format, notify an INSERT change, and verify observer receives it
-    6. Unregister the observer extension
-    7. Notify a DELETE change with the same extended data
-    8. Wait for observer notification and verify the change info does not match
-* @tc.expect:
-    1.Data insertion returns a positive value (success)
-    2.Registered observer correctly receives INSERT change info with extended data
-    3.Unregistered observer does not receive DELETE change info (change info mismatch)
-*/
+ * @tc.name: MediaDataShare_UnregisterObserverExt_002
+ * @tc.desc: Test that an unregistered DataShare observer extension no longer receives change notifications
+ *           with extended data, verifying the effectiveness of unregistration.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The global g_dataShareHelper is a pre-initialized, non-null std::shared_ptr<DataShareHelper>.
+    2. The test environment supports creating DataShareObserverTest instances, MEDIALIBRARY_DATA_URI, and
+       DataShareValuesBucket.
+    3. The helper's RegisterObserverExt/UnregisterObserverExt/Insert/NotifyChangeExt methods work; ValueProxy::Convert
+       can convert bucket vectors to ChangeInfo::VBuckets.
+    4. The DataShareObserverTest has data.Wait(), Clear() methods, and a changeInfo_ member (for notification checks).
+ * @tc.step:
+    1. Get the global g_dataShareHelper and confirm it is not null.
+    2. Create a Uri with MEDIALIBRARY_DATA_URI and a std::shared_ptr<DataShareObserverTest> instance.
+    3. Call helper->RegisterObserverExt with the Uri, observer, and true to register the observer extension.
+    4. Create a DataShareValuesBucket (add "name" = "Datashare_Observer_Test003"), call helper->Insert with the Uri,
+       and verify the return value is positive.
+    5. Add the bucket to a std::vector<DataShareValuesBucket>, use ValueProxy::Convert to get ChangeInfo::VBuckets
+       (extends).
+    6. Create a ChangeInfo instance (ChangeType::INSERT, URIs = {uri}, extends = extends), call helper->NotifyChangeExt
+       with it.
+    7. Call dataObserver->data.Wait(), verify dataObserver->changeInfo_ matches using ChangeInfoEqual, then call
+       dataObserver->Clear().
+    8. Call helper->UnregisterObserverExt with the Uri and observer to unregister the extension.
+    9. Call helper->NotifyChangeExt with a new ChangeInfo (ChangeType::DELETE, same URIs/extends as step 6).
+    10. Call dataObserver->data.Wait(), then verify dataObserver->changeInfo_ does not match the INSERT ChangeInfo
+       from step 6.
+ * @tc.expect:
+    1. The Insert operation returns a positive integer (indicating success).
+    2. The registered observer receives the INSERT notification, and changeInfo_ matches the sent ChangeInfo.
+    3. The unregistered observer does not receive the DELETE notification, and changeInfo_ does not match the INSERT
+       ChangeInfo.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_002, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_UnregisterObserverExt_002 start");
@@ -2515,26 +3170,37 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExt_002, TestS
 }
 
 /**
-* @tc.name: MediaDataShare_BatchUpdate_Test_001
-* @tc.desc: Test batch update functionality of DataShare helper with multiple operations and URIs
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Get the DataShare helper instance and verify it is not null
-    2. Create a media library URI and insert test data (name="batchUpdateTest")
-    3. Create batch update operations:
-        - For "uri1": Update existing test data to "batchUpdateTested"; Update non-existent data to "undefined1"
-        - For "uri2": Update non-existent data to "undefined1"
-    4. Execute batch update and get results
-    5. Delete the test data to clean up
-* @tc.expect:
-    1.Initial insertion returns a positive value (success)
-    2.Batch update returns success, with results size 2
-    3.Results for "uri1" contain [1, 0] (1 success, 1 no match)
-    4.Results for "uri2" contain [0] (no match)
-    5.Cleanup deletion returns a positive value (success)
-*/
+ * @tc.name: MediaDataShare_BatchUpdate_Test_001
+ * @tc.desc: Test the batch update functionality of the DataShare helper, including multiple update operations
+ *           across different URIs, and verify the results and cleanup.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The global g_dataShareHelper is a pre-initialized, non-null std::shared_ptr<DataShareHelper>.
+    2. The test environment supports creating MEDIALIBRARY_DATA_URI, DataShareValuesBucket, UpdateOperations (map of
+       URI to UpdateOperation vector), and BatchUpdateResult vector.
+    3. The helper's Insert/BatchUpdate/Delete methods work; BatchUpdate returns an integer and populates the result
+       vector.
+ * @tc.step:
+    1. Get the global g_dataShareHelper and confirm it is not null.
+    2. Create a Uri with MEDIALIBRARY_DATA_URI, create a DataShareValuesBucket (add "name" = "batchUpdateTest"),
+       call helper->Insert with them, and verify the return value is positive.
+    3. Create an UpdateOperations instance (map of std::string to std::vector<UpdateOperation>):
+       a. For "uri1": Create two UpdateOperations:
+          - Op1: ValuesBucket ("name" = "batchUpdateTested"), Predicates (EqualTo("name", "batchUpdateTest"));
+          - Op2: ValuesBucket ("name" = "undefined1"), Predicates (EqualTo("name", "undefined"));
+          Add both to the vector for "uri1".
+       b. For "uri2": Create one UpdateOperation (same as Op2), add to the vector for "uri2".
+    4. Add the "uri1" and "uri2" vectors to UpdateOperations, define a std::vector<BatchUpdateResult> (results),
+       call helper->BatchUpdate with operations and results.
+    5. Create a DataSharePredicates (EqualTo("name", "batchUpdateTested")), call helper->Delete with the Uri and
+       predicates, and verify the return value is positive.
+ * @tc.expect:
+    1. The initial Insert operation returns a positive integer (success).
+    2. The BatchUpdate operation returns success, and the results vector has a size of 2.
+    3. results[0].codes (for "uri1") is [1, 0] (1 successful update, 1 no match).
+    4. results[1].codes (for "uri2") is [0] (no match).
+    5. The cleanup Delete operation returns a positive integer (success).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_BatchUpdate_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_BatchUpdate_Test_001::Start");
@@ -2576,20 +3242,30 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_BatchUpdate_Test_001, TestSize.L
 }
 
 /**
-* @tc.name: MediaDataShare_BatchUpdateThanLimit_Test_001
-* @tc.desc: Test batch update functionality when operation count exceeds the limit
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Get the DataShare helper instance and verify it is not null
-    2. Create a media library URI
-    3. Create a batch update operation list with 4001 identical update operations (exceeding limit)
-    4. Execute batch update and check the return value and results
-* @tc.expect:
-    1.Batch update returns -1 (failure due to exceeding limit)
-    2.Results list is empty
-*/
+ * @tc.name: MediaDataShare_BatchUpdateThanLimit_Test_001
+ * @tc.desc: Test the batch update functionality of the DataShare helper when the number of operations exceeds
+ *           the preset limit, verifying if the operation fails as expected.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The global g_dataShareHelper is a pre-initialized, non-null std::shared_ptr<DataShareHelper>.
+    2. The test environment supports creating MEDIALIBRARY_DATA_URI, UpdateOperations, and std::vector<UpdateOperation>
+       with 4001 identical operations.
+    3. The helper's BatchUpdate method returns -1 when the operation count exceeds the limit, and the results vector
+       remains empty.
+ * @tc.step:
+    1. Get the global g_dataShareHelper and confirm it is not null.
+    2. Create a Uri with MEDIALIBRARY_DATA_URI (not used in operations but for setup consistency).
+    3. Create an UpdateOperations instance and a std::vector<DataShare::UpdateOperation> (updateOperations1).
+    4. Create one DataShare::UpdateOperation: set ValuesBucket ("name" = "batchUpdateTested"), Predicates
+       (EqualTo("name", "batchUpdateTest")).
+    5. Add the same UpdateOperation to updateOperations1 4001 times (exceeding the limit).
+    6. Add updateOperations1 to UpdateOperations with key "uri1", define an empty std::vector<BatchUpdateResult>
+       (results).
+    7. Call helper->BatchUpdate with operations and results, then check the return value and results size.
+ * @tc.expect:
+    1. The BatchUpdate operation returns -1 (indicating failure due to exceeding the operation limit).
+    2. The results vector remains empty (no partial results are recorded).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_BatchUpdateThanLimit_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_BatchUpdateThanLimit_Test_001::Start");
@@ -2652,22 +3328,44 @@ void PrepareNodeContent(RdbChangeNode &node)
 }
 
 /**
-* @tc.name: ReadAshmem
-* @tc.desc: Test ReadAshmem function for normal read operations and error scenarios
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create an Ashmem instance and map it for read/write
-    2. Write test data (string length and URI string) into Ashmem
-    3. Use RdbObserverStub to read the length from Ashmem and verify it matches
-    4. Read the URI string from Ashmem and verify it matches the original
-    5. Test error path: attempt to read data exceeding Ashmem size
-* @tc.expect:
-    1.Normal read of length returns E_OK and matches written length
-    2.Normal read of string returns E_OK and matches original URI
-    3.Error read (exceeding size) returns E_ERROR
-*/
+ * @tc.name: ReadAshmem
+ * @tc.desc: Test the ReadAshmem function of RdbObserverStub, covering normal read operations (integer and string)
+ *           and error scenarios (reading data exceeding Ashmem size).
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The test environment supports creating Ashmem instances (via Ashmem::CreateAshmem) and mapping them for
+       read-write access.
+    2. The RdbObserverStub class is defined, with a ReadAshmem method that accepts RdbChangeNode, const void**, size_t,
+       and int& (offset).
+    3. Predefined constants are valid: DATA_SIZE_ASHMEM_TRANSFER_LIMIT (Ashmem size), DATA_SHARE_URI (test string).
+    4. The ReadAshmem method returns E_OK for success and E_ERROR for errors.
+ * @tc.step:
+    1. Create an RdbChangeNode instance (node) to store Ashmem.
+    2. Create an Ashmem instance with name "ReadAshmem" and size DATA_SIZE_ASHMEM_TRANSFER_LIMIT, verify it is not
+       null.
+    3. Call memory->MapReadAndWriteAshmem() to enable read-write access, confirm the mapping is successful.
+    4. Write test data to Ashmem:
+       a. Get the length of DATA_SHARE_URI (len), write len (as integer, 4 bytes) to Ashmem at offset 0.
+       b. Get the C-string of DATA_SHARE_URI, write it to Ashmem at offset 4 (length = len).
+    5. Assign the Ashmem instance to node.memory_, then create an RdbObserverStub instance (stub) with
+       OnChangeCallback.
+    6. Test normal integer read:
+       a. Define const int* lenRead and int offset = 0.
+       b. Call stub.ReadAshmem(node, (const void**)&lenRead, 4, offset), verify return is E_OK.
+       c. Check that offset becomes 4, and *lenRead equals len.
+    7. Test normal string read:
+       a. Define const char* str (initialized to nullptr).
+       b. Call stub.ReadAshmem(node, (const void**)&str, *lenRead, offset), verify return is E_OK.
+       c. Check that offset becomes 4 + len, and the std::string converted from str (length *lenRead) matches
+          DATA_SHARE_URI.
+    8. Test error scenario:
+       a. Call stub.ReadAshmem(node, (const void**)&str, DATA_SIZE_ASHMEM_TRANSFER_LIMIT, offset), verify return is
+          E_ERROR.
+ * @tc.expect:
+    1. Normal integer read returns E_OK, offset is 4, and *lenRead matches the length of DATA_SHARE_URI.
+    2. Normal string read returns E_OK, offset is 4 + len, and the read string matches DATA_SHARE_URI.
+    3. Error read (exceeding Ashmem size) returns E_ERROR.
+ */
 HWTEST_F(MediaDataShareUnitTest, ReadAshmem, TestSize.Level1)
 {
     LOG_INFO("ReadAshmem starts");
@@ -2708,20 +3406,28 @@ HWTEST_F(MediaDataShareUnitTest, ReadAshmem, TestSize.Level1)
 }
 
 /**
-* @tc.name: DeserializeDataFromAshmem001
-* @tc.desc: Test DeserializeDataFromAshmem function for successful data deserialization from Ashmem
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Prepare an RdbChangeNode with Ashmem containing serialized data (2 URIs) using PrepareNodeContent
-    2. Create an RdbObserverStub with OnChangeCallback
-    3. Call DeserializeDataFromAshmem on the stub with the node
-    4. Verify the deserialized data in the node
-* @tc.expect:
-    1.Deserialization returns E_OK
-    2.Node contains 2 URIs, both matching DATA_SHARE_URI
-*/
+ * @tc.name: DeserializeDataFromAshmem001
+ * @tc.desc: Test the DeserializeDataFromAshmem function of RdbObserverStub for successful deserialization of
+ *           data (2 URIs) from Ashmem into an RdbChangeNode.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The PrepareNodeContent function is defined and can populate an RdbChangeNode with Ashmem containing
+       serialized data (2 URIs matching DATA_SHARE_URI).
+    2. The RdbObserverStub class has a DeserializeDataFromAshmem method that accepts RdbChangeNode and returns an
+       integer.
+    3. The DeserializeDataFromAshmem method returns E_OK for successful deserialization.
+    4. The RdbChangeNode has a data_ member (std::vector<std::string>) to store deserialized URIs.
+ * @tc.step:
+    1. Create an RdbChangeNode instance (node).
+    2. Call PrepareNodeContent(node) to populate node with Ashmem containing serialized data (2 URIs).
+    3. Create an RdbObserverStub instance (stub) with OnChangeCallback.
+    4. Call stub.DeserializeDataFromAshmem(node) and record the return value.
+    5. Check the size of node.data_ and the value of each element.
+ * @tc.expect:
+    1. The DeserializeDataFromAshmem function returns E_OK (indicating successful deserialization).
+    2. The size of node.data_ is 2.
+    3. Each element in node.data_ matches DATA_SHARE_URI.
+ */
 HWTEST_F(MediaDataShareUnitTest, DeserializeDataFromAshmem001, TestSize.Level1)
 {
     LOG_INFO("DeserializeDataFromAshmem001::Start");
@@ -2739,18 +3445,37 @@ HWTEST_F(MediaDataShareUnitTest, DeserializeDataFromAshmem001, TestSize.Level1)
 }
 
 /**
-* @tc.name: DeserializeDataFromAshmem002
-* @tc.desc: Test DeserializeDataFromAshmem function for error scenarios (invalid Ashmem data)
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Test with null Ashmem: call deserialization on a node with no memory_
-    2. Test with invalid string length: write Ashmem with excessive string length and call deserialization
-    3. Test with insufficient size for vector length: create small Ashmem and call deserialization
-    4. Test with insufficient size for string length: create Ashmem with partial data and call deserialization
-* @tc.expect: All error scenarios return E_ERROR
-*/
+ * @tc.name: DeserializeDataFromAshmem002
+ * @tc.desc: Test the DeserializeDataFromAshmem function of RdbObserverStub for error scenarios, including
+ *           null Ashmem, invalid string length, and insufficient Ashmem size.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The test environment supports creating Ashmem instances and mapping them for read-write access.
+    2. The RdbObserverStub class has a DeserializeDataFromAshmem method that returns E_ERROR for error scenarios.
+    3. Predefined constants are valid: DATA_SIZE_ASHMEM_TRANSFER_LIMIT (Ashmem size), DATA_SHARE_URI (test string).
+    4. The RdbChangeNode has memory_, size_, and isSharedMemory_ members to configure Ashmem state.
+ * @tc.step:
+    1. Create an RdbObserverStub instance (stub) with OnChangeCallback and an RdbChangeNode instance (node).
+    2. Test scenario 1: Null Ashmem (node.memory_ is unassigned, default null).
+       a. Call stub.DeserializeDataFromAshmem(node), verify return is E_ERROR.
+    3. Test scenario 2: Invalid string length.
+       a. Create an Ashmem instance ("DeserializeDataFromAshmem002", DATA_SIZE_ASHMEM_TRANSFER_LIMIT), map for
+          read-write.
+       b. Write vecLen = 1 (4 bytes) to offset 0, then write errorLen = DATA_SIZE_ASHMEM_TRANSFER_LIMIT (4 bytes) to
+          offset 4.
+       c. Write DATA_SHARE_URI's C-string to offset 8, assign Ashmem to node.memory_.
+       d. Call stub.DeserializeDataFromAshmem(node), verify return is E_ERROR.
+    4. Test scenario 3: Insufficient size for vector length.
+       a. Create an Ashmem instance ("DeserializeDataFromAshmem002", 2 bytes), map for read-write, assign to
+          node.memory_.
+       b. Call stub.DeserializeDataFromAshmem(node), verify return is E_ERROR.
+    5. Test scenario 4: Insufficient size for string length.
+       a. Create an Ashmem instance ("DeserializeDataFromAshmem002", 5 bytes), map for read-write.
+       b. Write vecLen = 1 (4 bytes) to offset 0, assign Ashmem to node.memory_.
+       c. Call stub.DeserializeDataFromAshmem(node), verify return is E_ERROR.
+ * @tc.expect:
+    1. All four error scenarios return E_ERROR (indicating deserialization failure).
+ */
 HWTEST_F(MediaDataShareUnitTest, DeserializeDataFromAshmem002, TestSize.Level1)
 {
     LOG_INFO("DeserializeDataFromAshmem002::Start");
@@ -2806,23 +3531,32 @@ HWTEST_F(MediaDataShareUnitTest, DeserializeDataFromAshmem002, TestSize.Level1)
 }
 
 /**
-* @tc.name: RecoverRdbChangeNodeData001
-* @tc.desc: Test RecoverRdbChangeNodeData function for normal recovery and non-recovery scenarios
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Prepare an RdbChangeNode with shared memory containing 2 URIs using PrepareNodeContent
-    2. Create an RdbObserverStub with OnChangeCallback
-    3. Call RecoverRdbChangeNodeData on the stub with the node and verify return value
-    4. Check that node data is correctly recovered, memory is nullified, and size is 0
-    5. Prepare a second RdbChangeNode with shared memory but set isSharedMemory_ to false
-    6. Call RecoverRdbChangeNodeData on the second node and verify return value
-    7. Check that node data remains empty, memory is retained, and size is unchanged
-* @tc.expect:
-    1.First recovery returns E_OK, node contains 2 URIs, memory is null, size is 0, and isSharedMemory_ is false
-    2.non-recovery returns E_OK, node data is empty, memory is not null, size is 82, and isSharedMemory_ is false
-*/
+ * @tc.name: RecoverRdbChangeNodeData001
+ * @tc.desc: Test the RecoverRdbChangeNodeData function of RdbObserverStub, covering normal data recovery (from Ashmem)
+ *           and non-recovery scenarios (isSharedMemory_ set to false).
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The PrepareNodeContent function can populate an RdbChangeNode with Ashmem containing 2 URIs (DATA_SHARE_URI)
+       and set isSharedMemory_ to true.
+    2. The RdbObserverStub class has a RecoverRdbChangeNodeData method that accepts RdbChangeNode and returns E_OK.
+    3. The RdbChangeNode has data_ (URI vector), memory_ (Ashmem), size_, and isSharedMemory_ members.
+    4. Predefined constant DATA_SIZE_ASHMEM_TRANSFER_LIMIT is valid; recovered nodes set memory_ to null and size_
+       to 0.
+ * @tc.step:
+    1. Create an RdbObserverStub instance (stub) with OnChangeCallback.
+    2. Test normal recovery:
+       a. Create RdbChangeNode node1, call PrepareNodeContent(node1) to populate Ashmem and set isSharedMemory_ = true.
+       b. Call stub.RecoverRdbChangeNodeData(node1), verify return is E_OK.
+       c. Check node1.data_ size is 2, each element matches DATA_SHARE_URI; node1.memory_ is null, size_ is 0,
+          isSharedMemory_ is false.
+    3. Test non-recovery (isSharedMemory_ = false):
+       a. Create RdbChangeNode node2, call PrepareNodeContent(node2), then set node2.isSharedMemory_ = false.
+       b. Call stub.RecoverRdbChangeNodeData(node2), verify return is E_OK.
+       c. Check node2.data_ size is 0; node2.memory_ is not null, size_ is 82, isSharedMemory_ is false.
+ * @tc.expect:
+    1. Normal recovery returns E_OK: node1 has 2 URIs, memory is null, size 0, isSharedMemory_ false.
+    2. Non-recovery returns E_OK: node2 has empty data, memory not null, size 82, isSharedMemory_ false.
+ */
 HWTEST_F(MediaDataShareUnitTest, RecoverRdbChangeNodeData001, TestSize.Level0)
 {
     LOG_INFO("RecoverRdbChangeNodeData::Start");
@@ -2856,20 +3590,24 @@ HWTEST_F(MediaDataShareUnitTest, RecoverRdbChangeNodeData001, TestSize.Level0)
 }
 
 /**
-* @tc.name: RecoverRdbChangeNodeData002
-* @tc.desc: Test RecoverRdbChangeNodeData function with error scenario (null shared memory)
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create an RdbChangeNode with isSharedMemory_ set to true but no memory allocated
-    2. Create an RdbObserverStub with OnChangeCallback
-    3. Call RecoverRdbChangeNodeData on the stub with the node
-    4. Verify the return value and node state after recovery
-* @tc.expect:
-    1.Recovery returns E_ERROR
-    2.Node data is empty, memory is null, size is 0, and isSharedMemory_ is false
-*/
+ * @tc.name: RecoverRdbChangeNodeData002
+ * @tc.desc: Test the RecoverRdbChangeNodeData function of RdbObserverStub for error scenarios where the RdbChangeNode
+ *           has isSharedMemory_ set to true but no Ashmem allocated (memory_ is null).
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The RdbObserverStub class has a RecoverRdbChangeNodeData method that returns E_ERROR when Ashmem is null (but
+       isSharedMemory_ = true).
+    2. The RdbChangeNode class allows setting isSharedMemory_ to true without assigning memory_ (default null).
+    3. The RdbChangeNode has data_ (empty by default), memory_ (null), size_ (0), and isSharedMemory_ members.
+ * @tc.step:
+    1. Create an RdbChangeNode instance (node) and set node.isSharedMemory_ = true (memory_ remains null by default).
+    2. Create an RdbObserverStub instance (stub) with OnChangeCallback.
+    3. Call stub.RecoverRdbChangeNodeData(node) and record the return value.
+    4. Check the state of node's data_, memory_, size_, and isSharedMemory_ members.
+ * @tc.expect:
+    1. The RecoverRdbChangeNodeData function returns E_ERROR (indicating recovery failure due to null Ashmem).
+    2. The node's data_ size is 0, memory_ is null, size_ is 0, and isSharedMemory_ is false.
+ */
 HWTEST_F(MediaDataShareUnitTest, RecoverRdbChangeNodeData002, TestSize.Level0)
 {
     LOG_INFO("RecoverRdbChangeNodeData002::Start");
@@ -2887,20 +3625,26 @@ HWTEST_F(MediaDataShareUnitTest, RecoverRdbChangeNodeData002, TestSize.Level0)
 }
 
 /**
-* @tc.name: OnChangeFromRdb001
-* @tc.desc: Test OnChangeFromRdb function for normal data processing
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Prepare an RdbChangeNode with shared memory containing 2 URIs using PrepareNodeContent
-    2. Create an RdbObserverStub with OnChangeCallback
-    3. Call OnChangeFromRdb on the stub with the node
-    4. Verify the node's data, memory, size, and isSharedMemory_ state
-* @tc.expect:
-    1.Node contains 2 URIs matching DATA_SHARE_URI
-    2.Node memory is null, size is 0, and isSharedMemory_ is false
-*/
+ * @tc.name: OnChangeFromRdb001
+ * @tc.desc: Test the OnChangeFromRdb function of RdbObserverStub for normal data processing, verifying if the
+ *           RdbChangeNode's data is correctly populated and Ashmem is cleaned up.
+ * @tc.type: FUNC
+ * @tc.precon:
+    1. The PrepareNodeContent function can populate an RdbChangeNode with Ashmem containing 2 URIs (DATA_SHARE_URI)
+       and set isSharedMemory_ to true.
+    2. The RdbObserverStub class has an OnChangeFromRdb method that accepts RdbChangeNode and processes its Ashmem
+       data.
+    3. The RdbChangeNode has data_ (URI vector), memory_ (Ashmem), size_, and isSharedMemory_ members.
+ * @tc.step:
+    1. Create an RdbChangeNode instance (node), call PrepareNodeContent(node) to populate Ashmem and set
+       isSharedMemory_ = true.
+    2. Create an RdbObserverStub instance (stub) with OnChangeCallback.
+    3. Call stub.OnChangeFromRdb(node) to process the node's data.
+    4. Check the state of node's data_, memory_, size_, and isSharedMemory_ members.
+ * @tc.expect:
+    1. The node's data_ size is 2, and each element matches DATA_SHARE_URI.
+    2. The node's memory_ is null, size_ is 0, and isSharedMemory_ is false.
+ */
 HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb001, TestSize.Level0)
 {
     LOG_INFO("OnChangeFromRdb001::Start");
@@ -2920,20 +3664,25 @@ HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb001, TestSize.Level0)
 }
 
 /**
-* @tc.name: OnChangeFromRdb002
-* @tc.desc: Test OnChangeFromRdb function with error scenario (null shared memory)
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create an RdbChangeNode with isSharedMemory_ set to true but no memory allocated
-    2. Create an RdbObserverStub with OnChangeCallback
-    3. Call OnChangeFromRdb on the stub with the node
-    4. Verify the node's data, memory, size, and isSharedMemory_ state
-* @tc.expect:
-    1.Node data is empty
-    2.Node memory is null, size is 0, and isSharedMemory_ is false
-*/
+ * @tc.name: OnChangeFromRdb002
+ * @tc.desc: Test the OnChangeFromRdb function of RdbObserverStub under an error scenario where the RdbChangeNode has
+ *           isSharedMemory_ set to true but no shared memory is allocated.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of RdbChangeNode and RdbObserverStub.
+    2. The OnChangeCallback is a valid, predefined callback function that can be used to initialize RdbObserverStub.
+    3. The RdbChangeNode class allows explicit setting of the isSharedMemory_ member without mandatory memory
+       allocation.
+ * @tc.step:
+    1. Create an RdbChangeNode instance and set its isSharedMemory_ member to true (no shared memory allocated).
+    2. Create an RdbObserverStub instance using the predefined OnChangeCallback.
+    3. Call the OnChangeFromRdb method of the RdbObserverStub, passing the created RdbChangeNode as a parameter.
+    4. Check the state of the RdbChangeNode's data_, memory_, size_, and isSharedMemory_ members.
+ * @tc.expect:
+    1. The data_ member of the RdbChangeNode is empty (size = 0).
+    2. The memory_ member of the RdbChangeNode is nullptr, size_ is 0, and isSharedMemory_ is false.
+ */
 HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb002, TestSize.Level0)
 {
     LOG_INFO("OnChangeFromRdb002::Start");
@@ -2949,23 +3698,28 @@ HWTEST_F(MediaDataShareUnitTest, OnChangeFromRdb002, TestSize.Level0)
 }
 
 /**
-* @tc.name: OnremoteRequestTest001
-* @tc.desc: Test OnRemoteRequest function with invalid and valid interface tokens and request codes
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create an RdbObserverStub with OnChangeCallback
-    2. Prepare MessageParcel, reply, and option objects
-    3. Write an invalid interface token to the parcel and call OnRemoteRequest with code 0
-    4. Write the correct interface token and call OnRemoteRequest with code 1
-    5. Call OnRemoteRequest with the correct token and code 0
-    6. Verify the return values for each scenario
-* @tc.expect:
-    1.Request with invalid token returns ERR_INVALID_STATE
-    2.Request with valid token and invalid code (1) returns ERR_INVALID_STATE
-    3.Request with valid token and code 0 returns ERR_INVALID_VALUE
-*/
+ * @tc.name: OnremoteRequestTest001
+ * @tc.desc: Test the OnRemoteRequest function of RdbObserverStub with invalid/valid interface tokens and different
+ *           request codes, verifying the return error codes for each scenario.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of RdbObserverStub, MessageParcel, MessageReply, and MessageOption.
+    2. The RdbObserverStub::GetDescriptor() method returns a valid interface descriptor (std::u16string).
+    3. Predefined error codes (ERR_INVALID_STATE, ERR_INVALID_VALUE) are valid and accessible.
+ * @tc.step:
+    1. Create an RdbObserverStub instance using the predefined OnChangeCallback.
+    2. Create empty MessageParcel (data), MessageParcel (reply), and MessageOption (option) objects.
+    3. Write an invalid interface token (u"ERROR") to 'data', then call OnRemoteRequest with code 0; record the return
+       value.
+    4. Write the valid interface descriptor (from GetDescriptor()) to 'data', call OnRemoteRequest with code 1; record
+       the value.
+    5. Write the valid interface descriptor to 'data' again, call OnRemoteRequest with code 0; record the return value.
+ * @tc.expect:
+    1. OnRemoteRequest returns ERR_INVALID_STATE when using an invalid interface token.
+    2. OnRemoteRequest returns ERR_INVALID_STATE when using a valid token and invalid request code (1).
+    3. OnRemoteRequest returns ERR_INVALID_VALUE when using a valid token and request code 0.
+ */
 HWTEST_F(MediaDataShareUnitTest, OnremoteRequestTest001, TestSize.Level0)
 {
     LOG_INFO("OnremoteRequestTest001::Start");
@@ -2989,18 +3743,25 @@ HWTEST_F(MediaDataShareUnitTest, OnremoteRequestTest001, TestSize.Level0)
 }
 
 /**
-* @tc.name: ReadAshmemTest001
-* @tc.desc: Test ReadAshmem function with null shared memory
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create an RdbObserverStub with OnChangeCallback
-    2. Create an RdbChangeNode with a null Ashmem pointer
-    3. Call ReadAshmem on the stub with the node, null data pointer, size 0, and undefined offset
-    4. Verify the return value
-* @tc.expect: ReadAshmem returns E_ERROR
-*/
+ * @tc.name: ReadAshmemTest001
+ * @tc.desc: Test the ReadAshmem function of RdbObserverStub under the error scenario where the RdbChangeNode has a
+ *           null shared memory (Ashmem) pointer.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of RdbObserverStub, RdbChangeNode, and setting the RdbChangeNode's
+       memory_ member to a null sptr<Ashmem>.
+    2. The ReadAshmem method accepts parameters: RdbChangeNode, const void**, int, and int& (offset).
+    3. The E_ERROR constant is predefined as the expected error return value.
+ * @tc.step:
+    1. Create an RdbObserverStub instance using the predefined OnChangeCallback.
+    2. Create an RdbChangeNode instance and set its memory_ member to sptr<Ashmem>(nullptr).
+    3. Define a null const void* (data), int size = 0, and an uninitialized int (offset).
+    4. Call the ReadAshmem method of the RdbObserverStub, passing the RdbChangeNode, &data, size, and offset.
+    5. Check the integer return value of the ReadAshmem function.
+ * @tc.expect:
+    1. The ReadAshmem function returns E_ERROR.
+ */
 HWTEST_F(MediaDataShareUnitTest, ReadAshmemTest001, TestSize.Level0)
 {
     LOG_INFO("ReadAshmemTest001::Start");
@@ -3016,18 +3777,23 @@ HWTEST_F(MediaDataShareUnitTest, ReadAshmemTest001, TestSize.Level0)
 }
 
 /**
-* @tc.name: MediaDataShare_User_Define_Func_Test_001
-* @tc.desc: Test UserDefineFunc with no interface descriptor
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Get the DataShare helper instance
-    2. Prepare empty MessageParcel, reply, and option objects (no descriptor written)
-    3. Call UserDefineFunc on the helper
-    4. Verify the error code
-* @tc.expect: UserDefineFunc returns -1 (failure due to missing descriptor)
-*/
+ * @tc.name: MediaDataShare_User_Define_Func_Test_001
+ * @tc.desc: Test the UserDefineFunc method of DataShareHelper under the scenario where no interface descriptor is
+ *           written to the input MessageParcel.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance g_dataShareHelper is pre-initialized and accessible.
+    2. The test environment supports instantiation of empty MessageParcel (data, reply) and MessageOption (option).
+    3. The UserDefineFunc method returns an integer error code, with -1 indicating failure due to missing descriptor.
+ * @tc.step:
+    1. Retrieve the pre-initialized DataShareHelper instance from g_dataShareHelper.
+    2. Create empty MessageParcel (data), empty MessageParcel (reply), and default MessageOption (option) objects.
+    3. Call the UserDefineFunc method of the DataShareHelper, passing data, reply, and option (no descriptor in data).
+    4. Check the integer error code returned by UserDefineFunc.
+ * @tc.expect:
+    1. The UserDefineFunc method returns -1 (failure caused by missing interface descriptor).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_User_Define_Func_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_User_Define_Func_Test_001::Start");
@@ -3042,19 +3808,25 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_User_Define_Func_Test_001, TestS
 }
 
 /**
-* @tc.name: MediaDataShare_User_Define_Func_Test_002
-* @tc.desc: Test UserDefineFunc with a valid interface descriptor
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Get the DataShare helper instance
-    2. Prepare MessageParcel, reply, and option objects
-    3. Write the valid interface descriptor ("OHOS.DataShare.IDataShare") to the parcel
-    4. Call UserDefineFunc on the helper
-    5. Verify the error code
-* @tc.expect: UserDefineFunc returns 0 (success with valid descriptor)
-*/
+ * @tc.name: MediaDataShare_User_Define_Func_Test_002
+ * @tc.desc: Test the UserDefineFunc method of DataShareHelper under the scenario where a valid interface descriptor
+ *           ("OHOS.DataShare.IDataShare") is written to the input MessageParcel.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The global DataShareHelper instance g_dataShareHelper is pre-initialized and accessible.
+    2. The test environment supports instantiation of MessageParcel (data, reply) and MessageOption (option), and
+       the MessageParcel::WriteInterfaceToken method works normally.
+    3. The valid interface descriptor u"OHOS.DataShare.IDataShare" is recognized by the UserDefineFunc method.
+ * @tc.step:
+    1. Retrieve the pre-initialized DataShareHelper instance from g_dataShareHelper.
+    2. Create MessageParcel (data), MessageParcel (reply), and default MessageOption (option) objects.
+    3. Write the valid interface descriptor (u"OHOS.DataShare.IDataShare") to 'data' using WriteInterfaceToken.
+    4. Call the UserDefineFunc method of the DataShareHelper, passing data, reply, and option.
+    5. Check the integer error code returned by UserDefineFunc.
+ * @tc.expect:
+    1. The UserDefineFunc method returns 0 (success, due to valid interface descriptor).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_User_Define_Func_Test_002, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_User_Define_Func_Test_002::Start");
@@ -3071,20 +3843,28 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_User_Define_Func_Test_002, TestS
 }
 
 /**
-* @tc.name: MediaDataShare_RegisterObserverExtProvider_Test_001
-* @tc.desc: Test RegisterObserverExtProvider with null observer and null controller scenarios
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShare helper instance and verify it is not null
-    2. Attempt to register a null observer with an empty URI, check error code
-    3. Create a valid observer and use a media library URI
-    4. Release the helper's controller and attempt to register the observer, check error code
-* @tc.expect:
-    1.Registering null observer returns E_NULL_OBSERVER
-    2.Registering with released (null) controller returns E_HELPER_DIED
-*/
+ * @tc.name: MediaDataShare_RegisterObserverExtProvider_Test_001
+ * @tc.desc: Test the RegisterObserverExtProvider method of DataShareHelper under two error scenarios: null observer
+ *           and null controller (released helper).
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The CreateDataShareHelper function (with STORAGE_MANAGER_MANAGER_ID) returns a valid, non-null DataShareHelper
+       instance.
+    2. The MEDIALIBRARY_DATA_URI constant is a valid predefined Uri for media library.
+    3. DataShareObserverTest can be instantiated to create a valid DataShareObserver; predefined error codes
+       (E_NULL_OBSERVER, E_HELPER_DIED) are accessible.
+ * @tc.step:
+    1. Create a DataShareHelper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID) and verify it is
+       non-null.
+    2. Attempt to register a null DataShareObserver with an empty Uri; record the error code.
+    3. Create a valid DataShareObserver (via DataShareObserverTest) and use MEDIALIBRARY_DATA_URI as the target Uri.
+    4. Call the Release() method of the DataShareHelper to set its controller to null.
+    5. Attempt to register the valid DataShareObserver with MEDIALIBRARY_DATA_URI; record the error code.
+ * @tc.expect:
+    1. Registering a null observer returns E_NULL_OBSERVER.
+    2. Registering with a released (null) controller returns E_HELPER_DIED.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_RegisterObserverExtProvider_Test_001::Start");
@@ -3110,18 +3890,26 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test
 }
 
 /**
-* @tc.name: MediaDataShare_RegisterObserverExtProvider_Test_002
-* @tc.desc: Test normal functionality of RegisterObserverExtProvider
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a media library URI and a valid DataShareObserverTest instance
-    2. Create a DataShare helper instance and verify it is not null
-    3. Call RegisterObserverExtProvider with the URI, observer, and false flag
-    4. Verify the error code
-* @tc.expect: RegisterObserverExtProvider returns E_OK (success)
-*/
+ * @tc.name: MediaDataShare_RegisterObserverExtProvider_Test_002
+ * @tc.desc: Test the normal functionality of the RegisterObserverExtProvider method of DataShareHelper with a valid
+ *           observer, valid Uri, and non-null controller.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The CreateDataShareHelper function (with STORAGE_MANAGER_MANAGER_ID) returns a valid, non-null DataShareHelper
+       instance.
+    2. The MEDIALIBRARY_DATA_URI constant is a valid predefined Uri for media library.
+    3. DataShareObserverTest can be instantiated to create a valid DataShareObserver; E_OK is predefined as success
+       code.
+ * @tc.step:
+    1. Define the target Uri as MEDIALIBRARY_DATA_URI (valid media library Uri).
+    2. Create a valid DataShareObserver instance via std::make_shared<DataShareObserverTest>().
+    3. Create a DataShareHelper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID) and verify it is
+       non-null.
+    4. Call RegisterObserverExtProvider with the valid Uri, valid observer, and false flag; record the error code.
+ * @tc.expect:
+    1. The RegisterObserverExtProvider method returns E_OK (success).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test_002, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_RegisterObserverExtProvider_Test_002::Start");
@@ -3137,21 +3925,29 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_RegisterObserverExtProvider_Test
 }
 
 /**
-* @tc.name: MediaDataShare_UnregisterObserverExtProvider_Test_001
-* @tc.desc: Test UnregisterObserverExtProvider with null observer, unregistered observer, and null controller
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShare helper instance and verify it is not null
-    2. Attempt to unregister a null observer, check error code
-    3. Create a valid observer and attempt to unregister it (not previously registered), check error code
-    4. Register the observer, release the helper's controller, then attempt to unregister, check error code
-* @tc.expect:
-    - Unregistering null observer returns E_NULL_OBSERVER
-    - Unregistering unregistered observer returns E_NULL_OBSERVER
-    - Unregistering with released (null) controller returns E_HELPER_DIED
-*/
+ * @tc.name: MediaDataShare_UnregisterObserverExtProvider_Test_001
+ * @tc.desc: Test the UnregisterObserverExtProvider method of DataShareHelper under three error scenarios: null
+ *           observer, unregistered valid observer, and null controller (released helper).
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The CreateDataShareHelper function (with STORAGE_MANAGER_MANAGER_ID) returns a valid DataShareHelper instance.
+    2. The MEDIALIBRARY_DATA_URI constant is a valid predefined Uri; DataShareObserverTest can be instantiated.
+    3. Predefined error codes (E_NULL_OBSERVER, E_HELPER_DIED, E_OK) are accessible.
+ * @tc.step:
+    1. Create a DataShareHelper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID) and verify it is
+       non-null.
+    2. Attempt to unregister a null DataShareObserver with MEDIALIBRARY_DATA_URI; record the error code.
+    3. Create a valid DataShareObserver (DataShareObserverTest) and attempt to unregister it (not registered); record
+       the code.
+    4. Register the valid observer with RegisterObserverExtProvider (verify return E_OK), then call Release() on the
+       helper.
+    5. Attempt to unregister the previously registered observer; record the error code.
+ * @tc.expect:
+    1. Unregistering a null observer returns E_NULL_OBSERVER.
+    2. Unregistering an unregistered observer returns E_NULL_OBSERVER.
+    3. Unregistering with a released (null) controller returns E_HELPER_DIED.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExtProvider_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_UnregisterObserverExtProvider_Test_001::Start");
@@ -3182,21 +3978,26 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExtProvider_Te
 }
 
 /**
-* @tc.name: MediaDataShare_UnregisterObserverExtProvider_Test_002
-* @tc.desc: Test normal functionality of UnregisterObserverExtProvider
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a media library URI and a valid DataShareObserverTest instance
-    2. Create a DataShare helper instance and verify it is not null
-    3. Register the observer using RegisterObserverExtProvider and verify success
-    4. Unregister the observer using UnregisterObserverExtProvider
-    5. Verify the error code of unregistration
-* @tc.expect:
-    1.Registration returns E_OK
-    2.Unregistration returns E_OK (success)
-*/
+ * @tc.name: MediaDataShare_UnregisterObserverExtProvider_Test_002
+ * @tc.desc: Test the normal functionality of the UnregisterObserverExtProvider method of DataShareHelper: register a
+ *           valid observer first, then unregister it successfully.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The CreateDataShareHelper function (with STORAGE_MANAGER_MANAGER_ID) returns a valid DataShareHelper instance.
+    2. The MEDIALIBRARY_DATA_URI constant is a valid predefined Uri; DataShareObserverTest can be instantiated.
+    3. Predefined error code E_OK is accessible (indicates success for register/unregister).
+ * @tc.step:
+    1. Define the target Uri as MEDIALIBRARY_DATA_URI (valid media library Uri).
+    2. Create a valid DataShareObserver instance via std::make_shared<DataShareObserverTest>().
+    3. Create a DataShareHelper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID) and verify it is
+       non-null.
+    4. Call RegisterObserverExtProvider (with Uri, valid observer, true flag) and verify return code is E_OK.
+    5. Call UnregisterObserverExtProvider with the same Uri and observer; record the error code.
+ * @tc.expect:
+    1. The RegisterObserverExtProvider method returns E_OK (successful registration).
+    2. The UnregisterObserverExtProvider method returns E_OK (successful unregistration).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExtProvider_Test_002, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_UnregisterObserverExtProvider_Test_002::Start");
@@ -3219,18 +4020,26 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_UnregisterObserverExtProvider_Te
 }
 
 /**
-* @tc.name: MediaDataShare_NotifyChangeExtProvider_Test_001
-* @tc.desc: Test NotifyChangeExtProvider with null controller (released helper)
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a media library URI and a valid DataShareObserverTest instance
-    2. Create a DataShare helper instance, register the observer, and verify registration success
-    3. Release the helper's controller to make it null
-    4. Create an INSERT-type ChangeInfo and call NotifyChangeExtProvider with it
-* @tc.expect: NotifyChangeExtProvider executes without crashing (no explicit error code check in test)
-*/
+ * @tc.name: MediaDataShare_NotifyChangeExtProvider_Test_001
+ * @tc.desc: Test the NotifyChangeExtProvider method of DataShareHelper under the scenario where the helper's
+ *           controller is null (released), verifying the method executes without crashing.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The CreateDataShareHelper function (with STORAGE_MANAGER_MANAGER_ID) returns a valid DataShareHelper instance.
+    2. The MEDIALIBRARY_DATA_URI constant is a valid Uri; DataShareObserverTest can be instantiated.
+    3. The ChangeInfo struct (with DataShareObserver::ChangeType::INSERT and Uri list) can be created normally.
+ * @tc.step:
+    1. Define the target Uri as MEDIALIBRARY_DATA_URI and create a valid DataShareObserver (DataShareObserverTest).
+    2. Create a DataShareHelper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID) and verify it is
+       non-null.
+    3. Register the valid observer with RegisterObserverExtProvider (verify return E_OK), then call Release() to null
+       the controller.
+    4. Create a ChangeInfo instance: set ChangeType to INSERT and Uri list to {MEDIALIBRARY_DATA_URI}.
+    5. Call the NotifyChangeExtProvider method of the DataShareHelper, passing the created ChangeInfo.
+ * @tc.expect:
+    1. The NotifyChangeExtProvider method executes without crashing (no explicit error code check in the test).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotifyChangeExtProvider_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_NotifyChangeExtProvider_Test_001::Start");
@@ -3253,17 +4062,26 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotifyChangeExtProvider_Test_001
 }
 
 /**
-* @tc.name: MediaDataShare_NotifyChangeExtProvider_Test_002
-* @tc.desc: Test normal functionality of NotifyChangeExtProvider with valid controller
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a media library URI and a valid DataShareObserverTest instance
-    2. Create a DataShare helper instance, register the observer, and verify registration success
-    3. Create an INSERT-type ChangeInfo and call NotifyChangeExtProvider with it
-* @tc.expect: NotifyChangeExtProvider executes successfully (no errors)
-*/
+ * @tc.name: MediaDataShare_NotifyChangeExtProvider_Test_002
+ * @tc.desc: Test the normal functionality of the NotifyChangeExtProvider method of DataShareHelper with a valid
+ *           controller, registered observer, and valid ChangeInfo.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The CreateDataShareHelper function (with STORAGE_MANAGER_MANAGER_ID) returns a valid, non-null controller
+       DataShareHelper.
+    2. The MEDIALIBRARY_DATA_URI constant is a valid Uri; DataShareObserverTest can be instantiated.
+    3. The ChangeInfo struct (with DataShareObserver::ChangeType::INSERT) can be created normally.
+ * @tc.step:
+    1. Define the target Uri as MEDIALIBRARY_DATA_URI and create a valid DataShareObserver (DataShareObserverTest).
+    2. Create a DataShareHelper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID) and verify it is
+       non-null.
+    3. Register the valid observer with RegisterObserverExtProvider (verify return E_OK, controller remains valid).
+    4. Create a ChangeInfo instance: set ChangeType to INSERT and Uri list to {MEDIALIBRARY_DATA_URI}.
+    5. Call the NotifyChangeExtProvider method of the DataShareHelper, passing the created ChangeInfo.
+ * @tc.expect:
+    1. The NotifyChangeExtProvider method executes successfully (no errors or crashes).
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotifyChangeExtProvider_Test_002, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_NotifyChangeExtProvider_Test_002::Start");
@@ -3284,20 +4102,27 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_NotifyChangeExtProvider_Test_002
 }
 
 /**
-* @tc.name: MediaDataShare_OpenFileWithErrCode_Test_001
-* @tc.desc: Test OpenFileWithErrCode function for file opening scenario
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
-    1. Create a DataShare helper instance and verify it is not null
-    2. Create a media library URI and specify "rw" mode
-    3. Call OpenFileWithErrCode with the URI, mode, and error code pointer
-    4. Verify the returned file descriptor (fd) and error code
-* @tc.expect:
-    1.File descriptor (fd) is negative (failure to open)
-    2.Error code is -1
-*/
+ * @tc.name: MediaDataShare_OpenFileWithErrCode_Test_001
+ * @tc.desc: Test the OpenFileWithErrCode method of DataShareHelper under a file opening failure scenario, verifying
+ *           the returned file descriptor (fd) and error code.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The CreateDataShareHelper function (with STORAGE_MANAGER_MANAGER_ID) returns a valid DataShareHelper instance.
+    2. The MEDIALIBRARY_DATA_URI constant is a valid predefined Uri; the "rw" (read-write) mode is a legal file open
+       mode.
+    3. The OpenFileWithErrCode method returns an integer fd and updates an int32_t& parameter with the error code.
+ * @tc.step:
+    1. Create a DataShareHelper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID) and verify it is
+       non-null.
+    2. Define the target Uri as MEDIALIBRARY_DATA_URI and the file open mode as "rw".
+    3. Declare an int32_t variable (errCode) and initialize it to 0.
+    4. Call OpenFileWithErrCode with the Uri, "rw" mode, and &errCode; record the returned fd.
+    5. Check the values of the returned fd and the updated errCode.
+ * @tc.expect:
+    1. The returned file descriptor (fd) is negative (indicating failure to open the file).
+    2. The error code (errCode) is updated to -1.
+ */
 HWTEST_F(MediaDataShareUnitTest, MediaDataShare_OpenFileWithErrCode_Test_001, TestSize.Level0)
 {
     LOG_INFO("MediaDataShare_OpenFileWithErrCode_Test_001::Start");

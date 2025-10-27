@@ -69,18 +69,24 @@ bool operator==(const RdbChangeNode node1, const RdbChangeNode node2)
 
 /**
  * @tc.name: Marshal_BatchUpdateResult_001
- * @tc.desc: Verify BatchUpdateResult marshal and unmarshal with marshalable data.
- *    This test case checks if the BatchUpdateResult object can be
- *    orrectly marshaled and unmarshaled.
- * @tc.expect: The test expects that the marshaled and unmarshaled
- *    BatchUpdateResult objects are equal.
- * @tc.step:
- *    1. Create a BatchUpdateResult object and set its uri and codes.
- *    2. Marshal the BatchUpdateResult object into a MessageParcel.
- *    3. Unmarshal the BatchUpdateResult object from the MessageParcel.
- *    4. Compare the original and unmarshaled BatchUpdateResult objects.
+ * @tc.desc: Verify the marshalling and unmarshalling functionality of the BatchUpdateResult class with valid,
+ *           marshalable data, ensuring the object can be correctly converted to and from a MessageParcel.
  * @tc.type: FUNC
- * @tc.require:issueIBYE9X
+ * @tc.require: issueIBYE9X
+ * @tc.precon:
+    1. The test environment supports instantiation of BatchUpdateResult and MessageParcel objects without
+       initialization errors.
+    2. The ITypesUtil class provides valid Marshalling and Unmarshalling methods for BatchUpdateResult.
+    3. The BatchUpdateResult class allows setting of 'uri' (string type) and 'codes' (vector<int> type) members.
+ * @tc.step:
+    1. Create a BatchUpdateResult object, set its 'uri' to "datashare:///com.acts.datasharetest".
+    2. Create a MessageParcel object, then call Marshalling to marshal the BatchUpdateResult into the parcel.
+    3. Create another BatchUpdateResult object (for unmarshalling), then call ITypesUtil::Unmarshalling to
+       restore it from the marshalled parcel.
+    4. Compare the 'uri' and 'codes' members of the original and unmarshalled BatchUpdateResult objects.
+ * @tc.expect:
+    1. The ITypesUtil::Marshalling and ITypesUtil::Unmarshalling methods both return true (operation success).
+    2. The 'uri' and 'codes' of the original BatchUpdateResult are identical to those of the unmarshalled one.
  */
 HWTEST_F(DatashareItypesUtilsTest, Marshal_BatchUpdateResult_001, TestSize.Level0)
 {
@@ -165,23 +171,32 @@ HWTEST_F(DatashareItypesUtilsTest, Marshal_RdbChangeNode_002, TestSize.Level0)
 
 /**
  * @tc.name: Marshal_RdbChangeNode_003
- * @tc.desc: Test the marshalling and unmarshalling functionality of RdbChangeNode
- * @tc.expect: The marshalling and unmarshalling process should succeed,
- *     data correctness and consistency should be ensured.
- * @tc.step:
- *    1. Create a RdbChangeNode object and set isSharedMemory_ flag to true.
- *    2. Use CreateAshmem to create a shared memory object and set it to the memory_ member
- *        of the RdbChangeNode object.
- *    3. Use ashmem to write data into the shared memory of the RdbChangeNode object.
- *    3. Use the Unmarshalling method of ITypesUtil to deserialize the MessageParcel object
- *        into another RdbChangeNode object.
- *    4. Verify that the original RdbChangeNode object and the deserialized RdbChangeNode objects
- *        are consistent with each other and the unmarshalling procress is successful.
- *    5. Close the ashmem of the RdbChangeNode objects.
+ * @tc.desc: Test the marshalling and unmarshalling of RdbChangeNode when 'isSharedMemory_' is true and 'memory_'
+ *           points to a valid shared memory (created via CreateAshmem), ensuring data consistency and
+ *           operation success.
  * @tc.type: FUNC
- * @tc.precon: The test requires that the BatchUpdateResult object is initialized, while isSharedMemory_
- *    is set to true, and use CreateAshmem to create a shared memory object to put in memory_.
- * @tc.require:issueIBYE9X
+ * @tc.require: issueIBYE9X
+ * @tc.precon:
+    1. The CreateRdbChangeNode() function generates a valid RdbChangeNode instance; CreateAshmem can create a shared
+       memory object with specified name and size.
+    2. The Ashmem class's MapReadAndWriteAshmem (for memory mapping), WriteToAshmem (for data writing), ReadFromAshmem
+       (for data reading), and CloseAshmem (for resource release) methods work normally.
+    3. The test environment supports ITypesUtil's Marshalling/Unmarshalling for RdbChangeNode and MessageParcel.
+ * @tc.step:
+    1. Call CreateRdbChangeNode() to create an RdbChangeNode object, set 'isSharedMemory_' to true.
+    2. Use Ashmem::CreateAshmem("testd", 8) to create a shared memory object, assign it to the 'memory_' member of the
+       RdbChangeNode.
+    3. Call MapReadAndWriteAshmem on 'memory_' to enable read-write access, then write an int32_t value (123) into the
+       shared memory.
+    4. Marshal the RdbChangeNode into a MessageParcel via ITypesUtil::Marshalling; unmarshal it into another
+       RdbChangeNode.
+    5. Map the shared memory of unmashalchangeNode, read data from both original and unmarshalled shared memories, then
+       compare the data.
+    6. Call CloseAshmem on both original and unmarshalled 'memory_' to release resources.
+ * @tc.expect:
+    1. All memory mapping, data writing, marshalling, and unmarshalling operations return true (success).
+    2. The original RdbChangeNode is equal to the unmarshalled one; the data read from their shared memories is
+       identical.
  */
 HWTEST_F(DatashareItypesUtilsTest, Marshal_RdbChangeNode_003, TestSize.Level0)
 {
@@ -216,20 +231,27 @@ HWTEST_F(DatashareItypesUtilsTest, Marshal_RdbChangeNode_003, TestSize.Level0)
 
 /**
  * @tc.name: Marshal_Predicates_001
- * @tc.desc: Test the marshalling and unmarshalling functionality of Predicates.
+ * @tc.desc: Test the marshalling and unmarshalling of DataSharePredicates, covering both abnormal
+ *           and normal scenarios to verify correct handling of valid and invalid data.
  * @tc.type: FUNC
- * @tc.require: The marshalling and unmarshalling process should succeed, data correctness and consistency should
- *     be ensured.
- * @tc.precon: None
+ * @tc.require: issueIBYE9X
+ * @tc.precon:
+    1. The test environment supports DataSharePredicates, MessageParcel, and the MarshalPredicates/UnmarshalPredicates
+       functions.
+    2. The MAX_IPC_SIZE constant is predefined (128 * 1024 * 1024 in the test code); string operations work.
+    3. DataSharePredicates allows setting conditions via the EqualTo method.
  * @tc.step:
-    1. Create a MessageParcel and a DataSharePredicates object.
-    2. Define a string for testing and an abnormal size exceeding MAX_IPC_SIZE.
-    3. Write the abnormal size and raw data to the MessageParcel.
-    4. Attempt to unmarshal the predicates from the MessageParcel and verify the operation fails due to
-        abnormal size.
-    5. Test the normal marshalling and unmarshalling of the predicates.
- * @tc.experct: The marshalling operation should succeed, and the unmarshalling operation should correctly handle both
-        normal and abnormal cases.
+    1. Create a MessageParcel (parcel1) and a DataSharePredicates (predicates1); define a test string and an
+       abnormal size (MAX_IPC_SIZE + 1 = 128*1024*1024 + 1).
+    2. Write the abnormal size and test string data into parcel1, then call UnmarshalPredicates to attempt restoring
+       predicates1 from parcel1.
+    3. Create another MessageParcel (parcel2) and DataSharePredicates (predicates2); use EqualTo to
+       set "name" = "Unmarshal_Predicates_001".
+    4. Marshal predicates2 into parcel2 via MarshalPredicates; unmarshal parcel2 into a third DataSharePredicates.
+ * @tc.expect:
+    1. Unmarshalling from parcel1 (abnormal size) returns false (failure); marshalling of predicates2 and unmarshalling
+       into predicates3 return true.
+    2. The normal unmarshalled predicates3 retains the condition set in predicates2.
  */
 HWTEST_F(DatashareItypesUtilsTest, Marshal_Predicates_001, TestSize.Level0)
 {
@@ -259,24 +281,31 @@ HWTEST_F(DatashareItypesUtilsTest, Marshal_Predicates_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: Marshal_ValuesBucketVec_001
-* @tc.desc: Test the marshalling and unmarshalling functionality of Predicates.
-* @tc.type: FUNC
-* @tc.require: The marshalling and unmarshalling process should succeed, data correctness and consistency should
-*    be ensured.
-* @tc.precon: None
-* @tc.step:
-    1. Create a MessageParcel and a DataShareValuesBucket object.
-    2. Add key-value pairs to the ValuesBucket, including "name" and "phoneNumber".
-    3. Marshal the ValuesBucket vector to a buffer and verify the operation succeeds.
-    4. Convert the marshaled data to a string and set an abnormal size exceeding MAX_IPC_SIZE.
-    5. Write the abnormal size and marshaled data to the MessageParcel.
-    6. Attempt to unmarshal the ValuesBucket vector from the MessageParcel and verify the operation fails due to
-        abnormal size.
-    7. Test the normal marshalling and unmarshalling of the ValuesBucket vector.
-* @tc.experct: The marshalling operation should succeed, and the unmarshalling operation should correctly handle both
-    normal and abnormal cases.
-*/
+ * @tc.name: Marshal_ValuesBucketVec_001
+ * @tc.desc: Test the marshalling and unmarshalling of std::vector<DataShareValuesBucket>, covering abnormal
+ *           and normal scenarios to ensure correct handling of valid and invalid data.
+ * @tc.type: FUNC
+ * @tc.require: issueIBYE9X
+ * @tc.precon:
+    1. The test environment supports DataShareValuesBucket (with Put method for key-value pairs), MessageParcel, and the
+       MarshalValuesBucketVec/UnmarshalValuesBucketVec functions.
+    2. The MAX_IPC_SIZE constant is predefined (128 * 1024 * 1024 in the test code); vector operations
+       work normally.
+    3. DataShareValuesBucket can store different data types (e.g., string "name", double "phoneNumber").
+ * @tc.step:
+    1. Create a MessageParcel (parcel1) and a std::vector<DataShareValuesBucket> (buckets); define a test string
+       and an abnormal size (MAX_IPC_SIZE + 1 = 128*1024*1024 + 1).
+    2. Write the abnormal size and test string data into parcel1, call UnmarshalValuesBucketVec to attempt restoring
+       buckets from parcel1.
+    3. Clear buckets; create a DataShareValuesBucket, use Put to add "name" = "dataShareTest006" and
+       "phoneNumber" = 20.6, then push it into buckets.
+    4. Create another MessageParcel (parcel2), marshal buckets into parcel2 via MarshalValuesBucketVec; clear buckets
+       and unmarshal parcel2 into it.
+ * @tc.expect:
+    1. Unmarshalling from parcel1 (abnormal size) returns false (failure); marshalling of buckets and unmarshalling
+       into buckets return true.
+    2. The unmarshalled buckets contains one DataShareValuesBucket with correct key-value pairs.
+ */
 HWTEST_F(DatashareItypesUtilsTest, Marshal_MarshalValuesBucketVec_001, TestSize.Level0)
 {
     LOG_INFO("Marshal_ValuesBucketVec_001 starts");
@@ -309,16 +338,26 @@ HWTEST_F(DatashareItypesUtilsTest, Marshal_MarshalValuesBucketVec_001, TestSize.
 }
 
 /**
-* @tc.name: UnmarshallingTest001
-* @tc.desc: test Unmarshalling function when parcel is nullptr
-* @tc.type: FUNC
-* @tc.require: issueIC9GIH
-* @tc.precon: None
-* @tc.step:
-    1.Creat a ITypesUtil object and parcel is nullptr
-    2.call Unmarshalling function and check the result
-* @tc.experct: Unmarshalling failed and return false
-*/
+ * @tc.name: UnmarshallingTest001
+ * @tc.desc: Test the Unmarshalling function of ITypesUtil for the ITypesUtil::Predicates type when using a normally
+ *           instantiated MessageParcel (without pre-marshalled data), verifying if unmarshalling fails as expected.
+ * @tc.type: FUNC
+ * @tc.require: issueIC9GIH
+ * @tc.precon:
+    1. The test environment supports normal instantiation of ITypesUtil::Predicates and MessageParcel objects, with no
+       initialization exceptions.
+    2. The ITypesUtil::Unmarshalling method is defined to accept an ITypesUtil::Predicates reference and a
+       MessageParcel reference, returning a boolean to indicate operation success.
+    3. The MessageParcel used in the test has no pre-stored data related to ITypesUtil::Predicates (ensuring no valid
+       data for unmarshalling).
+ * @tc.step:
+    1. Create an ITypesUtil::Predicates object (named predicates) to store the unmarshalled result.
+    2. Create a MessageParcel object (named parcel) without pre-marshalling any ITypesUtil::Predicates data into it.
+    3. Call the ITypesUtil::Unmarshalling function, passing the predicates and parcel as input parameters.
+    4. Check the boolean return value of the ITypesUtil::Unmarshalling function.
+ * @tc.expect:
+    1. The ITypesUtil::Unmarshalling function returns false, indicating the unmarshalling operation fails.
+ */
 HWTEST_F(DatashareItypesUtilsTest, UnmarshallingTest001, TestSize.Level0)
 {
     LOG_INFO("UnmarshallingTest001::Start");
@@ -330,16 +369,26 @@ HWTEST_F(DatashareItypesUtilsTest, UnmarshallingTest001, TestSize.Level0)
 }
 
 /**
-* @tc.name: UnmarshallingTest002
-* @tc.desc: test Unmarshalling function when parcel is nullptr
-* @tc.type: FUNC
-* @tc.require: issueIC9GIH
-* @tc.precon: None
-* @tc.step:
-    1.Creat a ITypesUtil object and parcel is nullptr
-    2.call Unmarshalling function and check the result
-* @tc.experct: Unmarshalling failed and return false
-*/
+ * @tc.name: UnmarshallingTest002
+ * @tc.desc: Test the Unmarshalling function of ITypesUtil for the OperationStatement type when using a normally
+ *           instantiated MessageParcel (without pre-marshalled data), verifying if unmarshalling fails as expected.
+ * @tc.type: FUNC
+ * @tc.require: issueIC9GIH
+ * @tc.precon:
+    1. The test environment supports normal instantiation of OperationStatement and MessageParcel objects, with no
+       initialization exceptions.
+    2. The ITypesUtil::Unmarshalling method is defined to accept an OperationStatement reference and a MessageParcel
+       reference, returning a boolean to indicate operation success.
+    3. The MessageParcel used in the test has no pre-stored data related to OperationStatement (ensuring no valid
+       data for unmarshalling).
+ * @tc.step:
+    1. Create an OperationStatement object (named operationStatement) to store the unmarshalled result.
+    2. Create a MessageParcel object (named parcel) without pre-marshalling any OperationStatement data into it.
+    3. Call the ITypesUtil::Unmarshalling function, passing the operationStatement and parcel as input parameters.
+    4. Check the boolean return value of the ITypesUtil::Unmarshalling function.
+ * @tc.expect:
+    1. The ITypesUtil::Unmarshalling function returns false, indicating the unmarshalling operation fails.
+ */
 HWTEST_F(DatashareItypesUtilsTest, UnmarshallingTest002, TestSize.Level0)
 {
     LOG_INFO("UnmarshallingTest002::Start");
@@ -351,16 +400,26 @@ HWTEST_F(DatashareItypesUtilsTest, UnmarshallingTest002, TestSize.Level0)
 }
 
 /**
-* @tc.name: UnmarshallingTest003
-* @tc.desc: test Unmarshalling function when parcel is nullptr
-* @tc.type: FUNC
-* @tc.require: issueIC9GIH
-* @tc.precon: None
-* @tc.step:
-    1.Creat a ITypesUtil object and parcel is nullptr
-    2.call Unmarshalling function and check the result
-* @tc.experct: Unmarshalling failed and return false
-*/
+ * @tc.name: UnmarshallingTest003
+ * @tc.desc: Test the Unmarshalling function of ITypesUtil for the ExecResult type when using a normally
+ *           instantiated MessageParcel (without pre-marshalled data), verifying if unmarshalling fails as expected.
+ * @tc.type: FUNC
+ * @tc.require: issueIC9GIH
+ * @tc.precon:
+    1. The test environment supports normal instantiation of ExecResult and MessageParcel objects, with no
+       initialization exceptions.
+    2. The ITypesUtil::Unmarshalling method is defined to accept an ExecResult reference and a MessageParcel
+       reference, returning a boolean to indicate operation success.
+    3. The MessageParcel used in the test has no pre-stored data related to ExecResult (ensuring no valid
+       data for unmarshalling).
+ * @tc.step:
+    1. Create an ExecResult object (named execResult) to store the unmarshalled result.
+    2. Create a MessageParcel object (named parcel) without pre-marshalling any ExecResult data into it.
+    3. Call the ITypesUtil::Unmarshalling function, passing the execResult and parcel as input parameters.
+    4. Check the boolean return value of the ITypesUtil::Unmarshalling function.
+ * @tc.expect:
+    1. The ITypesUtil::Unmarshalling function returns false, indicating the unmarshalling operation fails.
+ */
 HWTEST_F(DatashareItypesUtilsTest, UnmarshallingTest003, TestSize.Level0)
 {
     LOG_INFO("UnmarshallingTest003::Start");
@@ -372,16 +431,26 @@ HWTEST_F(DatashareItypesUtilsTest, UnmarshallingTest003, TestSize.Level0)
 }
 
 /**
-* @tc.name: UnmarshallingTest004
-* @tc.desc: test Unmarshalling function when parcel is nullptr
-* @tc.type: FUNC
-* @tc.require: issueIC9GIH
-* @tc.precon: None
-* @tc.step:
-    1.Creat a ITypesUtil object and parcel is nullptr
-    2.call Unmarshalling function and check the result
-* @tc.experct: Unmarshalling failed and return false
-*/
+ * @tc.name: UnmarshallingTest004
+ * @tc.desc: Test the Unmarshalling function of ITypesUtil for the ExecResultSet type when using a normally
+ *           instantiated MessageParcel (without pre-marshalled data), verifying if unmarshalling fails as expected.
+ * @tc.type: FUNC
+ * @tc.require: issueIC9GIH
+ * @tc.precon:
+    1. The test environment supports normal instantiation of ExecResultSet and MessageParcel objects, with no
+       initialization exceptions.
+    2. The ITypesUtil::Unmarshalling method is defined to accept an ExecResultSet reference and a MessageParcel
+       reference, returning a boolean to indicate operation success.
+    3. The MessageParcel used in the test has no pre-stored data related to ExecResultSet (ensuring no valid
+       data for unmarshalling).
+ * @tc.step:
+    1. Create an ExecResultSet object (named execResultSet) to store the unmarshalled result.
+    2. Create a MessageParcel object (named parcel) without pre-marshalling any ExecResultSet data into it.
+    3. Call the ITypesUtil::Unmarshalling function, passing the execResultSet and parcel as input parameters.
+    4. Check the boolean return value of the ITypesUtil::Unmarshalling function.
+ * @tc.expect:
+    1. The ITypesUtil::Unmarshalling function returns false, indicating the unmarshalling operation fails.
+ */
 HWTEST_F(DatashareItypesUtilsTest, UnmarshallingTest004, TestSize.Level0)
 {
     LOG_INFO("UnmarshallingTest004::Start");
@@ -393,16 +462,26 @@ HWTEST_F(DatashareItypesUtilsTest, UnmarshallingTest004, TestSize.Level0)
 }
 
 /**
-* @tc.name: MarshallingTest001
-* @tc.desc: test Marshalling function when parcel is nullptr
-* @tc.type: FUNC
-* @tc.require: issueIC9GIH
-* @tc.precon: None
-* @tc.step:
-    1.Creat a ITypesUtil object and parcel is nullptr
-    2.call Marshalling function and check the result
-* @tc.experct: Marshalling success and return ture
-*/
+ * @tc.name: MarshallingTest001
+ * @tc.desc: Test the Marshalling function of ITypesUtil for the ITypesUtil::RdbChangeNode type when using a normally
+ *           instantiated MessageParcel, verifying if marshalling succeeds as expected.
+ * @tc.type: FUNC
+ * @tc.require: issueIC9GIH
+ * @tc.precon:
+    1. The test environment supports normal instantiation of ITypesUtil::RdbChangeNode and MessageParcel objects, with
+       no initialization exceptions.
+    2. The ITypesUtil::Marshalling method is defined to accept an ITypesUtil::RdbChangeNode reference and a
+       MessageParcel reference, returning a boolean to indicate operation success.
+    3. The ITypesUtil::RdbChangeNode object used in the test has valid default values (meeting the marshalling data
+       requirements of the method).
+ * @tc.step:
+    1. Create an ITypesUtil::RdbChangeNode object (named changeNode) to be marshalled into the MessageParcel.
+    2. Create a MessageParcel object (named parcel) to store the marshalled data of changeNode.
+    3. Call the ITypesUtil::Marshalling function, passing the changeNode and parcel as input parameters.
+    4. Check the boolean return value of the ITypesUtil::Marshalling function.
+ * @tc.expect:
+    1. The ITypesUtil::Marshalling function returns true, indicating the marshalling operation succeeds.
+ */
 HWTEST_F(DatashareItypesUtilsTest, MarshallingTest001, TestSize.Level0)
 {
     LOG_INFO("MarshallingTest001::Start");

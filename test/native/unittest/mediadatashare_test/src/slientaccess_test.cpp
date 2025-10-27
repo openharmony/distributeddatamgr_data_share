@@ -247,20 +247,35 @@ void SlientAccessTest::SetUp(void) {}
 void SlientAccessTest::TearDown(void) {}
 
 /**
-* @tc.name: SlientAccess_Creator_Errorcode_Test_001
-* @tc.desc: Test DataShareHelper creation with valid parameters
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Get SystemAbilityManager instance
-* 2. Get remote object for STORAGE_MANAGER_MANAGER_ID
-* 3. Call DataShareHelper::Create() with valid remote object and URIs
-* 4. Check return code and helper instance
-* @tc.expect:
-* 1. Return code is E_OK
-* 2. Helper instance is not null
-*/
+ * @tc.name: SlientAccess_Creator_Errorcode_Test_001
+ * @tc.desc: Test the creation process of DataShareHelper using valid parameters (valid SystemAbilityManager,
+ *           remote object for STORAGE_MANAGER_MANAGER_ID, and valid URIs), verifying the return code and
+ *           non-null status of the helper instance.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The test environment supports accessing the SystemAbilityManagerClient and obtaining a valid
+       SystemAbilityManager instance via GetSystemAbilityManager().
+    2. The STORAGE_MANAGER_MANAGER_ID constant is predefined and valid, ensuring the SystemAbilityManager can
+       retrieve the corresponding remote object for this system ability.
+    3. The SLIENT_ACCESS_URI and DATA_SHARE_URI constants are valid URI strings, compatible with the
+       DataShareHelper::Create() method's parameter requirements.
+    4. The DataShareHelper::Create() method returns a pair of (integer error code, std::shared_ptr<DataShareHelper>),
+       and the E_OK constant is predefined as the success error code.
+ * @tc.step:
+    1. Call SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager() to obtain the
+       SystemAbilityManager instance (saManager).
+    2. Use the obtained saManager to call GetSystemAbility(STORAGE_MANAGER_MANAGER_ID), retrieving the
+       remote object corresponding to the STORAGE_MANAGER_MANAGER_ID system ability.
+    3. Define two valid URI strings: one using SLIENT_ACCESS_URI (uriStr1) and another using DATA_SHARE_URI (uriStr2).
+    4. Call DataShare::DataShareHelper::Create() with the retrieved remote object, uriStr1, and uriStr2 as parameters,
+       recording the returned (ret, helper) pair.
+    5. Check the value of the return code (ret) and verify whether the helper instance is non-null.
+ * @tc.expect:
+    1. The return code (ret) from DataShareHelper::Create() is equal to DataShare::E_OK (indicating successful
+       creation).
+    2. The returned DataShareHelper instance (helper) is not nullptr.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_001::Start");
@@ -282,18 +297,27 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_001, TestSize.Lev
 }
 
 /**
-* @tc.name: SlientAccess_Creator_Errorcode_Test_002
-* @tc.desc: Test DataShareHelper creation with null remote object
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Call DataShareHelper::Create() with null remote object and valid URIs
-* 2. Check return code and helper instance
-* @tc.expect:
-* 1. Return code is E_TOKEN_EMPTY
-* 2. Helper instance is null
-*/
+ * @tc.name: SlientAccess_Creator_Errorcode_Test_002
+ * @tc.desc: Test the creation process of DataShareHelper when passing a null remote object (with valid URIs),
+ *           verifying the return error code and null status of the helper instance.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The test environment supports the DataShare::DataShareHelper::Create() method, which accepts a remote object
+       and two URI strings, returning a (error code, helper instance) pair.
+    2. Predefined constants SLIENT_ACCESS_URI and DATA_SHARE_URI are valid URI strings (compatible with Create()
+       parameters).
+    3. The E_TOKEN_EMPTY constant is predefined as the error code for null remote object, accessible in the test
+       context.
+ * @tc.step:
+    1. Define two valid URI strings: uriStr1 using SLIENT_ACCESS_URI and uriStr2 using DATA_SHARE_URI.
+    2. Call DataShare::DataShareHelper::Create() with a null pointer (as remote object), uriStr1, and uriStr2.
+    3. Record the returned pair (ret, helper) from the Create() method.
+    4. Check the value of the return code (ret) and verify whether the helper instance is null.
+ * @tc.expect:
+    1. The return code (ret) from Create() is equal to DataShare::E_TOKEN_EMPTY.
+    2. The returned DataShareHelper instance (helper) is nullptr.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_002::Start");
@@ -306,20 +330,30 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_002, TestSize.Lev
 }
 
 /**
-* @tc.name: SlientAccess_Creator_Errorcode_Test_003
-* @tc.desc: Test DataShareHelper creation with invalid URIs
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Get SystemAbilityManager instance
-* 2. Get remote object for STORAGE_MANAGER_MANAGER_ID
-* 3. Call DataShareHelper::Create() with valid remote object, error URI and empty URI
-* 4. Check return code and helper instance
-* @tc.expect:
-* 1. Return code is E_EXT_URI_INVALID
-* 2. Helper instance is null
-*/
+ * @tc.name: SlientAccess_Creator_Errorcode_Test_003
+ * @tc.desc: Test the creation process of DataShareHelper with a valid remote object but invalid URIs (error URI
+ *           and empty URI), verifying the return error code and null helper instance.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The test environment allows obtaining a valid SystemAbilityManager instance via
+       SystemAbilityManagerClient::GetInstance().
+    2. STORAGE_MANAGER_MANAGER_ID is predefined, enabling SystemAbilityManager to retrieve its corresponding remote
+       object.
+    3. SLIENT_ERROR_URI (invalid) and empty string ("") are recognized as invalid URIs by Create(); E_EXT_URI_INVALID
+       is predefined as the corresponding error code.
+ * @tc.step:
+    1. Call SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager() to get the SystemAbilityManager
+       instance (saManager).
+    2. Use saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID) to retrieve the valid remote object for the system
+       ability.
+    3. Define two invalid URIs: uriStr1 using SLIENT_ERROR_URI and uriStr2 as an empty string ("").
+    4. Call DataShare::DataShareHelper::Create() with the valid remote object, uriStr1, and uriStr2.
+    5. Record the returned (ret, helper) pair and check the error code and helper instance status.
+ * @tc.expect:
+    1. The return code (ret) from Create() is equal to DataShare::E_EXT_URI_INVALID.
+    2. The returned DataShareHelper instance (helper) is nullptr.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_003, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_003::Start");
@@ -342,20 +376,28 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_003, TestSize.Lev
 }
 
 /**
-* @tc.name: SlientAccess_Creator_Errorcode_Test_004
-* @tc.desc: Test DataShareHelper creation with same valid URIs
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Get SystemAbilityManager instance
-* 2. Get remote object for STORAGE_MANAGER_MANAGER_ID
-* 3. Call DataShareHelper::Create() with valid remote object and same URIs
-* 4. Check return code and helper instance
-* @tc.expect:
-* 1. Return code is E_OK
-* 2. Helper instance is not null
-*/
+ * @tc.name: SlientAccess_Creator_Errorcode_Test_004
+ * @tc.desc: Test the creation process of DataShareHelper with a valid remote object and two identical valid URIs
+ *           (DATA_SHARE_URI), verifying successful creation via return code and non-null helper.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The test environment supports retrieving a valid SystemAbilityManager instance and the remote object for
+       STORAGE_MANAGER_MANAGER_ID.
+    2. DATA_SHARE_URI is a predefined valid URI string; using two identical copies of it is compatible with Create()
+       parameters.
+    3. The E_OK constant is predefined as the success error code for Create().
+ * @tc.step:
+    1. Obtain the SystemAbilityManager instance (saManager) via
+       SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager().
+    2. Retrieve the valid remote object for STORAGE_MANAGER_MANAGER_ID using saManager->GetSystemAbility().
+    3. Define two identical URI strings (uriStr1 and uriStr2), both using DATA_SHARE_URI.
+    4. Call DataShare::DataShareHelper::Create() with the valid remote object, uriStr1, and uriStr2.
+    5. Check the returned error code (ret) and whether the helper instance is non-null.
+ * @tc.expect:
+    1. The return code (ret) from Create() is equal to DataShare::E_OK.
+    2. The returned DataShareHelper instance (helper) is not nullptr.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_004, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_Errorcode_Test_004::Start");
@@ -377,19 +419,26 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_Errorcode_Test_004, TestSize.Lev
 }
 
 /**
-* @tc.name: SlientAccess_InsertEx_Test_001
-* @tc.desc: Test InsertEx operation with valid data
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
-* 2. Call InsertEx() with SLIENT_ACCESS_URI and values bucket
-* 3. Check error code and return value
-* @tc.expect:
-* 1. Error code is 0 (success)
-* 2. Return value is greater than 0 (valid row ID)
-*/
+ * @tc.name: SlientAccess_InsertEx_Test_001
+ * @tc.desc: Test the InsertEx operation of the silent access DataShareHelper with valid test data (name="lisi",
+ *           age=25), verifying the success error code and valid row ID return value.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized and non-null.
+    2. Predefined constants SLIENT_ACCESS_URI (target URI), TBL_STU_NAME (column name for name), and TBL_STU_AGE
+       (column name for age) are valid and accessible.
+    3. The InsertEx method returns a (error code, row ID) pair; a row ID > 0 indicates successful insertion.
+ * @tc.step:
+    1. Create a DataShare::DataShareValuesBucket instance (valuesBucket).
+    2. Call valuesBucket.Put() to add test data: TBL_STU_NAME = "lisi" (string) and TBL_STU_AGE = 25 (int).
+    3. Create a Uri instance using SLIENT_ACCESS_URI.
+    4. Call g_slientAccessHelper->InsertEx(uri, valuesBucket) and record the returned (errCode, retVal) pair.
+    5. Check the values of errCode and retVal against expected results.
+ * @tc.expect:
+    1. The error code (errCode) from InsertEx is 0 (indicating success).
+    2. The return value (retVal, row ID) is greater than 0 (valid row ID).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_InsertEx_Test_001::Start");
@@ -408,17 +457,25 @@ HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: SlientAccess_InsertEx_Test_002
-* @tc.desc: Test base class InsertEx operation
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
-* 2. Call base class InsertEx() with SLIENT_ACCESS_URI and values bucket
-* 3. Check return pair
-* @tc.expect: The return pair is (0, 0)
-*/
+ * @tc.name: SlientAccess_InsertEx_Test_002
+ * @tc.desc: Test the InsertEx operation of the DataShareHelper base class (not the silent access subclass) with
+ *           valid test data, verifying the returned (error code, row ID) pair.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized and non-null (to call base class
+       method).
+    2. Predefined constants SLIENT_ACCESS_URI, TBL_STU_NAME, and TBL_STU_AGE are valid for data preparation.
+    3. The base class method DataShareHelper::InsertEx is accessible and returns a (error code, row ID) pair.
+ * @tc.step:
+    1. Create a DataShare::DataShareValuesBucket (valuesBucket) and add test data: TBL_STU_NAME = "lisi" and
+       TBL_STU_AGE = 25.
+    2. Create a Uri instance using SLIENT_ACCESS_URI.
+    3. Call the base class method g_slientAccessHelper->DataShareHelper::InsertEx(uri, valuesBucket).
+    4. Record the returned (error code, row ID) pair and compare it with the expected value.
+ * @tc.expect:
+    1. The base class InsertEx method returns a pair (0, 0).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_002, TestSize.Level0)
 {
     LOG_INFO("SilentAccess_InsertEx_Test_002::Start");
@@ -435,20 +492,27 @@ HWTEST_F(SlientAccessTest, SlientAccess_InsertEx_Test_002, TestSize.Level0)
 }
 
 /**
-* @tc.name: SlientAccess_UpdateEx_Test_001
-* @tc.desc: Test UpdateEx operation with valid data
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Prepare DataShareValuesBucket with update data (age=50)
-* 2. Create DataSharePredicates to select record with name="lisi"
-* 3. Call UpdateEx() with SLIENT_ACCESS_URI, predicates and values bucket
-* 4. Check error code and return value
-* @tc.expect:
-* 1. Error code is 0 (success)
-* 2. Return value is greater than 0 (number of affected rows)
-*/
+ * @tc.name: SlientAccess_UpdateEx_Test_001
+ * @tc.desc: Test the UpdateEx operation of the silent access DataShareHelper with valid update data (age=50) and
+ *           predicates (filter name="lisi"), verifying success code and affected rows.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global helper (g_slientAccessHelper) is pre-initialized; there is an existing record with TBL_STU_NAME =
+       "lisi" in the data source pointed to by SLIENT_ACCESS_URI.
+    2. Predefined constants TBL_STU_NAME, TBL_STU_AGE, and SLIENT_ACCESS_URI are valid; UpdateEx returns a (error code,
+       affected rows) pair.
+ * @tc.step:
+    1. Create a DataShare::DataShareValuesBucket (valuesBucket) and call Put() to set TBL_STU_AGE = 50 (update data).
+    2. Create a DataShare::DataSharePredicates instance (predicates), then call SetWhereClause to set the filter:
+       TBL_STU_NAME + " = 'lisi'".
+    3. Create a Uri instance using SLIENT_ACCESS_URI.
+    4. Call g_slientAccessHelper->UpdateEx(uri, predicates, valuesBucket) and record (errCode, retVal).
+    5. Check errCode and retVal (number of affected rows).
+ * @tc.expect:
+    1. The error code (errCode) from UpdateEx is 0 (success).
+    2. The return value (retVal, affected rows) is greater than 0.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_UpdateEx_Test_001::Start");
@@ -467,18 +531,25 @@ HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: SlientAccess_UpdateEx_Test_002
-* @tc.desc: Test base class UpdateEx operation
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Prepare DataShareValuesBucket with update data (age=50)
-* 2. Create DataSharePredicates to select record with name="lisi"
-* 3. Call base class UpdateEx() with SLIENT_ACCESS_URI, predicates and values bucket
-* 4. Check return pair
-* @tc.expect: The return pair is (0, 0)
-*/
+ * @tc.name: SlientAccess_UpdateEx_Test_002
+ * @tc.desc: Test the UpdateEx operation of the DataShareHelper base class (not the silent access subclass) with
+ *           valid data and predicates, verifying the returned (error code, affected rows) pair.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global helper (g_slientAccessHelper) is pre-initialized, enabling calls to the base class method.
+    2. Predefined constants SLIENT_ACCESS_URI, TBL_STU_NAME, and TBL_STU_AGE are valid for data and predicate
+       preparation.
+    3. The base class method DataShareHelper::UpdateEx is accessible and returns a (error code, affected rows) pair.
+ * @tc.step:
+    1. Create a DataShareValuesBucket (valuesBucket) and set TBL_STU_AGE = 50 via Put().
+    2. Create a DataSharePredicates instance and set the filter to TBL_STU_NAME + " = 'lisi'".
+    3. Create a Uri instance using SLIENT_ACCESS_URI.
+    4. Call the base class method g_slientAccessHelper->DataShareHelper::UpdateEx(uri, predicates, valuesBucket).
+    5. Compare the returned pair with the expected value.
+ * @tc.expect:
+    1. The base class UpdateEx method returns a pair (0, 0).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_002, TestSize.Level0)
 {
     LOG_INFO("SilentAccess_UpdateEx_Test_002::Start");
@@ -496,19 +567,26 @@ HWTEST_F(SlientAccessTest, SlientAccess_UpdateEx_Test_002, TestSize.Level0)
 }
 
 /**
-* @tc.name: SlientAccess_DeleteEx_Test_001
-* @tc.desc: Test DeleteEx operation with valid parameters
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create DataSharePredicates to select record with name="lisi"
-* 2. Call DeleteEx() with SLIENT_ACCESS_URI and predicates
-* 3. Check error code and return value
-* @tc.expect:
-* 1. Error code is 0 (success)
-* 2. Return value is greater than 0 (number of deleted rows)
-*/
+ * @tc.name: SlientAccess_DeleteEx_Test_001
+ * @tc.desc: Test the DeleteEx operation of the silent access DataShareHelper with valid predicates (filter
+ *           name="lisi"), verifying the success error code and number of deleted rows.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global helper (g_slientAccessHelper) is pre-initialized; there is at least one record with TBL_STU_NAME =
+       "lisi" in the data source of SLIENT_ACCESS_URI.
+    2. Predefined constants SLIENT_ACCESS_URI and TBL_STU_NAME are valid; DeleteEx returns a (error code, deleted rows)
+       pair.
+ * @tc.step:
+    1. Create a DataShare::DataSharePredicates instance (deletePredicates).
+    2. Call deletePredicates.SetWhereClause() to set the filter: TBL_STU_NAME + " = 'lisi'".
+    3. Create a Uri instance using SLIENT_ACCESS_URI.
+    4. Call g_slientAccessHelper->DeleteEx(uri, deletePredicates) and record the returned (errCode, retVal) pair.
+    5. Check the values of errCode and retVal (deleted rows).
+ * @tc.expect:
+    1. The error code (errCode) from DeleteEx is 0 (success).
+    2. The return value (retVal, deleted rows) is greater than 0.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_DeleteEx_Test_001::Start");
@@ -525,17 +603,23 @@ HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: SlientAccess_DeleteEx_Test_002
-* @tc.desc: Test base class DeleteEx operation
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create DataSharePredicates to select record with name="lisi"
-* 2. Call base class DeleteEx() with SLIENT_ACCESS_URI and predicates
-* 3. Check return pair
-* @tc.expect: The return pair is (0, 0)
-*/
+ * @tc.name: SlientAccess_DeleteEx_Test_002
+ * @tc.desc: Test the DeleteEx operation of the DataShareHelper base class (not the silent access subclass) with
+ *           valid predicates, verifying the returned (error code, deleted rows) pair.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global helper (g_slientAccessHelper) is pre-initialized, allowing calls to the base class method.
+    2. Predefined constants SLIENT_ACCESS_URI and TBL_STU_NAME are valid for predicate preparation.
+    3. The base class method DataShareHelper::DeleteEx is accessible and returns a (error code, deleted rows) pair.
+ * @tc.step:
+    1. Create a DataShare::DataSharePredicates instance and set the filter to TBL_STU_NAME + " = 'lisi'".
+    2. Create a Uri instance using SLIENT_ACCESS_URI.
+    3. Call the base class method g_slientAccessHelper->DataShareHelper::DeleteEx(uri, deletePredicates).
+    4. Record the returned (error code, deleted rows) pair and compare it with expectations.
+ * @tc.expect:
+    1. The base class DeleteEx method returns a pair (0, 0).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_002, TestSize.Level0)
 {
     LOG_INFO("SilentAccess_DeleteEx_Test_002::Start");
@@ -550,17 +634,24 @@ HWTEST_F(SlientAccessTest, SlientAccess_DeleteEx_Test_002, TestSize.Level0)
 }
 
 /**
-* @tc.name: SlientAccess_Insert_Test_001
-* @tc.desc: Test Insert operation with valid data
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
-* 2. Call Insert() with SLIENT_ACCESS_URI and values bucket
-* 3. Check return value
-* @tc.expect: Return value is greater than 0 (valid row ID)
-*/
+ * @tc.name: SlientAccess_Insert_Test_001
+ * @tc.desc: Test the Insert operation of the silent access DataShareHelper with valid test data (name="lisi", age=25),
+ *           verifying the returned row ID is valid (greater than 0).
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized and non-null.
+    2. Predefined constants SLIENT_ACCESS_URI, TBL_STU_NAME, and TBL_STU_AGE are valid for data preparation.
+    3. The Insert method returns an integer row ID; a value > 0 indicates successful insertion.
+ * @tc.step:
+    1. Create a DataShare::DataShareValuesBucket (valuesBucket) and add test data: TBL_STU_NAME = "lisi" and
+       TBL_STU_AGE = 25.
+    2. Create a Uri instance using SLIENT_ACCESS_URI.
+    3. Call g_slientAccessHelper->Insert(uri, valuesBucket) and record the returned integer value (retVal).
+    4. Check whether retVal meets the expected valid row ID condition.
+ * @tc.expect:
+    1. The return value (retVal, row ID) from the Insert operation is greater than 0.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Insert_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Insert_Test_001::Start");
@@ -578,18 +669,26 @@ HWTEST_F(SlientAccessTest, SlientAccess_Insert_Test_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: SlientAccess_Update_Test_001
-* @tc.desc: Test Update operation with valid data
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Prepare DataShareValuesBucket with update data (age=50)
-* 2. Create DataSharePredicates to select record with name="lisi"
-* 3. Call Update() with SLIENT_ACCESS_URI, predicates and values bucket
-* 4. Check return value
-* @tc.expect: Return value is greater than 0 (number of affected rows)
-*/
+ * @tc.name: SlientAccess_Update_Test_001
+ * @tc.desc: Test the Update operation of the silent access DataShareHelper with valid update data (age=50) and
+ *           predicates filtering for the record with name="lisi", verifying the number of affected rows.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized and non-null.
+    2. There is an existing record with TBL_STU_NAME = "lisi" in the data source pointed to by SLIENT_ACCESS_URI.
+    3. Predefined constants SLIENT_ACCESS_URI, TBL_STU_NAME, and TBL_STU_AGE are valid and accessible.
+    4. The Update method returns an integer representing the number of affected rows; a value > 0 indicates success.
+ * @tc.step:
+    1. Create a DataShare::DataShareValuesBucket (valuesBucket) and call Put() to set TBL_STU_AGE = 50 (update data).
+    2. Create a DataShare::DataSharePredicates instance (predicates), then use SetWhereClause to set the filter:
+       TBL_STU_NAME + " = 'lisi'".
+    3. Create a Uri instance using SLIENT_ACCESS_URI.
+    4. Call g_slientAccessHelper->Update(uri, predicates, valuesBucket) and record the returned integer (retVal).
+    5. Check whether retVal meets the expected condition of being greater than 0.
+ * @tc.expect:
+    1. The return value (retVal) from the Update operation is greater than 0 (indicating successful update of rows).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Update_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Update_Test_001::Start");
@@ -607,17 +706,29 @@ HWTEST_F(SlientAccessTest, SlientAccess_Update_Test_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: SlientAccess_Query_Test_001
-* @tc.desc: Test Query operation with valid parameters
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create DataSharePredicates to select record with name="lisi"
-* 2. Call Query() with SLIENT_ACCESS_URI, predicates and empty columns list
-* 3. Check row count of the result set
-* @tc.expect: Query returns 1 record
-*/
+ * @tc.name: SlientAccess_Query_Test_001
+ * @tc.desc: Test the Query operation of the silent access DataShareHelper with valid predicates (filter name="lisi")
+ *           and an empty columns list, verifying the number of returned records.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized and non-null.
+    2. Exactly one record with TBL_STU_NAME = "lisi" exists in the data source pointed to by SLIENT_ACCESS_URI.
+    3. Predefined constants SLIENT_ACCESS_URI and TBL_STU_NAME are valid; the Query method returns a
+       DataShareResultSet pointer.
+    4. The ResultSet's GetRowCount method works normally to retrieve the number of rows.
+ * @tc.step:
+    1. Create a DataShare::DataSharePredicates instance (predicates) and call EqualTo to set the filter:
+       TBL_STU_NAME = "lisi".
+    2. Initialize an empty std::vector<std::string> (columns) to retrieve all columns (empty list).
+    3. Create a Uri instance using SLIENT_ACCESS_URI.
+    4. Call g_slientAccessHelper->Query(uri, predicates, columns) to get the ResultSet pointer (resultSet).
+    5. Declare an int variable (result) to store the row count; if resultSet is non-null, call
+       resultSet->GetRowCount(result).
+    6. Check the value of 'result' against the expected number of records.
+ * @tc.expect:
+    1. The Query operation returns a ResultSet that contains exactly 1 record (result = 1).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Query_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Query_Test_001::Start");
@@ -636,17 +747,25 @@ HWTEST_F(SlientAccessTest, SlientAccess_Query_Test_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: SlientAccess_Delete_Test_001
-* @tc.desc: Test Delete operation with valid parameters
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create DataSharePredicates to select record with name="lisi"
-* 2. Call Delete() with SLIENT_ACCESS_URI and predicates
-* 3. Check return value
-* @tc.expect: Return value is greater than 0 (number of deleted rows)
-*/
+ * @tc.name: SlientAccess_Delete_Test_001
+ * @tc.desc: Test the Delete operation of the silent access DataShareHelper with valid predicates (filter name="lisi"),
+ *           verifying the number of deleted rows.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized and non-null.
+    2. At least one record with TBL_STU_NAME = "lisi" exists in the data source pointed to by SLIENT_ACCESS_URI.
+    3. Predefined constants SLIENT_ACCESS_URI and TBL_STU_NAME are valid; the Delete method returns an integer
+       representing the number of deleted rows.
+ * @tc.step:
+    1. Create a DataShare::DataSharePredicates instance (deletePredicates).
+    2. Call deletePredicates.SetWhereClause() to set the filter: TBL_STU_NAME + " = 'lisi'".
+    3. Create a Uri instance using SLIENT_ACCESS_URI.
+    4. Call g_slientAccessHelper->Delete(uri, deletePredicates) and record the returned integer (retVal).
+    5. Check whether retVal meets the expected condition of being greater than 0.
+ * @tc.expect:
+    1. The return value (retVal) from the Delete operation is greater than 0 (indicating successful deletion of rows).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Delete_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Delete_Test_001::Start");
@@ -662,23 +781,36 @@ HWTEST_F(SlientAccessTest, SlientAccess_Delete_Test_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: SlientAccess_Register_Test_001
-* @tc.desc: Test observer registration and notification in silent access mode
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create IDataShareAbilityObserverTest instance and set initial name "zhangsan"
-* 2. Register observer with SLIENT_ACCESS_URI
-* 3. Insert test data (name="lisi", age=25) using helper
-* 4. Wait for observer notification
-* 5. Verify observer name changes to "OnChangeName"
-* 6. Delete test data and unregister observer
-* @tc.expect:
-* 1. Insert operation succeeds (retVal > 0)
-* 2. Observer is notified and name updates to "OnChangeName"
-* 3. Delete operation succeeds (retVal >= 0)
-*/
+ * @tc.name: SlientAccess_Register_Test_001
+ * @tc.desc: Test observer registration, data insertion-triggered notification, and observer unregistration in
+ *           silent access mode, verifying the entire workflow's correctness.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized and non-null; its RegisterObserver,
+       UnregisterObserver, and Insert methods work normally.
+    2. The IDataShareAbilityObserverTest class can be instantiated, with SetName, GetName, Clear methods, and a
+       'data' member supporting Wait() for notification synchronization.
+    3. The observer's name is updated to "OnChangeName" when notified of data changes.
+    4. Predefined constants SLIENT_ACCESS_URI, TBL_STU_NAME, and TBL_STU_AGE are valid.
+ * @tc.step:
+    1. Create an IDataShareAbilityObserverTest instance (dataObserver) via new (std::nothrow), then call
+       dataObserver->SetName("zhangsan").
+    2. Create a Uri instance using SLIENT_ACCESS_URI, then call g_slientAccessHelper->
+       RegisterObserver(uri, dataObserver) to register the observer.
+    3. Verify dataObserver->GetName() returns "zhangsan" (initial state).
+    4. Create a DataShareValuesBucket with TBL_STU_NAME = "lisi" and TBL_STU_AGE = 25; call g_slientAccessHelper->
+       Insert(uri, valuesBucket) and record retVal.
+    5. Call dataObserver->data.Wait() to wait for the notification to complete.
+    6. Verify dataObserver->GetName() returns "OnChangeName" (notified state), then call dataObserver->Clear().
+    7. Create a DataSharePredicates (deletePredicates) filtering TBL_STU_NAME = "lisi" and TBL_STU_AGE = 25; call
+       Delete and record retVal.
+    8. Call g_slientAccessHelper->UnregisterObserver(uri, dataObserver) to unregister the observer.
+ * @tc.expect:
+    1. The Insert operation returns retVal > 0 (successful data insertion).
+    2. The observer is notified, and its name is updated to "OnChangeName".
+    3. The Delete operation returns retVal >= 0 (successful data deletion or no data to delete).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Register_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Register_Test_001::Start");
@@ -708,24 +840,38 @@ HWTEST_F(SlientAccessTest, SlientAccess_Register_Test_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: SlientAccess_Register_Test_002
-* @tc.desc: Test Observer Concurrent Notification in Silent Access Mode
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create 10 IDataShareAbilityObserverTest instance and set initial name "zhangsan"
-* 2. Register 10 observer with SLIENT_ACCESS_URI
-* 3. Insert test data (name="lisi", age=25) using helper 20 times, 20 tasks are submited to the
-     queue for notification execution.
-* 4. Wait for observer notification
-* 5. Verify observer name changes to "OnChangeName"
-* 6. Delete test data and unregister observer
-* @tc.expect:
-* 1. Insert operation succeeds (retVal > 0)
-* 2. Observer is notified and name updates to "OnChangeName"
-* 3. Delete operation succeeds (retVal >= 0)
-*/
+ * @tc.name: SlientAccess_Register_Test_002
+ * @tc.desc: Test concurrent notification of 10 observers in silent access mode, verifying that all observers
+ *           receive notifications after multiple data insertions.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) supports concurrent observer registration and can
+       handle 20 consecutive Insert operations.
+    2. The IDataShareAbilityObserverTest class can be instantiated multiple times; each instance's notification
+       (name update to "OnChangeName") works independently.
+    3. The test environment supports storing 10 observer instances in a std::vector; the helper's RegisterObserver
+       returns 0 on successful registration.
+    4. Predefined constants SLIENT_ACCESS_URI, TBL_STU_NAME, and TBL_STU_AGE are valid.
+ * @tc.step:
+    1. Create a std::vector<sptr<IDataShareAbilityObserverTest>> (observerList) to store 10 observers; create a Uri
+       using SLIENT_ACCESS_URI.
+    2. Loop 10 times to create observers:
+        a. Create an IDataShareAbilityObserverTest instance via new (std::nothrow), call SetName("zhangsan1").
+        b. Call g_slientAccessHelper->RegisterObserver(uri, dataObserver), verify return value is 0.
+        c. Add the observer to observerList.
+    3. Create a DataShareValuesBucket with TBL_STU_NAME = "lisi" and TBL_STU_AGE = 25; loop 20 times to call Insert,
+       verify each retVal > 0.
+    4. Loop through observerList to wait for notifications and verify:
+        a. Call observerList[i]->data.Wait(), check GetName() returns "OnChangeName".
+        b. Call observerList[i]->Clear().
+    5. Create deletePredicates filtering TBL_STU_NAME = "lisi" and TBL_STU_AGE = 25; call Delete, verify retVal >= 0.
+    6. Loop through observerList to unregister: call UnregisterObserver, verify each return value is 0.
+ * @tc.expect:
+    1. All 20 Insert operations return retVal > 0 (successful insertions).
+    2. All 10 observers are notified, and their names are updated to "OnChangeName".
+    3. The Delete operation returns retVal >= 0 (successful deletion); all unregistrations return 0.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Register_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Register_Test_002::Start");
@@ -772,22 +918,33 @@ HWTEST_F(SlientAccessTest, SlientAccess_Register_Test_002, TestSize.Level0)
 }
 
 /**
-* @tc.name: SlientAccess_RegisterErrorUri_Test_001
-* @tc.desc: Test observer registration with incorrect URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create IDataShareAbilityObserverTest instance and set name "zhangsan"
-* 2. Register observer with incorrect URI (SLIENT_REGISTER_URI)
-* 3. Insert test data (name="lisi", age=25) to SLIENT_ACCESS_URI
-* 4. Check if observer is notified
-* 5. Delete test data and unregister observer
-* @tc.expect:
-* 1. Insert operation succeeds (retVal > 0)
-* 2. Observer is NOT notified (name remains "zhangsan")
-* 3. Delete operation succeeds (retVal >= 0)
-*/
+ * @tc.name: SlientAccess_RegisterErrorUri_Test_001
+ * @tc.desc: Test observer registration with an incorrect URI (SLIENT_REGISTER_URI) and data insertion to the
+ *           correct URI, verifying the observer does not receive unintended notifications.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized; RegisterObserver accepts any URI,
+       but notifications are only triggered by changes to the registered URI.
+    2. SLIENT_REGISTER_URI (incorrect) and SLIENT_ACCESS_URI (correct) are predefined distinct URIs.
+    3. The IDataShareAbilityObserverTest instance's name remains "zhangsan" if no notification is received.
+    4. Predefined constants for data columns (TBL_STU_NAME, TBL_STU_AGE) are valid.
+ * @tc.step:
+    1. Create an IDataShareAbilityObserverTest instance (dataObserver), call SetName("zhangsan"); create two Uris:
+       uri (SLIENT_ACCESS_URI) and uriRegister (SLIENT_REGISTER_URI).
+    2. Call g_slientAccessHelper->RegisterObserver(uriRegister, dataObserver) to register the observer with the
+       incorrect URI.
+    3. Verify dataObserver->GetName() returns "zhangsan"; create a valuesBucket with TBL_STU_NAME = "lisi" and
+       TBL_STU_AGE = 25.
+    4. Call g_slientAccessHelper->Insert(uri, valuesBucket) (correct URI), verify retVal > 0.
+    5. Check that dataObserver->GetName() is not "OnChangeName" (no notification received).
+    6. Create deletePredicates filtering TBL_STU_NAME = "lisi" and TBL_STU_AGE = 25; call Delete, verify retVal >= 0.
+    7. Call g_slientAccessHelper->UnregisterObserver(uriRegister, dataObserver) to unregister the observer.
+ * @tc.expect:
+    1. The Insert operation to the correct URI returns retVal > 0 (successful insertion).
+    2. The observer registered with the incorrect URI is not notified (name remains "zhangsan").
+    3. The Delete operation returns retVal >= 0 (successful deletion).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_RegisterErrorUri_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_RegisterErrorUri_Test_001::Start");
@@ -816,21 +973,31 @@ HWTEST_F(SlientAccessTest, SlientAccess_RegisterErrorUri_Test_001, TestSize.Leve
 }
 
 /**
-* @tc.name: SlientAccess_NoRegister_Test_001
-* @tc.desc: Test data operation without observer registration
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create IDataShareAbilityObserverTest instance but do NOT register it
-* 2. Insert test data (name="lisi", age=25) using helper
-* 3. Check if observer is notified
-* 4. Delete test data
-* @tc.expect:
-* 1. Insert operation succeeds (retVal > 0)
-* 2. Observer is NOT notified (name remains "zhangsan")
-* 3. Delete operation succeeds (retVal >= 0)
-*/
+ * @tc.name: SlientAccess_NoRegister_Test_001
+ * @tc.desc: Test data insertion and deletion in silent access mode without registering an observer, verifying
+ *           the observer does not receive any notifications.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized; its Insert and Delete methods work
+       normally.
+    2. An IDataShareAbilityObserverTest instance is created but not registered via RegisterObserver.
+    3. The observer's name remains "zhangsan" if no notification is triggered (no registration).
+    4. Predefined constants SLIENT_ACCESS_URI, TBL_STU_NAME, and TBL_STU_AGE are valid.
+ * @tc.step:
+    1. Create an IDataShareAbilityObserverTest instance (dataObserver) via new (std::nothrow), call
+       SetName("zhangsan").
+    2. Verify dataObserver->GetName() returns "zhangsan" (no registration, initial state).
+    3. Create a DataShareValuesBucket with TBL_STU_NAME = "lisi" and TBL_STU_AGE = 25; call g_slientAccessHelper->
+       Insert(uri, valuesBucket), verify retVal > 0.
+    4. Check that dataObserver->GetName() is not "OnChangeName" (no registration → no notification).
+    5. Create deletePredicates filtering TBL_STU_NAME = "lisi" and TBL_STU_AGE = 25; call Delete, verify retVal >= 0.
+    6. (Optional) Call g_slientAccessHelper->UnregisterObserver (no-op, to clean up if needed).
+ * @tc.expect:
+    1. The Insert operation returns retVal > 0 (successful insertion).
+    2. The unregistered observer does not receive notifications (name remains "zhangsan").
+    3. The Delete operation returns retVal >= 0 (successful deletion).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_NoRegister_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_NoRegister_Test_001::Start");
@@ -857,22 +1024,30 @@ HWTEST_F(SlientAccessTest, SlientAccess_NoRegister_Test_001, TestSize.Level0)
 }
 
 /**
-* @tc.name: SlientAccess_NoRegister_Test_002
-* @tc.desc: Test data operation after unregistering observer
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create IDataShareAbilityObserverTest instance and register it
-* 2. Immediately unregister the observer
-* 3. Insert test data (name="lisi", age=25) using helper
-* 4. Check if observer is notified
-* 5. Delete test data
-* @tc.expect:
-* 1. Insert operation succeeds (retVal > 0)
-* 2. Observer is NOT notified (name remains "zhangsan")
-* 3. Delete operation succeeds (retVal >= 0)
-*/
+ * @tc.name: SlientAccess_NoRegister_Test_002
+ * @tc.desc: Test data insertion after immediately unregistering an observer in silent access mode, verifying
+ *           the unregistered observer does not receive notifications.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) supports immediate unregistration after registration;
+       UnregisterObserver invalidates the observer's notification subscription.
+    2. The IDataShareAbilityObserverTest instance's name remains "zhangsan" if unregistered before data insertion.
+    3. Predefined constants SLIENT_ACCESS_URI, TBL_STU_NAME, and TBL_STU_AGE are valid.
+ * @tc.step:
+    1. Create an IDataShareAbilityObserverTest instance (dataObserver), call SetName("zhangsan"); create a Uri using
+       SLIENT_ACCESS_URI.
+    2. Call g_slientAccessHelper->RegisterObserver(uri, dataObserver) to register the observer, then immediately call
+       UnregisterObserver.
+    3. Verify dataObserver->GetName() returns "zhangsan" (post-unregistration initial state).
+    4. Create a valuesBucket with TBL_STU_NAME = "lisi" and TBL_STU_AGE = 25; call Insert, verify retVal > 0.
+    5. Check that dataObserver->GetName() is not "OnChangeName" (unregistered → no notification).
+    6. Create deletePredicates filtering TBL_STU_NAME = "lisi" and TBL_STU_AGE = 25; call Delete, verify retVal >= 0.
+ * @tc.expect:
+    1. The Insert operation returns retVal > 0 (successful insertion).
+    2. The unregistered observer does not receive notifications (name remains "zhangsan").
+    3. The Delete operation returns retVal >= 0 (successful deletion).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_NoRegister_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_NoRegister_Test_002::Start");
@@ -900,17 +1075,26 @@ HWTEST_F(SlientAccessTest, SlientAccess_NoRegister_Test_002, TestSize.Level0)
 }
 
 /**
-* @tc.name: SlientAccess_Permission_Insert_Test_001
-* @tc.desc: Test insert operation with proper permissions
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
-* 2. Call Insert() with SLIENT_ACCESS_URI
-* 3. Check return value
-* @tc.expect: Insert operation succeeds (retVal > 0)
-*/
+ * @tc.name: SlientAccess_Permission_Insert_Test_001
+ * @tc.desc: Test the Insert operation of the silent access DataShareHelper with proper permissions and valid
+ *           test data, verifying the operation succeeds.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized with proper permissions to perform
+       Insert operations on SLIENT_ACCESS_URI.
+    2. Predefined constants SLIENT_ACCESS_URI, TBL_STU_NAME, and TBL_STU_AGE are valid for data preparation.
+    3. The Insert method returns an integer row ID; a value > 0 indicates successful insertion (permission check
+       passed).
+ * @tc.step:
+    1. Create a DataShare::DataShareValuesBucket (valuesBucket).
+    2. Call valuesBucket.Put() to add test data: TBL_STU_NAME = "lisi" (string) and TBL_STU_AGE = 25 (int).
+    3. Create a Uri instance using SLIENT_ACCESS_URI.
+    4. Call g_slientAccessHelper->Insert(uri, valuesBucket) and record the returned integer (retVal).
+    5. Check whether retVal meets the expected condition of being greater than 0.
+ * @tc.expect:
+    1. The Insert operation returns retVal > 0 (successful insertion, proper permissions confirmed).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Insert_Test_001::Start");
@@ -928,17 +1112,26 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_001, TestSize.Lev
 }
 
 /**
-* @tc.name: SlientAccess_Permission_Insert_Test_003
-* @tc.desc: Test insert operation with proxy permission URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
-* 2. Call Insert() with SLIENT_PROXY_PERMISSION1_URI
-* 3. Check return value
-* @tc.expect: Insert operation succeeds (retVal > 0)
-*/
+ * @tc.name: SlientAccess_Permission_Insert_Test_003
+ * @tc.desc: Test the Insert operation of the silent access DataShareHelper with proper permissions and valid
+ *           test data, targeting the proxy permission URI (SLIENT_PROXY_PERMISSION1_URI).
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized with proper permissions to perform
+       Insert operations on SLIENT_PROXY_PERMISSION1_URI.
+    2. Predefined constants SLIENT_PROXY_PERMISSION1_URI, TBL_STU_NAME, and TBL_STU_AGE are valid for data preparation.
+    3. The Insert method returns an integer row ID; a value > 0 indicates successful insertion (proxy permission check
+       passed).
+ * @tc.step:
+    1. Create a DataShare::DataShareValuesBucket (valuesBucket).
+    2. Call valuesBucket.Put() to add test data: TBL_STU_NAME = "lisi" (string) and TBL_STU_AGE = 25 (int).
+    3. Create a Uri instance using SLIENT_PROXY_PERMISSION1_URI.
+    4. Call g_slientAccessHelper->Insert(uri, valuesBucket) and record the returned integer (retVal).
+    5. Check whether retVal meets the expected condition of being greater than 0.
+ * @tc.expect:
+    1. The Insert operation returns retVal > 0 (successful insertion, proxy permission confirmed).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_003, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Insert_Test_003::Start");
@@ -956,18 +1149,27 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_003, TestSize.Lev
 }
 
 /**
-* @tc.name: SlientAccess_Permission_Update_Test_001
-* @tc.require: NA
-* @tc.desc: Test update operation with proxy permission URI
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-* 1. Prepare DataShareValuesBucket with update data (age=50)
-* 2. Create predicates to select record with name="lisi"
-* 3. Call Update() with SLIENT_PROXY_PERMISSION1_URI
-* 4. Check return value
-* @tc.expect: Update operation succeeds (retVal > 0)
-*/
+ * @tc.name: SlientAccess_Permission_Update_Test_001
+ * @tc.desc: Test the Update operation of the silent access DataShareHelper with a proxy permission URI
+ *           (SLIENT_PROXY_PERMISSION1_URI), verifying success with proper permissions and valid update data.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized with proper permissions for updating
+       data via SLIENT_PROXY_PERMISSION1_URI.
+    2. At least one record with TBL_STU_NAME = "lisi" exists in the data source pointed to by the proxy permission URI.
+    3. Predefined constants SLIENT_PROXY_PERMISSION1_URI, TBL_STU_NAME, and TBL_STU_AGE are valid and accessible.
+    4. The Update method returns an integer representing affected rows; a value > 0 indicates success.
+ * @tc.step:
+    1. Create a DataShare::DataShareValuesBucket (valuesBucket) and call Put() to set TBL_STU_AGE = 50 (update data).
+    2. Create a DataShare::DataSharePredicates instance (predicates), then use SetWhereClause to set the filter:
+       TBL_STU_NAME + " = 'lisi'".
+    3. Create a Uri instance using SLIENT_PROXY_PERMISSION1_URI.
+    4. Call g_slientAccessHelper->Update(uri, predicates, valuesBucket) and record the returned integer (retVal).
+    5. Check whether retVal meets the expected condition of being greater than 0.
+ * @tc.expect:
+    1. The Update operation returns retVal > 0 (successful update with proper proxy permissions).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Update_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Update_Test_001::Start");
@@ -985,21 +1187,34 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Update_Test_001, TestSize.Lev
 }
 
 /**
-* @tc.name: SlientAccess_Permission_Query_Test_002
-* @tc.desc: Test query operation with proxy permission URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Insert test data (name="lisi", age=25) into SLIENT_PROXY_PERMISSION2_URI
-* 2. Create predicates to select inserted record
-* 3. Call Query() with SLIENT_PROXY_PERMISSION2_URI
-* 4. Check result set row count and business error code
-* @tc.expect:
-* 1. Insert operation succeeds (retVal > 0)
-* 2. Query returns 1 record
-* 3. Business error code is 0 (no error)
-*/
+ * @tc.name: SlientAccess_Permission_Query_Test_002
+ * @tc.desc: Test the Insert and Query operations of the silent access DataShareHelper with a proxy permission URI
+ *           (SLIENT_PROXY_PERMISSION2_URI), verifying data insertion success and correct query results.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) has proper permissions for Insert and Query operations
+       on SLIENT_PROXY_PERMISSION2_URI.
+    2. The DatashareBusinessError class works normally, with GetCode() returning 0 for no errors.
+    3. Predefined constants SLIENT_PROXY_PERMISSION2_URI, TBL_STU_NAME, and TBL_STU_AGE are valid; the ResultSet's
+       GetRowCount works.
+ * @tc.step:
+    1. Create a DataShare::DataShareValuesBucket (valuesBucket) and add test data: TBL_STU_NAME = "lisi" (string) and
+       TBL_STU_AGE = 25 (int).
+    2. Create a Uri instance using SLIENT_PROXY_PERMISSION2_URI; call g_slientAccessHelper->Insert(uri, valuesBucket)
+       and record retVal.
+    3. Verify retVal > 0 (successful insertion); create a DataSharePredicates instance and call
+       EqualTo(TBL_STU_NAME, "lisi").
+    4. Initialize an empty std::vector<std::string> (columns) and a DatashareBusinessError object (businessError).
+    5. Call g_slientAccessHelper->Query(uri, predicates, columns, &businessError) to get the ResultSet pointer.
+    6. Declare an int variable (result) to store row count; if resultSet is non-null, call
+       resultSet->GetRowCount(result).
+    7. Check the values of retVal, result, and businessError.GetCode().
+ * @tc.expect:
+    1. The Insert operation returns retVal > 0 (successful data insertion).
+    2. The Query operation returns a ResultSet with exactly 1 record (result = 1).
+    3. The DatashareBusinessError code (from GetCode()) is 0 (no business error).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Query_Test_002::Start");
@@ -1029,17 +1244,26 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_002, TestSize.Leve
 }
 
 /**
-* @tc.name: SlientAccess_Permission_Delete_Test_001
-* @tc.desc: Test delete operation with proxy permission URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create predicates to select record with name="lisi"
-* 2. Call Delete() with SLIENT_PROXY_PERMISSION2_URI
-* 3. Check return value
-* @tc.expect: Delete operation succeeds and deletes 1 record (retVal = 1)
-*/
+ * @tc.name: SlientAccess_Permission_Delete_Test_001
+ * @tc.desc: Test the Delete operation of the silent access DataShareHelper with a proxy permission URI
+ *           (SLIENT_PROXY_PERMISSION2_URI), verifying it successfully deletes exactly one target record.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) has proper permissions for Delete operations on
+       SLIENT_PROXY_PERMISSION2_URI.
+    2. Exactly one record with TBL_STU_NAME = "lisi" exists in the data source pointed to by the proxy permission URI.
+    3. Predefined constants SLIENT_PROXY_PERMISSION2_URI and TBL_STU_NAME are valid; the Delete method returns the
+       number of deleted rows.
+ * @tc.step:
+    1. Create a DataShare::DataSharePredicates instance (deletePredicates).
+    2. Call deletePredicates.SetWhereClause() to set the filter: TBL_STU_NAME + " = 'lisi'".
+    3. Create a Uri instance using SLIENT_PROXY_PERMISSION2_URI.
+    4. Call g_slientAccessHelper->Delete(uri, deletePredicates) and record the returned integer (retVal).
+    5. Check whether retVal matches the expected number of deleted rows.
+ * @tc.expect:
+    1. The Delete operation succeeds and returns retVal = 1 (exactly one record deleted).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Delete_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Delete_Test_001::Start");
@@ -1055,19 +1279,36 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Delete_Test_001, TestSize.Lev
 }
 
 /**
-* @tc.name: SlientAccess_Permission_Insert_Test_002
-* @tc.desc: Test insert operation without required permissions
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create HAP token with limited permissions
-* 2. Set token ID for current process
-* 3. Create DataShareHelper instance
-* 4. Try to insert data into SLIENT_ACCESS_PERMISSION1_URI
-* 5. Clean up token
-* @tc.expect: Insert operation fails (retVal = -2)
-*/
+ * @tc.name: SlientAccess_Permission_Insert_Test_002
+ * @tc.desc: Test the Insert operation of the silent access DataShareHelper without the required permissions,
+ *           verifying it fails with the expected error code.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The test environment supports AccessTokenKit methods (AllocHapToken, GetHapTokenIDEx, DeleteToken) and the
+       SetSelfTokenID function.
+    2. The CreateDataShareHelper function can generate a DataShareHelper instance with STORAGE_MANAGER_MANAGER_ID and
+       SLIENT_ACCESS_URI.
+    3. SLIENT_ACCESS_PERMISSION1_URI requires specific permissions not granted to the HAP token; the Insert method
+       returns -2 on permission failure.
+    4. Predefined constants USER_100, APL_SYSTEM_CORE, PermissionState::PERMISSION_GRANTED, and TBL_STU columns are
+       valid.
+ * @tc.step:
+    1. Initialize HapInfoParams (info) with USER_100, bundle name "ohos.permission.write.demo", and other required
+       fields.
+    2. Initialize HapPolicyParams (policy) with APL_SYSTEM_CORE, granting only "ohos.permission.WRITE_CONTACTS" (no
+       required permissions for the target URI).
+    3. Call AccessTokenKit::AllocHapToken(info, policy) to allocate the limited-permission token; get the token ID via
+       GetHapTokenIDEx.
+    4. Call SetSelfTokenID(testTokenId.tokenIDEx) to set the token as the current process's token.
+    5. Create a DataShareHelper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI).
+    6. Prepare a DataShareValuesBucket with TBL_STU_NAME = "lisi" and TBL_STU_AGE = 25; call Insert on
+       SLIENT_ACCESS_PERMISSION1_URI, record retVal.
+    7. Set the helper to nullptr, then call AccessTokenKit::DeleteToken(testTokenId.tokenIDEx) to clean up.
+    8. Check the value of retVal against the expected error code.
+ * @tc.expect:
+    1. The Insert operation fails and returns retVal = -2 (permission denied).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Insert_Test_002::Start");
@@ -1112,19 +1353,32 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Insert_Test_002, TestSize.Lev
 }
 
 /**
-* @tc.name: SlientAccess_Permission_Update_Test_002
-* @tc.desc: Test update operation without required permissions
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create HAP token with limited permissions
-* 2. Set token ID for current process
-* 3. Create DataShareHelper instance
-* 4. Try to update data in SLIENT_ACCESS_PERMISSION1_URI
-* 5. Clean up token
-* @tc.expect: Update operation fails (retVal = -2)
-*/
+ * @tc.name: SlientAccess_Permission_Update_Test_002
+ * @tc.desc: Test the Update operation of the silent access DataShareHelper without the required permissions,
+ *           verifying it fails with the expected error code.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The test environment supports AccessTokenKit operations (AllocHapToken, GetHapTokenIDEx, DeleteToken) and
+       SetSelfTokenID.
+    2. CreateDataShareHelper can generate a valid instance; SLIENT_ACCESS_PERMISSION1_URI requires permissions not
+       granted to the HAP token.
+    3. The Update method returns -2 on permission failure; there is a target record (TBL_STU_NAME = "lisi") in the data
+       source.
+    4. Predefined constants for HAP params, APL, and TBL_STU columns are valid.
+ * @tc.step:
+    1. Initialize HapInfoParams (info) and HapPolicyParams (policy) with limited permissions (only
+       "ohos.permission.WRITE_CONTACTS" granted).
+    2. Allocate the HAP token via AccessTokenKit::AllocHapToken, get the token ID, and set it as the current process
+       token with SetSelfTokenID.
+    3. Create a DataShareHelper instance using CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI).
+    4. Prepare a DataShareValuesBucket (TBL_STU_AGE = 50) and predicates (filter TBL_STU_NAME = "lisi").
+    5. Call helper->Update() on SLIENT_ACCESS_PERMISSION1_URI with the bucket and predicates; record retVal.
+    6. Clean up: set helper to nullptr and delete the token via AccessTokenKit::DeleteToken.
+    7. Check if retVal matches the expected permission error code.
+ * @tc.expect:
+    1. The Update operation fails and returns retVal = -2 (permission denied).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Update_Test_002, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Update_Test_002::Start");
@@ -1170,23 +1424,32 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Update_Test_002, TestSize.Lev
 }
 
 /**
-* @tc.name: SlientAccess_Permission_Query_Test_001
-* @tc.desc: Test query operation without required permissions
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create HAP token with limited permissions (only WRITE_CONTACTS granted)
-* 2. Set token ID for current process
-* 3. Create DataShareHelper instance
-* 4. Try to query data from SLIENT_ACCESS_PERMISSION2_URI with predicates for "lisi"
-* 5. Check result set, row count and business error code
-* 6. Clean up token
-* @tc.expect:
-* 1. Result set is nullptr
-* 2. Row count is 0
-* 3. Business error code is -2 (permission denied)
-*/
+ * @tc.name: SlientAccess_Permission_Query_Test_001
+ * @tc.desc: Test the Query operation of the silent access DataShareHelper without the required permissions (only
+ *           WRITE_CONTACTS granted), verifying it fails with the expected result set and error code.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The test environment supports AccessTokenKit, SetSelfTokenID, and CreateDataShareHelper;
+       DatashareBusinessError::GetCode() works.
+    2. SLIENT_ACCESS_PERMISSION2_URI requires read permissions not granted to the HAP token; the Query method returns
+       nullptr on failure.
+    3. Predefined constants for HAP params, token operations, and TBL_STU_NAME are valid.
+ * @tc.step:
+    1. Initialize HapInfoParams (info) and HapPolicyParams (policy) to grant only "ohos.permission.WRITE_CONTACTS" (no
+       read permissions).
+    2. Allocate the HAP token, get its ID, and set it as the current process token with SetSelfTokenID.
+    3. Create a DataShareHelper instance via CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI).
+    4. Create a Uri (SLIENT_ACCESS_PERMISSION2_URI), predicates (EqualTo(TBL_STU_NAME, "lisi")), empty columns, and
+       DatashareBusinessError (businessError).
+    5. Call helper->Query(uri, predicates, columns, &businessError) and record the ResultSet (resultSet).
+    6. Declare an int (result) for row count; if resultSet is non-null, call GetRowCount(result) (expect 0).
+    7. Clean up: set helper to nullptr and delete the token; check resultSet, result, and businessError.GetCode().
+ * @tc.expect:
+    1. The Query operation returns a nullptr ResultSet.
+    2. The row count (result) is 0.
+    3. The DatashareBusinessError code (from GetCode()) is -2 (permission denied).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Query_Test_001::Start");
@@ -1236,17 +1499,25 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_001, TestSize.Leve
 }
 
 /**
-* @tc.name: SlientAccess_Access_When_Uri_Error_Test_001
-* @tc.desc: Test data insertion with invalid URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
-* 2. Call Insert() with invalid URI (SLIENT_ERROR_URI)
-* 3. Check return value
-* @tc.expect: Insert operation fails (retVal < 0)
-*/
+ * @tc.name: SlientAccess_Access_When_Uri_Error_Test_001
+ * @tc.desc: Test the Insert operation of the silent access DataShareHelper with an invalid URI (SLIENT_ERROR_URI),
+ *           verifying it fails with a negative return value.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized and non-null.
+    2. SLIENT_ERROR_URI is a predefined invalid URI that cannot be resolved to any valid data source.
+    3. The Insert method returns a negative integer when the URI is invalid; TBL_STU_NAME and TBL_STU_AGE are valid
+       columns.
+ * @tc.step:
+    1. Create a DataShare::DataShareValuesBucket (valuesBucket) and add test data: TBL_STU_NAME = "lisi" and
+       TBL_STU_AGE = 25.
+    2. Create a Uri instance using SLIENT_ERROR_URI (invalid URI).
+    3. Call g_slientAccessHelper->Insert(uri, valuesBucket) and record the returned integer (retVal).
+    4. Check whether retVal meets the expected condition of being less than 0.
+ * @tc.expect:
+    1. The Insert operation fails and returns retVal < 0 (invalid URI).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Access_When_Uri_Error_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Permission_Access_When_URI_ERROR_Test_001::Begin");
@@ -1264,17 +1535,24 @@ HWTEST_F(SlientAccessTest, SlientAccess_Access_When_Uri_Error_Test_001, TestSize
 }
 
 /**
-* @tc.name: SlientAccess_Access_With_Uncreated_DataBase_Test_001
-* @tc.desc: Test data insertion to uncreated database
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Prepare DataShareValuesBucket with test data (name="lisi", age=25)
-* 2. Call Insert() with URI pointing to uncreated database (SLIENT_ERROR_DATABASE_URI)
-* 3. Check return value
-* @tc.expect: Insert operation fails (retVal < 0)
-*/
+ * @tc.name: SlientAccess_Access_With_Uncreated_DataBase_Test_001
+ * @tc.desc: Test the Insert operation of the silent access DataShareHelper with a URI pointing to an uncreated
+ *           database (SLIENT_ERROR_DATABASE_URI), verifying it fails with a negative return value.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized and non-null.
+    2. SLIENT_ERROR_DATABASE_URI points to a database that has not been created (no corresponding data source exists).
+    3. The Insert method returns a negative integer when accessing an uncreated database; TBL_STU columns are valid.
+ * @tc.step:
+    1. Create a DataShare::DataShareValuesBucket (valuesBucket) and add test data: TBL_STU_NAME = "lisi" and
+       TBL_STU_AGE = 25.
+    2. Create a Uri instance using SLIENT_ERROR_DATABASE_URI (points to uncreated database).
+    3. Call g_slientAccessHelper->Insert(uri, valuesBucket) and record the returned integer (retVal).
+    4. Check whether retVal meets the expected condition of being less than 0.
+ * @tc.expect:
+    1. The Insert operation fails and returns retVal < 0 (uncreated database).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Access_With_Uncreated_DataBase_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Access_With_Uncreated_DataBase_Test_001::Begin");
@@ -1292,17 +1570,29 @@ HWTEST_F(SlientAccessTest, SlientAccess_Access_With_Uncreated_DataBase_Test_001,
 }
 
 /**
-* @tc.name: SlientAccess_Creator_With_Uri_Error_Test_001
-* @tc.desc: Test DataShareHelper creation with invalid URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Get SystemAbilityManager instance and remote object for STORAGE_MANAGER_MANAGER_ID
-* 2. Try to create DataShareHelper with invalid URI (DATA_SHARE_ERROR_URI)
-* 3. Check helper instance
-* @tc.expect: Helper creation fails (helper == nullptr)
-*/
+ * @tc.name: SlientAccess_Creator_With_Uri_Error_Test_001
+ * @tc.desc: Test the creation of DataShareHelper via the Creator method with an invalid URI (DATA_SHARE_ERROR_URI),
+ *           verifying the helper instance is null (creation fails).
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The test environment supports obtaining a valid SystemAbilityManager instance via
+       SystemAbilityManagerClient::GetInstance().
+    2. The SystemAbilityManager can retrieve a valid remote object for STORAGE_MANAGER_MANAGER_ID.
+    3. DATA_SHARE_ERROR_URI is a predefined invalid URI; the DataShareHelper::Creator method returns nullptr for
+       invalid URIs.
+    4. The Creator method accepts remote object, two URI strings, and an integer parameter (2 in the test).
+ * @tc.step:
+    1. Call SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager() to get the SystemAbilityManager
+       instance (saManager).
+    2. Use saManager->GetSystemAbility(STORAGE_MANAGER_MANAGER_ID) to retrieve the valid remote object for the system
+       ability.
+    3. Define a std::string (uriStr) using DATA_SHARE_ERROR_URI (invalid URI).
+    4. Call DataShare::DataShareHelper::Creator(remoteObj, uriStr, uriStr, 2) to attempt creating the helper instance.
+    5. Check whether the returned helper instance is null.
+ * @tc.expect:
+    1. The DataShareHelper creation fails, and the returned helper instance is nullptr.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_With_Uri_Error_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_With_Uri_Error_Test_001::Begin");
@@ -1321,18 +1611,25 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_With_Uri_Error_Test_001, TestSiz
 }
 
 /**
-* @tc.name: SlientAccess_UserDefineFunc_Test_001
-* @tc.desc: Test custom user-defined function in DataShareHelper
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create empty MessageParcel objects for data and reply
-* 2. Create default MessageOption
-* 3. Call UserDefineFunc() on the helper
-* 4. Check return value
-* @tc.expect: User-defined function returns 0 (success)
-*/
+ * @tc.name: SlientAccess_UserDefineFunc_Test_001
+ * @tc.desc: Test the UserDefineFunc operation of the DataShareHelper base class (called via the silent access helper),
+ *           verifying it succeeds with the expected return code.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global silent access helper (g_slientAccessHelper) is pre-initialized and non-null, allowing calls to the
+       base class method.
+    2. The test environment supports instantiation of empty MessageParcel (for data and reply) and default
+       MessageOption.
+    3. The base class method DataShareHelper::UserDefineFunc returns 0 on successful execution.
+ * @tc.step:
+    1. Create two empty MessageParcel instances: one for input data (data) and one for reply (reply).
+    2. Create a MessageOption instance (option) with default initialization.
+    3. Call g_slientAccessHelper->DataShareHelper::UserDefineFunc(data, reply, option) and record the returned result.
+    4. Check whether the returned result matches the expected success code.
+ * @tc.expect:
+    1. The UserDefineFunc operation succeeds and returns result = 0.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_UserDefineFunc_Test_001, TestSize.Level0)
 {
     LOG_INFO("SilentAccess_UserDefineFunc_Test_001::Start");
@@ -1346,17 +1643,25 @@ HWTEST_F(SlientAccessTest, SlientAccess_UserDefineFunc_Test_001, TestSize.Level0
 }
 
 /**
-* @tc.name: SlientAccess_Creator_ErrorBundle_Test_001
-* @tc.desc: Test DataShareHelper creation with invalid bundle name in URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create URI with invalid bundle name ("com.acts.error.bundleName")
-* 2. Try to create DataShareHelper with this URI
-* 3. Check helper instance
-* @tc.expect: Helper creation fails (helper == nullptr) due to invalid bundle name
-*/
+ * @tc.name: SlientAccess_Creator_ErrorBundle_Test_001
+ * @tc.desc: Test the creation process of DataShareHelper using a URI with an invalid bundle name
+ *           ("com.acts.error.bundleName"), verifying that the helper fails to create as expected.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The CreateDataShareHelper function is available; it accepts STORAGE_MANAGER_MANAGER_ID and a URI string to
+       create a DataShareHelper instance.
+    2. The predefined constant STORAGE_MANAGER_MANAGER_ID is valid and accessible for helper creation.
+    3. The URI string with the invalid bundle name ("datashareproxy://com.acts.error.bundleName/test") is correctly
+       formatted but references a non-existent bundle.
+ * @tc.step:
+    1. Define a URI string with an invalid bundle name: "datashareproxy://com.acts.error.bundleName/test".
+    2. Call CreateDataShareHelper with STORAGE_MANAGER_MANAGER_ID and the invalid URI to attempt creating a
+       DataShareHelper.
+    3. Assign the returned value to a DataShareHelper pointer (helperSilent) and check its value.
+ * @tc.expect:
+    1. The DataShareHelper creation fails; the returned helperSilent pointer is nullptr.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_ErrorBundle_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_ErrorBundle_Test_001::Start");
@@ -1368,19 +1673,31 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_ErrorBundle_Test_001, TestSize.L
 }
 
 /**
-* @tc.name: SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001
-* @tc.desc: Test DataShareHelper creation with invalid silent URI but valid ext URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Get SystemAbilityManager instance and remote object for STORAGE_MANAGER_MANAGER_ID
-* 2. Try to create DataShareHelper with invalid silent URI but valid ext URI
-* 3. Check return code and helper instance
-* @tc.expect:
-* 1. Return code is E_OK
-* 2. Helper instance is not null (success due to valid ext URI)
-*/
+ * @tc.name: SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001
+ * @tc.desc: Test the creation of DataShareHelper using an invalid silent URI (with wrong bundle name) but a valid ext
+ *           URI, verifying that the helper creation succeeds due to the valid ext URI.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager() method can obtain a valid
+       SystemAbilityManager instance.
+    2. The SystemAbilityManager's GetSystemAbility method can retrieve a non-null remote object for
+       STORAGE_MANAGER_MANAGER_ID.
+    3. Predefined constants SLIENT_ERROR_URI (invalid silent URI) and DATA_SHARE_URI (valid ext URI) are correctly
+       defined.
+    4. The DataShare::DataShareHelper::Create method accepts a remote object, silent URI, and ext URI, returning a pair
+       of (error code, helper).
+ * @tc.step:
+    1. Get the SystemAbilityManager instance via SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager().
+    2. Call the SystemAbilityManager's GetSystemAbility method with STORAGE_MANAGER_MANAGER_ID to obtain a remote
+       object.
+    3. Define the invalid silent URI as SLIENT_ERROR_URI and the valid ext URI as DATA_SHARE_URI.
+    4. Call DataShare::DataShareHelper::Create with the remote object, invalid silent URI, and valid ext URI.
+    5. Extract the return code (ret) and helper instance from the returned pair, then check both values.
+ * @tc.expect:
+    1. The return code (ret) from DataShare::DataShareHelper::Create is DataShare::E_OK.
+    2. The returned DataShareHelper instance is not nullptr (creation succeeds due to valid ext URI).
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001::Start");
@@ -1403,21 +1720,30 @@ HWTEST_F(SlientAccessTest, SlientAccess_Creator_ErrorBundle_ExtSuccess_Test_001,
 }
 
 /**
-* @tc.name: SlientAccess_Create_With_Invalid_AppIndex_Test_001
-* @tc.desc: Test DataShareHelper creation with invalid appIndex in URI
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create URI with invalid appIndex parameter ("appIndex=-1")
-* 2. Try to create DataShareHelper using Create() method
-* 3. Try to create DataShareHelper using Creator() method
-* 4. Try to create DataShareHelper with CreateOptions
-* 5. Check return code and helper instances
-* @tc.expect:
-* 1. Create() returns E_EXT_URI_INVALID with null helper
-* 2. Both Creator() methods return null helper
-*/
+ * @tc.name: SlientAccess_Create_With_Invalid_AppIndex_Test_001
+ * @tc.desc: Test DataShareHelper creation using a URI with an invalid appIndex ("appIndex=-1") via three methods:
+ *           DataShare::DataShareHelper::Create, and two overloaded DataShare::DataShareHelper::Creator methods.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The SystemAbilityManager can be obtained and can return a valid remote object for STORAGE_MANAGER_MANAGER_ID.
+    2. The test URI is predefined with invalid appIndex:
+       "datashareproxy://com.acts.datasharetest/test?Proxy=true&appIndex=-1".
+    3. The CreateOptions structure is available and supports setting the isProxy_ member to true.
+    4. Three helper creation methods (Create, Creator with remoteObj+URI, Creator with URI+CreateOptions) are
+       accessible.
+ * @tc.step:
+    1. Define the test URI with invalid appIndex and set DATA_SHARE_URI as the ext URI.
+    2. Get the SystemAbilityManager instance and retrieve the remote object for STORAGE_MANAGER_MANAGER_ID.
+    3. Call DataShare::DataShareHelper::Create with remoteObj, test URI, and empty ext URI; record (ret, helper).
+    4. Call DataShare::DataShareHelper::Creator with remoteObj and test URI; record the returned helper.
+    5. Initialize CreateOptions (set isProxy_ to true), then call Creator with test URI and options; record the helper.
+    6. Check the return code from step 3 and the helper instances from steps 3-5.
+ * @tc.expect:
+    1. The Create method returns E_EXT_URI_INVALID as the error code and a nullptr helper.
+    2. The Creator method (with remoteObj+URI) returns a nullptr helper.
+    3. The Creator method (with URI+CreateOptions) returns a nullptr helper.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_Create_With_Invalid_AppIndex_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_Create_With_Invalid_AppIndex_Test_001::Start");
@@ -1446,17 +1772,26 @@ HWTEST_F(SlientAccessTest, SlientAccess_Create_With_Invalid_AppIndex_Test_001, T
 }
 
 /**
-* @tc.name: SlientAccess_RegisterObserverExtProvider_Test_001
-* @tc.desc: Test RegisterObserverExtProvider with invalid URI (covers generalCtl == nullptr branch)
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create invalid URI (SLIENT_ERROR_URI)
-* 2. Create DataShareObserverTest instance
-* 3. Call RegisterObserverExtProvider with invalid URI and observer
-* @tc.expect: No crash occurs, method executes without errors
-*/
+ * @tc.name: SlientAccess_RegisterObserverExtProvider_Test_001
+ * @tc.desc: Test the RegisterObserverExtProvider method using an invalid URI (SLIENT_ERROR_URI), covering the code
+ *           branch where the generalCtl_ member is nullptr, verifying no crashes and normal execution.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global DataShareHelper instance g_slientAccessHelper is pre-initialized and not nullptr.
+    2. The DataShareObserverTest class can be instantiated as a shared pointer (std::shared_ptr<DataShareObserver>).
+    3. The predefined constant SLIENT_ERROR_URI is a valid invalid URI string for testing.
+    4. The RegisterObserverExtProvider method accepts a Uri, shared_ptr<DataShareObserver>, and bool as parameters.
+ * @tc.step:
+    1. Create a Uri instance using the SLIENT_ERROR_URI constant.
+    2. Instantiate a DataShareObserverTest as a std::shared_ptr<DataShareObserver> (dataObserver).
+    3. Verify that g_slientAccessHelper and dataObserver are both not nullptr.
+    4. Call the RegisterObserverExtProvider method of g_slientAccessHelper with the invalid Uri, dataObserver, and
+       false.
+ * @tc.expect:
+    1. No crashes or unexpected exceptions occur during the method call.
+    2. The RegisterObserverExtProvider method executes normally without errors.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_RegisterObserverExtProvider_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_RegisterObserverExtProvider_Test_001::Begin");
@@ -1472,18 +1807,26 @@ HWTEST_F(SlientAccessTest, SlientAccess_RegisterObserverExtProvider_Test_001, Te
 }
 
 /**
-* @tc.name: SlientAccess_UnregisterObserverExtProvider_Test_001
-* @tc.desc: Test UnregisterObserverExtProvider with invalid URI (covers generalCtl == nullptr branch)
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create invalid URI (SLIENT_ERROR_URI)
-* 2. Create DataShareObserverTest instance
-* 3. Call UnregisterObserverExtProvider with invalid URI and observer
-* 4. Create dummy ChangeInfo object
-* @tc.expect: No crash occurs, method executes without errors
-*/
+ * @tc.name: SlientAccess_UnregisterObserverExtProvider_Test_001
+ * @tc.desc: Test the UnregisterObserverExtProvider method using an invalid URI (SLIENT_ERROR_URI), covering the code
+ *           branch where generalCtl_ is nullptr, and verify no crashes and normal execution.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global DataShareHelper instance g_slientAccessHelper is pre-initialized and not nullptr.
+    2. The DataShareObserverTest class can be instantiated as a std::shared_ptr<DataShareObserver>.
+    3. The SLIENT_ERROR_URI constant is valid for creating an invalid Uri; the ChangeInfo structure is accessible.
+    4. The UnregisterObserverExtProvider method accepts a Uri and shared_ptr<DataShareObserver> as parameters.
+ * @tc.step:
+    1. Create a Uri instance using the SLIENT_ERROR_URI constant.
+    2. Instantiate a DataShareObserverTest as a std::shared_ptr<DataShareObserver> (dataObserver).
+    3. Verify that g_slientAccessHelper and dataObserver are both not nullptr.
+    4. Call the UnregisterObserverExtProvider method of g_slientAccessHelper with the invalid Uri and dataObserver.
+    5. Create a dummy ChangeInfo object (set ChangeType to INSERT and include the invalid Uri in the URI list).
+ * @tc.expect:
+    1. No crashes or unexpected exceptions occur during the UnregisterObserverExtProvider call.
+    2. The method executes normally, and creating the dummy ChangeInfo object does not cause errors.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_UnregisterObserverExtProvider_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_UnregisterObserverExtProvider_Test_001::Begin");
@@ -1500,19 +1843,30 @@ HWTEST_F(SlientAccessTest, SlientAccess_UnregisterObserverExtProvider_Test_001, 
 }
 
 /**
-* @tc.name: SlientAccess_NotifyChangeExtProvider_Test_001
-* @tc.desc: Test NotifyChangeExtProvider with invalid URI (covers generalCtl == nullptr branch)
-* @tc.type: FUNC
-* @tc.require: NA
-* @tc.precon: None
-* @tc.step:
-* 1. Create invalid URI (SLIENT_ERROR_URI)
-* 2. Create DataShareObserverTest instance
-* 3. Register observer with invalid URI
-* 4. Create ChangeInfo object for INSERT operation
-* 5. Call NotifyChangeExtProvider with ChangeInfo
-* @tc.expect: No crash occurs, notification process executes without errors
-*/
+ * @tc.name: SlientAccess_NotifyChangeExtProvider_Test_001
+ * @tc.desc: Test the NotifyChangeExtProvider method using an invalid URI (SLIENT_ERROR_URI) (after registering an
+ *           observer), covering the generalCtl_ == nullptr branch, verifying no crashes and normal notification
+ *           process.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon:
+    1. The global DataShareHelper instance g_slientAccessHelper is pre-initialized and not nullptr.
+    2. DataShareObserverTest can be instantiated as a shared pointer; RegisterObserverExtProvider works for invalid
+       URIs.
+    3. The ChangeInfo structure supports setting ChangeType and a list of Uris; SLIENT_ERROR_URI is valid.
+    4. The NotifyChangeExtProvider method accepts a ChangeInfo object as a parameter.
+ * @tc.step:
+    1. Create a Uri instance using the SLIENT_ERROR_URI constant.
+    2. Instantiate a DataShareObserverTest as a std::shared_ptr<DataShareObserver> (dataObserver).
+    3. Verify that g_slientAccessHelper and dataObserver are not nullptr.
+    4. Call g_slientAccessHelper->RegisterObserverExtProvider with the invalid Uri, dataObserver, and true.
+    5. Create a ChangeInfo object: set ChangeType to DataShareObserver::ChangeType::INSERT, and include the invalid Uri
+       in its URI list.
+    6. Call g_slientAccessHelper->NotifyChangeExtProvider with the created ChangeInfo.
+ * @tc.expect:
+    1. No crashes or unexpected exceptions occur during registration and notification.
+    2. The NotifyChangeExtProvider method executes normally without errors.
+ */
 HWTEST_F(SlientAccessTest, SlientAccess_NotifyChangeExtProvider_Test_001, TestSize.Level0)
 {
     LOG_INFO("SlientAccess_NotifyChangeExtProvider_Test_001::Begin");

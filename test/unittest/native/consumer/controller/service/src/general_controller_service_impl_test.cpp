@@ -56,17 +56,24 @@ void GeneralControllerServiceImplTest::SetUp(void) {}
 void GeneralControllerServiceImplTest::TearDown(void) {}
 
 /**
-* @tc.name: RegisterObserverExtProviderTest001
-* @tc.desc: Verify RegisterObserverExtProvider operation in GeneralControllerServiceImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerServiceImpl with test URI
-    2. Call RegisterObserverExtProvider with empty URI and null observer
-    3. Check return code
-* @tc.expect:
-    1. Operation returns -1 (failure)
-*/
+ * @tc.name: RegisterObserverExtProviderTest001
+ * @tc.desc: Verify the RegisterObserverExtProvider operation in GeneralControllerServiceImpl with an empty Uri
+ *           and null observer, confirming failure via a return code of -1.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of GeneralControllerServiceImpl, sptr<AAFwk::IDataAbilityObserver>,
+       and Uri.
+    2. GeneralControllerServiceImpl can be initialized with a test URI string ("GeneralControllerServiceImpl").
+ * @tc.step:
+    1. Create an empty Uri and a GeneralControllerServiceImpl instance initialized with the test URI
+       ("GeneralControllerServiceImpl").
+    2. Create a null sptr<AAFwk::IDataAbilityObserver> (dataObserver).
+    3. Call the RegisterObserverExtProvider method with the empty Uri, dataObserver, and isDescendants = false.
+    4. Check the return code of the RegisterObserverExtProvider operation.
+ * @tc.expect:
+    1. The RegisterObserverExtProvider operation returns -1, indicating failure.
+ */
 HWTEST_F(GeneralControllerServiceImplTest, RegisterObserverExtProviderTest001, TestSize.Level0)
 {
     LOG_INFO("GeneralControllerServiceImplTest RegisterObserverExtProviderTest001::Start");
@@ -86,17 +93,24 @@ HWTEST_F(GeneralControllerServiceImplTest, RegisterObserverExtProviderTest001, T
 }
 
 /**
-* @tc.name: UnregisterObserverExtProviderTest001
-* @tc.desc: Verify UnregisterObserverExtProvider operation in GeneralControllerServiceImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerServiceImpl with test URI
-    2. Call UnregisterObserverExtProvider with empty URI and null observer
-    3. Check return code
-* @tc.expect:
-    1. Operation returns -1 (failure)
-*/
+ * @tc.name: UnregisterObserverExtProviderTest001
+ * @tc.desc: Verify the UnregisterObserverExtProvider operation in GeneralControllerServiceImpl with an empty Uri
+ *           and null observer, confirming failure via a return code of -1.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of GeneralControllerServiceImpl, sptr<AAFwk::IDataAbilityObserver>,
+       and Uri.
+    2. GeneralControllerServiceImpl can be initialized with a test URI string ("GeneralControllerServiceImpl").
+ * @tc.step:
+    1. Create an empty Uri and a GeneralControllerServiceImpl instance initialized with the test URI
+       ("GeneralControllerServiceImpl").
+    2. Create a null sptr<AAFwk::IDataAbilityObserver> (dataObserver).
+    3. Call the UnregisterObserverExtProvider method with the empty Uri and dataObserver.
+    4. Check the return code of the UnregisterObserverExtProvider operation.
+ * @tc.expect:
+    1. The UnregisterObserverExtProvider operation returns -1, indicating failure.
+ */
 HWTEST_F(GeneralControllerServiceImplTest, UnregisterObserverExtProviderTest001, TestSize.Level0)
 {
     LOG_INFO("GeneralControllerServiceImplTest UnregisterObserverExtProviderTest001::Start");
@@ -116,18 +130,23 @@ HWTEST_F(GeneralControllerServiceImplTest, UnregisterObserverExtProviderTest001,
 }
 
 /**
-* @tc.name: NotifyChangeExtProviderTest001
-* @tc.desc: Verify NotifyChangeExtProvider operation in GeneralControllerServiceImpl
-* @tc.type: FUNC
-* @tc.precon: None
-* @tc.step:
-    1. Create GeneralControllerServiceImpl with test URI
-    2. Prepare ChangeInfo with empty URI
-    3. Call NotifyChangeExtProvider with the change info
-    4. Check return code
-* @tc.expect:
-    1. Operation returns -1 (failure)
-*/
+ * @tc.name: NotifyChangeExtProviderTest001
+ * @tc.desc: Verify the NotifyChangeExtProvider operation in GeneralControllerServiceImpl with a ChangeInfo containing
+ *           an empty Uri, confirming failure via a return code of -1.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The test environment supports instantiation of GeneralControllerServiceImpl, ChangeInfo, and Uri.
+    2. GeneralControllerServiceImpl can be initialized with a test URI string ("GeneralControllerServiceImpl").
+    3. ChangeInfo supports initialization with ChangeType::INSERT and a list containing an empty Uri.
+ * @tc.step:
+    1. Create an empty Uri and a ChangeInfo (ChangeType::INSERT, {empty Uri}).
+    2. Create a GeneralControllerServiceImpl instance initialized with the test URI ("GeneralControllerServiceImpl").
+    3. Call the NotifyChangeExtProvider method with the created ChangeInfo.
+    4. Check the return code of the NotifyChangeExtProvider operation.
+ * @tc.expect:
+    1. The NotifyChangeExtProvider operation returns -1, indicating failure.
+ */
 HWTEST_F(GeneralControllerServiceImplTest, NotifyChangeExtProviderTest001, TestSize.Level0)
 {
     LOG_INFO("GeneralControllerServiceImplTest NotifyChangeExtProviderTest001::Start");
