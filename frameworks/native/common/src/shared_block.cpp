@@ -164,7 +164,8 @@ int SharedBlock::Clear()
     mHeader->lastPos_ = 0;
     mHeader->blockPos_ = 0;
 
-    RowGroupHeader *firstGroup = static_cast<RowGroupHeader *>(OffsetToPtr(mHeader->firstRowGroupOffset));
+    RowGroupHeader *firstGroup =
+        static_cast<RowGroupHeader *>(OffsetToPtr(mHeader->firstRowGroupOffset, sizeof(RowGroupHeader)));
     if (!firstGroup) {
         LOG_ERROR("Failed to get group in clear().");
         return SHARED_BLOCK_BAD_VALUE;
@@ -215,7 +216,7 @@ int SharedBlock::AllocRow()
         return SHARED_BLOCK_NO_MEMORY;
     }
 
-    CellUnit *fieldDir = static_cast<CellUnit *>(OffsetToPtr(fieldDirOffset));
+    CellUnit *fieldDir = static_cast<CellUnit *>(OffsetToPtr(fieldDirOffset, sizeof(CellUnit)));
     if (fieldDir == nullptr) {
         return SHARED_BLOCK_BAD_VALUE;
     }
@@ -251,7 +252,7 @@ uint32_t SharedBlock::Alloc(size_t size, bool aligned)
     uint32_t offset = mHeader->unusedOffset + padding;
     uint32_t nextFreeOffset;
 
-    if (offset + size > mSize) {
+    if (offset + size >= mSize) {
         LOG_ERROR("SharedBlock is full: requested allocation %{public}zu bytes,"
             " free space %{public}zu bytes, block size %{public}zu bytes",
             size, mSize - mHeader->unusedOffset, mSize);
@@ -266,7 +267,8 @@ inline uint32_t *SharedBlock::GetRowOffset(uint32_t row)
 {
     uint32_t rowPos = row;
 
-    RowGroupHeader *group = static_cast<RowGroupHeader *>(OffsetToPtr(mHeader->firstRowGroupOffset));
+    RowGroupHeader *group =
+        static_cast<RowGroupHeader *>(OffsetToPtr(mHeader->firstRowGroupOffset, sizeof(RowGroupHeader)));
     if (group == nullptr) {
         LOG_ERROR("Failed to get group in getRowOffset().");
         return nullptr;
@@ -288,14 +290,15 @@ uint32_t *SharedBlock::AllocRowOffset()
 {
     uint32_t rowPos = mHeader->rowNums;
 
-    RowGroupHeader *group = static_cast<RowGroupHeader *>(OffsetToPtr(mHeader->firstRowGroupOffset));
+    RowGroupHeader *group =
+        static_cast<RowGroupHeader *>(OffsetToPtr(mHeader->firstRowGroupOffset, sizeof(RowGroupHeader)));
     if (group == nullptr) {
         LOG_ERROR("Failed to get group in allocRowOffset().");
         return nullptr;
     }
 
     while (rowPos > ROW_OFFSETS_NUM) {
-        group = static_cast<RowGroupHeader *>(OffsetToPtr(group->nextGroupOffset));
+        group = static_cast<RowGroupHeader *>(OffsetToPtr(group->nextGroupOffset, sizeof(RowGroupHeader)));
         if (group == nullptr) {
             LOG_ERROR("Failed to get group in OffsetToPtr(group->nextGroupOffset) when while loop.");
             return nullptr;
@@ -310,7 +313,7 @@ uint32_t *SharedBlock::AllocRowOffset()
                 return nullptr;
             }
         }
-        group = static_cast<RowGroupHeader *>(OffsetToPtr(group->nextGroupOffset));
+        group = static_cast<RowGroupHeader *>(OffsetToPtr(group->nextGroupOffset, sizeof(RowGroupHeader)));
         if (group == nullptr) {
             LOG_ERROR("Failed to get group in OffsetToPtr(group->nextGroupOffset).");
             return nullptr;
@@ -338,7 +341,7 @@ SharedBlock::CellUnit *SharedBlock::GetCellUnit(uint32_t row, uint32_t column)
         return nullptr;
     }
 
-    CellUnit *cellUnit = static_cast<CellUnit *>(OffsetToPtr(*rowOffset));
+    CellUnit *cellUnit = static_cast<CellUnit *>(OffsetToPtr(*rowOffset, sizeof(CellUnit)));
     if (!cellUnit) {
         LOG_ERROR("Failed to find cellUnit for rowOffset %{public}" PRIu32 ".", *rowOffset);
         return nullptr;
@@ -373,7 +376,7 @@ int SharedBlock::PutBlobOrString(uint32_t row, uint32_t column, const void *valu
         return SHARED_BLOCK_NO_MEMORY;
     }
 
-    void *ptr = OffsetToPtr(offset);
+    void *ptr = OffsetToPtr(offset, size);
     if (!ptr) {
         return SHARED_BLOCK_NO_MEMORY;
     }
