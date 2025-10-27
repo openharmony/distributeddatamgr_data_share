@@ -1,0 +1,543 @@
+{
+  "crossAppSharedConfig": [
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test01",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test02",
+      "value": "222",
+      "allowList": [
+        "6918703363676659027",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test03",
+      "value": "333111",
+      "allowList": [
+        "6918703363676659027",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test04",
+      "value": "444",
+      "allowList": [
+        "6918703363676659027",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test05",
+      "value": "datashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1testdatashareproxy://com.test.dataproxyhandle/test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1test1",
+      "allowList" : [
+        "12345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678123456781234567812345678",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "1",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "256",
+        "257"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test06",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test07",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test08",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test09",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test10",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test11",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test12",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test13",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test14",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test15",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test16",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test17",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test18",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test19",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test20",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test21",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test22",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test23",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test24",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test25",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test26",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test27",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test28",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test29",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test30",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test31",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    },
+    {
+      "uri": "datashareproxy://com.test.dataproxyhandle/test32",
+      "value": "111",
+      "allowList": [
+        "6918703363676659027",
+        "6917573629901742292",
+        "all"
+      ]
+    }
+  ]
+}
