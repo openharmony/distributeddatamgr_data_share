@@ -31,6 +31,7 @@ group("unittest") {
     ":DataShareHelperImplRegisterTest",
     ":DataShareHelperThresholdTest",
     ":DataShareHelperProxyTest",
+    ":DataShareResultSetTest",
   ]
 }
 
@@ -593,6 +594,35 @@ ohos_unittest("DataShareHelperProxyTest") {
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
     "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
+}
+
+ohos_unittest("DataShareResultSetTest") {
+  module_out_path = "data_share/data_share/native/consumer"
+
+  sources = [ "${datashare_base_path}/test/unittest/native/consumer/src/datashare_result_set_test.cpp" ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer",
+    "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_base_path}/test/unittest/native/resource/datashare_ext_bundle:datashare_ext",
+    "${datashare_base_path}/test/unittest/native/resource/ohos_test:copy_ohos_test",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:dataobs_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
