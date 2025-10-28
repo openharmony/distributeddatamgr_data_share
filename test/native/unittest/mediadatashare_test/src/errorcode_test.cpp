@@ -66,14 +66,14 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t system
 HapPolicyParams GetPolicy()
 {
     HapPolicyParams policy = {
-        .apl = APL_NORMAL,
+        .apl = APL_SYSTEM_CORE,
         .domain = "test.domain",
         .permList = {
             {
                 .permissionName = "ohos.permission.test",
                 .bundleName = "ohos.datashareclienttest.demo",
                 .grantMode = 1,
-                .availableLevel = APL_NORMAL,
+                .availableLevel = APL_SYSTEM_CORE,
                 .label = "label",
                 .labelId = 1,
                 .description = "ohos.datashareclienttest.demo",
@@ -81,13 +81,6 @@ HapPolicyParams GetPolicy()
             }
         },
         .permStateList = {
-            {
-                .permissionName = "ohos.permission.test",
-                .isGeneral = true,
-                .resDeviceID = { "local" },
-                .grantStatus = { PermissionState::PERMISSION_GRANTED },
-                .grantFlags = { 1 }
-            },
             {
                 .permissionName = "ohos.permission.GET_BUNDLE_INFO",
                 .isGeneral = true,
@@ -112,13 +105,14 @@ void ErrorCodeTest::SetUpTestCase(void)
         .userID = 100,
         .bundleName = "ohos.datashareclienttest.demo",
         .instIndex = 0,
+        .isSystemApp = true,
         .appIDDesc = "ohos.datashareclienttest.demo"
     };
     auto policy = GetPolicy();
     AccessTokenKit::AllocHapToken(info, policy);
-    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(
+    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenIDEx(
         info.userID, info.bundleName, info.instIndex);
-    SetSelfTokenID(testTokenId);
+    SetSelfTokenID(testTokenId.tokenIDEx);
 
     g_slientAccessHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI);
     ASSERT_TRUE(g_slientAccessHelper != nullptr);

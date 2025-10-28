@@ -59,6 +59,15 @@
       },
       {
         "srcEntrance": "./ets/entrybackupability/EntryBackupAbility.ts",
+        "name": "DataShareExtAbility1",
+        "type": "dataShare",
+        "uri": "datashare://com.acts.datasharetestsetup",
+        "readPermission": "ohos.permission.GET_BUNDLE_INFO",
+        "writePermission": "ohos.permission.GET_BUNDLE_INFO",
+        "exported": true
+      },
+      {
+        "srcEntrance": "./ets/entrybackupability/EntryBackupAbility.ts",
         "name": "DataShareExtAbility2",
         "type": "dataShare",
         "uri": "datashare://com.acts.datasharetest2",
@@ -81,6 +90,15 @@
         "uri": "datashareproxy://com.acts.datasharetest/test",
         "requiredReadPermission":"ohos.permission.GET_BUNDLE_INFO",
         "requiredWritePermission":"ohos.permission.WRITE_CONTACTS",
+        "metadata": {
+          "name": "dataProperties",
+          "resource": "$profile:test"
+        }
+      },
+      {
+        "uri": "datashareproxy://com.acts.datasharetest/DataShareStubImpl",
+        "requiredReadPermission":"ohos.permission.GET_BUNDLE_INFO",
+        "requiredWritePermission":"ohos.permission.GET_BUNDLE_INFO",
         "metadata": {
           "name": "dataProperties",
           "resource": "$profile:test"

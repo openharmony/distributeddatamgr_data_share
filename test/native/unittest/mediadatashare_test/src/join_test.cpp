@@ -79,13 +79,14 @@ void JoinTest::SetUpTestCase(void)
         .userID = 100,
         .bundleName = "ohos.datashareclienttest.demo",
         .instIndex = 0,
+        .isSystemApp = true,
         .appIDDesc = "ohos.datashareclienttest.demo" };
-    HapPolicyParams policy = { .apl = APL_NORMAL,
+    HapPolicyParams policy = { .apl = APL_SYSTEM_CORE,
         .domain = "test.domain",
         .permList = { { .permissionName = "ohos.permission.test",
             .bundleName = "ohos.datashareclienttest.demo",
             .grantMode = 1,
-            .availableLevel = APL_NORMAL,
+            .availableLevel = APL_SYSTEM_CORE,
             .label = "label",
             .labelId = 1,
             .description = "ohos.datashareclienttest.demo",
@@ -102,9 +103,9 @@ void JoinTest::SetUpTestCase(void)
         }
     };
     AccessTokenKit::AllocHapToken(info, policy);
-    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(
+    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenIDEx(
         info.userID, info.bundleName, info.instIndex);
-    SetSelfTokenID(testTokenId);
+    SetSelfTokenID(testTokenId.tokenIDEx);
 
     g_slientAccessHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI);
     ASSERT_TRUE(g_slientAccessHelper != nullptr);

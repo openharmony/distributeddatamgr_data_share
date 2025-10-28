@@ -119,18 +119,19 @@ void DataShareThresholdTest::SetUpTestCase(void)
         .userID = 100,
         .bundleName = "ohos.datashareclienttest.demo",
         .instIndex = 0,
+        .isSystemApp = true,
         .appIDDesc = "ohos.datashareclienttest.demo"
     };
     auto permStateList = GetPermissionStateFulls();
     HapPolicyParams policy = {
-        .apl = APL_NORMAL,
+        .apl = APL_SYSTEM_CORE,
         .domain = "test.domain",
         .permList = {
             {
                 .permissionName = "ohos.permission.test",
                 .bundleName = "ohos.datashareclienttest.demo",
                 .grantMode = 1,
-                .availableLevel = APL_NORMAL,
+                .availableLevel = APL_SYSTEM_CORE,
                 .label = "label",
                 .labelId = 1,
                 .description = "ohos.datashareclienttest.demo",

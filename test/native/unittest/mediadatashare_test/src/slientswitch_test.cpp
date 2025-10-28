@@ -77,17 +77,18 @@ void SlientSwitchTest::SetUpTestCase(void)
         .userID = 100,
         .bundleName = "com.acts.datasharetest",
         .instIndex = 0,
+        .isSystemApp = true,
         .appIDDesc = "com.acts.datasharetest"
     };
     HapPolicyParams policy = {
-        .apl = APL_NORMAL,
+        .apl = APL_SYSTEM_CORE,
         .domain = "test.domain",
         .permList = {
             {
                 .permissionName = "ohos.permission.test",
                 .bundleName = "com.acts.datasharetest",
                 .grantMode = 1,
-                .availableLevel = APL_NORMAL,
+                .availableLevel = APL_SYSTEM_CORE,
                 .label = "label",
                 .labelId = 1,
                 .description = "com.acts.datasharetest",
@@ -105,9 +106,9 @@ void SlientSwitchTest::SetUpTestCase(void)
         }
     };
     AccessTokenKit::AllocHapToken(info, policy);
-    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(
+    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenIDEx(
         info.userID, info.bundleName, info.instIndex);
-    SetSelfTokenID(testTokenId);
+    SetSelfTokenID(testTokenId.tokenIDEx);
 
     g_slientAccessHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI);
     ASSERT_TRUE(g_slientAccessHelper != nullptr);
