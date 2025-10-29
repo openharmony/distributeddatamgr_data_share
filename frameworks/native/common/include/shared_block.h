@@ -309,6 +309,9 @@ private:
         if (offset >= mSize) {
             return nullptr;
         }
+        if (offset > UINT32_MAX - bufferSize) {
+            return nullptr;
+        }
         if (offset + bufferSize >= mSize) {
             return nullptr;
         }

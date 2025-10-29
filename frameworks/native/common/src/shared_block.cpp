@@ -275,7 +275,7 @@ inline uint32_t *SharedBlock::GetRowOffset(uint32_t row)
     }
 
     while (rowPos >= ROW_OFFSETS_NUM) {
-        group = static_cast<RowGroupHeader *>(OffsetToPtr(group->nextGroupOffset));
+        group = static_cast<RowGroupHeader *>(OffsetToPtr(group->nextGroupOffset, sizeof(RowGroupHeader)));
         if (group == nullptr) {
             LOG_ERROR("Failed to get group in OffsetToPtr(group->nextGroupOffset) when while loop.");
             return nullptr;
