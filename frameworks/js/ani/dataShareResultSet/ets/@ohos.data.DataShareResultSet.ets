@@ -25,7 +25,7 @@ export default interface DataShareResultSet {
 
 class DataShareResultSetImpl implements DataShareResultSet {
 
-    static {loadLibrary("data_share_result_set")}
+    static {loadLibraryWithPermissionCheck("data_share_result_set", "@ohos.data.DataShareResultSet")}
     private nativePtr: long = 0;
 
     private clearNativePtr(): void {

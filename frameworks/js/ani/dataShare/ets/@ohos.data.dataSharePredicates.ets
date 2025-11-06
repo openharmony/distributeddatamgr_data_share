@@ -55,7 +55,7 @@ class FinalizationAgent<T extends Object> {
 let finalizer = new FinalizationRegistry<Cleaner>(Cleaner.callback)
 
 export class DataSharePredicates{
-    static { loadLibrary("datasharepredicates_ani") }
+    static { loadLibraryWithPermissionCheck("datasharepredicates_ani", "@ohos.data.dataSharePredicates") }
     private nativePtr:long = 0;
     private fzAgent: FinalizationAgent<DataSharePredicates>;
 
