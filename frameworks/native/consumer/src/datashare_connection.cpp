@@ -67,10 +67,12 @@ void DataShareConnection::OnAbilityConnectDone(
             DataShareStringUtils::Change(element.GetURI()).c_str(), resultCode);
         Disconnect();
     }
-    // re-register when re-connect successed
+    // only filp isReconnect flag in onAbilityConnectDone, in the first time this ability is connected, set this flag
+    // to true, when this callback is called not first time, it always means reconnect and need reregister
     if (isReconnect_.load()) {
         ReRegisterObserverExtProvider();
-        isReconnect_.store(false);
+    } else {
+        isReconnect_.store(true);
     }
 }
 
@@ -122,8 +124,6 @@ void DataShareConnection::ReconnectExtAbility(const std::string &uri)
             reConnects_.count = 1;
             reConnects_.firstTime = std::chrono::duration_cast<std::chrono::milliseconds>(curr).count();
             reConnects_.prevTime = std::chrono::duration_cast<std::chrono::milliseconds>(curr).count();
-            // set status true
-            isReconnect_.store(true);
         }
         return;
     }
@@ -162,7 +162,6 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
                 selfSharedPtr->reConnects_.count++;
                 selfSharedPtr->reConnects_.prevTime = std::chrono::duration_cast<std::chrono::milliseconds>(
                     std::chrono::system_clock::now().time_since_epoch()).count();
-                selfSharedPtr->isReconnect_.store(true);
             }
         }
     });
