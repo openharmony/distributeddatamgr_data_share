@@ -1444,12 +1444,10 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Update_Test_002, TestSize.Lev
     4. Create a Uri (SLIENT_ACCESS_PERMISSION2_URI), predicates (EqualTo(TBL_STU_NAME, "lisi")), empty columns, and
        DatashareBusinessError (businessError).
     5. Call helper->Query(uri, predicates, columns, &businessError) and record the ResultSet (resultSet).
-    6. Declare an int (result) for row count; if resultSet is non-null, call GetRowCount(result) (expect 0).
-    7. Clean up: set helper to nullptr and delete the token; check resultSet, result, and businessError.GetCode().
+    6. Clean up: set helper to nullptr and delete the token; check resultSet and businessError.GetCode().
  * @tc.expect:
     1. The Query operation returns a nullptr ResultSet.
-    2. The row count (result) is 0.
-    3. The DatashareBusinessError code (from GetCode()) is -2 (permission denied).
+    2. The DatashareBusinessError code (from GetCode()) is -2 (permission denied).
  */
 HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_001, TestSize.Level0)
 {
@@ -1487,11 +1485,6 @@ HWTEST_F(SlientAccessTest, SlientAccess_Permission_Query_Test_001, TestSize.Leve
     vector<string> columns;
     DatashareBusinessError businessError;
     auto resultSet = helper->Query(uri, predicates, columns, &businessError);
-    int result = 0;
-    if (resultSet != nullptr) {
-        resultSet->GetRowCount(result);
-    }
-    EXPECT_EQ(result, 0);
     EXPECT_EQ(resultSet, nullptr);
     EXPECT_EQ(businessError.GetCode(), -2);
     helper = nullptr;
