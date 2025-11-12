@@ -66,13 +66,16 @@ void DataShareConnection::OnAbilityConnectDone(
             DataShareStringUtils::Change(uri_.ToString()).c_str(),
             DataShareStringUtils::Change(element.GetURI()).c_str(), resultCode);
         Disconnect();
+        // when inInvalid is true, it means that this connection has been disconnected and does not need to be
+        // re-registered
+        return;
     }
-    // only filp isReconnect flag in onAbilityConnectDone, in the first time this ability is connected, set this flag
-    // to true, when this callback is called not first time, it always means reconnect and need reregister
-    if (isReconnect_.load()) {
+    // Entering this function for the first time indicates a normal connection, and re-registration is not required.
+    // Entering this function for the second time or later indicates an abnormal reconnection, and re-registration is
+    // necessary. The atomic operation of the exchange ensures that only the thread that first connect can get false
+    // while all other thread attempting to reconnect will get true.
+    if (isReconnect_.exchange(true)) {
         ReRegisterObserverExtProvider();
-    } else {
-        isReconnect_.store(true);
     }
 }
 

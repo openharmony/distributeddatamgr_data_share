@@ -40,6 +40,8 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
+    void OnAbilityConnectDone(const sptr<DataShare::DataShareConnection> &connection, const sptr<IRemoteObject> &token,
+       std::atomic<bool> &stop);
     bool UrisEqual(std::list<Uri> uri1, std::list<Uri> uri2)
     {
         if (uri1.size() != uri2.size()) {
@@ -103,11 +105,29 @@ public:
 
 std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
 std::string DATA_SHARE_URI1 = "datashare:///com.acts.datasharetest1";
+constexpr int TEST_TIME = 20;
 
 void DataShareConnectionTest::SetUpTestCase(void) {}
 void DataShareConnectionTest::TearDownTestCase(void) {}
 void DataShareConnectionTest::SetUp(void) {}
 void DataShareConnectionTest::TearDown(void) {}
+
+void DataShareConnectionTest::OnAbilityConnectDone(const sptr<DataShare::DataShareConnection> &connection,
+    const sptr<IRemoteObject> &token, std::atomic<bool> &stop)
+{
+    int i = 0;
+    while (!stop.load()) {
+        LOG_INFO("OnAbilityConnectDone start %{public}d", i);
+        std::string deviceId = "deviceId";
+        std::string bundleName = "bundleName";
+        std::string abilityName = "abilityName";
+        AppExecFwk::ElementName element(deviceId, bundleName, abilityName);
+        int resultCode = 0;
+        connection->OnAbilityConnectDone(element, token, resultCode);
+        LOG_INFO("OnAbilityConnectDone end %{public}d", i);
+        i++;
+    }
+}
 
 /**
  * @tc.name: DataShareConnection_UpdateObserverExtsProviderMap_Test_001
@@ -355,6 +375,68 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityConnectDone_Test_
 }
 
 /**
+ * @tc.name: DataShareConnection_OnAbilityConnectDone_Test_002
+ * @tc.desc: Verify OnAbilityConnectDone method called after disconnect
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataShareConnection object with the test URI (DATA_SHARE_URI) and a valid IRemoteObject token.
+    2. Create a DataShareProxy instance using the token and assign it to the dataShareConnection's dataShareProxy_
+       member.
+    3. Add two observers to the observerExtsProvider_ map (with DATA_SHARE_URI and DATA_SHARE_URI1 respectively) using
+       UpdateObserverExtsProviderMap.
+    4. Set the isInvalid_ flag of the DataShareConnection to true.
+    5. Create an AppExecFwk::ElementName instance with test parameters and a resultCode of 0.
+    6. Call the OnAbilityConnectDone method with the ElementName, token, and resultCode as parameters.
+    7. Check whether the observerExtsProvider_ map remains non-empty after the connection is done.
+ * @tc.expect:
+    1. The observerExtsProvider_ map remains non-empty after the OnAbilityConnectDone method is executed.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityConnectDone_Test_002, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_OnAbilityConnectDone_Test_002::Start");
+
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    sptr<DataShare::DataShareConnection> connection =
+        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    ASSERT_NE(connection, nullptr);
+
+    // get proxy not null
+    std::shared_ptr<DataShareProxy> tokenProxy = std::make_shared<DataShareProxy>(token);
+    ASSERT_NE(tokenProxy, nullptr);
+    connection->dataShareProxy_ = tokenProxy;
+
+    // insert data
+    EXPECT_TRUE(connection->observerExtsProvider_.Empty());
+    sptr<IDataAbilityObserverTest> dataObserver = new (std::nothrow) IDataAbilityObserverTest(DATA_SHARE_URI);
+    connection->UpdateObserverExtsProviderMap(uri, dataObserver, true);
+
+    Uri uri1(DATA_SHARE_URI1);
+    sptr<IDataAbilityObserverTest> dataObserver1 = new (std::nothrow) IDataAbilityObserverTest(DATA_SHARE_URI1);
+    connection->UpdateObserverExtsProviderMap(uri1, dataObserver1, true);
+
+    EXPECT_FALSE(connection->observerExtsProvider_.Empty());
+    EXPECT_EQ(connection->observerExtsProvider_.Size(), 2);
+
+    // test onAbilityConnectDone after disconnect scene
+    connection->isInvalid_.store(true);
+    std::string deviceId = "deviceId";
+    std::string bundleName = "bundleName";
+    std::string abilityName = "abilityName";
+    AppExecFwk::ElementName element(deviceId, bundleName, abilityName);
+    int resultCode = 0;
+    connection->OnAbilityConnectDone(element, token, resultCode);
+    EXPECT_FALSE(connection->observerExtsProvider_.Empty());
+    connection = nullptr;
+
+    LOG_INFO("DataShareConnection_OnAbilityConnectDone_Test_002::End");
+}
+
+/**
  * @tc.name: DataShareConnection_OnAbilityDisconnectDone_Test_001
  * @tc.desc: Verify that the thread name in the connection pool of DataShareConnection is correctly set to the expected
  *           value after the OnAbilityDisconnectDone method is called during reconnection.
@@ -393,6 +475,69 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityDisconnectDone_Te
     connection->OnAbilityDisconnectDone(element, resultCode);
     EXPECT_EQ(connection->pool_->pool_.threadName_, DATASHARE_EXECUTOR_NAME);
     LOG_INFO("DataShareConnection_OnAbilityDisconnectDone_Test_001::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_ConcurrentOnAbilityConnectDone_Test_001
+ * @tc.desc: Verify concurrent OnAbilityConnectDone operations
+ * @tc.type: concurrent
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Create a DataShareConnection instance
+    2. Get DataShareProxy
+    3. Create three threads to concurrently perform onAbilityConnectDone
+    4. Run the concurrent operations for a specified test duration
+    5. Stop all threads and wait for their completion
+ * @tc.expect:
+    1. All concurrent OnAbilityConnectDone operations complete without crashes
+    2. No deadlocks occur during concurrent observer management
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_ConcurrentOnAbilityConnectDone_Test_001, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_ConcurrentOnAbilityConnectDone_Test_001::Start");
+    std::atomic<bool> stop = false;
+    int testTime = TEST_TIME;
+
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    sptr<DataShare::DataShareConnection> connection =
+        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    ASSERT_NE(connection, nullptr);
+
+    // get proxy not null
+    std::shared_ptr<DataShareProxy> tokenProxy = std::make_shared<DataShareProxy>(token);
+    ASSERT_NE(tokenProxy, nullptr);
+    connection->dataShareProxy_ = tokenProxy;
+
+    // insert data
+    EXPECT_TRUE(connection->observerExtsProvider_.Empty());
+    sptr<IDataAbilityObserverTest> dataObserver = new (std::nothrow) IDataAbilityObserverTest(DATA_SHARE_URI);
+    ASSERT_NE(dataObserver, nullptr);
+    connection->UpdateObserverExtsProviderMap(uri, dataObserver, true);
+
+    Uri uri1(DATA_SHARE_URI1);
+    sptr<IDataAbilityObserverTest> dataObserver1 = new (std::nothrow) IDataAbilityObserverTest(DATA_SHARE_URI1);
+    ASSERT_NE(dataObserver1, nullptr);
+    connection->UpdateObserverExtsProviderMap(uri1, dataObserver1, true);
+
+    EXPECT_FALSE(connection->observerExtsProvider_.Empty());
+    EXPECT_EQ(connection->observerExtsProvider_.Size(), 2);
+    std::function<void()> func1 = [&connection, &token, &stop, this]() {
+        OnAbilityConnectDone(connection, token, stop);
+    };
+    std::function<void()> func2 = [&connection, &token, &stop, this]() {
+        OnAbilityConnectDone(connection, token, stop);
+    };
+    std::thread t1(func1);
+    std::thread t2(func2);
+    sleep(testTime);
+    stop = true;
+    t1.join();
+    t2.join();
+    LOG_INFO("DataShareConnection_ConcurrentOnAbilityConnectDone_Test_001::End");
 }
 }
 }
