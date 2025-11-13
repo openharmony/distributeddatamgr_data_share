@@ -1,0 +1,178 @@
+# Copyright (c) 2022-2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/components/ets_frontend/ets2abc_config.gni")
+import("//build/ohos.gni")
+import("//foundation/distributeddatamgr/data_share/datashare.gni")
+
+rust_cxx("datashare_ani_cxx_gen") {
+  sources = [
+    "src/wrapper.rs"
+  ]
+}
+
+ohos_static_library("datashare_ani_cxx") {
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  stack_protector_ret = true
+
+  include_dirs = [
+    "include",
+    "${target_gen_dir}/src",
+  ]
+
+  sources = [
+    "src/cxx/datashare_ani.cpp",
+    "src/cxx/ani_inner_observer.cpp",
+    "src/cxx/ani_observer.cpp",
+    "src/cxx/ani_subscriber.cpp",
+    "src/cxx/ani_subscriber_manager.cpp",
+  ]
+  sources += get_target_outputs(":datashare_ani_cxx_gen")
+  deps = [
+    "../../../interfaces/inner_api:datashare_consumer",
+    "${datashare_innerapi_path}/common:datashare_common",
+    ":datashare_ani_cxx_gen",
+  ]
+  external_deps = [
+    "ability_runtime:ani_base_context",
+    "ability_runtime:app_context",
+    "ability_runtime:dataobs_manager",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "hitrace:libhitracechain",
+    "ipc:ipc_single",
+    "runtime_core:ani",
+    "rust_cxx:cxx_cppdeps",
+    "samgr:samgr_proxy",
+  ]
+  subsystem_name = "distributeddatamgr"
+  part_name = "data_share"
+}
+
+ohos_rust_shared_ffi("datashare_ani_rs") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    boundary_sanitize = true
+    all_ubsan = true
+    debug = false
+  }
+
+  sources = [ "src/lib.rs" ]
+  
+  external_deps = [
+    "hilog:libhilog",
+    "hilog:hilog_rust",
+    "ipc:ipc_rust",
+    "netmanager_base:ani_rs",
+    "runtime_core:ani",
+    "rust_cxx:lib",
+    "samgr:samgr_rust",
+  ]
+  deps = [
+    ":datashare_ani_cxx",
+    "//third_party/rust/crates/serde/serde:lib",
+  ]
+
+  clippy_lints = "none"
+
+  subsystem_name = "distributeddatamgr"
+  part_name = "data_share"
+  output_extension = "so"
+}
+
+generate_static_abc("datashare_ani_abc") {
+  base_url = "ets"
+  files = [ "ets/@ohos.data.dataShare.ets" ]
+  dst_file = "$target_out_dir/datashareAni.abc"
+  out_puts = [ "$target_out_dir/datashareAni.abc" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/datashareAni.abc"
+}
+
+ohos_prebuilt_etc("datashare_ani_abc_etc") {
+  source = "$target_out_dir/datashareAni.abc"
+  module_install_dir = "framework"
+  subsystem_name = "distributeddatamgr"
+  part_name = "data_share"
+  deps = [ ":datashare_ani_abc" ]
+}
+
+generate_static_abc("datashare_predicates_ani_abc") {
+  base_url = "ets"
+  files = [ "ets/@ohos.data.dataSharePredicates.ets" ]
+  dst_file = "$target_out_dir/dataSharePredicatesAni.abc"
+  out_puts = [ "$target_out_dir/dataSharePredicatesAni.abc" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/dataSharePredicatesAni.abc"
+}
+
+ohos_prebuilt_etc("datashare_predicates_ani_abc_etc") {
+  source = "$target_out_dir/dataSharePredicatesAni.abc"
+  module_install_dir = "framework"
+  subsystem_name = "distributeddatamgr"
+  part_name = "data_share"
+  deps = [ ":datashare_predicates_ani_abc" ]
+}
+
+generate_static_abc("datashare_resultset_ani_abc") {
+  base_url = "ets"
+  files = [ "ets/@ohos.data.DataShareResultSet.ets" ]
+  dst_file = "$target_out_dir/DataShareResultSetAni.abc"
+  out_puts = [ "$target_out_dir/DataShareResultSetAni.abc" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/DataShareResultSetAni.abc"
+}
+
+ohos_prebuilt_etc("datashare_resultset_ani_abc_etc") {
+  source = "$target_out_dir/DataShareResultSetAni.abc"
+  module_install_dir = "framework"
+  subsystem_name = "distributeddatamgr"
+  part_name = "data_share"
+  deps = [ ":datashare_resultset_ani_abc" ]
+}
+
+generate_static_abc("datashare_extension_ability_ani_abc") {
+  base_url = "ets"
+  files = [ "ets/@ohos.application.DataShareExtensionAbility.ets" ]
+  dst_file = "$target_out_dir/DataShareExtensionAbilityAni.abc"
+  out_puts = [ "$target_out_dir/DataShareExtensionAbilityAni.abc" ]
+  is_boot_abc = "True"
+  device_dst_file = "/system/framework/DataShareExtensionAbilityAni.abc"
+}
+
+ohos_prebuilt_etc("datashare_extension_ability_ani_abc_etc") {
+  source = "$target_out_dir/DataShareExtensionAbilityAni.abc"
+  module_install_dir = "framework"
+  subsystem_name = "distributeddatamgr"
+  part_name = "data_share"
+  deps = [ ":datashare_extension_ability_ani_abc" ]
+}
+
+group("datashare_ani_group") {
+  deps = [
+    ":datashare_ani_rs",
+    ":datashare_ani_abc_etc",
+    ":datashare_predicates_ani_abc_etc",
+    ":datashare_resultset_ani_abc_etc",
+    ":datashare_extension_ability_ani_abc_etc",
+  ]
+}

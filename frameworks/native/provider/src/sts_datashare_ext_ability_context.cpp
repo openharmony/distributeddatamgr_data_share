@@ -1,0 +1,109 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#define LOG_TAG "sts_datashare_ext_ability_context"
+
+#include "sts_datashare_ext_ability_context.h"
+
+#include "datashare_log.h"
+#include "ability_manager_client.h"
+#include "ets_context_utils.h"
+#include "ets_error_utils.h"
+#include "ets_extension_context.h"
+
+namespace OHOS {
+namespace DataShare {
+using namespace AbilityRuntime;
+constexpr const char* CONTEXT_CLASS_NAME = "Lapplication/ExtensionContext/ExtensionContext;";
+namespace {
+class StsDataShareExtAbilityContext final {
+public:
+    explicit StsDataShareExtAbilityContext(const std::shared_ptr<DataShareExtAbilityContext>& context)
+        : context_(context) {}
+    ~StsDataShareExtAbilityContext() = default;
+
+private:
+    std::weak_ptr<DataShareExtAbilityContext> context_;
+};
+} // namespace
+
+bool GetNativeContext(ani_env *env, ani_status &status, ani_class &cls, ani_object &contextObj, ani_field &field)
+{
+    ani_method method = nullptr;
+    if ((env->FindClass(CONTEXT_CLASS_NAME, &cls)) != ANI_OK) {
+        LOG_ERROR("Failed to find class %{public}s, status: %{public}d", CONTEXT_CLASS_NAME, status);
+        return false;
+    }
+    
+    if ((status = env->Class_FindMethod(cls, "<ctor>", ":V", &method)) != ANI_OK) {
+        LOG_ERROR("Failed to find constructor of %{public}s, status: %{public}d", CONTEXT_CLASS_NAME, status);
+        return false;
+    }
+    
+    if ((status = env->Object_New(cls, method, &contextObj)) != ANI_OK) {
+        LOG_ERROR("Failed to create context object, status: %{public}d", status);
+        return false;
+    }
+    
+    if ((status = env->Class_FindField(cls, "nativeContext", &field)) != ANI_OK) {
+        LOG_ERROR("Failed to find field nativeContext, status: %{public}d", status);
+        env->Reference_Delete(contextObj);
+        return false;
+    }
+    return true;
+}
+
+ani_object CreateStsDataShareExtAbilityContext(ani_env *env, std::shared_ptr<DataShareExtAbilityContext> context,
+    const std::shared_ptr<AppExecFwk::OHOSApplication> &application)
+{
+    LOG_DEBUG("CreateStsDataShareExtAbilityContext begin");
+    if (env == nullptr) {
+        LOG_ERROR("Failed to create sts extension ability context, env is null");
+        return nullptr;
+    }
+    ani_status status = ANI_ERROR;
+    ani_class cls = nullptr;
+    ani_object contextObj = nullptr;
+    ani_field field = nullptr;
+    if (!GetNativeContext(env, status, cls, contextObj, field)) {
+        LOG_ERROR("Failed to get native context, status: %{public}d", status);
+        return nullptr;
+    }
+    
+    StsDataShareExtAbilityContext* stsContext = new (std::nothrow)StsDataShareExtAbilityContext(context);
+    if (stsContext == nullptr) {
+        LOG_ERROR("Get stsContext failed");
+        env->Reference_Delete(contextObj);
+        return nullptr;
+    }
+    ani_long nativeContextLong = (ani_long)stsContext;
+    if ((status = env->Object_SetField_Long(contextObj, field, nativeContextLong)) != ANI_OK) {
+        LOG_ERROR("Failed to set field, status: %{public}d", status);
+        env->Reference_Delete(contextObj);
+        delete stsContext;
+        return nullptr;
+    }
+    if (application == nullptr) {
+        LOG_ERROR("Failed to create sts extension ability context, application is null");
+        env->Reference_Delete(contextObj);
+        delete stsContext;
+        return nullptr;
+    }
+    OHOS::AbilityRuntime::ContextUtil::CreateEtsBaseContext(env, cls, contextObj, context);
+    OHOS::AbilityRuntime::CreateEtsExtensionContext(env, cls, contextObj, context, context->GetAbilityInfo());
+    return contextObj;
+}
+}  // namespace DataShare
+}  // namespace OHOS

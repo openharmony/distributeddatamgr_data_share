@@ -20,17 +20,17 @@
 
 namespace OHOS {
 namespace DataShare {
-class IDataProxyRdbObserver : public OHOS::IRemoteBroker {
+class IDataProxyRdbObserver : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DataShare.IDataProxyRdbObserver");
 };
 
-class IDataProxyPublishedDataObserver : public OHOS::IRemoteBroker {
+class IDataProxyPublishedDataObserver : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DataShare.IDataProxyPublishedDataObserver");
 };
 
-class IProxyDataObserver : public OHOS::IRemoteBroker {
+class IProxyDataObserver : public IRemoteBroker {
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DataShare.IProxyDataObserver");
 };

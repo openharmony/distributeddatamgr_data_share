@@ -86,10 +86,10 @@ public:
     virtual int GetSilentProxyStatus(const std::string &uri) = 0;
 
     virtual int RegisterObserver(const Uri &uri,
-        const sptr<OHOS::IRemoteObject> &dataObserver) = 0;
+        const sptr<IRemoteObject> &dataObserver) = 0;
 
     virtual int UnRegisterObserver(const Uri &uri,
-        const sptr<OHOS::IRemoteObject> &dataObserver) = 0;
+        const sptr<IRemoteObject> &dataObserver) = 0;
 
     virtual std::pair<int32_t, int32_t> InsertEx(const Uri &uri, const Uri &extUri,
         const DataShareValuesBucket &value) = 0;
