@@ -28,7 +28,7 @@ public:
         : DataShareKvServiceProxy(impl) {}
     ~MockDataShareKvServiceProxy() = default;
     MOCK_METHOD(sptr<IRemoteObject>, GetFeatureInterface, (const std::string &name), (override));
-    MOCK_METHOD(uint32_t, RegisterClientDeathObserver, (const std::string &appId, sptr<IRemoteObject> observer),
+    MOCK_METHOD(int32_t, RegisterClientDeathObserver, (const std::string &appId, sptr<IRemoteObject> observer),
         (override));
 };
 }

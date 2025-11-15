@@ -57,7 +57,7 @@ sptr<IRemoteObject> DataShareKvServiceProxy::GetFeatureInterface(const std::stri
     return remoteObject;
 }
 
-uint32_t DataShareKvServiceProxy::RegisterClientDeathObserver(const std::string &appId, sptr<IRemoteObject> observer)
+int32_t DataShareKvServiceProxy::RegisterClientDeathObserver(const std::string &appId, sptr<IRemoteObject> observer)
 {
     if (observer == nullptr) {
         LOG_ERROR("observer is nullptr");
@@ -66,22 +66,50 @@ uint32_t DataShareKvServiceProxy::RegisterClientDeathObserver(const std::string 
 
     MessageParcel data;
     MessageParcel reply;
+    std::string featureName = "data_share";
     if (!data.WriteInterfaceToken(DataShareKvServiceProxy::GetDescriptor())) {
         LOG_ERROR("write descriptor failed");
         return -1;
     }
-    if (!ITypesUtil::Marshal(data, appId, observer)) {
+    if (!ITypesUtil::Marshal(data, appId, observer, featureName)) {
         LOG_ERROR("remote observer fail");
         return -1;
     }
     MessageOption mo { MessageOption::TF_SYNC };
     int32_t error = Remote()->SendRequest(
-        static_cast<uint32_t>(IKvStoreDataInterfaceCode::REGISTERCLIENTDEATHOBSERVER), data, reply, mo);
+        static_cast<uint32_t>(IKvStoreDataInterfaceCode::REGISTER_CLIENT_DEATH_OBSERVER), data, reply, mo);
     if (error != 0) {
         LOG_WARN("failed during IPC. errCode %{public}d", error);
         return -1;
     }
     return static_cast<uint32_t>(reply.ReadInt32());
+}
+
+std::pair<int32_t, std::string> DataShareKvServiceProxy::GetSelfBundleNameFromDataService()
+{
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(DataShareKvServiceProxy::GetDescriptor())) {
+        LOG_ERROR("write descriptor failed");
+        return {DATA_SHARE_ERROR, ""};
+    }
+
+    MessageOption mo { MessageOption::TF_SYNC };
+    int32_t error = Remote()->SendRequest(
+        static_cast<uint32_t>(IKvStoreDataInterfaceCode::GET_SELF_BUNDLE_NAME), data, reply, mo);
+    if (error != E_OK) {
+        LOG_ERROR("failed during IPC. errCode %{public}d", error);
+        return {DATA_SHARE_ERROR, ""};
+    }
+
+    int32_t status;
+    std::string bundleName;
+    if (!ITypesUtil::Unmarshal(reply, bundleName, status)) {
+        LOG_ERROR("fail to Unmarshal get bundleName reply");
+        return std::make_pair(DATA_SHARE_ERROR, "");
+    }
+
+    return std::make_pair(status, bundleName);
 }
 }
 }

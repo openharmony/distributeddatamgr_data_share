@@ -28,7 +28,9 @@ class IKvStoreDataService : public IRemoteBroker {
 public:
     virtual sptr<IRemoteObject> GetFeatureInterface(const std::string &name) = 0;
 
-    virtual uint32_t RegisterClientDeathObserver(const std::string &appId, sptr<IRemoteObject> observer) = 0;
+    virtual int32_t RegisterClientDeathObserver(const std::string &appId, sptr<IRemoteObject> observer) = 0;
+
+    virtual std::pair<int32_t, std::string> GetSelfBundleNameFromDataService() = 0;
 
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.DistributedKv.IKvStoreDataService");
 };
@@ -38,7 +40,8 @@ public:
     explicit DataShareKvServiceProxy(const sptr<IRemoteObject> &impl);
     ~DataShareKvServiceProxy() = default;
     sptr<IRemoteObject> GetFeatureInterface(const std::string &name) override;
-    uint32_t RegisterClientDeathObserver(const std::string &appId, sptr<IRemoteObject> observer) override;
+    int32_t RegisterClientDeathObserver(const std::string &appId, sptr<IRemoteObject> observer) override;
+    std::pair<int32_t, std::string> GetSelfBundleNameFromDataService() override;
 };
 }
 }
