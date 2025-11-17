@@ -49,30 +49,11 @@ void ProxyHandleTest::SetUpTestCase(void)
     int sleepTime = 1;
     sleep(sleepTime);
 
-    HapInfoParams info = { .userID = 100,
-        .bundleName = "com.acts.datasharetest",
-        .instIndex = 0,
-        .appIDDesc = "com.acts.datasharetest",
-        .isSystemApp = true };
-    HapPolicyParams policy = { .apl = APL_SYSTEM_BASIC,
-        .domain = "test.domain",
-        .permList = { { .permissionName = "ohos.permission.GET_BUNDLE_INFO",
-            .bundleName = "com.acts.datasharetest",
-            .grantMode = 1,
-            .availableLevel = APL_SYSTEM_BASIC,
-            .label = "label",
-            .labelId = 1,
-            .description = "com.acts.datasharetest",
-            .descriptionId = 1 } },
-        .permStateList = { { .permissionName = "ohos.permission.GET_BUNDLE_INFO",
-            .isGeneral = true,
-            .resDeviceID = { "local" },
-            .grantStatus = { PermissionState::PERMISSION_GRANTED },
-            .grantFlags = { 1 } } } };
-    AccessTokenKit::AllocHapToken(info, policy);
-    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenIDEx(
-        info.userID, info.bundleName, info.instIndex);
-    SetSelfTokenID(testTokenId.tokenIDEx);
+    int32_t userId = 100;
+    std::string bundleName = "com.acts.datasharetest";
+    int32_t appIndex = 0;
+    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenID(userId, bundleName, appIndex);
+    SetSelfTokenID(testTokenId);
 
     LOG_INFO("SetUpTestCase end");
 }
