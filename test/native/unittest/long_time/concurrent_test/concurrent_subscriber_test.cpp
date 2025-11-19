@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include <unistd.h>
 
+#include "accesstoken_kit.h"
 #include "callbacks_manager.h"
 #include "data_ability_observer_stub.h"
 #include "datashare_errno.h"
@@ -25,16 +26,24 @@
 #include "datashare_log.h"
 #include "datashare_template.h"
 #include "datashare_string_utils.h"
+#include "hap_token_info.h"
 #include "iservice_registry.h"
 #include "published_data_subscriber_manager.h"
 #include "rdb_subscriber_manager.h"
+#include "token_setproc.h"
 
 namespace OHOS {
 namespace DataShare {
 using namespace testing::ext;
+using namespace OHOS::Security::AccessToken;
 using RdbBaseCallbacks = CallbacksManager<RdbObserverMapKey, RdbObserver>;
 using RdbCallback = std::function<void(const RdbChangeNode &changeNode)>;
 RdbCallback g_rbdCallback = [](const RdbChangeNode &changeNode) {};
+RdbCallback g_timeConsumingRbdCallback = [](const RdbChangeNode &changeNode) {
+    LOG_INFO("rdb change sleep begin");
+    sleep(2);
+    LOG_INFO("rdb change sleep end");
+};
 RdbChangeNode g_rdbChangeNode;
 using PublishedBaseCallbacks = CallbacksManager<PublishedObserverMapKey, PublishedDataObserver>;
 using PublishedDataCallback = std::function<void(PublishedDataChangeNode &changeNode)>;
@@ -42,6 +51,7 @@ PublishedDataCallback g_publishedCallback = [](const PublishedDataChangeNode &ch
 PublishedDataChangeNode g_publishedChangeNode;
 constexpr int TEST_TIME = 20;
 void *g_subscriber;
+std::string DATA_SHARE_PROXY_URI = "datashareproxy://com.acts.ohos.data.datasharetest/test";
 
 /**
  * @Usage: add long_time/concurrent_test/ConcurrentTest to unittest.deps of file
@@ -57,6 +67,35 @@ public:
 
 void ConcurrentSubscriberTest::SetUpTestCase(void)
 {
+    LOG_INFO("SetUpTestCase invoked");
+    int sleepTime = 1;
+    sleep(sleepTime);
+
+    HapInfoParams info = { .userID = 100,
+        .bundleName = "ohos.datashareproxyclienttest.demo",
+        .instIndex = 0,
+        .appIDDesc = "ohos.datashareproxyclienttest.demo",
+        .isSystemApp = true };
+    HapPolicyParams policy = { .apl = APL_SYSTEM_BASIC,
+        .domain = "test.domain",
+        .permList = { { .permissionName = "ohos.permission.GET_BUNDLE_INFO",
+            .bundleName = "ohos.datashareproxyclienttest.demo",
+            .grantMode = 1,
+            .availableLevel = APL_SYSTEM_BASIC,
+            .label = "label",
+            .labelId = 1,
+            .description = "ohos.datashareproxyclienttest.demo",
+            .descriptionId = 1 } },
+        .permStateList = { { .permissionName = "ohos.permission.GET_BUNDLE_INFO",
+            .isGeneral = true,
+            .resDeviceID = { "local" },
+            .grantStatus = { PermissionState::PERMISSION_GRANTED },
+            .grantFlags = { 1 } } } };
+    AccessTokenKit::AllocHapToken(info, policy);
+    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenIDEx(
+        info.userID, info.bundleName, info.instIndex);
+    SetSelfTokenID(testTokenId.tokenIDEx);
+    LOG_INFO("SetUpTestCase end");
 }
 
 void ConcurrentSubscriberTest::TearDownTestCase(void)
@@ -91,7 +130,11 @@ public:
     using Key = RdbObserverMapKey;
     using Observer = RdbObserver;
     void AddObservers(int64_t subscriberId, std::string &bundleName, std::string &uri, std::atomic<bool> &stop);
+    void AddTimeConsumingObservers(std::shared_ptr<DataShare::DataShareHelper> helper, int64_t subscriberId,
+        std::string &bundleName, std::string &uri, std::atomic<bool> &stop);
     void DelObservers(int64_t subscriberId, std::string &bundleName, std::string &uri, std::atomic<bool> &stop);
+    void DelTimeConsumingObservers(std::shared_ptr<DataShare::DataShareHelper> helper, int64_t subscriberId,
+        std::string &bundleName, std::string &uri, std::atomic<bool> &stop);
 };
 
 void RdbSubscriberManagerTest::AddObservers(
@@ -125,6 +168,24 @@ void RdbSubscriberManagerTest::AddObservers(
     }
 }
 
+void RdbSubscriberManagerTest::AddTimeConsumingObservers(std::shared_ptr<DataShare::DataShareHelper> helper,
+    int64_t subscriberId, std::string &bundleName, std::string &uri, std::atomic<bool> &stop)
+{
+    std::vector<std::string> uris = { uri };
+    TemplateId templateId;
+    templateId.bundleName_ = bundleName;
+    templateId.subscriberId_ = subscriberId;
+    std::vector<PredicateTemplateNode> nodes;
+    Template tpl(nodes, "select name1 as name from TBL00");
+    auto result1 = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, subscriberId, tpl);
+    EXPECT_EQ(result1, 0);
+    while (!stop.load()) {
+        LOG_INFO("Rdb AddObservers start, subscriberId: %{public}d", static_cast<int>(subscriberId));
+        helper->SubscribeRdbData(uris, templateId, g_timeConsumingRbdCallback);
+        LOG_INFO("Rdb AddObservers end, subscriberId: %{public}d", static_cast<int>(subscriberId));
+    }
+}
+
 void RdbSubscriberManagerTest::DelObservers(
     int64_t subscriberId, std::string &bundleName, std::string &uri, std::atomic<bool> &stop)
 {
@@ -143,6 +204,20 @@ void RdbSubscriberManagerTest::DelObservers(
                     [](auto &result) { RdbSubscriberManager::GetInstance().lastChangeNodeMap_.Erase(result); });
             });
         LOG_INFO("Rdb DelObservers end, subscriberId: %{public}d", static_cast<int>(subscriberId));
+    }
+}
+
+void RdbSubscriberManagerTest::DelTimeConsumingObservers(std::shared_ptr<DataShare::DataShareHelper> helper,
+    int64_t subscriberId, std::string &bundleName, std::string &uri, std::atomic<bool> &stop)
+{
+    std::vector<std::string> uris = { uri };
+    TemplateId templateId;
+    templateId.bundleName_ = bundleName;
+    templateId.subscriberId_ = subscriberId;
+    while (!stop.load()) {
+        LOG_INFO("Rdb AddObservers start, subscriberId: %{public}d", static_cast<int>(subscriberId));
+        helper->UnsubscribeRdbData(uris, templateId);
+        LOG_INFO("Rdb AddObservers end, subscriberId: %{public}d", static_cast<int>(subscriberId));
     }
 }
 
@@ -202,6 +277,61 @@ HWTEST_F(ConcurrentSubscriberTest, ConcurrentRdbObserverTest, TestSize.Level0)
         sleep(1);
         testTime--;
     }
+    stop = true;
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+}
+
+
+/**
+ * @tc.name: ConcurrentRdbOnChangeTest
+ * @tc.desc: Verify concurrent SubscribeRdbData and UnsubscribeRdbData and Notify operations
+ * @tc.type: concurrent
+ * @tc.require: None
+ * @tc.precon: RdbSubscriberManager is properly initialized
+ * @tc.step: Subscribe and Unsubscribe rdbDataChange of two uris and notify in multithread
+ * @tc.expect:
+    1. All concurrent operations complete without crashes
+    2. No deadlocks occur during concurrent subscription management
+ */
+HWTEST_F(ConcurrentSubscriberTest, ConcurrentRdbOnChangeTest, TestSize.Level0)
+{
+    CreateOptions options;
+    options.enabled_ = true;
+    std::shared_ptr<DataShare::DataShareHelper> helper =
+        DataShare::DataShareHelper::Creator(DATA_SHARE_PROXY_URI, options);
+    ASSERT_NE(helper, nullptr);
+
+    std::atomic<bool> stop = false;
+    int testTime = TEST_TIME;
+    RdbSubscriberManagerTest instance;
+    std::string uri0 = DATA_SHARE_PROXY_URI;
+    std::string uri1 = "uri1";
+    std::string bundleName0 = "bundleName0";
+    std::string bundleName1 = "bundleName1";
+    std::function<void()> func1 = [&helper, &instance, &bundleName0, &uri0, &stop]() {
+        instance.AddTimeConsumingObservers(helper, 0, bundleName0, uri0, stop);
+    };
+    std::function<void()> func2 = [&helper, &instance, &bundleName0, &uri1, &stop]() {
+        instance.AddTimeConsumingObservers(helper, 1, bundleName0, uri1, stop);
+    };
+    std::function<void()> func3 = [&helper, &instance, &bundleName0, &uri1, &stop]() {
+        instance.DelTimeConsumingObservers(helper, 1, bundleName0, uri1, stop);
+    };
+    std::function<void()> func4 = [&helper, &instance, &bundleName1, &uri0, &stop]() {
+        Uri uri(uri0);
+        DataShare::DataShareValuesBucket valuesBucket;
+        valuesBucket.Put("name1", 1);
+        auto ret = helper->Insert(uri, valuesBucket);
+        EXPECT_GT(ret, 0);
+    };
+    std::thread t1(func1);
+    std::thread t2(func2);
+    std::thread t3(func3);
+    std::thread t4(func4);
+    sleep(testTime);
     stop = true;
     t1.join();
     t2.join();
