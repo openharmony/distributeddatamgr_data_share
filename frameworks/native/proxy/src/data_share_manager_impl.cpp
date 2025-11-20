@@ -124,28 +124,43 @@ sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
         dataMgrService_ = nullptr;
         return nullptr;
     }
-    RegisterClientDeathObserver();
+    // Unprocessed in history, pay attention to whether to return an error in the future
+    auto status = RegisterClientDeathObserver();
+    if (status != E_OK) {
+        LOG_ERROR("RegisterClientDeathObserver failed");
+    }
+
     return iface_cast<DataShareServiceProxy>(remote);
 }
 
-void DataShareManagerImpl::RegisterClientDeathObserver()
+int32_t DataShareManagerImpl::RegisterClientDeathObserver()
 {
-    if (dataMgrService_ == nullptr || bundleName_.empty()) {
-        return;
+    if (dataMgrService_ == nullptr) {
+        return DATA_SHARE_ERROR;
     }
-    LOG_INFO("RegisterClientDeathObserver bundleName is %{public}s", bundleName_.c_str());
     if (clientDeathObserverPtr_ == nullptr) {
         clientDeathObserverPtr_ = new (std::nothrow) DataShareClientDeathObserverStub();
     }
     if (clientDeathObserverPtr_ == nullptr) {
         LOG_WARN("new KvStoreClientDeathObserver failed");
-        return;
+        return DATA_SHARE_ERROR;
     }
+
+    if (bundleName_ == "") {
+        auto [code, bundleName] = dataMgrService_->GetSelfBundleNameFromDataService();
+        if (code != E_OK || bundleName == "") {
+            LOG_ERROR("get bundleName failed, code: %{public}d, bundleName: %{public}s", code, bundleName.c_str());
+            return DATA_SHARE_ERROR;
+        }
+        bundleName_ = bundleName;
+    }
+
     auto status = dataMgrService_->RegisterClientDeathObserver(bundleName_, clientDeathObserverPtr_);
     if (!status) {
         LOG_ERROR("RegisterClientDeathObserver failed, bundleName is %{public}s", bundleName_.c_str());
-        return;
+        return DATA_SHARE_ERROR;
     }
+    return E_OK;
 }
 
 DataShareManagerImpl::DataShareManagerImpl()

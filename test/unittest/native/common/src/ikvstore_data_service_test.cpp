@@ -90,7 +90,7 @@ HWTEST_F(IkvStoreDataServiceTest, RegisterClientDeathObserverNull_Test_001, Test
     LOG_INFO("RegisterClientDeathObserverNull_Test_001::Start");
     DataShareKvServiceProxy proxy(nullptr);
     std::string appId;
-    uint32_t result = proxy.RegisterClientDeathObserver(appId, nullptr);
+    int32_t result = proxy.RegisterClientDeathObserver(appId, nullptr);
     EXPECT_EQ(result, -1);
     LOG_INFO("RegisterClientDeathObserverNull_Test_001::End");
 }

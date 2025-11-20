@@ -21,6 +21,7 @@
 #include "idata_share_client_death_observer.h"
 #include "ikvstore_data_service.h"
 #include "iremote_object.h"
+#include "iservice_registry.h"
 #include "refbase.h"
 #include "system_ability_definition.h"
 #include "system_ability_status_change_stub.h"
@@ -215,6 +216,30 @@ HWTEST_F(DataShareManagerImplTest, GetProxy001, TestSize.Level0)
     ASSERT_NE(proxy, nullptr);
 
     LOG_INFO("DataShareManagerImplTest GetProxy001::End");
+}
+
+/**
+ * @tc.name: RegisterClientDeathObserver001
+ * @tc.desc: test RegisterClientDeathObserver normal func
+ * @tc.type: FUNC
+ */
+HWTEST_F(DataShareManagerImplTest, RegisterClientDeathObserver001, TestSize.Level0)
+{
+    LOG_INFO("DataShareManagerImplTest RegisterClientDeathObserver001::Start");
+    auto manager = DataShareManagerImpl::GetInstance();
+
+    auto SysManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    auto remoteObject = SysManager->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    remoteObject = new (std::nothrow) RemoteObjectTest(tokenString);
+
+    sptr<DataShareKvServiceProxy> proxy = new (std::nothrow)DataShareKvServiceProxy(remoteObject);
+
+    manager->dataMgrService_ = proxy;
+    auto status = manager->RegisterClientDeathObserver();
+    ASSERT_NE(status, E_OK);
+    LOG_INFO("DataShareManagerImplTest RegisterClientDeathObserver001::End");
 }
 }
 }

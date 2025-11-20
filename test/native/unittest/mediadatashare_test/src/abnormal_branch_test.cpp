@@ -173,7 +173,7 @@ HWTEST_F(AbnormalBranchTest, AbnormalBranchTest_RegisterClientDeathObserverNull_
     LOG_INFO("AbnormalBranchTest_RegisterClientDeathObserverNull_Test_001::Start");
     DataShareKvServiceProxy proxy(nullptr);
     std::string appId;
-    uint32_t result = proxy.RegisterClientDeathObserver(appId, nullptr);
+    int32_t result = proxy.RegisterClientDeathObserver(appId, nullptr);
     EXPECT_EQ(result, -1);
     LOG_INFO("AbnormalBranchTest_RegisterClientDeathObserverNull_Test_001::End");
 }
@@ -741,8 +741,6 @@ HWTEST_F(AbnormalBranchTest, RegisterClientDeathObserverTest001, TestSize.Level0
     datashareManager->RegisterClientDeathObserver();
     datashareManager->dataMgrService_ = datashareManager->GetDistributedDataManager();
     EXPECT_NE(datashareManager->dataMgrService_, nullptr);
-    datashareManager->RegisterClientDeathObserver();
-    EXPECT_EQ(datashareManager->clientDeathObserverPtr_, nullptr);
     datashareManager->bundleName_ = "com.testbundlename";
     datashareManager->RegisterClientDeathObserver();
     EXPECT_NE(datashareManager->clientDeathObserverPtr_, nullptr);

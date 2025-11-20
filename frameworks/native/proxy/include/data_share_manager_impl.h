@@ -115,7 +115,7 @@ private:
 
     void ResetServiceHandle();
 
-    void RegisterClientDeathObserver();
+    int32_t RegisterClientDeathObserver();
 
     static sptr<DataShareKvServiceProxy> GetDistributedDataManager();
     static std::mutex pmutex_;

@@ -53,6 +53,7 @@ ohos_unittest("DataShareManagerImplTest") {
     "${datashare_innerapi_path}:datashare_consumer_static",
     "${datashare_innerapi_path}:datashare_provider",
     "${datashare_innerapi_path}/common:datashare_common_static",
+    "${datashare_base_path}/test/unittest/native/resource/ohos_test:copy_ohos_test",
   ]
  
   external_deps = [

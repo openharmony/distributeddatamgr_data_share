@@ -134,9 +134,13 @@ enum class DataShareServiceInterfaceCode {
     DATA_SHARE_SERVICE_CMD_MAX_SYSTEM,
 };
 
+// Defined the index of the server-side function
 enum class IKvStoreDataInterfaceCode {
     GET_FEATURE_INTERFACE = 0,
-    REGISTERCLIENTDEATHOBSERVER
+    REGISTER_CLIENT_DEATH_OBSERVER,
+    CLEAR_APP_STORAGE,
+    EXIT,
+    GET_SELF_BUNDLE_NAME
 };
 }
 } // namespace OHOS
