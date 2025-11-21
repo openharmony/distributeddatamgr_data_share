@@ -13,10 +13,16 @@
  * limitations under the License.
  */
 
-import DataSharePredicatesEtsTest from './dataSharePredicate.test.ets';
+import DataSharePredicatesKVEtsTest from './dataSharePredicatesKV.test.ets';
+import DataSharePredicatesKVErrCodeEtsTest from './dataSharePredicatesKVErrCode.test.ets';
+import DataSharePredicatesRDBEtsTest from './dataSharePredicatesRDB.test.ets';
+import DataSharePredicatesRDBErrCodeEtsTest from './dataSharePredicatesRDBErrCode.test.ets';
 import DataShareSubscribeTest from './dataShareSubscribe.test.ets';
 
 export default function testsuite() {
-  DataSharePredicatesEtsTest();
+  DataSharePredicatesKVEtsTest();
+  DataSharePredicatesKVErrCodeEtsTest();
+  DataSharePredicatesRDBEtsTest();
+  DataSharePredicatesRDBErrCodeEtsTest();
   DataShareSubscribeTest();
 }
