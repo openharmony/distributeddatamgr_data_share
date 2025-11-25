@@ -24,6 +24,7 @@
 #include "datashare_log.h"
 #include "datashare_template.h"
 #include "dataproxy_handle_common.h"
+#include "datashare_string_utils.h"
 
 namespace OHOS::DataShare {
 template<class Key, class Observer>
@@ -80,6 +81,7 @@ public:
     std::vector<Key> GetKeys();
     void SetObserversNotifiedOnEnabled(const Key &key);
     bool IsObserversNotifiedOnEnabled(const Key &key, std::shared_ptr<Observer> &observer);
+    bool AreAllOpsSucceeded(const std::vector<OperationResult> &unsubResult, const Key &key);
 
 private:
     static void DefaultProcess(const std::vector<Key> &, std::vector<OperationResult> &){};
@@ -98,11 +100,14 @@ private:
         };
     };
     void DelLocalObservers(const Key &key, void *subscriber, std::vector<Key> &lastDelKeys,
-        std::vector<OperationResult> &result);
+        std::vector<OperationResult> &result, std::map<Key, std::vector<ObserverNode>> &recoverCallbacks);
     void DelLocalObservers(const Key &key, void *subscriber, std::vector<Key> &lastDelKeys,
         std::vector<DataProxyResult> &result);
-    void DelLocalObservers(void *subscriber, std::vector<Key> &lastDelKeys, std::vector<OperationResult> &result);
+    void DelLocalObservers(void *subscriber, std::vector<Key> &lastDelKeys, std::vector<OperationResult> &result,
+        std::map<Key, std::vector<ObserverNode>> &recoverCallbacks);
     void DelLocalObservers(void *subscriber, std::vector<Key> &lastDelKeys, std::vector<DataProxyResult> &result);
+    void RecoverLocalObservers(std::map<Key, std::vector<ObserverNode>> recoverCallbacks,
+        std::vector<OperationResult> result);
     std::recursive_mutex mutex_{};
     std::map<Key, std::vector<ObserverNode>> callbacks_;
 };
@@ -170,10 +175,10 @@ std::vector<Key> CallbacksManager<Key, Observer>::GetKeys()
 
 template<class Key, class Observer>
 void CallbacksManager<Key, Observer>::DelLocalObservers(void *subscriber, std::vector<Key> &lastDelKeys,
-    std::vector<OperationResult> &result)
+    std::vector<OperationResult> &result, std::map<Key, std::vector<ObserverNode>> &recoverCallbacks)
 {
     for (auto &it : callbacks_) {
-        DelLocalObservers(it.first, subscriber, lastDelKeys, result);
+        DelLocalObservers(it.first, subscriber, lastDelKeys, result, recoverCallbacks);
     }
 }
 
@@ -188,7 +193,8 @@ void CallbacksManager<Key, Observer>::DelLocalObservers(void *subscriber, std::v
 
 template<class Key, class Observer>
 void CallbacksManager<Key, Observer>::DelLocalObservers(const Key &key, void *subscriber,
-    std::vector<Key> &lastDelKeys, std::vector<OperationResult> &result)
+    std::vector<Key> &lastDelKeys, std::vector<OperationResult> &result,
+    std::map<Key, std::vector<ObserverNode>> &recoverCallbacks)
 {
     auto it = callbacks_.find(key);
     if (it == callbacks_.end()) {
@@ -202,6 +208,7 @@ void CallbacksManager<Key, Observer>::DelLocalObservers(const Key &key, void *su
             callbackIt++;
             continue;
         }
+        recoverCallbacks[key].emplace_back(*callbackIt);
         callbackIt = callbacks.erase(callbackIt);
     }
     if (!it->second.empty()) {
@@ -242,9 +249,10 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::DelObservers(void 
 {
     std::vector<OperationResult> result;
     std::vector<Key> lastDelKeys;
+    std::map<Key, std::vector<ObserverNode>> recoverCallbacks;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
-        DelLocalObservers(subscriber, lastDelKeys, result);
+        DelLocalObservers(subscriber, lastDelKeys, result, recoverCallbacks);
         if (lastDelKeys.empty()) {
             return result;
         }
@@ -252,8 +260,43 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::DelObservers(void 
             callbacks_.erase(key);
         }
     }
-    processOnLastDel(lastDelKeys, result);
+    std::vector<OperationResult> proxyResult;
+    processOnLastDel(lastDelKeys, proxyResult);
+    RecoverLocalObservers(recoverCallbacks, proxyResult);
+    result.insert(result.end(), proxyResult.begin(), proxyResult.end());
     return result;
+}
+
+template<class Key, class Observer>
+bool CallbacksManager<Key, Observer>::AreAllOpsSucceeded(const std::vector<OperationResult> &unsubResult,
+    const Key &key)
+{
+    bool isSubSuccess = true;
+    for (auto subResult : unsubResult) {
+        if (subResult.errCode_ != E_OK && subResult.key_ == key.uri_) {
+            return false;
+        }
+    }
+    return isSubSuccess;
+}
+
+template<class Key, class Observer>
+void CallbacksManager<Key, Observer>::RecoverLocalObservers(std::map<Key, std::vector<ObserverNode>> recoverCallbacks,
+    std::vector<OperationResult> proxyResult)
+{
+    std::lock_guard<decltype(mutex_)> lck(mutex_);
+    for (OperationResult &subResult : proxyResult) {
+        if (subResult.errCode_ == E_OK) {
+            continue;
+        }
+        for (const auto& [key, value] : recoverCallbacks) {
+            if (subResult.key_ == key.uri_) {
+                callbacks_[key].insert(callbacks_[key].end(), value.begin(), value.end());
+                LOG_WARN("Recover observers, uri = %{public}s, cnt = %{public}zu, errorcode = %{public}d",
+                    DataShareStringUtils::Anonymous(subResult.key_).c_str(), value.size(), subResult.errCode_);
+            }
+        }
+    }
 }
 
 template<class Key, class Observer>
@@ -262,10 +305,11 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::DelObservers(const
 {
     std::vector<OperationResult> result;
     std::vector<Key> lastDelKeys;
+    std::map<Key, std::vector<ObserverNode>> recoverCallbacks;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
         for (auto &key : keys) {
-            DelLocalObservers(key, subscriber, lastDelKeys, result);
+            DelLocalObservers(key, subscriber, lastDelKeys, result, recoverCallbacks);
         }
         if (lastDelKeys.empty()) {
             return result;
@@ -274,7 +318,10 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::DelObservers(const
             callbacks_.erase(key);
         }
     }
-    processOnLastDel(lastDelKeys, result);
+    std::vector<OperationResult> proxyResult;
+    processOnLastDel(lastDelKeys, proxyResult);
+    RecoverLocalObservers(recoverCallbacks, proxyResult);
+    result.insert(result.end(), proxyResult.begin(), proxyResult.end());
     return result;
 }
 

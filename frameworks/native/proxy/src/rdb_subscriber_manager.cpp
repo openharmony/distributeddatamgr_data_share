@@ -99,15 +99,19 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
     return BaseCallbacks::DelObservers(keys, subscriber,
         [&proxy, &templateId, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
-            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
+            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
                 lastDelUris.emplace_back(result);
-                lastChangeNodeMap_.Erase(result);
             });
             if (lastDelUris.empty()) {
                 return;
             }
             auto unsubResult = proxy->UnSubscribeRdbData(lastDelUris, templateId);
             opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
+            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&unsubResult, this](auto &result) {
+                if (AreAllOpsSucceeded(unsubResult, result)) {
+                    lastChangeNodeMap_.Erase(result);
+                }
+            });
         });
 }
 
@@ -122,9 +126,11 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
         [&proxy, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             // delete all obs by subscriber
             for (const auto &key : lastDelKeys) {
-                lastChangeNodeMap_.Erase(key);
                 auto unsubResult = proxy->UnSubscribeRdbData(std::vector<std::string>(1, key.uri_), key.templateId_);
                 opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
+                if (AreAllOpsSucceeded(unsubResult, key)) {
+                    lastChangeNodeMap_.Erase(key);
+                }
             }
         });
 }
