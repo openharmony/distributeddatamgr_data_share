@@ -421,7 +421,12 @@ napi_value NapiDataProxyHandle::Napi_UnSubscribeProxyData(napi_env env, size_t a
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env,
             valueType == napi_function || valueType == napi_undefined || valueType == napi_null,
             error = std::make_shared<ParametersTypeError>("callback", "function"), error, nullptr);
-        results = proxy->jsProxyDataObsManager_->DelObservers(env, argv[PARAM3], uris);
+        if (valueType == napi_function) {
+            results = proxy->jsProxyDataObsManager_->DelObservers(env, argv[PARAM3], uris);
+        } else {
+            results = proxy->jsProxyDataObsManager_->DelObservers(env, nullptr, uris);
+        }
+        return DataShareJSUtils::Convert2JSValue(env, results);
     }
 
     results = proxy->jsProxyDataObsManager_->DelObservers(env, nullptr, uris);
