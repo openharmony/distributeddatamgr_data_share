@@ -830,6 +830,34 @@ HWTEST_F(DataSharePermissionTest, DataObs_GetUriPermission_Uri_Error_Test_001, T
 }
 
 /**
+ * @tc.name: DataObs_GetUriPermission_Uri_Error_Test_002
+ * @tc.desc: Verify that GetUriPermission returns E_DATASHARE_INVALID_URI when given an invalid URI(no schema).
+ * @tc.type: FUNC
+ * @tc.require:None
+ * @tc.precon:
+     1. PROXY_ERROR_BUNDLE_URI is predefined as an invalid URI string.
+     2. E_DATASHARE_INVALID_URI is the expected error code for invalid URI.
+ * @tc.step:
+     1. Construct Uri with invalid string PROXY_ERROR_BUNDLE_URI.
+     2. Create DataSharePermission instance.
+     3. Invoke GetUriPermission(invalidUri, USER_100, true, true).
+ * @tc.expect:
+     1. Return code is E_DATASHARE_INVALID_URI.
+     2. Permission string is empty.
+ */
+HWTEST_F(DataSharePermissionTest, DataObs_GetUriPermission_Uri_Error_Test_002, TestSize.Level0)
+{
+    LOG_INFO("DataObs_GetUriPermission_Uri_Error_Test_002::Start");
+    Uri uri(TEST_BUNDLE_NAME);
+    bool isSilent = true;
+    auto datashare = std::make_shared<DataShare::DataSharePermission>();
+    auto [ret, permission] = datashare->GetUriPermission(uri, USER_100, true, isSilent);
+    EXPECT_EQ(ret, E_DATASHARE_INVALID_URI);
+    EXPECT_EQ(permission, "");
+    LOG_INFO("DataObs_GetUriPermission_Uri_Error_Test_002::End");
+}
+
+/**
  * @tc.name: DataObs_GetUriPermission_Uri_OK_Test_001
  * @tc.desc: Verify that the GetUriPermission method in DataSharePermission returns a success code and the correct
  *           permission when called with a valid proxy URI (PROXY_URI_OK), specified user, read operation flag, and
