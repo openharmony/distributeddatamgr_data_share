@@ -92,7 +92,7 @@ export class DataSharePredicates{
     native beginWrap(): DataSharePredicates;
     native greaterThan(field: string, value: ValueType): DataSharePredicates;
     native groupBy(fields:Array<string>): DataSharePredicates;
-    native in(field: string, value: Array<ValueType>): DataSharePredicates;
-    native notIn(field: string, value: Array<ValueType>): DataSharePredicates;
+    native inValues(field: string, value: Array<ValueType>): DataSharePredicates;
+    native notInValues(field: string, value: Array<ValueType>): DataSharePredicates;
 }
 }
