@@ -77,16 +77,24 @@ public:
 
     std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) override;
 
+    int32_t SetExtUri(const std::string &extUri) override;
+
 private:
     void ReRegisterObserver();
 
     void SetRegisterCallback();
+
+    std::string GetExtUri();
+
+    bool IsExtUri(const std::string &extUri);
 
     std::pair<std::shared_ptr<DataShareResultSet>, DatashareBusinessError> TimedQuery(
         std::shared_ptr<DataShareServiceProxy> proxy, const UriInfo &paramSet,
         const DataSharePredicates &predicates, const std::vector<std::string> &columns);
 
     ConcurrentMap<sptr<AAFwk::IDataAbilityObserver>, std::list<Uri>> observers_;
+
+    std::shared_mutex mutex_;
 
     std::string extUri_;
 

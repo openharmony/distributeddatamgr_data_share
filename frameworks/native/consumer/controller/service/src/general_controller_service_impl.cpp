@@ -55,7 +55,8 @@ int GeneralControllerServiceImpl::Insert(const Uri &uri, const DataShareValuesBu
         LOG_ERROR("proxy is nullptr");
         return DATA_SHARE_ERROR;
     }
-    return proxy->Insert(uri, Uri(extUri_), value);
+    std::string extUri = GetExtUri();
+    return proxy->Insert(uri, Uri(extUri), value);
 }
 
 int GeneralControllerServiceImpl::Update(const Uri &uri, const DataSharePredicates &predicates,
@@ -75,7 +76,8 @@ int GeneralControllerServiceImpl::Update(const Uri &uri, const DataSharePredicat
         LOG_ERROR("proxy is nullptr");
         return DATA_SHARE_ERROR;
     }
-    return proxy->Update(uri, Uri(extUri_), predicates, value);
+    std::string extUri = GetExtUri();
+    return proxy->Update(uri, Uri(extUri), predicates, value);
 }
 
 int GeneralControllerServiceImpl::Delete(const Uri &uri, const DataSharePredicates &predicates)
@@ -94,7 +96,8 @@ int GeneralControllerServiceImpl::Delete(const Uri &uri, const DataSharePredicat
         LOG_ERROR("proxy is nullptr");
         return DATA_SHARE_ERROR;
     }
-    return proxy->Delete(uri, Uri(extUri_), predicates);
+    std::string extUri = GetExtUri();
+    return proxy->Delete(uri, Uri(extUri), predicates);
 }
 
 std::pair<int32_t, int32_t> GeneralControllerServiceImpl::InsertEx(const Uri &uri, const DataShareValuesBucket &value)
@@ -113,7 +116,8 @@ std::pair<int32_t, int32_t> GeneralControllerServiceImpl::InsertEx(const Uri &ur
         LOG_ERROR("proxy is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
-    return proxy->InsertEx(uri, Uri(extUri_), value);
+    std::string extUri = GetExtUri();
+    return proxy->InsertEx(uri, Uri(extUri), value);
 }
 
 std::pair<int32_t, int32_t> GeneralControllerServiceImpl::UpdateEx(
@@ -133,7 +137,8 @@ std::pair<int32_t, int32_t> GeneralControllerServiceImpl::UpdateEx(
         LOG_ERROR("proxy is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
-    return proxy->UpdateEx(uri, Uri(extUri_), predicates, value);
+    std::string extUri = GetExtUri();
+    return proxy->UpdateEx(uri, Uri(extUri), predicates, value);
 }
 
 std::pair<int32_t, int32_t> GeneralControllerServiceImpl::DeleteEx(const Uri &uri,
@@ -153,7 +158,8 @@ std::pair<int32_t, int32_t> GeneralControllerServiceImpl::DeleteEx(const Uri &ur
         LOG_ERROR("proxy is nullptr");
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
-    return proxy->DeleteEx(uri, Uri(extUri_), predicates);
+    std::string extUri = GetExtUri();
+    return proxy->DeleteEx(uri, Uri(extUri), predicates);
 }
 
 std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Uri &uri,
@@ -175,10 +181,11 @@ std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Ur
         return nullptr;
     }
 
+    std::string extUri = GetExtUri();
     if (option.timeout > 0) {
         UriInfo uriInfo = {
             .uri = uri.ToString(),
-            .extUri = extUri_,
+            .extUri = extUri,
             .option = { .timeout = option.timeout },
         };
 
@@ -187,13 +194,13 @@ std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Ur
         return resultSet;
     }
 
-    auto resultSet = proxy->Query(uri, Uri(extUri_), predicates, columns, businessError);
+    auto resultSet = proxy->Query(uri, Uri(extUri), predicates, columns, businessError);
     int retryCount = 0;
     while (resultSet == nullptr && businessError.GetCode() == E_RESULTSET_BUSY && retryCount++ < MAX_RETRY_COUNT) {
         LOG_ERROR("resultSet busy retry, uri: %{public}s", DataShareStringUtils::Anonymous(uri.ToString()).c_str());
         std::this_thread::sleep_for(std::chrono::milliseconds(
             DataShareStringUtils::GetRandomNumber(RANDOM_MIN, RANDOM_MAX)));
-        resultSet = proxy->Query(uri, Uri(extUri_), predicates, columns, businessError);
+        resultSet = proxy->Query(uri, Uri(extUri), predicates, columns, businessError);
     }
     if (resultSet == nullptr) {
         LOG_ERROR("resultSet is nullptr, err: %{public}d", businessError.GetCode());
@@ -335,6 +342,44 @@ std::pair<std::shared_ptr<DataShareResultSet>, DatashareBusinessError> GeneralCo
         return std::make_pair(nullptr, businessError);
     }
     return std::make_pair(res.resultSet_, res.businessError_);
+}
+
+bool GeneralControllerServiceImpl::IsExtUri(const std::string &extUri)
+{
+    auto pos = extUri.find("?");
+    if (pos != std::string::npos) {
+        return false;
+    }
+    pos = extUri.rfind("datashare:///");
+    if (pos == std::string::npos || pos != 0) {
+        return false;
+    }
+    auto pathStart = std::string("datashare:///").length();
+    if (pathStart >= extUri.length()) {
+        return false;
+    }
+    return  true;
+}
+
+std::string GeneralControllerServiceImpl::GetExtUri()
+{
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    return extUri_;
+}
+
+int32_t GeneralControllerServiceImpl::SetExtUri(const std::string &extUri)
+{
+    if (!IsExtUri(extUri)) {
+        LOG_ERROR("invalid extUri: %{public}s",
+            DataShareStringUtils::Anonymous(extUri).c_str());
+        return E_DATASHARE_INVALID_URI;
+    }
+    LOG_INFO("SetExtUri old: %{public}s, new: %{public}s",
+        DataShareStringUtils::Anonymous(extUri_).c_str(),
+        DataShareStringUtils::Anonymous(extUri).c_str());
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    extUri_ = extUri;
+    return E_OK;
 }
 } // namespace DataShare
 } // namespace OHOS

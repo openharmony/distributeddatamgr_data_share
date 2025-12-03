@@ -171,19 +171,26 @@ bool MediaDataShareUnitTest::ValueBucketEqual(const VBuckets& v1, const VBuckets
 bool MediaDataShareUnitTest::ChangeInfoEqual(const ChangeInfo &changeInfo, const ChangeInfo &expectChangeInfo)
 {
     if (changeInfo.changeType_ != expectChangeInfo.changeType_) {
+        LOG_ERROR("changeType_ not equal, changeInfo: %{public}d, expectChangeInfo: %{public}d",
+            changeInfo.changeType_, expectChangeInfo.changeType_);
         return false;
     }
     
     if (!UrisEqual(changeInfo.uris_, expectChangeInfo.uris_)) {
+        LOG_ERROR("uris_ not equal, changeInfo: %{public}s, expectChangeInfo: %{public}s",
+            changeInfo.uris_.front().ToString().c_str(), expectChangeInfo.uris_.front().ToString().c_str());
         return false;
     }
     
     if (changeInfo.size_ != expectChangeInfo.size_) {
+        LOG_ERROR("size_ not equal, changeInfo: %{public}d, expectChangeInfo: %{public}d",
+            changeInfo.size_, expectChangeInfo.size_);
         return false;
     }
     
     if (changeInfo.size_ != 0) {
         if (changeInfo.data_ == nullptr && expectChangeInfo.data_ == nullptr) {
+            LOG_ERROR("data_ not equal");
             return false;
         }
         return memcmp(changeInfo.data_, expectChangeInfo.data_, expectChangeInfo.size_) == 0;
@@ -4141,17 +4148,17 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_OpenFileWithErrCode_Test_001, Te
 }
 
 /**
-* @tc.name: ExecuteBatchCapacity_Test_001
-* @tc.desc: Test batch execution when operationStatements is over 128MB via DataShare helper
-* @tc.type: FUNC
-* @tc.require: None
-* @tc.precon: None
-* @tc.step:
+ * @tc.name: ExecuteBatchCapacity_Test_001
+ * @tc.desc: Test batch execution when operationStatements is over 128MB via DataShare helper
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
     1. Get the DataShare helper instance
     2. Create operationStatements with test data that exceeds 128MB
     3. Execute the batch operation using helper->ExecuteBatch()
-* @tc.expect: Batch execution returns -1 (fail)
-*/
+ * @tc.expect: Batch execution returns -1 (fail)
+ */
 HWTEST_F(MediaDataShareUnitTest, ExecuteBatchCapacity_Test_001, TestSize.Level0)
 {
     LOG_INFO("ExecuteBatchCapacity_Test_001::Start");
@@ -4195,6 +4202,46 @@ HWTEST_F(MediaDataShareUnitTest, ExecuteBatchCapacity_Test_001, TestSize.Level0)
     ret = helper->ExecuteBatch(statements, resultSet);
     EXPECT_EQ(ret, -1);
     LOG_INFO("ExecuteBatchCapacity_Test_001 End");
+}
+
+/**
+ * @tc.name: MediaDataShare_GetDataShareHelperType_Test_001
+ * @tc.desc: Verify helper type
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. get non-silent datasharehelper type
+ * @tc.expect:
+    1. GetDataShareHelperType returns NON_SILENT
+ */
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_GetDataShareHelperType_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_GetDataShareHelperType_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    DataShareType ret = helper->GetDataShareHelperType();
+    EXPECT_EQ(ret, NON_SILENT);
+    LOG_INFO("MediaDataShare_GetDataShareHelperType_Test_001::End");
+}
+
+/**
+ * @tc.name: MediaDataShare_SetDataShareHelperExtUri_Test_001
+ * @tc.desc: Verify the SetDataShareHelperExtUri function for non-silent datashare.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. set non-silent datasharehelper extUri
+ * @tc.expect:
+    1. GetDataShareHelperType returns E_DATASHARE_TYPE
+ */
+HWTEST_F(MediaDataShareUnitTest, MediaDataShare_SetDataShareHelperExtUri_Test_001, TestSize.Level0)
+{
+    LOG_INFO("MediaDataShare_SetDataShareHelperExtUri_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    int32_t ret = helper->SetDataShareHelperExtUri(DATA_SHARE_URI);
+    EXPECT_EQ(ret, E_DATASHARE_TYPE);
+    LOG_INFO("MediaDataShare_SetDataShareHelperExtUri_Test_001::End");
 }
 } // namespace DataShare
 } // namespace OHOS

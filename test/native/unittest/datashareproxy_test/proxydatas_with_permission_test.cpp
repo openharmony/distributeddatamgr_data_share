@@ -1420,6 +1420,58 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_UnsubscribePublishedData_Test_001, TestS
 }
 
 /**
+ * @tc.name: ProxyDatasTest_GetDataShareHelperType_Test_001
+ * @tc.desc: Verify helper type
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. get silent datasharehelper type
+ * @tc.expect:
+    1. GetDataShareHelperType returns SILENT
+ */
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_GetDataShareHelperType_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_GetDataShareHelperType_Test_001::Start");
+    auto helper = dataShareHelper;
+    DataShareType ret = helper->GetDataShareHelperType();
+    EXPECT_EQ(ret, SILENT);
+    LOG_INFO("ProxyDatasTest_GetDataShareHelperType_Test_001::End");
+}
+
+/**
+ * @tc.name: ProxyDatasTest_SetDataShareHelperExtUri_Test_001
+ * @tc.desc: Verify the SetDataShareHelperExtUri function for silent datashare.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. set silent datasharehelper extUri
+ * @tc.expect:
+    1. GetDataShareHelperType returns E_OK
+ */
+HWTEST_F(ProxyDatasTest, ProxyDatasTest_SetDataShareHelperExtUri_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ProxyDatasTest_SetDataShareHelperExtUri_Test_001::Start");
+    auto helper = dataShareHelper;
+    int32_t ret = helper->SetDataShareHelperExtUri("NON_SILENT_URI");
+    EXPECT_EQ(ret, E_DATASHARE_INVALID_URI);
+    ret = helper->SetDataShareHelperExtUri("datashare//media");
+    EXPECT_EQ(ret, E_DATASHARE_INVALID_URI);
+    ret = helper->SetDataShareHelperExtUri("datashare://media");
+    EXPECT_EQ(ret, E_DATASHARE_INVALID_URI);
+    ret = helper->SetDataShareHelperExtUri("datashare:///media?user=100");
+    EXPECT_EQ(ret, E_DATASHARE_INVALID_URI);
+    ret = helper->SetDataShareHelperExtUri("datashare:///");
+    EXPECT_EQ(ret, E_DATASHARE_INVALID_URI);
+    ret = helper->SetDataShareHelperExtUri("aaaaaadatashare:///media");
+    EXPECT_EQ(ret, E_DATASHARE_INVALID_URI);
+    ret = helper->SetDataShareHelperExtUri("datashare:///media");
+    EXPECT_EQ(ret, E_OK);
+    LOG_INFO("ProxyDatasTest_SetDataShareHelperExtUri_Test_001::End");
+}
+
+/**
  * @tc.name: ProxyDatasTest_extSpCtl_Null_Test_001
  * @tc.desc: Verify the behavior of extended special control operations (GetFileTypes, OpenFile, OpenRawFile) in the
  *           data share proxy after releasing the DataShareHelper instance.

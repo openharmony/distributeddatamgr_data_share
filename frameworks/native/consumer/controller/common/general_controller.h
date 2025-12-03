@@ -82,6 +82,7 @@ public:
         const Uri &uri, const DataSharePredicates &predicates, const DataShareValuesBucket &value) = 0;
 
     virtual std::pair<int32_t, int32_t> DeleteEx(const Uri &uri, const DataSharePredicates &predicates) = 0;
+    virtual int32_t SetExtUri(const std::string &extUri) { return E_DATASHARE_TYPE; };
 };
 } // namespace DataShare
 } // namespace OHOS

@@ -603,5 +603,20 @@ HWTEST_F(DataShareHelperImplTest, User_Define_func_No_ExtSpCtl_Test001, TestSize
     EXPECT_EQ(result, DATA_SHARE_ERROR);
     LOG_INFO("User_Define_func_No_ExtSpCtl_Test001::End");
 }
+
+/*
+* @tc.desc: test SetDataShareHelperExtUri with no generalCtl_
+* @tc.require: Null
+*/
+HWTEST_F(DataShareHelperImplTest, SetDataShareHelperExtUri_No_generalCtl_Test001, TestSize.Level0)
+{
+    LOG_INFO("SetDataShareHelperExtUri_No_generalCtl_Test001::Start");
+    DataShareHelperImplTest::GetInstance()->generalCtl_ = nullptr;
+    int32_t result = DataShareHelperImplTest::GetInstance()->SetDataShareHelperExtUri("NON_SILENT_URI");
+    EXPECT_EQ(result, DATA_SHARE_ERROR);
+    std::shared_ptr<MockGeneralController> controller = DataShareHelperImplTest::GetController();
+    DataShareHelperImplTest::GetInstance()->generalCtl_ = controller;
+    LOG_INFO("SetDataShareHelperExtUri_No_generalCtl_Test001::End");
+}
 } // namespace DataShare
 } // namespace OHOS
