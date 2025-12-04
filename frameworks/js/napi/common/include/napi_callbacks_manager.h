@@ -22,8 +22,6 @@
 #include "datashare_errno.h"
 #include "datashare_template.h"
 #include "dataproxy_handle_common.h"
-#include "datashare_log.h"
-#include "datashare_string_utils.h"
 
 namespace OHOS::DataShare {
 template<class Key, class Observer>
@@ -51,7 +49,6 @@ public:
     std::vector<std::shared_ptr<Observer>> GetEnabledObservers(const Key &);
 
     int GetEnabledSubscriberSize();
-    bool AreAllOpsSucceeded(const std::vector<OperationResult> &unsubResult, const Key &key);
 
 private:
     static void DefaultProcess(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
@@ -67,14 +64,6 @@ private:
             : observer_(observer), enabled_(enabled){};
     };
     bool IsRegistered(const Observer &, const std::vector<ObserverNode> &);
-    void RecoverLocalObservers(
-        std::map<Key, std::vector<ObserverNode>> recoverCallbacks,
-        std::vector<OperationResult> proxyResult);
-
-    void DelLocalObservers(const std::vector<Key> &keys,
-        const std::shared_ptr<Observer> observer, std::vector<Key> &lastDelKeys, std::vector<OperationResult> &result,
-        std::map<Key, std::vector<ObserverNode>> &recoverCallbacks);
-
     std::recursive_mutex mutex_{};
     std::map<Key, std::vector<ObserverNode>> callbacks_;
 };
@@ -156,86 +145,6 @@ bool NapiCallbacksManager<Key, Observer>::IsRegistered(const Observer &observer,
 }
 
 template<class Key, class Observer>
-bool NapiCallbacksManager<Key, Observer>::AreAllOpsSucceeded(const std::vector<OperationResult> &unsubResult,
-    const Key &key)
-{
-    bool isSubSuccess = true;
-    for (auto subResult : unsubResult) {
-        if (subResult.errCode_ != E_OK && subResult.key_ == key.uri_) {
-            return false;
-        }
-    }
-    return isSubSuccess;
-}
-
-template<class Key, class Observer>
-void NapiCallbacksManager<Key, Observer>::RecoverLocalObservers(
-    std::map<Key, std::vector<ObserverNode>> recoverCallbacks,
-    std::vector<OperationResult> proxyResult)
-{
-    std::lock_guard<decltype(mutex_)> lck(mutex_);
-    for (OperationResult &subResult : proxyResult) {
-        if (subResult.errCode_ == E_OK) {
-            continue;
-        }
-        for (const auto& [key, value] : recoverCallbacks) {
-            if (subResult.key_ == key.uri_) {
-                callbacks_[key].insert(callbacks_[key].end(), value.begin(), value.end());
-                LOG_WARN("Napi recover observers, uri = %{public}s, cnt = %{public}zu, errorcode = %{public}d",
-                    DataShareStringUtils::Anonymous(subResult.key_).c_str(), value.size(), subResult.errCode_);
-            }
-        }
-    }
-}
-
-template<class Key, class Observer>
-void NapiCallbacksManager<Key, Observer>::DelLocalObservers(const std::vector<Key> &keys,
-    const std::shared_ptr<Observer> observer, std::vector<Key> &lastDelKeys, std::vector<OperationResult> &result,
-    std::map<Key, std::vector<ObserverNode>> &recoverCallbacks)
-{
-    if (keys.empty() && observer == nullptr) {
-        for (auto &it : callbacks_) {
-            lastDelKeys.emplace_back(it.first);
-        }
-        recoverCallbacks = std::move(callbacks_);
-        callbacks_.clear();
-    }
-    for (auto &key : keys) {
-        auto it = callbacks_.find(key);
-        if (it == callbacks_.end()) {
-            result.emplace_back(key, E_UNREGISTERED_EMPTY);
-            continue;
-        }
-        if (observer == nullptr) {
-            recoverCallbacks[key] = std::move(callbacks_[key]);
-            callbacks_.erase(key);
-            lastDelKeys.emplace_back(key);
-            continue;
-        }
-        if (!IsRegistered(*observer, it->second)) {
-            result.emplace_back(key, E_UNREGISTERED_EMPTY);
-            continue;
-        }
-        std::vector<ObserverNode> &callbacks = it->second;
-        auto callbackIt = callbacks.begin();
-        while (callbackIt != callbacks.end()) {
-            if (!(*(callbackIt->observer_) == *observer)) {
-                callbackIt++;
-                continue;
-            }
-            recoverCallbacks[key].emplace_back(*callbackIt);
-            callbackIt = callbacks.erase(callbackIt);
-        }
-        if (!it->second.empty()) {
-            result.emplace_back(key, E_OK);
-            continue;
-        }
-        callbacks_.erase(key);
-        lastDelKeys.emplace_back(key);
-    }
-}
-
-template<class Key, class Observer>
 std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::DelObservers(
     const std::vector<Key> &keys, const std::shared_ptr<Observer> observer,
     std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &, std::vector<OperationResult> &)>
@@ -243,18 +152,50 @@ std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::DelObservers(
 {
     std::vector<OperationResult> result;
     std::vector<Key> lastDelKeys;
-    std::map<Key, std::vector<ObserverNode>> recoverCallbacks;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
-        DelLocalObservers(keys, observer, lastDelKeys, result, recoverCallbacks);
+        if (keys.empty() && observer == nullptr) {
+            for (auto &it : callbacks_) {
+                lastDelKeys.emplace_back(it.first);
+            }
+            callbacks_.clear();
+        }
+        for (auto &key : keys) {
+            auto it = callbacks_.find(key);
+            if (it == callbacks_.end()) {
+                result.emplace_back(key, E_UNREGISTERED_EMPTY);
+                continue;
+            }
+            if (observer == nullptr) {
+                callbacks_.erase(key);
+                lastDelKeys.emplace_back(key);
+                continue;
+            }
+            if (!IsRegistered(*observer, it->second)) {
+                result.emplace_back(key, E_UNREGISTERED_EMPTY);
+                continue;
+            }
+            std::vector<ObserverNode> &callbacks = it->second;
+            auto callbackIt = callbacks.begin();
+            while (callbackIt != callbacks.end()) {
+                if (!(*(callbackIt->observer_) == *observer)) {
+                    callbackIt++;
+                    continue;
+                }
+                callbackIt = callbacks.erase(callbackIt);
+            }
+            if (!it->second.empty()) {
+                result.emplace_back(key, E_OK);
+                continue;
+            }
+            callbacks_.erase(key);
+            lastDelKeys.emplace_back(key);
+        }
         if (lastDelKeys.empty()) {
             return result;
         }
     }
-    std::vector<OperationResult> proxyResult;
-    processOnLastDel(lastDelKeys, observer, proxyResult);
-    RecoverLocalObservers(recoverCallbacks, proxyResult);
-    result.insert(result.end(), proxyResult.begin(), proxyResult.end());
+    processOnLastDel(lastDelKeys, observer, result);
     return result;
 }
 

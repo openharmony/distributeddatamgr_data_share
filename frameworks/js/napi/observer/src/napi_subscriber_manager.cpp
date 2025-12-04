@@ -94,6 +94,7 @@ std::vector<OperationResult> NapiRdbSubscriberManager::DelObservers(napi_env env
             const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
+                lastChangeNodeMap_.Erase(result);
                 lastDelUris.emplace_back(result);
             });
             if (lastDelUris.empty()) {
@@ -101,11 +102,6 @@ std::vector<OperationResult> NapiRdbSubscriberManager::DelObservers(napi_env env
             }
             auto unsubResult = dataShareHelper->UnsubscribeRdbData(lastDelUris, templateId);
             opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
-            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&unsubResult, this](auto &result) {
-                if (AreAllOpsSucceeded(unsubResult, result)) {
-                    lastChangeNodeMap_.Erase(result);
-                }
-            });
         });
 }
 
@@ -207,6 +203,7 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::DelObservers(napi_e
             const std::shared_ptr<Observer> &observer, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
+                lastChangeNodeMap_.Erase(result);
                 lastDelUris.emplace_back(result);
             });
             if (lastDelUris.empty()) {
@@ -214,11 +211,6 @@ std::vector<OperationResult> NapiPublishedSubscriberManager::DelObservers(napi_e
             }
             auto unsubResult = dataShareHelper->UnsubscribePublishedData(lastDelUris, subscriberId);
             opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
-            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&unsubResult, this](auto &result) {
-                if (AreAllOpsSucceeded(unsubResult, result)) {
-                    lastChangeNodeMap_.Erase(result);
-                }
-            });
         });
 }
 
