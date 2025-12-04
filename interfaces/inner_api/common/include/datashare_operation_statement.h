@@ -38,11 +38,57 @@ struct BatchUpdateResult {
     std::vector<int> codes;
 };
 
+class BackReference {
+public:
+    explicit BackReference(std::string col = "", int32_t index = INVALID_INDEX)
+        : column_(std::move(col)), fromIndex_(index) {};
+
+    bool IsValid()
+    {
+        return fromIndex_ != INVALID_INDEX && !column_.empty();
+    }
+    // Setter for column
+    void SetColumn(const std::string& col)
+    {
+        column_ = col;
+    }
+    // Setter for fromIndex
+    void SetFromIndex(int32_t index)
+    {
+        fromIndex_ = index;
+    }
+
+    const std::string& GetColumn() const
+    {
+        return column_;
+    }
+
+    int32_t GetFromIndex() const
+    {
+        return fromIndex_;
+    }
+private:
+    static const int32_t INVALID_INDEX = -1;
+    std::string column_;     // column name
+    int32_t fromIndex_;          // the index indicating which historical operation's result should overwrite the value
+};
+
 struct OperationStatement {
     Operation operationType;
     std::string uri;
     DataSharePredicates predicates;
     DataShareValuesBucket valuesBucket;
+    BackReference backReference;
+
+    bool HasBackReference()
+    {
+        return backReference.IsValid();
+    }
+
+    bool IsOperationTypeValid() const
+    {
+        return operationType >= Operation::INSERT && operationType <= Operation::DELETE;
+    }
 };
 
 enum ExecErrorCode : int32_t {
@@ -55,16 +101,27 @@ struct ExecResult {
     Operation operationType;
     int code;
     std::string message;
+
+    bool IsOperationTypeValid() const
+    {
+        return operationType >= Operation::INSERT && operationType <= Operation::DELETE;
+    }
 };
 
 struct ExecResultSet {
     ExecErrorCode errorCode;
     std::vector<ExecResult> results;
+
+    bool IsErrorCodeValid() const
+    {
+        return errorCode >= ExecErrorCode::EXEC_SUCCESS && errorCode <= ExecErrorCode::EXEC_PARTIAL_SUCCESS;
+    }
 };
 
 struct RegisterOption {
     bool isReconnect;
 };
+
 }
 }
 #endif // DATASHARE_OPERATION_STATEMENT_H

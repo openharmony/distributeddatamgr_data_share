@@ -270,6 +270,10 @@ bool Unmarshalling(OperationStatement &operationStatement, MessageParcel &parcel
 template<>
 bool Marshalling(const ExecResult &execResult, MessageParcel &parcel)
 {
+    if (!execResult.IsOperationTypeValid()) {
+        // existing marshalling use static cast on enum, only log when operationType exceeds defined types
+        LOG_ERROR("operationType Invalid:%{public}d", execResult.operationType);
+    }
     return ITypesUtil::Marshal(parcel, static_cast<int32_t>(execResult.operationType), execResult.code,
         execResult.message);
 }
@@ -282,12 +286,20 @@ bool Unmarshalling(ExecResult &execResult, MessageParcel &parcel)
         return false;
     }
     execResult.operationType = static_cast<DataShare::Operation>(type);
+    if (!execResult.IsOperationTypeValid()) {
+        // existing marshalling use static cast on enum, only log when operationType exceeds defined types
+        LOG_ERROR("operationType Invalid:%{public}d", execResult.operationType);
+    }
     return ITypesUtil::Unmarshal(parcel, execResult.code, execResult.message);
 }
 
 template<>
 bool Marshalling(const ExecResultSet &execResultSet, MessageParcel &parcel)
 {
+    if (!execResultSet.IsErrorCodeValid()) {
+        // existing marshalling use static cast on enum, only log when errorCode exceeds defined types
+        LOG_ERROR("errorCode Invalid:%{public}d", execResultSet.errorCode);
+    }
     return ITypesUtil::Marshal(parcel, static_cast<int32_t>(execResultSet.errorCode), execResultSet.results);
 }
 
@@ -299,6 +311,10 @@ bool Unmarshalling(ExecResultSet &execResultSet, MessageParcel &parcel)
         return false;
     }
     execResultSet.errorCode = static_cast<DataShare::ExecErrorCode>(errorCode);
+    if (!execResultSet.IsErrorCodeValid()) {
+        // existing marshalling use static cast on enum, only log when errorCode exceeds defined types
+        LOG_ERROR("errorCode Invalid:%{public}d", execResultSet.errorCode);
+    }
     return ITypesUtil::Unmarshal(parcel, execResultSet.results);
 }
 
@@ -759,69 +775,6 @@ bool MarshalPredicatesToBuffer(std::ostringstream &oss, const DataSharePredicate
     return oss.good();
 }
 
-bool MarshalValuesBucketToBuffer(std::ostringstream &oss, const DataShareValuesBucket &bucket)
-{
-    for (const auto &[key, value] : bucket.valuesMap) {
-        // write key
-        if (!MarshalStringToBuffer(oss, key)) { return false; }
-        // write typeId
-        uint8_t typeId = value.index();
-        if (!MarshalBasicTypeToBuffer(oss, typeId)) { return false; }
-        switch (typeId) {
-            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_NULL): {
-                continue;
-            }
-            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_INT): {
-                int64_t val = std::get<int64_t>(value);
-                if (!MarshalBasicTypeToBuffer(oss, val)) { return false; }
-                break;
-            }
-            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_DOUBLE): {
-                double val = std::get<double>(value);
-                if (!MarshalBasicTypeToBuffer(oss, val)) { return false; }
-                break;
-            }
-            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_STRING): {
-                std::string val = std::get<std::string>(value);
-                if (!MarshalStringToBuffer(oss, val)) { return false; }
-                break;
-            }
-            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_BOOL): {
-                bool val = std::get<bool>(value);
-                if (!MarshalBasicTypeToBuffer(oss, val)) { return false; }
-                break;
-            }
-            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_BLOB): {
-                std::vector<uint8_t> val = std::get<std::vector<uint8_t>>(value);
-                if (!MarshalBasicTypeVecToBuffer(oss, val)) { return false; }
-                break;
-            }
-            default:
-                LOG_ERROR("MarshalValuesBucketToBuffer: unknown typeId");
-                return false;
-        }
-    }
-    return oss.good();
-}
-
-bool MarshalValuesBucketVecToBuffer(std::ostringstream &oss, const std::vector<DataShareValuesBucket> &values)
-{
-    size_t size = values.size();
-    if (!MarshalBasicTypeToBuffer(oss, size)) {
-        return false;
-    }
-    for (const auto &bucket : values) {
-        size_t mapSize = bucket.valuesMap.size();
-        if (!MarshalBasicTypeToBuffer(oss, mapSize)) {
-            return false;
-        }
-        if (!MarshalValuesBucketToBuffer(oss, bucket)) {
-            return false;
-        }
-    }
-    return oss.good();
-}
-
 template <typename T>
 bool UnmarshalBasicTypeToBuffer(std::istringstream &iss, T &value)
 {
@@ -1053,22 +1006,27 @@ bool UnmarshalPredicatesToBuffer(std::istringstream &iss, DataSharePredicates &p
 
     // Deserialize operations
     if (!UnmarshalOperationItemVecToBuffer(iss, operations)) {
+        LOG_ERROR("Unmarshal operations failed.");
         return false;
     }
     // Deserialize whereClause
     if (!UnmarshalStringToBuffer(iss, whereClause)) {
+        LOG_ERROR("Unmarshal whereClause failed.");
         return false;
     }
     // Deserialize whereArgs
     if (!UnmarshalStringVecToBuffer(iss, whereArgs)) {
+        LOG_ERROR("Unmarshal whereArgs failed.");
         return false;
     }
     // Deserialize order
     if (!UnmarshalStringToBuffer(iss, order)) {
+        LOG_ERROR("Unmarshal order failed.");
         return false;
     }
     // Deserialize mode
     if (!UnmarshalBasicTypeToBuffer(iss, mode)) {
+        LOG_ERROR("Unmarshal mode failed.");
         return false;
     }
 
@@ -1078,73 +1036,6 @@ bool UnmarshalPredicatesToBuffer(std::istringstream &iss, DataSharePredicates &p
     predicates.SetOrder(order);
     predicates.SetSettingMode(mode);
 
-    return iss.good();
-}
-
-bool UnmarshalValuesMapToBuffer(std::istringstream &iss,
-    std::map<std::string, DataShareValueObject::Type> &valuesMap)
-{
-    std::string key;
-    UnmarshalStringToBuffer(iss, key);
-    uint8_t typeId;
-    UnmarshalBasicTypeToBuffer(iss, typeId);
-    DataShareValueObject::Type value;
-    switch (typeId) {
-        case static_cast<uint8_t>(DataShareValueObjectType::TYPE_NULL): { return iss.good(); }
-        case static_cast<uint8_t>(DataShareValueObjectType::TYPE_INT): {
-            int64_t val;
-            UnmarshalBasicTypeToBuffer(iss, val);
-            value = val;
-            break;
-        }
-        case static_cast<uint8_t>(DataShareValueObjectType::TYPE_DOUBLE): {
-            double val;
-            UnmarshalBasicTypeToBuffer(iss, val);
-            value = val;
-            break;
-        }
-        case static_cast<uint8_t>(DataShareValueObjectType::TYPE_STRING): {
-            std::string val;
-            UnmarshalStringToBuffer(iss, val);
-            value = val;
-            break;
-        }
-        case static_cast<uint8_t>(DataShareValueObjectType::TYPE_BOOL): {
-            bool val;
-            UnmarshalBasicTypeToBuffer(iss, val);
-            value = val;
-            break;
-        }
-        case static_cast<uint8_t>(DataShareValueObjectType::TYPE_BLOB): {
-            std::vector<uint8_t> val;
-            UnmarshalBasicTypeVecToBuffer(iss, val);
-            value = val;
-            break;
-        }
-        default:
-            LOG_ERROR("UnmarshalValuesMapToBuffer: unknown typeId");
-            return false;
-    }
-    valuesMap.insert(std::make_pair(key, value));
-    return iss.good();
-}
-
-bool UnmarshalValuesBucketVecToBuffer(std::istringstream &iss, std::vector<DataShareValuesBucket> &values)
-{
-    size_t size;
-    if (!UnmarshalBasicTypeToBuffer(iss, size)) { return false; }
-    for (size_t i = 0; i < size; i++) {
-        size_t mapSize;
-        if (!UnmarshalBasicTypeToBuffer(iss, mapSize)) { return false; }
-        std::map<std::string, DataShareValueObject::Type> valuesMap;
-        for (size_t j = 0; j < mapSize; j++) {
-            if (!UnmarshalValuesMapToBuffer(iss, valuesMap)) {
-                return false;
-            }
-        }
-        DataShareValuesBucket value(valuesMap);
-        values.push_back(value);
-    }
     return iss.good();
 }
 
@@ -1186,6 +1077,140 @@ bool UnmarshalPredicates(Predicates &predicates, MessageParcel &parcel)
     }
     std::istringstream iss(std::string(buffer, length));
     return UnmarshalPredicatesToBuffer(iss, predicates);
+}
+
+bool MarshalValuesBucketToBuffer(std::ostringstream &oss, const DataShareValuesBucket &bucket)
+{
+    // marshal valuesMap size
+    size_t mapSize = bucket.valuesMap.size();
+    if (!MarshalBasicTypeToBuffer(oss, mapSize)) {
+        LOG_ERROR("Marshal valuesMap size failed");
+        return false;
+    }
+    for (const auto &[key, value] : bucket.valuesMap) {
+        // write key
+        if (!MarshalStringToBuffer(oss, key)) { return false; }
+        // write typeId
+        uint8_t typeId = value.index();
+        if (!MarshalBasicTypeToBuffer(oss, typeId)) { return false; }
+        switch (typeId) {
+            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_NULL): {
+                continue;
+            }
+            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_INT): {
+                int64_t val = std::get<int64_t>(value);
+                if (!MarshalBasicTypeToBuffer(oss, val)) { return false; }
+                break;
+            }
+            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_DOUBLE): {
+                double val = std::get<double>(value);
+                if (!MarshalBasicTypeToBuffer(oss, val)) { return false; }
+                break;
+            }
+            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_STRING): {
+                std::string val = std::get<std::string>(value);
+                if (!MarshalStringToBuffer(oss, val)) { return false; }
+                break;
+            }
+            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_BOOL): {
+                bool val = std::get<bool>(value);
+                if (!MarshalBasicTypeToBuffer(oss, val)) { return false; }
+                break;
+            }
+            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_BLOB): {
+                std::vector<uint8_t> val = std::get<std::vector<uint8_t>>(value);
+                if (!MarshalBasicTypeVecToBuffer(oss, val)) { return false; }
+                break;
+            }
+            default:
+                LOG_ERROR("MarshalValuesBucketToBuffer: unknown typeId");
+                return false;
+        }
+    }
+    return oss.good();
+}
+
+bool UnmarshalValuesBucketToBuffer(std::istringstream &iss,
+    DataShareValuesBucket &bucket)
+{
+    size_t mapSize;
+    if (!UnmarshalBasicTypeToBuffer(iss, mapSize)) {
+        LOG_ERROR("Unmarshal valuesMap size failed");
+        return false;
+    }
+    for (size_t j = 0; j < mapSize; j++) {
+        std::string key;
+        UnmarshalStringToBuffer(iss, key);
+        uint8_t typeId;
+        UnmarshalBasicTypeToBuffer(iss, typeId);
+        DataShareValueObject::Type value;
+        switch (typeId) {
+            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_NULL): { continue; }
+            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_INT): {
+                int64_t val;
+                UnmarshalBasicTypeToBuffer(iss, val);
+                value = val;
+                break;
+            }
+            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_DOUBLE): {
+                double val;
+                UnmarshalBasicTypeToBuffer(iss, val);
+                value = val;
+                break;
+            }
+            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_STRING): {
+                std::string val;
+                UnmarshalStringToBuffer(iss, val);
+                value = val;
+                break;
+            }
+            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_BOOL): {
+                bool val;
+                UnmarshalBasicTypeToBuffer(iss, val);
+                value = val;
+                break;
+            }
+            case static_cast<uint8_t>(DataShareValueObjectType::TYPE_BLOB): {
+                std::vector<uint8_t> val;
+                UnmarshalBasicTypeVecToBuffer(iss, val);
+                value = val;
+                break;
+            }
+            default:
+                LOG_ERROR("UnmarshalValuesMapToBuffer: unknown typeId");
+                return false;
+        }
+        bucket.valuesMap.insert(std::make_pair(key, value));
+    }
+    return iss.good();
+}
+
+bool MarshalValuesBucketVecToBuffer(std::ostringstream &oss, const std::vector<DataShareValuesBucket> &values)
+{
+    size_t size = values.size();
+    if (!MarshalBasicTypeToBuffer(oss, size)) {
+        return false;
+    }
+    for (const auto &bucket : values) {
+        if (!MarshalValuesBucketToBuffer(oss, bucket)) {
+            return false;
+        }
+    }
+    return oss.good();
+}
+
+bool UnmarshalValuesBucketVecToBuffer(std::istringstream &iss, std::vector<DataShareValuesBucket> &values)
+{
+    size_t size;
+    if (!UnmarshalBasicTypeToBuffer(iss, size)) { return false; }
+    for (size_t i = 0; i < size; i++) {
+        DataShareValuesBucket bucket;
+        if (!UnmarshalValuesBucketToBuffer(iss, bucket)) {
+            return false;
+        }
+        values.push_back(bucket);
+    }
+    return iss.good();
 }
 
 bool MarshalValuesBucketVec(const std::vector<DataShareValuesBucket> &values, MessageParcel &parcel)
@@ -1240,4 +1265,153 @@ bool Unmarshalling(RegisterOption &option, MessageParcel &parcel)
     return ITypesUtil::Unmarshal(parcel, option.isReconnect);
 }
 
+bool MarshalBackReferenceToBuffer(std::ostringstream &oss, const BackReference &backReference)
+{
+    if (!MarshalStringToBuffer(oss, backReference.GetColumn())) {
+        LOG_ERROR("Marshal column failed.");
+        return false;
+    }
+    if (!MarshalBasicTypeToBuffer(oss, backReference.GetFromIndex())) {
+        LOG_ERROR("Marshal fromIndex failed.");
+        return false;
+    }
+    return oss.good();
+}
+
+bool UnmarshalBackReferenceToBuffer(std::istringstream &iss, BackReference &backReference)
+{
+    std::string column = "";
+    int32_t fromIndex;
+    if (!UnmarshalStringToBuffer(iss, column)) {
+        LOG_ERROR("Unmarshal column failed.");
+        return false;
+    }
+    backReference.SetColumn(column);
+    if (!UnmarshalBasicTypeToBuffer(iss, fromIndex)) {
+        LOG_ERROR("Unmarshal fromIndex failed.");
+        return false;
+    }
+    backReference.SetFromIndex(fromIndex);
+    return iss.good();
+}
+
+bool MarshalOperationStatementVecToBuffer(std::ostringstream &oss,
+                                          const std::vector<OperationStatement> &operationStatements)
+{
+    size_t size = operationStatements.size();
+    if (!MarshalBasicTypeToBuffer(oss, size)) {
+        LOG_ERROR("Marshal vec size failed.");
+        return false;
+    }
+    size_t index = 0;
+    for (const auto &statement : operationStatements) {
+        if (!statement.IsOperationTypeValid()) {
+            // existing marshalling use static cast on enum, only log when operationType exceeds defined types
+            LOG_ERROR("operationType Invalid:%{public}d, index:%{public}zu", statement.operationType, index);
+        }
+        if (!MarshalBasicTypeToBuffer(oss, statement.operationType)) {
+            LOG_ERROR("Marshal operationType failed.");
+            return false;
+        }
+        if (!MarshalStringToBuffer(oss, statement.uri)) {
+            LOG_ERROR("Marshal uri failed.");
+            return false;
+        }
+        if (!MarshalPredicatesToBuffer(oss, statement.predicates)) {
+            LOG_ERROR("Marshal predicates failed.");
+            return false;
+        }
+        if (!MarshalValuesBucketToBuffer(oss, statement.valuesBucket)) {
+            LOG_ERROR("Marshal valuesBucket failed.");
+            return false;
+        }
+        if (!MarshalBackReferenceToBuffer(oss, statement.backReference)) {
+            LOG_ERROR("Marshal backReference failed.");
+            return false;
+        }
+        index += 1;
+    }
+    return oss.good();
+}
+
+bool UnmarshalOperationStatementVecToBuffer(std::istringstream &iss,
+                                            std::vector<OperationStatement> &operationStatements)
+{
+    size_t size;
+    if (!UnmarshalBasicTypeToBuffer(iss, size)) {
+        LOG_ERROR("Unmarshal vec size failed.");
+        return false;
+    }
+    
+    for (size_t i = 0; i < size; i++) {
+        OperationStatement statement;
+        if (!UnmarshalBasicTypeToBuffer(iss, statement.operationType)) {
+            LOG_ERROR("Unmarshal operationType failed.");
+            return false;
+        }
+        if (!statement.IsOperationTypeValid()) {
+            // existing marshalling use static cast on enum, only log when operationType exceeds defined types
+            LOG_ERROR("operationType Invalid:%{public}d, index:%{public}zu", statement.operationType, i);
+        }
+        if (!UnmarshalStringToBuffer(iss, statement.uri)) {
+            LOG_ERROR("Unmarshal uri failed.");
+            return false;
+        }
+        if (!UnmarshalPredicatesToBuffer(iss, statement.predicates)) {
+            LOG_ERROR("Unmarshal predicates failed.");
+            return false;
+        }
+        if (!UnmarshalValuesBucketToBuffer(iss, statement.valuesBucket)) {
+            LOG_ERROR("Unmarshal valuesBucket failed.");
+            return false;
+        }
+        if (!UnmarshalBackReferenceToBuffer(iss, statement.backReference)) {
+            LOG_ERROR("Unmarshal backReference failed.");
+            return false;
+        }
+        operationStatements.push_back(std::move(statement));
+    }
+    return iss.good();
+}
+
+// Currently as a substitution for MarshalToBuffer
+bool MarshalOperationStatementVec(const std::vector<OperationStatement> &operationStatements, MessageParcel &parcel)
+{
+    std::ostringstream oss;
+    if (!MarshalOperationStatementVecToBuffer(oss, operationStatements)) {
+        LOG_ERROR("MarshalOperationStatementVecToBuffer failed.");
+        return false;
+    }
+    std::string str = oss.str();
+    size_t size = str.length();
+    if (size > MAX_IPC_SIZE) {
+        LOG_ERROR("Size of OperationStatementVec exceed limit:%{public}zu", size);
+        return false;
+    }
+    if (!parcel.WriteInt32(size)) {
+        LOG_ERROR("Write size failed.");
+        return false;
+    }
+    return parcel.WriteRawData(reinterpret_cast<const void *>(str.data()), size);
+}
+
+bool UnmarshalOperationStatementVec(std::vector<OperationStatement> &operationStatements, MessageParcel &parcel)
+{
+    int32_t length = parcel.ReadInt32();
+    if (length < 1) {
+        LOG_ERROR("Length of OperationStatementVec is invalid:%{public}d", length);
+        return false;
+    }
+    if (static_cast<size_t>(length) > MAX_IPC_SIZE) {
+        LOG_ERROR("Length of OperationStatementVec exceed limit:%{public}d", length);
+        return false;
+    }
+    const char *buffer = reinterpret_cast<const char *>(parcel.ReadRawData(static_cast<size_t>(length)));
+    if (buffer == nullptr) {
+        LOG_ERROR("ReadRawData failed.");
+        return false;
+    }
+    std::istringstream iss(std::string(buffer, length));
+    return UnmarshalOperationStatementVecToBuffer(iss, operationStatements);
+}
 }  // namespace OHOS::ITypesUtil

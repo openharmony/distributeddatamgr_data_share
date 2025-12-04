@@ -54,6 +54,7 @@ using DataProxyGetResult = DataShare::DataProxyGetResult;
 using DataProxyChangeInfo = DataShare::DataProxyChangeInfo;
 using UriInfo = DataShare::UriInfo;
 using RegisterOption = DataShare::RegisterOption;
+using BackReference = DataShare::BackReference;
 
 template<>
 bool Marshalling(const BatchUpdateResult &result, MessageParcel &parcel);
@@ -173,6 +174,10 @@ bool UnmarshalPredicates(Predicates &predicates, MessageParcel &parcel);
 bool MarshalValuesBucketVec(const std::vector<DataShareValuesBucket> &values, MessageParcel &parcel);
 
 bool UnmarshalValuesBucketVec(std::vector<DataShareValuesBucket> &values, MessageParcel &parcel);
+
+bool MarshalOperationStatementVec(const std::vector<OperationStatement> &operationStatements, MessageParcel &parcel);
+
+bool UnmarshalOperationStatementVec(std::vector<OperationStatement> &operationStatements, MessageParcel &parcel);
 
 template<>
 bool Marshalling(const DataShareProxyData &proxyData, MessageParcel &parcel);
