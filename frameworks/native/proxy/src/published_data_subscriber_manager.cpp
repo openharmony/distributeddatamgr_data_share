@@ -78,14 +78,14 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
     return BaseCallbacks::DelObservers(subscriber,
         [&proxy, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             // delete all obs by subscriber
-            std::vector<OperationResult> results;
+            std::map<int64_t, std::vector<std::string>> keysMap;
             for (auto const &key : lastDelKeys) {
-                auto results = proxy->UnSubscribePublishedData(std::vector<std::string>(1, key.uri_),
-                    key.subscriberId_);
+                lastChangeNodeMap_.Erase(key);
+                keysMap[key.subscriberId_].emplace_back(key.uri_);
+            }
+            for (auto const &[subscriberId, uris] : keysMap) {
+                auto results = proxy->UnSubscribePublishedData(uris, subscriberId);
                 opResult.insert(opResult.end(), results.begin(), results.end());
-                if (AreAllOpsSucceeded(results, key)) {
-                    lastChangeNodeMap_.Erase(key);
-                }
             }
         });
 }
@@ -108,7 +108,8 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
     return BaseCallbacks::DelObservers(keys, subscriber,
         [&proxy, &subscriberId, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
-            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
+            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
+                lastChangeNodeMap_.Erase(result);
                 lastDelUris.emplace_back(result);
             });
             if (lastDelUris.empty()) {
@@ -116,11 +117,6 @@ std::vector<OperationResult> PublishedDataSubscriberManager::DelObservers(void *
             }
             auto unsubResult = proxy->UnSubscribePublishedData(lastDelUris, subscriberId);
             opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
-            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&unsubResult, this](auto &result) {
-                if (AreAllOpsSucceeded(unsubResult, result)) {
-                    lastChangeNodeMap_.Erase(result);
-                }
-            });
         });
 }
 
