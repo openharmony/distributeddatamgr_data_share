@@ -69,7 +69,6 @@ async function generateTable() {
       'isStudent': true,
     };
     await rdbStore.insert("test", valueBucket5);
-    console.info(TAG + 'generateTable end');
     const valueBucket6: relationalStore.ValuesBucket = {
       name: "Error",
       age: 0,

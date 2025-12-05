@@ -496,7 +496,6 @@ export default function DataSharePredicatesRDBEtsTest() {
       if (rdbStore != undefined) {
         await insertMoreData();
       }
-      console.info(TAG + 'Axi_Beft await end');
       try {
         let dp = new dataSharePredicates.DataSharePredicates();
         dp.notEqualTo('age', 14)
