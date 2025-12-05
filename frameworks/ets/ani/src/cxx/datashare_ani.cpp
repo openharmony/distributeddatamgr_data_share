@@ -1,0 +1,1313 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#define LOG_TAG "ANIDatashare"
+
+#include "ani_base_context.h"
+#include "datashare_ani.h"
+#include "datashare_business_error.h"
+#include "datashare_log.h"
+#include "datashare_predicates.h"
+#include "datashare_value_object.h"
+#include "datashare_values_bucket.h"
+#include "ikvstore_data_service.h"
+#include "idata_share_service.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
+#include "datashare_result.h"
+#include "wrapper.rs.h"
+#include "js_proxy.h"
+#define UNIMPL_RET_CODE 0
+
+namespace OHOS {
+using namespace DataShare;
+using namespace DistributedShare::DataShare;
+namespace DataShareAni {
+
+std::mutex listMutex_{};
+static std::map<std::string, std::list<sptr<ANIDataShareObserver>>> observerMap_;
+
+std::vector<std::string> convert_rust_vec_to_cpp_vector(const rust::Vec<rust::String>& rust_vec)
+{
+    std::vector<std::string> cpp_vector;
+    for (const auto& rust_str : rust_vec) {
+        cpp_vector.push_back(std::string(rust_str));
+    }
+    return cpp_vector;
+}
+
+std::vector<uint8_t> convert_rust_vec_to_cpp_vector(const rust::Vec<uint8_t>& rust_vec)
+{
+    std::vector<uint8_t> cpp_vector;
+    for (const auto& rust_data : rust_vec) {
+        cpp_vector.push_back(rust_data);
+    }
+    return cpp_vector;
+}
+
+// @ohos.data.DataShareResultSet.d.ets
+int32_t GetRowCount(int64_t resultSetPtr)
+{
+    int32_t count = -1;
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return count;
+    }
+    resultSet->resultSetPtr_->GetRowCount(count);
+    return count;
+}
+
+bool GoToFirstRow(int64_t resultSetPtr)
+{
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return false;
+    }
+    int errCode = resultSet->resultSetPtr_->GoToFirstRow();
+    if (errCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errCode);
+        return false;
+    }
+    return true;
+}
+
+bool GoToLastRow(int64_t resultSetPtr)
+{
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return false;
+    }
+    int errCode = resultSet->resultSetPtr_->GoToLastRow();
+    if (errCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errCode);
+        return false;
+    }
+    return true;
+}
+
+bool GoToNextRow(int64_t resultSetPtr)
+{
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return false;
+    }
+    int errCode = resultSet->resultSetPtr_->GoToNextRow();
+    if (errCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errCode);
+        return false;
+    }
+    return true;
+}
+
+rust::String GetString(int64_t resultSetPtr, int columnIndex)
+{
+    std::string strValue;
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+    } else {
+        resultSet->resultSetPtr_->GetString(columnIndex, strValue);
+    }
+    return rust::String(strValue);
+}
+
+int64_t GetLong(int64_t resultSetPtr, int columnIndex)
+{
+    int64_t value = -1;
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return value;
+    }
+    int errorCode = resultSet->resultSetPtr_->GetLong(columnIndex, value);
+    if (errorCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errorCode);
+    }
+    return value;
+}
+
+void Close(int64_t resultSetPtr)
+{
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return;
+    }
+    resultSet->resultSetPtr_->Close();
+}
+
+int GetColumnIndex(int64_t resultSetPtr, rust::String columnName)
+{
+    std::string name = std::string(columnName);
+    int32_t columnIndex = -1;
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return columnIndex;
+    }
+    int errorCode = resultSet->resultSetPtr_->GetColumnIndex(name, columnIndex);
+    if (errorCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d columnIndex:%{public}d", errorCode, columnIndex);
+    }
+    return columnIndex;
+}
+
+// @ohos.data.dataSharePredicates.d.ets
+int64_t DataSharePredicatesNew()
+{
+    return reinterpret_cast<long long>(new DataSharePredicates);
+}
+
+void DataSharePredicatesClean(int64_t predicatesPtr)
+{
+    delete reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+}
+
+void DataSharePredicatesEqualTo(int64_t predicatesPtr, rust::String field, const ValueType& value)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    std::string strFiled = std::string(field);
+    EnumType type = value_type_get_type(value);
+    switch (type) {
+        case EnumType::StringType: {
+            rust::String str = value_type_get_string(value);
+            predicates->EqualTo(strFiled, std::string(str));
+            break;
+        }
+        case EnumType::F64Type: {
+            double data = value_type_get_f64(value);
+            predicates->EqualTo(strFiled, data);
+            break;
+        }
+        case EnumType::BooleanType: {
+            bool data = value_type_get_bool(value);
+            predicates->EqualTo(strFiled, data);
+            break;
+        }
+        default: {
+            LOG_ERROR("Invalid argument! Wrong argument Type");
+            break;
+        }
+    }
+}
+
+void DataSharePredicatesNotEqualTo(int64_t predicatesPtr, rust::String field, const ValueType& value)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    std::string strFiled = std::string(field);
+    EnumType type = value_type_get_type(value);
+    switch (type) {
+        case EnumType::StringType: {
+            rust::String str = value_type_get_string(value);
+            predicates->NotEqualTo(strFiled, std::string(str));
+            break;
+        }
+        case EnumType::F64Type: {
+            double data = value_type_get_f64(value);
+            predicates->NotEqualTo(strFiled, data);
+            break;
+        }
+        case EnumType::BooleanType: {
+            bool data = value_type_get_bool(value);
+            predicates->NotEqualTo(strFiled, data);
+            break;
+        }
+        default: {
+            LOG_ERROR("Invalid argument! Wrong argument Type");
+            break;
+        }
+    }
+}
+
+void DataSharePredicatesBeginWrap(int64_t predicatesPtr)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->BeginWrap());
+}
+
+void DataSharePredicatesEndWrap(int64_t predicatesPtr)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->EndWrap());
+}
+
+void DataSharePredicatesOr(int64_t predicatesPtr)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->Or());
+}
+
+void DataSharePredicatesAnd(int64_t predicatesPtr)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->And());
+}
+
+void DataSharePredicatesContains(int64_t predicatesPtr, rust::String field, rust::String value)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->Contains(std::string(field), std::string(value)));
+}
+
+void DataSharePredicatesIsNull(int64_t predicatesPtr, rust::String field)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->IsNull(std::string(field)));
+}
+
+void DataSharePredicatesIsNotNull(int64_t predicatesPtr, rust::String field)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->IsNotNull(std::string(field)));
+}
+
+void DataSharePredicatesLike(int64_t predicatesPtr, rust::String field, rust::String value)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->Like(std::string(field), std::string(value)));
+}
+
+void GetValueType(const ValueType& valueType, std::string& typeStr)
+{
+    EnumType type = value_type_get_type(valueType);
+    switch (type) {
+        case EnumType::StringType: {
+            rust::String str = value_type_get_string(valueType);
+            typeStr = std::string(str);
+            break;
+        }
+        case EnumType::F64Type: {
+            double data = value_type_get_f64(valueType);
+            typeStr = std::to_string(data);
+            break;
+        }
+        case EnumType::BooleanType: {
+            bool data = value_type_get_bool(valueType);
+            typeStr = std::to_string(data);
+            break;
+        }
+        default: {
+            LOG_ERROR("Invalid argument! Wrong argument Type");
+            break;
+        }
+    }
+}
+
+void DataSharePredicatesBetween(int64_t predicatesPtr, rust::String field, const ValueType& low,
+    const ValueType& high)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    std::string strLow;
+    std::string strHigh;
+    GetValueType(low, strLow);
+    GetValueType(high, strHigh);
+    (void)(*predicates->Between(std::string(field), strLow, strHigh));
+}
+
+void DataSharePredicatesGreaterThan(int64_t predicatesPtr, rust::String field, const ValueType& value)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    EnumType type = value_type_get_type(value);
+    switch (type) {
+        case EnumType::StringType: {
+            rust::String str = value_type_get_string(value);
+            (void)(*predicates->GreaterThan(std::string(field), std::string(str)));
+            break;
+        }
+        case EnumType::F64Type: {
+            double data = value_type_get_f64(value);
+            (void)(*predicates->GreaterThan(std::string(field), data));
+            break;
+        }
+        case EnumType::BooleanType: {
+            bool data = value_type_get_bool(value);
+            (void)(*predicates->GreaterThan(std::string(field), data));
+            break;
+        }
+        default: {
+            LOG_ERROR("Invalid argument! Wrong argument Type");
+            break;
+        }
+    }
+}
+
+void DataSharePredicatesGreaterThanOrEqualTo(int64_t predicatesPtr, rust::String field, const ValueType& value)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    EnumType type = value_type_get_type(value);
+    switch (type) {
+        case EnumType::StringType: {
+            rust::String str = value_type_get_string(value);
+            (void)(*predicates->GreaterThanOrEqualTo(std::string(field), std::string(str)));
+            break;
+        }
+        case EnumType::F64Type: {
+            double data = value_type_get_f64(value);
+            (void)(*predicates->GreaterThanOrEqualTo(std::string(field), data));
+            break;
+        }
+        case EnumType::BooleanType: {
+            bool data = value_type_get_bool(value);
+            (void)(*predicates->GreaterThanOrEqualTo(std::string(field), data));
+            break;
+        }
+        default: {
+            LOG_ERROR("Invalid argument! Wrong argument Type");
+            break;
+        }
+    }
+}
+
+void DataSharePredicatesLessThanOrEqualTo(int64_t predicatesPtr, rust::String field, const ValueType& value)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    EnumType type = value_type_get_type(value);
+    switch (type) {
+        case EnumType::StringType: {
+            rust::String str = value_type_get_string(value);
+            (void)(*predicates->LessThanOrEqualTo(std::string(field), std::string(str)));
+            break;
+        }
+        case EnumType::F64Type: {
+            double data = value_type_get_f64(value);
+            (void)(*predicates->LessThanOrEqualTo(std::string(field), data));
+            break;
+        }
+        case EnumType::BooleanType: {
+            bool data = value_type_get_bool(value);
+            (void)(*predicates->LessThanOrEqualTo(std::string(field), data));
+            break;
+        }
+        default: {
+            LOG_ERROR("Invalid argument! Wrong argument Type");
+            break;
+        }
+    }
+}
+
+void DataSharePredicatesLessThan(int64_t predicatesPtr, rust::String field, const ValueType& value)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    EnumType type = value_type_get_type(value);
+    switch (type) {
+        case EnumType::StringType: {
+            rust::String str = value_type_get_string(value);
+            (void)(*predicates->LessThan(std::string(field), std::string(str)));
+            break;
+        }
+        case EnumType::F64Type: {
+            double data = value_type_get_f64(value);
+            (void)(*predicates->LessThan(std::string(field), data));
+            break;
+        }
+        case EnumType::BooleanType: {
+            bool data = value_type_get_bool(value);
+            (void)(*predicates->LessThan(std::string(field), data));
+            break;
+        }
+        default: {
+            LOG_ERROR("Invalid argument! Wrong argument Type");
+            break;
+        }
+    }
+}
+
+void DataSharePredicatesOrderByAsc(int64_t predicatesPtr, rust::String field)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->OrderByAsc(std::string(field)));
+}
+
+void DataSharePredicatesOrderByDesc(int64_t predicatesPtr, rust::String field)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->OrderByDesc(std::string(field)));
+}
+
+void DataSharePredicatesLimit(int64_t predicatesPtr, int total, int offset)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->Limit(total, offset));
+}
+
+void DataSharePredicatesGroupBy(int64_t predicatesPtr, rust::Vec<rust::String> field)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    std::vector<std::string> strings;
+    for (const auto &str : field) {
+        strings.push_back(std::string(str));
+    }
+    (void)(*predicates->GroupBy(strings));
+}
+
+void DataSharePredicatesIn(int64_t predicatesPtr, rust::String field,  rust::Vec<ValueType> value)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    std::vector<std::string> values;
+    for (const ValueType& v : value) {
+        EnumType type = value_type_get_type(v);
+        switch (type) {
+            case EnumType::StringType: {
+                rust::String str = value_type_get_string(v);
+                values.push_back(std::string(str));
+                break;
+            }
+            case EnumType::F64Type: {
+                double data = value_type_get_f64(v);
+                values.push_back(std::to_string(data));
+                break;
+            }
+            case EnumType::BooleanType: {
+                bool data = value_type_get_bool(v);
+                values.push_back(std::to_string(data));
+                break;
+            }
+            default: {
+                LOG_ERROR("Invalid argument! Wrong argument Type");
+                break;
+            }
+        }
+    }
+    (void)(*predicates->In(std::string(field), values));
+}
+
+void DataSharePredicatesNotIn(int64_t predicatesPtr, rust::String field, rust::Vec<ValueType> value)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    std::vector<std::string> values;
+    for (const ValueType& v : value) {
+        EnumType type = value_type_get_type(v);
+        switch (type) {
+            case EnumType::StringType: {
+                rust::String str = value_type_get_string(v);
+                values.push_back(std::string(str));
+                break;
+            }
+            case EnumType::F64Type: {
+                double data = value_type_get_f64(v);
+                values.push_back(std::to_string(data));
+                break;
+            }
+            case EnumType::BooleanType: {
+                bool data = value_type_get_bool(v);
+                values.push_back(std::to_string(data));
+                break;
+            }
+            default: {
+                LOG_ERROR("Invalid argument! Wrong argument Type");
+                break;
+            }
+        }
+    }
+    (void)(*predicates->NotIn(std::string(field), values));
+}
+
+// @ohos.data.dataShare.d.ets
+I64ResultWrap DataShareNativeCreate(int64_t context, rust::String strUri,
+    bool optionIsUndefined, bool isProxy)
+{
+    if (context == 0) {
+        LOG_ERROR("context is nullptr, create dataShareHelper failed.");
+        return I64ResultWrap{0, EXCEPTION_PARAMETER_CHECK};
+    }
+    std::string stdStrUri = std::string(strUri);
+    std::shared_ptr<AbilityRuntime::Context> weakContext =
+        reinterpret_cast<std::weak_ptr<AbilityRuntime::Context>*>(context)->lock();
+    std::shared_ptr<DataShareHelper> dataShareHelper;
+    if (optionIsUndefined) {
+        dataShareHelper = DataShareHelper::Creator(weakContext->GetToken(), stdStrUri);
+    } else {
+        CreateOptions options = {
+            isProxy,
+            weakContext->GetToken(),
+            Uri(stdStrUri).GetScheme() == "datashareproxy",
+        };
+        dataShareHelper = DataShareHelper::Creator(stdStrUri, options);
+    }
+    if (dataShareHelper == nullptr) {
+        LOG_ERROR("create dataShareHelper failed.");
+        return I64ResultWrap{0, EXCEPTION_HELPER_UNINITIALIZED};
+    }
+    auto helperHolder = new SharedPtrHolder(dataShareHelper);
+    return I64ResultWrap{reinterpret_cast<long long>(helperHolder), E_OK};
+}
+
+void DataShareNativeClean(int64_t dataShareHelperPtr)
+{
+    delete reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+}
+
+I64ResultWrap DataShareNativeQuery(int64_t dataShareHelperPtr, rust::String strUri,
+    int64_t dataSharePredicatesPtr, rust::Vec<rust::String> columns)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("datashareHelper query failed, helper is nullptr.");
+        return I64ResultWrap{0, EXCEPTION_HELPER_CLOSED};
+    }
+    std::string stdStrUri = std::string(strUri);
+    std::vector<std::string> std_vector = convert_rust_vec_to_cpp_vector(columns);
+    DatashareBusinessError businessError;
+    Uri uri(stdStrUri);
+    std::shared_ptr<DataShareResultSet> resultSet = helperHolder->datashareHelper_->Query(uri,
+        *reinterpret_cast<DataSharePredicates*>(dataSharePredicatesPtr), std_vector, &businessError);
+    if (resultSet == nullptr) {
+        LOG_ERROR("datashareHelper query failed, resultSet is nullptr.");
+        return I64ResultWrap{0, EXCEPTION_INNER};
+    }
+
+    if (businessError.GetCode() != 0) {
+        LOG_ERROR("datashareHelper query falied, errorCode: %{public}d.", businessError.GetCode());
+        return I64ResultWrap{0, EXCEPTION_INNER};
+    }
+    auto resultSetHolder = new ResultSetHolder(resultSet);
+    return I64ResultWrap{reinterpret_cast<long long>(resultSetHolder), E_OK};
+}
+
+void GetValuesBucketWrap(const rust::Vec<ValuesBucketKvItem> &bucket, DataShareValuesBucket &valuesBucket)
+{
+    for (const ValuesBucketKvItem& cpp_bucket : bucket) {
+        rust::String bucket_key = value_bucket_get_key(cpp_bucket);
+        std::string key = std::string(bucket_key);
+        EnumType bucket_type = value_bucket_get_vtype(cpp_bucket);
+        switch (bucket_type) {
+            case EnumType::StringType: {
+                rust::String str = value_bucket_get_string(cpp_bucket);
+                std::string stdStr = std::string(str);
+                valuesBucket.Put(key, stdStr);
+                break;
+            }
+            case EnumType::F64Type: {
+                double data = value_bucket_get_f64(cpp_bucket);
+                valuesBucket.Put(key, data);
+                break;
+            }
+            case EnumType::BooleanType: {
+                bool data = value_bucket_get_bool(cpp_bucket);
+                valuesBucket.Put(key, data);
+                break;
+            }
+            case EnumType::Uint8ArrayType: {
+                rust::Vec<uint8_t> data = value_bucket_get_uint8array(cpp_bucket);
+                std::vector<uint8_t> std_vector = convert_rust_vec_to_cpp_vector(data);
+                valuesBucket.Put(key, std_vector);
+                break;
+            }
+            case EnumType::NullType: {
+                valuesBucket.Put(key, {});
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+}
+
+I32ResultWrap DataShareNativeUpdate(int64_t dataShareHelperPtr, rust::String strUri,
+    int64_t dataSharePredicatesPtr, rust::Vec<ValuesBucketKvItem> bucket)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("datashareHelper update failed, helper is nullptr.");
+        return I32ResultWrap{0, EXCEPTION_HELPER_CLOSED};
+    }
+    std::string stdStrUri = std::string(strUri);
+    DataShareValuesBucket valuesBucket;
+    GetValuesBucketWrap(bucket, valuesBucket);
+    
+    Uri uri(stdStrUri);
+    int resultNumber = helperHolder->datashareHelper_->Update(uri,
+        *reinterpret_cast<DataSharePredicates*>(dataSharePredicatesPtr), valuesBucket);
+    if (resultNumber < 0) {
+        LOG_ERROR("datashareHelper update failed, resultNumber: %{public}d.", resultNumber);
+        return I32ResultWrap{resultNumber, EXCEPTION_INNER};
+    }
+    return I32ResultWrap{resultNumber, E_OK};
+}
+
+int DataShareNativePublish(int64_t dataShareHelperPtr, rust::Vec<PublishedItem> data,
+    rust::String bundleName, VersionWrap version, PublishSretParam& sret)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("datashareHelper publish failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    std::string stdBundleName = std::string(bundleName);
+    Data PublishData;
+    for (PublishedItem& item : data) {
+        rust::String key = published_item_get_key(item);
+        std::string strKey = std::string(key);
+        rust::String subscriberId = published_item_get_subscriber_id(item);
+        std::string strSubscriberId = std::string(published_item_get_subscriber_id(item));
+        int64_t llSubscriberId = atoll(strSubscriberId.c_str());
+        EnumType data_type = published_item_get_data_type(item);
+        switch (data_type) {
+            case EnumType::StringType: {
+                rust::String data_str = published_item_get_data_string(item);
+                std::string strData = std::string(data_str);
+                PublishData.datas_.emplace_back(strKey, llSubscriberId, strData);
+                break;
+            }
+            case EnumType::ArrayBufferType: {
+                rust::Vec<uint8_t> data_arraybuffer = published_item_get_data_arraybuffer(item);
+                std::vector<uint8_t> std_vec;
+                for (const auto &dataItem : data_arraybuffer) {
+                    std_vec.push_back(dataItem);
+                }
+                PublishData.datas_.emplace_back(strKey, llSubscriberId, std_vec);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
+
+    std::vector<OperationResult> results = helperHolder->datashareHelper_->Publish(PublishData, stdBundleName);
+    for (const auto &result : results) {
+        publish_sret_push(sret, rust::String(result.key_), result.errCode_); // EXCEPTION_DATA_AREA_NOT_EXIST
+    }
+    return E_OK;
+}
+
+int DataShareNativeGetPublishedData(int64_t dataShareHelperPtr, rust::String bundleName,
+    GetPublishedDataSretParam& sret)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("datashareHelper getPublish failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    std::string stdBundleName = std::string(bundleName);
+    int errorCode = 0;
+    Data publishData = helperHolder->datashareHelper_->GetPublishedData(stdBundleName, errorCode);
+    for (const auto &data : publishData.datas_) {
+        DataShare::PublishedDataItem::DataType dataItem = data.GetData();
+        if (dataItem.index() == 0) {
+            std::vector std_vec = std::get<std::vector<uint8_t>>(dataItem);
+            rust::Vec<uint8_t> rust_vec;
+            for (const auto &u8data : std_vec) {
+                rust_vec.push_back(u8data);
+            }
+            published_data_sret_push_array(sret,
+                rust::String(data.key_), rust::String(std::to_string(data.subscriberId_)), rust_vec);
+        } else {
+            std::string strData = std::get<std::string>(dataItem);
+            published_data_sret_push_str(sret,
+                rust::String(data.key_), rust::String(std::to_string(data.subscriberId_)), rust::String(strData));
+        }
+    }
+    return E_OK;
+}
+
+int DataShareNativeAddTemplate(int64_t dataShareHelperPtr, rust::String uri,
+    rust::String subscriberId, const Template& temp)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("AddTemplate failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    rust::String scheduler = template_get_scheduler(temp);
+    rust::String update = template_get_update(temp);
+    rust::Vec<TemplatePredicatesKvItem> predicates = template_get_predicates(temp);
+    std::vector<PredicateTemplateNode> stdPredicates;
+    for (TemplatePredicatesKvItem& kv : predicates) {
+        rust::String key = template_predicates_get_key(kv);
+        rust::String value = template_predicates_get_value(kv);
+        stdPredicates.emplace_back(std::string(key), std::string(value));
+    }
+
+    std::string tplUri = std::string(uri);
+    int64_t llSubscriberId = atoll(std::string(subscriberId).c_str());
+    DataShare::Template tpl(std::string(update), stdPredicates, std::string(scheduler));
+    auto result = helperHolder->datashareHelper_->AddQueryTemplate(tplUri, llSubscriberId, tpl);
+    if (result == E_URI_NOT_EXIST || result == E_BUNDLE_NAME_NOT_EXIST) {
+        LOG_ERROR("AddTemplate failed, result: %{public}d.", result);
+        return EXCEPTION_URI_NOT_EXIST;
+    }
+    return E_OK;
+}
+
+int DataShareNativeDelTemplate(int64_t dataShareHelperPtr, rust::String uri, rust::String subscriberId)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("DelTemplate update failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    std::string tplUri = std::string(uri);
+    int64_t llSubscriberId = atoll(std::string(subscriberId).c_str());
+    auto result = helperHolder->datashareHelper_->DelQueryTemplate(tplUri, llSubscriberId);
+    if (result == E_URI_NOT_EXIST || result == E_BUNDLE_NAME_NOT_EXIST) {
+        LOG_ERROR("DelTemplate failed, result: %{public}d.", result);
+        return EXCEPTION_URI_NOT_EXIST;
+    }
+    return E_OK;
+}
+
+I32ResultWrap DataShareNativeInsert(int64_t dataShareHelperPtr, rust::String strUri,
+    rust::Vec<ValuesBucketKvItem> bucket)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("datashareHelper insert failed, helper is nullptr.");
+        return I32ResultWrap{0, EXCEPTION_HELPER_CLOSED};
+    }
+    std::string stdStrUri = std::string(strUri);
+    DataShareValuesBucket valuesBucket;
+    GetValuesBucketWrap(bucket, valuesBucket);
+
+    Uri uri(std::string(strUri).c_str());
+    int resultNumber = 0;
+    resultNumber = helperHolder->datashareHelper_->Insert(uri, valuesBucket);
+    if (resultNumber < 0) {
+        LOG_ERROR("datashareHelper insert failed, resultNumber: %{public}d.", resultNumber);
+        return I32ResultWrap{resultNumber, EXCEPTION_INNER};
+    }
+    return I32ResultWrap{resultNumber, E_OK};
+}
+
+I32ResultWrap DataShareNativeBatchInsert(int64_t dataShareHelperPtr, rust::String strUri,
+    rust::Vec<ValuesBucketWrap> buckets)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("datashareHelper batchInsert failed, helper is nullptr.");
+        return I32ResultWrap{0, EXCEPTION_HELPER_CLOSED};
+    }
+    std::vector<DataShareValuesBucket> valuesBuckets;
+    for (ValuesBucketWrap& wrapBuckets : buckets) {
+        rust::Vec<ValuesBucketKvItem> const &bucket = values_bucket_wrap_inner(wrapBuckets);
+        DataShareValuesBucket valuesBucket;
+        GetValuesBucketWrap(bucket, valuesBucket);
+        valuesBuckets.push_back(valuesBucket);
+    }
+
+    Uri uri(std::string(strUri).c_str());
+    int resultNumber = 0;
+    resultNumber = helperHolder->datashareHelper_->BatchInsert(uri, valuesBuckets);
+    if (resultNumber < 0) {
+        LOG_ERROR("datashareHelper batchInsert failed, resultNumber: %{public}d.", resultNumber);
+        return I32ResultWrap{resultNumber, EXCEPTION_INNER};
+    }
+    return I32ResultWrap{resultNumber, E_OK};
+}
+
+I32ResultWrap DataShareNativeDelete(int64_t dataShareHelperPtr, rust::String strUri, int64_t dataSharePredicatesPtr)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("datashareHelper delete failed, helper is nullptr.");
+        return I32ResultWrap{0, EXCEPTION_HELPER_CLOSED};
+    }
+    int resultNumber = 0;
+    Uri uri(std::string(strUri).c_str());
+    resultNumber = helperHolder->datashareHelper_->Delete(uri,
+        *reinterpret_cast<DataSharePredicates*>(dataSharePredicatesPtr));
+    if (resultNumber < 0) {
+        LOG_ERROR("datashareHelper delete failed, resultNumber: %{public}d.", resultNumber);
+        return I32ResultWrap{resultNumber, EXCEPTION_INNER};
+    }
+    return I32ResultWrap{resultNumber, E_OK};
+}
+
+int DataShareNativeClose(int64_t dataShareHelperPtr)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        return E_OK;
+    }
+    if (!helperHolder->datashareHelper_->Release()) {
+        LOG_ERROR("datashareHelper close failed, inner error.");
+        return EXCEPTION_INNER;
+    }
+    helperHolder->datashareHelper_ = nullptr;
+    return E_OK;
+}
+
+int ANIRegisterObserver(const std::string &strUri, long long dataShareHelperPtr,
+    rust::Box<DataShareCallback> &callback, bool isNotifyDetails)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("ANIRegisterObserver failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    std::lock_guard<std::mutex> lck(listMutex_);
+    observerMap_.try_emplace(strUri);
+    auto &list = observerMap_.find(strUri)->second;
+    for (const auto &item : list) {
+        if (callback_is_equal(*callback, *(item->observer_->GetCallback()))) {
+            LOG_ERROR("observer has already subscribed.");
+            return E_OK;
+        }
+    }
+
+    auto innerObserver = std::make_shared<ANIInnerDataShareObserver>(std::move(callback));
+    sptr<ANIDataShareObserver> observer(new (std::nothrow) ANIDataShareObserver(innerObserver));
+    if (observer == nullptr) {
+        LOG_ERROR("observer is nullptr.");
+        return E_OK;
+    }
+    Uri uri(strUri);
+    if (!isNotifyDetails) {
+        helperHolder->datashareHelper_->RegisterObserver(uri, observer);
+    } else {
+        helperHolder->datashareHelper_->RegisterObserverExt(uri,
+            std::shared_ptr<DataShareObserver>(observer.GetRefPtr(), [holder = observer](const auto*) {}), false);
+    }
+    list.push_back(observer);
+    return E_OK;
+}
+
+int ANIUnRegisterObserver(const std::string &strUri, long long dataShareHelperPtr,
+    rust::Box<DataShareCallback> &callback, bool isNotifyDetails)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("ANIUnRegisterObserver failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    std::lock_guard<std::mutex> lck(listMutex_);
+    if (observerMap_.find(strUri) == observerMap_.end()) {
+        LOG_ERROR("ANIUnRegisterObserver failed, uri does not exist.");
+        return E_OK;
+    }
+    auto &list = observerMap_.find(strUri)->second;
+    auto it = list.begin();
+    Uri uri(strUri);
+    while (it != list.end()) {
+        if (!callback_is_equal(*callback, *((*it)->observer_->GetCallback()))) {
+            ++it;
+            continue;
+        }
+        if (!isNotifyDetails) {
+            helperHolder->datashareHelper_->UnregisterObserver(uri, *it);
+        } else {
+            helperHolder->datashareHelper_->UnregisterObserverExt(uri,
+                std::shared_ptr<DataShareObserver>((*it).GetRefPtr(), [holder = *it](const auto*) {}));
+        }
+        it = list.erase(it);
+        break;
+    }
+    if (list.empty()) {
+        observerMap_.erase(strUri);
+    }
+    return E_OK;
+}
+
+int ANIUnRegisterObserver(const std::string &strUri, long long dataShareHelperPtr, bool isNotifyDetails)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("ANIUnRegisterObserver failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    std::lock_guard<std::mutex> lck(listMutex_);
+    if (observerMap_.find(strUri) == observerMap_.end()) {
+        LOG_ERROR("ANIUnRegisterObserver failed, uri does not exist.");
+        return E_OK;
+    }
+    auto &list = observerMap_.find(strUri)->second;
+    auto it = list.begin();
+    Uri uri(strUri);
+    while (it != list.end()) {
+        if (!isNotifyDetails) {
+            helperHolder->datashareHelper_->UnregisterObserver(uri, *it);
+        } else {
+            helperHolder->datashareHelper_->UnregisterObserverExt(uri,
+                std::shared_ptr<DataShareObserver>((*it).GetRefPtr(), [holder = *it](const auto*) {}));
+        }
+        it = list.erase(it);
+    }
+    observerMap_.erase(strUri);
+    return E_OK;
+}
+
+int DataShareNativeOn(PtrWrap ptrWrap, rust::String strUri)
+{
+    return ANIRegisterObserver(std::string(strUri), ptrWrap.dataShareHelperPtr, ptrWrap.callback);
+}
+
+int DataShareNativeOnChangeinfo(PtrWrap ptrWrap, int32_t arktype, rust::String strUri)
+{
+    return ANIRegisterObserver(std::string(strUri), ptrWrap.dataShareHelperPtr, ptrWrap.callback, true);
+}
+
+int DataShareNativeOnRdbDataChange(PtrWrap ptrWrap, rust::Vec<rust::String> uris,
+    const TemplateId& templateId, PublishSretParam& sret)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(ptrWrap.dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("OnRdbDataChange failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    std::vector<OperationResult> results;
+    std::vector<std::string> stdUris;
+    for (const auto &uri : uris) {
+        stdUris.push_back(std::string(uri));
+    }
+    DataShare::TemplateId tplId;
+    tplId.subscriberId_ = atoll(std::string(template_id_get_subscriber_id(templateId)).c_str());
+    tplId.bundleName_ = std::string(template_id_get_bundle_name_of_owner(templateId));
+    helperHolder->jsRdbObsManager_ =
+        std::make_shared<AniRdbSubscriberManager>(helperHolder->datashareHelper_);
+    if (helperHolder->jsRdbObsManager_ == nullptr) {
+        LOG_ERROR("OnRdbDataChange failed, jsRdbObsManager is nullptr");
+        return E_OK;
+    }
+    results = helperHolder->jsRdbObsManager_->AddObservers(ptrWrap.callback, stdUris, tplId);
+    for (const auto &result : results) {
+        publish_sret_push(sret, rust::String(result.key_), result.errCode_);
+    }
+    return E_OK;
+}
+
+int DataShareNativeOnPublishedDataChange(PtrWrap ptrWrap, rust::Vec<rust::String> uris,
+    rust::String subscriberId, PublishSretParam& sret)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(ptrWrap.dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("OnPublishedDataChange failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    std::vector<OperationResult> results;
+    std::vector<std::string> stdUris;
+    for (const auto &uri : uris) {
+        stdUris.push_back(std::string(uri));
+    }
+
+    int64_t innerSubscriberId = atoll(std::string(subscriberId).c_str());
+    helperHolder->jsPublishedObsManager_ =
+        std::make_shared<AniPublishedSubscriberManager>(helperHolder->datashareHelper_);
+    if (helperHolder->jsPublishedObsManager_ == nullptr) {
+        LOG_ERROR("OnPublishedDataChange failed, jsPublishedObsManager is nullptr");
+        return E_OK;
+    }
+    results = helperHolder->jsPublishedObsManager_->AddObservers(ptrWrap.callback, stdUris, innerSubscriberId);
+    for (const auto &result : results) {
+        publish_sret_push(sret, rust::String(result.key_), result.errCode_);
+    }
+    return E_OK;
+}
+
+int DataShareNativeOff(PtrWrap ptrWrap, rust::String strUri)
+{
+    return ANIUnRegisterObserver(std::string(strUri), ptrWrap.dataShareHelperPtr, ptrWrap.callback, false);
+}
+
+int DataShareNativeOffNone(int64_t dataShareHelperPtr, rust::String strUri)
+{
+    return ANIUnRegisterObserver(std::string(strUri), dataShareHelperPtr, false);
+}
+
+int DataShareNativeOffChangeinfo(PtrWrap ptrWrap, int32_t arktype, rust::String strUri)
+{
+    return ANIUnRegisterObserver(std::string(strUri), ptrWrap.dataShareHelperPtr, ptrWrap.callback, true);
+}
+
+int DataShareNativeOffChangeinfoNone(int64_t dataShareHelperPtr, int32_t arktype, rust::String strUri)
+{
+    return ANIUnRegisterObserver(std::string(strUri), dataShareHelperPtr, true);
+}
+
+int DataShareNativeOffRdbDataChange(PtrWrap ptrWrap, rust::Vec<rust::String> uris, const TemplateId& templateId,
+    PublishSretParam& sret)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(ptrWrap.dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("OffRdbDataChange failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    std::vector<OperationResult> results;
+    std::vector<std::string> stdUris;
+    for (const auto &uri : uris) {
+        stdUris.push_back(std::string(uri));
+    }
+    DataShare::TemplateId tplId;
+    tplId.subscriberId_ = atoll(std::string(template_id_get_subscriber_id(templateId)).c_str());
+    tplId.bundleName_ = std::string(template_id_get_bundle_name_of_owner(templateId));
+    if (helperHolder->jsRdbObsManager_ == nullptr) {
+        LOG_ERROR("OffRdbDataChange failed, jsRdbObsManager is nullptr");
+        return E_OK;
+    }
+    results = helperHolder->jsRdbObsManager_->DelObservers(ptrWrap.callback, stdUris, tplId);
+    for (const auto &result : results) {
+        publish_sret_push(sret, rust::String(result.key_), result.errCode_);
+    }
+    return E_OK;
+}
+
+int DataShareNativeOffRdbDataChangeNone(int64_t dataShareHelperPtr, rust::Vec<rust::String> uris,
+    const TemplateId& templateId, PublishSretParam& sret)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("OffRdbDataChange failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    std::vector<OperationResult> results;
+    std::vector<std::string> stdUris;
+    for (const auto &uri : uris) {
+        stdUris.push_back(std::string(uri));
+    }
+    DataShare::TemplateId tplId;
+    tplId.subscriberId_ = atoll(std::string(template_id_get_subscriber_id(templateId)).c_str());
+    tplId.bundleName_ = std::string(template_id_get_bundle_name_of_owner(templateId));
+    if (helperHolder->jsRdbObsManager_ == nullptr) {
+        LOG_ERROR("OffRdbDataChange failed, jsRdbObsManager is nullptr");
+        return E_OK;
+    }
+    results = helperHolder->jsRdbObsManager_->DelObservers(stdUris, tplId);
+    for (const auto &result : results) {
+        publish_sret_push(sret, rust::String(result.key_), result.errCode_);
+    }
+    return E_OK;
+}
+
+int DataShareNativeOffPublishedDataChange(PtrWrap ptrWrap, rust::Vec<rust::String> uris, rust::String subscriberId,
+    PublishSretParam& sret)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(ptrWrap.dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("OffPublishedDataChange failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    std::vector<OperationResult> results;
+    std::vector<std::string> stdUris;
+    for (const auto &uri : uris) {
+        stdUris.push_back(std::string(uri));
+    }
+    int64_t innerSubscriberId = atoll(std::string(subscriberId).c_str());
+    if (helperHolder->jsPublishedObsManager_ == nullptr) {
+        LOG_ERROR("OffPublishedDataChange failed, jsPublishedObsManager is nullptr");
+        return E_OK;
+    }
+    results = helperHolder->jsPublishedObsManager_->DelObservers(ptrWrap.callback, stdUris, innerSubscriberId);
+    for (const auto &result : results) {
+        publish_sret_push(sret, rust::String(result.key_), result.errCode_);
+    }
+    return E_OK;
+}
+
+int DataShareNativeOffPublishedDataChangeNone(int64_t dataShareHelperPtr, rust::Vec<rust::String> uris,
+    rust::String subscriberId, PublishSretParam& sret)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("OffPublishedDataChange failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    std::vector<OperationResult> results;
+    std::vector<std::string> stdUris;
+    for (const auto &uri : uris) {
+        stdUris.push_back(std::string(uri));
+    }
+    int64_t innerSubscriberId = atoll(std::string(subscriberId).c_str());
+    if (helperHolder->jsPublishedObsManager_ == nullptr) {
+        LOG_ERROR("OffPublishedDataChange failed, jsPublishedObsManager is nullptr");
+        return E_OK;
+    }
+    results = helperHolder->jsPublishedObsManager_->DelObservers(stdUris, innerSubscriberId);
+    for (const auto &result : results) {
+        publish_sret_push(sret, rust::String(result.key_), result.errCode_);
+    }
+    return E_OK;
+}
+
+void DataShareNativeExtensionCallbackInt(double errorCode, rust::string errorMsg, int32_t data, int64_t nativePtr)
+{
+    AsyncCallBackPoint* point = reinterpret_cast<AsyncCallBackPoint*>(nativePtr);
+    if (point == nullptr) {
+        LOG_ERROR("AsyncCallBackPoint is nullptr.");
+        return;
+    }
+    auto resultWrap = point->result;
+    if (resultWrap == nullptr) {
+        LOG_ERROR("ResultWrap is nullptr.");
+        return;
+    }
+    resultWrap->callbackResultNumber_ = data;
+    DatashareBusinessError businessError;
+    businessError.SetCode((int)errorCode);
+    businessError.SetMessage(std::string(errorMsg));
+    resultWrap->businessError_= businessError;
+    resultWrap->isRecvReply_ = true;
+}
+
+void DataShareNativeExtensionCallbackObject(double errorCode, rust::string errorMsg, int64_t ptr, int64_t nativePtr)
+{
+    AsyncCallBackPoint* point = reinterpret_cast<AsyncCallBackPoint*>(nativePtr);
+    if (point == nullptr) {
+        LOG_ERROR("AsyncCallBackPoint is nullptr.");
+        return;
+    }
+    auto resultWrap = point->result;
+    if (resultWrap == nullptr) {
+        LOG_ERROR("ResultWrap is nullptr.");
+        return;
+    }
+
+    JSProxy::JSCreator<ResultSetBridge> *proxy = reinterpret_cast<JSProxy::JSCreator<ResultSetBridge> *>(ptr);
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr.");
+        return;
+    }
+    std::shared_ptr<ResultSetBridge> resultPtr = proxy->Create();
+    resultWrap->callbackResultObject_ = std::make_shared<DataShareResultSet>(resultPtr);
+    DatashareBusinessError businessError;
+    businessError.SetCode((int)errorCode);
+    businessError.SetMessage(std::string(errorMsg));
+    resultWrap->businessError_= businessError;
+    resultWrap->isRecvReply_ = true;
+}
+
+void DataShareNativeExtensionCallbackVoid(double errorCode, rust::string errorMsg, int64_t nativePtr)
+{
+    AsyncPoint *point = reinterpret_cast<AsyncPoint *>(nativePtr);
+    if (point == nullptr) {
+        LOG_ERROR("AsyncPoint is nullptr.");
+        return;
+    }
+    if (point->context == nullptr) {
+        LOG_ERROR("AsyncContext is nullptr.");
+        return;
+    }
+    if (point->context->isNeedNotify_) {
+        auto manager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (manager == nullptr) {
+            LOG_ERROR("Get system ability manager failed!");
+            return;
+        }
+        auto remoteObject = manager->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
+        if (remoteObject == nullptr) {
+            LOG_ERROR("CheckSystemAbility failed!");
+            return;
+        }
+        auto serviceProxy = std::make_shared<DataShareKvServiceProxy>(remoteObject);
+        if (serviceProxy == nullptr) {
+            LOG_ERROR("Create service proxy failed!");
+            return;
+        }
+        auto remote = serviceProxy->GetFeatureInterface("data_share");
+        if (remote == nullptr) {
+            LOG_ERROR("Get DataShare service failed!");
+            return;
+        }
+        MessageParcel data;
+        MessageParcel reply;
+        MessageOption option(MessageOption::TF_ASYNC);
+        if (!data.WriteInterfaceToken(DataShare::IDataShareService::GetDescriptor())) {
+            LOG_ERROR("Write descriptor failed!");
+            return;
+        }
+        remote->SendRequest(
+            static_cast<uint32_t>(DataShareServiceInterfaceCode::DATA_SHARE_SERVICE_CMD_NOTIFY), data, reply, option);
+    }
+}
+
+} // namespace DataShareAni
+} // namespace OHOS

@@ -21,6 +21,7 @@
 #include "connection_manager.h"
 #include "datashare_log.h"
 #include "js_datashare_ext_ability.h"
+#include "sts_datashare_ext_ability.h"
 #include "runtime.h"
 #include "datashare_ext_ability_context.h"
 
@@ -49,6 +50,8 @@ DataShareExtAbility* DataShareExtAbility::Create(const std::unique_ptr<Runtime>&
     switch (runtime->GetLanguage()) {
         case Runtime::Language::JS:
             return JsDataShareExtAbility::Create(runtime);
+        case Runtime::Language::ETS:
+            return StsDataShareExtAbility::Create(runtime);
 
         default:
             return new (std::nothrow)DataShareExtAbility();
@@ -142,6 +145,13 @@ bool DataShareExtAbility::NotifyChange(const Uri &uri)
     return true;
 }
 
+bool DataShareExtAbility::NotifyChangeWithUser(const Uri &uri, int32_t userId, uint32_t callingToken,
+    int32_t callingPid)
+{
+    LOG_INFO("Basic NotifyChangeWithUser.");
+    return true;
+}
+
 bool DataShareExtAbility::RegisterObserverExtProvider(const Uri &uri,
     const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants)
 {
@@ -169,6 +179,11 @@ Uri DataShareExtAbility::DenormalizeUri(const Uri &uri)
 {
     Uri urivalue("");
     return uri;
+}
+
+void DataShareExtAbility::InitResult(std::shared_ptr<ResultWrap> result)
+{
+    return;
 }
 } // namespace DataShare
 } // namespace OHOS

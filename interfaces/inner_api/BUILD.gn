@@ -200,6 +200,8 @@ ohos_shared_library("datashare_provider") {
     "${datashare_common_napi_path}/include",
     "${datashare_native_dfx_path}/include",
     "${datashare_native_permission_path}/include",
+    "${datashare_base_path}/frameworks/ets/ani/include",
+    "${target_gen_dir}/../../frameworks/ets/ani/src",
   ]
 
   sources = [
@@ -214,12 +216,16 @@ ohos_shared_library("datashare_provider") {
     "${datashare_native_provider_path}/src/js_datashare_ext_ability_context.cpp",
     "${datashare_native_permission_path}/src/data_share_config.cpp",
     "${datashare_native_dfx_path}/src/hiview_datashare.cpp",
+    "${datashare_native_provider_path}/src/sts_datashare_ext_ability.cpp",
+    "${datashare_native_provider_path}/src/sts_datashare_ext_ability_context.cpp",
   ]
   configs = [ ":ability_config" ]
   public_configs = [ ":datashare_public_config" ]
   version_script = "provider/libdatashare_provider.map"
   innerapi_tags = [ "platformsdk" ]
   deps = [
+    "${datashare_base_path}/frameworks/ets/ani:datashare_ani_cxx",
+    "${datashare_base_path}/frameworks/ets/ani:datashare_ani_rs",
     "${datashare_innerapi_path}/common:datashare_common",
     "${datashare_napi_path}/dataShare:datashare_jscommon",
   ]
@@ -234,17 +240,21 @@ ohos_shared_library("datashare_provider") {
     "ability_runtime:app_context",
     "ability_runtime:extensionkit_native",
     "ability_runtime:napi_common",
+    "ability_runtime:ani_common",
     "ability_runtime:runtime",
     "access_token:libaccesstoken_sdk",
     "access_token:libtokenid_sdk",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "eventhandler:libeventhandler",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "ipc:ipc_napi",
     "ipc:ipc_single",
     "kv_store:distributeddata_inner",
     "napi:ace_napi",
+    "runtime_core:ani",
+    "rust_cxx:cxx_cppdeps",
     "samgr:samgr_proxy",
   ]
 

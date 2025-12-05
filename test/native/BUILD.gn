@@ -830,6 +830,7 @@ ohos_unittest("DataShareStubTest") {
     "ability_base:zuri",
     "ability_runtime:ability_manager",
     "ability_runtime:abilitykit_native",
+    "ability_runtime:ani_common",
     "ability_runtime:dataobs_manager",
     "ability_runtime:extension_manager",
     "access_token:libaccesstoken_sdk",
@@ -842,6 +843,7 @@ ohos_unittest("DataShareStubTest") {
     "ipc:ipc_single",
     "ipc:ipc_napi",
     "relational_store:rdb_data_ability_adapter",
+    "runtime_core:ani",
     "samgr:samgr_proxy",
   ]
 

@@ -50,39 +50,7 @@ constexpr const char ASYNC_CALLBACK_NAME[] = "AsyncCallback";
 constexpr int CALLBACK_LENGTH = sizeof(ASYNC_CALLBACK_NAME) - 1;
 }
 
-
-void JsResult::SetAsyncResult(napi_env env, DatashareBusinessError &businessError, napi_value result)
-{
-    std::lock_guard<std::mutex> lock(asyncLock_);
-    napi_valuetype type = napi_undefined;
-    napi_typeof(env, result, &type);
-    if (type == napi_valuetype::napi_number) {
-        int32_t value = OHOS::AppExecFwk::UnwrapInt32FromJS(env, result);
-        callbackResultNumber_ = value;
-    } else if (type == napi_valuetype::napi_string) {
-        std::string value = OHOS::AppExecFwk::UnwrapStringFromJS(env, result);
-        callbackResultString_ = std::move(value);
-    } else if (type == napi_valuetype::napi_object) {
-        JSProxy::JSCreator<ResultSetBridge> *proxy = nullptr;
-        napi_unwrap(env, result, reinterpret_cast<void **>(&proxy));
-        if (proxy == nullptr) {
-            if (UnwrapBatchUpdateResult(env, result, updateResults_)) {
-                callbackResultNumber_ = E_OK;
-                isRecvReply_ = true;
-                return;
-            }
-            OHOS::AppExecFwk::UnwrapArrayStringFromJS(env, result, callbackResultStringArr_);
-        } else {
-            std::shared_ptr<ResultSetBridge> value = proxy->Create();
-            callbackResultObject_ = std::make_shared<DataShareResultSet>(value);
-        }
-    }
-    businessError_= businessError;
-    isRecvReply_ = true;
-}
-
-bool JsResult::UnwrapBatchUpdateResult(napi_env env, napi_value &info,
-    std::vector<BatchUpdateResult> &results)
+bool UnwrapBatchUpdateResult(napi_env env, napi_value &info, std::vector<BatchUpdateResult> &results)
 {
     napi_value keys = 0;
     if (napi_get_property_names(env, info, &keys) != napi_ok) {
@@ -115,6 +83,37 @@ bool JsResult::UnwrapBatchUpdateResult(napi_env env, napi_value &info,
         results.push_back(std::move(batchUpdateResult));
     }
     return true;
+}
+
+void SetAsyncResult(std::shared_ptr<ResultWrap> jsResult, napi_env env, DatashareBusinessError &businessError,
+    napi_value result)
+{
+    std::lock_guard<std::mutex> lock(jsResult->asyncLock_);
+    napi_valuetype type = napi_undefined;
+    napi_typeof(env, result, &type);
+    if (type == napi_valuetype::napi_number) {
+        int32_t value = OHOS::AppExecFwk::UnwrapInt32FromJS(env, result);
+        jsResult->callbackResultNumber_ = value;
+    } else if (type == napi_valuetype::napi_string) {
+        std::string value = OHOS::AppExecFwk::UnwrapStringFromJS(env, result);
+        jsResult->callbackResultString_ = std::move(value);
+    } else if (type == napi_valuetype::napi_object) {
+        JSProxy::JSCreator<ResultSetBridge> *proxy = nullptr;
+        napi_unwrap(env, result, reinterpret_cast<void **>(&proxy));
+        if (proxy == nullptr) {
+            if (UnwrapBatchUpdateResult(env, result, jsResult->updateResults_)) {
+                jsResult->callbackResultNumber_ = E_OK;
+                jsResult->isRecvReply_ = true;
+                return;
+            }
+            OHOS::AppExecFwk::UnwrapArrayStringFromJS(env, result, jsResult->callbackResultStringArr_);
+        } else {
+            std::shared_ptr<ResultSetBridge> value = proxy->Create();
+            jsResult->callbackResultObject_ = std::make_shared<DataShareResultSet>(value);
+        }
+    }
+    jsResult->businessError_= businessError;
+    jsResult->isRecvReply_ = true;
 }
 
 bool MakeNapiColumn(napi_env env, napi_value &napiColumns, const std::vector<std::string> &columns);
@@ -255,7 +254,7 @@ napi_value JsDataShareExtAbility::AsyncCallback(napi_env env, napi_callback_info
         UnWrapBusinessError(env, argv[0], businessError);
     }
     if (result != nullptr) {
-        result->SetAsyncResult(env, businessError, argv[1]);
+        SetAsyncResult(result, env, businessError, argv[1]);
     }
     return CreateJsUndefined(env);
 }
@@ -397,7 +396,7 @@ napi_value JsDataShareExtAbility::CallObjectMethod(const char* name, napi_value 
     return handleEscape.Escape(remoteNapi);
 }
 
-void JsDataShareExtAbility::InitResult(std::shared_ptr<JsResult> result)
+void JsDataShareExtAbility::InitResult(std::shared_ptr<ResultWrap> result)
 {
     result_ = result;
 }
