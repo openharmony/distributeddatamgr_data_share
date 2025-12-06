@@ -16,6 +16,7 @@
 
 #include <gtest/gtest.h>
 #include <unistd.h>
+#include <sstream>
 #include "datashare_errno.h"
 #include "datashare_itypes_utils.h"
 #include "datashare_log.h"
@@ -26,13 +27,16 @@
 #include "ishared_result_set_stub.h"
 #include "itypes_util.h"
 #include "message_parcel.h"
+#include "datashare_operation_statement.h"
 
 namespace OHOS {
 namespace DataShare {
 using namespace testing::ext;
+DataShareValuesBucket testBucket;
+
 class DatashareItypesUtilsTest : public testing::Test {
 public:
-    static void SetUpTestCase(void){};
+    static void SetUpTestCase(void);
     static void TearDownTestCase(void){};
     void SetUp(){};
     void TearDown(){};
@@ -65,6 +69,50 @@ bool operator==(const RdbChangeNode node1, const RdbChangeNode node2)
         return firstPart;
     }
     return false;
+}
+
+bool operator==(const ExecResultSet set1, const ExecResultSet set2)
+{
+    if (set1.errorCode != set2.errorCode) {
+        return false;
+    }
+    size_t size1 = set1.results.size();
+    size_t size2 = set2.results.size();
+    if (size1 != size2) {
+        return false;
+    }
+    for (size_t i = 0; i < size1; ++i) {
+        bool equal = set1.results[i].operationType == set2.results[i].operationType
+            && set1.results[i].code == set2.results[i].code
+            && set1.results[i].message == set2.results[i].message;
+        if (!equal) {
+            return equal;
+        }
+    }
+    return true;
+}
+
+void GenerateValuesBucket()
+{
+    // empty bucket
+    testBucket.Clear();
+    // each loop need to contain 90 bytes, 30 loops makeup total 2700 bytes
+    for (int i = 0; i < 30; ++i) {
+        // 1 byte of typeID, 8 bytes + key length + 8bytes + value length, when less then 10 data length is 1
+        if (i < 10) {
+            testBucket.Put("datasharete" + std::to_string(i),
+                "Initialize the vector with a large number of key value pairs.");
+        }
+        testBucket.Put("datasharete" + std::to_string(i),
+            "Initialize the vector with a large number of key value pairs");
+    }
+}
+
+void DatashareItypesUtilsTest::SetUpTestCase(void)
+{
+    LOG_INFO("SetUpTestCase invoked");
+    GenerateValuesBucket();
+    LOG_INFO("SetUpTestCase end");
 }
 
 /**
@@ -490,6 +538,729 @@ HWTEST_F(DatashareItypesUtilsTest, MarshallingTest001, TestSize.Level0)
     auto result = ITypesUtil::Marshalling(changeNode, parcel);
     EXPECT_TRUE(result);
     LOG_INFO("MarshallingTest001::End");
+}
+
+/**
+* @tc.name: Marshal_OperationStatement_001
+* @tc.desc: Test the marshalling and unmarshalling functionality of one OperationStatement.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a vector of OperationStatement objects.
+*    2. Initialize the vector with 1 OperationStatement objects.
+*    3. Marshal the vector to the MessageParcel and verify the operation succeeds.
+*    4. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    5. Compare the unmarshaled vector with the original vector to ensure data consistency.
+* @tc.expect: The marshalling and unmarshalling process should succeed, data correctness and consistency should.
+*    be ensured.
+*/
+HWTEST_F(DatashareItypesUtilsTest, Marshal_OperationStatement_001, TestSize.Level0)
+{
+    LOG_INFO("Marshal_OperationStatement_001 starts");
+    // prepare test data
+    std::vector<OperationStatement> operationStatements;
+    OperationStatement statement;
+    int value = 123;
+    statement.operationType = Operation::INSERT;
+    statement.uri = "test_uri";
+    statement.predicates.SetWhereClause("`DB_NUM` > 100");
+    statement.valuesBucket.Put("key", value);
+    statement.backReference.SetColumn("column");
+    statement.backReference.SetFromIndex(1);
+    operationStatements.emplace_back(statement);
+
+    // marshal
+    MessageParcel parcel;
+    ASSERT_TRUE(ITypesUtil::MarshalOperationStatementVec(operationStatements, parcel));
+
+    // unmarshal
+    std::vector<OperationStatement> operationStatementsOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalOperationStatementVec(operationStatementsOut, parcel));
+
+    // result comparison
+    EXPECT_EQ(operationStatements.size(), operationStatementsOut.size());
+    EXPECT_EQ(operationStatements[0].operationType, operationStatementsOut[0].operationType);
+    EXPECT_EQ(operationStatements[0].uri, operationStatementsOut[0].uri);
+    EXPECT_EQ(operationStatements[0].predicates.GetWhereClause(),
+              operationStatementsOut[0].predicates.GetWhereClause());
+    bool isValid = false;
+    int valueOut = operationStatements[0].valuesBucket.Get("key", isValid);
+    EXPECT_EQ(value, valueOut);
+    EXPECT_EQ(operationStatements[0].backReference.GetColumn(), operationStatementsOut[0].backReference.GetColumn());
+    EXPECT_EQ(operationStatements[0].backReference.GetFromIndex(),
+        operationStatementsOut[0].backReference.GetFromIndex());
+    LOG_INFO("Marshal_OperationStatement_001 ends");
+}
+
+/**
+* @tc.name: Marshal_OperationStatement_002
+* @tc.desc: Test the marshalling OperationStatement with operationType exceeds defined types.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a vector of OperationStatement objects.
+*    2. Initialize the vector with 1 OperationStatement objects which has an opeartionType exceeds defined types.
+*    3. Marshal the vector to the MessageParcel and verify the operation success.
+* @tc.expect: The marshalling and unmarshalling process should succeed.
+*    be ensured.
+*/
+HWTEST_F(DatashareItypesUtilsTest, Marshal_OperationStatement_002, TestSize.Level0)
+{
+    LOG_INFO("Marshal_OperationStatement_002 starts");
+    // prepare test data
+    std::vector<OperationStatement> operationStatements;
+    OperationStatement statement;
+    int value = 123;
+    statement.operationType = static_cast<Operation>(4);
+    statement.uri = "datashare://";
+    statement.predicates.SetWhereClause("`DB_NUM` > 100");
+    statement.valuesBucket.Put("key", value);
+    statement.backReference.SetColumn("column");
+    statement.backReference.SetFromIndex(1);
+    operationStatements.emplace_back(statement);
+
+    // marshal
+    MessageParcel parcel;
+    ASSERT_TRUE(ITypesUtil::MarshalOperationStatementVec(operationStatements, parcel));
+
+    // unmarshal
+    std::vector<OperationStatement> operationStatementsOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalOperationStatementVec(operationStatementsOut, parcel));
+
+    // result comparison
+    EXPECT_EQ(operationStatements.size(), operationStatementsOut.size());
+    EXPECT_EQ(operationStatements[0].operationType, operationStatementsOut[0].operationType);
+    EXPECT_EQ(operationStatements[0].uri, operationStatementsOut[0].uri);
+    EXPECT_EQ(operationStatements[0].predicates.GetWhereClause(),
+              operationStatementsOut[0].predicates.GetWhereClause());
+    bool isValid = false;
+    int valueOut = operationStatements[0].valuesBucket.Get("key", isValid);
+    EXPECT_EQ(value, valueOut);
+    EXPECT_EQ(operationStatements[0].backReference.GetColumn(), operationStatementsOut[0].backReference.GetColumn());
+    EXPECT_EQ(operationStatements[0].backReference.GetFromIndex(),
+        operationStatementsOut[0].backReference.GetFromIndex());
+    LOG_INFO("Marshal_OperationStatement_002 ends");
+}
+
+/**
+* @tc.name: Marshal_OperationStatement_003
+* @tc.desc: Test the marshalling OperationStatement with operationType that is negative.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a vector of OperationStatement objects.
+*    2. Initialize the vector with 1 OperationStatement objects which has an negative opeartionType.
+*    3. Marshal the vector to the MessageParcel and verify the operation success.
+* @tc.expect: The marshalling and unmarshalling process should succeed.
+*    be ensured.
+*/
+HWTEST_F(DatashareItypesUtilsTest, Marshal_OperationStatement_003, TestSize.Level0)
+{
+    LOG_INFO("Marshal_OperationStatement_003 starts");
+    // prepare test data
+    std::vector<OperationStatement> operationStatements;
+    OperationStatement statement;
+    int value = 123;
+    statement.operationType = static_cast<Operation>(-1);
+    statement.uri = "datashare://";
+    statement.predicates.SetWhereClause("`DB_NUM` > 100");
+    statement.valuesBucket.Put("key", value);
+    statement.backReference.SetColumn("column");
+    statement.backReference.SetFromIndex(1);
+    operationStatements.emplace_back(statement);
+
+    // marshal
+    MessageParcel parcel;
+    ASSERT_TRUE(ITypesUtil::MarshalOperationStatementVec(operationStatements, parcel));
+
+    // unmarshal
+    std::vector<OperationStatement> operationStatementsOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalOperationStatementVec(operationStatementsOut, parcel));
+
+    // result comparison
+    EXPECT_EQ(operationStatements.size(), operationStatementsOut.size());
+    EXPECT_EQ(operationStatements[0].operationType, operationStatementsOut[0].operationType);
+    EXPECT_EQ(operationStatements[0].uri, operationStatementsOut[0].uri);
+    EXPECT_EQ(operationStatements[0].predicates.GetWhereClause(),
+              operationStatementsOut[0].predicates.GetWhereClause());
+    bool isValid = false;
+    int valueOut = operationStatements[0].valuesBucket.Get("key", isValid);
+    EXPECT_EQ(value, valueOut);
+    EXPECT_EQ(operationStatements[0].backReference.GetColumn(), operationStatementsOut[0].backReference.GetColumn());
+    EXPECT_EQ(operationStatements[0].backReference.GetFromIndex(),
+        operationStatementsOut[0].backReference.GetFromIndex());
+    LOG_INFO("Marshal_OperationStatement_003 ends");
+}
+
+/**
+* @tc.name: Marshal_OperationStatement_004
+* @tc.desc: Test the marshalling OperationStatement with valuebucket that contains boolean value.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a vector of OperationStatement objects.
+*    2. Initialize the vector with 1 OperationStatement, where its valuebucket contains a boolean value.
+*    3. Marshal the vector to the MessageParcel and verify the operation success.
+* @tc.expect: The marshalling and unmarshalling process should succeed.
+*    be ensured.
+*/
+HWTEST_F(DatashareItypesUtilsTest, Marshal_OperationStatement_004, TestSize.Level0)
+{
+    LOG_INFO("Marshal_OperationStatement_004 starts");
+    // prepare test data
+    std::vector<OperationStatement> operationStatements;
+    OperationStatement statement;
+    bool value = true;
+    statement.operationType = Operation::UPDATE;
+    statement.uri = "datashare://";
+    statement.predicates.SetWhereClause("`DB_NUM` > 100");
+    statement.valuesBucket.Put("key", value);
+    statement.backReference.SetColumn("column");
+    statement.backReference.SetFromIndex(1);
+    operationStatements.emplace_back(statement);
+
+    // marshal
+    MessageParcel parcel;
+    ASSERT_TRUE(ITypesUtil::MarshalOperationStatementVec(operationStatements, parcel));
+
+    // unmarshal
+    std::vector<OperationStatement> operationStatementsOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalOperationStatementVec(operationStatementsOut, parcel));
+
+    // result comparison
+    EXPECT_EQ(operationStatements.size(), operationStatementsOut.size());
+    EXPECT_EQ(operationStatements[0].operationType, operationStatementsOut[0].operationType);
+    EXPECT_EQ(operationStatements[0].uri, operationStatementsOut[0].uri);
+    EXPECT_EQ(operationStatements[0].predicates.GetWhereClause(),
+              operationStatementsOut[0].predicates.GetWhereClause());
+    bool isValid = false;
+    bool valueOut = operationStatements[0].valuesBucket.Get("key", isValid);
+    EXPECT_EQ(value, valueOut);
+    EXPECT_EQ(operationStatements[0].backReference.GetColumn(), operationStatementsOut[0].backReference.GetColumn());
+    EXPECT_EQ(operationStatements[0].backReference.GetFromIndex(),
+        operationStatementsOut[0].backReference.GetFromIndex());
+    LOG_INFO("Marshal_OperationStatement_004 ends");
+}
+
+/**
+* @tc.name: Marshal_OperationStatement_005
+* @tc.desc: Test the marshalling OperationStatement with valuebucket that contains blob(std::vector<uint8_t>) value.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a vector of OperationStatement objects.
+*    2. Initialize the vector with 1 OperationStatement where its valuebucket contains a blob value.
+*    3. Marshal the vector to the MessageParcel and verify the operation success.
+* @tc.expect: The marshalling and unmarshalling process should succeed.
+*    be ensured.
+*/
+HWTEST_F(DatashareItypesUtilsTest, Marshal_OperationStatement_005, TestSize.Level0)
+{
+    LOG_INFO("Marshal_OperationStatement_005 starts");
+    // prepare test data
+    std::vector<OperationStatement> operationStatements;
+    OperationStatement statement;
+    std::vector<uint8_t> value(10, 0xFF);
+    statement.operationType = Operation::INSERT;
+    statement.uri = "datashare://";
+    statement.predicates.SetWhereClause("`DB_NUM` > 100");
+    statement.valuesBucket.Put("key", value);
+    statement.backReference.SetColumn("column");
+    statement.backReference.SetFromIndex(1);
+    operationStatements.emplace_back(statement);
+
+    // marshal
+    MessageParcel parcel;
+    ASSERT_TRUE(ITypesUtil::MarshalOperationStatementVec(operationStatements, parcel));
+
+    // unmarshal
+    std::vector<OperationStatement> operationStatementsOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalOperationStatementVec(operationStatementsOut, parcel));
+
+    // result comparison
+    EXPECT_EQ(operationStatements.size(), operationStatementsOut.size());
+    EXPECT_EQ(operationStatements[0].operationType, operationStatementsOut[0].operationType);
+    EXPECT_EQ(operationStatements[0].uri, operationStatementsOut[0].uri);
+    EXPECT_EQ(operationStatements[0].predicates.GetWhereClause(),
+              operationStatementsOut[0].predicates.GetWhereClause());
+    bool isValid = false;
+    std::vector<uint8_t> valueOut = operationStatements[0].valuesBucket.Get("key", isValid);
+    EXPECT_EQ(value, valueOut);
+    EXPECT_EQ(operationStatements[0].backReference.GetColumn(), operationStatementsOut[0].backReference.GetColumn());
+    EXPECT_EQ(operationStatements[0].backReference.GetFromIndex(),
+        operationStatementsOut[0].backReference.GetFromIndex());
+    LOG_INFO("Marshal_OperationStatement_005 ends");
+}
+
+/**
+* @tc.name: Marshal_OperationStatement_006
+* @tc.desc: Test the marshalling OperationStatement with valuebucket that contains std::monostate value.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a vector of OperationStatement objects.
+*    2. Initialize the vector with 1 OperationStatement objects where its valuebucket contains a monostate value.
+*    3. Marshal the vector to the MessageParcel and verify the operation success.
+* @tc.expect: The marshalling and unmarshalling process should succeed.
+*    be ensured.
+*/
+HWTEST_F(DatashareItypesUtilsTest, Marshal_OperationStatement_006, TestSize.Level0)
+{
+    LOG_INFO("Marshal_OperationStatement_006 starts");
+    // prepare test data
+    std::vector<OperationStatement> operationStatements;
+    OperationStatement statement;
+    DataShareValueObject value;
+    statement.operationType = Operation::INSERT;
+    statement.uri = "datashare://";
+    statement.predicates.SetWhereClause("`DB_NUM` > 100");
+    statement.valuesBucket.Put("key", value);
+    statement.backReference.SetColumn("column");
+    statement.backReference.SetFromIndex(1);
+    operationStatements.emplace_back(statement);
+
+    // marshal
+    MessageParcel parcel;
+    ASSERT_TRUE(ITypesUtil::MarshalOperationStatementVec(operationStatements, parcel));
+
+    // unmarshal
+    std::vector<OperationStatement> operationStatementsOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalOperationStatementVec(operationStatementsOut, parcel));
+
+    // result comparison
+    EXPECT_EQ(operationStatements.size(), operationStatementsOut.size());
+    EXPECT_EQ(operationStatements[0].operationType, operationStatementsOut[0].operationType);
+    EXPECT_EQ(operationStatements[0].uri, operationStatementsOut[0].uri);
+    EXPECT_EQ(operationStatements[0].predicates.GetWhereClause(),
+              operationStatementsOut[0].predicates.GetWhereClause());
+    bool isValid = false;
+    DataShareValueObject valueOut = operationStatements[0].valuesBucket.Get("key", isValid);
+    uint8_t typeId = valueOut.value.index();
+    EXPECT_EQ(0, typeId);
+    EXPECT_EQ(operationStatements[0].backReference.GetColumn(), operationStatementsOut[0].backReference.GetColumn());
+    EXPECT_EQ(operationStatements[0].backReference.GetFromIndex(),
+        operationStatementsOut[0].backReference.GetFromIndex());
+    LOG_INFO("Marshal_OperationStatement_006 ends");
+}
+
+/**
+* @tc.name: MarshalOperationStatementVec_001
+* @tc.desc: Test the marshalling and unmarshalling functionality of OperationStatementVec with normal data.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a vector of OperationStatement objects.
+*    2. Initialize the vector with 2 OperationStatement objects.
+*    3. Marshal the vector to the MessageParcel and verify the operation succeeds.
+*    4. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    5. Compare the unmarshaled vector with the original vector to ensure data consistency.
+* @tc.expect: The marshalling and unmarshalling operations should succeed, and the unmarshaled data should match
+*    the original data.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalOperationStatementVec_001, TestSize.Level0)
+{
+    LOG_INFO("MarshalOperationStatementVec_001 starts");
+
+    // Step 1: Create a MessageParcel
+    MessageParcel parcel;
+
+    // Step 2: Initialize the vector with OperationStatement objects
+    std::vector<OperationStatement> operationStatements;
+    OperationStatement statement1;
+    std::string value = "MarshalOperationStatementVec_001";
+    statement1.operationType = Operation::INSERT;
+    statement1.uri = "datashare://com.ohos.contactsdataability";
+    statement1.predicates.SetWhereClause("`DB_NUM` > 100");
+    statement1.valuesBucket.Put("key0", value);
+    operationStatements.emplace_back(statement1);
+
+    OperationStatement statement2;
+    statement2.operationType = Operation::INSERT;
+    statement2.uri = "datashareproxy://com.ohos.contactsdataability/contacts/setting";
+    statement2.predicates.SetWhereClause("`TESTCASE` < 200");
+    statement2.valuesBucket.Put("key1", value);
+    statement2.backReference.SetColumn("UserName");
+    statement2.backReference.SetFromIndex(0);
+    operationStatements.emplace_back(statement2);
+
+    // Step 3: Marshal the vector to the MessageParcel
+    ASSERT_TRUE(ITypesUtil::MarshalOperationStatementVec(operationStatements, parcel));
+
+    // Step 4: Unmarshal the vector from the MessageParcel
+    std::vector<OperationStatement> operationStatementsOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalOperationStatementVec(operationStatementsOut, parcel));
+
+    // Step 5: Compare the unmarshaled vector with the original vector
+    EXPECT_EQ(operationStatements.size(), operationStatementsOut.size());
+    for (size_t i = 0; i < operationStatements.size(); ++i) {
+        EXPECT_EQ(operationStatements[i].operationType, operationStatementsOut[i].operationType);
+        EXPECT_EQ(operationStatements[i].uri, operationStatementsOut[i].uri);
+        EXPECT_EQ(operationStatements[i].predicates.GetWhereClause(),
+                  operationStatementsOut[i].predicates.GetWhereClause());
+        bool isValid = false;
+        std::string valueOut = operationStatementsOut[i].valuesBucket.Get("key" + std::to_string(i), isValid);
+        EXPECT_EQ(value, valueOut);
+        EXPECT_EQ(operationStatements[i].backReference.GetColumn(),
+                  operationStatementsOut[i].backReference.GetColumn());
+        EXPECT_EQ(operationStatements[i].backReference.GetFromIndex(),
+                  operationStatementsOut[i].backReference.GetFromIndex());
+    }
+    LOG_INFO("MarshalOperationStatementVec_001 ends");
+}
+
+/**
+* @tc.name: MarshalOperationStatementVec_002
+* @tc.desc: Test the marshalling and unmarshalling functionality of an empty OperationStatementVec.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and an empty vector of OperationStatement objects.
+*    2. Marshal the empty vector to the MessageParcel and verify the operation succeeds.
+*    3. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    4. Verify that the unmarshaled vector is empty.
+* @tc.experct: The marshalling and unmarshalling operations should succeed, and the unmarshaled vector should be empty.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalOperationStatementVec_002, TestSize.Level0)
+{
+    LOG_INFO("MarshalOperationStatementVec_002 starts");
+
+    // Step 1: Create a MessageParcel
+    MessageParcel parcel;
+
+    // Step 2: Initialize an empty vector
+    std::vector<OperationStatement> operationStatements;
+
+    // Step 3: Marshal the empty vector to the MessageParcel
+    ASSERT_TRUE(ITypesUtil::MarshalOperationStatementVec(operationStatements, parcel));
+
+    // Step 4: Unmarshal the vector from the MessageParcel
+    std::vector<OperationStatement> operationStatementsOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalOperationStatementVec(operationStatementsOut, parcel));
+
+    // Step 5: Verify that the unmarshaled vector is empty
+    EXPECT_TRUE(operationStatementsOut.empty());
+
+    LOG_INFO("MarshalOperationStatementVec_002 ends");
+}
+
+/**
+* @tc.name: MarshalOperationStatementVecCapacity_001
+* @tc.desc: Test the marshalling functionality of OperationStatementVec with data exceeding MAX_IPC_SIZE.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a vector of OperationStatement objects.
+*    2. Initialize the vector with a large number of OperationStatement objects such that the serialized size
+*       exceeds MAX_IPC_SIZE(134,217,728 bytes).
+*    3. Marshal the vector to the MessageParcel and verify the operation fails.
+* @tc.experct: The marshalling operation should fail due to exceeding the maximum size limit.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalOperationStatementVecCapacity_001, TestSize.Level0) {
+    LOG_INFO("MarshalOperationStatementVecCapacity_001 starts");
+
+    // Step 1: Create a MessageParcel
+    MessageParcel parcel;
+
+    // Step 2: Initialize the vector with a large number of OperationStatement objects
+    std::vector<OperationStatement> operationStatements;
+
+    // vector size 8 bytes, 2,856 bytes per loops, 46995 * 2856 + 8 = MAX_IPC_SIZE
+    int loops = 46995;
+    if (sizeof(void*) == 4) {
+        // on 32bit system size_t take less spaces, therefore more loops required
+        loops = 60000;
+    }
+    for (int i = 0; i < loops + 1; ++i) {
+        OperationStatement statement;
+        statement.operationType = Operation::INSERT;    // 4 bytes
+        // 8 bytes + data length 70
+        statement.uri = "datashareproxy://com.ohos.contactsdataability/contacts/settingssssssss";
+        // operationItem 8 bytes
+        // where cluase 8 bytes + data length 14
+        // whereArgs 8 bytes, order 8 bytes
+        // mode 2 bytes
+        statement.predicates.SetWhereClause("`DB_NUM` > 100");
+        statement.valuesBucket = testBucket;   // 8 bytes + 2700 bytes
+        statement.backReference.SetColumn("column");    // 8 bytes + data length
+        statement.backReference.SetFromIndex(i);    // 4 bytes
+        operationStatements.emplace_back(statement);
+    }
+
+    // Step 3: Marshal the vector to the MessageParcel and verify the operation fails
+    ASSERT_FALSE(ITypesUtil::MarshalOperationStatementVec(operationStatements, parcel));
+
+    LOG_INFO("MarshalOperationStatementVecCapacity_001 ends");
+}
+
+/**
+* @tc.name: MarshalOperationStatementVecCapacity_002
+* @tc.desc: Test the marshalling functionality of OperationStatementVec with data equal MAX_IPC_SIZE.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a vector of OperationStatement objects.
+*    2. Initialize the vector with a large number of OperationStatement objects such that the serialized size
+*       equals MAX_IPC_SIZE(134,217,728 bytes).
+*    3. Marshal the vector to the MessageParcel and verify the operation success.
+* @tc.experct: The marshalling operation should succeed.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalOperationStatementVecCapacity_002, TestSize.Level0) {
+    LOG_INFO("MarshalOperationStatementVecCapacity_002 starts");
+
+    // Step 1: Create a MessageParcel
+    MessageParcel parcel;
+
+    // Step 2: Initialize the vector with a large number of OperationStatement objects
+    std::vector<OperationStatement> operationStatements;
+
+    // vector size 8 bytes, 2,856 bytes per loops, 46995 * 2856 + 8 = MAX_IPC_SIZE
+    for (int i = 0; i < 46995; ++i) {
+        OperationStatement statement;
+        statement.operationType = Operation::INSERT;    // 4 bytes
+        // 8 bytes + data length 70
+        statement.uri = "datashareproxy://com.ohos.contactsdataability/contacts/settingssssssss";
+        // operationItem 8 bytes
+        // where cluase 8 bytes + data length 14
+        // whereArgs 8 bytes, order 8 bytes
+        // mode 2 bytes
+        statement.predicates.SetWhereClause("`DB_NUM` > 100");
+        statement.valuesBucket = testBucket;   // 8 bytes + 2700 bytes
+        statement.backReference.SetColumn("column");    // 8 bytes + data length
+        statement.backReference.SetFromIndex(i);    // 4 bytes
+        operationStatements.emplace_back(statement);
+    }
+
+    // Step 3: Marshal the vector to the MessageParcel and verify the operation fails
+    ASSERT_TRUE(ITypesUtil::MarshalOperationStatementVec(operationStatements, parcel));
+
+    LOG_INFO("MarshalOperationStatementVecCapacity_002 ends");
+}
+
+/**
+* @tc.name: MarshalExecResultSet_001
+* @tc.desc: Test the marshalling functionality of ExecResultSet that contain one ExecResult.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a ExecResultSet objects.
+*    2. Initialize ExecResultSet.results vector with 1 ExecResult objects.
+*    3. Marshal the vector to the MessageParcel and verify the operation succeeds.
+*    4. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    5. Compare the unmarshaled ExecResultSet with the original object to ensure data consistency.
+* @tc.experct: The marshalling and unmarshalling operation should succeed. ExecResultSet should be consistent.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalExecResultSet_001, TestSize.Level0) {
+    LOG_INFO("MarshalExecResultSet_001 starts");
+    MessageParcel parcel;
+    ExecResultSet execResultSet;
+    // Initialize ExecResult
+    ExecResult execResult;
+    execResult.operationType = Operation::INSERT;
+    execResult.code = 0;
+    execResult.message = "23";
+
+    execResultSet.errorCode = ExecErrorCode::EXEC_SUCCESS;
+    execResultSet.results.emplace_back(execResult);
+
+    // Marshal the ExecResultSet object to the MessageParcel
+    ASSERT_TRUE(ITypesUtil::Marshalling(execResultSet, parcel));
+
+    ExecResultSet execResultSetOut;
+    ASSERT_TRUE(ITypesUtil::Unmarshalling(execResultSetOut, parcel));
+    EXPECT_EQ(execResultSet, execResultSetOut);
+    LOG_INFO("MarshalExecResultSet_001 ends");
+}
+
+/**
+* @tc.name: MarshalExecResultSet_002
+* @tc.desc: Test the marshalling functionality of ExecResultSet that contain multiple ExecResult.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a ExecResultSet objects.
+*    2. Initialize ExecResultSet.results vector with multiple ExecResult objects.
+*    3. Marshal the vector to the MessageParcel and verify the operation succeeds.
+*    4. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    5. Compare the unmarshaled ExecResultSet with the original object to ensure data consistency.
+* @tc.experct: The marshalling and unmarshalling operation should succeed. ExecResultSet should be consistent.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalExecResultSet_002, TestSize.Level0) {
+    LOG_INFO("MarshalExecResultSet_002 starts");
+    MessageParcel parcel;
+    ExecResultSet execResultSet;
+
+    for (int i = 0; i < 10; ++i) {
+        ExecResult execResult;
+        execResult.operationType = Operation::INSERT;
+        execResult.code = 0;
+        execResult.message = "test" + std::to_string(i);
+        execResultSet.results.emplace_back(execResult);
+    }
+
+    // add execResult with a different code
+    ExecResult execResult;
+    execResult.operationType = Operation::INSERT;
+    execResult.code = 1;
+    execResult.message = "testcode1";
+
+    execResultSet.errorCode = ExecErrorCode::EXEC_SUCCESS;
+    execResultSet.results.emplace_back(execResult);
+
+    // Marshal the ExecResultSet object to the MessageParcel
+    ASSERT_TRUE(ITypesUtil::Marshalling(execResultSet, parcel));
+
+    ExecResultSet execResultSetOut;
+    ASSERT_TRUE(ITypesUtil::Unmarshalling(execResultSetOut, parcel));
+    EXPECT_EQ(execResultSet, execResultSetOut);
+    LOG_INFO("MarshalExecResultSet_002 ends");
+}
+
+/**
+* @tc.name: MarshalExecResultSet_003
+* @tc.desc: Test the marshalling functionality of empty ExecResultSet
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a ExecResultSet objects.
+*    2. Marshal the ExecResultSet to the MessageParcel and verify the operation succeeds.
+*    3. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    4. Compare the unmarshaled ExecResultSet with the original object to ensure data consistency.
+* @tc.experct: The marshalling and unmarshalling operation should succeed. ExecResultSet should be consistent.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalExecResultSet_003, TestSize.Level0) {
+    LOG_INFO("MarshalExecResultSet_003 starts");
+    MessageParcel parcel;
+    ExecResultSet execResultSet;
+
+    // Marshal the ExecResultSet object to the MessageParcel
+    ASSERT_TRUE(ITypesUtil::Marshalling(execResultSet, parcel));
+
+    ExecResultSet execResultSetOut;
+    ASSERT_TRUE(ITypesUtil::Unmarshalling(execResultSetOut, parcel));
+
+    EXPECT_EQ(execResultSet, execResultSetOut);
+    LOG_INFO("MarshalExecResultSet_003 ends");
+}
+
+/**
+* @tc.name: MarshalExecResultSet_004
+* @tc.desc: Test the marshalling functionality of ExecResultSet that contain negative operationType and errorCode.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a ExecResultSet objects.
+*    2. Initialize ExecResultSet with negative operationType and errorCode.
+*    3. Marshal the vector to the MessageParcel and verify the operation succeeds.
+*    4. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    5. Compare the unmarshaled ExecResultSet with the original object to ensure data consistency.
+* @tc.experct: The marshalling and unmarshalling operation should succeed. ExecResultSet should be consistent.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalExecResultSet_004, TestSize.Level0) {
+    LOG_INFO("MarshalExecResultSet_004 starts");
+    MessageParcel parcel;
+    ExecResultSet execResultSet;
+    // Initialize ExecResult
+    ExecResult execResult;
+    execResult.operationType = static_cast<Operation>(-1);
+    execResult.code = 0;
+    execResult.message = "23";
+
+    execResultSet.errorCode = static_cast<ExecErrorCode>(-1);
+    execResultSet.results.emplace_back(execResult);
+
+    // Marshal the ExecResultSet object to the MessageParcel
+    ASSERT_TRUE(ITypesUtil::Marshalling(execResultSet, parcel));
+
+    ExecResultSet execResultSetOut;
+    ASSERT_TRUE(ITypesUtil::Unmarshalling(execResultSetOut, parcel));
+    EXPECT_EQ(execResultSet, execResultSetOut);
+    LOG_INFO("MarshalExecResultSet_004 ends");
+}
+
+/**
+* @tc.name: MarshalExecResultSet_005
+* @tc.desc: Test the marshalling functionality of ExecResultSet that contain operationType and errorCode
+* exceed defined type.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a ExecResultSet objects.
+*    2. Initialize ExecResultSet with operationType and errorCode exceed defined type.
+*    3. Marshal the vector to the MessageParcel and verify the operation succeeds.
+*    4. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    5. Compare the unmarshaled ExecResultSet with the original object to ensure data consistency.
+* @tc.experct: The marshalling and unmarshalling operation should succeed. ExecResultSet should be consistent.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalExecResultSet_005, TestSize.Level0) {
+    LOG_INFO("MarshalExecResultSet_005 starts");
+    MessageParcel parcel;
+    ExecResultSet execResultSet;
+    // Initialize ExecResult
+    ExecResult execResult;
+    execResult.operationType = static_cast<Operation>(4);
+    execResult.code = 0;
+    execResult.message = "23";
+
+    execResultSet.errorCode = static_cast<ExecErrorCode>(4);
+    execResultSet.results.emplace_back(execResult);
+
+    // Marshal the ExecResultSet object to the MessageParcel
+    ASSERT_TRUE(ITypesUtil::Marshalling(execResultSet, parcel));
+
+    ExecResultSet execResultSetOut;
+    ASSERT_TRUE(ITypesUtil::Unmarshalling(execResultSetOut, parcel));
+    EXPECT_EQ(execResultSet, execResultSetOut);
+    LOG_INFO("MarshalExecResultSet_005 ends");
+}
+
+/**
+* @tc.name: MarshalExecResultSetCapacity_001
+* @tc.desc: Test the marshalling functionality of ExecResultSet that exceeds 200KB
+* exceed defined type.
+* @tc.type: FUNC
+* @tc.require: 1014
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a ExecResultSet objects.
+*    2. Initialize ExecResultSet that exceeds 200KB.
+*    3. Marshal the vector to the MessageParcel and verify the operation succeeds.
+*    4. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    5. Compare the unmarshaled ExecResultSet with the original object to ensure data consistency.
+* @tc.experct: The marshalling and unmarshalling operation should succeed. ExecResultSet should be consistent.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalExecResultSetCapacity_001, TestSize.Level0) {
+    LOG_INFO("MarshalExecResultSetCapacity_001 starts");
+    MessageParcel parcel;
+    ExecResultSet execResultSet;
+    // Initialize ExecResult
+    ExecResult execResult;
+    execResult.operationType = Operation::INSERT;
+    execResult.code = 0;
+    execResult.message = "Initialize the message with a large number of key value pairs.";
+
+    execResultSet.errorCode = ExecErrorCode::EXEC_FAILED;
+    for (int i = 0; i < 4000 + 1; ++i) {
+        execResultSet.results.emplace_back(execResult);
+    }
+
+    // Marshal the ExecResultSet object to the MessageParcel
+    ASSERT_FALSE(ITypesUtil::Marshalling(execResultSet, parcel));
+    LOG_INFO("MarshalExecResultSetCapacity_001 ends");
 }
 }
 }

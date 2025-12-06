@@ -34,6 +34,7 @@ group("unittest") {
     ":DataShareHelperTimeoutTest",
     ":DataShareHelperProxyTest",
     ":DataShareResultSetTest",
+    ":DataShareProxyExecuteBatchTest",
   ]
 }
 
@@ -487,6 +488,59 @@ ohos_unittest("DataShareHelperJoinTest") {
   ]
 }
 
+ohos_unittest("DataShareProxyExecuteBatchTest") {
+  module_out_path = "data_share/data_share/native/consumer"
+
+  include_dirs = [
+    "${datashare_innerapi_path}/consumer/include",
+    "${datashare_native_consumer_path}/controller/common",
+    "${datashare_native_consumer_path}/controller/provider/include",
+    "${datashare_native_consumer_path}/controller/service/include",
+    "${datashare_native_consumer_path}/include",
+    "${datashare_innerapi_path}/common/include",
+    "${datashare_native_proxy_path}/include",
+  ]
+
+  sources = [ "${datashare_base_path}/test/unittest/native/consumer/src/proxy_executebatch_test.cpp" ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "hilog:libhilog",
+    "hitrace:hitrace_meter",
+    "ipc:ipc_single",
+    "samgr:samgr_proxy",
+  ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+  }
+}
 ohos_unittest("DataShareHelperImplRegisterTest") {
   sanitize = {
     integer_overflow = true

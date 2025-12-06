@@ -502,7 +502,7 @@ int DataShareProxy::ExecuteBatch(const std::vector<OperationStatement> &statemen
         LOG_ERROR("WriteInterfaceToken failed");
         return -1;
     }
-    if (!ITypesUtil::Marshal(data, statements)) {
+    if (!ITypesUtil::MarshalOperationStatementVec(statements, data)) {
         LOG_ERROR("fail to Marshal");
         return -1;
     }

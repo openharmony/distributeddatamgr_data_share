@@ -4139,5 +4139,62 @@ HWTEST_F(MediaDataShareUnitTest, MediaDataShare_OpenFileWithErrCode_Test_001, Te
     EXPECT_EQ(errCode, -1);
     LOG_INFO("MediaDataShare_OpenFileWithErrCode_Test_001::End");
 }
+
+/**
+* @tc.name: ExecuteBatchCapacity_Test_001
+* @tc.desc: Test batch execution when operationStatements is over 128MB via DataShare helper
+* @tc.type: FUNC
+* @tc.require: None
+* @tc.precon: None
+* @tc.step:
+    1. Get the DataShare helper instance
+    2. Create operationStatements with test data that exceeds 128MB
+    3. Execute the batch operation using helper->ExecuteBatch()
+* @tc.expect: Batch execution returns -1 (fail)
+*/
+HWTEST_F(MediaDataShareUnitTest, ExecuteBatchCapacity_Test_001, TestSize.Level0)
+{
+    LOG_INFO("ExecuteBatchCapacity_Test_001::Start");
+    std::shared_ptr<DataShare::DataShareHelper> helper = g_dataShareHelper;
+    DataShareValuesBucket testBucket;
+    std::vector<DataShare::OperationStatement> statements;
+    for (int i = 0; i < 30; ++i) {
+        // 1 byte of typeID, 8 bytes + key length + 8bytes + value length, when less then 10 data length is 1
+        if (i < 10) {
+            testBucket.Put("datasharete" + std::to_string(i),
+                "Initialize the vector with a large number of key value pairs.");
+        }
+        testBucket.Put("datasharete" + std::to_string(i),
+            "Initialize the vector with a large number of key value pairs");
+    }
+
+    // vector size 8 bytes, 2,856 bytes per loops, 46995 * 2856 + 8 = MAX_IPC_SIZE
+    int loops = 46995;
+    if (sizeof(void*) == 4) {
+        // on 32bit system size_t take less spaces, therefore more loops required
+        loops = 60000;
+    }
+    for (int i = 0; i < loops + 1; ++i) {
+        OperationStatement statement;
+        statement.operationType = Operation::INSERT;    // 4 bytes
+        // 8 bytes + data length 70
+        statement.uri = "datashareproxy://com.ohos.contactsdataability/contacts/settingssssssss";
+        // operationItem 8 bytes
+        // where cluase 8 bytes + data length 14
+        // whereArgs 8 bytes, order 8 bytes
+        // mode 2 bytes
+        statement.predicates.SetWhereClause("`DB_NUM` > 100");
+        statement.valuesBucket = testBucket;   // 8 bytes + 2700 bytes
+        statement.backReference.SetColumn("column");    // 8 bytes + data length
+        statement.backReference.SetFromIndex(i);    // 4 bytes
+        statements.emplace_back(statement);
+    }
+
+    DataShare::ExecResultSet resultSet;
+    int ret = 0;
+    ret = helper->ExecuteBatch(statements, resultSet);
+    EXPECT_EQ(ret, -1);
+    LOG_INFO("ExecuteBatchCapacity_Test_001 End");
+}
 } // namespace DataShare
 } // namespace OHOS

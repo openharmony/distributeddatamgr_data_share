@@ -601,7 +601,7 @@ ErrCode DataShareStub::CmdExecuteBatch(MessageParcel &data, MessageParcel &reply
 {
     std::vector<OperationStatement> statements;
     ExecResultSet result;
-    if (!ITypesUtil::Unmarshal(data, statements)) {
+    if (!ITypesUtil::UnmarshalOperationStatementVec(statements, data)) {
         LOG_ERROR("Unmarshalling OperationStatement failed");
         return ERR_INVALID_VALUE;
     }

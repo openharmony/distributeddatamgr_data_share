@@ -644,5 +644,79 @@ HWTEST_F(ConcurrentSubscriberTest, ConcurrentRegisterObserverExtProviderTest, Te
     t4.join();
     LOG_INFO("ConcurrentRegisterObserverExtProviderTest::end");
 }
+
+class ConcurrentExecuteBatchProvider {
+public:
+    void ExecuteBatchProvider(std::shared_ptr<DataShare::DataShareHelper> helper,
+        std::vector<OperationStatement> statements, std::atomic<bool> &stop)
+    {
+        while (!stop.load()) {
+            LOG_INFO("ConcurrentExecuteBatchProvider start");
+
+            DataShare::ExecResultSet resultSet;
+            helper->ExecuteBatch(statements, resultSet);
+
+            LOG_INFO("ConcurrentExecuteBatchProvider end");
+        }
+    }
+};
+
+/**
+ * @tc.name: ConcurrentExecuteBatchProviderTest
+ * @tc.desc: Verify concurrent ExecuteBatch operations
+ * @tc.type: concurrent
+ * @tc.require: None
+ * @tc.precon:
+    1. DataShare service is properly initialized
+    2. STORAGE_MANAGER_MANAGER_ID system ability is available
+ * @tc.step:
+    1. Create a DataShareHelper instance using STORAGE_MANAGER_MANAGER_ID
+    2. Define a vector of OperationStatement with valid operation for testing
+    3. Create two threads to concurrently perform ExecuteBatch
+    4. Run the concurrent operations for a specified test duration
+    5. Stop all threads and wait for their completion
+ * @tc.expect:
+    1. DataShareHelper is created successfully (not nullptr)
+    2. All concurrent ExecuteBatch operations complete without crashes
+ */
+HWTEST_F(ConcurrentSubscriberTest, ConcurrentExecuteBatchProviderTest, TestSize.Level0)
+{
+    LOG_INFO("ConcurrentExecuteBatchProviderTest::Start");
+    std::atomic<bool> stop = false;
+    int testTime = TEST_TIME;
+    ConcurrentExecuteBatchProvider instance;
+    Uri uri1(DATA_SHARE_URI1);
+    Uri uri2(DATA_SHARE_URI2);
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID);
+    ASSERT_NE(helper, nullptr);
+
+    std::vector<DataShare::OperationStatement> statements;
+    DataShare::OperationStatement statement1;
+    statement1.operationType = Operation::INSERT;
+    statement1.uri = "datashare:///uri1";
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put("DB_NUM", 150);
+    valuesBucket.Put("DB_TITLE", "ExecuteBatch_Test002");
+    statement1.valuesBucket = valuesBucket;
+    DataShare::DataSharePredicates predicates;
+    predicates.SetWhereClause("`DB_NUM` > 100");
+    statement1.predicates = predicates;
+    statements.emplace_back(statement1);
+
+    std::function<void()> func1 = [&instance, &helper, &statements, &stop]() {
+        instance.ExecuteBatchProvider(helper, statements, stop);
+    };
+    std::function<void()> func2 = [&instance, &helper, &statements, &stop]() {
+        instance.ExecuteBatchProvider(helper, statements, stop);
+    };
+    std::thread t1(func1);
+    std::thread t2(func2);
+
+    sleep(testTime);
+    stop = true;
+    t1.join();
+    t2.join();
+    LOG_INFO("ConcurrentExecuteBatchProviderTest::end");
+}
 } // namespace DataShare
 } // namespace OHOS
