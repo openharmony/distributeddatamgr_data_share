@@ -42,6 +42,7 @@ pub fn value_bucket_get_vtype(kv: &ValuesBucketKvItem) -> ffi::EnumType {
         BucketValue::F64(_) => ffi::EnumType::F64Type,
         BucketValue::Boolean(_) => ffi::EnumType::BooleanType,
         BucketValue::Uint8Array(_) => ffi::EnumType::Uint8ArrayType,
+        BucketValue::I64(_) => ffi::EnumType::I64Type,
         BucketValue::Null(_) => ffi::EnumType::NullType,
     }
 }
@@ -73,6 +74,14 @@ pub fn value_bucket_get_bool(kv: &ValuesBucketKvItem) -> bool {
     panic!("Not Boolean Type!!!");
 }
 
+// called by c++, if BucketValue is i64, get i64.
+pub fn value_bucket_get_i64(kv: &ValuesBucketKvItem) -> i64 {
+    if let BucketValue::I64(i) = &kv.value {
+        return *i;
+    }
+    panic!("Not I64 Type!!!");
+}
+
 // called by c++, if BucketValue is uint8array, get uint8array.
 pub fn value_bucket_get_uint8array(kv: &ValuesBucketKvItem) -> Vec<u8> {
     if let BucketValue::Uint8Array(a) = &kv.value {
@@ -88,8 +97,9 @@ pub fn values_bucket_wrap_inner(kv: &ValuesBucketWrap) -> &Vec<ValuesBucketKvIte
     &kv.0
 }
 
+#[derive(Clone)]
 pub struct ValuesBucketHashWrap {
-    value_bucket: HashMap<String, BucketValue>,
+    pub value_bucket: HashMap<String, BucketValue>,
 }
 
 impl ValuesBucketHashWrap {

@@ -77,13 +77,23 @@ export class DataSharePredicates {
 
   native contains(field: string, value: string): DataSharePredicates;
 
+  native beginsWith(field: string, value: string): DataSharePredicates;
+
+  native endsWith(field: string, value: string): DataSharePredicates;
+
   native isNull(field: string): DataSharePredicates;
 
   native isNotNull(field: string): DataSharePredicates;
 
   native like(field: string, value: string): DataSharePredicates;
 
+  native unlike(field: string, value: string): DataSharePredicates;
+
+  native glob(field: string, value: string): DataSharePredicates;
+
   native between(field: string, low: ValueType, high: ValueType): DataSharePredicates;
+
+  native notBetween(field: string, low: ValueType, high: ValueType): DataSharePredicates;
 
   native greaterThan(field: string, value: ValueType): DataSharePredicates;
 
@@ -97,12 +107,20 @@ export class DataSharePredicates {
 
   native orderByDesc(field: string): DataSharePredicates;
 
+  native distinct(): DataSharePredicates;
+
   native limit(total: int, offset: int): DataSharePredicates;
 
   native groupBy(fields: Array<string>): DataSharePredicates;
 
+  native indexedBy(field: string): DataSharePredicates;
+
   native inValues(field: string, value: Array<ValueType>): DataSharePredicates;
 
   native notInValues(field: string, value: Array<ValueType>): DataSharePredicates;
+
+  native prefixKey(prefix: string): DataSharePredicates;
+
+  native inKeys(keys: Array<string>): DataSharePredicates;
 }
 }

@@ -499,5 +499,97 @@ void StsDataShareExtAbility::SaveNewCallingInfo(ani_env *env)
     // todo
 }
 
+Uri StsDataShareExtAbility::NormalizeUri(const Uri &uri)
+{
+    AsyncCallBackPoint *point = new (std::nothrow)AsyncCallBackPoint();
+    if (point == nullptr) {
+        LOG_ERROR("New AsyncCallBackPoint error.");
+        return uri;
+    }
+    point->result = std::move(result_);
+    ani_env* env = stsRuntime_.GetAniEnv();
+    if (env == nullptr) {
+        LOG_ERROR("Query failed, env is null");
+        return uri;
+    }
+    Uri normalizedUri = DataShareExtAbility::NormalizeUri(uri);
+    call_arkts_normalize_uri(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
+        rust::String(normalizedUri.ToString()), reinterpret_cast<int64_t>(point));
+    return normalizedUri;
+}
+
+Uri StsDataShareExtAbility::DenormalizeUri(const Uri &uri)
+{
+    AsyncCallBackPoint *point = new (std::nothrow)AsyncCallBackPoint();
+    if (point == nullptr) {
+        LOG_ERROR("New AsyncCallBackPoint error.");
+        return uri;
+    }
+    point->result = std::move(result_);
+    ani_env* env = stsRuntime_.GetAniEnv();
+    if (env == nullptr) {
+        LOG_ERROR("Query failed, env is null");
+        return uri;
+    }
+    Uri denormalizedUri = DataShareExtAbility::DenormalizeUri(uri);
+    call_arkts_denormalize_uri(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
+        rust::String(denormalizedUri.ToString()), reinterpret_cast<int64_t>(point));
+    return denormalizedUri;
+}
+
+static void CleanupPredicates(rust::Vec<int64_t>& vec_predicates)
+{
+    for (int i = 0; i < vec_predicates.size(); ++i) {
+        delete (DataSharePredicates*)vec_predicates[i];
+        vec_predicates[i] = 0;
+    }
+    vec_predicates.clear();
+}
+
+int StsDataShareExtAbility::BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results)
+{
+    int ret = INVALID_VALUE;
+    ret = DataShareExtAbility::BatchUpdate(operations, results);
+    ani_env* env = stsRuntime_.GetAniEnv();
+    if (env == nullptr) {
+        LOG_ERROR("BatchUpdate failed, env is null");
+        return ret;
+    }
+
+    rust::Vec<int64_t> vec_steps;
+    rust::Vec<rust::String> vec_key;
+    rust::Vec<int64_t> vec_predicates;
+
+    rust::Box<ExtensionBatchUpdateParamOut> param_out = rust_create_extension_batch_update_param_out();
+    for (const auto &op : operations) {
+        vec_key.push_back(rust::String(op.first));
+        vec_steps.push_back(static_cast<int64_t>(op.second.size()));
+        for (const auto &item : op.second) {
+            rust::Box<ValuesBucketHashWrap> valuesBucket = rust_create_values_bucket();
+            PushBucket(valuesBucket, item.valuesBucket);
+            DataSharePredicates *predicatesPtr = new (std::nothrow)DataSharePredicates(item.predicates);
+            if (predicatesPtr == nullptr) {
+                CleanupPredicates(vec_predicates);
+                LOG_ERROR("Get predicatesPtr failed");
+                return ret;
+            }
+            vec_predicates.push_back(reinterpret_cast<int64_t>(predicatesPtr));
+            extension_batch_update_param_out_set_bucket(*param_out, *valuesBucket);
+        }
+    }
+
+    extension_batch_update_param_out_set_value(*param_out, reinterpret_cast<int64_t>(env),
+        vec_key, vec_predicates, vec_steps);
+
+    AsyncCallBackPoint *point = new (std::nothrow)AsyncCallBackPoint();
+    if (point == nullptr) {
+        LOG_ERROR("New AsyncCallBackPoint error.");
+        return ret;
+    }
+    point->result = std::move(result_);
+    call_arkts_batch_update(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
+        *param_out, reinterpret_cast<int64_t>(point));
+    return ret;
+}
 } // namespace DataShare
 } // namespace OHOS

@@ -169,6 +169,12 @@ public:
 
     void InitResult(std::shared_ptr<ResultWrap> result) override;
 
+    Uri NormalizeUri(const Uri &uri) override;
+
+    Uri DenormalizeUri(const Uri &uri) override;
+
+    int BatchUpdate(const UpdateOperations &operations, std::vector<BatchUpdateResult> &results) override;
+
 private:
     void SaveNewCallingInfo(ani_env *env);
     void ResetEnv(ani_env *env);

@@ -12,12 +12,13 @@
 // limitations under the License.
 
 use std::ffi::CStr;
-
+use std::collections::HashMap;
 use ani_rs::{business_error::BusinessError, objects::AniObject, AniEnv, error::AniError};
 
 use crate::{
-    get_native_ptr, wrapper::{self, ValuesBucketArrayWrap, ValuesBucketHashWrap}, DATA_SHARE_EXTENSION_HELPER,
-    DATA_SHARE_PREDICATES, datashare_error
+    get_native_ptr, wrapper::{self, ValuesBucketArrayWrap, ValuesBucketHashWrap,
+    ExtensionBatchUpdateParamIn, ExtensionBatchUpdateParamOut},
+    DATA_SHARE_EXTENSION_HELPER, DATA_SHARE_PREDICATES, datashare::UpdateOperation,datashare_error
 };
 
 fn call_arkts_insert_inner(
@@ -322,6 +323,132 @@ pub fn call_arkts_on_create(
     });
 }
 
+fn call_arkts_normalize_uri_inner(
+    extension_ability_ptr: i64,
+    env_ptr: i64,
+    uri: String,
+    native_ptr: i64,
+) -> Result<(), AniError> {
+    let extension_ability_obj = AniObject::from_raw(extension_ability_ptr as _);
+    let env = AniEnv::from_raw(env_ptr as _);
+    let helper_class = env.find_class(DATA_SHARE_EXTENSION_HELPER)?;
+    let instance = env.new_object(&helper_class, (extension_ability_obj, native_ptr))?;
+    let do_normalize_method_name = unsafe { CStr::from_bytes_with_nul_unchecked(b"doNormalizeUri\0") };
+    let do_normalize_method = env.find_method(&helper_class, do_normalize_method_name)?;
+    let arg = env.serialize(&uri)?;
+    env.call_method(&instance, &do_normalize_method, (arg,))
+    .map_err(|err| {
+        datashare_error!("Panic occurred: doNormalizeUri err: {}", err);
+        env.exist_unhandled_error().map(|is_unhandled| {
+            if is_unhandled {
+                let _ = env.describe_error();
+            }
+        })
+    });
+    Ok(())
+}
+
+pub fn call_arkts_normalize_uri(
+    extension_ability_ptr: i64,
+    env_ptr: i64,
+    uri: String,
+    native_ptr: i64,
+) {
+    call_arkts_normalize_uri_inner(
+        extension_ability_ptr,
+        env_ptr,
+        uri,
+        native_ptr,
+    )
+    .map_err(|err| {
+        datashare_error!("Panic occurred: call arkts normalize uri failed, err: {}", err);
+    });
+}
+
+fn call_arkts_denormalize_uri_inner(
+    extension_ability_ptr: i64,
+    env_ptr: i64,
+    uri: String,
+    native_ptr: i64,
+) -> Result<(), AniError> {
+    let extension_ability_obj = AniObject::from_raw(extension_ability_ptr as _);
+    let env = AniEnv::from_raw(env_ptr as _);
+    let helper_class = env.find_class(DATA_SHARE_EXTENSION_HELPER)?;
+    let instance = env.new_object(&helper_class, (extension_ability_obj, native_ptr))?;
+    let do_denormalize_method_name = unsafe { CStr::from_bytes_with_nul_unchecked(b"doDenormalizeUri\0") };
+    let do_denormalize_method = env.find_method(&helper_class, do_denormalize_method_name)?;
+    let arg = env.serialize(&uri)?;
+    env.call_method(&instance, &do_denormalize_method, (arg,))
+    .map_err(|err| {
+        datashare_error!("Panic occurred: doDenormalizeUri err: {}", err);
+        env.exist_unhandled_error().map(|is_unhandled| {
+            if is_unhandled {
+                let _ = env.describe_error();
+            }
+        })
+    });
+    Ok(())
+}
+
+pub fn call_arkts_denormalize_uri(
+    extension_ability_ptr: i64,
+    env_ptr: i64,
+    uri: String,
+    native_ptr: i64,
+) {
+    call_arkts_denormalize_uri_inner(
+        extension_ability_ptr,
+        env_ptr,
+        uri,
+        native_ptr,
+    )
+    .map_err(|err| {
+        datashare_error!("Panic occurred: call arkts denormalize uri failed, err: {}", err);
+    });
+}
+
+fn call_arkts_batch_update_inner(
+    extension_ability_ptr: i64,
+    env_ptr: i64,
+    param_out: &ExtensionBatchUpdateParamOut,
+    native_ptr: i64,
+) -> Result<(), AniError> {
+    let extension_ability_obj = AniObject::from_raw(extension_ability_ptr as _);
+    let env = AniEnv::from_raw(env_ptr as _);
+    let helper_class = env.find_class(DATA_SHARE_EXTENSION_HELPER)?;
+    let instance = env.new_object(&helper_class, (extension_ability_obj, native_ptr))?;
+    let do_batch_update_method_name = unsafe { CStr::from_bytes_with_nul_unchecked(b"doBatchUpdate\0") };
+    let do_batch_update_method = env.find_method(&helper_class, do_batch_update_method_name)?;
+    let arg = env.serialize(&param_out.operations)?;
+    env.call_method(&instance, &do_batch_update_method, (arg,))
+    .map_err(|err| {
+        datashare_error!("Panic occurred: doBatchUpdate err: {}", err);
+        env.exist_unhandled_error().map(|is_unhandled| {
+            if is_unhandled {
+                let _ = env.describe_error();
+            }
+        })
+    });
+    Ok(())
+}
+
+pub fn call_arkts_batch_update(
+    extension_ability_ptr: i64,
+    env_ptr: i64,
+    param_out: &ExtensionBatchUpdateParamOut,
+    native_ptr: i64,
+) {
+    call_arkts_batch_update_inner(
+        extension_ability_ptr,
+        env_ptr,
+        param_out,
+        native_ptr,
+    )
+    .map_err(|err| {
+        datashare_error!("Panic occurred: call arkts batch update failed, err: {}", err);
+    });
+}
+
 #[ani_rs::native]
 pub fn native_extension_callback_int(
     error_code: f64,
@@ -379,5 +506,31 @@ pub fn native_extension_callback_void(
     native_ptr: i64
 ) -> Result<(), BusinessError> {
     wrapper::ffi::DataShareNativeExtensionCallbackVoid(error_code, error_msg, native_ptr);
+    Ok(())
+}
+
+#[ani_rs::native]
+pub fn native_extension_callback_string(
+    error_code: f64,
+    error_msg: String,
+    data: String,
+    native_ptr: i64,
+) -> Result<(), BusinessError> {
+    wrapper::ffi::DataShareNativeExtensionCallbackString(error_code, error_msg, data, native_ptr);
+    Ok(())
+}
+
+#[ani_rs::native]
+pub fn native_extension_callback_batch_update(
+    error_code: f64,
+    error_msg: String,
+    data: HashMap<String, Vec<i32>>,
+    native_ptr: i64,
+) -> Result<(), BusinessError> {
+    let mut param_in: ExtensionBatchUpdateParamIn = ExtensionBatchUpdateParamIn::new();
+    for (key, value) in data {
+        param_in.data.insert(key, value);
+    }
+    wrapper::ffi::DataShareNativeExtensionCallbackBatchUpdate(error_code, error_msg, &param_in, native_ptr);
     Ok(())
 }

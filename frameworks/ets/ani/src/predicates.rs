@@ -19,11 +19,12 @@ use ani_rs::{
 
 use crate::{get_native_ptr, wrapper};
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub enum ValueType {
     S(String),
     F64(f64),
     Boolean(bool),
+    I64(i64),
 }
 
 pub fn create<'local>(_env: AniEnv<'local>, _clazz: AniClass<'local>) -> i64 {
@@ -119,6 +120,30 @@ pub fn native_contains<'local>(
 }
 
 #[ani_rs::native]
+pub fn native_begins_with<'local>(
+    env: &AniEnv<'local>,
+    ani_this: AniRef<'local>,
+    field: String,
+    value: String,
+) -> Result<AniRef<'local>, BusinessError> {
+    let predicates_ptr = get_native_ptr(&env, &ani_this.clone().into());
+    wrapper::ffi::DataSharePredicatesBeginsWith(predicates_ptr, field, value);
+    Ok(ani_this)
+}
+
+#[ani_rs::native]
+pub fn native_ends_with<'local>(
+    env: &AniEnv<'local>,
+    ani_this: AniRef<'local>,
+    field: String,
+    value: String,
+) -> Result<AniRef<'local>, BusinessError> {
+    let predicates_ptr = get_native_ptr(&env, &ani_this.clone().into());
+    wrapper::ffi::DataSharePredicatesEndsWith(predicates_ptr, field, value);
+    Ok(ani_this)
+}
+
+#[ani_rs::native]
 pub fn native_is_null<'local>(
     env: &AniEnv<'local>,
     ani_this: AniRef<'local>,
@@ -153,6 +178,30 @@ pub fn native_like<'local>(
 }
 
 #[ani_rs::native]
+pub fn native_unlike<'local>(
+    env: &AniEnv<'local>,
+    ani_this: AniRef<'local>,
+    field: String,
+    value: String,
+) -> Result<AniRef<'local>, BusinessError> {
+    let predicates_ptr = get_native_ptr(&env, &ani_this.clone().into());
+    wrapper::ffi::DataSharePredicatesUnlike(predicates_ptr, field, value);
+    Ok(ani_this)
+}
+
+#[ani_rs::native]
+pub fn native_glob<'local>(
+    env: &AniEnv<'local>,
+    ani_this: AniRef<'local>,
+    field: String,
+    value: String,
+) -> Result<AniRef<'local>, BusinessError> {
+    let predicates_ptr = get_native_ptr(&env, &ani_this.clone().into());
+    wrapper::ffi::DataSharePredicatesGlob(predicates_ptr, field, value);
+    Ok(ani_this)
+}
+
+#[ani_rs::native]
 pub fn native_between<'local>(
     env: &AniEnv<'local>,
     ani_this: AniRef<'local>,
@@ -163,6 +212,19 @@ pub fn native_between<'local>(
     let predicates_ptr = get_native_ptr(&env, &ani_this.clone().into());
 
     wrapper::ffi::DataSharePredicatesBetween(predicates_ptr, field, &low, &high);
+    Ok(ani_this)
+}
+
+#[ani_rs::native]
+pub fn native_not_between<'local>(
+    env: &AniEnv<'local>,
+    ani_this: AniRef<'local>,
+    field: String,
+    low: ValueType,
+    high: ValueType,
+) -> Result<AniRef<'local>, BusinessError> {
+    let predicates_ptr = get_native_ptr(&env, &ani_this.clone().into());
+    wrapper::ffi::DataSharePredicatesNotBetween(predicates_ptr, field, &low, &high);
     Ok(ani_this)
 }
 
@@ -243,6 +305,17 @@ pub fn native_order_by_desc<'local>(
 }
 
 #[ani_rs::native]
+pub fn native_distinct<'local>(
+    env: &AniEnv<'local>,
+    ani_this: AniRef<'local>
+) -> Result<AniRef<'local>, BusinessError> {
+    let predicates_ptr = get_native_ptr(&env, &ani_this.clone().into());
+    wrapper::ffi::DataSharePredicatesDistinct(predicates_ptr);
+    Ok(ani_this)
+}
+
+
+#[ani_rs::native]
 pub fn native_limit<'local>(
     env: &AniEnv<'local>,
     ani_this: AniRef<'local>,
@@ -264,6 +337,18 @@ pub fn native_group_by<'local>(
     let predicates_ptr = get_native_ptr(&env, &ani_this.clone().into());
 
     wrapper::ffi::DataSharePredicatesGroupBy(predicates_ptr, fields);
+    Ok(ani_this)
+}
+
+#[ani_rs::native]
+pub fn native_indexed_by<'local>(
+    env: &AniEnv<'local>,
+    ani_this: AniRef<'local>,
+    field: String,
+) -> Result<AniRef<'local>, BusinessError> {
+    let predicates_ptr = get_native_ptr(&env, &ani_this.clone().into());
+
+    wrapper::ffi::DataSharePredicatesIndexedBy(predicates_ptr, field);
     Ok(ani_this)
 }
 
@@ -292,6 +377,30 @@ pub fn native_not_in<'local>(
 
     wrapper::ffi::DataSharePredicatesNotIn(predicates_ptr, field, value);
 
+    Ok(ani_this)
+}
+
+#[ani_rs::native]
+pub fn native_prefix_key<'local>(
+    env: &AniEnv<'local>,
+    ani_this: AniRef<'local>,
+    prefix: String,
+) -> Result<AniRef<'local>, BusinessError> {
+    let predicates_ptr = get_native_ptr(&env, &ani_this.clone().into());
+
+    wrapper::ffi::DataSharePredicatesPrefixKey(predicates_ptr, prefix);
+    Ok(ani_this)
+}
+
+#[ani_rs::native]
+pub fn native_in_keys<'local>(
+    env: &AniEnv<'local>,
+    ani_this: AniRef<'local>,
+    keys: Vec<String>,
+) -> Result<AniRef<'local>, BusinessError> {
+    let predicates_ptr = get_native_ptr(&env, &ani_this.clone().into());
+
+    wrapper::ffi::DataSharePredicatesInKeys(predicates_ptr, keys);
     Ok(ani_this)
 }
 

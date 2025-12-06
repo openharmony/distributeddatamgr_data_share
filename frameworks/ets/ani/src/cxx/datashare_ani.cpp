@@ -29,6 +29,7 @@
 #include "datashare_result.h"
 #include "wrapper.rs.h"
 #include "js_proxy.h"
+#include <map>
 #define UNIMPL_RET_CODE 0
 
 namespace OHOS {
@@ -55,6 +56,42 @@ std::vector<uint8_t> convert_rust_vec_to_cpp_vector(const rust::Vec<uint8_t>& ru
         cpp_vector.push_back(rust_data);
     }
     return cpp_vector;
+}
+
+std::vector<int32_t> convert_rust_vec_to_cpp_vector(const rust::Vec<int32_t>& rust_vec)
+{
+    std::vector<int32_t> cpp_vector;
+    for (const auto& rust_data : rust_vec) {
+        cpp_vector.push_back(rust_data);
+    }
+    return cpp_vector;
+}
+
+rust::Vec<rust::String> convert_cpp_vector_to_rust_vec(const std::vector<std::string>& cpp_vec)
+{
+    rust::Vec<rust::String> rust_vec;
+    for (const auto &cpp_data : cpp_vec) {
+        rust_vec.push_back(rust::String(cpp_data));
+    }
+    return rust_vec;
+}
+
+rust::Vec<int32_t> convert_cpp_vector_to_rust_vec(const std::vector<int>& cpp_vec)
+{
+    rust::Vec<int32_t> rust_vec;
+    for (const auto &cpp_data : cpp_vec) {
+        rust_vec.push_back(cpp_data);
+    }
+    return rust_vec;
+}
+
+rust::Vec<uint8_t> convert_cpp_vector_to_rust_vec(const std::vector<uint8_t>& cpp_vec)
+{
+    rust::Vec<uint8_t> rust_vec;
+    for (const auto &cpp_data : cpp_vec) {
+        rust_vec.push_back(cpp_data);
+    }
+    return rust_vec;
 }
 
 // @ohos.data.DataShareResultSet.d.ets
@@ -115,6 +152,67 @@ bool GoToNextRow(int64_t resultSetPtr)
     return true;
 }
 
+bool GoToPreviousRow(int64_t resultSetPtr)
+{
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return false;
+    }
+    int errCode = resultSet->resultSetPtr_->GoToPreviousRow();
+    if (errCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errCode);
+        return false;
+    }
+    return true;
+}
+
+bool GoTo(int64_t resultSetPtr, int32_t offset)
+{
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return false;
+    }
+    int errCode = resultSet->resultSetPtr_->GoTo(offset);
+    if (errCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errCode);
+        return false;
+    }
+    return true;
+}
+
+bool GoToRow(int64_t resultSetPtr, int32_t position)
+{
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return false;
+    }
+    int errCode = resultSet->resultSetPtr_->GoToRow(position);
+    if (errCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errCode);
+        return false;
+    }
+    return true;
+}
+
+rust::Vec<uint8_t> GetBlob(int64_t resultSetPtr, int32_t columnIndex)
+{
+    std::vector<uint8_t> blob;
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return rust::Vec<uint8_t>{};
+    }
+    int errorCode = resultSet->resultSetPtr_->GetBlob(columnIndex, blob);
+    if (errorCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errorCode);
+        return rust::Vec<uint8_t>{};
+    }
+    return convert_cpp_vector_to_rust_vec(blob);
+}
+
 rust::String GetString(int64_t resultSetPtr, int columnIndex)
 {
     std::string strValue;
@@ -136,6 +234,21 @@ int64_t GetLong(int64_t resultSetPtr, int columnIndex)
         return value;
     }
     int errorCode = resultSet->resultSetPtr_->GetLong(columnIndex, value);
+    if (errorCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errorCode);
+    }
+    return value;
+}
+
+double GetDouble(int64_t resultSetPtr, int columnIndex)
+{
+    double value = -1.0;
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return value;
+    }
+    int errorCode = resultSet->resultSetPtr_->GetDouble(columnIndex, value);
     if (errorCode != E_OK) {
         LOG_ERROR("failed code:%{public}d", errorCode);
     }
@@ -166,6 +279,37 @@ int GetColumnIndex(int64_t resultSetPtr, rust::String columnName)
         LOG_ERROR("failed code:%{public}d columnIndex:%{public}d", errorCode, columnIndex);
     }
     return columnIndex;
+}
+
+rust::String GetColumnName(int64_t resultSetPtr, int columnIndex)
+{
+    std::string strValue;
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return rust::String(strValue);
+    }
+    int errorCode = resultSet->resultSetPtr_->GetColumnName(columnIndex, strValue);
+    if (errorCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errorCode);
+    }
+    return rust::String(strValue);
+}
+
+int32_t GetDataType(int64_t resultSetPtr, int columnIndex)
+{
+    DataType dataType = DataType::TYPE_NULL;
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSetPtr == 0 || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return static_cast<int32_t>(DataType::TYPE_NULL);
+    }
+    int errorCode = resultSet->resultSetPtr_->GetDataType(columnIndex, dataType);
+    if (errorCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errorCode);
+        return static_cast<int32_t>(DataType::TYPE_NULL);
+    }
+    return static_cast<int32_t>(dataType);
 }
 
 // @ohos.data.dataSharePredicates.d.ets
@@ -293,6 +437,26 @@ void DataSharePredicatesContains(int64_t predicatesPtr, rust::String field, rust
     (void)(*predicates->Contains(std::string(field), std::string(value)));
 }
 
+void DataSharePredicatesBeginsWith(int64_t predicatesPtr, rust::String field, rust::String value)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->BeginsWith(std::string(field), std::string(value)));
+}
+
+void DataSharePredicatesEndsWith(int64_t predicatesPtr, rust::String field, rust::String value)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->EndsWith(std::string(field), std::string(value)));
+}
+
 void DataSharePredicatesIsNull(int64_t predicatesPtr, rust::String field)
 {
     auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
@@ -323,6 +487,26 @@ void DataSharePredicatesLike(int64_t predicatesPtr, rust::String field, rust::St
     (void)(*predicates->Like(std::string(field), std::string(value)));
 }
 
+void DataSharePredicatesUnlike(int64_t predicatesPtr, rust::String field, rust::String value)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->Unlike(std::string(field), std::string(value)));
+}
+
+void DataSharePredicatesGlob(int64_t predicatesPtr, rust::String field, rust::String value)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->Glob(std::string(field), std::string(value)));
+}
+
 void GetValueType(const ValueType& valueType, std::string& typeStr)
 {
     EnumType type = value_type_get_type(valueType);
@@ -339,6 +523,11 @@ void GetValueType(const ValueType& valueType, std::string& typeStr)
         }
         case EnumType::BooleanType: {
             bool data = value_type_get_bool(valueType);
+            typeStr = std::to_string(data);
+            break;
+        }
+        case EnumType::I64Type: {
+            int64_t data = value_type_get_i64(valueType);
             typeStr = std::to_string(data);
             break;
         }
@@ -362,6 +551,21 @@ void DataSharePredicatesBetween(int64_t predicatesPtr, rust::String field, const
     GetValueType(low, strLow);
     GetValueType(high, strHigh);
     (void)(*predicates->Between(std::string(field), strLow, strHigh));
+}
+
+void DataSharePredicatesNotBetween(int64_t predicatesPtr, rust::String field, const ValueType& low,
+    const ValueType& high)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    std::string strLow;
+    std::string strHigh;
+    GetValueType(low, strLow);
+    GetValueType(high, strHigh);
+    (void)(*predicates->NotBetween(std::string(field), strLow, strHigh));
 }
 
 void DataSharePredicatesGreaterThan(int64_t predicatesPtr, rust::String field, const ValueType& value)
@@ -508,6 +712,16 @@ void DataSharePredicatesOrderByDesc(int64_t predicatesPtr, rust::String field)
     (void)(*predicates->OrderByDesc(std::string(field)));
 }
 
+void DataSharePredicatesDistinct(int64_t predicatesPtr)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->Distinct());
+}
+
 void DataSharePredicatesLimit(int64_t predicatesPtr, int total, int offset)
 {
     auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
@@ -530,6 +744,16 @@ void DataSharePredicatesGroupBy(int64_t predicatesPtr, rust::Vec<rust::String> f
         strings.push_back(std::string(str));
     }
     (void)(*predicates->GroupBy(strings));
+}
+
+void DataSharePredicatesIndexedBy(int64_t predicatesPtr, rust::String field)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->IndexedBy(std::string(field)));
 }
 
 void DataSharePredicatesIn(int64_t predicatesPtr, rust::String field,  rust::Vec<ValueType> value)
@@ -602,6 +826,27 @@ void DataSharePredicatesNotIn(int64_t predicatesPtr, rust::String field, rust::V
     (void)(*predicates->NotIn(std::string(field), values));
 }
 
+void DataSharePredicatesPrefixKey(int64_t predicatesPtr, rust::String prefix)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    (void)(*predicates->KeyPrefix(std::string(prefix)));
+}
+
+void DataSharePredicatesInKeys(int64_t predicatesPtr, rust::Vec<rust::String> keys)
+{
+    auto predicates = reinterpret_cast<DataSharePredicates*>(predicatesPtr);
+    if (predicates == nullptr) {
+        LOG_ERROR("predicates is null.");
+        return;
+    }
+    auto strings = convert_rust_vec_to_cpp_vector(keys);
+    (void)(*predicates->InKeys(strings));
+}
+
 // @ohos.data.dataShare.d.ets
 I64ResultWrap DataShareNativeCreate(int64_t context, rust::String strUri,
     bool optionIsUndefined, bool isProxy)
@@ -635,6 +880,36 @@ I64ResultWrap DataShareNativeCreate(int64_t context, rust::String strUri,
 void DataShareNativeClean(int64_t dataShareHelperPtr)
 {
     delete reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+}
+
+int DataShareNativeEnableSilentProxy(int64_t context, rust::String strUri)
+{
+    if (context == 0) {
+        LOG_ERROR("DataShareNativeEnableSilentProxy context is null");
+        return EXCEPTION_PARAMETER_CHECK;
+    }
+    std::string stdStrUri = std::string(strUri);
+    Uri uri(stdStrUri);
+    int res = DataShareHelper::SetSilentSwitch(uri, true, true);
+    if (res == E_NOT_SYSTEM_APP) {
+        return EXCEPTION_SYSTEMAPP_CHECK;
+    }
+    return E_OK;
+}
+
+int DataShareNativeDisableSilentProxy(int64_t context, rust::String strUri)
+{
+    if (context == 0) {
+        LOG_ERROR("DataShareNativeDisableSilentProxy context is null");
+        return EXCEPTION_PARAMETER_CHECK;
+    }
+    std::string stdStrUri = std::string(strUri);
+    Uri uri(stdStrUri);
+    int res = DataShareHelper::SetSilentSwitch(uri, false, true);
+    if (res == E_NOT_SYSTEM_APP) {
+        return EXCEPTION_SYSTEMAPP_CHECK;
+    }
+    return E_OK;
 }
 
 I64ResultWrap DataShareNativeQuery(int64_t dataShareHelperPtr, rust::String strUri,
@@ -894,6 +1169,205 @@ I32ResultWrap DataShareNativeBatchInsert(int64_t dataShareHelperPtr, rust::Strin
         return I32ResultWrap{resultNumber, EXCEPTION_INNER};
     }
     return I32ResultWrap{resultNumber, E_OK};
+}
+
+std::map<std::string, std::vector<UpdateOperation>> DataShareNativeBatchUpdateGetOperations(
+    const rust::Vec<rust::String>& vec_key,
+    const rust::Vec<int64_t>& vec_predicates,
+    const rust::Vec<ValuesBucketWrap>& vec_buckets,
+    const rust::Vec<int64_t>& vec_steps)
+{
+    std::map<std::string, std::vector<UpdateOperation>> operations;
+    int sum = 0;
+    for (int i = 0; i < vec_key.size(); ++i) {
+        std::vector<UpdateOperation> op;
+        for (int j = 0; j < vec_steps[i]; ++j) {
+            DataSharePredicates* predicates = reinterpret_cast<DataSharePredicates*>(vec_predicates[sum + j]);
+            rust::Vec<ValuesBucketKvItem> const &bucket = values_bucket_wrap_inner(vec_buckets[sum + j]);
+            DataShareValuesBucket valuesBucket;
+            std::string key = std::string(value_bucket_get_key(bucket[j]));
+            EnumType bucket_type = value_bucket_get_vtype(bucket[j]);
+            switch (bucket_type) {
+                case EnumType::StringType: {
+                    valuesBucket.Put(key, std::string(value_bucket_get_string(bucket[j])));
+                    break;
+                }
+                case EnumType::F64Type: {
+                    valuesBucket.Put(key, (double)value_bucket_get_f64(bucket[j]));
+                    break;
+                }
+                case EnumType::BooleanType: {
+                    valuesBucket.Put(key, (bool)value_bucket_get_bool(bucket[j]));
+                    break;
+                }
+                case EnumType::I64Type: {
+                    valuesBucket.Put(key, (int64_t)value_bucket_get_i64(bucket[j]));
+                    break;
+                }
+                case EnumType::Uint8ArrayType: {
+                    rust::Vec<uint8_t> data = value_bucket_get_uint8array(bucket[j]);
+                    std::vector<uint8_t> std_vec = convert_rust_vec_to_cpp_vector(data);
+                    valuesBucket.Put(key, std_vec);
+                    break;
+                }
+                case EnumType::NullType: {
+                    valuesBucket.Put(key, {});
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+            op.push_back(UpdateOperation{valuesBucket, *predicates});
+        }
+        sum += vec_steps[i];
+        operations[std::string(vec_key[i])] = op;
+    }
+    return operations;
+}
+
+void DataShareNativeBatchUpdate(int64_t dataShareHelperPtr, const DataShareBatchUpdateParamIn& param_in,
+    DataShareBatchUpdateParamOut& param_out)
+{
+    rust::Vec<rust::String> vec_key;
+    rust::Vec<int64_t> vec_predicates;
+    rust::Vec<ValuesBucketWrap> vec_bucket;
+    rust::Vec<int64_t> vec_step;
+    data_share_batch_update_param_in_get_value(param_in, vec_key, vec_predicates, vec_bucket, vec_step);
+    if (vec_bucket.size() != vec_predicates.size()) {
+        LOG_ERROR("vec_bucket size is not equal to vec_predicates size");
+        return;
+    }
+    if (vec_key.size() != vec_step.size()) {
+        LOG_ERROR("vec_key size is not equal to vec_step size");
+        return;
+    }
+    auto operations = DataShareNativeBatchUpdateGetOperations(vec_key, vec_predicates, vec_bucket, vec_step);
+    std::vector<BatchUpdateResult> results;
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    auto ret = helperHolder->datashareHelper_->BatchUpdate(operations, results);
+    if (ret != E_OK) {
+        data_share_batch_update_param_out_error_code(param_out, ret);
+        LOG_ERROR("BatchUpdate failed, ret: %{public}d", ret);
+        return;
+    }
+    for (const auto &result : results) {
+        data_share_batch_update_param_out_push(param_out, rust::String(result.uri),
+            convert_cpp_vector_to_rust_vec(result.codes));
+    }
+}
+
+StringResultWrap DataShareNativeNormalizeUri(int64_t dataShareHelperPtr, rust::String strUri)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr || strUri.empty()) {
+        LOG_ERROR("datashareHelper normalizeUri failed, helper is nullptr.");
+        return StringResultWrap{"", EXCEPTION_HELPER_CLOSED};
+    }
+    Uri uri(std::string(strUri).c_str());
+    Uri normalizedUri = helperHolder->datashareHelper_->NormalizeUri(uri);
+    return StringResultWrap{normalizedUri.ToString(), 0};
+}
+
+StringResultWrap DataShareNativeDeNormalizeUri(int64_t dataShareHelperPtr, rust::String strUri)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr || strUri.empty()) {
+        LOG_ERROR("datashareHelper deNormalizeUri failed, helper is nullptr.");
+        return StringResultWrap{"", EXCEPTION_HELPER_CLOSED};
+    }
+    Uri uri(std::string(strUri).c_str());
+    Uri denormalizedUri = helperHolder->datashareHelper_->DenormalizeUri(uri);
+    return StringResultWrap{denormalizedUri.ToString(), 0};
+}
+
+int DataShareNativeNotifyChange(int64_t dataShareHelperPtr, rust::String strUri)
+{
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("datashareHelper notifyChange failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    if (strUri.empty()) {
+        LOG_ERROR("Parameter error.Mandatory parameters are left unspecified.");
+        return EXCEPTION_PARAMETER_CHECK;
+    }
+    Uri uri(std::string(strUri).c_str());
+    helperHolder->datashareHelper_->NotifyChange(uri);
+    return E_OK;
+}
+void ParseValueBucket(rust::Vec<ValuesBucketKvItem> const &bucket,
+                      std::map<std::string, std::variant<std::monostate, int64_t, double,
+                      std::string, bool, std::vector<uint8_t>>>& valuesBucket)
+{
+    for (const ValuesBucketKvItem& cpp_bucket : bucket) {
+        std::string key = std::string(value_bucket_get_key(cpp_bucket));
+        EnumType bucket_type = value_bucket_get_vtype(cpp_bucket);
+        switch (bucket_type) {
+            case EnumType::StringType: {
+                valuesBucket.insert(std::make_pair(key, std::string(value_bucket_get_string(cpp_bucket))));
+                break;
+            }
+            case EnumType::F64Type: {
+                valuesBucket.insert(std::make_pair(key, (double)value_bucket_get_f64(cpp_bucket)));
+                break;
+            }
+            case EnumType::BooleanType: {
+                valuesBucket.insert(std::make_pair(key, (bool)value_bucket_get_bool(cpp_bucket)));
+                break;
+            }
+            case EnumType::I64Type: {
+                valuesBucket.insert(std::make_pair(key, (int64_t)value_bucket_get_i64(cpp_bucket)));
+                break;
+            }
+            case EnumType::Uint8ArrayType: {
+                rust::Vec<uint8_t> data = value_bucket_get_uint8array(cpp_bucket);
+                valuesBucket.insert(std::make_pair(key, convert_rust_vec_to_cpp_vector(data)));
+                break;
+            }
+            case EnumType::NullType: {
+                valuesBucket.insert(std::make_pair(key, std::monostate{}));
+                break;
+            }
+            default: {
+                valuesBucket.insert(std::make_pair(key, std::monostate{}));
+                break;
+            }
+        }
+    }
+}
+
+void rust_change_info_to_cpp_observer_change_info(const int32_t changeType,
+    const rust::Vec<ValuesBucketWrap>& buckets, DataShareObserver::ChangeInfo& info)
+{
+    info.changeType_ = (DataShareObserver::ChangeType)changeType;
+    for (const ValuesBucketWrap& wrapBuckets : buckets) {
+        rust::Vec<ValuesBucketKvItem> const &bucket = values_bucket_wrap_inner(wrapBuckets);
+        std::map<std::string,
+            std::variant<std::monostate, int64_t, double, std::string, bool, std::vector<uint8_t>>> valuesBucket;
+        ParseValueBucket(bucket, valuesBucket);
+        info.valueBuckets_.push_back(valuesBucket);
+    }
+}
+
+int DataShareNativeNotifyChangeInfo(int64_t dataShareHelperPtr, int32_t changeType,
+    rust::String strUri, rust::Vec<ValuesBucketWrap> buckets)
+{
+    std::string stdStrUri = std::string(strUri);
+    if (stdStrUri.empty() || buckets.empty()) {
+        LOG_ERROR("stdStrUrt or buckets is empty!");
+        return EXCEPTION_PARAMETER_CHECK;
+    }
+    DataShareObserver::ChangeInfo info;
+    info.uris_.push_back(Uri(stdStrUri));
+    rust_change_info_to_cpp_observer_change_info(changeType, buckets, info);
+    auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
+    if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
+        LOG_ERROR("datashareHelper notifyChange failed, helper is nullptr.");
+        return EXCEPTION_HELPER_CLOSED;
+    }
+    helperHolder->datashareHelper_->NotifyChangeExt(info, true);
+    return E_OK;
 }
 
 I32ResultWrap DataShareNativeDelete(int64_t dataShareHelperPtr, rust::String strUri, int64_t dataSharePredicatesPtr)
@@ -1309,5 +1783,63 @@ void DataShareNativeExtensionCallbackVoid(double errorCode, rust::string errorMs
     }
 }
 
+void DataShareNativeExtensionCallbackString(double errorCode, rust::String errorMsg,
+                                            rust::String value, int64_t nativePtr)
+{
+    AsyncCallBackPoint* point = reinterpret_cast<AsyncCallBackPoint*>(nativePtr);
+    if (point == nullptr) {
+        LOG_ERROR("AsyncCallBackPoint is nullptr.");
+        return;
+    }
+    auto jsResult = point->result;
+    if (jsResult == nullptr) {
+        LOG_ERROR("JsResult is nullptr.");
+        return;
+    }
+    jsResult->callbackResultString_ = std::string(value);
+    DatashareBusinessError businessError;
+    businessError.SetCode((int)errorCode);
+    businessError.SetMessage(std::string(errorMsg));
+    jsResult->businessError_= businessError;
+    jsResult->isRecvReply_ = true;
+}
+
+void DataShareNativeExtensionCallbackBatchUpdate(double errorCode, rust::String errorMsg,
+    const ExtensionBatchUpdateParamIn& param_in, int64_t nativePtr)
+{
+    AsyncCallBackPoint* point = reinterpret_cast<AsyncCallBackPoint*>(nativePtr);
+    if (point == nullptr) {
+        LOG_ERROR("AsyncCallBackPoint is nullptr.");
+        return;
+    }
+    auto jsResult = point->result;
+    if (jsResult == nullptr) {
+        LOG_ERROR("JsResult is nullptr.");
+        return;
+    }
+    rust::Vec<rust::String> in_key;
+    rust::Vec<int32_t> in_value;
+    rust::Vec<int32_t> in_steps;
+    extension_batch_update_param_in_get_value(param_in, in_key, in_value, in_steps);
+    if (in_key.size() != in_steps.size()) {
+        LOG_ERROR("key size not equal step size.");
+        return;
+    }
+    int sum = 0;
+    for (int i = 0; i < in_key.size(); ++i) {
+        BatchUpdateResult bur;
+        bur.uri = std::string(in_key[i]);
+        for (int j = 0; j < in_steps[i]; ++j) {
+            bur.codes.push_back(in_value[sum + j]);
+        }
+        sum += in_steps[i];
+        jsResult->updateResults_.push_back(bur);
+    }
+    DatashareBusinessError businessError;
+    businessError.SetCode((int)errorCode);
+    businessError.SetMessage(std::string(errorMsg));
+    jsResult->businessError_= businessError;
+    jsResult->isRecvReply_ = true;
+}
 } // namespace DataShareAni
 } // namespace OHOS
