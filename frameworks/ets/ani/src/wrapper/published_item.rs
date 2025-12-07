@@ -13,7 +13,9 @@
 
 use ani_rs::typed_array::ArrayBuffer;
 
-use crate::datashare::{OperationResult, PublishedItem, PublishedItemData};
+use crate::datashare::{OperationResult, PublishedItem, PublishedItemData, AniDataProxyResult,
+    AniDataProxyGetResult, DataProxyErrorCode};
+use crate::predicates::ValueType;
 
 use super::ffi;
 
@@ -146,4 +148,75 @@ pub fn published_data_sret_push_array(
         data_arr: Some(data_buffer),
     };
     sret.0.push(item);
+}
+
+// called by c++, used to accept c++ return value
+pub struct AniDataProxyResultSretParam(Vec<AniDataProxyResult>);
+impl AniDataProxyResultSretParam {
+    pub fn new() -> Self {
+        Self(Vec::new())
+    }
+
+    pub fn into_inner(self) -> Vec<AniDataProxyResult> {
+        self.0
+    }
+}
+// called by c++, Call this method on the C++ side to fill data into the Rust structure
+pub fn data_proxy_result_sret_push(sret: &mut AniDataProxyResultSretParam, uri: String, result: i32) {
+    let mut adpgr = AniDataProxyResult::new();
+    adpgr.uri = uri;
+    adpgr.result = DataProxyErrorCode::from_i32(result);
+    sret.0.push(adpgr);
+}
+
+pub struct AniDataProxyGetResultSretParam(Vec<AniDataProxyGetResult>);
+impl AniDataProxyGetResultSretParam {
+    pub fn new() -> Self {
+        Self(Vec::new())
+    }
+
+    pub fn into_inner(self) -> Vec<AniDataProxyGetResult> {
+        self.0
+    }
+}
+
+// called by c++, Call this method on the C++ side to fill data into the Rust structure
+pub fn data_proxy_get_result_sret_push_i64(sret: &mut AniDataProxyGetResultSretParam, uri: String, result: i32,
+        value: i64, allowList: Vec<String>) {
+    let mut adpgr = AniDataProxyGetResult::new();
+    adpgr.uri = uri;
+    adpgr.result = DataProxyErrorCode::from_i32(result);
+    adpgr.value = Some(ValueType::I64(value));
+    adpgr.allowList = Some(allowList);
+    sret.0.push(adpgr);
+}
+
+pub fn data_proxy_get_result_sret_push_f64(sret: &mut AniDataProxyGetResultSretParam, uri: String, result: i32,
+        value: f64, allowList: Vec<String>) {
+    let mut adpgr = AniDataProxyGetResult::new();
+    adpgr.uri = uri;
+    adpgr.result = DataProxyErrorCode::from_i32(result);
+    adpgr.value = Some(ValueType::F64(value));
+    adpgr.allowList = Some(allowList);
+    sret.0.push(adpgr);
+}
+
+pub fn data_proxy_get_result_sret_push_bool(sret: &mut AniDataProxyGetResultSretParam, uri: String, result: i32,
+        value: bool, allowList: Vec<String>) {
+    let mut adpgr = AniDataProxyGetResult::new();
+    adpgr.uri = uri;
+    adpgr.result = DataProxyErrorCode::from_i32(result);
+    adpgr.value = Some(ValueType::Boolean(value));
+    adpgr.allowList = Some(allowList);
+    sret.0.push(adpgr);
+}
+
+pub fn data_proxy_get_result_sret_push_string(sret: &mut AniDataProxyGetResultSretParam, uri: String, result: i32,
+        value: String, allowList: Vec<String>) {
+    let mut adpgr = AniDataProxyGetResult::new();
+    adpgr.uri = uri;
+    adpgr.result = DataProxyErrorCode::from_i32(result);
+    adpgr.value = Some(ValueType::S(value));
+    adpgr.allowList = Some(allowList);
+    sret.0.push(adpgr);
 }

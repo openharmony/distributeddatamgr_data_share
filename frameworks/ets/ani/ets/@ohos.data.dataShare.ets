@@ -18,7 +18,7 @@ import type { Callback, AsyncCallback } from '@ohos.base';
 import Context from 'application.Context';
 import DataShareResultSet from './@ohos.data.DataShareResultSet';
 import dataSharePredicates from './@ohos.data.dataSharePredicates';
-import { ValuesBucket } from '@ohos.data.ValuesBucket';
+import { ValuesBucket, ValueType } from '@ohos.data.ValuesBucket';
 
 export namespace dataShare {
   loadLibrary("datashare_ani_rs")
@@ -72,6 +72,11 @@ export namespace dataShare {
     key: string;
 
     result: int;
+  }
+
+  export interface UpdateOperation {
+    values: ValuesBucket;
+    predicates: dataSharePredicates.DataSharePredicates;
   }
 
   export enum ChangeType {
@@ -181,16 +186,39 @@ export namespace dataShare {
 
     batchInsert(uri: string, values: Array<ValuesBucket>): Promise<int>;
 
+    batchUpdate(operations: Record<string, Array<UpdateOperation>>): Promise<Record<string, Array<int>>>;
+
+    normalizeUri(uri: string, callback: AsyncCallback<string>): void;
+
+    normalizeUri(uri: string): Promise<string>;
+
+    denormalizeUri(uri: string, callback: AsyncCallback<string>): void;
+
+    denormalizeUri(uri: string): Promise<string>;
+
+    notifyChange(uri: string, callback: AsyncCallback<void>): void;
+
+    notifyChange(uri: string): Promise<void>;
+
+    notifyChange(data: ChangeInfo): Promise<void>;
+
     close(): Promise<void>;
   }
 
   export native function native_create(context: Context, uri: string, options?: DataShareHelperOptions): DataShareHelper
+  export native function native_enableSilentProxy(context: Context, uri?: string): void
+  export native function native_disableSilentProxy(context: Context, uri?: string): void
   export native function native_query(obj: DataShareHelper, uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>): DataShareResultSet
   export native function native_update(obj: DataShareHelper, uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket): int
   export native function native_publish(obj: DataShareHelper, data: Array<PublishedItem>, bundleName: string, version?: int): Array<OperationResult>
   export native function native_get_published_data(obj: DataShareHelper, bundleName: string): Array<PublishedItem>
   export native function native_insert(obj: DataShareHelper, uri: string, value: ValuesBucket): int
   export native function native_batch_insert(obj: DataShareHelper, uri: string, values: Array<ValuesBucket>): int
+  export native function native_batch_update(obj: DataShareHelper, operations: Record<string, Array<UpdateOperation>>): Record<string, Array<int>>
+  export native function native_normalize_uri(obj: DataShareHelper, uri: string): string
+  export native function native_denormalize_uri(obj: DataShareHelper, uri: string): string
+  export native function native_notify_change(obj: DataShareHelper, uri: string): void
+  export native function native_notify_change_info(obj: DataShareHelper, data: ChangeInfo): void
   export native function native_delete(obj: DataShareHelper, uri: string, predicates: dataSharePredicates.DataSharePredicates): int
   export native function native_close(obj: DataShareHelper):void
   export native function native_on(obj: DataShareHelper, uri: string, callback: Callback<void>): void
@@ -235,6 +263,28 @@ export namespace dataShare {
           p.then((e: NullishType) => {
               let r = e as DataShareHelper
               resolve(r)
+          }).catch((e: Error): void => {
+              reject(e)
+          })
+      })
+  }
+
+    function enableSilentProxy(context: Context, uri?: string): Promise<void> {
+      return new Promise<void>((resolve, reject) => {
+          let p = taskpool.execute(native_enableSilentProxy, context, uri)
+          p.then(() => {
+              resolve(undefined)
+          }).catch((e: Error): void => {
+              reject(e)
+          })
+      })
+  }
+
+  function disableSilentProxy(context: Context, uri?: string): Promise<void> {
+      return new Promise<void>((resolve, reject) => {
+          let p = taskpool.execute(native_disableSilentProxy, context, uri)
+          p.then(() => {
+              resolve(undefined)
           }).catch((e: Error): void => {
               reject(e)
           })
@@ -413,6 +463,91 @@ export namespace dataShare {
         })
     }
 
+    batchUpdate(operations: Record<string, Array<UpdateOperation>>): Promise<Record<string, Array<int>>> {
+        return new Promise<Record<string, Array<int>>>((resolve, reject) => {
+            let p = taskpool.execute(native_batch_update, this, operations)
+            p.then((e: NullishType) => {
+                let r = e as Record<string, Array<int>>
+                resolve(r)
+            }).catch((e: Error): void => {
+                reject(e)
+            })
+        });
+    }
+
+    normalizeUri(uri: string, callback: AsyncCallback<string>): void {
+        let p = taskpool.execute(native_normalize_uri, this, uri)
+        p.then((r: NullishType) => {
+            callback(null, r as string);
+        }, (err: Error): void => {
+            callback(err as BusinessError, undefined);
+        });
+    }
+
+    normalizeUri(uri: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            let p = taskpool.execute(native_normalize_uri, this, uri)
+            p.then((e: NullishType) => {
+                let r = e as string
+                resolve(r)
+            }).catch((e: Error): void => {
+                reject(e)
+            })
+        })
+    }
+
+    denormalizeUri(uri: string, callback: AsyncCallback<string>): void {
+        let p = taskpool.execute(native_denormalize_uri, this, uri)
+        p.then((r: NullishType) => {
+            callback(null, r as string);
+        }, (err: Error): void => {
+            callback(err as BusinessError, undefined);
+        });
+    }
+
+    denormalizeUri(uri: string): Promise<string> {
+        return new Promise<string>((resolve, reject) => {
+            let p = taskpool.execute(native_denormalize_uri, this, uri)
+            p.then((e: NullishType) => {
+                let r = e as string
+                resolve(r)
+            }).catch((e: Error): void => {
+                reject(e)
+            })
+        })
+    }
+
+    notifyChange(uri: string, callback: AsyncCallback<void>): void {
+        let p = taskpool.execute(native_notify_change, this, uri)
+        p.then((r: NullishType) => {
+            callback(null, undefined);
+        }, (err: Error): void => {
+            callback(err as BusinessError, undefined);
+        });
+    }
+
+    notifyChange(uri: string): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            let p = taskpool.execute(native_notify_change, this, uri)
+            p.then(() => {
+                resolve(undefined);
+            }).catch((e: Error): void => {
+                reject(e)
+            })
+        })
+    }
+
+    notifyChange(data: ChangeInfo): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            let p = taskpool.execute(native_notify_change_info, this, data)
+            p.then(() => {
+                resolve(undefined);
+            }).catch((e: Error): void => {
+                reject(e)
+            })
+        })
+    }
+
     delete(uri: string, predicates: dataSharePredicates.DataSharePredicates, callback: AsyncCallback<int>): void {
         let p = taskpool.execute(native_delete, this, uri, predicates)
         p.then((r: NullishType) => {
@@ -509,6 +644,11 @@ export namespace dataShare {
       result: int;
   }
 
+  class UpdateOperationInner implements UpdateOperation {
+      values: ValuesBucket;
+      predicates: dataSharePredicates.DataSharePredicates;
+  }
+
   class TemplateInner implements Template {
     predicates: Record<string, string>;
     scheduler: string;
@@ -535,5 +675,64 @@ export namespace dataShare {
   class PublishedDataChangeNodeInner implements PublishedDataChangeNode {
     bundleName: string;
     data: Array<PublishedItem>;
+  }
+
+  export interface ProxyData {
+    uri: string;
+    value?: ValueType;
+    allowList?: string[];
+  }
+
+  class ProxyDataInner implements ProxyData {
+    uri: string;
+    value?: ValueType;
+    allowList?: string[];
+  }
+
+  export interface DataProxyChangeInfo {
+    type: ChangeType;
+    uri: string;
+    value: ValueType;
+  }
+
+  class DataProxyChangeInfoInner implements DataProxyChangeInfo {
+    type: ChangeType;
+    uri: string;
+    value: ValueType;
+  }
+
+  export enum DataProxyErrorCode {
+    SUCCESS = 0,
+    URI_NOT_EXIST = 1,
+    NO_PERMISSION = 2,
+    OVER_LIMIT = 3
+  }
+
+  export interface DataProxyResult {
+    uri: string;
+    result: DataProxyErrorCode;
+  }
+
+  class DataProxyResultInner implements DataProxyResult {
+    uri: string;
+    result: DataProxyErrorCode;
+  }
+
+  export interface DataProxyGetResult {
+    uri: string;
+    result: DataProxyErrorCode;
+    value: ValueType | undefined;
+    allowList: string[] | undefined;
+  }
+  
+  class DataProxyGetResultInner implements DataProxyGetResult {
+    uri: string;
+    result: DataProxyErrorCode;
+    value: ValueType | undefined;
+    allowList: string[] | undefined;
+  }
+
+  export enum DataProxyType {
+    SHARED_CONFIG = 0
   }
 }

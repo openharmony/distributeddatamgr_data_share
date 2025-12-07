@@ -31,6 +31,10 @@ const DATA_SHARE: &CStr = unsafe {
     CStr::from_bytes_with_nul_unchecked(b"L@ohos/data/dataShare/dataShare/DataShareHelperInner;\0")
 };
 
+const DATA_SHARE_DATA_PROXY_HANDLE: &CStr = unsafe {
+    CStr::from_bytes_with_nul_unchecked(b"L@ohos/data/dataShare/dataShare/DataProxyHandleInner\0")
+};
+
 const DATA_SHARE_EXTENSION_HELPER: &CStr = unsafe {
     CStr::from_bytes_with_nul_unchecked(b"L@ohos/application/DataShareExtensionAbility/dataShareExtensionAbilityHelper/CallbackWrap;\0")
 };
@@ -47,10 +51,17 @@ ani_constructor!(
         "goToFirstRow" : result_set::go_to_first_row,
         "goToLastRow" : result_set::go_to_last_row,
         "goToNextRow" : result_set::go_to_next_row,
+        "goToPreviousRow" : result_set::go_to_previous_row,
+        "goTo" : result_set::go_to,
+        "goToRow" : result_set::go_to_row,
+        "getBlob" : result_set::get_blob,
         "getString" : result_set::get_string,
         "getLong" : result_set::get_long,
+        "getDouble" : result_set::get_double,
         "getColumnIndex" : result_set::get_column_index,
         "close" : result_set::close,
+        "getColumnName" : result_set::get_column_name,
+        "getDataType" : result_set::get_data_type,
     ]
     class "L@ohos/data/dataSharePredicates/dataSharePredicates/DataSharePredicates"
     [
@@ -61,20 +72,29 @@ ani_constructor!(
         "or" : predicates::native_or,
         "and" : predicates::native_and,
         "contains" : predicates::native_contains,
+        "beginsWith" : predicates::native_begins_with,
+        "endsWith" : predicates::native_ends_with,
         "isNull" : predicates::native_is_null,
         "isNotNull" : predicates::native_is_not_null,
         "like" : predicates::native_like,
+        "unlike" : predicates::native_unlike,
+        "glob" : predicates::native_glob,
         "between" : predicates::native_between,
+        "notBetween" : predicates::native_not_between,
         "greaterThan" : predicates::native_greater_than,
         "greaterThanOrEqualTo" : predicates::native_greater_than_or_equal_to,
         "lessThanOrEqualTo" : predicates::native_less_than_or_equal_to,
         "lessThan" : predicates::native_less_than,
         "orderByAsc" : predicates::native_order_by_asc,
         "orderByDesc" : predicates::native_order_by_desc,
+        "distinct" : predicates::native_distinct,
         "limit" : predicates::native_limit,
         "groupBy" : predicates::native_group_by,
+        "indexedBy" : predicates::native_indexed_by,
         "inValues" : predicates::native_in,
         "notInValues" : predicates::native_not_in,
+        "prefixKey" : predicates::native_prefix_key,
+        "inKeys" : predicates::native_in_keys,
     ]
     namespace "L@ohos/data/dataSharePredicates/dataSharePredicates"
     [
@@ -83,12 +103,19 @@ ani_constructor!(
     namespace "L@ohos/data/dataShare/dataShare"
     [
         "native_create": datashare::native_create,
+        "native_enableSilentProxy": datashare::native_enable_silent_proxy,
+        "native_disableSilentProxy": datashare::native_disable_silent_proxy,
         "native_query": datashare::native_query,
         "native_update": datashare::native_update,
         "native_publish": datashare::native_publish,
         "native_get_published_data": datashare::native_get_published_data,
         "native_insert": datashare::native_insert,
         "native_batch_insert": datashare::native_batch_insert,
+        "native_batch_update": datashare::native_batch_update,
+        "native_normalize_uri": datashare::native_normalize_uri,
+        "native_denormalize_uri": datashare::native_denormalize_uri,
+        "native_notify_change": datashare::native_notify_change,
+        "native_notify_change_info": datashare::native_notify_change_info,
         "native_delete": datashare::native_delete,
         "native_close": datashare::native_close,
         "native_on": datashare::native_on,
@@ -118,6 +145,8 @@ ani_constructor!(
         "nativeExtensionCallbackInt": datashare_extension::native_extension_callback_int,
         "nativeExtensionCallbackObject": datashare_extension::native_extension_callback_object,
         "nativeExtensionCallbackVoid": datashare_extension::native_extension_callback_void,
+        "nativeExtensionCallbackString": datashare_extension::native_extension_callback_string,
+        "nativeExtensionCallbackBatchUpdate": datashare_extension::native_extension_callback_batch_update
     ]
 );
 

@@ -13,6 +13,10 @@
 
 use crate::datashare::{
     ChangeInfo, PublishedDataChangeNode, PublishedItem, RdbDataChangeNode, Template, TemplateId,
+    AniDataProxyConfig, AniProxyData, AniDataProxyType, data_share_data_proxy_config_get_type,
+    ani_proxy_data_get_uri, ani_proxy_data_get_enum_type, ani_proxy_data_get_value_string,
+    ani_proxy_data_get_value_i64, ani_proxy_data_get_value_f64, ani_proxy_data_get_value_boolean,
+    ani_proxy_data_get_data,
 };
 use crate::datashare_extension::*;
 use crate::predicates::ValueType;
@@ -36,11 +40,14 @@ mod template;
 pub use template::*;
 mod value_type;
 pub use value_type::*;
+mod batch_update;
+pub use batch_update::*;
 
 pub const fn convert_to_business_error(code: i32) -> BusinessError {
     match code {
         // 201 => BusinessError::PERMISSION,
         401 => BusinessError::new_static(code, "Parameter error.Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameters types."),
+        202 => BusinessError::new_static(code, "Not system app."),
         15700000 => BusinessError::new_static(code, "Inner error. Possible causes: 1.The internal status is abnormal; 2.The interface is incorrectly used; 3.Permission configuration error; 4.A system error."),
         15700010 => BusinessError::new_static(code, "DataShareHelper fails to be initialized."),
         15700011 => BusinessError::new_static(code, "The URI does not exist."),
@@ -59,6 +66,7 @@ pub mod ffi {
         Uint8ArrayType = 3,
         NullType = 4,
         ArrayBufferType = 5,
+        I64Type = 6,
     }
 
     struct PtrWrap {
@@ -76,6 +84,11 @@ pub mod ffi {
         err_code: i32,
     }
 
+    struct StringResultWrap { 
+        result: String,
+        errCode: i32,
+    }
+
     struct I64ResultWrap {
         result: i64,
         err_code: i32,
@@ -88,6 +101,7 @@ pub mod ffi {
         fn value_bucket_get_string(kv: &ValuesBucketKvItem) -> String;
         fn value_bucket_get_f64(kv: &ValuesBucketKvItem) -> f64;
         fn value_bucket_get_bool(kv: &ValuesBucketKvItem) -> bool;
+        fn value_bucket_get_i64(kv: &ValuesBucketKvItem) -> i64;
         fn value_bucket_get_uint8array(kv: &ValuesBucketKvItem) -> Vec<u8>;
 
         type ValueType;
@@ -95,6 +109,7 @@ pub mod ffi {
         fn value_type_get_string(v: &ValueType) -> String;
         fn value_type_get_f64(v: &ValueType) -> f64;
         fn value_type_get_bool(v: &ValueType) -> bool;
+        fn value_type_get_i64(v: &ValueType) -> i64;
 
         type PublishedItem;
         type PublishSretParam;
@@ -307,6 +322,104 @@ pub mod ffi {
             ani_want: i64,
             native_ptr: i64,
         );
+        fn call_arkts_normalize_uri(
+            extension_ability_ptr: i64,
+            env_ptr: i64,
+            uri: String,
+            native_ptr: i64,
+        );
+        fn call_arkts_denormalize_uri(
+            extension_ability_ptr: i64,
+            env_ptr: i64,
+            uri: String,
+            native_ptr: i64,
+        );
+        type DataShareBatchUpdateParamIn;
+        type DataShareBatchUpdateParamOut;
+        type ExtensionBatchUpdateParamIn;
+        type ExtensionBatchUpdateParamOut;
+        fn data_share_batch_update_param_out_push(
+            param_out: &mut DataShareBatchUpdateParamOut,
+            key: String,
+            result: Vec<i32>,
+        );
+        pub fn data_share_batch_update_param_out_error_code(
+            param_out: &mut DataShareBatchUpdateParamOut,
+            error_code: i32,
+        );
+        pub fn data_share_batch_update_param_in_get_value(
+            param_in: &DataShareBatchUpdateParamIn,
+            vec_key: &mut Vec<String>,
+            vec_predicates: &mut Vec<i64>,
+            vec_bucket: &mut Vec<ValuesBucketWrap>,
+            vec_step: &mut Vec<i64>,
+        );
+        pub fn extension_batch_update_param_in_get_value(
+            param_in: &ExtensionBatchUpdateParamIn,
+            vec_key: &mut Vec<String>,
+            vec_value: &mut Vec<i32>,
+            vec_steps: &mut Vec<i32>,
+        );
+        pub fn rust_create_extension_batch_update_param_out() -> Box<ExtensionBatchUpdateParamOut>;
+        pub fn extension_batch_update_param_out_set_bucket(
+            param_out: &mut ExtensionBatchUpdateParamOut,
+            bucket: &ValuesBucketHashWrap,
+        );
+        pub fn extension_batch_update_param_out_set_value(
+            param_out: &mut ExtensionBatchUpdateParamOut,
+            env_ptr: i64,
+            vec_key: Vec<String>,
+            vec_predicates: Vec<i64>,
+            vec_steps: Vec<i64>,
+        );
+        pub fn call_arkts_batch_update(
+            extension_ability_ptr: i64,
+            env_ptr: i64,
+            param_in: &ExtensionBatchUpdateParamOut,
+            native_ptr: i64,
+        );
+
+        type AniProxyData;
+        type AniDataProxyConfig;
+        type AniDataProxyResultSretParam;
+        type AniDataProxyGetResultSretParam;
+        pub fn data_proxy_result_sret_push(sret: &mut AniDataProxyResultSretParam, uri: String, result: i32);
+        pub fn data_share_data_proxy_config_get_type(config: &AniDataProxyConfig) -> i32;
+        pub fn ani_proxy_data_get_uri(data: &AniProxyData) -> String;
+        pub fn ani_proxy_data_get_enum_type(data: &AniProxyData) -> EnumType;
+        pub fn ani_proxy_data_get_value_string(data: &AniProxyData) -> String;
+        pub fn ani_proxy_data_get_value_i64(data: &AniProxyData) -> i64;
+        pub fn ani_proxy_data_get_value_f64(data: &AniProxyData) -> f64;
+        pub fn ani_proxy_data_get_value_boolean(data: &AniProxyData) -> bool;
+        pub fn ani_proxy_data_get_data(data: &AniProxyData, vec: &mut Vec<String>);
+        pub fn data_proxy_get_result_sret_push_i64(
+            sret: &mut AniDataProxyGetResultSretParam,
+            uri: String,
+            result: i32,
+            value: i64,
+            allowList: Vec<String>,
+        );
+        pub fn data_proxy_get_result_sret_push_f64(
+            sret: &mut AniDataProxyGetResultSretParam,
+            uri: String,
+            result: i32,
+            value: f64,
+            allowList: Vec<String>,
+        );
+        pub fn data_proxy_get_result_sret_push_bool(
+            sret: &mut AniDataProxyGetResultSretParam,
+            uri: String,
+            result: i32,
+            value: bool,
+            allowList: Vec<String>,
+        );
+        pub fn data_proxy_get_result_sret_push_string(
+            sret: &mut AniDataProxyGetResultSretParam,
+            uri: String,
+            result: i32,
+            value: String,
+            allowList: Vec<String>,
+        );
     }
 
     unsafe extern "C++" {
@@ -316,10 +429,17 @@ pub mod ffi {
         fn GoToFirstRow(resultSetPtr: i64) -> bool;
         fn GoToLastRow(resultSetPtr: i64) -> bool;
         fn GoToNextRow(resultSetPtr: i64) -> bool;
+        fn GoToPreviousRow(resultSetPtr: i64) -> bool;
+        fn GoTo(resultSetPtr: i64, offset: i32) -> bool;
+        fn GoToRow(resultSetPtr: i64, position: i32) -> bool;
+        fn GetBlob(resultSetPtr: i64, columnIndex: i32) -> Vec<u8>;
         fn GetString(resultSetPtr: i64, columnIndex: i32) -> String;
         fn GetLong(resultSetPtr: i64, columnIndex: i32) -> i64;
+        fn GetDouble(resultSetPtr: i64, columnIndex: i32) -> f64;
         fn Close(resultSetPtr: i64);
         fn GetColumnIndex(resultSetPtr: i64, s: String) -> i32;
+        fn GetColumnName(resultSetPtr: i64, columnIndex: i32) -> String;
+        fn GetDataType(resultSetPtr: i64, columnIndex: i32) -> i32;
 
         fn DataSharePredicatesNew() -> i64;
         fn DataSharePredicatesClean(predicatesPtr: i64);
@@ -330,10 +450,20 @@ pub mod ffi {
         fn DataSharePredicatesOr(predicatesPtr: i64);
         fn DataSharePredicatesAnd(predicatesPtr: i64);
         fn DataSharePredicatesContains(predicatesPtr: i64, field: String, value: String);
+        fn DataSharePredicatesBeginsWith(predicatesPtr: i64, field: String, value: String);
+        fn DataSharePredicatesEndsWith(predicatesPtr: i64, field: String, value: String);
         fn DataSharePredicatesIsNull(predicatesPtr: i64, field: String);
         fn DataSharePredicatesIsNotNull(predicatesPtr: i64, field: String);
         fn DataSharePredicatesLike(predicatesPtr: i64, field: String, value: String);
+        fn DataSharePredicatesUnlike(predicatesPtr: i64, field: String, value: String);
+        fn DataSharePredicatesGlob(predicatesPtr: i64, field: String, value: String);
         fn DataSharePredicatesBetween(
+            predicatesPtr: i64,
+            field: String,
+            low: &ValueType,
+            high: &ValueType,
+        );
+        fn DataSharePredicatesNotBetween(
             predicatesPtr: i64,
             field: String,
             low: &ValueType,
@@ -353,10 +483,14 @@ pub mod ffi {
         fn DataSharePredicatesLessThan(predicatesPtr: i64, field: String, value: &ValueType);
         fn DataSharePredicatesOrderByAsc(predicatesPtr: i64, field: String);
         fn DataSharePredicatesOrderByDesc(predicatesPtr: i64, field: String);
+        fn DataSharePredicatesDistinct(predicatesPtr: i64);
         fn DataSharePredicatesLimit(predicatesPtr: i64, total: i32, offset: i32);
         fn DataSharePredicatesGroupBy(predicatesPtr: i64, field: Vec<String>);
+        fn DataSharePredicatesIndexedBy(predicatesPtr: i64, field: String);
         fn DataSharePredicatesIn(predicatesPtr: i64, field: String, value: Vec<ValueType>);
         fn DataSharePredicatesNotIn(predicatesPtr: i64, field: String, value: Vec<ValueType>);
+        fn DataSharePredicatesPrefixKey(predicatesPtr: i64, prefix: String);
+        fn DataSharePredicatesInKeys(predicatesPtr: i64, keys: Vec<String>);
 
         fn DataShareNativeCreate(
             context: i64,
@@ -366,6 +500,16 @@ pub mod ffi {
         ) -> I64ResultWrap;
 
         fn DataShareNativeClean(dataShareHelperPtr: i64);
+
+        fn DataShareNativeEnableSilentProxy(
+            context: i64,
+            strUri: String,
+        ) -> i32;
+
+        fn DataShareNativeDisableSilentProxy(
+            context: i64,
+            strUri: String,
+        ) -> i32;
 
         fn DataShareNativeQuery(
             dataShareHelperPtr: i64,
@@ -414,6 +558,34 @@ pub mod ffi {
             strUri: String,
             buckets: Vec<ValuesBucketWrap>,
         ) -> I32ResultWrap;
+
+        fn DataShareNativeBatchUpdate(
+            dataShareHelperPtr: i64,
+            param_in: &DataShareBatchUpdateParamIn,
+            param_out: &mut DataShareBatchUpdateParamOut,
+        );
+
+        fn DataShareNativeNormalizeUri(
+            dataShareHelperPtr: i64,
+            strUri: String,
+        ) -> StringResultWrap;
+
+        fn DataShareNativeDeNormalizeUri(
+            dataShareHelperPtr: i64,
+            strUri: String,
+        ) -> StringResultWrap;
+
+        fn DataShareNativeNotifyChange(
+            dataShareHelperPtr: i64,
+            strUri: String,
+        ) -> i32;
+
+        fn DataShareNativeNotifyChangeInfo(
+            dataShareHelperPtr: i64,
+            changeType: i32,
+            strUri: String,
+            buckets: Vec<ValuesBucketWrap>,
+        ) -> i32;
 
         fn DataShareNativeDelete(
             dataShareHelperPtr: i64,
@@ -499,6 +671,15 @@ pub mod ffi {
         );
 
         fn DataShareNativeExtensionCallbackVoid(error_code: f64, error_msg: String, native_ptr: i64);
+
+        fn DataShareNativeExtensionCallbackString(error_code: f64, error_msg: String, data: String, native_ptr: i64);
+
+        fn DataShareNativeExtensionCallbackBatchUpdate(
+            error_code: f64,
+            error_msg: String,
+            param_in: &ExtensionBatchUpdateParamIn,
+            native_ptr: i64,
+        );
     }
 }
 

@@ -20,6 +20,7 @@
 #include "ani_observer.h"
 #include "ani_subscriber_manager.h"
 #include "datashare_helper.h"
+#include "dataproxy_handle.h"
 #include "cxx.h"
 namespace OHOS {
 using namespace DataShare;
@@ -29,6 +30,7 @@ namespace DataShareAni {
 struct PtrWrap;
 struct VersionWrap;
 struct I32ResultWrap;
+struct StringResultWrap;
 struct I64ResultWrap;
 struct ValuesBucketKvItem;
 struct ValueType;
@@ -43,8 +45,18 @@ struct TemplateId;
 struct RdbDataChangeNode;
 struct PublishedDataChangeNode;
 struct DataShareCallback;
+struct AniProxyData;
+struct AniDataProxyConfig;
+struct AniDataProxyResultSretParam;
+struct AniDataProxyGetResultSretParam;
+struct AniDataProxyResult;
+struct DataShareBatchUpdateParamIn;
+struct DataShareBatchUpdateParamOut;
+struct ExtensionBatchUpdateParamIn;
+struct ExtensionBatchUpdateParamOut;
 
 const int E_OK = 0;
+const int EXCEPTION_SYSTEMAPP_CHECK = 202;
 const int EXCEPTION_PARAMETER_CHECK = 401;
 const int EXCEPTION_INNER = 15700000;
 const int EXCEPTION_HELPER_UNINITIALIZED = 15700010;
@@ -78,10 +90,17 @@ int32_t GetRowCount(int64_t resultSetPtr);
 bool GoToFirstRow(int64_t resultSetPtr);
 bool GoToLastRow(int64_t resultSetPtr);
 bool GoToNextRow(int64_t resultSetPtr);
+bool GoToPreviousRow(int64_t resultSetPtr);
+bool GoTo(int64_t resultSetPtr, int32_t offset);
+bool GoToRow(int64_t resultSetPtr, int32_t position);
+rust::Vec<uint8_t> GetBlob(int64_t resultSetPtr, int32_t columnIndex);
 rust::String GetString(int64_t resultSetPtr, int columnIndex);
 int64_t GetLong(int64_t resultSetPtr, int columnIndex);
+double GetDouble(int64_t resultSetPtr, int columnIndex);
 void Close(int64_t resultSetPtr);
 int GetColumnIndex(int64_t resultSetPtr, rust::String columnName);
+rust::String GetColumnName(int64_t resultSetPtr, int columnIndex);
+int32_t GetDataType(int64_t resultSetPtr, int columnIndex);
 
 int64_t DataSharePredicatesNew();
 void DataSharePredicatesClean(int64_t predicatesPtr);
@@ -92,24 +111,37 @@ void DataSharePredicatesEndWrap(int64_t predicatesPtr);
 void DataSharePredicatesOr(int64_t predicatesPtr);
 void DataSharePredicatesAnd(int64_t predicatesPtr);
 void DataSharePredicatesContains(int64_t predicatesPtr, rust::String field, rust::String value);
+void DataSharePredicatesBeginsWith(int64_t predicatesPtr, rust::String field, rust::String value);
+void DataSharePredicatesEndsWith(int64_t predicatesPtr, rust::String field, rust::String value);
 void DataSharePredicatesIsNull(int64_t predicatesPtr, rust::String field);
 void DataSharePredicatesIsNotNull(int64_t predicatesPtr, rust::String field);
 void DataSharePredicatesLike(int64_t predicatesPtr, rust::String field, rust::String value);
+void DataSharePredicatesUnlike(int64_t predicatesPtr, rust::String field, rust::String value);
+void DataSharePredicatesGlob(int64_t predicatesPtr, rust::String field, rust::String value);
 void DataSharePredicatesBetween(int64_t predicatesPtr, rust::String field, const ValueType& low, const ValueType& high);
+void DataSharePredicatesNotBetween(int64_t predicatesPtr, rust::String field,
+    const ValueType& low, const ValueType& high);
 void DataSharePredicatesGreaterThan(int64_t predicatesPtr, rust::String field, const ValueType& value);
 void DataSharePredicatesGreaterThanOrEqualTo(int64_t predicatesPtr, rust::String field, const ValueType& value);
 void DataSharePredicatesLessThanOrEqualTo(int64_t predicatesPtr, rust::String field, const ValueType& value);
 void DataSharePredicatesLessThan(int64_t predicatesPtr, rust::String field, const ValueType& value);
 void DataSharePredicatesOrderByAsc(int64_t predicatesPtr, rust::String field);
 void DataSharePredicatesOrderByDesc(int64_t predicatesPtr, rust::String field);
+void DataSharePredicatesDistinct(int64_t predicatesPtr);
 void DataSharePredicatesLimit(int64_t predicatesPtr, int total, int offset);
 void DataSharePredicatesGroupBy(int64_t predicatesPtr, rust::Vec<rust::String> field);
+void DataSharePredicatesIndexedBy(int64_t predicatesPtr, rust::String field);
 void DataSharePredicatesIn(int64_t predicatesPtr, rust::String field, rust::Vec<ValueType> value);
 void DataSharePredicatesNotIn(int64_t predicatesPtr, rust::String field, rust::Vec<ValueType> value);
+void DataSharePredicatesPrefixKey(int64_t predicatesPtr, rust::String prefix);
+void DataSharePredicatesInKeys(int64_t predicatesPtr, rust::Vec<rust::String> keys);
 
 I64ResultWrap DataShareNativeCreate(int64_t context, rust::String strUri, bool optionIsUndefined, bool isProxy);
 
 void DataShareNativeClean(int64_t dataShareHelperPtr);
+
+int DataShareNativeEnableSilentProxy(int64_t context, rust::String strUri);
+int DataShareNativeDisableSilentProxy(int64_t context, rust::String strUri);
 
 I64ResultWrap DataShareNativeQuery(int64_t dataShareHelperPtr, rust::String strUri,
     int64_t dataSharePredicatesPtr, rust::Vec<rust::String> columns);
@@ -133,6 +165,18 @@ I32ResultWrap DataShareNativeInsert(int64_t dataShareHelperPtr, rust::String str
 
 I32ResultWrap DataShareNativeBatchInsert(int64_t dataShareHelperPtr, rust::String strUri,
     rust::Vec<ValuesBucketWrap> buckets);
+
+void DataShareNativeBatchUpdate(int64_t dataShareHelperPtr, const DataShareBatchUpdateParamIn& param_in,
+    DataShareBatchUpdateParamOut& param_out);
+
+StringResultWrap DataShareNativeNormalizeUri(int64_t dataShareHelperPtr, rust::String strUri);
+
+StringResultWrap DataShareNativeDeNormalizeUri(int64_t dataShareHelperPtr, rust::String strUri);
+
+int DataShareNativeNotifyChange(int64_t dataShareHelperPtr, rust::String strUri);
+
+int DataShareNativeNotifyChangeInfo(int64_t dataShareHelperPtr, int32_t changeType,
+    rust::String strUri, rust::Vec<ValuesBucketWrap> buckets);
 
 I32ResultWrap DataShareNativeDelete(int64_t dataShareHelperPtr, rust::String strUri, int64_t dataSharePredicatesPtr);
 
@@ -182,6 +226,11 @@ void DataShareNativeExtensionCallbackObject(double errorCode, rust::string error
 
 void DataShareNativeExtensionCallbackVoid(double errorCode, rust::string errorMsg, int64_t nativePtr);
 
+void DataShareNativeExtensionCallbackString(double errorCode, rust::String errorMsg,
+    rust::String value, int64_t nativePtr);
+
+void DataShareNativeExtensionCallbackBatchUpdate(double errorCode, rust::String errorMsg,
+    const ExtensionBatchUpdateParamIn& param_in, int64_t nativePtr);
 } // namespace DataShareAni
 } // namespace OHOS
 

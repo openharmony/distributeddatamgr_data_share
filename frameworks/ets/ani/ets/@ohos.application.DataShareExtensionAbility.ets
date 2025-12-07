@@ -25,6 +25,11 @@ import Want from '@ohos.app.ability.Want';
 import dataSharePredicates from './@ohos.data.dataSharePredicates';
 import { ValuesBucket } from '@ohos.data.ValuesBucket';
 
+export interface UpdateOperation {
+    values: ValuesBucket;
+    predicates: dataSharePredicates.DataSharePredicates;
+}
+
 export namespace dataShareExtensionAbilityHelper {
     loadLibrary("datashare_ani_rs")
 
@@ -33,6 +38,10 @@ export namespace dataShareExtensionAbilityHelper {
     export native function nativeExtensionCallbackObject(errorCode: double, errMsg: string, data: Object, nativePtr: long): void;
 
     export native function nativeExtensionCallbackVoid(errorCode: double, errMsg: string, nativePtr: long): void;
+
+    export native function nativeExtensionCallbackString(errorCode: double, errMsg: string, data: string, nativePtr: long): void;
+
+    export native function nativeExtensionCallbackBatchUpdate(errorCode: double, errMsg: string, data: Record<string, Array<int>>, nativePtr: long): void;
 
     export class CallbackWrap {
         private nativeObject: DataShareExtensionAbility
@@ -67,6 +76,26 @@ export namespace dataShareExtensionAbilityHelper {
             if (err instanceof BusinessError) {
                 let error: BusinessError = err as BusinessError
                 nativeExtensionCallbackVoid(error.code, error.message, this.nativePtr)
+            } else {
+                console.error(`invalid type param`)
+            }
+        }
+
+        doExtensionCallbackString(err: BusinessError | null, data: string | undefined) {
+            if ((err instanceof BusinessError) && (data instanceof string)) {
+                let error: BusinessError = err as BusinessError
+                let dataVal: string = data as string
+                nativeExtensionCallbackString(error.code, error.message, dataVal, this.nativePtr)
+            } else {
+                console.error(`invalid type param`)
+            }
+        }
+
+        doExtensionCallbackBatchUpdate(err: BusinessError | null, data: Record<string, Array<int>> | undefined) {
+            if ((err instanceof BusinessError) && (data instanceof Record<string, Array<int>>)) {
+                let error: BusinessError = err as BusinessError
+                let dataVal: Record<string, Array<int>> = data as Record<string, Array<int>>
+                nativeExtensionCallbackBatchUpdate(error.code, error.message, dataVal, this.nativePtr)
             } else {
                 console.error(`invalid type param`)
             }
@@ -127,6 +156,30 @@ export namespace dataShareExtensionAbilityHelper {
                 console.error(`onCreate is undefined.`);
             }
         }
+
+        doBatchUpdate(operations: Record<string, Array<UpdateOperation>>): void {
+            if (this.nativeObject.batchUpdate != undefined) {
+                this.nativeObject.batchUpdate!(operations, this.doExtensionCallbackBatchUpdate);
+            } else {
+                console.error(`batchUpdate is undefined.`);
+            }
+        }
+
+        doNormalizeUri(uri: string): void {
+            if (this.nativeObject.normalizeUri != undefined) {
+                this.nativeObject.normalizeUri!(uri, this.doExtensionCallbackString);
+            } else {
+                console.error(`normalizeUri is undefined.`);
+            }    
+        }
+        
+        doDenormalizeUri(uri: string): void {
+            if (this.nativeObject.denormalizeUri != undefined) {
+                this.nativeObject.denormalizeUri!(uri, this.doExtensionCallbackString);
+            } else {
+                console.error(`denormalizeUri is undefined.`);
+            }    
+        }
     }
 }
 
@@ -156,6 +209,16 @@ type QueryFn = (
 
 type BatchInsertFn = (uri: string, valueBuckets: Array<ValuesBucket>, callback: AsyncCallback<int>) => void;
 
+type BatchUpdateFn = (
+    operations: Record<string,
+    Array<UpdateOperation>>,
+    callback: AsyncCallback<Record<string, Array<int>>>
+) => void;
+
+type NormalizeUriFn = (uri: string, callback: AsyncCallback<string>) => void;
+
+type DenormalizeUriFn = (uri: string, callback: AsyncCallback<string>) => void;
+
 export default class DataShareExtensionAbility {
 
     context: ExtensionContext;
@@ -175,4 +238,10 @@ export default class DataShareExtensionAbility {
     query?: QueryFn;
 
     batchInsert?: BatchInsertFn;
+
+    batchUpdate?: BatchUpdateFn;
+
+    normalizeUri?: NormalizeUriFn;
+
+    denormalizeUri?: DenormalizeUriFn;
 }

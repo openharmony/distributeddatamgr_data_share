@@ -21,6 +21,7 @@ pub fn value_type_get_type(v: &ValueType) -> ffi::EnumType {
         ValueType::S(_) => ffi::EnumType::StringType,
         ValueType::F64(_) => ffi::EnumType::F64Type,
         ValueType::Boolean(_) => ffi::EnumType::BooleanType,
+        ValueType::I64(_) => ffi::EnumType::I64Type,
     }
 }
 
@@ -49,4 +50,12 @@ pub fn value_type_get_bool(v: &ValueType) -> bool {
     }
 
     panic!("Not Boolean Type!!!");
+}
+
+// called by c++, if ValueType is i64, get i64.
+pub fn value_type_get_i64(v: &ValueType) -> i64 {
+    if let ValueType::I64(i) = v {
+        return *i;
+    }
+    panic!("Not I64 Type!!!");
 }
