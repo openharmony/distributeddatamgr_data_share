@@ -100,7 +100,7 @@ bool DataShareStubImpl::VerifyProvider(const CallingInfo &callingInfo, const uin
 
     if (PROVIDER_LIST.find(bundleInfo.signatureInfo.appIdentifier) == PROVIDER_LIST.end()) {
         // No need to print since app not in AppGallery do not have appIdentifier.
-        DataShareFaultInfo faultInfo{HiViewFaultAdapter::unapprovedProvider,
+        DataShareFaultInfo faultInfo{HiViewFaultAdapter::UNAPPROVED_PROVIDER,
             bundleInfo.applicationInfo.bundleName.c_str(), "", "", __FUNCTION__, -1, "Non-Silent"};
         HiViewFaultAdapter::ReportDataFault(faultInfo);
         // Provider not in allowlist
