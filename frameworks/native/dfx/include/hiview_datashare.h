@@ -34,13 +34,13 @@ struct DataShareFaultInfo {
 
 class HiViewFaultAdapter {
 public:
-    static constexpr const char* extensionFailed = "EXT_FAILED";
-    static constexpr const char* silentFailed = "SILENT_FAILED";
-    static constexpr const char* trustsFailed = "TRUSTS_FAILED";
-    static void ReportDataFault(const DataShareFaultInfo &faultInfo);
+    static constexpr const char* EXTENSION_FAILED = "EXT_FAILED";
+    static constexpr const char* SILENT_FAILED = "SILENT_FAILED";
+    static constexpr const char* TRUSTS_FAILED = "TRUSTS_FAILED";
+    static void ReportDataFault(DataShareFaultInfo &faultInfo);
     static std::pair<std::string, int> GetCallingName(uint32_t callingTokenid);
 };
 
 } // namespace DataShare
 } // namespace OHOS
-#endif // DATASHARESERVICE_HIVIEW_ADAPTER_H
+#endif // DATASHARESERVICE_HIVIEW_ADAPTER_H
