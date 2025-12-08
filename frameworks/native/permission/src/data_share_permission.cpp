@@ -160,8 +160,8 @@ int32_t DataSharePermission::UriIsTrust(Uri &uri)
     if (IsInUriTrusts(uri)) {
         return E_OK;
     }
-    if (!scheme.empty() && scheme != SCHEME_DATASHARE && scheme != SCHEME_DATASHARE_PROXY) {
-        LOG_ERROR("invalid uri %{public}s, scheme %{public}s",
+    if (scheme != SCHEME_DATASHARE && scheme != SCHEME_DATASHARE_PROXY) {
+        LOG_WARN("invalid uri %{public}s, scheme %{public}s",
             uri.ToString().c_str(), uri.GetScheme().c_str());
         return E_DATASHARE_INVALID_URI;
     }
