@@ -86,7 +86,10 @@ public:
     std::shared_ptr<DataShareResultSet> resultSetPtr_ = nullptr;
 };
 
+rust::Vec<rust::string> GetColumnNames(int64_t resultSetPtr);
+int32_t GetColumnCount(int64_t resultSetPtr);
 int32_t GetRowCount(int64_t resultSetPtr);
+bool GetIsClosed(int64_t resultSetPtr);
 bool GoToFirstRow(int64_t resultSetPtr);
 bool GoToLastRow(int64_t resultSetPtr);
 bool GoToNextRow(int64_t resultSetPtr);
@@ -136,7 +139,8 @@ void DataSharePredicatesNotIn(int64_t predicatesPtr, rust::String field, rust::V
 void DataSharePredicatesPrefixKey(int64_t predicatesPtr, rust::String prefix);
 void DataSharePredicatesInKeys(int64_t predicatesPtr, rust::Vec<rust::String> keys);
 
-I64ResultWrap DataShareNativeCreate(int64_t context, rust::String strUri, bool optionIsUndefined, bool isProxy);
+I64ResultWrap DataShareNativeCreate(int64_t context, rust::String strUri,
+    bool optionIsUndefined, bool isProxy, int waitTime);
 
 void DataShareNativeClean(int64_t dataShareHelperPtr);
 

@@ -47,7 +47,10 @@ pub fn get_native_ptr<'local>(env: &AniEnv<'local>, obj: &AniObject) -> i64 {
 ani_constructor!(
     class "L@ohos/data/DataShareResultSet/DataShareResultSetInner"
     [
+        "getColumnNames" : result_set::get_column_names,
+        "getColumnCount" : result_set::get_column_count,
         "getRowCount" : result_set::get_row_count,
+        "getIsClosed" : result_set::get_is_closed,
         "goToFirstRow" : result_set::go_to_first_row,
         "goToLastRow" : result_set::go_to_last_row,
         "goToNextRow" : result_set::go_to_next_row,

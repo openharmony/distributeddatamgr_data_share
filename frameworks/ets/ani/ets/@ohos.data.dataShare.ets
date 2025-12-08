@@ -36,6 +36,7 @@ export namespace dataShare {
 
   export interface DataShareHelperOptions {
     isProxy?: boolean;
+    waitTime?: int;
   }
 
   export interface TemplateId {
@@ -631,6 +632,7 @@ export namespace dataShare {
 
   class DataShareHelperOptionsInner implements DataShareHelperOptions {
       isProxy?: boolean;
+      waitTime?: int;
   }
 
   class PublishedItemInner implements PublishedItem {

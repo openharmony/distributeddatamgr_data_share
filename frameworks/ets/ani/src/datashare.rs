@@ -35,9 +35,12 @@ use crate::{
     datashare_info,
 };
 
+const DEFAULT_WAITTIME: i32 = 2;
+
 #[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/DataShareHelperOptionsInner")]
 struct DataShareHelperOptions {
     is_proxy: Option<bool>,
+    wait_time: Option<i32>,
 }
 
 #[ani_rs::ani(path = "L@ohos/data/DataShareResultSet/DataShareResultSetInner")]
@@ -265,11 +268,12 @@ pub fn native_create<'local>(
     let result_wrap;
     if let Some(opt_inner) = options {
         let is_proxy = opt_inner.is_proxy.unwrap_or(false);
+        let wait_time = opt_inner.wait_time.unwrap_or(DEFAULT_WAITTIME);
         result_wrap =
-            wrapper::ffi::DataShareNativeCreate(native_context, uri, false, is_proxy);
+            wrapper::ffi::DataShareNativeCreate(native_context, uri, false, is_proxy, wait_time);
     } else {
         result_wrap =
-            wrapper::ffi::DataShareNativeCreate(native_context, uri, true, false);
+            wrapper::ffi::DataShareNativeCreate(native_context, uri, true, false, DEFAULT_WAITTIME);
     }
 
     if result_wrap.err_code != 0 {
