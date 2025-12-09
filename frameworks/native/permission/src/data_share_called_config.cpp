@@ -97,7 +97,7 @@ int DataShareCalledConfig::GetFromProxyData()
             return E_OK;
         }
     }
-    LOG_ERROR("E_URI_NOT_EXIST uriWithoutQuery %{public}s", uriWithoutQuery.c_str());
+    LOG_ERROR("E_URI_NOT_EXIST uriWithoutQuery %{public}s", DataShareStringUtils::Anonymous(uriWithoutQuery).c_str());
     return E_URI_NOT_EXIST;
 }
 
@@ -112,12 +112,12 @@ std::pair<int, DataShareCalledConfig::ProviderInfo> DataShareCalledConfig::GetPr
     auto ret = GetFromProxyData();
     if (ret != E_OK) {
         LOG_ERROR("GetFromProxyData Failed! ret:%{public}d,user:%{public}d,uri:%{public}s",
-            ret, user, providerInfo_.uri.c_str());
+            ret, user, DataShareStringUtils::Anonymous(providerInfo_.uri).c_str());
     }
     return std::make_pair(ret, providerInfo_);
 }
 
-std::pair<bool, BundleInfo> DataShareCalledConfig::GetBundleInfoFromBMS(std::string bundleName, int32_t user)
+std::pair<bool, BundleInfo> DataShareCalledConfig::GetBundleInfoFromBMS(const std::string &bundleName, int32_t user)
 {
     BundleInfo bundleInfo;
     auto bmsHelper = DelayedSingleton<BundleMgrHelper>::GetInstance();
@@ -145,7 +145,8 @@ std::pair<bool, BundleInfo> DataShareCalledConfig::GetBundleInfoFromBMS(std::str
     return std::make_pair(true, bundleInfo);
 }
 
-std::pair<bool, ExtensionAbilityInfo> DataShareCalledConfig::GetExtensionInfoFromBMS(std::string &uri, int32_t user)
+std::pair<bool, ExtensionAbilityInfo> DataShareCalledConfig::GetExtensionInfoFromBMS(const std::string &uri,
+    int32_t user)
 {
     ExtensionAbilityInfo info;
     auto bmsHelper = DelayedSingleton<BundleMgrHelper>::GetInstance();

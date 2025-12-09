@@ -250,7 +250,7 @@ std::pair<int, std::string> DataSharePermission::GetUriPermission(Uri &uri, int3
 
 void DataSharePermission::ReportExcuteFault(int32_t errCode,  std::string &consumer, std::string &provider)
 {
-    DataShareFaultInfo faultInfo = {HiViewFaultAdapter::trustsFailed, consumer, provider,
+    DataShareFaultInfo faultInfo = {HiViewFaultAdapter::TRUSTS_FAILED, consumer, provider,
         "", "", errCode, ""};
     HiViewFaultAdapter::ReportDataFault(faultInfo);
 }
@@ -259,7 +259,7 @@ void DataSharePermission::ReportExtensionFault(int32_t errCode, uint32_t tokenId
     std::string &uri, std::string &bussinessType)
 {
     auto [bundleName, ret] = HiViewFaultAdapter::GetCallingName(tokenId);
-    DataShareFaultInfo faultInfo = {HiViewFaultAdapter::extensionFailed, bundleName, "",
+    DataShareFaultInfo faultInfo = {HiViewFaultAdapter::EXTENSION_FAILED, bundleName, "",
         "", bussinessType, errCode, uri};
     HiViewFaultAdapter::ReportDataFault(faultInfo);
 }

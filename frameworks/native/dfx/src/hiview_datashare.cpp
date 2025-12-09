@@ -36,7 +36,7 @@ namespace {
     constexpr uint8_t MILLSECOND_DIGIT = 3;
 }
 
-void HiViewFaultAdapter::ReportDataFault(const DataShareFaultInfo &faultInfo)
+void HiViewFaultAdapter::ReportDataFault(DataShareFaultInfo &faultInfo)
 {
     auto now = std::chrono::system_clock::now();
     auto t = std::chrono::system_clock::to_time_t(now);
@@ -47,21 +47,21 @@ void HiViewFaultAdapter::ReportDataFault(const DataShareFaultInfo &faultInfo)
     ss << '.' << std::setfill('0') << std::setw(MILLSECOND_DIGIT) << ms.count();
     auto time = ss.str();
     HiSysEventParam faultTime = { .name = "FAULT_TIME", .t = HISYSEVENT_STRING,
-        .v = { .s = const_cast<char*>(time.c_str()) }, .arraySize = 0 };
+        .v = { .s = time.data() }, .arraySize = 0 };
     HiSysEventParam faultType = { .name = "FAULT_TYPE", .t = HISYSEVENT_STRING,
-        .v = { .s = const_cast<char*>(faultInfo.faultType.c_str()) }, .arraySize = 0 };
+        .v = { .s = faultInfo.faultType.data() }, .arraySize = 0 };
     HiSysEventParam bundleName = { .name = "BUNDLE_NAME", .t = HISYSEVENT_STRING,
-        .v = { .s = const_cast<char*>(faultInfo.bundleName.c_str()) }, .arraySize = 0 };
+        .v = { .s = faultInfo.bundleName.data() }, .arraySize = 0 };
     HiSysEventParam moduleName = { .name = "MODULE_NAME", .t = HISYSEVENT_STRING,
-        .v = { .s = const_cast<char*>(faultInfo.moduleName.c_str()) }, .arraySize = 0 };
+        .v = { .s = faultInfo.moduleName.data() }, .arraySize = 0 };
     HiSysEventParam storeName = { .name = "STORE_NAME", .t = HISYSEVENT_STRING,
-        .v = { .s = const_cast<char*>(faultInfo.storeName.c_str()) }, .arraySize = 0 };
+        .v = { .s = faultInfo.storeName.data() }, .arraySize = 0 };
     HiSysEventParam businessType = { .name = "BUSINESS_TYPE", .t = HISYSEVENT_STRING,
-        .v = { .s = const_cast<char*>(faultInfo.businessType.c_str()) }, .arraySize = 0 };
+        .v = { .s = faultInfo.businessType.data() }, .arraySize = 0 };
     HiSysEventParam errorCode = { .name = "ERROR_CODE", .t = HISYSEVENT_INT32,
         .v = { .i32 = faultInfo.errorCode }, .arraySize = 0 };
     HiSysEventParam appendix = { .name = "APPENDIX", .t = HISYSEVENT_STRING,
-        .v = { .s = const_cast<char*>(faultInfo.appendix.c_str()) }, .arraySize = 0 };
+        .v = { .s = faultInfo.appendix.data() }, .arraySize = 0 };
     HiSysEventParam params[] = { faultTime, faultType, bundleName, moduleName,
         storeName, businessType, errorCode, appendix };
     int res = OH_HiSysEvent_Write(DOMAIN, EVENT_NAME, HISYSEVENT_FAULT, params, PARAMS_SIZE);
@@ -94,4 +94,4 @@ std::pair<std::string, int> HiViewFaultAdapter::GetCallingName(uint32_t callingT
 }
 
 } // namespace DataShare
-} // namespace OHOS
+} // namespace OHOS

@@ -55,9 +55,9 @@ public:
 
 class ConfigFactory {
 public:
-    API_EXPORT static ConfigFactory &GetInstance();
-    API_EXPORT int32_t Initialize();
-    API_EXPORT DataShareConfig *GetDataShareConfig();
+    static ConfigFactory &GetInstance();
+    int32_t Initialize();
+    DataShareConfig *GetDataShareConfig();
 private:
     static constexpr const char *CONF_PATH = "/system/etc/distributeddata/conf";
     ConfigFactory();
