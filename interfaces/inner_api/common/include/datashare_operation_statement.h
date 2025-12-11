@@ -43,7 +43,7 @@ public:
     explicit BackReference(std::string col = "", int32_t index = INVALID_INDEX)
         : column_(std::move(col)), fromIndex_(index) {};
 
-    bool IsValid()
+    bool IsValid() const
     {
         return fromIndex_ != INVALID_INDEX && !column_.empty();
     }
@@ -80,7 +80,7 @@ struct OperationStatement {
     DataShareValuesBucket valuesBucket;
     BackReference backReference;
 
-    bool HasBackReference()
+    bool HasBackReference() const
     {
         return backReference.IsValid();
     }
