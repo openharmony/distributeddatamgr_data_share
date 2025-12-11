@@ -130,7 +130,7 @@ sptr<DataShareServiceProxy> DataShareManagerImpl::GetDataShareServiceProxy()
         LOG_ERROR("RegisterClientDeathObserver failed");
     }
 
-    return iface_cast<DataShareServiceProxy>(remote);
+    return sptr<DataShareServiceProxy>(new (std::nothrow) DataShareServiceProxy(remote));
 }
 
 int32_t DataShareManagerImpl::RegisterClientDeathObserver()
