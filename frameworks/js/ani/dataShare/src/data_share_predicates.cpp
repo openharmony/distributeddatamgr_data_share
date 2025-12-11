@@ -385,21 +385,15 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         std::cerr << "Unsupported ANI_VERSION_1" << std::endl;
         return ANI_ERROR;
     }
-    ani_namespace ns;
-    if (env->FindNamespace("L@ohos/data/dataSharePredicates/dataSharePredicates;", &ns) != ANI_OK) {
-        LOG_ERROR("Namespace not found");
-        return ANI_ERROR;
-    };
 
     ani_class cls;
-    static const char *className = "LDataSharePredicates;";
-    if (env->Namespace_FindClass(ns, className, &cls) != ANI_OK) {
+    static const char *className = "@ohos.data.dataSharePredicates.dataSharePredicates.DataSharePredicates";
+    if (env->FindClass(className, &cls) != ANI_OK) {
         LOG_ERROR("Class not found");
         return ANI_ERROR;
     }
 
     std::array methods = {
-        ani_native_function {"create", nullptr, reinterpret_cast<void *>(Create) },
         ani_native_function {"equalTo", nullptr, reinterpret_cast<void *>(EqualTo)},
         ani_native_function {"notEqualTo", nullptr, reinterpret_cast<void *>(NotEqualTo)},
         ani_native_function {"orderByDesc", nullptr, reinterpret_cast<void *>(OrderByDesc)},
@@ -424,8 +418,16 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_ERROR;
     };
 
-    static const char *cleanerName = "LCleaner;";
-    auto cleanerCls = AniTypeFinder(env).FindClass(ns, cleanerName);
+    std::array staticMethods = {
+        ani_native_function {"create", nullptr, reinterpret_cast<void *>(Create) },
+    };
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        LOG_ERROR("Cannot bind static native methods to %{public}s", className);
+        return ANI_ERROR;
+    };
+
+    static const char *cleanerName = "@ohos.data.dataSharePredicates.dataSharePredicates.Cleaner";
+    auto cleanerCls = AniTypeFinder(env).FindClass(cleanerName);
     DataSharePredicatesCleaner(env).Bind(cleanerCls.value());
 
     *result = ANI_VERSION_1;

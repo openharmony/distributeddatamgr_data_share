@@ -99,7 +99,7 @@ ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const std::variant<Ty
 ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const DataShareValuesBucket &valueBucket)
 {
     ani_object valuesBucketList = nullptr;
-    static const char *className = "Lescompat/Record;";
+    static const char *className = "Lstd/core/Record;";
 
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
@@ -141,8 +141,8 @@ template<typename T>
 ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const std::vector<T> &values)
 {
     ani_class arrayCls;
-    if (ANI_OK != env->FindClass("Lescompat/Array;", &arrayCls)) {
-        LOG_ERROR("FindClass Lescompat/Array; Failed");
+    if (ANI_OK != env->FindClass("Lstd/core/Array;", &arrayCls)) {
+        LOG_ERROR("FindClass Lstd/core/Array; Failed");
         return nullptr;
     }
 
@@ -174,16 +174,9 @@ ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const std::vector<T> 
 
 ani_enum_item ANIInnerObserver::GetEnumItem(ani_env *env, int32_t type)
 {
-    ani_namespace ns;
-    static const char *namespaceName = "L@ohos/data/dataShare/dataShare;";
-    if (ANI_OK != env->FindNamespace(namespaceName, &ns)) {
-        LOG_ERROR("Not found '%{public}s'", namespaceName);
-        return nullptr;
-    }
-
     ani_enum aniEnum{};
-    const char *enumName = "LChangeType;";
-    if (ANI_OK != env->Namespace_FindEnum(ns, enumName, &aniEnum)) {
+    const char *enumName = "@ohos.data.dataShare.dataShare.ChangeType";
+    if (ANI_OK != env->FindEnum(enumName, &aniEnum)) {
         LOG_ERROR("Not found '%{public}s'", enumName);
         return nullptr;
     }
@@ -212,16 +205,10 @@ ani_object ANIInnerObserver::GetNewChangeInfo(ani_env *env)
         LOG_ERROR("env is nullptr %{public}s", __func__);
         return nullptr;
     }
-    ani_namespace ns;
-    const char *spaceName = "L@ohos/data/dataShare/dataShare;";
-    if (ANI_OK != env->FindNamespace(spaceName, &ns)) {
-        LOG_ERROR("Not found space name '%{public}s'", spaceName);
-        return nullptr;
-    }
 
     ani_class cls;
-    const char *className = "LChangeInfoInner;";
-    if (ANI_OK != env->Namespace_FindClass(ns, className, &cls)) {
+    const char *className = "@ohos.data.dataShare.dataShare.ChangeInfoInner";
+    if (ANI_OK != env->FindClass(className, &cls)) {
         LOG_ERROR("Not found class name '%{public}s'", className);
         return nullptr;
     }

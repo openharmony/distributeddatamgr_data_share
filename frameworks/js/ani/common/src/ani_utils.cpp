@@ -41,7 +41,8 @@ ani_object AniObjectUtils::Create(ani_env *env, const char* nsName, const char* 
     }
 
     ani_class cls;
-    if (ANI_OK != env->Namespace_FindClass(ns, clsName, &cls)) {
+    const std::string fullClsName = std::string(nsName).append(".").append(clsName);
+    if (ANI_OK != env->FindClass(fullClsName.c_str(), &cls)) {
         LOG_ERROR("[ANI] Not found class %{public}s", clsName);
         return nullobj;
     }
@@ -124,7 +125,7 @@ ani_object AniObjectUtils::Create(ani_env *env, ani_class cls, ...)
 
 ani_object AniObjectUtils::From(ani_env *env, bool value)
 {
-    return Create(env, "Lstd/core/Boolean;", static_cast<ani_boolean>(value));
+    return Create(env, "std.core.Boolean", static_cast<ani_boolean>(value));
 }
 
 std::string AniStringUtils::ToStd(ani_env *env, ani_string ani_str)
