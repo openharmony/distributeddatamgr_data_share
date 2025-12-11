@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+/* It is made public only for internal interface use */
+
 #ifndef DATASHARE_RESULT_SET_PROXY
 #define DATASHARE_RESULT_SET_PROXY
 

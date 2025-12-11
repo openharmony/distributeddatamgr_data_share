@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+/* It is made public only for internal interface use */
+
 #ifndef DATASHARE_PREDICATES_PROXY_H
 #define DATASHARE_PREDICATES_PROXY_H
 

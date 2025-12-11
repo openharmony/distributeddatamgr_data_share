@@ -16,6 +16,7 @@
     *DataShareJSUtils*;
     *DataSharePredicates*;
     *DataShareValuesBucket*;
+    *DataShareResultSetProxy*;
   local:
     *;
 };

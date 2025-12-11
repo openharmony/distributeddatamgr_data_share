@@ -184,6 +184,16 @@
                         ],
                         "header_base": "//foundation/distributeddatamgr/data_share/frameworks/native/common/include"
                     }
+                },
+                {
+                    "name": "//foundation/distributeddatamgr/data_share/frameworks/js/napi/dataShare:datashare_jscommon",
+                    "header": {
+                        "header_files": [
+                            "datashare_predicates_proxy.h",
+                            "datashare_result_set_proxy.h"
+                        ],
+                        "header_base": "//foundation/distributeddatamgr/data_share/frameworks/js/napi/common/include"
+                    }
                 }
             ],
             "test": [
