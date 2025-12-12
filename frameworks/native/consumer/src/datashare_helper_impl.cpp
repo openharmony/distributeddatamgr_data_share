@@ -39,6 +39,7 @@ DataShareHelperImpl::DataShareHelperImpl(const Uri &uri, const sptr<IRemoteObjec
     isSystem_ = isSystem;
     generalCtl_ = std::make_shared<GeneralControllerProviderImpl>(connection, uri, token);
     extSpCtl_ = std::make_shared<ExtSpecialController>(connection, uri, token);
+    type_ = NON_SILENT;
 }
 
 // silent access
@@ -825,6 +826,35 @@ int TryUnregisterObserverExtInner(const Uri &uri, std::shared_ptr<DataShareObser
     }
     ObserverImpl::DeleteObserver(uri, dataObserver);
     return ret;
+}
+
+/**
+* This interface is used to set the URI of a non-silent connection under a silent connection.
+*
+* @param extUri, Indicates extensionUri.
+*
+* @return Returns the result. Error codes are listed in DataShare datashare_errno.h
+*/
+int32_t DataShareHelperImpl::SetDataShareHelperExtUri(const std::string &extUri)
+{
+    auto generalCtl = GetGeneralCtl();
+    if (generalCtl == nullptr) {
+        LOG_ERROR("generalCtl_ is nullptr");
+        return DATA_SHARE_ERROR;
+    }
+    return generalCtl->SetExtUri(extUri);
+}
+
+/**
+* This interface is used to set the URI of a non-silent connection under a silent connection.
+*
+* @param extUri, Indicates extensionUri.
+*
+* @return Returns the current datasharehelper type.
+*/
+DataShareType DataShareHelperImpl::GetDataShareHelperType()
+{
+    return type_;
 }
 } // namespace DataShare
 } // namespace OHOS

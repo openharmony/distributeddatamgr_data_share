@@ -175,6 +175,24 @@ public:
     int TryUnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
         bool isSystem = false) override;
 
+    /**
+    * This interface is used to set the URI of a non-silent connection under a silent connection.
+    *
+    * @param extUri, Indicates extensionUri.
+    *
+    * @return Returns the result. Error codes are listed in DataShare datashare_errno.h
+    */
+    int32_t SetDataShareHelperExtUri(const std::string &extUri) override;
+
+    /**
+    * This interface is used to set the URI of a non-silent connection under a silent connection.
+    *
+    * @param extUri, Indicates extensionUri.
+    *
+    * @return Returns the current datasharehelper type.
+    */
+    DataShareType GetDataShareHelperType() override;
+
 private:
     std::shared_mutex mutex_;
     std::shared_ptr<ExtSpecialController> extSpCtl_ = nullptr;
@@ -182,6 +200,7 @@ private:
     std::shared_ptr<PersistentDataController> persistentDataCtl_ = nullptr;
     std::shared_ptr<PublishedDataController> publishedDataCtl_ = nullptr;
     bool isSystem_;
+    DataShareType type_ = SILENT;
 };
 
 /**

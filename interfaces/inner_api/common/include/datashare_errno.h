@@ -275,6 +275,10 @@ constexpr int E_NULL_OBSERVER_CLIENT = (E_BASE + 84);
 */
 constexpr int E_UNIMPLEMENT = (E_BASE + 85);
 
+/**
+* @brief The error code for DataShare Silent/Non-Silent Type Error.
+*/
+constexpr int E_DATASHARE_TYPE = (E_BASE + 86);
 } // namespace DataShare
 } // namespace OHOS
 

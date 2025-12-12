@@ -31,6 +31,7 @@
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
 #include "datashare_template.h"
+#include "datashare_type.h"
 #include "datashare_values_bucket.h"
 #include "uri.h"
 
@@ -568,6 +569,24 @@ public:
      */
     virtual int TryUnregisterObserverExt(const Uri &uri, std::shared_ptr<DataShareObserver> dataObserver,
         bool isSystem = false) { return E_UNIMPLEMENT; };
+    
+    /**
+     * This interface is used to set the URI of a non-silent connection under a silent connection.
+     *
+     * @param extUri, Indicates extensionUri. The URI should start with 'datashare:///' and not contain any parameters.
+     *
+     * @return Returns the result. Error codes are listed in DataShare datashare_errno.h
+     */
+    virtual int32_t SetDataShareHelperExtUri(const std::string &extUri) { return E_DATASHARE_TYPE; };
+
+    /**
+     * This interface is used to set the URI of a non-silent connection under a silent connection.
+     *
+     * @param extUri, Indicates extensionUri.
+     *
+     * @return Returns the current datasharehelper type.
+     */
+    virtual DataShareType GetDataShareHelperType() { return SILENT; };
 private:
     static std::shared_ptr<DataShareHelper> CreateServiceHelper(const std::string &extUri = "",
         const std::string &bundleName = "", bool isSystem = false);
