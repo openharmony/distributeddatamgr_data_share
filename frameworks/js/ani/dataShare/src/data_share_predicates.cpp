@@ -282,12 +282,12 @@ static ani_object GreaterThan([[maybe_unused]] ani_env *env, [[maybe_unused]] an
     }
 
     ani_string strValue = nullptr;
-    if (unionAccessor.IsInstanceOf("Lstd/core/String;")) {
+    if (unionAccessor.IsInstanceOf("std.core.String")) {
         dataSharePredicates->GreaterThan(fieldStr, AniStringUtils::ToStd(env, strValue));
     }
 
     ani_boolean boolValue = 0;
-    if (unionAccessor.IsInstanceOf("Lstd/core/Boolean;")) {
+    if (unionAccessor.IsInstanceOf("std.core.Boolean")) {
         if (ANI_OK != env->Object_CallMethodByName_Boolean(value, "unboxed", nullptr, &boolValue)) {
             dataSharePredicates->GreaterThan(fieldStr, static_cast<bool>(boolValue));
         }
@@ -307,7 +307,7 @@ static ani_object GroupBy([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_ob
     std::vector<std::string> strings;
     for (int i = 0; i < int(length); i++) {
         ani_ref stringEntryRef;
-        if (ANI_OK != env->Object_CallMethodByName_Ref(arrayObj, "$_get", "I:Lstd/core/Object;", &stringEntryRef,
+        if (ANI_OK != env->Object_CallMethodByName_Ref(arrayObj, "$_get", "i:Y;", &stringEntryRef,
             (ani_int)i)) {
             return obj;
         }

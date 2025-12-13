@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AbilityRuntime;
-constexpr const char* CONTEXT_CLASS_NAME = "Lapplication/ExtensionContext/ExtensionContext;";
+constexpr const char* CONTEXT_CLASS_NAME = "application.ExtensionContext.ExtensionContext";
 namespace {
 class StsDataShareExtAbilityContext final {
 public:
@@ -47,7 +47,7 @@ bool GetNativeContext(ani_env *env, ani_status &status, ani_class &cls, ani_obje
         return false;
     }
     
-    if ((status = env->Class_FindMethod(cls, "<ctor>", ":V", &method)) != ANI_OK) {
+    if ((status = env->Class_FindMethod(cls, "<ctor>", ":", &method)) != ANI_OK) {
         LOG_ERROR("Failed to find constructor of %{public}s, status: %{public}d", CONTEXT_CLASS_NAME, status);
         return false;
     }

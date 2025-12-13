@@ -99,7 +99,7 @@ ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const std::variant<Ty
 ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const DataShareValuesBucket &valueBucket)
 {
     ani_object valuesBucketList = nullptr;
-    static const char *className = "Lstd/core/Record;";
+    static const char *className = "std.core.Record";
 
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
@@ -108,7 +108,7 @@ ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const DataShareValues
     }
 
     ani_method aniCtor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &aniCtor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &aniCtor)) {
         LOG_ERROR("Class_GetMethod <ctor> Failed '%{public}s'.", className);
         return valuesBucketList;
     }
@@ -141,13 +141,13 @@ template<typename T>
 ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const std::vector<T> &values)
 {
     ani_class arrayCls;
-    if (ANI_OK != env->FindClass("Lstd/core/Array;", &arrayCls)) {
-        LOG_ERROR("FindClass Lstd/core/Array; Failed");
+    if (ANI_OK != env->FindClass("std.core.Array", &arrayCls)) {
+        LOG_ERROR("FindClass std.core.Array Failed");
         return nullptr;
     }
 
     ani_method arrayCtor;
-    if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", "I:V", &arrayCtor)) {
+    if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", "i:", &arrayCtor)) {
         LOG_ERROR("Class_FindMethod <ctor> Failed");
         return nullptr;
     }
@@ -160,7 +160,7 @@ ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const std::vector<T> 
 
     ani_size index = 0;
     for (auto value : values) {
-        if (ANI_OK != env->Object_CallMethodByName_Void(arrayObj, "$_set", "ILstd/core/Object;:V", index,
+        if (ANI_OK != env->Object_CallMethodByName_Void(arrayObj, "$_set", "iY:", index,
             Convert2TSValue(env, value))) {
             LOG_ERROR("Object_CallMethodByName_Void  $_set Faild ");
             break;
