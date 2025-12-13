@@ -95,6 +95,40 @@ rust::Vec<uint8_t> convert_cpp_vector_to_rust_vec(const std::vector<uint8_t>& cp
 }
 
 // @ohos.data.DataShareResultSet.d.ets
+rust::Vec<rust::string> GetColumnNames(int64_t resultSetPtr)
+{
+    std::vector<std::string> columnNames;
+    rust::Vec<rust::String> rust_vec;
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSet == nullptr || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return rust_vec;
+    }
+    int errCode = resultSet->resultSetPtr_->GetAllColumnNames(columnNames);
+    if (errCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errCode);
+    }
+    for (const auto &column_names_data : columnNames) {
+        rust_vec.push_back(rust::String(column_names_data));
+    }
+    return rust_vec;
+}
+
+int32_t GetColumnCount(int64_t resultSetPtr)
+{
+    int32_t count = -1;
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSet == nullptr || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return count;
+    }
+    int errCode = resultSet->resultSetPtr_->GetColumnCount(count);
+    if (errCode != E_OK) {
+        LOG_ERROR("failed code:%{public}d", errCode);
+    }
+    return count;
+}
+
 int32_t GetRowCount(int64_t resultSetPtr)
 {
     int32_t count = -1;
@@ -105,6 +139,18 @@ int32_t GetRowCount(int64_t resultSetPtr)
     }
     resultSet->resultSetPtr_->GetRowCount(count);
     return count;
+}
+
+bool GetIsClosed(int64_t resultSetPtr)
+{
+    bool result = false;
+    auto resultSet = reinterpret_cast<ResultSetHolder*>(resultSetPtr);
+    if (resultSet == nullptr || resultSet->resultSetPtr_ == nullptr) {
+        LOG_ERROR("resultSet is null.");
+        return result;
+    }
+    result = resultSet->resultSetPtr_->IsClosed();
+    return result;
 }
 
 bool GoToFirstRow(int64_t resultSetPtr)
@@ -849,7 +895,7 @@ void DataSharePredicatesInKeys(int64_t predicatesPtr, rust::Vec<rust::String> ke
 
 // @ohos.data.dataShare.d.ets
 I64ResultWrap DataShareNativeCreate(int64_t context, rust::String strUri,
-    bool optionIsUndefined, bool isProxy)
+    bool optionIsUndefined, bool isProxy, int waitTime)
 {
     if (context == 0) {
         LOG_ERROR("context is nullptr, create dataShareHelper failed.");
@@ -860,14 +906,15 @@ I64ResultWrap DataShareNativeCreate(int64_t context, rust::String strUri,
         reinterpret_cast<std::weak_ptr<AbilityRuntime::Context>*>(context)->lock();
     std::shared_ptr<DataShareHelper> dataShareHelper;
     if (optionIsUndefined) {
-        dataShareHelper = DataShareHelper::Creator(weakContext->GetToken(), stdStrUri);
+        dataShareHelper = DataShareHelper::Creator(weakContext->GetToken(), stdStrUri, "", waitTime, true);
     } else {
         CreateOptions options = {
             isProxy,
             weakContext->GetToken(),
             Uri(stdStrUri).GetScheme() == "datashareproxy",
+            waitTime
         };
-        dataShareHelper = DataShareHelper::Creator(stdStrUri, options);
+        dataShareHelper = DataShareHelper::Creator(stdStrUri, options, "", waitTime, true);
     }
     if (dataShareHelper == nullptr) {
         LOG_ERROR("create dataShareHelper failed.");
@@ -1246,8 +1293,8 @@ void DataShareNativeBatchUpdate(int64_t dataShareHelperPtr, const DataShareBatch
     std::vector<BatchUpdateResult> results;
     auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
     auto ret = helperHolder->datashareHelper_->BatchUpdate(operations, results);
-    if (ret != E_OK) {
-        data_share_batch_update_param_out_error_code(param_out, ret);
+    if (ret < 0) {
+        data_share_batch_update_param_out_error_code(param_out, EXCEPTION_INNER);
         LOG_ERROR("BatchUpdate failed, ret: %{public}d", ret);
         return;
     }
@@ -1355,7 +1402,7 @@ int DataShareNativeNotifyChangeInfo(int64_t dataShareHelperPtr, int32_t changeTy
 {
     std::string stdStrUri = std::string(strUri);
     if (stdStrUri.empty() || buckets.empty()) {
-        LOG_ERROR("stdStrUrt or buckets is empty!");
+        LOG_ERROR("stdStrUri or buckets is empty!");
         return EXCEPTION_PARAMETER_CHECK;
     }
     DataShareObserver::ChangeInfo info;
@@ -1839,6 +1886,7 @@ void DataShareNativeExtensionCallbackBatchUpdate(double errorCode, rust::String 
     businessError.SetCode((int)errorCode);
     businessError.SetMessage(std::string(errorMsg));
     jsResult->businessError_= businessError;
+    jsResult->callbackResultNumber_ = E_OK;
     jsResult->isRecvReply_ = true;
 }
 } // namespace DataShareAni

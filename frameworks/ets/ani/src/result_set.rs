@@ -43,9 +43,30 @@ impl AniDataType {
 }
 
 #[ani_rs::native]
+pub fn get_column_names(this: DataShareResultSet) -> Result<Vec<String>, BusinessError> {
+    let result_set_ptr = this.native_ptr;
+    let res = wrapper::ffi::GetColumnNames(result_set_ptr);
+    Ok(res)
+}
+
+#[ani_rs::native]
+pub fn get_column_count(this: DataShareResultSet) -> Result<i32, BusinessError> {
+    let result_set_ptr = this.native_ptr;
+    let res = wrapper::ffi::GetColumnCount(result_set_ptr);
+    Ok(res)
+}
+
+#[ani_rs::native]
 pub fn get_row_count(this: DataShareResultSet) -> Result<i32, BusinessError> {
     let result_set_ptr = this.native_ptr;
     let res = wrapper::ffi::GetRowCount(result_set_ptr);
+    Ok(res)
+}
+
+#[ani_rs::native]
+pub fn get_is_closed(this: DataShareResultSet) -> Result<bool, BusinessError> {
+    let result_set_ptr = this.native_ptr;
+    let res = wrapper::ffi::GetIsClosed(result_set_ptr);
     Ok(res)
 }
 

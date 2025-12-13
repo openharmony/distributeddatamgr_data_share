@@ -425,7 +425,10 @@ pub mod ffi {
     unsafe extern "C++" {
         include!("datashare_ani.h");
 
+        fn GetColumnNames(resultSetPtr: i64) -> Vec<String>;
+        fn GetColumnCount(resultSetPtr: i64) -> i32;
         fn GetRowCount(resultSetPtr: i64) -> i32;
+        fn GetIsClosed(resultSetPtr: i64) -> bool;
         fn GoToFirstRow(resultSetPtr: i64) -> bool;
         fn GoToLastRow(resultSetPtr: i64) -> bool;
         fn GoToNextRow(resultSetPtr: i64) -> bool;
@@ -497,6 +500,7 @@ pub mod ffi {
             strUri: String,
             optionIsUndefined: bool,
             isProxy: bool,
+            waitTime: i32,
         ) -> I64ResultWrap;
 
         fn DataShareNativeClean(dataShareHelperPtr: i64);

@@ -22,7 +22,10 @@
 }
 
 export default interface DataShareResultSet {
+  columnNames: Array<string>;
+  columnCount: int;
   rowCount: int;
+  isClosed: boolean;
   goToFirstRow(): boolean;
   goToLastRow(): boolean;
   goToNextRow(): boolean;
@@ -52,7 +55,13 @@ class DataShareResultSetInner implements DataShareResultSet {
       this.nativePtr = nativePtr;
   }
 
+  native getColumnNames(): Array<string>;
+
+  native getColumnCount(): int;
+
   native getRowCount(): int;
+
+  native getIsClosed(): boolean;
 
   get rowCount(): int {
     return this.getRowCount();
@@ -60,6 +69,30 @@ class DataShareResultSetInner implements DataShareResultSet {
 
   set rowCount(value: int) {
     this.rowCount = value;
+  }
+
+  get columnNames(): Array<string> {
+    return this.getColumnNames();
+  }
+
+  set columnNames(value: Array<string>) {
+    this.columnNames = value;
+  }
+
+  get columnCount(): int {
+    return this.getColumnCount();
+  }
+
+  set columnCount(value: int) {
+    this.columnCount = value;
+  }
+
+  get isClosed(): boolean{
+    return this.getIsClosed();
+  }
+
+  set isClosed(value: boolean) {
+    this.isClosed = value;
   }
 
   native goToFirstRow(): boolean;
