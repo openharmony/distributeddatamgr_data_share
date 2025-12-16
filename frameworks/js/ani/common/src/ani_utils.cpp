@@ -185,25 +185,25 @@ bool UnionAccessor::IsInstanceOf(const std::string& clsName, ani_object obj)
 template<>
 bool UnionAccessor::IsInstanceOfType<bool>()
 {
-    return IsInstanceOf("Lstd/core/Boolean;");
+    return IsInstanceOf("std.core.Boolean");
 }
 
 template<>
 bool UnionAccessor::IsInstanceOfType<int>()
 {
-    return IsInstanceOf("Lstd/core/Int;");
+    return IsInstanceOf("std.core.Int");
 }
 
 template<>
 bool UnionAccessor::IsInstanceOfType<double>()
 {
-    return IsInstanceOf("Lstd/core/Double;");
+    return IsInstanceOf("std.core.Double");
 }
 
 template<>
 bool UnionAccessor::IsInstanceOfType<std::string>()
 {
-    return IsInstanceOf("Lstd/core/String;");
+    return IsInstanceOf("std.core.String");
 }
 
 template<>
@@ -283,13 +283,13 @@ bool UnionAccessor::TryConvertArray<bool>(std::vector<bool> &value)
 
     for (int i = 0; i < int(length); i++) {
         ani_ref ref;
-        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &ref, (ani_int)i)) {
+        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "i:C{std.core.Object}", &ref, (ani_int)i)) {
             LOG_ERROR("Object_GetPropertyByName_Ref failed");
             return false;
         }
 
-        if (!IsInstanceOf("Lstd/core/Boolean;", static_cast<ani_object>(ref))) {
-            LOG_ERROR("Not found 'Lstd/core/Boolean;'");
+        if (!IsInstanceOf("std.core.Boolean", static_cast<ani_object>(ref))) {
+            LOG_ERROR("Not found 'std.core.Boolean'");
             return false;
         }
 
@@ -316,13 +316,13 @@ bool UnionAccessor::TryConvertArray<int>(std::vector<int> &value)
 
     for (int i = 0; i < int(length); i++) {
         ani_ref ref;
-        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &ref, (ani_int)i)) {
+        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "i:C{std.core.Object}", &ref, (ani_int)i)) {
             LOG_ERROR("Object_GetPropertyByName_Ref failed");
             return false;
         }
 
-        if (!IsInstanceOf("Lstd/core/Int;", static_cast<ani_object>(ref))) {
-            LOG_ERROR("Not found 'Lstd/core/Double;'");
+        if (!IsInstanceOf("std.core.Int", static_cast<ani_object>(ref))) {
+            LOG_ERROR("Not found 'std.core.Double'");
             return false;
         }
 
@@ -349,13 +349,13 @@ bool UnionAccessor::TryConvertArray<double>(std::vector<double> &value)
 
     for (int i = 0; i < int(length); i++) {
         ani_ref ref;
-        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &ref, (ani_int)i)) {
+        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "i:C{std.core.Object}", &ref, (ani_int)i)) {
             LOG_ERROR("Object_GetPropertyByName_Ref failed");
             return false;
         }
 
-        if (!IsInstanceOf("Lstd/core/Double;", static_cast<ani_object>(ref))) {
-            LOG_ERROR("Not found 'Lstd/core/Double;'");
+        if (!IsInstanceOf("std.core.Double", static_cast<ani_object>(ref))) {
+            LOG_ERROR("Not found 'std.core.Double'");
             return false;
         }
 
@@ -407,13 +407,13 @@ bool UnionAccessor::TryConvertArray<std::string>(std::vector<std::string> &value
 
     for (int i = 0; i < int(length); i++) {
         ani_ref ref;
-        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "I:Lstd/core/Object;", &ref, (ani_int)i)) {
+        if (ANI_OK != env_->Object_CallMethodByName_Ref(obj_, "$_get", "i:C{std.core.Object}", &ref, (ani_int)i)) {
             LOG_ERROR("Object_GetPropertyByName_Double length failed");
             return false;
         }
 
-        if (!IsInstanceOf("Lstd/core/String;", static_cast<ani_object>(ref))) {
-            LOG_ERROR("Not found 'Lstd/core/String;'");
+        if (!IsInstanceOf("std.core.String", static_cast<ani_object>(ref))) {
+            LOG_ERROR("Not found 'std.core.String'");
             return false;
         }
 
@@ -505,14 +505,14 @@ ani_object DoubleToObject(ani_env *env, double value)
 {
     ani_object aniObject = nullptr;
     ani_double doubleValue = static_cast<ani_double>(value);
-    const char *className = "Lstd/core/Double;";
+    const char *className = "std.core.Double";
     ani_class aniClass;
     if (ANI_OK != env->FindClass(className, &aniClass)) {
         LOG_ERROR("Not found '%{public}s'.", className);
         return aniObject;
     }
     ani_method personInfoCtor;
-    if (ANI_OK != env->Class_FindMethod(aniClass, "<ctor>", "D:V", &personInfoCtor)) {
+    if (ANI_OK != env->Class_FindMethod(aniClass, "<ctor>", "d:", &personInfoCtor)) {
         LOG_ERROR("Class_GetMethod Failed '%{public}s <ctor>.'", className);
         return aniObject;
     }
@@ -528,7 +528,7 @@ ani_object BoolToObject(ani_env *env, bool value)
 {
     ani_object aniObject = nullptr;
     ani_boolean boolValue = static_cast<bool>(value);
-    const char *className = "Lstd/core/Boolean;";
+    const char *className = "std.core.Boolean";
     ani_class aniClass;
     if (ANI_OK != env->FindClass(className, &aniClass)) {
         LOG_ERROR("Not found '%{public}s.'", className);
@@ -536,7 +536,7 @@ ani_object BoolToObject(ani_env *env, bool value)
     }
 
     ani_method personInfoCtor;
-    if (ANI_OK != env->Class_FindMethod(aniClass, "<ctor>", "Z:V", &personInfoCtor)) {
+    if (ANI_OK != env->Class_FindMethod(aniClass, "<ctor>", "z:", &personInfoCtor)) {
         LOG_ERROR("Class_GetMethod Failed '%{public}s' <ctor>.", className);
         return aniObject;
     }
@@ -561,14 +561,14 @@ ani_object Uint8ArrayToObject(ani_env *env, const std::vector<uint8_t> &values)
         LOG_ERROR("values is empty");
         return aniObject;
     }
-    ani_status retCode = env->FindClass("Lescompat/Uint8Array;", &arrayClass);
+    ani_status retCode = env->FindClass("escompat.Uint8Array", &arrayClass);
     if (retCode != ANI_OK) {
         LOG_ERROR("Failed: env->FindClass()");
         return aniObject;
     }
 
     ani_method arrayCtor;
-    retCode = env->Class_FindMethod(arrayClass, "<ctor>", "I:V", &arrayCtor);
+    retCode = env->Class_FindMethod(arrayClass, "<ctor>", "i:", &arrayCtor);
     if (retCode != ANI_OK) {
         LOG_ERROR("Failed: env->Class_FindMethod()");
         return aniObject;

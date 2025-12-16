@@ -307,7 +307,7 @@ static ani_object GroupBy([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_ob
     std::vector<std::string> strings;
     for (int i = 0; i < int(length); i++) {
         ani_ref stringEntryRef;
-        if (ANI_OK != env->Object_CallMethodByName_Ref(arrayObj, "$_get", "i:Y;", &stringEntryRef,
+        if (ANI_OK != env->Object_CallMethodByName_Ref(arrayObj, "$_get", "i:Y", &stringEntryRef,
             (ani_int)i)) {
             return obj;
         }

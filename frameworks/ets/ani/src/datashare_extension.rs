@@ -135,7 +135,7 @@ fn call_arkts_update_inner(
     let do_update_method_name = unsafe { CStr::from_bytes_with_nul_unchecked(b"doUpdate\0") };
     let do_update_method = env.find_method(&helper_class, do_update_method_name)?;
 
-    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"J:V\0") };
+    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"l:\0") };
     let predicates_class = env.find_class(DATA_SHARE_PREDICATES)?;
     let arg1 = env.serialize(&uri)?;
     let arg2 = env.new_object_with_signature(&predicates_class, ctor_signature, (predicates_ptr,))?;
@@ -189,7 +189,7 @@ fn call_arkts_delete_inner(
     let do_delete_method = env.find_method(&helper_class, do_delete_method_name)?;
 
     let arg1 = env.serialize(&uri)?;
-    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"J:V\0") };
+    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"l:\0") };
     let predicates_class = env.find_class(DATA_SHARE_PREDICATES)?;
     let arg2 = env.new_object_with_signature(&predicates_class, ctor_signature, (predicates_ptr,))?;
 
@@ -241,7 +241,7 @@ fn call_arkts_query_inner(
     let do_query_method = env.find_method(&helper_class, do_query_method_name)?;
 
     let arg1 = env.serialize(&uri)?;
-    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"J:V\0") };
+    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"l:\0") };
     let predicates_class = env.find_class(DATA_SHARE_PREDICATES)?;
     let arg2 = env.new_object_with_signature(&predicates_class, ctor_signature, (predicates_ptr,))?;
     let arg3 = env.serialize(&columns)?;
@@ -469,11 +469,11 @@ pub fn native_extension_callback_object(
     native_ptr: i64,
 ) -> Result<(), BusinessError> {
     let rdb_cls_name = unsafe { 
-        CStr::from_bytes_with_nul_unchecked(b"L@ohos/data/relationalStore/relationalStore/_taihe_ResultSet_inner;\0")
+        CStr::from_bytes_with_nul_unchecked(b"@ohos.data.relationalStore.relationalStore._taihe_ResultSet_inner\0")
     };
     let rdb_cls = env.find_class(rdb_cls_name).ok();
     let kv_cls_name = unsafe {
-        CStr::from_bytes_with_nul_unchecked(b"L@ohos/data/distributedKVStore/distributedKVStore/_taihe_KVStoreResultSet_inner;\0")
+        CStr::from_bytes_with_nul_unchecked(b"@ohos.data.distributedKVStore.distributedKVStore._taihe_KVStoreResultSet_inner\0")
     };
     let kv_cls = env.find_class(kv_cls_name).ok();
 
