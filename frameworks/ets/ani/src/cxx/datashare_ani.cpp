@@ -308,7 +308,11 @@ void Close(int64_t resultSetPtr)
         LOG_ERROR("resultSet is null.");
         return;
     }
-    resultSet->resultSetPtr_->Close();
+    int errCode = resultSet->resultSetPtr_->Close();
+    if (errCode != E_OK) {
+        LOG_ERROR("failed code: %{public}d", errCode);
+    }
+    resultSet->resultSetPtr_ = nullptr;
 }
 
 int GetColumnIndex(int64_t resultSetPtr, rust::String columnName)
@@ -633,11 +637,6 @@ void DataSharePredicatesGreaterThan(int64_t predicatesPtr, rust::String field, c
             (void)(*predicates->GreaterThan(std::string(field), data));
             break;
         }
-        case EnumType::BooleanType: {
-            bool data = value_type_get_bool(value);
-            (void)(*predicates->GreaterThan(std::string(field), data));
-            break;
-        }
         default: {
             LOG_ERROR("Invalid argument! Wrong argument Type");
             break;
@@ -661,11 +660,6 @@ void DataSharePredicatesGreaterThanOrEqualTo(int64_t predicatesPtr, rust::String
         }
         case EnumType::F64Type: {
             double data = value_type_get_f64(value);
-            (void)(*predicates->GreaterThanOrEqualTo(std::string(field), data));
-            break;
-        }
-        case EnumType::BooleanType: {
-            bool data = value_type_get_bool(value);
             (void)(*predicates->GreaterThanOrEqualTo(std::string(field), data));
             break;
         }
@@ -695,11 +689,6 @@ void DataSharePredicatesLessThanOrEqualTo(int64_t predicatesPtr, rust::String fi
             (void)(*predicates->LessThanOrEqualTo(std::string(field), data));
             break;
         }
-        case EnumType::BooleanType: {
-            bool data = value_type_get_bool(value);
-            (void)(*predicates->LessThanOrEqualTo(std::string(field), data));
-            break;
-        }
         default: {
             LOG_ERROR("Invalid argument! Wrong argument Type");
             break;
@@ -723,11 +712,6 @@ void DataSharePredicatesLessThan(int64_t predicatesPtr, rust::String field, cons
         }
         case EnumType::F64Type: {
             double data = value_type_get_f64(value);
-            (void)(*predicates->LessThan(std::string(field), data));
-            break;
-        }
-        case EnumType::BooleanType: {
-            bool data = value_type_get_bool(value);
             (void)(*predicates->LessThan(std::string(field), data));
             break;
         }
@@ -1089,7 +1073,10 @@ int DataShareNativePublish(int64_t dataShareHelperPtr, rust::Vec<PublishedItem> 
 
     std::vector<OperationResult> results = helperHolder->datashareHelper_->Publish(PublishData, stdBundleName);
     for (const auto &result : results) {
-        publish_sret_push(sret, rust::String(result.key_), result.errCode_); // EXCEPTION_DATA_AREA_NOT_EXIST
+        if (result.errCode_ == E_BUNDLE_NAME_NOT_EXIST) {
+            return EXCEPTION_DATA_AREA_NOT_EXIST;
+        }
+        publish_sret_push(sret, rust::String(result.key_), result.errCode_);
     }
     return E_OK;
 }

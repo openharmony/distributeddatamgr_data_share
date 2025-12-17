@@ -89,7 +89,7 @@ void DataShareUvQueue::JsSyncCall(VoidFunc func, BoolFunc retFunc)
 
 void DataShareUvQueue::StsSyncCall(VoidFunc func, BoolFunc retFunc)
 {
-    auto *taskEntry = new TaskEntry {std::move(func), false, {}, {}, std::atomic<int>(1)};
+    auto *taskEntry = new (std::nothrow)TaskEntry {std::move(func), false, {}, {}, std::atomic<int>(1)};
     if (taskEntry == nullptr) {
         LOG_ERROR("invalid taskEntry.");
         return;
