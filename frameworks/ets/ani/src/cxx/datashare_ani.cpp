@@ -30,6 +30,7 @@
 #include "wrapper.rs.h"
 #include "js_proxy.h"
 #include <map>
+#include "datashare_errno.h"
 #define UNIMPL_RET_CODE 0
 
 namespace OHOS {
@@ -1105,6 +1106,9 @@ int DataShareNativeGetPublishedData(int64_t dataShareHelperPtr, rust::String bun
     std::string stdBundleName = std::string(bundleName);
     int errorCode = 0;
     Data publishData = helperHolder->datashareHelper_->GetPublishedData(stdBundleName, errorCode);
+    if (errorCode == E_BUNDLE_NAME_NOT_EXIST) {
+        return EXCEPTION_DATA_AREA_NOT_EXIST;
+    }
     for (const auto &data : publishData.datas_) {
         DataShare::PublishedDataItem::DataType dataItem = data.GetData();
         if (dataItem.index() == 0) {
@@ -1226,7 +1230,7 @@ std::map<std::string, std::vector<UpdateOperation>> DataShareNativeBatchUpdateGe
 {
     std::map<std::string, std::vector<UpdateOperation>> operations;
     int sum = 0;
-    for (int i = 0; i < vec_key.size(); ++i) {
+    for (size_t i = 0; i < vec_key.size(); ++i) {
         std::vector<UpdateOperation> op;
         for (int j = 0; j < vec_steps[i]; ++j) {
             DataSharePredicates* predicates = reinterpret_cast<DataSharePredicates*>(vec_predicates[sum + j]);
@@ -1873,7 +1877,7 @@ void DataShareNativeExtensionCallbackBatchUpdate(double errorCode, rust::String 
         return;
     }
     int sum = 0;
-    for (int i = 0; i < in_key.size(); ++i) {
+    for (size_t i = 0; i < in_key.size(); ++i) {
         BatchUpdateResult bur;
         bur.uri = std::string(in_key[i]);
         for (int j = 0; j < in_steps[i]; ++j) {
