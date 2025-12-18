@@ -28,6 +28,7 @@ group("unittest") {
     ":IsharedResultSetStubTest",
     ":SharedBlockTest",
     ":IkvStoreDataServiceTest",
+    ":DataSharePredicatesVerifyTest",
   ]
 }
 
@@ -370,4 +371,46 @@ ohos_unittest("IkvStoreDataServiceTest") {
     "-Dprivate=public",
     "-Dprotected=public",
   ]
+}
+
+ohos_unittest("DataSharePredicatesVerifyTest") {
+  module_out_path = "data_share/data_share/native/common"
+
+  include_dirs = [
+    "${datashare_common_native_path}/include",
+    "${datashare_base_path}/interfaces/inner_api/common/include",
+  ]
+
+  sources = [ "${datashare_base_path}/test/unittest/native/common/src/datashare_predicates_verify_test.cpp" ]
+
+  deps = [
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+
+  external_deps = [
+    "ability_base:zuri",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
+    "hitrace:hitrace_meter",
+    "hitrace:libhitracechain",
+    "ipc:ipc_core",
+    "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
+  ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+  }
 }
