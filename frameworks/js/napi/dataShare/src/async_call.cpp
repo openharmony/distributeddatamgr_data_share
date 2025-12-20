@@ -73,8 +73,19 @@ napi_value AsyncCall::Call(napi_env env, Context::ExecAction exec)
     napi_create_string_utf8(env, "DataShareAsyncCall", NAPI_AUTO_LENGTH, &resource);
     napi_create_async_work(env, nullptr, resource, AsyncCall::OnExecute, AsyncCall::OnComplete, context_, &work);
     context_->work = work;
+    auto status = napi_queue_async_work_with_qos(env, work, napi_qos_user_initiated);
+    if (status != napi_ok) {
+        LOG_ERROR("queue async work failed, status %{public}d", status);
+        napi_get_undefined(env, &promise);
+        if (context_->defer != nullptr) {
+            auto rejectStatus = napi_reject_deferred(env, context_->defer, promise);
+            if (rejectStatus != napi_ok) {
+                LOG_ERROR("reject promise failed, status %{public}d", rejectStatus);
+            }
+        }
+        DeleteContext(env, context_);
+    }
     context_ = nullptr;
-    napi_queue_async_work_with_qos(env, work, napi_qos_user_initiated);
     return promise;
 }
 
