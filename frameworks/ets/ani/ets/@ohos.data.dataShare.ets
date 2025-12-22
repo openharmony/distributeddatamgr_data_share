@@ -233,7 +233,7 @@ export namespace dataShare {
 
   export function createDataShareHelper(context: Context, uri: string, callback: AsyncCallback<DataShareHelper>): void {
         let p = taskpool.execute(native_create, context, uri, undefined)
-        p.then((r: NullishType) => {
+        p.then((r: Any) => {
             callback(null, r as DataShareHelper);
         }, (err: Error): void => {
             callback(err as BusinessError, undefined);
@@ -247,7 +247,7 @@ export namespace dataShare {
     callback: AsyncCallback<DataShareHelper>
   ): void {
         let p = taskpool.execute(native_create, context, uri, options)
-        p.then((r: NullishType) => {
+        p.then((r: Any) => {
             callback(null, r as DataShareHelper);
         }, (err: Error): void => {
             callback(err as BusinessError, undefined);
@@ -261,7 +261,7 @@ export namespace dataShare {
   ): Promise<DataShareHelper>  {
       return new Promise<DataShareHelper>((resolve, reject) => {
           let p = taskpool.execute(native_create, context, uri, options)
-          p.then((e: NullishType) => {
+          p.then((e: Any) => {
               let r = e as DataShareHelper
               resolve(r)
           }).catch((e: Error): void => {
@@ -317,7 +317,7 @@ export namespace dataShare {
 
     query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>, callback: AsyncCallback<DataShareResultSet>): void {
         let p = taskpool.execute(native_query, this, uri, predicates, columns)
-        p.then((r: NullishType) => {
+        p.then((r: Any) => {
             callback(null, r as DataShareResultSet);
         }, (err: Error): void => {
             callback(err as BusinessError, undefined);
@@ -327,7 +327,7 @@ export namespace dataShare {
     query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>): Promise<DataShareResultSet> {
         return new Promise<DataShareResultSet>((resolve, reject) => {
             let p = taskpool.execute(native_query, this, uri, predicates, columns)
-            p.then((e: NullishType) => {
+            p.then((e: Any) => {
                 let r = e as DataShareResultSet
                 resolve(r)
             }).catch((e: Error): void => {
@@ -343,7 +343,7 @@ export namespace dataShare {
       callback: AsyncCallback<int>
     ): void {
         let p = taskpool.execute(native_update, this, uri, predicates, value)
-        p.then((r: NullishType) => {
+        p.then((r: Any) => {
             callback(null, r as int);
         }, (err: Error): void => {
             callback(err as BusinessError, undefined);
@@ -353,7 +353,7 @@ export namespace dataShare {
     update(uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket): Promise<int> {
         return new Promise<int>((resolve, reject) => {
             let p = taskpool.execute(native_update, this, uri, predicates, value)
-            p.then((e: NullishType) => {
+            p.then((e: Any) => {
                 let r = e as int
                 resolve(r)
             }).catch((e: Error): void => {
@@ -369,7 +369,7 @@ export namespace dataShare {
       callback: AsyncCallback<Array<OperationResult>>
     ): void {
         let p = taskpool.execute(native_publish, this, data, bundleName, version)
-        p.then((r: NullishType) => {
+        p.then((r: Any) => {
             callback(null, r as Array<OperationResult>);
         }, (err: Error): void => {
             callback(err as BusinessError, undefined);
@@ -382,7 +382,7 @@ export namespace dataShare {
       callback: AsyncCallback<Array<OperationResult>>
     ): void {
         let p = taskpool.execute(native_publish, this, data, bundleName, undefined)
-        p.then((r: NullishType) => {
+        p.then((r: Any) => {
             callback(null, r as Array<OperationResult>);
         }, (err: Error): void => {
             callback(err as BusinessError, undefined);
@@ -392,7 +392,7 @@ export namespace dataShare {
     publish(data: Array<PublishedItem>, bundleName: string, version?: int): Promise<Array<OperationResult>> {
         return new Promise<Array<OperationResult>>((resolve, reject) => {
             let p = taskpool.execute(native_publish, this, data, bundleName, version)
-            p.then((e: NullishType) => {
+            p.then((e: Any) => {
                 let r = e as Array<OperationResult>
                 resolve(r)
             }).catch((e: Error): void => {
@@ -403,7 +403,7 @@ export namespace dataShare {
 
     getPublishedData(bundleName: string, callback: AsyncCallback<Array<PublishedItem>>): void {
         let p = taskpool.execute(native_get_published_data, this, bundleName)
-        p.then((r: NullishType) => {
+        p.then((r: Any) => {
             callback(null, r as Array<PublishedItem>);
         }, (err: Error): void => {
             callback(err as BusinessError, undefined);
@@ -413,7 +413,7 @@ export namespace dataShare {
     getPublishedData(bundleName: string): Promise<Array<PublishedItem>> {
         return new Promise<Array<PublishedItem>>((resolve, reject) => {
             let p = taskpool.execute(native_get_published_data, this, bundleName)
-            p.then((e: NullishType) => {
+            p.then((e: Any) => {
                 let r = e as Array<PublishedItem>
                 resolve(r)
             }).catch((e: Error): void => {
@@ -424,7 +424,7 @@ export namespace dataShare {
 
     insert(uri: string, value: ValuesBucket, callback: AsyncCallback<int>): void {
         let p = taskpool.execute(native_insert, this, uri, value)
-        p.then((r: NullishType) => {
+        p.then((r: Any) => {
             callback(null, r as int);
         }, (err: Error): void => {
             callback(err as BusinessError, undefined);
@@ -434,7 +434,7 @@ export namespace dataShare {
     insert(uri: string, value: ValuesBucket): Promise<int> {
         return new Promise<int>((resolve, reject) => {
             let p = taskpool.execute(native_insert, this, uri, value)
-            p.then((e: NullishType) => {
+            p.then((e: Any) => {
                 let r = e as int
                 resolve(r)
             }).catch((e: Error): void => {
@@ -445,7 +445,7 @@ export namespace dataShare {
 
     batchInsert(uri: string, values: Array<ValuesBucket>, callback: AsyncCallback<int>): void {
         let p = taskpool.execute(native_batch_insert, this, uri, values)
-        p.then((r: NullishType) => {
+        p.then((r: Any) => {
             callback(null, r as int);
         }, (err: Error): void => {
             callback(err as BusinessError, undefined);
@@ -455,7 +455,7 @@ export namespace dataShare {
     batchInsert(uri: string, values: Array<ValuesBucket>): Promise<int> {
         return new Promise<int>((resolve, reject) => {
             let p = taskpool.execute(native_batch_insert, this, uri, values)
-            p.then((e: NullishType) => {
+            p.then((e: Any) => {
                 let r = e as int
                 resolve(r)
             }).catch((e: Error): void => {
@@ -467,7 +467,7 @@ export namespace dataShare {
     batchUpdate(operations: Record<string, Array<UpdateOperation>>): Promise<Record<string, Array<int>>> {
         return new Promise<Record<string, Array<int>>>((resolve, reject) => {
             let p = taskpool.execute(native_batch_update, this, operations)
-            p.then((e: NullishType) => {
+            p.then((e: Any) => {
                 let r = e as Record<string, Array<int>>
                 resolve(r)
             }).catch((e: Error): void => {
@@ -478,7 +478,7 @@ export namespace dataShare {
 
     normalizeUri(uri: string, callback: AsyncCallback<string>): void {
         let p = taskpool.execute(native_normalize_uri, this, uri)
-        p.then((r: NullishType) => {
+        p.then((r: Any) => {
             callback(null, r as string);
         }, (err: Error): void => {
             callback(err as BusinessError, undefined);
@@ -488,7 +488,7 @@ export namespace dataShare {
     normalizeUri(uri: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             let p = taskpool.execute(native_normalize_uri, this, uri)
-            p.then((e: NullishType) => {
+            p.then((e: Any) => {
                 let r = e as string
                 resolve(r)
             }).catch((e: Error): void => {
@@ -499,7 +499,7 @@ export namespace dataShare {
 
     denormalizeUri(uri: string, callback: AsyncCallback<string>): void {
         let p = taskpool.execute(native_denormalize_uri, this, uri)
-        p.then((r: NullishType) => {
+        p.then((r: Any) => {
             callback(null, r as string);
         }, (err: Error): void => {
             callback(err as BusinessError, undefined);
@@ -509,7 +509,7 @@ export namespace dataShare {
     denormalizeUri(uri: string): Promise<string> {
         return new Promise<string>((resolve, reject) => {
             let p = taskpool.execute(native_denormalize_uri, this, uri)
-            p.then((e: NullishType) => {
+            p.then((e: Any) => {
                 let r = e as string
                 resolve(r)
             }).catch((e: Error): void => {
@@ -520,7 +520,7 @@ export namespace dataShare {
 
     notifyChange(uri: string, callback: AsyncCallback<void>): void {
         let p = taskpool.execute(native_notify_change, this, uri)
-        p.then((r: NullishType) => {
+        p.then((r: Any) => {
             callback(null, undefined);
         }, (err: Error): void => {
             callback(err as BusinessError, undefined);
@@ -551,7 +551,7 @@ export namespace dataShare {
 
     delete(uri: string, predicates: dataSharePredicates.DataSharePredicates, callback: AsyncCallback<int>): void {
         let p = taskpool.execute(native_delete, this, uri, predicates)
-        p.then((r: NullishType) => {
+        p.then((r: Any) => {
             callback(null, r as int);
         }, (err: Error): void => {
             callback(err as BusinessError, undefined);
@@ -561,7 +561,7 @@ export namespace dataShare {
     delete(uri: string, predicates: dataSharePredicates.DataSharePredicates): Promise<int> {
         return new Promise<int>((resolve, reject) => {
             let p = taskpool.execute(native_delete, this, uri, predicates)
-            p.then((e: NullishType) => {
+            p.then((e: Any) => {
                 let r = e as int
                 resolve(r)
             }).catch((e: Error): void => {

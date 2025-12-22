@@ -44,14 +44,14 @@ static bool IsSystemApp()
 static void ThrowBusinessError(ani_env *env, int errCode, std::string&& errMsg)
 {
     LOG_DEBUG("Begin ThrowBusinessError.");
-    static const char *errorClsName = "L@ohos/base/BusinessError;";
+    static const char *errorClsName = "@ohos.base.BusinessError";
     ani_class cls {};
     if (ANI_OK != env->FindClass(errorClsName, &cls)) {
         LOG_ERROR("find class BusinessError %{public}s failed", errorClsName);
         return;
     }
     ani_method ctor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &ctor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &ctor)) {
         LOG_ERROR("find method BusinessError.constructor failed");
         return;
     }
@@ -80,7 +80,7 @@ static void ThrowBusinessError(ani_env *env, int errCode, std::string&& errMsg)
 
 static bool getNameSpace(ani_env *env, ani_namespace &ns)
 {
-    const char *spaceName = "L@ohos/data/dataShare/dataShare;";
+    const char *spaceName = "@ohos.data.dataShare.dataShare";
     if (ANI_OK != env->FindNamespace(spaceName, &ns)) {
         LOG_ERROR("Not found space name '%{public}s'", spaceName);
         return false;
@@ -91,13 +91,8 @@ static bool getNameSpace(ani_env *env, ani_namespace &ns)
 
 static bool getClass(ani_env *env, ani_class &cls)
 {
-    ani_namespace ns;
-    if (!getNameSpace(env, ns)) {
-        return false;
-    }
-
-    const char *className = "LDataShareHelperInner;";
-    if (ANI_OK != env->Namespace_FindClass(ns, className, &cls)) {
+    const char *className = "@ohos.data.dataShare.dataShare.DataShareHelperInner";
+    if (ANI_OK != env->FindClass(className, &cls)) {
         LOG_ERROR("Not found class name '%{public}s'", className);
         return false;
     }
@@ -257,8 +252,8 @@ static ani_object ANI_Create([[maybe_unused]] ani_env *env, ani_object context, 
         return nullptr;
     }
 
-    const char *spaceName = "L@ohos/data/dataShare/dataShare;";
-    const char *className = "LDataShareHelperInner;";
+    const char *spaceName = "@ohos.data.dataShare.dataShare";
+    const char *className = "DataShareHelperInner";
     ani_object dataShareObj = AniObjectUtils::Create(env, spaceName, className,
         reinterpret_cast<ani_long>(shareptrData));
 
@@ -544,7 +539,7 @@ static ani_object ANI_Query([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_
         return nullptr;
     }
 
-    const char *className = "L@ohos/data/DataShareResultSet/DataShareResultSetImpl;";
+    const char *className = "@ohos.data.DataShareResultSet.DataShareResultSetImpl";
     ani_object resultSetObj = AniObjectUtils::Create(env, className,
         reinterpret_cast<ani_long>(shareptrData));
 
@@ -559,21 +554,21 @@ auto g_convertValuesBucket = [](ani_env *env, ani_ref &ani_key, ani_ref &object,
     auto key = AniStringUtils::ToStd(env, static_cast<ani_string>(ani_key));
     auto unionObject = static_cast<ani_object>(object);
     UnionAccessor unionAccessor(env, unionObject);
-    if (unionAccessor.IsInstanceOf("Lstd/core/Double;")) {
+    if (unionAccessor.IsInstanceOf("std.core.Double")) {
         double value;
         unionAccessor.TryConvert<double>(value);
         records->emplace(key, value);
         return true;
     }
 
-    if (unionAccessor.IsInstanceOf("Lstd/core/String;")) {
+    if (unionAccessor.IsInstanceOf("std.core.String")) {
         std::string value;
         unionAccessor.TryConvert<std::string>(value);
         records->emplace(key, value);
         return true;
     }
 
-    if (unionAccessor.IsInstanceOf("Lstd/core/Boolean;")) {
+    if (unionAccessor.IsInstanceOf("std.core.Boolean")) {
         bool value;
         unionAccessor.TryConvert<bool>(value);
         records->emplace(key, value);
@@ -650,15 +645,15 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     }
 
     std::array methods = {
-        ani_native_function {"on", "Lstd/core/String;Lstd/core/String;Lstd/core/Function2;:V",
+        ani_native_function {"on", "C{std.core.String}C{std.core.String}C{std.core.Function2}:",
             reinterpret_cast<void *>(ANI_OnType)},
-        ani_native_function {"off", "Lstd/core/String;Lstd/core/String;Lstd/core/Function2;:V",
+        ani_native_function {"off", "C{std.core.String}C{std.core.String}C{std.core.Function2}:",
             reinterpret_cast<void *>(ANI_OffType)},
         ani_native_function {"on",
-            "Lstd/core/String;L@ohos/data/dataShare/dataShare/SubscriptionType;Lstd/core/String;Lstd/core/Function2;:V",
+            "C{std.core.String}C{@ohos.data.dataShare.dataShare.SubscriptionType}C{std.core.String}C{std.core.Function2}:",
             reinterpret_cast<void *>(ANI_OnEvent)},
         ani_native_function {"off",
-            "Lstd/core/String;L@ohos/data/dataShare/dataShare/SubscriptionType;Lstd/core/String;Lstd/core/Function2;:V",
+            "C{std.core.String}C{@ohos.data.dataShare.dataShare.SubscriptionType}C{std.core.String}C{std.core.Function2}:",
             reinterpret_cast<void *>(ANI_OffEvent)},
         ani_native_function {"ani_query", nullptr, reinterpret_cast<void *>(ANI_Query)},
         ani_native_function {"ani_update", nullptr, reinterpret_cast<void *>(ANI_Update)},
@@ -674,8 +669,8 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_ERROR;
     }
 
-    static const char *cleanerName = "LCleaner;";
-    auto cleanerCls = AniTypeFinder(env).FindClass(ns, cleanerName);
+    static const char *cleanerName = "@ohos.data.dataShare.dataShare.DataShareHelperInner.Cleaner";
+    auto cleanerCls = AniTypeFinder(env).FindClass(cleanerName);
     NativePtrCleaner(env).Bind(cleanerCls.value());
 
     *result = ANI_VERSION_1;

@@ -99,7 +99,7 @@ ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const std::variant<Ty
 ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const DataShareValuesBucket &valueBucket)
 {
     ani_object valuesBucketList = nullptr;
-    static const char *className = "Lescompat/Record;";
+    static const char *className = "std.core.Record";
 
     ani_class cls;
     if (ANI_OK != env->FindClass(className, &cls)) {
@@ -108,7 +108,7 @@ ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const DataShareValues
     }
 
     ani_method aniCtor;
-    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":V", &aniCtor)) {
+    if (ANI_OK != env->Class_FindMethod(cls, "<ctor>", ":", &aniCtor)) {
         LOG_ERROR("Class_GetMethod <ctor> Failed '%{public}s'.", className);
         return valuesBucketList;
     }
@@ -141,13 +141,13 @@ template<typename T>
 ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const std::vector<T> &values)
 {
     ani_class arrayCls;
-    if (ANI_OK != env->FindClass("Lescompat/Array;", &arrayCls)) {
-        LOG_ERROR("FindClass Lescompat/Array; Failed");
+    if (ANI_OK != env->FindClass("std.core.Array", &arrayCls)) {
+        LOG_ERROR("FindClass std.core.Array Failed");
         return nullptr;
     }
 
     ani_method arrayCtor;
-    if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", "I:V", &arrayCtor)) {
+    if (ANI_OK != env->Class_FindMethod(arrayCls, "<ctor>", "i:", &arrayCtor)) {
         LOG_ERROR("Class_FindMethod <ctor> Failed");
         return nullptr;
     }
@@ -160,7 +160,7 @@ ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const std::vector<T> 
 
     ani_size index = 0;
     for (auto value : values) {
-        if (ANI_OK != env->Object_CallMethodByName_Void(arrayObj, "$_set", "ILstd/core/Object;:V", index,
+        if (ANI_OK != env->Object_CallMethodByName_Void(arrayObj, "$_set", "iY:", index,
             Convert2TSValue(env, value))) {
             LOG_ERROR("Object_CallMethodByName_Void  $_set Faild ");
             break;
@@ -174,16 +174,9 @@ ani_object ANIInnerObserver::Convert2TSValue(ani_env *env, const std::vector<T> 
 
 ani_enum_item ANIInnerObserver::GetEnumItem(ani_env *env, int32_t type)
 {
-    ani_namespace ns;
-    static const char *namespaceName = "L@ohos/data/dataShare/dataShare;";
-    if (ANI_OK != env->FindNamespace(namespaceName, &ns)) {
-        LOG_ERROR("Not found '%{public}s'", namespaceName);
-        return nullptr;
-    }
-
     ani_enum aniEnum{};
-    const char *enumName = "LChangeType;";
-    if (ANI_OK != env->Namespace_FindEnum(ns, enumName, &aniEnum)) {
+    const char *enumName = "@ohos.data.dataShare.dataShare.ChangeType";
+    if (ANI_OK != env->FindEnum(enumName, &aniEnum)) {
         LOG_ERROR("Not found '%{public}s'", enumName);
         return nullptr;
     }
@@ -212,16 +205,10 @@ ani_object ANIInnerObserver::GetNewChangeInfo(ani_env *env)
         LOG_ERROR("env is nullptr %{public}s", __func__);
         return nullptr;
     }
-    ani_namespace ns;
-    const char *spaceName = "L@ohos/data/dataShare/dataShare;";
-    if (ANI_OK != env->FindNamespace(spaceName, &ns)) {
-        LOG_ERROR("Not found space name '%{public}s'", spaceName);
-        return nullptr;
-    }
 
     ani_class cls;
-    const char *className = "LChangeInfoInner;";
-    if (ANI_OK != env->Namespace_FindClass(ns, className, &cls)) {
+    const char *className = "@ohos.data.dataShare.dataShare.ChangeInfoInner";
+    if (ANI_OK != env->FindClass(className, &cls)) {
         LOG_ERROR("Not found class name '%{public}s'", className);
         return nullptr;
     }

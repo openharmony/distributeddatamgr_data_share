@@ -37,13 +37,13 @@ use crate::{
 
 const DEFAULT_WAITTIME: i32 = 2;
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/DataShareHelperOptionsInner")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.DataShareHelperOptionsInner")]
 struct DataShareHelperOptions {
     is_proxy: Option<bool>,
     wait_time: Option<i32>,
 }
 
-#[ani_rs::ani(path = "L@ohos/data/DataShareResultSet/DataShareResultSetInner")]
+#[ani_rs::ani(path = "@ohos.data.DataShareResultSet.DataShareResultSetInner")]
 pub struct DataShareResultSet {
     pub native_ptr: i64,
 }
@@ -56,7 +56,7 @@ impl DataShareResultSet {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataSharePredicates/DataSharePredicates")]
+#[ani_rs::ani(path = "@ohos.data.dataSharePredicates.DataSharePredicates")]
 #[derive(Clone)]
 pub struct DataSharePredicates {
     pub native_ptr: i64,
@@ -78,7 +78,7 @@ pub enum PublishedItemData {
     ArrayBuffer(ArrayBuffer),
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/PublishedItemInner")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.PublishedItemInner")]
 #[derive(Clone)]
 pub struct PublishedItem {
     pub key: String,
@@ -96,7 +96,7 @@ impl PublishedItem {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/OperationResultInner")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.OperationResultInner")]
 pub struct OperationResult {
     key: String,
     result: i32,
@@ -108,7 +108,7 @@ impl OperationResult {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/UpdateOperationInner")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.UpdateOperationInner")]
 #[derive(Clone)]
 pub struct UpdateOperation {
     pub values: HashMap<String, BucketValue>,
@@ -124,7 +124,7 @@ impl UpdateOperation {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/UpdateOperationInner")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.UpdateOperationInner")]
 #[derive(Clone)]
 pub struct UpdateOperationPredicates<'local> {
     pub values: HashMap<String, BucketValue>,
@@ -140,14 +140,14 @@ impl<'local> UpdateOperationPredicates<'local> {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/TemplateInner")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.TemplateInner")]
 pub struct Template {
     pub predicates: HashMap<String, String>,
     pub scheduler: String,
     pub update: Option<String>,
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/ChangeType")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.ChangeType")]
 #[derive(Clone)]
 pub enum ChangeType {
     Insert = 0,
@@ -166,13 +166,13 @@ impl ChangeType {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/SubscriptionType")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.SubscriptionType")]
 pub enum SubscriptionType {
     SubscriptionTypeExactUri = 0,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Clone)]
-#[serde(rename = "L@ohos/data/dataShare/dataShare/ChangeInfoInner;\0")]
+#[serde(rename = "@ohos.data.dataShare.dataShare.ChangeInfoInner\0")]
 pub struct ChangeInfo {
     #[serde(rename = "type\0")]
     pub change_type: ChangeType,
@@ -192,7 +192,7 @@ impl ChangeInfo {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/TemplateIdInner")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.TemplateIdInner")]
 #[derive(Clone)]
 pub struct TemplateId {
     pub subscriber_id: String,
@@ -208,7 +208,7 @@ impl TemplateId {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/RdbDataChangeNodeInner")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.RdbDataChangeNodeInner")]
 #[derive(Clone)]
 pub struct RdbDataChangeNode {
     uri: String,
@@ -230,7 +230,7 @@ impl RdbDataChangeNode {
     }
 }
 
-#[ani_rs::ani(path = "L@ohos/data/dataShare/dataShare/PublishedDataChangeNodeInner")]
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.PublishedDataChangeNodeInner")]
 #[derive(Clone)]
 pub struct PublishedDataChangeNode {
     bundle_name: String,
@@ -281,7 +281,7 @@ pub fn native_create<'local>(
     }
 
     let datashare_helper_ptr = result_wrap.result;
-    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"J:V\0") };
+    let ctor_signature = unsafe { CStr::from_bytes_with_nul_unchecked(b"l:\0") };
     let datashare_class = env.find_class(DATA_SHARE)?;
     let datashare_obj = env
         .new_object_with_signature(&datashare_class, ctor_signature, (datashare_helper_ptr,))?;

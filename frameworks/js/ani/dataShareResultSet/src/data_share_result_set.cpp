@@ -46,7 +46,7 @@ static std::shared_ptr<DataShareResultSet> GetResultSet(ani_env *env, ani_object
 
 static void Close([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_object obj)
 {
-    static const char *className = "L@ohos/data/DataShareResultSet/DataShareResultSetImpl;";
+    static const char *className = "@ohos.data.DataShareResultSet.DataShareResultSetImpl";
     auto classObj = GetResultSet(env, obj);
     if (classObj == nullptr) {
         LOG_ERROR("DataShareResultSet is NULL");
@@ -149,7 +149,7 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
     }
 
     ani_class cls;
-    static const char *className = "L@ohos/data/DataShareResultSet/DataShareResultSetImpl;";
+    static const char *className = "@ohos.data.DataShareResultSet.DataShareResultSetImpl";
     if (ANI_OK != env->FindClass(className, &cls)) {
         LOG_ERROR("Not found class:%{public}s", className);
         return ANI_ERROR;

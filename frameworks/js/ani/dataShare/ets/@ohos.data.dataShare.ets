@@ -64,11 +64,11 @@ export namespace dataShare {
 
     export function createDataShareHelper(context: Context, uri: string, callback: AsyncCallback<DataShareHelper>): void {
         let p = taskpool.execute(create, context, uri, undefined)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as DataShareHelper
             let err: BusinessError<void>
             callback(err, r)
-        }).catch((error: NullishType) => {
+        }).catch((error: Any) => {
             let r = new DataShareHelperInner(0)
             let err =  error as BusinessError<void>
             hilog.error(0x0000, 'DataShareHelper', "create failed:" + err)
@@ -78,11 +78,11 @@ export namespace dataShare {
 
     export function createDataShareHelper(context: Context, uri: string, options: DataShareHelperOptions, callback: AsyncCallback<DataShareHelper>): void {
         let p = taskpool.execute(create, context, uri, options)
-        p.then((e: NullishType) => {
+        p.then((e: Any) => {
             let r = e as DataShareHelper
             let err: BusinessError<void>
             callback(err, r)
-        }).catch((error: NullishType) => {
+        }).catch((error: Any) => {
             let r = new DataShareHelperInner(0)
             let err =  error as BusinessError<void>
             hilog.error(0x0000, 'DataShareHelper', "create failed:" + err)
@@ -94,7 +94,7 @@ export namespace dataShare {
         console.println("createDataShareHelper enter")
         return new Promise<DataShareHelper>((resolve: (v: DataShareHelper) => void, reject: (error: Error) => void) => {
             let p = taskpool.execute(create, context, uri, options)
-            p.then((e: NullishType) => {
+            p.then((e: Any) => {
                 let r = e as DataShareHelper
                 resolve(r)
             }).catch((e: Error): void => {
@@ -177,11 +177,11 @@ export namespace dataShare {
 
         query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>, callback: AsyncCallback<DataShareResultSet>): void {
             let p = taskpool.execute(this.ani_query, uri, predicates, columns)
-            p.then((e: NullishType) => {
+            p.then((e: Any) => {
                 let r = e as DataShareResultSet
                 let err: BusinessError<void>
                 callback(err, r)
-            }).catch((error: NullishType) => {
+            }).catch((error: Any) => {
                 let err =  error as BusinessError<void>
                 hilog.error(0x0000, 'DataShareHelper', "query failed:" + err)
             })
@@ -190,7 +190,7 @@ export namespace dataShare {
         query(uri: string, predicates: dataSharePredicates.DataSharePredicates, columns: Array<string>): Promise<DataShareResultSet> {
             return new Promise<DataShareResultSet>((resolve: (v: DataShareResultSet) => void, reject: (error: Error) => void) => {
                 let p = taskpool.execute(this.ani_query, uri, predicates, columns)
-                p.then((e: NullishType) => {
+                p.then((e: Any) => {
                     let r = e as DataShareResultSet
                     resolve(r)
                 }).catch((e: Error): void => {
@@ -202,11 +202,11 @@ export namespace dataShare {
 
         update(uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket, callback: AsyncCallback<number>): void {
             let p = taskpool.execute(this.ani_update, uri, predicates, value)
-            p.then((e: NullishType) => {
+            p.then((e: Any) => {
                 let r = e as number
                 let err: BusinessError<void>
                 callback(err, r)
-            }).catch((error: NullishType) => {
+            }).catch((error: Any) => {
                 let err =  error as BusinessError<void>
                 hilog.error(0x0000, 'DataShareHelper', "create failed:" + err)
             })
@@ -215,7 +215,7 @@ export namespace dataShare {
         update(uri: string, predicates: dataSharePredicates.DataSharePredicates, value: ValuesBucket): Promise<number> {
             return new Promise<number>((resolve: (v: number) => void, reject: (error: Error) => void) => {
                 let p = taskpool.execute(this.ani_update, uri, predicates, value)
-                p.then((e: NullishType) => {
+                p.then((e: Any) => {
                     let r = e as number
                     resolve(r)
                 }).catch((e: Error): void => {

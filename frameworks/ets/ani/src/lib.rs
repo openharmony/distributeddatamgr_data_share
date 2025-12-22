@@ -23,20 +23,20 @@ mod log;
 
 const DATA_SHARE_PREDICATES: &CStr = unsafe {
     CStr::from_bytes_with_nul_unchecked(
-        b"L@ohos/data/dataSharePredicates/dataSharePredicates/DataSharePredicates;\0",
+        b"@ohos.data.dataSharePredicates.dataSharePredicates.DataSharePredicates\0",
     )
 };
 
 const DATA_SHARE: &CStr = unsafe {
-    CStr::from_bytes_with_nul_unchecked(b"L@ohos/data/dataShare/dataShare/DataShareHelperInner;\0")
+    CStr::from_bytes_with_nul_unchecked(b"@ohos.data.dataShare.dataShare.DataShareHelperInner\0")
 };
 
 const DATA_SHARE_DATA_PROXY_HANDLE: &CStr = unsafe {
-    CStr::from_bytes_with_nul_unchecked(b"L@ohos/data/dataShare/dataShare/DataProxyHandleInner\0")
+    CStr::from_bytes_with_nul_unchecked(b"@ohos.data.dataShare.dataShare.DataProxyHandleInner\0")
 };
 
 const DATA_SHARE_EXTENSION_HELPER: &CStr = unsafe {
-    CStr::from_bytes_with_nul_unchecked(b"L@ohos/application/DataShareExtensionAbility/dataShareExtensionAbilityHelper/CallbackWrap;\0")
+    CStr::from_bytes_with_nul_unchecked(b"@ohos.application.DataShareExtensionAbility.dataShareExtensionAbilityHelper.CallbackWrap\0")
 };
 
 pub fn get_native_ptr<'local>(env: &AniEnv<'local>, obj: &AniObject) -> i64 {
@@ -45,7 +45,7 @@ pub fn get_native_ptr<'local>(env: &AniEnv<'local>, obj: &AniObject) -> i64 {
 }
 
 ani_constructor!(
-    class "L@ohos/data/DataShareResultSet/DataShareResultSetInner"
+    class "@ohos.data.DataShareResultSet.DataShareResultSetInner"
     [
         "getColumnNames" : result_set::get_column_names,
         "getColumnCount" : result_set::get_column_count,
@@ -66,7 +66,7 @@ ani_constructor!(
         "getColumnName" : result_set::get_column_name,
         "getDataType" : result_set::get_data_type,
     ]
-    class "L@ohos/data/dataSharePredicates/dataSharePredicates/DataSharePredicates"
+    class "@ohos.data.dataSharePredicates.dataSharePredicates.DataSharePredicates"
     [
         "equalTo" : predicates::native_equal_to,
         "notEqualTo" : predicates::native_not_equal_to,
@@ -99,11 +99,11 @@ ani_constructor!(
         "prefixKey" : predicates::native_prefix_key,
         "inKeys" : predicates::native_in_keys,
     ]
-    namespace "L@ohos/data/dataSharePredicates/dataSharePredicates"
+    namespace "@ohos.data.dataSharePredicates.dataSharePredicates"
     [
         "native_create" : predicates::create,
     ]
-    namespace "L@ohos/data/dataShare/dataShare"
+    namespace "@ohos.data.dataShare.dataShare"
     [
         "native_create": datashare::native_create,
         "native_enableSilentProxy": datashare::native_enable_silent_proxy,
@@ -130,20 +130,20 @@ ani_constructor!(
         "native_off_rdb_data_change": datashare::native_off_rdb_data_change,
         "native_off_published_data_change": datashare::native_off_published_data_change,
     ]
-    class "L@ohos/data/dataShare/dataShare/DataShareHelperInner"
+    class "@ohos.data.dataShare.dataShare.DataShareHelperInner"
     [
         "addTemplate" : datashare::native_add_template,
         "delTemplate" : datashare::native_del_template,
     ]
-    class "L@ohos/data/dataSharePredicates/dataSharePredicates/Cleaner"
+    class "@ohos.data.dataSharePredicates.dataSharePredicates.Cleaner"
     [
         "native_clean" : predicates::native_clean,
     ]
-    class "L@ohos/data/dataShare/dataShare/Cleaner"
+    class "@ohos.data.dataShare.dataShare.Cleaner"
     [
         "native_clean" : datashare::native_clean,
     ]
-    namespace "L@ohos/application/DataShareExtensionAbility/dataShareExtensionAbilityHelper"
+    namespace "@ohos.application.DataShareExtensionAbility.dataShareExtensionAbilityHelper"
     [
         "nativeExtensionCallbackInt": datashare_extension::native_extension_callback_int,
         "nativeExtensionCallbackObject": datashare_extension::native_extension_callback_object,

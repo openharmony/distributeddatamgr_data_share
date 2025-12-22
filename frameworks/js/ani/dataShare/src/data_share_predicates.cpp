@@ -282,12 +282,12 @@ static ani_object GreaterThan([[maybe_unused]] ani_env *env, [[maybe_unused]] an
     }
 
     ani_string strValue = nullptr;
-    if (unionAccessor.IsInstanceOf("Lstd/core/String;")) {
+    if (unionAccessor.IsInstanceOf("std.core.String")) {
         dataSharePredicates->GreaterThan(fieldStr, AniStringUtils::ToStd(env, strValue));
     }
 
     ani_boolean boolValue = 0;
-    if (unionAccessor.IsInstanceOf("Lstd/core/Boolean;")) {
+    if (unionAccessor.IsInstanceOf("std.core.Boolean")) {
         if (ANI_OK != env->Object_CallMethodByName_Boolean(value, "unboxed", nullptr, &boolValue)) {
             dataSharePredicates->GreaterThan(fieldStr, static_cast<bool>(boolValue));
         }
@@ -307,7 +307,7 @@ static ani_object GroupBy([[maybe_unused]] ani_env *env, [[maybe_unused]] ani_ob
     std::vector<std::string> strings;
     for (int i = 0; i < int(length); i++) {
         ani_ref stringEntryRef;
-        if (ANI_OK != env->Object_CallMethodByName_Ref(arrayObj, "$_get", "I:Lstd/core/Object;", &stringEntryRef,
+        if (ANI_OK != env->Object_CallMethodByName_Ref(arrayObj, "$_get", "i:Y", &stringEntryRef,
             (ani_int)i)) {
             return obj;
         }
@@ -385,21 +385,15 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         std::cerr << "Unsupported ANI_VERSION_1" << std::endl;
         return ANI_ERROR;
     }
-    ani_namespace ns;
-    if (env->FindNamespace("L@ohos/data/dataSharePredicates/dataSharePredicates;", &ns) != ANI_OK) {
-        LOG_ERROR("Namespace not found");
-        return ANI_ERROR;
-    };
 
     ani_class cls;
-    static const char *className = "LDataSharePredicates;";
-    if (env->Namespace_FindClass(ns, className, &cls) != ANI_OK) {
+    static const char *className = "@ohos.data.dataSharePredicates.dataSharePredicates.DataSharePredicates";
+    if (env->FindClass(className, &cls) != ANI_OK) {
         LOG_ERROR("Class not found");
         return ANI_ERROR;
     }
 
     std::array methods = {
-        ani_native_function {"create", nullptr, reinterpret_cast<void *>(Create) },
         ani_native_function {"equalTo", nullptr, reinterpret_cast<void *>(EqualTo)},
         ani_native_function {"notEqualTo", nullptr, reinterpret_cast<void *>(NotEqualTo)},
         ani_native_function {"orderByDesc", nullptr, reinterpret_cast<void *>(OrderByDesc)},
@@ -424,8 +418,16 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         return ANI_ERROR;
     };
 
-    static const char *cleanerName = "LCleaner;";
-    auto cleanerCls = AniTypeFinder(env).FindClass(ns, cleanerName);
+    std::array staticMethods = {
+        ani_native_function {"create", nullptr, reinterpret_cast<void *>(Create) },
+    };
+    if (ANI_OK != env->Class_BindStaticNativeMethods(cls, staticMethods.data(), staticMethods.size())) {
+        LOG_ERROR("Cannot bind static native methods to %{public}s", className);
+        return ANI_ERROR;
+    };
+
+    static const char *cleanerName = "@ohos.data.dataSharePredicates.dataSharePredicates.Cleaner";
+    auto cleanerCls = AniTypeFinder(env).FindClass(cleanerName);
     DataSharePredicatesCleaner(env).Bind(cleanerCls.value());
 
     *result = ANI_VERSION_1;
