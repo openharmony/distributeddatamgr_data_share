@@ -18,19 +18,21 @@
 #include "ani_base_context.h"
 #include "datashare_ani.h"
 #include "datashare_business_error.h"
+#include "datashare_errno.h"
 #include "datashare_log.h"
 #include "datashare_predicates.h"
+#include "datashare_result.h"
 #include "datashare_value_object.h"
 #include "datashare_values_bucket.h"
 #include "ikvstore_data_service.h"
 #include "idata_share_service.h"
+#include "ipc_skeleton.h"
 #include "iservice_registry.h"
-#include "system_ability_definition.h"
-#include "datashare_result.h"
-#include "wrapper.rs.h"
 #include "js_proxy.h"
+#include "system_ability_definition.h"
+#include "tokenid_kit.h"
+#include "wrapper.rs.h"
 #include <map>
-#include "datashare_errno.h"
 #define UNIMPL_RET_CODE 0
 
 namespace OHOS {
@@ -882,6 +884,11 @@ void DataSharePredicatesInKeys(int64_t predicatesPtr, rust::Vec<rust::String> ke
 I64ResultWrap DataShareNativeCreate(int64_t context, rust::String strUri,
     bool optionIsUndefined, bool isProxy, int waitTime)
 {
+    uint64_t tokenId = IPCSkeleton::GetSelfTokenID();
+    if (!Security::AccessToken::TokenIdKit::IsSystemAppByFullTokenID(tokenId)) {
+        return I64ResultWrap{0, EXCEPTION_SYSTEMAPP_CHECK};
+    }
+    
     if (context == 0) {
         LOG_ERROR("context is nullptr, create dataShareHelper failed.");
         return I64ResultWrap{0, EXCEPTION_PARAMETER_CHECK};

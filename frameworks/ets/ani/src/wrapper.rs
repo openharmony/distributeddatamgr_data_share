@@ -45,9 +45,8 @@ pub use batch_update::*;
 
 pub const fn convert_to_business_error(code: i32) -> BusinessError {
     match code {
-        // 201 => BusinessError::PERMISSION,
-        401 => BusinessError::new_static(code, "Parameter error.Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameters types."),
         202 => BusinessError::new_static(code, "Not system app."),
+        401 => BusinessError::new_static(code, "Parameter error.Possible causes: 1. Mandatory parameters are left unspecified; 2. Incorrect parameters types."),
         15700000 => BusinessError::new_static(code, "Inner error. Possible causes: 1.The internal status is abnormal; 2.The interface is incorrectly used; 3.Permission configuration error; 4.A system error."),
         15700010 => BusinessError::new_static(code, "DataShareHelper fails to be initialized."),
         15700011 => BusinessError::new_static(code, "The URI does not exist."),
