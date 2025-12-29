@@ -204,9 +204,14 @@ void DataShareConnection::ReRegisterObserverExtProvider()
     LOG_INFO("ReRegisterObserverExtProvider start");
     decltype(observerExtsProvider_) observerExtsProvider(std::move(observerExtsProvider_));
     observerExtsProvider_.Clear();
-    observerExtsProvider.ForEach([this](const auto &key, const auto &value) {
+    auto dataShareProxy = GetDataShareProxy();
+    if (dataShareProxy == nullptr) {
+        LOG_ERROR("dataShareProxy_ is nullptr");
+        return;
+    }
+    observerExtsProvider.ForEach([this, &dataShareProxy](const auto &key, const auto &value) {
         for (const auto &param : value) {
-            auto ret = dataShareProxy_->RegisterObserverExtProvider(param.uri, key, param.isDescendants, { true });
+            auto ret = dataShareProxy->RegisterObserverExtProvider(param.uri, key, param.isDescendants, { true });
             if (ret != E_OK) {
                 LOG_ERROR(
                     "RegisterObserverExt failed, param.uri:%{public}s, ret:%{public}d, param.isDescendants:%{public}d",

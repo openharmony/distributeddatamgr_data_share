@@ -150,7 +150,14 @@ ohos_unittest("PermissionTest") {
 ohos_unittest("SlientAccessTest") {
   module_out_path = "data_share/data_share/inner_tests"
 
-  sources = [ "./unittest/mediadatashare_test/src/slientaccess_test.cpp" ]
+  include_dirs = [
+      "${datashare_base_path}/test/unittest/test_helper/include",
+  ]
+
+  sources = [
+    "./unittest/mediadatashare_test/src/slientaccess_test.cpp",
+    "${datashare_base_path}/test/unittest/test_helper/src/mock_token.cpp"
+  ]
 
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
@@ -208,7 +215,14 @@ ohos_unittest("SlientTimeoutTest") {
 ohos_unittest("SlientSwitchTest") {
   module_out_path = "data_share/data_share/inner_tests"
 
-  sources = [ "./unittest/mediadatashare_test/src/slientswitch_test.cpp" ]
+  include_dirs = [
+      "${datashare_base_path}/test/unittest/test_helper/include",
+  ]
+
+  sources = [
+    "./unittest/mediadatashare_test/src/slientswitch_test.cpp",
+    "${datashare_base_path}/test/unittest/test_helper/src/mock_token.cpp"
+  ]
 
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
@@ -236,7 +250,14 @@ ohos_unittest("SlientSwitchTest") {
 ohos_unittest("ErrorCodeTest") {
   module_out_path = "data_share/data_share/inner_tests"
 
-  sources = [ "./unittest/mediadatashare_test/src/errorcode_test.cpp" ]
+  include_dirs = [
+      "${datashare_base_path}/test/unittest/test_helper/include",
+  ]
+
+  sources = [
+    "./unittest/mediadatashare_test/src/errorcode_test.cpp",
+    "${datashare_base_path}/test/unittest/test_helper/src/mock_token.cpp"
+  ]
 
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
@@ -264,7 +285,14 @@ ohos_unittest("ErrorCodeTest") {
 ohos_unittest("JoinTest") {
   module_out_path = "data_share/data_share/inner_tests"
 
-  sources = [ "./unittest/mediadatashare_test/src/join_test.cpp" ]
+  include_dirs = [
+      "${datashare_base_path}/test/unittest/test_helper/include",
+  ]
+
+  sources = [
+    "./unittest/mediadatashare_test/src/join_test.cpp",
+    "${datashare_base_path}/test/unittest/test_helper/src/mock_token.cpp"
+  ]
 
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",

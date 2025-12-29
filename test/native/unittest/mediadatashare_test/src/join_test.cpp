@@ -24,6 +24,7 @@
 #include "datashare_values_bucket.h"
 #include "hap_token_info.h"
 #include "iservice_registry.h"
+#include "mock_token.h"
 #include "system_ability_definition.h"
 #include "token_setproc.h"
 
@@ -67,20 +68,8 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t system
     return DataShare::DataShareHelper::Creator(remoteObj, uri);
 }
 
-void JoinTest::SetUpTestCase(void)
+HapPolicyParams GetPolicy()
 {
-    LOG_INFO("SetUpTestCase invoked");
-    auto dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
-    ASSERT_TRUE(dataShareHelper != nullptr);
-    int sleepTime = 3;
-    sleep(sleepTime);
-
-    HapInfoParams info = {
-        .userID = 100,
-        .bundleName = "ohos.datashareclienttest.demo",
-        .instIndex = 0,
-        .isSystemApp = true,
-        .appIDDesc = "ohos.datashareclienttest.demo" };
     HapPolicyParams policy = { .apl = APL_SYSTEM_CORE,
         .domain = "test.domain",
         .permList = { { .permissionName = "ohos.permission.test",
@@ -90,25 +79,61 @@ void JoinTest::SetUpTestCase(void)
             .label = "label",
             .labelId = 1,
             .description = "ohos.datashareclienttest.demo",
-            .descriptionId = 1 }
-        },
+            .descriptionId = 1 } },
         .permStateList = {
-            {
-                .permissionName = "ohos.permission.test",
+            { .permissionName = "ohos.permission.test",
                 .isGeneral = true,
                 .resDeviceID = { "local" },
                 .grantStatus = { PermissionState::PERMISSION_GRANTED },
-                .grantFlags = { 1 }
-            }
-        }
-    };
-    AccessTokenKit::AllocHapToken(info, policy);
-    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenIDEx(
-        info.userID, info.bundleName, info.instIndex);
-    SetSelfTokenID(testTokenId.tokenIDEx);
+                .grantFlags = { 1 } },
+            { .permissionName = "ohos.permission.GET_BUNDLE_INFO",
+                .isGeneral = true,
+                .resDeviceID = { "local" },
+                .grantStatus = { PermissionState::PERMISSION_GRANTED },
+                .grantFlags = { 1 } } } };
+    return policy;
+}
 
+void JoinTest::SetUpTestCase(void)
+{
+    LOG_INFO("JoinTest SetUpTestCase invoked. Non-silent helper connect starts.");
+    MockToken::SetTestEnvironment();
+    auto dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
+    if (dataShareHelper != nullptr) {
+        LOG_INFO("JoinTest non-silent helper connect done");
+    } else {
+        LOG_ERROR("JoinTest non-silent helper connect fail");
+    }
+    int sleepTime = 3;
+    sleep(sleepTime);
+
+    HapInfoParams info = {
+        .userID = 100,
+        .bundleName = "ohos.datashareclienttest.demo",
+        .instIndex = 0,
+        .isSystemApp = true,
+        .appIDDesc = "ohos.datashareclienttest.demo" };
+    HapPolicyParams policy = GetPolicy();
+    AccessTokenIDEx tokenIdEx = MockToken::AllocTestHapToken(info, policy);
+    uint64_t token = tokenIdEx.tokenIdExStruct.tokenID;
+    if (token == INVALID_TOKENID) {
+        LOG_ERROR("JoinTest token invalid.");
+        return;
+    }
+    int ret = SetSelfTokenID(token);
+    if (ret != E_OK) {
+        LOG_ERROR("JoinTest SetSelfTokenID: %{public}d", ret);
+        return;
+    }
+
+    LOG_INFO("JoinTest silent helper connect starts");
     g_slientAccessHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI);
-    ASSERT_TRUE(g_slientAccessHelper != nullptr);
+    if (g_slientAccessHelper != nullptr) {
+        LOG_INFO("JoinTest silent helper connect end");
+    } else {
+        LOG_ERROR("JoinTest silent helper connect fail");
+        return;
+    }
     JoinTest::InsertUserDates();
     JoinTest::InsertBookDates();
     LOG_INFO("SetUpTestCase end");
@@ -119,6 +144,7 @@ void JoinTest::TearDownTestCase(void)
     auto tokenId = AccessTokenKit::GetHapTokenID(100, "ohos.datashareclienttest.demo", 0);
     AccessTokenKit::DeleteToken(tokenId);
     g_slientAccessHelper = nullptr;
+    MockToken::ResetTestEnvironment();
 }
 
 void JoinTest::SetUp(void) {}
@@ -127,6 +153,7 @@ void JoinTest::TearDown(void) {}
 void JoinTest::InsertUserDates()
 {
     LOG_INFO("JoinTest::InsertUserDates start");
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     DataShare::DataShareValuesBucket values;
 
     values.Put("userId", 1);
@@ -174,6 +201,7 @@ void JoinTest::InsertUserDates()
 void JoinTest::InsertBookDates()
 {
     LOG_INFO("JoinTest::InsertBookDates start");
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     DataShare::DataShareValuesBucket values;
 
     values.Put("id", 1);
@@ -241,6 +269,7 @@ int JoinTest::ResultSize(std::shared_ptr<DataShareResultSet> &resultSet)
  */
 HWTEST_F(JoinTest, Join_CrossJoin_001, TestSize.Level0)
 {
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataSharePredicates predicates;
     std::vector<std::string> clauses;
@@ -320,6 +349,7 @@ HWTEST_F(JoinTest, Join_CrossJoin_001, TestSize.Level0)
  */
 HWTEST_F(JoinTest, Join_InnerJoin_001, TestSize.Level0)
 {
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataSharePredicates predicates;
     std::vector<std::string> clauses;
@@ -400,6 +430,7 @@ HWTEST_F(JoinTest, Join_InnerJoin_001, TestSize.Level0)
  */
 HWTEST_F(JoinTest, Join_LeftOuterJoin_001, TestSize.Level0)
 {
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataSharePredicates predicates;
     std::vector<std::string> fields;
@@ -475,6 +506,7 @@ HWTEST_F(JoinTest, Join_LeftOuterJoin_001, TestSize.Level0)
  */
 HWTEST_F(JoinTest, Join_LeftOuterJoin_002, TestSize.Level0)
 {
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataSharePredicates predicates;
     std::vector<std::string> clauses;
