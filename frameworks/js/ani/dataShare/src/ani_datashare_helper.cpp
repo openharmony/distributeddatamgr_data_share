@@ -179,7 +179,7 @@ static ani_status GetIsProxy(ani_env *env, ani_object options, bool &isProxy)
     }
 
     ani_boolean proxy;
-    result = env->Object_CallMethodByName_Boolean(static_cast<ani_object>(proxyObj), "unboxed", nullptr, &proxy);
+    result = env->Object_CallMethodByName_Boolean(static_cast<ani_object>(proxyObj), "toBoolean", nullptr, &proxy);
     if (ANI_OK != result) {
         LOG_ERROR("options Failed to get property named isProxy: %{public}d", result);
         return result;
