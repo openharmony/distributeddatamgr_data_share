@@ -288,7 +288,7 @@ static ani_object GreaterThan([[maybe_unused]] ani_env *env, [[maybe_unused]] an
 
     ani_boolean boolValue = 0;
     if (unionAccessor.IsInstanceOf("std.core.Boolean")) {
-        if (ANI_OK != env->Object_CallMethodByName_Boolean(value, "unboxed", nullptr, &boolValue)) {
+        if (ANI_OK != env->Object_CallMethodByName_Boolean(value, "toBoolean", nullptr, &boolValue)) {
             dataSharePredicates->GreaterThan(fieldStr, static_cast<bool>(boolValue));
         }
     }
