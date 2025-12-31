@@ -896,6 +896,10 @@ I64ResultWrap DataShareNativeCreate(int64_t context, rust::String strUri,
     std::string stdStrUri = std::string(strUri);
     std::shared_ptr<AbilityRuntime::Context> weakContext =
         reinterpret_cast<std::weak_ptr<AbilityRuntime::Context>*>(context)->lock();
+    if (weakContext == nullptr) {
+        LOG_ERROR("weakContext is nullptr, create dataShareHelper failed.");
+        return I64ResultWrap{0, EXCEPTION_PARAMETER_CHECK};
+    }
     std::shared_ptr<DataShareHelper> dataShareHelper;
     if (optionIsUndefined) {
         dataShareHelper = DataShareHelper::Creator(weakContext->GetToken(), stdStrUri, "", waitTime, true);
