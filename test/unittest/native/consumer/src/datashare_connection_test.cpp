@@ -305,6 +305,40 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ReRegisterObserverExtProvi
     LOG_INFO("DataShareConnection_ReRegisterObserverExtProvider_Test_001::End");
 }
 
+
+/**
+ * @tc.name: DataShareConnection_ReRegisterObserverExtProvider_Test_002
+ * @tc.desc: Verify that test won't crash if call this method with nullptr proxy
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: NA
+ * @tc.step:
+    1. Create a DataShareConnection object with the demo test URI (DATA_SHARE_URI) and a demo IRemoteObject token.
+    2. Set dataShareProxy to be nullptr.
+    3. Call ReRegisterObserverExtProvider and the test won't crash.
+ * @tc.expect:
+    1. The test won't crash.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_ReRegisterObserverExtProvider_Test_002, TestSize.Level1)
+{
+    LOG_INFO("DataShareConnection_ReRegisterObserverExtProvider_Test_002::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    sptr<DataShare::DataShareConnection> connection =
+        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    ASSERT_NE(connection, nullptr);
+    connection->dataShareProxy_ = nullptr;
+    // Add observers
+    EXPECT_TRUE(connection->observerExtsProvider_.Empty());
+    sptr<IDataAbilityObserverTest> dataObserver = new (std::nothrow) IDataAbilityObserverTest(DATA_SHARE_URI);
+    connection->UpdateObserverExtsProviderMap(uri, dataObserver, true);
+    EXPECT_EQ(connection->observerExtsProvider_.Size(), 1);
+    // Shouldn't crash
+    connection->ReRegisterObserverExtProvider();
+    LOG_INFO("DataShareConnection_ReRegisterObserverExtProvider_Test_002::End");
+}
+
 /**
  * @tc.name: DataShareConnection_OnAbilityConnectDone_Test_001
  * @tc.desc: Verify that the OnAbilityConnectDone method in DataShareConnection correctly handles reconnection (when
@@ -531,12 +565,22 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ConcurrentOnAbilityConnect
     std::function<void()> func2 = [&connection, &token, &stop, this]() {
         OnAbilityConnectDone(connection, token, stop);
     };
+    std::function<void()> func3 = [&connection, &token, &stop, this]() {
+        OnAbilityConnectDone(connection, token, stop);
+    };
+    std::function<void()> func4 = [&connection, &token, &stop, this]() {
+        OnAbilityConnectDone(connection, token, stop);
+    };
     std::thread t1(func1);
     std::thread t2(func2);
+    std::thread t3(func3);
+    std::thread t4(func4);
     sleep(testTime);
     stop = true;
     t1.join();
     t2.join();
+    t3.join();
+    t4.join();
     LOG_INFO("DataShareConnection_ConcurrentOnAbilityConnectDone_Test_001::End");
 }
 }

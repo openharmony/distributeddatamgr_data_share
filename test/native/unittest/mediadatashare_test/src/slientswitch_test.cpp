@@ -23,6 +23,7 @@
 #include "datashare_log.h"
 #include "hap_token_info.h"
 #include "iservice_registry.h"
+#include "mock_token.h"
 #include "system_ability_definition.h"
 #include "token_setproc.h"
 
@@ -65,11 +66,36 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int32_t system
     return DataShare::DataShareHelper::Creator(remoteObj, silentProxyUri, providerUri);
 }
 
+HapPolicyParams GetPolicy()
+{
+    HapPolicyParams policy = { .apl = APL_SYSTEM_CORE,
+        .domain = "test.domain",
+        .permList = { { .permissionName = "ohos.permission.test",
+            .bundleName = "com.acts.datasharetest",
+            .grantMode = 1,
+            .availableLevel = APL_SYSTEM_CORE,
+            .label = "label",
+            .labelId = 1,
+            .description = "com.acts.datasharetest",
+            .descriptionId = 1 } },
+        .permStateList = { { .permissionName = "ohos.permission.test",
+            .isGeneral = true,
+            .resDeviceID = { "local" },
+            .grantStatus = { PermissionState::PERMISSION_GRANTED },
+            .grantFlags = { 1 } } } };
+    return policy;
+}
+
 void SlientSwitchTest::SetUpTestCase(void)
 {
     LOG_INFO("SetUpTestCase invoked");
+    MockToken::SetTestEnvironment();
     auto dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
-    ASSERT_TRUE(dataShareHelper != nullptr);
+    if (dataShareHelper != nullptr) {
+        LOG_INFO("SlientSwitchTest non-silent helper connect done");
+    } else {
+        LOG_ERROR("SlientSwitchTest non-silent helper connect fail");
+    }
     int sleepTime = 3;
     sleep(sleepTime);
 
@@ -80,38 +106,25 @@ void SlientSwitchTest::SetUpTestCase(void)
         .isSystemApp = true,
         .appIDDesc = "com.acts.datasharetest"
     };
-    HapPolicyParams policy = {
-        .apl = APL_SYSTEM_CORE,
-        .domain = "test.domain",
-        .permList = {
-            {
-                .permissionName = "ohos.permission.test",
-                .bundleName = "com.acts.datasharetest",
-                .grantMode = 1,
-                .availableLevel = APL_SYSTEM_CORE,
-                .label = "label",
-                .labelId = 1,
-                .description = "com.acts.datasharetest",
-                .descriptionId = 1
-            }
-        },
-        .permStateList = {
-            {
-                .permissionName = "ohos.permission.test",
-                .isGeneral = true,
-                .resDeviceID = { "local" },
-                .grantStatus = { PermissionState::PERMISSION_GRANTED },
-                .grantFlags = { 1 }
-            }
-        }
-    };
-    AccessTokenKit::AllocHapToken(info, policy);
-    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenIDEx(
-        info.userID, info.bundleName, info.instIndex);
-    SetSelfTokenID(testTokenId.tokenIDEx);
+    HapPolicyParams policy = GetPolicy();
+    AccessTokenIDEx tokenIdEx = MockToken::AllocTestHapToken(info, policy);
+    uint64_t token = tokenIdEx.tokenIdExStruct.tokenID;
+    if (token == INVALID_TOKENID) {
+        LOG_ERROR("SlientSwitchTest token invalid.");
+        return;
+    }
+    int ret = SetSelfTokenID(token);
+    if (ret != E_OK) {
+        LOG_ERROR("SlientSwitchTest SetSelfTokenID: %{public}d", ret);
+        return;
+    }
 
     g_slientAccessHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI);
-    ASSERT_TRUE(g_slientAccessHelper != nullptr);
+    if (g_slientAccessHelper != nullptr) {
+        LOG_INFO("SlientSwitchTest silent helper connect end");
+    } else {
+        LOG_ERROR("SlientSwitchTest silent helper connect fail");
+    }
     LOG_INFO("SetUpTestCase end");
 }
 
@@ -120,6 +133,7 @@ void SlientSwitchTest::TearDownTestCase(void)
     auto tokenId = AccessTokenKit::GetHapTokenID(100, "com.acts.datasharetest", 0);
     AccessTokenKit::DeleteToken(tokenId);
     g_slientAccessHelper = nullptr;
+    MockToken::ResetTestEnvironment();
 }
 
 void SlientSwitchTest::SetUp(void) {}
@@ -261,6 +275,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Insert_Test_001, TestSize.
     int retVal = DataShareHelper::SetSilentSwitch(uri, false);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataShareValuesBucket valuesBucket;
     std::string value = "lisi";
@@ -302,6 +317,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Insert_Test_002, TestSize.
     int retVal = DataShareHelper::SetSilentSwitch(uri, false);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataShareValuesBucket valuesBucket;
     std::string value = "wangwu";
@@ -344,6 +360,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Insert_Test_001, TestSize.L
     int retVal = DataShareHelper::SetSilentSwitch(uri, true);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataShareValuesBucket valuesBucket;
     std::string value = "lisi";
@@ -385,6 +402,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Insert_Test_002, TestSize.L
     int retVal = DataShareHelper::SetSilentSwitch(uri, true);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataShareValuesBucket valuesBucket;
     std::string value = "wangwu";
@@ -429,6 +447,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Update_Test_001, TestSize.
     int retVal = DataShareHelper::SetSilentSwitch(uri, false);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataShareValuesBucket valuesBucket;
     int value = 50;
@@ -470,6 +489,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Update_Test_002, TestSize.
     int retVal = DataShareHelper::SetSilentSwitch(uri, false);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataShareValuesBucket valuesBucket;
     int value = 50;
@@ -512,6 +532,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Update_Test_001, TestSize.L
     int retVal = DataShareHelper::SetSilentSwitch(uri, true);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataShareValuesBucket valuesBucket;
     int value = 50;
@@ -553,6 +574,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Update_Test_002, TestSize.L
     int retVal = DataShareHelper::SetSilentSwitch(uri, true);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataShareValuesBucket valuesBucket;
     int value = 50;
@@ -595,6 +617,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Query_Test_001, TestSize.L
     int retVal = DataShareHelper::SetSilentSwitch(uri, false);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(TBL_STU_NAME, "lisi");
@@ -632,6 +655,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Query_Test_002, TestSize.L
     int retVal = DataShareHelper::SetSilentSwitch(uri, false);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(TBL_STU_NAME, "wangwu");
@@ -673,6 +697,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Query_Test_001, TestSize.Le
     int retVal = DataShareHelper::SetSilentSwitch(uri, true);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(TBL_STU_NAME, "lisi");
@@ -716,6 +741,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Query_Test_002, TestSize.Le
     int retVal = DataShareHelper::SetSilentSwitch(uri, true);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(TBL_STU_NAME, "wangwu");
@@ -760,6 +786,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Delete_Test_001, TestSize.
     int retVal = DataShareHelper::SetSilentSwitch(uri, false);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataSharePredicates deletePredicates;
     std::string selections = TBL_STU_NAME + " = 'lisi'";
@@ -797,6 +824,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchDisable_Delete_Test_002, TestSize.
     int retVal = DataShareHelper::SetSilentSwitch(uri, false);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataSharePredicates deletePredicates;
     std::string selections = TBL_STU_NAME + " = 'wangwu'";
@@ -835,6 +863,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Delete_Test_001, TestSize.L
     int retVal = DataShareHelper::SetSilentSwitch(uri, true);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataSharePredicates deletePredicates;
     std::string selections = TBL_STU_NAME + " = 'lisi'";
@@ -872,6 +901,7 @@ HWTEST_F(SlientSwitchTest, SlientSwitch_SwitchEnable_Delete_Test_002, TestSize.L
     int retVal = DataShareHelper::SetSilentSwitch(uri, true);
     EXPECT_EQ(retVal, E_OK);
 
+    ASSERT_NE(g_slientAccessHelper, nullptr);
     auto helper = g_slientAccessHelper;
     DataShare::DataSharePredicates deletePredicates;
     std::string selections = TBL_STU_NAME + " = 'wangwu'";

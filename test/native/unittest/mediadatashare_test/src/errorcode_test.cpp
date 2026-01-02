@@ -23,6 +23,7 @@
 #include "datashare_log.h"
 #include "hap_token_info.h"
 #include "iservice_registry.h"
+#include "mock_token.h"
 #include "rdb_errno.h"
 #include "system_ability_definition.h"
 #include "token_setproc.h"
@@ -96,8 +97,13 @@ HapPolicyParams GetPolicy()
 void ErrorCodeTest::SetUpTestCase(void)
 {
     LOG_INFO("SetUpTestCase invoked");
+    MockToken::SetTestEnvironment();
     dataShareHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, DATA_SHARE_URI);
-    ASSERT_TRUE(dataShareHelper != nullptr);
+    if (dataShareHelper != nullptr) {
+        LOG_INFO("ErrorCodeTest non-silent helper connect done");
+    } else {
+        LOG_ERROR("ErrorCodeTest non-silent helper connect fail");
+    }
     int sleepTime = 3;
     sleep(sleepTime);
 
@@ -109,13 +115,24 @@ void ErrorCodeTest::SetUpTestCase(void)
         .appIDDesc = "ohos.datashareclienttest.demo"
     };
     auto policy = GetPolicy();
-    AccessTokenKit::AllocHapToken(info, policy);
-    auto testTokenId = Security::AccessToken::AccessTokenKit::GetHapTokenIDEx(
-        info.userID, info.bundleName, info.instIndex);
-    SetSelfTokenID(testTokenId.tokenIDEx);
+    AccessTokenIDEx tokenIdEx = MockToken::AllocTestHapToken(info, policy);
+    uint64_t token = tokenIdEx.tokenIdExStruct.tokenID;
+    if (token == INVALID_TOKENID) {
+        LOG_ERROR("ErrorCodeTest token invalid.");
+        return;
+    }
+    int ret = SetSelfTokenID(token);
+    if (ret != E_OK) {
+        LOG_ERROR("ErrorCodeTest SetSelfTokenID: %{public}d", ret);
+        return;
+    }
 
     g_slientAccessHelper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, SLIENT_ACCESS_URI);
-    ASSERT_TRUE(g_slientAccessHelper != nullptr);
+    if (g_slientAccessHelper != nullptr) {
+        LOG_INFO("ErrorCodeTest silent helper connect end");
+    } else {
+        LOG_ERROR("ErrorCodeTest silent helper connect fail");
+    }
     LOG_INFO("SetUpTestCase end");
 }
 
@@ -125,6 +142,7 @@ void ErrorCodeTest::TearDownTestCase(void)
     AccessTokenKit::DeleteToken(tokenId);
     g_slientAccessHelper = nullptr;
     dataShareHelper = nullptr;
+    MockToken::ResetTestEnvironment();
 }
 
 void ErrorCodeTest::SetUp(void) {}
@@ -155,6 +173,7 @@ HWTEST_F(ErrorCodeTest, ErrorCodeTest_Insert_Test_001, TestSize.Level0)
 {
     LOG_INFO("ErrorCodeTest_Insert_Test_001::Start");
     auto helper = g_slientAccessHelper;
+    ASSERT_NE(helper, nullptr);
     Uri uri(SLIENT_ACCESS_URI);
     DataShare::DataShareValuesBucket valuesBucket;
     std::string value = "lisi";
@@ -198,6 +217,7 @@ HWTEST_F(ErrorCodeTest, ErrorCodeTest_QUERY_Test_001, TestSize.Level0)
 {
     LOG_INFO("ErrorCodeTest_QUERY_Test_001::Start");
     auto helper = g_slientAccessHelper;
+    ASSERT_NE(helper, nullptr);
     Uri uri(SLIENT_ACCESS_URI);
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(TBL_STU_NAME, "lisi");
@@ -251,7 +271,7 @@ HWTEST_F(ErrorCodeTest, ErrorCodeTest_QUERY_Test_001, TestSize.Level0)
 HWTEST_F(ErrorCodeTest, ErrorCodeTest_QUERY_Test_002, TestSize.Level0)
 {
     LOG_INFO("ErrorCodeTest_QUERY_Test_002::Start");
-    ASSERT_TRUE(dataShareHelper != nullptr);
+    ASSERT_NE(dataShareHelper, nullptr);
     Uri uri(DATA_SHARE_URI);
 
     DataShare::DataShareValuesBucket valuesBucket;
