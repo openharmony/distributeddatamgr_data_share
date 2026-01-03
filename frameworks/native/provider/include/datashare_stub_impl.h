@@ -93,6 +93,8 @@ private:
     bool IsCallerSystemApp(const CallingInfo &callingInfo, const uint64_t fullTokenId);
     bool VerifyProvider(const CallingInfo &callingInfo, const uint64_t fullTokenId,
         const std::string &uri = "");
+    bool VerifyPredicates(const DataSharePredicates &predicates, const CallingInfo &callingInfo,
+        const std::string &func);
     std::shared_ptr<DataShareExtAbility> extension_;
     std::shared_ptr<DataShare::DataShareUvQueue> uvQueue_;
     std::mutex mutex_;

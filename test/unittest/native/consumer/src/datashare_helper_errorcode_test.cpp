@@ -283,5 +283,232 @@ HWTEST_F(DataShareHelperErrorCodeTest, QUERY_Test_002, TestSize.Level0)
     EXPECT_EQ((retVal > 0), true);
     LOG_INFO("QUERY_Test_002::End");
 }
+
+/**
+ * @tc.name: PREDICATES_VERIFY_Test_001
+ * @tc.desc: Verify predicates and error handling for update, query, and delete operations with non-silent access
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: DataShareHelper instance is initialized
+ * @tc.step:
+    1. Insert test data into the database
+    2. Update data with illegal predicates and verify error code
+    3. Query data with invalid predicates and verify error code and result set
+    4. Delete data with normal predicates and verify success
+ * @tc.experct:
+    1. Insert operation succeeds with positive return value
+    2. Update operation returns -1 due to illegal predicates
+    3. Query operation returns 401 error code and null result set
+    4. Delete operation succeeds with positive return value
+ */
+HWTEST_F(DataShareHelperErrorCodeTest, Predicates_verify_Test_001, TestSize.Level0)
+{
+    LOG_INFO("Predicates_Verify_Test_001::Start");
+    ASSERT_TRUE(dataShareHelper != nullptr);
+    Uri uri(DATA_SHARE_URI);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "wangwu";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 30;
+    valuesBucket.Put(TBL_STU_AGE, age);
+    int retVal = dataShareHelper->Insert(uri, valuesBucket);
+    EXPECT_TRUE(retVal > 0);
+
+    // update with illegal predicates
+    DataShare::DataShareValuesBucket valuesBucket1;
+    value = "wangwu_new";
+    valuesBucket1.Put(TBL_STU_NAME, value);
+    DataShare::DataSharePredicates predicates;
+    predicates.GreaterThan("name and true", "wangwu");
+    retVal = dataShareHelper->Update(uri, predicates, valuesBucket1);
+    EXPECT_EQ(retVal, -1);
+
+    // query with invalid predicates
+    vector<string> columns;
+    DatashareBusinessError error;
+    DataShare::DataSharePredicates predicates1;
+    predicates1.EqualTo("name AS colName", "wangwu");
+    // add log only, do not return error when verify failed. 401 returns from JS provider
+    auto resultSet = dataShareHelper->Query(uri, predicates1, columns, &error);
+    EXPECT_EQ(error.GetCode(), 401);
+    EXPECT_EQ(resultSet, nullptr);
+
+    // delete with normal predicates
+    DataShare::DataSharePredicates deletePredicates;
+    std::string selections = TBL_STU_NAME + " = 'wangwu'";
+    deletePredicates.SetWhereClause(selections);
+    retVal = dataShareHelper->Delete(uri, deletePredicates);
+    EXPECT_TRUE(retVal > 0);
+    LOG_INFO("Predicates_Verify_Test_001::End");
+}
+
+/**
+ * @tc.name: PREDICATES_VERIFY_Test_002
+ * @tc.desc: Verify predicates and error handling for update and delete operations with non-silent access
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: DataShareHelper instance is initialized
+ * @tc.step:
+    1. Insert test data into the database
+    2. Update data with normal predicates and verify success
+    3. Delete data with illegal predicates and verify error code
+    4. Delete data with normal predicates and verify success
+ * @tc.experct:
+    1. Insert operation succeeds with positive return value
+    2. Update operation succeeds with return value 1
+    3. Delete operation returns -1 due to illegal predicates
+    4. Delete operation succeeds with positive return value
+ */
+HWTEST_F(DataShareHelperErrorCodeTest, Predicates_verify_Test_002, TestSize.Level0)
+{
+    LOG_INFO("Predicates_verify_Test_002::Start");
+    ASSERT_TRUE(dataShareHelper != nullptr);
+    Uri uri(DATA_SHARE_URI);
+
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "wangwu";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 30;
+    valuesBucket.Put(TBL_STU_AGE, age);
+    int retVal = dataShareHelper->Insert(uri, valuesBucket);
+    EXPECT_TRUE(retVal > 0);
+
+    // update with normal predicates
+    DataShare::DataShareValuesBucket valuesBucket1;
+    value = "wangwu_new";
+    valuesBucket1.Put(TBL_STU_NAME, value);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_NAME, "wangwu");
+    retVal = dataShareHelper->Update(uri, predicates, valuesBucket1);
+    EXPECT_EQ(retVal, 1);
+
+    // delete with illegal predicates
+    DataShare::DataSharePredicates deletePredicates;
+    deletePredicates.GreaterThanOrEqualTo("(1 = 1) OR true", "wangwu");
+    retVal = dataShareHelper->Delete(uri, deletePredicates);
+    EXPECT_EQ(retVal, -1);
+
+    // delete with normal predicates
+    DataShare::DataSharePredicates deletePredicates1;
+    std::string selections = TBL_STU_NAME + " = 'wangwu_new'";
+    deletePredicates1.SetWhereClause(selections);
+    retVal = dataShareHelper->Delete(uri, deletePredicates1);
+    EXPECT_TRUE(retVal > 0);
+    LOG_INFO("Predicates_verify_Test_002::End");
+}
+
+/**
+ * @tc.name: PREDICATES_VERIFY_Test_003
+ * @tc.desc: Verify predicates and error handling for update, query, and delete operations with silent access
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: DataShareHelper instance is initialized
+ * @tc.step:
+    1. Insert test data into the database
+    2. Update data with normal predicates and verify success
+    3. Query data with illegal predicates and verify error code and result set
+    4. Delete data with normal predicates and verify success
+ * @tc.experct:
+    1. Insert operation succeeds with positive return value
+    2. Update operation succeeds with return value 1
+    3. Query operation returns E_ERROR and null result set
+    4. Delete operation succeeds with positive return value
+ */
+HWTEST_F(DataShareHelperErrorCodeTest, Predicates_verify_Test_003, TestSize.Level0)
+{
+    LOG_INFO("Predicates_verify_Test_003::Start");
+    // insert data
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "ZhangSan";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_TRUE(retVal > 0);
+
+    // update with normal predicates
+    DataShare::DataShareValuesBucket valuesBucket1;
+    value = "ZhangSan_new";
+    valuesBucket1.Put(TBL_STU_NAME, value);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(TBL_STU_NAME, "ZhangSan");
+    retVal = helper->Update(uri, predicates, valuesBucket1);
+    EXPECT_EQ(retVal, 1);
+
+    // query with illegal predicates
+    DataShare::DataSharePredicates predicates1;
+    predicates1.NotEqualTo("(SELECT * from test)", "ZhangSan_new");
+    vector<string> columns;
+    DatashareBusinessError noError;
+    auto resultSet = helper->Query(uri, predicates1, columns, &noError);
+    EXPECT_EQ(noError.GetCode(), E_ERROR);
+    EXPECT_EQ(resultSet, nullptr);
+
+    // delete with normal predicates
+    DataShare::DataSharePredicates deletePredicates;
+    std::string selections = TBL_STU_NAME + " = 'ZhangSan_new'";
+    deletePredicates.SetWhereClause(selections);
+    retVal = helper->Delete(uri, deletePredicates);
+    EXPECT_TRUE(retVal > 0);
+    LOG_INFO("Predicates_verify_Test_003::End");
+}
+
+/**
+ * @tc.name: PREDICATES_VERIFY_Test_004
+ * @tc.desc: Verify predicates and error handling for update and delete operations with silent access
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: DataShareHelper instance is initialized
+ * @tc.step:
+    1. Insert test data into the database
+    2. Update data with illegal predicates and verify error code
+    3. Delete data with illegal predicates and verify error code
+    4. Delete data with normal predicates and verify success
+ * @tc.experct:
+    1. Insert operation succeeds with positive return value
+    2. Update operation returns DATA_SHARE_ERROR due to illegal predicates
+    3. Delete operation returns -1 due to illegal predicates
+    4. Delete operation succeeds with positive return value
+ */
+HWTEST_F(DataShareHelperErrorCodeTest, Predicates_verify_Test_004, TestSize.Level0)
+{
+    LOG_INFO("Predicates_verify_Test_004::Start");
+    // insert data
+    auto helper = g_slientAccessHelper;
+    Uri uri(SLIENT_ACCESS_URI);
+    DataShare::DataShareValuesBucket valuesBucket;
+    std::string value = "ZhangSan";
+    valuesBucket.Put(TBL_STU_NAME, value);
+    int age = 25;
+    valuesBucket.Put(TBL_STU_AGE, age);
+    int retVal = helper->Insert(uri, valuesBucket);
+    EXPECT_TRUE(retVal > 0);
+
+    // update with illegal predicates
+    DataShare::DataShareValuesBucket valuesBucket1;
+    value = "ZhangSan_new";
+    valuesBucket1.Put(TBL_STU_NAME, value);
+    DataShare::DataSharePredicates predicates;
+    predicates.LessThan("SUM(age) as name", "ZhangSan");
+    retVal = helper->Update(uri, predicates, valuesBucket1);
+    EXPECT_EQ(retVal, DATA_SHARE_ERROR);
+
+    // delete with illegal predicates
+    DataShare::DataSharePredicates deletePredicates;
+    deletePredicates.GreaterThanOrEqualTo("name = name0 ) and (1 = 1 or name = ", "ZhangSan");
+    retVal = helper->Delete(uri, deletePredicates);
+    EXPECT_EQ(retVal, -1);
+
+    // delete with normal predicates
+    DataShare::DataSharePredicates deletePredicates1;
+    std::string selections = TBL_STU_NAME + " = 'ZhangSan'";
+    deletePredicates1.SetWhereClause(selections);
+    retVal = helper->Delete(uri, deletePredicates1);
+    EXPECT_TRUE(retVal > 0);
+    LOG_INFO("Predicates_verify_Test_004::End");
+}
 } // namespace DataShare
 } // namespace OHOS

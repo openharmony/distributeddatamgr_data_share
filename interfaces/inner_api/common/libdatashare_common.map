@@ -16,6 +16,7 @@
     *DataShareAbsPredicates*;
     *DataShareJSUtils*;
     *DataSharePredicates*;
+    *DataSharePredicatesVerify*;
     *DataShareResultSet*;
     *DataShareValueObject*;
     *DataShareValuesBucket*;

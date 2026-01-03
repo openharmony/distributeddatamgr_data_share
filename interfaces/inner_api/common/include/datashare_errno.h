@@ -279,6 +279,16 @@ constexpr int E_UNIMPLEMENT = (E_BASE + 85);
 * @brief The error code for DataShare Silent/Non-Silent Type Error.
 */
 constexpr int E_DATASHARE_TYPE = (E_BASE + 86);
+
+/**
+* @brief The error code for illegal predicate field.
+*/
+constexpr int E_FIELD_ILLEGAL = (E_BASE + 87);
+
+/**
+* @brief The error code for invalid predicate field.
+*/
+constexpr int E_FIELD_INVALID = (E_BASE + 88);
 } // namespace DataShare
 } // namespace OHOS
 

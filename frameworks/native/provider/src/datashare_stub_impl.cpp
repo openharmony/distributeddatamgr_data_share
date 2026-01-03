@@ -25,6 +25,7 @@
 #include "data_share_config.h"
 #include "datashare_errno.h"
 #include "datashare_log.h"
+#include "datashare_predicates_verify.h"
 #include "datashare_string_utils.h"
 #include "hiview_datashare.h"
 #include "ipc_skeleton.h"
@@ -108,6 +109,26 @@ bool DataShareStubImpl::VerifyProvider(const CallingInfo &callingInfo, const uin
     }
     // Provider in allowlist
     return true;
+}
+
+bool DataShareStubImpl::VerifyPredicates(const DataSharePredicates &predicates, const CallingInfo &callingInfo,
+    const std::string &func)
+{
+    DataSharePredicatesVerify predicatesVerify;
+    auto [predicatesType, errCode] = predicatesVerify.VerifyPredicates(predicates);
+    if (errCode != E_OK) {
+        std::string appIndex = "Non-Silent predicate:" + std::to_string(predicatesType);
+        DataShareFaultInfo faultInfo{HiViewFaultAdapter::INVALID_PREDICATES,
+            "callingUid:" + std::to_string(callingInfo.callingUid), "", "", func, errCode, appIndex};
+        HiViewFaultAdapter::ReportDataFault(faultInfo);
+        LOG_WARN("callingUid: %{public}d func: %{public}s predicates:%{public}d invalid, err:%{public}d",
+            callingInfo.callingUid, func.c_str(), predicatesType, errCode);
+    }
+    // E_FIELD_INVALID only add hiview
+    if (errCode == E_FIELD_INVALID || errCode == E_OK) {
+        return true;
+    }
+    return false;
 }
 
 std::vector<std::string> DataShareStubImpl::GetFileTypes(const Uri &uri, const std::string &mimeTypeFilter)
@@ -252,6 +273,11 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
     // Only log when check failed. For ReportDataFault purpose.
     VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
+    std::string func = __FUNCTION__;
+    if (!VerifyPredicates(predicates, info, func)) {
+        return DATA_SHARE_ERROR;
+    }
+
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
     if (extension == nullptr) {
@@ -335,6 +361,11 @@ int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predica
     GetCallingInfo(info);
     // Only log when check failed. For ReportDataFault purpose.
     VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
+
+    std::string func = __FUNCTION__;
+    if (!VerifyPredicates(predicates, info, func)) {
+        return DATA_SHARE_ERROR;
+    }
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
@@ -421,6 +452,11 @@ std::pair<int32_t, int32_t> DataShareStubImpl::UpdateEx(const Uri &uri, const Da
     // Only log when check failed. For ReportDataFault purpose.
     VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
+    std::string func = __FUNCTION__;
+    if (!VerifyPredicates(predicates, info, func)) {
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
     if (extension == nullptr) {
@@ -463,6 +499,11 @@ std::pair<int32_t, int32_t> DataShareStubImpl::DeleteEx(const Uri &uri, const Da
     // Only log when check failed. For ReportDataFault purpose.
     VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
 
+    std::string func = __FUNCTION__;
+    if (!VerifyPredicates(predicates, info, func)) {
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
     if (extension == nullptr) {
@@ -505,6 +546,11 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
     GetCallingInfo(info);
     // Only log when check failed. For ReportDataFault purpose.
     VerifyProvider(info, IPCSkeleton::GetCallingFullTokenID(), uri.ToString());
+
+    std::string func = __FUNCTION__;
+    if (!VerifyPredicates(predicates, info, func)) {
+        return nullptr;
+    }
 
     std::shared_ptr<DataShareResultSet> resultSet = nullptr;
     auto client = sptr<DataShareStubImpl>(this);
