@@ -506,10 +506,6 @@ impl GlobalRefErrorCallback {
     pub fn execute(&self, business_error: BusinessError) {
         self.inner.execute_global(business_error);
     }
-
-    pub fn execute_spawn_thread(&self, business_error: BusinessError) {
-        self.inner.execute_global_spawn_thread(business_error);
-    }
 }
 
 pub trait InputVec {
