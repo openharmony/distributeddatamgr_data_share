@@ -195,6 +195,10 @@
                         ],
                         "header_base": "//foundation/distributeddatamgr/data_share/frameworks/js/napi/common/include"
                     }
+                },
+                {
+                    "type": "so",
+                    "name": "//foundation/distributeddatamgr/data_share/common/ani_rs:ani_rs"
                 }
             ],
             "test": [
