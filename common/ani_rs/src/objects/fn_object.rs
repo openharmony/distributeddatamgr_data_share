@@ -26,7 +26,6 @@ use std::{
     ops::Deref,
     sync::{Arc, Once},
 };
-use ylong_runtime::builder::RuntimeBuilder;
 
 static INIT_RUNTIME: Once = Once::new();
 const MAX_BLOCKING_POOL_SIZE: u8 = 1;
@@ -397,38 +396,6 @@ impl GlobalRef<AniFnObject<'static>> {
         })
         .send_event("callback execute global");
     }
-
-    pub fn execute_global_spawn_thread<T>(self: &Arc<Self>, input: T)
-    where
-        Self: 'static,
-        T: InputVec + Send + 'static,
-    {
-        let me = self.clone();
-        INIT_RUNTIME.call_once(|| {
-            RuntimeBuilder::new_multi_thread()
-                .max_blocking_pool_size(MAX_BLOCKING_POOL_SIZE)
-                .worker_num(1)
-                .build_global()
-                .unwrap_or_else(|_| {
-                    ani_rs_error!("Failed to init runtime");
-                });
-        });
-        ylong_runtime::spawn_blocking(move || {
-            if let Ok(env) = AniVm::get_instance().get_env() {
-                me.0.execute_local(&env, input).unwrap();
-            } else {
-                match AniVm::get_instance().attach_current_thread() {
-                    Ok(env) => {
-                        me.0.execute_local(&env, input).unwrap();
-                        AniVm::get_instance().detach_current_thread().unwrap();
-                    }
-                    Err(err) => {
-                        ani_rs_error!("Failed to attach_current_thread in thread, err = {:?}", err);
-                    }
-                }
-            }
-        });
-    }
 }
 
 impl GlobalRef<AniAsyncCallback<'static>> {
@@ -456,41 +423,6 @@ impl GlobalRef<AniAsyncCallback<'static>> {
         })
         .send_event("async callback execute global");
     }
-
-    pub fn execute_global_spawn_thread<T>(
-        self: &Arc<Self>,
-        business_error: Option<BusinessError>,
-        input: T,
-    ) where
-        Self: 'static,
-        T: InputVec + Send + 'static,
-    {
-        let me = self.clone();
-        INIT_RUNTIME.call_once(|| {
-            RuntimeBuilder::new_multi_thread()
-                .max_blocking_pool_size(MAX_BLOCKING_POOL_SIZE)
-                .worker_num(1)
-                .build_global()
-                .unwrap_or_else(|_| {
-                    ani_rs_error!("Failed to init runtime");
-                });
-        });
-        ylong_runtime::spawn_blocking(move || {
-            if let Ok(env) = AniVm::get_instance().get_env() {
-                me.0.execute_local(&env, business_error, input).unwrap();
-            } else {
-                match AniVm::get_instance().attach_current_thread() {
-                    Ok(env) => {
-                        me.0.execute_local(&env, business_error, input).unwrap();
-                        AniVm::get_instance().detach_current_thread().unwrap();
-                    }
-                    Err(err) => {
-                        ani_rs_error!("Failed to attach_current_thread in thread, err = {:?}", err);
-                    }
-                }
-            }
-        });
-    }
 }
 
 impl GlobalRef<AniErrorCallback<'static>> {
@@ -514,37 +446,6 @@ impl GlobalRef<AniErrorCallback<'static>> {
             }
         })
         .send_event("Error callback execute global");
-    }
-
-    pub fn execute_global_spawn_thread(self: &Arc<Self>, business_error: BusinessError)
-    where
-        Self: 'static,
-    {
-        let me = self.clone();
-        INIT_RUNTIME.call_once(|| {
-            RuntimeBuilder::new_multi_thread()
-                .max_blocking_pool_size(MAX_BLOCKING_POOL_SIZE)
-                .worker_num(1)
-                .build_global()
-                .unwrap_or_else(|_| {
-                    ani_rs_error!("Failed to init runtime");
-                });
-        });
-        ylong_runtime::spawn_blocking(move || {
-            if let Ok(env) = AniVm::get_instance().get_env() {
-                me.0.execute_local(&env, business_error).unwrap();
-            } else {
-                match AniVm::get_instance().attach_current_thread() {
-                    Ok(env) => {
-                        me.0.execute_local(&env, business_error).unwrap();
-                        AniVm::get_instance().detach_current_thread().unwrap();
-                    }
-                    Err(err) => {
-                        ani_rs_error!("Failed to attach_current_thread in thread, err = {:?}", err);
-                    }
-                }
-            }
-        });
     }
 }
 
@@ -589,11 +490,6 @@ impl<T: InputVec + Send + 'static> GlobalRefAsyncCallback<T> {
     pub fn execute(&self, business_error: Option<BusinessError>, input: T) {
         self.inner.execute_global(business_error, input);
     }
-
-    pub fn execute_spawn_thread(&self, business_error: Option<BusinessError>, input: T) {
-        self.inner
-            .execute_global_spawn_thread(business_error, input);
-    }
 }
 
 impl<T: InputVec + Send + 'static> Eq for GlobalRefCallback<T> {}
@@ -601,10 +497,6 @@ impl<T: InputVec + Send + 'static> Eq for GlobalRefCallback<T> {}
 impl<T: InputVec + Send + 'static> GlobalRefCallback<T> {
     pub fn execute(&self, input: T) {
         self.inner.execute_global(input);
-    }
-
-    pub fn execute_spawn_thread(&self, input: T) {
-        self.inner.execute_global_spawn_thread(input);
     }
 }
 

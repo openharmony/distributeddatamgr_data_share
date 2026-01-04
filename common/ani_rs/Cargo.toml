@@ -20,6 +20,5 @@ edition = "2021"
 ani_rs_macros = { path = "../ani_rs_macros/" }
 ani_sys = { path = "../ani_sys" }
 serde = { version = "1.0", features = ["derive"] }
-ylong_runtime = { git = "https://gitee.com/openharmony/commonlibrary_rust_ylong_runtime", features = ["full"] }
 cxx = "1.0.115"
 hilog_rust = { git = "https://gitee.com/openharmony/hiviewdfx_hilog" }

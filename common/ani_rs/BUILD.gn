@@ -71,7 +71,6 @@ ohos_rust_static_library("ani_rs") {
     "hilog:hilog_rust",
     "runtime_core:ani",
     "rust_cxx:lib",
-    "ylong_runtime:ylong_runtime",
   ]
 
   clippy_lints = "none"

@@ -49,11 +49,18 @@ pub const ENTRIES: &CStr = cstr(b"entries\0");
 pub const NEXT: &CStr = cstr(b"next\0");
 pub const VALUE: &CStr = cstr(b"value\0");
 pub const ANI_UNIONT: &CStr = cstr(b"ani_union\0");
-pub const UNBOX: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"unboxed\0") };
+pub const TOBOOLEAN: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"toBoolean\0") };
+pub const TOBYTE: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"toByte\0") };
+pub const TOCHAR: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"toChar\0") };
+pub const TOSHORT: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"toShort\0") };
+pub const TOINT: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"toInt\0") };
+pub const TOLONG: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"toLong\0") };
+pub const TOFLOAT: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"toFloat\0") };
+pub const TODOUBLE: &CStr = unsafe { CStr::from_bytes_with_nul_unchecked(b"toDouble\0") };
 
 
 pub const TYPED_ARRAY_CTOR: &CStr =
-    cstr(b"C{std.core.ArrayBuffer}d:\0");
+    cstr(b"C{escompat.ArrayBuffer}d:\0");
 pub const BYTE_LENGTH: &CStr = cstr(b"byteLength\0");
 pub const BYTE_OFFSET: &CStr = cstr(b"byteOffset\0");
 pub const BUFFER: &CStr = cstr(b"buffer\0");

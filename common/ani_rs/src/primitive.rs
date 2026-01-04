@@ -193,7 +193,7 @@ impl AniExt for bool {
             (**env.inner).Object_CallMethodByName_Boolean.unwrap()(
                 env.inner,
                 ani_ref.as_raw(),
-                signature::UNBOX.as_ptr(),
+                signature::TOBOOLEAN.as_ptr(),
                 null_mut(),
                 &mut value as *mut ani_boolean,
             )
@@ -375,7 +375,7 @@ impl AniExt for i8 {
             (**env.inner).Object_CallMethodByName_Byte.unwrap()(
                 env.inner,
                 ani_ref.as_raw(),
-                signature::UNBOX.as_ptr(),
+                signature::TOBYTE.as_ptr(),
                 null_mut(),
                 &mut value as *mut _,
             )
@@ -556,7 +556,7 @@ impl AniExt for i16 {
             (**env.inner).Object_CallMethodByName_Short.unwrap()(
                 env.inner,
                 ani_ref.as_raw(),
-                signature::UNBOX.as_ptr(),
+                signature::TOSHORT.as_ptr(),
                 null_mut(),
                 &mut value as *mut _,
             )
@@ -736,7 +736,7 @@ impl AniExt for i32 {
             (**env.inner).Object_CallMethodByName_Int.unwrap()(
                 env.inner,
                 ani_ref.as_raw(),
-                signature::UNBOX.as_ptr(),
+                signature::TOINT.as_ptr(),
                 null_mut(),
                 &mut value as *mut _,
             )
@@ -916,7 +916,7 @@ impl AniExt for i64 {
             (**env.inner).Object_CallMethodByName_Long.unwrap()(
                 env.inner,
                 ani_ref.as_raw(),
-                signature::UNBOX.as_ptr(),
+                signature::TOLONG.as_ptr(),
                 null_mut(),
                 &mut value as *mut _,
             )
@@ -1097,7 +1097,7 @@ impl AniExt for f32 {
             (**env.inner).Object_CallMethodByName_Float.unwrap()(
                 env.inner,
                 ani_ref.as_raw(),
-                signature::UNBOX.as_ptr(),
+                signature::TOFLOAT.as_ptr(),
                 null_mut(),
                 &mut value as *mut _,
             )
@@ -1277,7 +1277,7 @@ impl AniExt for f64 {
             (**env.inner).Object_CallMethodByName_Double.unwrap()(
                 env.inner,
                 ani_ref.as_raw(),
-                signature::UNBOX.as_ptr(),
+                signature::TODOUBLE.as_ptr(),
                 null_mut(),
                 &mut value as *mut _,
             )
@@ -1486,7 +1486,7 @@ impl AniExt for char {
             (**env.inner).Object_CallMethodByName_Char.unwrap()(
                 env.inner,
                 ani_ref.as_raw(),
-                signature::UNBOX.as_ptr(),
+                signature::TOCHAR.as_ptr(),
                 null_mut(),
                 &mut value as *mut _,
             )
