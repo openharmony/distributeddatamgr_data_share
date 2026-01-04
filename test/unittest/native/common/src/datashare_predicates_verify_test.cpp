@@ -178,7 +178,7 @@ HWTEST_F(DataSharePredicatesVerifyTest, VerifyPredicatesByType002, TestSize.Leve
     // verifyType is SINGLE_3_PARAMS_PUBLIC and filed is invalid
     OperationItem publicTest1 {};
     publicTest1.operation = SINGLE_2_PARAMS_PUBLIC_TEST;
-    publicTest1.singleParams.push_back("2test");
+    publicTest1.singleParams.push_back("./test");
     ret = predicatesVerify.VerifyPredicatesByType(
         DataSharePredicatesVerify::PredicatesVerifyType::SINGLE_3_PARAMS_PUBLIC, publicTest1);
     EXPECT_EQ(ret, E_FIELD_INVALID);
@@ -350,6 +350,14 @@ HWTEST_F(DataSharePredicatesVerifyTest, VerifyField001, TestSize.Level0)
 
     // abnormal branch test
     test = "columnName]";
+    ret = predicatesVerify.VerifyField(test);
+    EXPECT_FALSE(ret);
+
+    test = "test..";
+    ret = predicatesVerify.VerifyField(test);
+    EXPECT_FALSE(ret);
+
+    test = "(.test.)";
     ret = predicatesVerify.VerifyField(test);
     EXPECT_FALSE(ret);
     LOG_INFO("DataSharePredicatesVerifyTest VerifyField001::End");
