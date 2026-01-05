@@ -145,6 +145,15 @@ pub fn value_bucket_push_kv_f64(
     values_bucket_push_kv(value_bucket, key, value);
 }
 
+pub fn value_bucket_push_kv_i64(
+    value_bucket: &mut ValuesBucketHashWrap,
+    key: String,
+    value: i64,
+) {
+    let value = BucketValue::I64(value);
+    values_bucket_push_kv(value_bucket, key, value);
+}
+
 pub fn value_bucket_push_kv_boolean(
     value_bucket: &mut ValuesBucketHashWrap,
     key: String,
@@ -223,6 +232,16 @@ pub fn values_bucket_array_push_kv_f64(
     new_hashmap: bool,
 ) {
     let value = BucketValue::F64(value);
+    values_bucket_array_push_kv(value_buckets, key, value, new_hashmap);
+}
+
+pub fn values_bucket_array_push_kv_i64(
+    value_buckets: &mut ValuesBucketArrayWrap,
+    key: String,
+    value: i64,
+    new_hashmap: bool,
+) {
+    let value = BucketValue::I64(value);
     values_bucket_array_push_kv(value_buckets, key, value, new_hashmap);
 }
 

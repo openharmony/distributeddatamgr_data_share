@@ -401,6 +401,11 @@ void DataSharePredicatesEqualTo(int64_t predicatesPtr, rust::String field, const
             predicates->EqualTo(strFiled, data);
             break;
         }
+        case EnumType::I64Type: {
+            int64_t data = value_type_get_i64(value);
+            predicates->EqualTo(strFiled, data);
+            break;
+        }
         default: {
             LOG_ERROR("Invalid argument! Wrong argument Type");
             break;
@@ -430,6 +435,11 @@ void DataSharePredicatesNotEqualTo(int64_t predicatesPtr, rust::String field, co
         }
         case EnumType::BooleanType: {
             bool data = value_type_get_bool(value);
+            predicates->NotEqualTo(strFiled, data);
+            break;
+        }
+        case EnumType::I64Type: {
+            int64_t data = value_type_get_i64(value);
             predicates->NotEqualTo(strFiled, data);
             break;
         }
@@ -640,6 +650,11 @@ void DataSharePredicatesGreaterThan(int64_t predicatesPtr, rust::String field, c
             (void)(*predicates->GreaterThan(std::string(field), data));
             break;
         }
+        case EnumType::I64Type: {
+            int64_t data = value_type_get_i64(value);
+            (void)(*predicates->GreaterThan(std::string(field), data));
+            break;
+        }
         default: {
             LOG_ERROR("Invalid argument! Wrong argument Type");
             break;
@@ -663,6 +678,11 @@ void DataSharePredicatesGreaterThanOrEqualTo(int64_t predicatesPtr, rust::String
         }
         case EnumType::F64Type: {
             double data = value_type_get_f64(value);
+            (void)(*predicates->GreaterThanOrEqualTo(std::string(field), data));
+            break;
+        }
+        case EnumType::I64Type: {
+            int64_t data = value_type_get_i64(value);
             (void)(*predicates->GreaterThanOrEqualTo(std::string(field), data));
             break;
         }
@@ -692,6 +712,11 @@ void DataSharePredicatesLessThanOrEqualTo(int64_t predicatesPtr, rust::String fi
             (void)(*predicates->LessThanOrEqualTo(std::string(field), data));
             break;
         }
+        case EnumType::I64Type: {
+            int64_t data = value_type_get_i64(value);
+            (void)(*predicates->LessThanOrEqualTo(std::string(field), data));
+            break;
+        }
         default: {
             LOG_ERROR("Invalid argument! Wrong argument Type");
             break;
@@ -715,6 +740,11 @@ void DataSharePredicatesLessThan(int64_t predicatesPtr, rust::String field, cons
         }
         case EnumType::F64Type: {
             double data = value_type_get_f64(value);
+            (void)(*predicates->LessThan(std::string(field), data));
+            break;
+        }
+        case EnumType::I64Type: {
+            int64_t data = value_type_get_i64(value);
             (void)(*predicates->LessThan(std::string(field), data));
             break;
         }
@@ -815,6 +845,11 @@ void DataSharePredicatesIn(int64_t predicatesPtr, rust::String field,  rust::Vec
                 values.push_back(std::to_string(data));
                 break;
             }
+            case EnumType::I64Type: {
+                int64_t data = value_type_get_i64(v);
+                values.push_back(std::to_string(data));
+                break;
+            }
             default: {
                 LOG_ERROR("Invalid argument! Wrong argument Type");
                 break;
@@ -847,6 +882,11 @@ void DataSharePredicatesNotIn(int64_t predicatesPtr, rust::String field, rust::V
             }
             case EnumType::BooleanType: {
                 bool data = value_type_get_bool(v);
+                values.push_back(std::to_string(data));
+                break;
+            }
+            case EnumType::I64Type: {
+                int64_t data = value_type_get_i64(v);
                 values.push_back(std::to_string(data));
                 break;
             }
@@ -1013,6 +1053,11 @@ void GetValuesBucketWrap(const rust::Vec<ValuesBucketKvItem> &bucket, DataShareV
             }
             case EnumType::NullType: {
                 valuesBucket.Put(key, {});
+                break;
+            }
+            case EnumType::I64Type: {
+                int64_t data = value_bucket_get_i64(cpp_bucket);
+                valuesBucket.Put(key, data);
                 break;
             }
             default: {
