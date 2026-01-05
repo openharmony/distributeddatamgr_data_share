@@ -242,6 +242,11 @@ pub mod ffi {
             key: String,
             value: f64,
         );
+        fn value_bucket_push_kv_i64(
+            value_bucket: &mut ValuesBucketHashWrap,
+            key: String,
+            value: i64,
+        );
         fn value_bucket_push_kv_boolean(
             value_bucket: &mut ValuesBucketHashWrap,
             key: String,
@@ -273,6 +278,12 @@ pub mod ffi {
             value_buckets: &mut ValuesBucketArrayWrap,
             key: String,
             value: f64,
+            new_hashmap: bool,
+        );
+        fn values_bucket_array_push_kv_i64(
+            value_buckets: &mut ValuesBucketArrayWrap,
+            key: String,
+            value: i64,
             new_hashmap: bool,
         );
         fn values_bucket_array_push_kv_boolean(
