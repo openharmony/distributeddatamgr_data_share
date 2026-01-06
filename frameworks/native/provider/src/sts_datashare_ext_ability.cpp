@@ -510,6 +510,7 @@ Uri StsDataShareExtAbility::NormalizeUri(const Uri &uri)
     ani_env* env = stsRuntime_.GetAniEnv();
     if (env == nullptr) {
         LOG_ERROR("Query failed, env is null");
+        delete point;
         return uri;
     }
     Uri normalizedUri = DataShareExtAbility::NormalizeUri(uri);
@@ -529,6 +530,7 @@ Uri StsDataShareExtAbility::DenormalizeUri(const Uri &uri)
     ani_env* env = stsRuntime_.GetAniEnv();
     if (env == nullptr) {
         LOG_ERROR("Query failed, env is null");
+        delete point;
         return uri;
     }
     Uri denormalizedUri = DataShareExtAbility::DenormalizeUri(uri);
@@ -539,7 +541,7 @@ Uri StsDataShareExtAbility::DenormalizeUri(const Uri &uri)
 
 static void CleanupPredicates(rust::Vec<int64_t>& vec_predicates)
 {
-    for (int i = 0; i < vec_predicates.size(); ++i) {
+    for (size_t i = 0; i < vec_predicates.size(); ++i) {
         delete (DataSharePredicates*)vec_predicates[i];
         vec_predicates[i] = 0;
     }
