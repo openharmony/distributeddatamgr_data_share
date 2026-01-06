@@ -33,37 +33,37 @@ static const std::set<OperationType> MULTI_2_PARAMS_SYS_SET = { IN_KEY, GROUP_BY
 // colName or (colName) or [colName] or "colName"
 // allows leading/trailing spaces
 static const std::regex COLNAME_OPTIONAL_BRACKETS(
-    "^\\s*([a-zA-Z0-9_]*)\\s*$|"
-    "^\\s*\\(([a-zA-Z0-9_]*)\\)\\s*$|"
-    "^\\s*\\[([a-zA-Z0-9_]*)\\]\\s*$|"
-    "^\\s*\"([a-zA-Z0-9_]*)\"\\s*$"
+    "^\\s*([a-zA-Z0-9_]+)\\s*$|"
+    "^\\s*\\(([a-zA-Z0-9_]+)\\)\\s*$|"
+    "^\\s*\\[([a-zA-Z0-9_]+)\\]\\s*$|"
+    "^\\s*\"([a-zA-Z0-9_]+)\"\\s*$"
 );
 
 // tableName.colName or (tableName.colName) or [tableName.colName] or "tableName.colName"
 // allows leading/trailing spaces
 static const std::regex TABLENAME_DOT_COLNAME_OPTIONAL_BRACKETS(
-    "^\\s*([a-zA-Z0-9_]*\\.[a-zA-Z0-9_]*)\\s*$|"
-    "^\\s*\\(([a-zA-Z0-9_]*\\.[a-zA-Z0-9_]*)\\)\\s*$|"
-    "^\\s*\\[([a-zA-Z0-9_]*\\.[a-zA-Z0-9_]*)\\]\\s*$|"
-    "^\\s*\"([a-zA-Z0-9_]*\\.[a-zA-Z0-9_]*)\"\\s*$"
+    "^\\s*([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)\\s*$|"
+    "^\\s*\\(([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)\\)\\s*$|"
+    "^\\s*\\[([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)\\]\\s*$|"
+    "^\\s*\"([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)\"\\s*$"
 );
 
 // $.colName or ($.colName) or [$.colName] or "$.colName"
 // allows leading/trailing spaces
 static const std::regex AMPERSAND_DOT_COLNAME_OPTIONAL_BRACKETS(
-    "^\\s*(\\$\\.[a-zA-Z0-9_]*)\\s*$|"
-    "^\\s*\\((\\$\\.[a-zA-Z0-9_]*)\\)\\s*$|"
-    "^\\s*\\[(\\$\\.[a-zA-Z0-9_]*)\\]\\s*$|"
-    "^\\s*\"(\\$\\.[a-zA-Z0-9_]*)\"\\s*$"
+    "^\\s*(\\$\\.[a-zA-Z0-9_]+)\\s*$|"
+    "^\\s*\\((\\$\\.[a-zA-Z0-9_]+)\\)\\s*$|"
+    "^\\s*\\[(\\$\\.[a-zA-Z0-9_]+)\\]\\s*$|"
+    "^\\s*\"(\\$\\.[a-zA-Z0-9_]+)\"\\s*$"
 );
 
 // store.table.colName or (store.table.colName) or [store.table.colName] or "store.table.colName"
 // allows leading/trailing spaces
 static const std::regex STORE_TABLE_COLNAME_OPTIONAL_BRACKETS(
-    "^\\s*([a-zA-Z0-9_]*\\.[a-zA-Z0-9_]*\\.[a-zA-Z0-9_]*)\\s*$|"
-    "^\\s*\\(([a-zA-Z0-9_]*\\.[a-zA-Z0-9_]*\\.[a-zA-Z0-9_]*)\\)\\s*$|"
-    "^\\s*\\[([a-zA-Z0-9_]*\\.[a-zA-Z0-9_]*\\.[a-zA-Z0-9_]*)\\]\\s*$|"
-    "^\\s*\"([a-zA-Z0-9_]*\\.[a-zA-Z0-9_]*\\.[a-zA-Z0-9_]*)\"\\s*$"
+    "^\\s*([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)\\s*$|"
+    "^\\s*\\(([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)\\)\\s*$|"
+    "^\\s*\\[([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)\\]\\s*$|"
+    "^\\s*\"([a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+\\.[a-zA-Z0-9_]+)\"\\s*$"
 );
 
 std::pair<int, int> DataSharePredicatesVerify::VerifyPredicates(const DataSharePredicates &predicates)
