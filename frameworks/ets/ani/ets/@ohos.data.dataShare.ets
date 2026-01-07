@@ -737,4 +737,141 @@ export namespace dataShare {
   export enum DataProxyType {
     SHARED_CONFIG = 0
   }
+
+  export interface DataProxyConfig {
+    type: DataProxyType;
+  }
+
+  class DataProxyConfigInner implements DataProxyConfig {
+    type: DataProxyType;
+  }
+
+  class DataProxyHandleCleaner {
+    private nativePtr: long = 0
+    constructor(ptr:long) {
+      this.nativePtr = ptr
+    }
+    native native_proxy_handle_clean(): void
+  }
+
+  let destroyRegisterDataProxy = new FinalizationRegistry<DataProxyHandleCleaner>((
+    cleaner: DataProxyHandleCleaner) => {cleaner.native_proxy_handle_clean()})
+  let unregisterTokenDataProxy = new object()
+
+  export interface DataProxyHandle {
+    onDataChange(
+      uris: string[],
+      config: DataProxyConfig,
+      callback: Callback<DataProxyChangeInfo[]>
+    ): DataProxyResult[];
+
+    offDataChange(
+      uris: string[],
+      config: DataProxyConfig,
+      callback?: Callback<DataProxyChangeInfo[]>
+    ): DataProxyResult[];
+    
+    publish(data: ProxyData[], config: DataProxyConfig): Promise<DataProxyResult[]>;
+    delete(uris: string[], config: DataProxyConfig): Promise<DataProxyResult[]>;
+    get(uris: string[], config: DataProxyConfig): Promise<DataProxyGetResult[]>;
+  }
+
+  export native function native_create_data_proxy_handle(): DataProxyHandle
+  export native function native_on_data_proxy_handle_data_change(obj: DataProxyHandle, uris: string[], config: DataProxyConfig, callback: Callback<DataProxyChangeInfo[]>): DataProxyResult[]
+  export native function native_off_data_proxy_handle_data_change(obj: DataProxyHandle, uris: string[], config: DataProxyConfig, callback?: Callback<DataProxyChangeInfo[]>): DataProxyResult[]
+  export native function native_data_proxy_handle_publish(obj: DataProxyHandle, data: ProxyData[], config: DataProxyConfig): Promise<DataProxyResult[]>
+  export native function native_data_proxy_handle_delete(obj: DataProxyHandle, uris: string[], config: DataProxyConfig): Promise<DataProxyResult[]>
+  export native function native_data_proxy_handle_get(obj: DataProxyHandle, uris: string[], config: DataProxyConfig): Promise<DataProxyGetResult[]>
+  native function check_uris(uris: string[]): int;
+  native function publish_check_uris(data: ProxyData[]): int;
+
+  export function createDataProxyHandle(): Promise<DataProxyHandle> {
+    return new Promise<DataProxyHandle>((resolve, reject) => {
+        let p = taskpool.execute(native_create_data_proxy_handle)
+        p.then((e: Any) => {
+            let r = e as DataProxyHandle
+            resolve(r)
+        }).catch((e: Error): void => {
+            reject(e)
+        })
+      })
+  }
+
+  class DataProxyHandleInner implements DataProxyHandle {
+    private nativePtr: long = 0
+    private cleaner: DataProxyHandleCleaner | null = null;
+
+    constructor(nativePtr: long) {
+        if(this.nativePtr == 0){
+            this.nativePtr = nativePtr;
+        }
+        this.registerCleaner(this.nativePtr)
+    }
+
+    registerCleaner(ptr: long): void {
+        this.cleaner = new DataProxyHandleCleaner(ptr)
+        destroyRegisterDataProxy.register(this, this.cleaner!, unregisterTokenDataProxy);
+    }
+
+    unregisterCleaner(): void {
+        destroyRegisterDataProxy.unregister(unregisterTokenDataProxy);
+    }
+
+    onDataChange(
+      uris: string[],
+      config: DataProxyConfig,
+      callback: Callback<DataProxyChangeInfo[]>
+    ): DataProxyResult[] {
+        let result = check_uris(uris);
+        return native_on_data_proxy_handle_data_change(this, uris, config, callback);
+    }
+
+    offDataChange(
+      uris: string[],
+      config: DataProxyConfig,
+      callback?: Callback<DataProxyChangeInfo[]>
+    ): DataProxyResult[] {
+        let result = check_uris(uris);
+        return native_off_data_proxy_handle_data_change(this, uris, config, callback);
+    }
+
+    publish(data: ProxyData[], config: DataProxyConfig): Promise<DataProxyResult[]> {
+        let result = publish_check_uris(data);
+        return new Promise<DataProxyResult[]>((resolve, reject) => {
+            let p = taskpool.execute(native_data_proxy_handle_publish, this, data, config)
+            p.then((e: Any) => {
+                let r = e as DataProxyResult[]
+                resolve(r)
+            }).catch((e: Error): void => {
+                reject(e)
+            })
+        })
+    }
+
+    delete(uris: string[], config: DataProxyConfig): Promise<DataProxyResult[]> {
+        let result = check_uris(uris);
+        return new Promise<DataProxyResult[]>((resolve, reject) => {
+            let p = taskpool.execute(native_data_proxy_handle_delete, this, uris, config)
+            p.then((e: Any) => {
+                let r = e as DataProxyResult[]
+                resolve(r)
+            }).catch((e: Error): void => {
+                reject(e)
+            })
+        })
+    }
+
+    get(uris: string[], config: DataProxyConfig): Promise<DataProxyGetResult[]> {
+        let result = check_uris(uris);
+        return new Promise<DataProxyGetResult[]>((resolve, reject) => {
+            let p = taskpool.execute(native_data_proxy_handle_get, this, uris, config)
+            p.then((e: Any) => {
+                let r = e as DataProxyGetResult[]
+                resolve(r)
+            }).catch((e: Error): void => {
+                reject(e)
+            })
+        })
+    }
+  }
 }

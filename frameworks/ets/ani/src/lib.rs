@@ -129,6 +129,14 @@ ani_constructor!(
         "native_off_changeinfo": datashare::native_off_changeinfo,
         "native_off_rdb_data_change": datashare::native_off_rdb_data_change,
         "native_off_published_data_change": datashare::native_off_published_data_change,
+        "check_uris": datashare::check_uris,
+        "publish_check_uris": datashare::publish_check_uris,
+        "native_create_data_proxy_handle": datashare::native_create_data_proxy_handle,
+        "native_on_data_proxy_handle_data_change": datashare::native_on_data_proxy_handle_data_change,
+        "native_off_data_proxy_handle_data_change": datashare::native_off_data_proxy_handle_data_change,
+        "native_data_proxy_handle_publish": datashare::native_data_proxy_handle_publish,
+        "native_data_proxy_handle_delete": datashare::native_data_proxy_handle_delete,
+        "native_data_proxy_handle_get": datashare::native_data_proxy_handle_get,
     ]
     class "@ohos.data.dataShare.dataShare.DataShareHelperInner"
     [
@@ -142,6 +150,10 @@ ani_constructor!(
     class "@ohos.data.dataShare.dataShare.Cleaner"
     [
         "native_clean" : datashare::native_clean,
+    ]
+    class "@ohos.data.dataShare.dataShare.DataProxyHandleCleaner"
+    [
+        "native_proxy_handle_clean" : datashare::native_proxy_handle_clean,
     ]
     namespace "@ohos.application.DataShareExtensionAbility.dataShareExtensionAbilityHelper"
     [

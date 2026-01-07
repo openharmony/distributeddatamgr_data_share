@@ -205,7 +205,6 @@ ohos_shared_library("datashare_provider") {
   ]
 
   sources = [
-    "${datashare_common_native_path}/src/datashare_string_utils.cpp",
     "${datashare_common_native_path}/src/serializable.cpp",
     "${datashare_native_provider_path}/src/datashare_ext_ability.cpp",
     "${datashare_native_provider_path}/src/datashare_ext_ability_context.cpp",
