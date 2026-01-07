@@ -132,6 +132,7 @@ JsDataShareExtAbility::~JsDataShareExtAbility()
 {
     LOG_DEBUG("Js datashare extension destructor.");
     jsRuntime_.FreeNativeReference(std::move(jsObj_));
+    jsRuntime_.FreeNativeReference(std::move(contextRef_));
 }
 
 void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &record,
@@ -175,8 +176,8 @@ void JsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &reco
         LOG_ERROR("Failed to get contextRef");
         return;
     }
-    contextObj = contextRef->GetNapiValue();
-    context->Bind(jsRuntime_, contextRef.release());
+    contextRef_ = std::move(contextRef);
+    contextObj = contextRef_->GetNapiValue();
     napi_set_named_property(env, obj, "context", contextObj);
     napi_status status = napi_wrap(env, contextObj, new (std::nothrow)std::weak_ptr<AbilityRuntime::Context>(context),
         [](napi_env, void *data, void *) {
