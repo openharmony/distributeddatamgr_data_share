@@ -16,6 +16,7 @@
 #define LOG_TAG "ANISubscriberManager"
 
 #include "wrapper.rs.h"
+#include "datashare_string_utils.h"
 #include "ani_subscriber_manager.h"
 #include "datashare_log.h"
 
@@ -308,5 +309,126 @@ void AniPublishedSubscriberManager::Emit(const std::vector<Key> &keys, const std
     }
     observer->OnChange(node);
 }
+
+std::vector<DataProxyResult> AniProxyDataSubscriberManager::AddObservers(
+    rust::Box<DataShareCallback> &callback, const std::vector<std::string> &uris)
+{
+    std::vector<DataProxyResult> result = {};
+    auto dataProxyHandle = dataProxyHandle_.lock();
+    if (dataProxyHandle == nullptr) {
+        LOG_ERROR("dataProxyHandle is nullptr");
+        return result;
+    }
+
+    std::vector<Key> keys;
+    std::for_each(uris.begin(), uris.end(), [&keys](auto &uri) {
+        keys.emplace_back(uri);
+    });
+    return AniBaseCallbacks::AddObservers(
+        keys, std::make_shared<Observer>(std::move(callback)),
+        [&dataProxyHandle, this](const std::vector<Key> &firstAddKeys,
+            const std::shared_ptr<Observer> observer, std::vector<DataProxyResult> &opResult) {
+            std::vector<std::string> firstAddUris;
+            std::for_each(firstAddKeys.begin(), firstAddKeys.end(), [&firstAddUris](auto &result) {
+                firstAddUris.emplace_back(result);
+            });
+            if (firstAddUris.empty()) {
+                return;
+            }
+            auto subResults = dataProxyHandle->SubscribeProxyData(firstAddUris,
+                [this](const std::vector<DataShare::DataProxyChangeInfo> &changeInfo) {
+                    Emit(changeInfo);
+                });
+            std::vector<Key> failedKeys;
+            for (auto &subResult : subResults) {
+                opResult.emplace_back(subResult);
+                if (subResult.result_ != SUCCESS) {
+                    failedKeys.emplace_back(subResult.uri_);
+                    LOG_WARN("registered failed, uri is %{public}s", subResult.uri_.c_str());
+                }
+            }
+            if (failedKeys.size() > 0) {
+                AniBaseCallbacks::DelObservers(failedKeys, observer);
+            }
+        });
+}
+
+std::vector<DataProxyResult> AniProxyDataSubscriberManager::DelObservers(
+    rust::Box<DataShareCallback> &callback, const std::vector<std::string> &uris)
+{
+    std::vector<DataProxyResult> result = {};
+    auto dataProxyHandle = dataProxyHandle_.lock();
+    if (dataProxyHandle == nullptr) {
+        LOG_ERROR("dataProxyHandle is nullptr");
+        return result;
+    }
+
+    std::vector<Key> keys;
+    std::for_each(uris.begin(), uris.end(), [&keys](auto &uri) {
+        keys.emplace_back(uri);
+    });
+    return AniBaseCallbacks::DelObservers(keys,
+        std::make_shared<Observer>(std::move(callback)),
+        [&dataProxyHandle, this](const std::vector<Key> &lastDelKeys,
+            const std::shared_ptr<Observer> &observer, std::vector<DataProxyResult> &opResult) {
+            std::vector<std::string> lastDelUris;
+            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
+                lastDelUris.emplace_back(result);
+            });
+            if (lastDelUris.empty()) {
+                return;
+            }
+            auto unsubResult = dataProxyHandle->UnsubscribeProxyData(lastDelUris);
+            opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
+        });
+}
+
+std::vector<DataProxyResult> AniProxyDataSubscriberManager::DelObservers(const std::vector<std::string> &uris)
+{
+    std::vector<DataProxyResult> result = {};
+    auto dataProxyHandle = dataProxyHandle_.lock();
+    if (dataProxyHandle == nullptr) {
+        LOG_ERROR("dataProxyHandle is nullptr");
+        return result;
+    }
+
+    std::vector<Key> keys;
+    std::for_each(uris.begin(), uris.end(), [&keys](auto &uri) {
+        keys.emplace_back(uri);
+    });
+    return AniBaseCallbacks::DelObservers(keys, nullptr,
+        [&dataProxyHandle, this](const std::vector<Key> &lastDelKeys,
+            const std::shared_ptr<Observer> &observer, std::vector<DataProxyResult> &opResult) {
+            std::vector<std::string> lastDelUris;
+            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
+                lastDelUris.emplace_back(result);
+            });
+            if (lastDelUris.empty()) {
+                return;
+            }
+            auto unsubResult = dataProxyHandle->UnsubscribeProxyData(lastDelUris);
+            opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
+        });
+}
+
+void AniProxyDataSubscriberManager::Emit(const std::vector<DataShare::DataProxyChangeInfo> &changeInfo)
+{
+    std::map<std::shared_ptr<Observer>, std::vector<DataShare::DataProxyChangeInfo>> results;
+    for (const auto &info : changeInfo) {
+        Key key(info.uri_);
+        auto callbacks = AniBaseCallbacks::GetEnabledObservers(key);
+        if (callbacks.empty()) {
+            LOG_WARN("emit but nobody subscribe, uri is %{public}s",
+                DataShareStringUtils::Anonymous(info.uri_).c_str());
+            continue;
+        }
+        for (const auto &obs : callbacks) {
+            results[obs].emplace_back(info);
+        }
+    }
+    for (const auto &[callback, infos] : results) {
+        callback->OnChange(infos);
+    }
+}
 } // namespace DataShareAni
-} // namespace OHOS
+} // namespace OHOS

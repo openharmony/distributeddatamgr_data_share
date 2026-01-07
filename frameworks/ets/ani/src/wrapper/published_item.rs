@@ -151,8 +151,8 @@ pub fn published_data_sret_push_array(
 }
 
 // called by c++, used to accept c++ return value
-pub struct AniDataProxyResultSretParam(Vec<AniDataProxyResult>);
-impl AniDataProxyResultSretParam {
+pub struct AniDataProxyResultSetParam(Vec<AniDataProxyResult>);
+impl AniDataProxyResultSetParam {
     pub fn new() -> Self {
         Self(Vec::new())
     }
@@ -162,15 +162,15 @@ impl AniDataProxyResultSretParam {
     }
 }
 // called by c++, Call this method on the C++ side to fill data into the Rust structure
-pub fn data_proxy_result_sret_push(sret: &mut AniDataProxyResultSretParam, uri: String, result: i32) {
+pub fn data_proxy_result_set_push(set: &mut AniDataProxyResultSetParam, uri: String, result: i32) {
     let mut adpgr = AniDataProxyResult::new();
     adpgr.uri = uri;
     adpgr.result = DataProxyErrorCode::from_i32(result);
-    sret.0.push(adpgr);
+    set.0.push(adpgr);
 }
 
-pub struct AniDataProxyGetResultSretParam(Vec<AniDataProxyGetResult>);
-impl AniDataProxyGetResultSretParam {
+pub struct AniDataProxyGetResultSetParam(Vec<AniDataProxyGetResult>);
+impl AniDataProxyGetResultSetParam {
     pub fn new() -> Self {
         Self(Vec::new())
     }
@@ -181,42 +181,59 @@ impl AniDataProxyGetResultSretParam {
 }
 
 // called by c++, Call this method on the C++ side to fill data into the Rust structure
-pub fn data_proxy_get_result_sret_push_i64(sret: &mut AniDataProxyGetResultSretParam, uri: String, result: i32,
+pub fn data_proxy_get_result_set_push_i64(set: &mut AniDataProxyGetResultSetParam, uri: String, result: i32,
         value: i64, allowList: Vec<String>) {
     let mut adpgr = AniDataProxyGetResult::new();
     adpgr.uri = uri;
     adpgr.result = DataProxyErrorCode::from_i32(result);
     adpgr.value = Some(ValueType::I64(value));
-    adpgr.allowList = Some(allowList);
-    sret.0.push(adpgr);
+    if result == 0 {
+        adpgr.allowList = Some(allowList);
+    } else {
+        adpgr.allowList = None;
+    }
+    set.0.push(adpgr);
 }
 
-pub fn data_proxy_get_result_sret_push_f64(sret: &mut AniDataProxyGetResultSretParam, uri: String, result: i32,
+pub fn data_proxy_get_result_set_push_f64(set: &mut AniDataProxyGetResultSetParam, uri: String, result: i32,
         value: f64, allowList: Vec<String>) {
     let mut adpgr = AniDataProxyGetResult::new();
     adpgr.uri = uri;
     adpgr.result = DataProxyErrorCode::from_i32(result);
     adpgr.value = Some(ValueType::F64(value));
-    adpgr.allowList = Some(allowList);
-    sret.0.push(adpgr);
+    if result == 0 {
+        adpgr.allowList = Some(allowList);
+    } else {
+        adpgr.allowList = None;
+    }
+    set.0.push(adpgr);
 }
 
-pub fn data_proxy_get_result_sret_push_bool(sret: &mut AniDataProxyGetResultSretParam, uri: String, result: i32,
+pub fn data_proxy_get_result_set_push_bool(set: &mut AniDataProxyGetResultSetParam, uri: String, result: i32,
         value: bool, allowList: Vec<String>) {
     let mut adpgr = AniDataProxyGetResult::new();
     adpgr.uri = uri;
     adpgr.result = DataProxyErrorCode::from_i32(result);
     adpgr.value = Some(ValueType::Boolean(value));
-    adpgr.allowList = Some(allowList);
-    sret.0.push(adpgr);
+    if result == 0 {
+        adpgr.allowList = Some(allowList);
+    } else {
+        adpgr.allowList = None;
+    }
+    set.0.push(adpgr);
 }
 
-pub fn data_proxy_get_result_sret_push_string(sret: &mut AniDataProxyGetResultSretParam, uri: String, result: i32,
+pub fn data_proxy_get_result_set_push_string(set: &mut AniDataProxyGetResultSetParam, uri: String, result: i32,
         value: String, allowList: Vec<String>) {
     let mut adpgr = AniDataProxyGetResult::new();
     adpgr.uri = uri;
     adpgr.result = DataProxyErrorCode::from_i32(result);
-    adpgr.value = Some(ValueType::S(value));
-    adpgr.allowList = Some(allowList);
-    sret.0.push(adpgr);
+    if result == 0 {
+        adpgr.value = Some(ValueType::S(value));
+        adpgr.allowList = Some(allowList);
+    } else {
+        adpgr.value = None;
+        adpgr.allowList = None;
+    }
+    set.0.push(adpgr);
 }

@@ -23,6 +23,7 @@
 #include "ani_callbacks_manager.h"
 #include "datashare_helper.h"
 #include "ani_subscriber.h"
+#include "dataproxy_handle.h"
 
 namespace OHOS {
 using namespace DataShare;
@@ -125,6 +126,46 @@ private:
     std::weak_ptr<DataShareHelper> dataShareHelper_;
     ConcurrentMap<Key, DataShare::PublishedDataChangeNode> lastChangeNodeMap_;
 };
+
+struct AniProxyDataObserverMapKey {
+    std::string uri_;
+    AniProxyDataObserverMapKey(const std::string &uri) : uri_(uri) {};
+    bool operator==(const AniProxyDataObserverMapKey &node) const
+    {
+        return uri_ == node.uri_;
+    }
+    bool operator!=(const AniProxyDataObserverMapKey &node) const
+    {
+        return !(node == *this);
+    }
+    bool operator<(const AniProxyDataObserverMapKey &node) const
+    {
+        return uri_ < node.uri_;
+    }
+    operator std::string() const
+    {
+        return uri_;
+    }
+};
+
+class AniProxyDataSubscriberManager
+    : public OHOS::DataShareAni::AniCallbacksManager<AniProxyDataObserverMapKey, AniProxyDataObserver> {
+public:
+    using Key = AniProxyDataObserverMapKey;
+    using Observer = AniProxyDataObserver;
+    using AniBaseCallbacks = OHOS::DataShareAni::AniCallbacksManager<AniProxyDataObserverMapKey, AniProxyDataObserver>;
+    explicit AniProxyDataSubscriberManager(std::weak_ptr<DataProxyHandle> dataProxyHandle)
+        : dataProxyHandle_(dataProxyHandle){};
+    std::vector<DataProxyResult> AddObservers(
+        rust::Box<DataShareCallback> &callback, const std::vector<std::string> &uris);
+    std::vector<DataProxyResult> DelObservers(
+        rust::Box<DataShareCallback> &callback, const std::vector<std::string> &uris);
+    std::vector<DataProxyResult> DelObservers(const std::vector<std::string> &uris);
+    void Emit(const std::vector<DataProxyChangeInfo> &changeNode);
+
+private:
+    std::weak_ptr<DataProxyHandle> dataProxyHandle_;
+};
 } // namespace DataShareAni
 } // namespace OHOS
-#endif // ANI_SUBSCRIBER_MANAGER_H
+#endif // ANI_SUBSCRIBER_MANAGER_H

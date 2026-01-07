@@ -18,9 +18,12 @@
 #include "wrapper.rs.h"
 #include "ani_subscriber.h"
 #include "datashare_log.h"
+#include <chrono>
+#include <cinttypes>
 
 namespace OHOS {
 using namespace DataShare;
+using namespace std::chrono;
 namespace DataShareAni {
 bool AniObserver::operator==(const AniObserver &rhs) const
 {
@@ -71,5 +74,31 @@ void AniPublishedObserver::OnChange(DataShare::PublishedDataChangeNode &changeNo
     }
     callback_->execute_callback_published_data_change(*node);
 }
+
+void AniProxyDataObserver::OnChange(const std::vector<DataShare::DataProxyChangeInfo> &changeNode)
+{
+    auto time =
+        static_cast<uint64_t>(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
+    LOG_INFO("call proxyData obs, t %{public}" PRIu64 ", s %{public}zu", time, changeNode.size());
+    rust::Vec<DataProxyChangeInfo> node = rust_create_proxy_data_change_info();
+    for (const auto &result : changeNode) {
+        if (std::holds_alternative<int64_t>(result.value_)) {
+            data_proxy_change_info_push_i64(
+                node, (int32_t)result.changeType_, result.uri_, std::get<int64_t>(result.value_));
+        } else if (std::holds_alternative<double>(result.value_)) {
+            data_proxy_change_info_push_f64(
+                node, (int32_t)result.changeType_, result.uri_, std::get<double>(result.value_));
+        } else if (std::holds_alternative<bool>(result.value_)) {
+            data_proxy_change_info_push_bool(
+                node, (int32_t)result.changeType_, result.uri_, std::get<bool>(result.value_));
+        } else if (std::holds_alternative<std::string>(result.value_)) {
+            data_proxy_change_info_push_string(
+                node, (int32_t)result.changeType_, result.uri_, std::get<std::string>(result.value_));
+        }
+    }
+
+    callback_->execute_callback_proxy_data_change_info(node);
+    LOG_INFO("callback end");
+}
 } // namespace DataShareAni
-} // namespace OHOS
+} // namespace OHOS

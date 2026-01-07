@@ -13,10 +13,10 @@
 
 use crate::datashare::{
     ChangeInfo, PublishedDataChangeNode, PublishedItem, RdbDataChangeNode, Template, TemplateId,
-    AniDataProxyConfig, AniProxyData, AniDataProxyType, data_share_data_proxy_config_get_type,
-    ani_proxy_data_get_uri, ani_proxy_data_get_enum_type, ani_proxy_data_get_value_string,
+    AniDataProxyConfig, AniProxyData, AniDataProxyType, DataProxyChangeInfo, data_share_data_proxy_config_get_type,ani_proxy_data_get_uri, ani_proxy_data_get_enum_type, ani_proxy_data_get_value_string,
     ani_proxy_data_get_value_i64, ani_proxy_data_get_value_f64, ani_proxy_data_get_value_boolean,
-    ani_proxy_data_get_data,
+    ani_proxy_data_get_data, rust_create_proxy_data_change_info, data_proxy_change_info_push_i64,
+    data_proxy_change_info_push_f64, data_proxy_change_info_push_bool, data_proxy_change_info_push_string,
 };
 use crate::datashare_extension::*;
 use crate::predicates::ValueType;
@@ -203,6 +203,33 @@ pub mod ffi {
             subscriber_id: String,
         );
 
+        type DataProxyChangeInfo;
+        fn rust_create_proxy_data_change_info() -> Vec<DataProxyChangeInfo>;
+        fn data_proxy_change_info_push_i64(
+            node: &mut Vec<DataProxyChangeInfo>,
+            change_type: i32,
+            change_info_uri: String,
+            change_info_value: i64,
+        );
+        fn data_proxy_change_info_push_f64(
+            node: &mut Vec<DataProxyChangeInfo>,
+            change_type: i32,
+            change_info_uri: String,
+            change_info_value: f64,
+        );
+        fn data_proxy_change_info_push_bool(
+            node: &mut Vec<DataProxyChangeInfo>,
+            change_type: i32,
+            change_info_uri: String,
+            change_info_value: bool,
+        );
+        fn data_proxy_change_info_push_string(
+            node: &mut Vec<DataProxyChangeInfo>,
+            change_type: i32,
+            change_info_uri: String,
+            change_info_value: String,
+        );
+
         type DataShareCallback;
         fn execute_callback(self: &DataShareCallback);
         fn execute_callback_changeinfo(
@@ -216,6 +243,10 @@ pub mod ffi {
         fn execute_callback_published_data_change(
             self: &DataShareCallback,
             node: &PublishedDataChangeNode,
+        );
+        fn execute_callback_proxy_data_change_info(
+            self: &DataShareCallback,
+            node: &Vec<DataProxyChangeInfo>,
         );
         fn callback_is_equal(
             org_callback: &DataShareCallback,
@@ -380,9 +411,9 @@ pub mod ffi {
 
         type AniProxyData;
         type AniDataProxyConfig;
-        type AniDataProxyResultSretParam;
-        type AniDataProxyGetResultSretParam;
-        pub fn data_proxy_result_sret_push(sret: &mut AniDataProxyResultSretParam, uri: String, result: i32);
+        type AniDataProxyResultSetParam;
+        type AniDataProxyGetResultSetParam;
+        pub fn data_proxy_result_set_push(set: &mut AniDataProxyResultSetParam, uri: String, result: i32);
         pub fn data_share_data_proxy_config_get_type(config: &AniDataProxyConfig) -> i32;
         pub fn ani_proxy_data_get_uri(data: &AniProxyData) -> String;
         pub fn ani_proxy_data_get_enum_type(data: &AniProxyData) -> EnumType;
@@ -390,30 +421,30 @@ pub mod ffi {
         pub fn ani_proxy_data_get_value_i64(data: &AniProxyData) -> i64;
         pub fn ani_proxy_data_get_value_f64(data: &AniProxyData) -> f64;
         pub fn ani_proxy_data_get_value_boolean(data: &AniProxyData) -> bool;
-        pub fn ani_proxy_data_get_data(data: &AniProxyData, vec: &mut Vec<String>);
-        pub fn data_proxy_get_result_sret_push_i64(
-            sret: &mut AniDataProxyGetResultSretParam,
+        pub fn ani_proxy_data_get_data(data: &AniProxyData, vec: &mut Vec<String>) -> bool;
+        pub fn data_proxy_get_result_set_push_i64(
+            set: &mut AniDataProxyGetResultSetParam,
             uri: String,
             result: i32,
             value: i64,
             allowList: Vec<String>,
         );
-        pub fn data_proxy_get_result_sret_push_f64(
-            sret: &mut AniDataProxyGetResultSretParam,
+        pub fn data_proxy_get_result_set_push_f64(
+            set: &mut AniDataProxyGetResultSetParam,
             uri: String,
             result: i32,
             value: f64,
             allowList: Vec<String>,
         );
-        pub fn data_proxy_get_result_sret_push_bool(
-            sret: &mut AniDataProxyGetResultSretParam,
+        pub fn data_proxy_get_result_set_push_bool(
+            set: &mut AniDataProxyGetResultSetParam,
             uri: String,
             result: i32,
             value: bool,
             allowList: Vec<String>,
         );
-        pub fn data_proxy_get_result_sret_push_string(
-            sret: &mut AniDataProxyGetResultSretParam,
+        pub fn data_proxy_get_result_set_push_string(
+            set: &mut AniDataProxyGetResultSetParam,
             uri: String,
             result: i32,
             value: String,
@@ -683,6 +714,53 @@ pub mod ffi {
             param_in: &ExtensionBatchUpdateParamIn,
             native_ptr: i64,
         );
+
+        fn ValidateUrisForDataProxy(uris: Vec<String>) -> i32;
+
+        fn ValidateDataShareNativePublishParameters(proxydata: Vec<AniProxyData>) -> i32;
+
+        fn DataProxyHandleNativeCreate() -> I64ResultWrap;
+
+        fn CleanupDataProxyHandle(dataProxyHandlePtr: i64);
+
+        fn DataShareNativeDataProxyHandleOnDataProxy(
+            ptrWrap: PtrWrap,
+            uris: Vec<String>,
+            set: &mut AniDataProxyResultSetParam,
+        ) -> i32;
+
+        fn DataShareNativeDataProxyHandleOffDataProxy(
+            ptrWrap: PtrWrap,
+            uris: Vec<String>,
+            set: &mut AniDataProxyResultSetParam,
+        ) -> i32;
+
+        fn DataShareNativeDataProxyHandleOffDataProxyNone(
+            dataShareProxyHandlePtr: i64,
+            uris: Vec<String>,
+            set: &mut AniDataProxyResultSetParam,
+        ) -> i32;
+
+        fn DataShareNativeDataProxyHandlePublish(
+            dataShareProxyHandlePtr: i64,
+            proxydata: Vec<AniProxyData>,
+            config: &AniDataProxyConfig,
+            set: &mut AniDataProxyResultSetParam,
+        ) -> i32;
+
+        fn DataShareNativeDataProxyHandleDelete(
+            dataShareProxyHandlePtr: i64,
+            uris: Vec<String>,
+            config: &AniDataProxyConfig,
+            set: &mut AniDataProxyResultSetParam,
+        ) -> i32;
+
+        fn DataShareNativeDataProxyHandleGet(
+            dataShareProxyHandlePtr: i64,
+            uris: Vec<String>,
+            config: &AniDataProxyConfig,
+            set: &mut AniDataProxyGetResultSetParam,
+        ) -> i32;
     }
 }
 
@@ -692,6 +770,7 @@ pub enum CallbackFlavor {
     DataChangeInfo(GlobalRefCallback<(ChangeInfo,)>),
     RdbDataChange(GlobalRefCallback<(RdbDataChangeNode,)>),
     PublishedDataChange(GlobalRefCallback<(PublishedDataChangeNode,)>),
+    ProxyDataChange(GlobalRefCallback<(Vec<DataProxyChangeInfo>,)>),
 }
 
 #[derive(PartialEq, Eq)]
@@ -728,6 +807,12 @@ impl DataShareCallback {
 
     pub fn execute_callback_published_data_change(&self, node: &PublishedDataChangeNode) {
         if let CallbackFlavor::PublishedDataChange(callback) = &self.inner {
+            callback.execute((node.clone(),));
+        }
+    }
+
+    pub fn execute_callback_proxy_data_change_info(&self, node: &Vec<DataProxyChangeInfo>) {
+        if let CallbackFlavor::ProxyDataChange(callback) = &self.inner {
             callback.execute((node.clone(),));
         }
     }
