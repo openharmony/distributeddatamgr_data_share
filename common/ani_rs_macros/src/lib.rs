@@ -80,7 +80,6 @@ fn entry(args: TokenStream2, item: TokenStream2) -> Result<TokenStream2> {
         let s = syn::parse2::<LitStr>(s)
             .map_err(|item| Error::new(item.span(), "Invalid Attribute `path`"))?;
         rename = s.value();
-        rename.push(';');
         rename.push('\0');
     }
     if let Ok(mut item) = syn::parse2::<ItemStruct>(item.clone()) {
