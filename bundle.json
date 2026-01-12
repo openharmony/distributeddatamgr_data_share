@@ -91,7 +91,7 @@
                 "service_group": [
                 ]
             },
-            "inner_api": [
+            "inner_kits": [
                 {
                     "name": "//foundation/distributeddatamgr/data_share/frameworks/cj/ffi/data_share_predicates:cj_data_share_predicates_ffi",
                     "header": {
