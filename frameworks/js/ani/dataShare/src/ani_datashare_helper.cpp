@@ -650,10 +650,12 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm *vm, uint32_t *result)
         ani_native_function {"off", "C{std.core.String}C{std.core.String}C{std.core.Function2}:",
             reinterpret_cast<void *>(ANI_OffType)},
         ani_native_function {"on",
-            "C{std.core.String}C{@ohos.data.dataShare.dataShare.SubscriptionType}C{std.core.String}C{std.core.Function2}:",
+            "C{std.core.String}C{@ohos.data.dataShare.dataShare.SubscriptionType}C{std.core.String}C{std.core."
+            "Function2}:",
             reinterpret_cast<void *>(ANI_OnEvent)},
         ani_native_function {"off",
-            "C{std.core.String}C{@ohos.data.dataShare.dataShare.SubscriptionType}C{std.core.String}C{std.core.Function2}:",
+            "C{std.core.String}C{@ohos.data.dataShare.dataShare.SubscriptionType}C{std.core.String}C{std.core."
+            "Function2}:",
             reinterpret_cast<void *>(ANI_OffEvent)},
         ani_native_function {"ani_query", nullptr, reinterpret_cast<void *>(ANI_Query)},
         ani_native_function {"ani_update", nullptr, reinterpret_cast<void *>(ANI_Update)},
