@@ -170,7 +170,7 @@ void PushBucket(rust::Box<ValuesBucketHashWrap> &valuesBucket, const DataShareVa
         }
         if (index == TYPE_INT) {
             auto value = std::get<int64_t>(rawValue);
-            value_bucket_push_kv_f64(*valuesBucket, rust::String(key), value);
+            value_bucket_push_kv_i64(*valuesBucket, rust::String(key), value);
             continue;
         }
         if (index == TYPE_DOUBLE) {
@@ -218,7 +218,7 @@ void PushBucketsArray(rust::Box<ValuesBucketArrayWrap> &valueBucketsArray, const
         }
         if (index == TYPE_INT) {
             auto value = std::get<int64_t>(rawValue);
-            values_bucket_array_push_kv_f64(*valueBucketsArray, rust::String(key), (double)value, isNew);
+            values_bucket_array_push_kv_i64(*valueBucketsArray, rust::String(key), value, isNew);
             continue;
         }
         if (index == TYPE_DOUBLE) {
