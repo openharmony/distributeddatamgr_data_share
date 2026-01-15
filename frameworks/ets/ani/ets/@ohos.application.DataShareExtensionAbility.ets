@@ -92,7 +92,7 @@ export namespace dataShareExtensionAbilityHelper {
         }
 
         doExtensionCallbackBatchUpdate(err: BusinessError | null, data: Record<string, Array<int>> | undefined) {
-            if ((err instanceof BusinessError) && (data instanceof Record<string, Array<int>>)) {
+            if ((err instanceof BusinessError) && (data instanceof Record)) {
                 let error: BusinessError = err as BusinessError
                 let dataVal: Record<string, Array<int>> = data as Record<string, Array<int>>
                 nativeExtensionCallbackBatchUpdate(error.code, error.message, dataVal, this.nativePtr)
