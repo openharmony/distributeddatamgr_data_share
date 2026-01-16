@@ -276,6 +276,7 @@ private:
     JsRuntime& jsRuntime_;
     std::unique_ptr<NativeReference> jsObj_;
     std::shared_ptr<ResultWrap> result_;
+    std::unique_ptr<NativeReference> contextRef_;
 };
 } // namespace DataShare
 } // namespace OHOS
