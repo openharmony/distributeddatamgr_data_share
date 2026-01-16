@@ -35,14 +35,17 @@ ohos_static_library("datashare_ani_cxx") {
   include_dirs = [
     "include",
     "${target_gen_dir}/src",
+    "${datashare_common_native_path}/include",
   ]
 
   sources = [
     "src/cxx/datashare_ani.cpp",
+    "src/cxx/dataproxy_handle_ani.cpp",
     "src/cxx/ani_inner_observer.cpp",
     "src/cxx/ani_observer.cpp",
     "src/cxx/ani_subscriber.cpp",
     "src/cxx/ani_subscriber_manager.cpp",
+    "${datashare_common_native_path}/src/datashare_string_utils.cpp",
   ]
   sources += get_target_outputs(":datashare_ani_cxx_gen")
   deps = [

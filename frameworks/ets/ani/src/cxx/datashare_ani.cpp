@@ -43,7 +43,7 @@ namespace DataShareAni {
 std::mutex listMutex_{};
 static std::map<std::string, std::list<sptr<ANIDataShareObserver>>> observerMap_;
 
-std::vector<std::string> convert_rust_vec_to_cpp_vector(const rust::Vec<rust::String>& rust_vec)
+static std::vector<std::string> convert_rust_vec_to_cpp_vector(const rust::Vec<rust::String>& rust_vec)
 {
     std::vector<std::string> cpp_vector;
     for (const auto& rust_str : rust_vec) {
@@ -52,7 +52,7 @@ std::vector<std::string> convert_rust_vec_to_cpp_vector(const rust::Vec<rust::St
     return cpp_vector;
 }
 
-std::vector<uint8_t> convert_rust_vec_to_cpp_vector(const rust::Vec<uint8_t>& rust_vec)
+static std::vector<uint8_t> convert_rust_vec_to_cpp_vector(const rust::Vec<uint8_t>& rust_vec)
 {
     std::vector<uint8_t> cpp_vector;
     for (const auto& rust_data : rust_vec) {
@@ -61,25 +61,7 @@ std::vector<uint8_t> convert_rust_vec_to_cpp_vector(const rust::Vec<uint8_t>& ru
     return cpp_vector;
 }
 
-std::vector<int32_t> convert_rust_vec_to_cpp_vector(const rust::Vec<int32_t>& rust_vec)
-{
-    std::vector<int32_t> cpp_vector;
-    for (const auto& rust_data : rust_vec) {
-        cpp_vector.push_back(rust_data);
-    }
-    return cpp_vector;
-}
-
-rust::Vec<rust::String> convert_cpp_vector_to_rust_vec(const std::vector<std::string>& cpp_vec)
-{
-    rust::Vec<rust::String> rust_vec;
-    for (const auto &cpp_data : cpp_vec) {
-        rust_vec.push_back(rust::String(cpp_data));
-    }
-    return rust_vec;
-}
-
-rust::Vec<int32_t> convert_cpp_vector_to_rust_vec(const std::vector<int>& cpp_vec)
+static rust::Vec<int32_t> convert_cpp_vector_to_rust_vec(const std::vector<int>& cpp_vec)
 {
     rust::Vec<int32_t> rust_vec;
     for (const auto &cpp_data : cpp_vec) {
@@ -88,7 +70,7 @@ rust::Vec<int32_t> convert_cpp_vector_to_rust_vec(const std::vector<int>& cpp_ve
     return rust_vec;
 }
 
-rust::Vec<uint8_t> convert_cpp_vector_to_rust_vec(const std::vector<uint8_t>& cpp_vec)
+static rust::Vec<uint8_t> convert_cpp_vector_to_rust_vec(const std::vector<uint8_t>& cpp_vec)
 {
     rust::Vec<uint8_t> rust_vec;
     for (const auto &cpp_data : cpp_vec) {
@@ -1935,6 +1917,52 @@ void DataShareNativeExtensionCallbackBatchUpdate(double errorCode, rust::String 
     jsResult->businessError_= businessError;
     jsResult->callbackResultNumber_ = E_OK;
     jsResult->isRecvReply_ = true;
+}
+
+int ValidateUrisForDataProxy(rust::Vec<rust::String> uris)
+{
+    if (uris.empty()) {
+        LOG_ERROR("ValidateUrisForDataProxy failed, uris is empty.");
+        return EXCEPTION_PARAMETER_CHECK;
+    }
+    if (uris.size() > URI_MAX_COUNT) {
+        LOG_ERROR("the size of uris %{public}zu is over limit", uris.size());
+        return EXCEPTION_PROXY_PARAMETER_CHECK;
+    }
+    auto curis = convert_rust_vec_to_cpp_vector(uris);
+    for (const auto &uri : curis) {
+        if (uri.size() > URI_MAX_SIZE) {
+            LOG_ERROR("the size of uri %{public}s is over limit", uri.c_str());
+            return EXCEPTION_PROXY_PARAMETER_CHECK;
+        }
+    }
+    return E_OK;
+}
+
+int ValidateDataShareNativePublishParameters(rust::Vec<AniProxyData> proxydata)
+{
+    std::vector<DataShareProxyData> vec_proxyData;
+    for (const auto &item : proxydata) {
+        EnumType type = ani_proxy_data_get_enum_type(item);
+        DataShareProxyData dspd;
+        dspd.uri_ = std::string(ani_proxy_data_get_uri(item));
+        if (type == EnumType::StringType) {
+            std::string valStr = std::string(ani_proxy_data_get_value_string(item));
+            if (valStr.size() > VALUE_MAX_SIZE) {
+                LOG_ERROR("ProxyData's value is over limit, uri: %{public}s", dspd.uri_.c_str());
+                return EXCEPTION_PROXY_PARAMETER_CHECK;
+            }
+        }
+        if (dspd.uri_.size() > URI_MAX_SIZE) {
+            LOG_ERROR("the size of uri %{public}s is over limit", dspd.uri_.c_str());
+            return EXCEPTION_PROXY_PARAMETER_CHECK;
+        }
+        vec_proxyData.push_back(dspd);
+    }
+    if (vec_proxyData.size() > PROXY_DATA_MAX_COUNT || vec_proxyData.empty()) {
+        return EXCEPTION_PROXY_PARAMETER_CHECK;
+    }
+    return E_OK;
 }
 } // namespace DataShareAni
 } // namespace OHOS
