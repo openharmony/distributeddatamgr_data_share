@@ -44,6 +44,12 @@ public:
     AniPublishedObserver(rust::Box<DataShareCallback> &&callback) : AniObserver(std::move(callback)) {};
     void OnChange(DataShare::PublishedDataChangeNode &changeNode);
 };
+
+class AniProxyDataObserver final: public AniObserver, public std::enable_shared_from_this<AniProxyDataObserver> {
+public:
+    AniProxyDataObserver(rust::Box<DataShareCallback> &&callback) : AniObserver(std::move(callback)) {};
+    void OnChange(const std::vector<DataShare::DataProxyChangeInfo> &changeNode);
+};
 } // namespace DataShareAni
 } // namespace OHOS
-#endif // ANI_SUBSCRIBER_H
+#endif // ANI_SUBSCRIBER_H

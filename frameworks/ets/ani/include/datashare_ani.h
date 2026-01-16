@@ -47,8 +47,8 @@ struct PublishedDataChangeNode;
 struct DataShareCallback;
 struct AniProxyData;
 struct AniDataProxyConfig;
-struct AniDataProxyResultSretParam;
-struct AniDataProxyGetResultSretParam;
+struct AniDataProxyResultSetParam;
+struct AniDataProxyGetResultSetParam;
 struct AniDataProxyResult;
 struct DataShareBatchUpdateParamIn;
 struct DataShareBatchUpdateParamOut;
@@ -74,6 +74,17 @@ public:
     std::shared_ptr<DataShareHelper> datashareHelper_ = nullptr;
     std::shared_ptr<AniRdbSubscriberManager> jsRdbObsManager_ = nullptr;
     std::shared_ptr<AniPublishedSubscriberManager> jsPublishedObsManager_ = nullptr;
+};
+
+class DataProxyHandleHolder {
+public:
+    DataProxyHandleHolder(const std::shared_ptr<DataProxyHandle> &dataProxyHandle) : dataProxyHandle_(dataProxyHandle)
+    {
+    }
+
+public:
+    std::shared_ptr<DataProxyHandle> dataProxyHandle_ = nullptr;
+    std::shared_ptr<AniProxyDataSubscriberManager> jsProxyDataObsManager_ = nullptr;
 };
 
 class ResultSetHolder {
@@ -235,6 +246,32 @@ void DataShareNativeExtensionCallbackString(double errorCode, rust::String error
 
 void DataShareNativeExtensionCallbackBatchUpdate(double errorCode, rust::String errorMsg,
     const ExtensionBatchUpdateParamIn& param_in, int64_t nativePtr);
+
+int ValidateUrisForDataProxy(rust::Vec<rust::String> uris);
+
+int ValidateDataShareNativePublishParameters(rust::Vec<AniProxyData> proxydata);
+
+I64ResultWrap DataProxyHandleNativeCreate();
+
+void CleanupDataProxyHandle(int64_t dataProxyHandlePtr);
+
+int DataShareNativeDataProxyHandleOnDataProxy(
+    PtrWrap ptrWrap, rust::Vec<rust::String> uris, AniDataProxyResultSetParam& param);
+
+int DataShareNativeDataProxyHandleOffDataProxy(
+    PtrWrap ptrWrap, rust::Vec<rust::String> uris, AniDataProxyResultSetParam& param);
+
+int DataShareNativeDataProxyHandleOffDataProxyNone(
+    int64_t dataShareProxyHandlePtr, rust::Vec<rust::String> uris, AniDataProxyResultSetParam& param);
+
+int DataShareNativeDataProxyHandlePublish(int64_t dataShareProxyHandlePtr, rust::Vec<AniProxyData> proxydata,
+    const AniDataProxyConfig& config, AniDataProxyResultSetParam& param);
+
+int DataShareNativeDataProxyHandleDelete(int64_t dataShareProxyHandlePtr, rust::Vec<rust::String> uris,
+    const AniDataProxyConfig& config, AniDataProxyResultSetParam& param);
+
+int DataShareNativeDataProxyHandleGet(int64_t dataShareProxyHandlePtr, rust::Vec<rust::String> uris,
+    const AniDataProxyConfig& config, AniDataProxyGetResultSetParam& param);
 } // namespace DataShareAni
 } // namespace OHOS
 
