@@ -77,19 +77,26 @@ NapiObserver::~NapiObserver()
     }
     
     if (ref_ != nullptr) {
+        // SAFETY: observerEnvHookWorker will not be accessed in napi_remove_env_cleanup_hook.
+        // Temporary workaround for timing-related crashes：pointer lifetime may be mishandled only if
+        // napi_remove_env_cleanup_hook or napi_send_event fails.
         auto task = [env = env_, ref = ref_, observerEnvHookWorker = observerEnvHookWorker_]() {
             napi_delete_reference(env, ref);
-            napi_remove_env_cleanup_hook(env, &CleanEnv, observerEnvHookWorker);
+            napi_status status = napi_remove_env_cleanup_hook(env, &CleanEnv, observerEnvHookWorker);
+            if (status != napi_ok) {
+                LOG_ERROR("remove hook failed: %{public}d, env:%{public}d, worker:%{public}d", status, env == nullptr,
+                    observerEnvHookWorker == nullptr);
+                return;
+            }
+            if (observerEnvHookWorker != nullptr) {
+                delete observerEnvHookWorker;
+            }
         };
         int ret = napi_send_event(env_, task, napi_eprio_immediate);
         if (ret != 0) {
-            LOG_ERROR("napi_send_event failed: %{public}d", ret);
+            LOG_ERROR("napi_send_event failed: %{public}d, env_:%{public}d", ret, env_ == nullptr);
         }
         ref_ = nullptr;
-    }
-    if (observerEnvHookWorker_ != nullptr) {
-        delete observerEnvHookWorker_;
-        observerEnvHookWorker_ = nullptr;
     }
 }
 
