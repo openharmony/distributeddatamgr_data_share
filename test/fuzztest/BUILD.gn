@@ -19,5 +19,6 @@ group("fuzztest") {
   deps = []
   deps += [
     "//foundation/distributeddatamgr/data_share/test/fuzztest/datasharehelp_fuzzer:fuzztest",
+    "//foundation/distributeddatamgr/data_share/test/fuzztest/datasharestub_fuzzer:fuzztest",
   ]
 }
