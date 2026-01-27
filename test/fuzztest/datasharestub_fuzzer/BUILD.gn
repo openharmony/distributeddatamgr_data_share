@@ -1,0 +1,112 @@
+# Copyright (c) 2025 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+##############################hydra-fuzz########################################
+import("//build/test.gni")
+import("//build/config/features.gni")
+import("//foundation/distributeddatamgr/data_share/datashare.gni")
+
+import("//build/ohos.gni")
+import("//build/ohos_var.gni")
+##############################fuzztest##########################################
+datashare_consumer_sources = [
+  "${datashare_common_native_path}/src/call_reporter.cpp",
+  "${datashare_common_native_path}/src/datashare_string_utils.cpp",
+  "${datashare_common_native_path}/src/datashare_uri_utils.cpp",
+  "${datashare_native_consumer_path}/controller/provider/src/ext_special_controller.cpp",
+  "${datashare_native_consumer_path}/controller/provider/src/general_controller_provider_impl.cpp",
+  "${datashare_native_consumer_path}/controller/service/src/general_controller_service_impl.cpp",
+  "${datashare_native_consumer_path}/controller/service/src/persistent_data_controller.cpp",
+  "${datashare_native_consumer_path}/controller/service/src/published_data_controller.cpp",
+  "${datashare_native_consumer_path}/src/datashare_connection.cpp",
+  "${datashare_native_consumer_path}/src/datashare_helper.cpp",
+  "${datashare_native_consumer_path}/src/datashare_helper_impl.cpp",
+  "${datashare_native_consumer_path}/src/dataproxy_handle.cpp",
+  "${datashare_native_consumer_path}/src/datashare_proxy.cpp",
+  "${datashare_native_proxy_path}/src/ams_mgr_proxy.cpp",
+  "${datashare_native_proxy_path}/src/data_proxy_observer_stub.cpp",
+  "${datashare_native_proxy_path}/src/data_share_manager_impl.cpp",
+  "${datashare_native_proxy_path}/src/data_share_service_proxy.cpp",
+  "${datashare_native_proxy_path}/src/idata_share_client_death_observer.cpp",
+  "${datashare_native_proxy_path}/src/published_data_subscriber_manager.cpp",
+  "${datashare_native_proxy_path}/src/rdb_subscriber_manager.cpp",
+  "${datashare_native_proxy_path}/src/proxy_data_subscriber_manager.cpp",
+]
+
+ohos_fuzztest("DataShareStubFuzzTest") {
+  module_out_path = "data_share/data_share"
+  fuzz_config_file = "//foundation/distributeddatamgr/data_share/test/fuzztest/datasharestub_fuzzer"
+
+  include_dirs = [
+    "${datashare_innerapi_path}/common/include",
+    "${datashare_common_native_path}/include",
+    "${datashare_native_provider_path}/include",
+    "${datashare_native_consumer_path}/include",
+    "${datashare_native_proxy_path}/include",
+  ]
+
+  cflags = [
+    "-Dprivate=public",
+    "-Dprotected=public",
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+
+  sources = datashare_consumer_sources
+  sources += [
+    "datasharestub_fuzzer.cpp",
+  ]
+
+  deps = [
+    "${datashare_innerapi_path}/common:datashare_common",
+    "${datashare_innerapi_path}:datashare_consumer",
+    "${datashare_innerapi_path}:datashare_provider",
+  ]
+
+  external_deps = [
+    "ability_base:want",
+    "ability_base:zuri",
+    "ability_runtime:ability_connect_callback_stub",
+    "ability_runtime:ability_context_native",
+    "ability_runtime:abilitykit_native",
+    "ability_runtime:app_context",
+    "ability_runtime:extension_manager",
+    "ability_runtime:extensionkit_native",
+    "ability_runtime:napi_common",
+    "ability_runtime:ani_common",
+    "ability_runtime:runtime",
+    "c_utils:utils",
+    "hilog:libhilog",
+    "ipc:ipc_single",
+    "ipc:rpc",
+    "ipc:ipc_napi",
+    "napi:ace_napi",
+    "runtime_core:ani",
+    "hisysevent:libhisysevent",
+    "samgr:samgr_proxy",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+  deps = []
+
+  deps += [
+    # deps file
+    ":DataShareStubFuzzTest",
+  ]
+}
+###############################################################################
