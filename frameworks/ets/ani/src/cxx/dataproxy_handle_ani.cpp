@@ -233,11 +233,16 @@ int DataShareNativeDataProxyHandleDelete(int64_t dataShareProxyHandlePtr, rust::
 int DataShareNativeDataProxyHandleGet(int64_t dataShareProxyHandlePtr, rust::Vec<rust::String> uris,
     const AniDataProxyConfig& config, AniDataProxyGetResultSetParam& param)
 {
+    auto handlePtr = reinterpret_cast<DataProxyHandleHolder*>(dataShareProxyHandlePtr);
+    if (handlePtr == nullptr || handlePtr->dataProxyHandle_ == nullptr) {
+        LOG_ERROR("DataShareNativeDataProxyHandleGet failed, dataShareProxyHandlePtr is nullptr.");
+        return EXCEPTION_INNER;
+    }
     auto curis = convert_rust_vec_to_cpp_vector(uris);
     DataProxyConfig proxyConfig;
     int32_t type = data_share_data_proxy_config_get_type(config);
     proxyConfig.type_ = (DataProxyType)type;
-    auto results = DataProxyHandle::GetProxyData(curis, proxyConfig);
+    auto results = handlePtr->dataProxyHandle_->GetProxyData(curis, proxyConfig);
     for (const auto &result : results) {
         if (std::holds_alternative<int64_t>(result.value_)) {
             data_proxy_get_result_set_push_i64(param, result.uri_, (int32_t)result.result_,
