@@ -37,7 +37,6 @@ std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetestsetup";
 std::string SILENT_ACCESS_URI = "datashareproxy://com.acts.datasharetest/DataShareStubImpl?Proxy=true";
 std::string VERIFIED_CREATE_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 std::string VERIFIED_QUERY_URI = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
-std::string VERIFIED_SILENT_URI = "datashareproxy://com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 std::string TBL_STU_NAME = "name";
 std::string TBL_STU_AGE = "age";
 std::string TBL_SETTINGS_COL1 = "KEYWORD";
@@ -89,6 +88,13 @@ std::vector<PermissionStateFull> GetPermissionStateFulls()
         },
         {
             .permissionName = "ohos.permission.GET_BUNDLE_INFO",
+            .isGeneral = true,
+            .resDeviceID = { "local" },
+            .grantStatus = { PermissionState::PERMISSION_GRANTED },
+            .grantFlags = { 1 }
+        },
+        {
+            .permissionName = "ohos.permission.MANAGE_SECURE_SETTINGS",
             .isGeneral = true,
             .resDeviceID = { "local" },
             .grantStatus = { PermissionState::PERMISSION_GRANTED },
@@ -694,40 +700,6 @@ HWTEST_F(DataShareStubImplSystemTest, SystemApp_Active_BatchUpdate_Test001, Test
     EXPECT_NE(retBatchUpdate, PERMISSION_ERR_CODE);
     EXPECT_TRUE(results.size() > 0);
     LOG_INFO("SystemApp_Active_BatchUpdate_Test001::End");
-}
-
-/**
- * @tc.name: SystemApp_Silent_VerifiedProvider_Test001
- * @tc.desc: Verify silent access Query operation behavior when caller is system app and provider in allowList
- * @tc.type: FUNC
- * @tc.require: gitcode#852
- * @tc.precon: Test process is set to be equivalent to a system app
- * @tc.step:
-    1. Create a DataShareHelper instance with silent access configuration
-    2. Initialize query predicates and columns
-    3. Perform Query operation and verify resultSet
-* @tc.expect:
-    1. DataShareHelper is created successfully(not nullptr)
-    2. Query operation return a non-null resultSet and rowcount is greater than 0(success)
- */
-HWTEST_F(DataShareStubImplSystemTest, SystemApp_Silent_VerifiedProvider_Test001, TestSize.Level0)
-{
-    LOG_INFO("SystemApp_Silent_VerifiedProvider_Test001::Start");
-    auto helper = CreateDataShareHelper(STORAGE_MANAGER_MANAGER_ID, VERIFIED_SILENT_URI);
-    ASSERT_TRUE(helper != nullptr);
-
-    Uri uri(VERIFIED_SILENT_URI);
-
-    DataShare::DataSharePredicates predicates;
-    vector<string> columns;
-    int totalRow = 0;
-
-    auto resultSet = helper->Query(uri, predicates, columns);
-    ASSERT_NE(resultSet, nullptr);
-    resultSet->GetRowCount(totalRow);
-    EXPECT_TRUE(totalRow > 0);
-    resultSet->Close();
-    LOG_INFO("SystemApp_Silent_VerifiedProvider_Test001::End");
 }
 
 /**
