@@ -87,13 +87,13 @@ ohos_rust_shared_ffi("datashare_ani_rs") {
     "hilog:libhilog",
     "hilog:hilog_rust",
     "ipc:ipc_rust",
-    "netmanager_base:ani_rs",
     "runtime_core:ani",
     "rust_cxx:lib",
     "samgr:samgr_rust",
   ]
   deps = [
     ":datashare_ani_cxx",
+    "${datashare_base_path}/common/ani_rs:ani_rs",
     "//third_party/rust/crates/serde/serde:lib",
   ]
 
