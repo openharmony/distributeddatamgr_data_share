@@ -55,7 +55,8 @@ struct AniRdbObserverMapKey {
     }
 };
 
-class AniRdbSubscriberManager : public OHOS::DataShareAni::AniCallbacksManager<AniRdbObserverMapKey, AniRdbObserver> {
+class AniRdbSubscriberManager : public OHOS::DataShareAni::AniCallbacksManager<AniRdbObserverMapKey, AniRdbObserver>,
+                                public std::enable_shared_from_this<AniRdbSubscriberManager> {
 public:
     using Key = AniRdbObserverMapKey;
     using Observer = AniRdbObserver;
@@ -105,7 +106,8 @@ struct AniPublishedObserverMapKey {
 };
 
 class AniPublishedSubscriberManager
-    : public OHOS::DataShareAni::AniCallbacksManager<AniPublishedObserverMapKey, AniPublishedObserver> {
+    : public OHOS::DataShareAni::AniCallbacksManager<AniPublishedObserverMapKey, AniPublishedObserver>,
+      public std::enable_shared_from_this<AniPublishedSubscriberManager> {
 public:
     using Key = AniPublishedObserverMapKey;
     using Observer = AniPublishedObserver;
