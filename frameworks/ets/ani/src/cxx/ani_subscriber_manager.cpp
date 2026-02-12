@@ -50,9 +50,15 @@ std::vector<OperationResult> AniRdbSubscriberManager::AddObservers(rust::box<Dat
             if (firstAddUris.empty()) {
                 return;
             }
+            std::weak_ptr<AniRdbSubscriberManager> thisWp = weak_from_this();
             auto subResults =
-                datashareHelper->SubscribeRdbData(firstAddUris, templateId, [this](const RdbChangeNode &changeNode) {
-                    Emit(changeNode);
+                datashareHelper->SubscribeRdbData(firstAddUris, templateId, [thisWp](const RdbChangeNode &changeNode) {
+                    auto thisPtr = thisWp.lock();
+                    if (thisPtr == nullptr) {
+                        LOG_WARN("AniRdbSubscriberManager invalid this ptr in lambda");
+                        return;
+                    }
+                    thisPtr->Emit(changeNode);
                 });
             std::vector<Key> failedKeys;
             for (auto &subResult : subResults) {
@@ -188,9 +194,15 @@ std::vector<OperationResult> AniPublishedSubscriberManager::AddObservers(rust::B
             if (firstAddUris.empty()) {
                 return;
             }
+            std::weak_ptr<AniPublishedSubscriberManager> thisWp = weak_from_this();
             auto subResults = dataShareHelper->SubscribePublishedData(firstAddUris, subscriberId,
-                [this](const DataShare::PublishedDataChangeNode &changeNode) {
-                    Emit(changeNode);
+                [thisWp](const DataShare::PublishedDataChangeNode &changeNode) {
+                    auto thisPtr = thisWp.lock();
+                    if (thisPtr == nullptr) {
+                        LOG_WARN("AniPublishedSubscriberManager invalid this ptr in lambda");
+                        return;
+                    }
+                    thisPtr->Emit(changeNode);
                 });
             std::vector<Key> failedKeys;
             for (auto &subResult : subResults) {

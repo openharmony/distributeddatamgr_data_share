@@ -939,6 +939,13 @@ I64ResultWrap DataShareNativeCreate(int64_t context, rust::String strUri,
         return I64ResultWrap{0, EXCEPTION_HELPER_UNINITIALIZED};
     }
     auto helperHolder = new SharedPtrHolder(dataShareHelper);
+    helperHolder->jsRdbObsManager_ =
+        std::make_shared<AniRdbSubscriberManager>(helperHolder->datashareHelper_);
+    helperHolder->jsPublishedObsManager_ =
+        std::make_shared<AniPublishedSubscriberManager>(helperHolder->datashareHelper_);
+    if (helperHolder->jsRdbObsManager_ == nullptr || helperHolder->jsPublishedObsManager_ == nullptr) {
+        LOG_ERROR("create observer manager failed!");
+    }
     return I64ResultWrap{reinterpret_cast<long long>(helperHolder), E_OK};
 }
 
@@ -1603,8 +1610,6 @@ int DataShareNativeOnRdbDataChange(PtrWrap ptrWrap, rust::Vec<rust::String> uris
     DataShare::TemplateId tplId;
     tplId.subscriberId_ = atoll(std::string(template_id_get_subscriber_id(templateId)).c_str());
     tplId.bundleName_ = std::string(template_id_get_bundle_name_of_owner(templateId));
-    helperHolder->jsRdbObsManager_ =
-        std::make_shared<AniRdbSubscriberManager>(helperHolder->datashareHelper_);
     if (helperHolder->jsRdbObsManager_ == nullptr) {
         LOG_ERROR("OnRdbDataChange failed, jsRdbObsManager is nullptr");
         return E_OK;
@@ -1631,8 +1636,6 @@ int DataShareNativeOnPublishedDataChange(PtrWrap ptrWrap, rust::Vec<rust::String
     }
 
     int64_t innerSubscriberId = atoll(std::string(subscriberId).c_str());
-    helperHolder->jsPublishedObsManager_ =
-        std::make_shared<AniPublishedSubscriberManager>(helperHolder->datashareHelper_);
     if (helperHolder->jsPublishedObsManager_ == nullptr) {
         LOG_ERROR("OnPublishedDataChange failed, jsPublishedObsManager is nullptr");
         return E_OK;
