@@ -60,8 +60,11 @@ void HiViewFaultAdapter::ReportDataFault(DataShareFaultInfo &faultInfo)
         .v = { .s = faultInfo.businessType.data() }, .arraySize = 0 };
     HiSysEventParam errorCode = { .name = "ERROR_CODE", .t = HISYSEVENT_INT32,
         .v = { .i32 = faultInfo.errorCode }, .arraySize = 0 };
+    // put a copy of BUSINESS_TYPE in APPENDIX because cloud database has BUSINESS_TYPE wrongly written as BUSINESE_TYPE
+    // whitch prevent BUSINESS_TYPE from uploading
+    std::string appendixContent = faultInfo.appendix + "BUSINESS_TYPE" + faultInfo.businessType;
     HiSysEventParam appendix = { .name = "APPENDIX", .t = HISYSEVENT_STRING,
-        .v = { .s = faultInfo.appendix.data() }, .arraySize = 0 };
+        .v = { .s = appendixContent.data() }, .arraySize = 0 };
     HiSysEventParam params[] = { faultTime, faultType, bundleName, moduleName,
         storeName, businessType, errorCode, appendix };
     int res = OH_HiSysEvent_Write(DOMAIN, EVENT_NAME, HISYSEVENT_FAULT, params, PARAMS_SIZE);
