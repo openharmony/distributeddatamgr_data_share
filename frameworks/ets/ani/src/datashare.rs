@@ -153,6 +153,7 @@ pub enum ChangeType {
     Insert = 0,
     Delete = 1,
     Update = 2,
+    Other = 3,
 }
 
 impl ChangeType {
@@ -161,7 +162,8 @@ impl ChangeType {
             0 => Self::Insert,
             1 => Self::Delete,
             2 => Self::Update,
-            _ => Self::Insert,
+            3 => Self::Other,
+            _ => Self::Other,
         }
     }
 }
