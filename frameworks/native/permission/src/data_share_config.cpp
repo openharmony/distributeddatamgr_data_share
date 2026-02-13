@@ -37,6 +37,10 @@ ConfigFactory &ConfigFactory::GetInstance()
         return factory;
     }
     std::lock_guard<std::mutex> lock(mutex);
+    // double check
+    if (factory.isInited) {
+        return factory;
+    }
     factory.Initialize();
     return factory;
 }

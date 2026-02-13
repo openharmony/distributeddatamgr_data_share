@@ -19,7 +19,7 @@ use ani_rs::{
 
 use crate::{get_native_ptr, wrapper, datashare::DataShareResultSet, datashare_error};
 
-#[ani_rs::ani(path = "L@ohos/data/DataShareResultSet/DataType")]
+#[ani_rs::ani(path = "@ohos.data.DataShareResultSet.DataType")]
 #[derive(Debug)]
 pub enum AniDataType {
     TypeNull = 0,
