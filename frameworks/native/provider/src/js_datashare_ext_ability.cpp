@@ -831,6 +831,7 @@ bool JsDataShareExtAbility::RegisterObserver(const Uri &uri, const sptr<AAFwk::I
     opt.SetFirstCallerTokenID(token);
     opt.SetFirstCallerPid(IPCSkeleton::GetCallingPid());
     opt.SetDataShare(true);
+    opt.SetFirstCallerFullTokenID(IPCSkeleton::GetCallingFullTokenID());
     Uri innerUri = uri;
     ErrCode ret = obsMgrClient->RegisterObserverFromExtension(innerUri, dataObserver, callingUserId, opt);
     if (ret != ERR_OK) {
@@ -887,6 +888,7 @@ bool JsDataShareExtAbility::NotifyChangeWithUser(const Uri &uri, int32_t userId,
     opt.SetFirstCallerTokenID(callingToken);
     opt.SetFirstCallerPid(callingPid);
     opt.SetDataShare(true);
+    opt.SetFirstCallerFullTokenID(IPCSkeleton::GetCallingFullTokenID());
     Uri innerUri = uri;
     ErrCode ret = obsMgrClient->NotifyChangeFromExtension(innerUri, userId, opt);
     if (ret != ERR_OK) {
