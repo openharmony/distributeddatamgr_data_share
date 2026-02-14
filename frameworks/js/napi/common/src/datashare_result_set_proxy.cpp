@@ -175,7 +175,7 @@ napi_value DataShareResultSetProxy::GoToFirstRow(napi_env env, napi_callback_inf
     int errCode = E_ERROR;
     std::shared_ptr<DataShareResultSet> innerResultSet = GetInnerResultSet(env, info);
     if (innerResultSet != nullptr) {
-	    // No need to print error log because this func will return false when innerResultSet GoToFirstRow failed
+        // No need to print error log because this func will return false when innerResultSet GoToFirstRow failed
         errCode = innerResultSet->GoToFirstRow();
     } else {
         LOG_ERROR("GetInnerResultSet failed.");

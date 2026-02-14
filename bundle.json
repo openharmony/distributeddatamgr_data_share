@@ -64,7 +64,6 @@
                 "kv_store",
                 "libuv",
                 "napi",
-                "netmanager_base",
                 "relational_store",
                 "runtime_core",
                 "rust_bindgen",
