@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2025-2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -169,14 +169,16 @@ bool forEachMapEntry(ani_env *env, ani_object map_object, F &&callback, std::sha
         }
 
         ani_ref ani_key;
-        if (ANI_OK != env->TupleValue_GetItem_Ref(static_cast<ani_tuple_value>(key_value), 0, &ani_key)) {
-            std::cout << "Failed to get key value" << std::endl;
+        //The 0th element of the tuple
+        if (ANI_OK != env->Object_GetFieldByName_Ref(static_cast<ani_object>(key_value), "$0", &ani_key)) {
+            std::cout << "Failed to get tuple field $0" << std::endl;
             return false;
         }
 
         ani_ref ani_val;
-        if (ANI_OK != env->TupleValue_GetItem_Ref(static_cast<ani_tuple_value>(key_value), 1, &ani_val)) {
-            std::cout << "Failed to get key value" << std::endl;
+        //The 1th element of the tuple
+        if (ANI_OK != env->Object_GetFieldByName_Ref(static_cast<ani_object>(key_value), "$1", &ani_val)) {
+            std::cout << "Failed to get tuple field $1" << std::endl;
             return false;
         }
 
