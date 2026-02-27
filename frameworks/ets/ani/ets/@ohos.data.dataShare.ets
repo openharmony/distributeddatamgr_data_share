@@ -83,7 +83,8 @@ export namespace dataShare {
   export enum ChangeType {
     INSERT = 0,
     DELETE,
-    UPDATE
+    UPDATE,
+    OTHER
   }
 
   export enum SubscriptionType {
