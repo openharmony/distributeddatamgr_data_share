@@ -26,6 +26,7 @@ public:
     static std::map<std::string, std::string> GetQueryParams(const std::string& uri);
     static std::pair<bool, uint32_t> Strtoul(const std::string &str);
     static std::pair<bool, int32_t> GetUserFromUri(const std::string &uri);
+    static std::string ExtractFirstPathSegment(const std::string& uri);
 
 private:
     static constexpr const char USER_PARAM[] = "user";
