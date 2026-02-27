@@ -59,6 +59,8 @@ public:
 
     static int32_t UriIsTrust(Uri &uri);
 
+    static bool IsUriPathSegmentAllowed(const Uri &uri);
+
     std::pair<int, std::string> GetUriPermission(Uri &uri, int32_t user, bool isRead, bool &isSilent);
 
     static int32_t IsExtensionValid(uint32_t tokenId, uint32_t fullToken, int32_t user);
