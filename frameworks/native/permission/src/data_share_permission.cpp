@@ -108,6 +108,27 @@ bool IsInUriTrusts(Uri &uri)
     return false;
 }
 
+bool DataSharePermission::IsUriPathSegmentAllowed(const Uri &uri)
+{
+    auto config = ConfigFactory::GetInstance().GetDataShareConfig();
+    if (config == nullptr) {
+        LOG_ERROR("GetDataShareConfig null");
+        return false;
+    }
+    std::string segment = DataShareURIUtils::ExtractFirstPathSegment(uri.ToString());
+    if (segment.empty()) {
+        LOG_ERROR("ExtractFirstPathSegment failed");
+        return false;
+    }
+
+    for (const std::string& item : config->publicProvider) {
+        if (segment == item) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CheckAppIdentifier(std::string &name, std::string &appIdentifier)
 {
     auto [isSuccess, bundleInfo]  = DataShareCalledConfig::GetBundleInfoFromBMS(name, 0);

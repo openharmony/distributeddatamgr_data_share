@@ -1689,5 +1689,64 @@ HWTEST_F(DataSharePermissionTest, Hava_Read_Permission_Test_001, TestSize.Level1
     LOG_INFO("Hava_Read_Permission_Test_001::End");
 }
 
+/**
+ * @tc.name: IsUriPathSegmentAllowed_001
+ * @tc.desc: Test IsUriPathSegmentAllowed when ExtractFirstPathSegment fails
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon: NA
+ * @tc.step:
+ * 1. Call DataSharePermission::IsUriPathSegmentAllowed() with an invalid URI
+ * 2. Check the result
+ * @tc.expect: The result is false
+ */
+HWTEST_F(DataSharePermissionTest, IsUriPathSegmentAllowed_001, TestSize.Level0)
+{
+    LOG_INFO("IsUriPathSegmentAllowed_001 starts");
+    Uri uri("invalid_uri_format");
+    bool result = DataSharePermission::IsUriPathSegmentAllowed(uri);
+    EXPECT_FALSE(result);
+    LOG_INFO("IsUriPathSegmentAllowed_001 ends");
+}
+
+/**
+ * @tc.name: IsUriPathSegmentAllowed_002
+ * @tc.desc: Test IsUriPathSegmentAllowed when path segment is in publicProvider
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon: NA
+ * @tc.step:
+ * 1. Call DataSharePermission::IsUriPathSegmentAllowed() with a valid URI
+ * 2. Check the result
+ * @tc.expect: The result is true
+ */
+HWTEST_F(DataSharePermissionTest, IsUriPathSegmentAllowed_002, TestSize.Level0)
+{
+    LOG_INFO("IsUriPathSegmentAllowed_002 starts");
+    Uri uri("datashare://com.ohos.contactsdataability");
+    bool result = DataSharePermission::IsUriPathSegmentAllowed(uri);
+    EXPECT_TRUE(result);
+    LOG_INFO("IsUriPathSegmentAllowed_002 ends");
+}
+
+/**
+ * @tc.name: IsUriPathSegmentAllowed_003
+ * @tc.desc: Test IsUriPathSegmentAllowed when path segment is not in publicProvider
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon: NA
+ * @tc.step:
+ * 1. Call DataSharePermission::IsUriPathSegmentAllowed() with a valid URI
+ * 2. Check the result
+ * @tc.expect: The result is false
+ */
+HWTEST_F(DataSharePermissionTest, IsUriPathSegmentAllowed_003, TestSize.Level0)
+{
+    LOG_INFO("IsUriPathSegmentAllowed_003 starts");
+    Uri uri("datashare://com.other.app");
+    bool result = DataSharePermission::IsUriPathSegmentAllowed(uri);
+    EXPECT_FALSE(result);
+    LOG_INFO("IsUriPathSegmentAllowed_003 ends");
+}
 } // namespace DataShare
 } // namespace OHOS
