@@ -74,6 +74,7 @@ bool DataShareConfig::Marshal(Serializable::json &node) const
     SetValue(node[GET_NAME(uriTrusts)], uriTrusts);
     SetValue(node[GET_NAME(extensionObsTrusts)], extensionObsTrusts);
     SetValue(node[GET_NAME(singletonUriTrusts)], singletonUriTrusts);
+    SetValue(node[GET_NAME(publicProvider)], publicProvider);
     return true;
 }
 
@@ -83,6 +84,7 @@ bool DataShareConfig::Unmarshal(const Serializable::json &node)
     GetValue(node, GET_NAME(uriTrusts), uriTrusts);
     GetValue(node, GET_NAME(extensionObsTrusts), extensionObsTrusts);
     GetValue(node, GET_NAME(singletonUriTrusts), singletonUriTrusts);
+    GetValue(node, GET_NAME(publicProvider), publicProvider);
     return true;
 }
 

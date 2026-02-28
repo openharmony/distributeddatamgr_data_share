@@ -91,4 +91,46 @@ std::pair<bool, int32_t> DataShareURIUtils::GetUserFromUri(const std::string &ur
     }
     return std::make_pair(true, data);
 }
+
+/**
+ * Extract first path segment from uri
+ * suuport:
+ *   1. xxx://authority/path   -> extract authority
+ *   2. xxx:///path1/path2     -> extract path1
+ * extract rules: find path after the first '/'
+ *
+ * @param uri uri string
+ * @return first path segment from uri，return empty string if not found.
+ */
+std::string DataShareURIUtils::ExtractFirstPathSegment(const std::string& uri)
+{
+    // find "://" position
+    size_t colonPos = uri.find("://");
+    if (colonPos == std::string::npos) {
+        return "";  // wrong uri format
+    }
+
+    // skip "://"
+    size_t startPos = colonPos + 3;
+
+    // resolve case for ":///"
+    while (startPos < uri.length() && uri[startPos] == '/') {
+        startPos++;
+    }
+
+    // if no path segement return empty string
+    if (startPos >= uri.length()) {
+        return "";
+    }
+
+    // find next '/' or end position
+    size_t endPos = uri.find('/', startPos);
+    if (endPos == std::string::npos) {
+        // return segment before end position
+        return uri.substr(startPos);
+    } else {
+        // if next '/' exist，return segment before next '/'
+        return uri.substr(startPos, endPos - startPos);
+    }
+}
 } // namespace OHOS::DataShare

@@ -118,18 +118,19 @@ void DataShareHelperImplRegisterTest::SetUpTestCase(void)
         .userID = 100,
         .bundleName = "ohos.datashareclienttest.demo",
         .instIndex = 0,
+        .isSystemApp = true,
         .appIDDesc = "ohos.datashareclienttest.demo"
     };
     auto permStateList = GetPermissionStateFulls();
     HapPolicyParams policy = {
-        .apl = APL_NORMAL,
+        .apl = APL_SYSTEM_CORE,
         .domain = "test.domain",
         .permList = {
             {
                 .permissionName = "ohos.permission.test",
                 .bundleName = "ohos.datashareclienttest.demo",
                 .grantMode = 1,
-                .availableLevel = APL_NORMAL,
+                .availableLevel = APL_SYSTEM_CORE,
                 .label = "label",
                 .labelId = 1,
                 .description = "ohos.datashareclienttest.demo",
@@ -654,7 +655,7 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_006, TestSize.L
     1. Obtain the global DataShareHelper instance and verify it is not null
     2. Create a Uri object with DATA_SHARE_URI and a MockDatashareObserver instance
     3. Call TryRegisterObserverExt with the Uri, observer, isDescendants=false, and isSystem=true
-    4. Verify the return value is not ERR_OK
+    4. Verify the return value is ERR_OK
  * @tc.expect:
     1. The DataShareHelper instance is not null
     2. TryRegisterObserverExt returns an error code (not ERR_OK) when isSystem=true
@@ -668,7 +669,8 @@ HWTEST_F(DataShareHelperImplRegisterTest, TryRegisterObserverExt_007, TestSize.L
     Uri uri(DATA_SHARE_URI);
     std::shared_ptr<MockDatashareObserver> dataObserver = std::make_shared<MockDatashareObserver>();
     auto ret1 = helper->TryRegisterObserverExt(uri, dataObserver, false, true);
-    EXPECT_NE(ret1, ERR_OK);
+    // Test process is mocked as system app, so registration attemp should pass system check
+    EXPECT_EQ(ret1, ERR_OK);
     LOG_INFO("TryRegisterObserverExt_007 end");
 }
 

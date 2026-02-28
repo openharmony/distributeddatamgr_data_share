@@ -41,6 +41,7 @@ public:
     bool Unmarshal(const Serializable::json &node) override;
     std::vector<std::string> dataShareExtNames;
     std::vector<std::string> uriTrusts;
+    std::vector<std::string> publicProvider;
     std::vector<ConsumerProvider> extensionObsTrusts;
     std::vector<std::string> singletonUriTrusts;
 };
