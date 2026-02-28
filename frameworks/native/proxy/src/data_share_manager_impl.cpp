@@ -255,6 +255,8 @@ void DataShareManagerImpl::OnAddSystemAbility(int32_t systemAbilityId, const std
             systemAbilityId);
         return;
     }
+    // Clear existing service handle when system ability (OnAddSystemAbility) is ready.
+    ResetServiceHandle();
     observers_.ForEach([](const auto &, auto &callback) {
         callback();
         return false;
