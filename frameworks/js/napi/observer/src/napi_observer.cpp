@@ -23,6 +23,11 @@
 
 namespace OHOS {
 namespace DataShare {
+static constexpr const char* TASK_NAPIOBSERVER_DESTRUCTOR = "datashare.~NapiObserver";
+static constexpr const char* TASK_NAPIRDBOBSERVER_CALLBACK = "datashare.NapiRdbObserver";
+static constexpr const char* TASK_NAPIPUBLISHEDOBSERVER_CALLBACK = "datashare.NapiPublishedObserver";
+static constexpr const char* TASK_NAPIPROXYDATAOBSERVER_CALLBACK = "datashare.NapiProxyDataObserver";
+
 NapiObserver::NapiObserver(napi_env env, napi_value callback) : env_(env)
 {
     envMutexPtr_ = std::make_unique<std::mutex>();
@@ -92,7 +97,7 @@ NapiObserver::~NapiObserver()
                 delete observerEnvHookWorker;
             }
         };
-        int ret = napi_send_event(env_, task, napi_eprio_immediate);
+        int ret = napi_send_event(env_, task, napi_eprio_immediate, TASK_NAPIOBSERVER_DESTRUCTOR);
         if (ret != 0) {
             LOG_ERROR("napi_send_event failed: %{public}d, env_:%{public}d", ret, env_ == nullptr);
         }
@@ -175,7 +180,7 @@ void NapiRdbObserver::OnChange(const RdbChangeNode &changeNode)
     auto task = [observerWorker]() {
         NapiObserver::CallbackFunc(observerWorker);
     };
-    int ret = napi_send_event(env_, task, napi_eprio_immediate);
+    int ret = napi_send_event(env_, task, napi_eprio_immediate, TASK_NAPIRDBOBSERVER_CALLBACK);
     if (ret != 0) {
         LOG_ERROR("napi_send_event failed: %{public}d", ret);
         delete observerWorker;
@@ -208,7 +213,7 @@ void NapiPublishedObserver::OnChange(PublishedDataChangeNode &changeNode)
     auto task = [observerWorker]() {
         NapiObserver::CallbackFunc(observerWorker);
     };
-    int ret = napi_send_event(env_, task, napi_eprio_immediate);
+    int ret = napi_send_event(env_, task, napi_eprio_immediate, TASK_NAPIPUBLISHEDOBSERVER_CALLBACK);
     if (ret != 0) {
         LOG_ERROR("napi_send_event failed: %{public}d", ret);
         delete observerWorker;
@@ -242,7 +247,7 @@ void NapiProxyDataObserver::OnChange(const std::vector<DataProxyChangeInfo> &cha
     auto task = [observerWorker]() {
         NapiObserver::CallbackFunc(observerWorker);
     };
-    int ret = napi_send_event(env_, task, napi_eprio_immediate);
+    int ret = napi_send_event(env_, task, napi_eprio_immediate, TASK_NAPIPROXYDATAOBSERVER_CALLBACK);
     if (ret != 0) {
         LOG_ERROR("napi_send_event failed: %{public}d", ret);
         delete observerWorker;
