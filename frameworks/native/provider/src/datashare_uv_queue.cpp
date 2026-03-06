@@ -28,6 +28,8 @@ using namespace std::chrono;
 constexpr int WAIT_TIME = 3;
 constexpr int SLEEP_TIME = 1;
 constexpr int TRY_TIMES = 2000;
+static constexpr const char* TASK_DATASHAREUVQUEUE_TASKENTRY = "datashare.DataShareUVQueue";
+
 DataShareUvQueue::DataShareUvQueue(napi_env env)
     : naipEnv_(env)
 {
@@ -67,7 +69,8 @@ void DataShareUvQueue::JsSyncCall(VoidFunc func, BoolFunc retFunc)
         auto task = [taskEntry]() {
             DataShareUvQueue::LambdaForWork(taskEntry);
         };
-        if (napi_status::napi_ok != napi_send_event(naipEnv_, task, napi_eprio_immediate)) {
+        if (napi_status::napi_ok != napi_send_event(naipEnv_, task, napi_eprio_immediate,
+            TASK_DATASHAREUVQUEUE_TASKENTRY)) {
             LOG_ERROR("napi_send_event task failed");
             delete taskEntry;
             taskEntry = nullptr;

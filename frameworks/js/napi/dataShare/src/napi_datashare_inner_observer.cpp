@@ -26,6 +26,9 @@
 namespace OHOS {
 namespace DataShare {
 using namespace std::chrono;
+static constexpr const char* TASK_NAPIINNEROBSERVER_DESTRUCTOR = "datashare.~NAPIInnerObserver";
+static constexpr const char* TASK_NAPIINNEROBSERVER_CALLBACK = "datashare.NAPIInnerObserver";
+
 NAPIInnerObserver::NAPIInnerObserver(napi_env env, napi_value callback)
     : env_(env)
 {
@@ -53,7 +56,7 @@ NAPIInnerObserver::~NAPIInnerObserver()
             delete observerEnvHookWorker;
         }
     };
-    int ret = napi_send_event(env_, task, napi_eprio_immediate);
+    int ret = napi_send_event(env_, task, napi_eprio_immediate, TASK_NAPIINNEROBSERVER_DESTRUCTOR);
     if (ret != 0) {
         LOG_ERROR("napi_send_event failed: %{public}d, env_:%{public}d", ret, env_ == nullptr);
     }
@@ -131,7 +134,7 @@ void NAPIInnerObserver::OnChange(const DataShareObserver::ChangeInfo& changeInfo
     auto task = [observerWorker]() {
         NAPIInnerObserver::OnComplete(observerWorker);
     };
-    int ret = napi_send_event(env_, task, napi_eprio_immediate);
+    int ret = napi_send_event(env_, task, napi_eprio_immediate, TASK_NAPIINNEROBSERVER_CALLBACK);
     if (ret != 0) {
         LOG_ERROR("napi_send_event failed: %{public}d", ret);
         delete observerWorker;
