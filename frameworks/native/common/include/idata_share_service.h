@@ -25,6 +25,7 @@
 #include "datashare_common.h"
 #include "datashare_predicates.h"
 #include "datashare_result_set.h"
+#include "datashare_sa_provider_info.h"
 #include "datashare_template.h"
 #include "datashare_values_bucket.h"
 #include "distributeddata_data_share_ipc_interface_code.h"
@@ -113,6 +114,9 @@ public:
         const sptr<IProxyDataObserver> &observer) = 0;
 
     virtual std::vector<DataProxyResult> UnsubscribeProxyData(const std::vector<std::string> &uris) = 0;
+
+    virtual std::pair<int32_t, ConnectionInterfaceInfo> GetConnectionInterfaceInfo(int32_t saId,
+        uint32_t waitTime) = 0;
 };
 } // namespace OHOS::DataShare
 #endif

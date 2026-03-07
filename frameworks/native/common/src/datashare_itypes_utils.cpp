@@ -549,6 +549,18 @@ bool Unmarshalling(UriInfo &result, MessageParcel &parcel)
     return ITypesUtil::Unmarshal(parcel, result.uri, result.extUri, result.option.timeout);
 }
 
+template<>
+bool Marshalling(const ConnectionInterfaceInfo &info, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, info.descriptor_, info.code_);
+}
+
+template<>
+bool Unmarshalling(ConnectionInterfaceInfo &info, MessageParcel &parcel)
+{
+    return ITypesUtil::Unmarshal(parcel, info.descriptor_, info.code_);
+}
+
 template <typename T>
 bool MarshalBasicTypeToBuffer(std::ostringstream &oss, const T &value)
 {

@@ -603,6 +603,8 @@ private:
 
     static std::pair<int, std::shared_ptr<DataShareHelper>> CreateProxyHelper(const std::string &strUri,
         const std::string &extUri);
+    static std::shared_ptr<DataShareHelper> CreateSAProviderHelper(Uri &uri, const sptr<IRemoteObject> &token,
+        const int32_t saId, const int waitTime, bool isSystem);
 };
 } // namespace DataShare
 } // namespace OHOS

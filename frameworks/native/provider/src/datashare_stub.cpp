@@ -19,6 +19,7 @@
 
 #include <cinttypes>
 
+#include "accesstoken_kit.h"
 #include "data_ability_observer_interface.h"
 #include "datashare_itypes_utils.h"
 #include "datashare_log.h"
@@ -30,9 +31,9 @@
 #include "string_ex.h"
 
 using namespace OHOS::DistributedShare::DataShare;
-
 namespace OHOS {
 namespace DataShare {
+using namespace OHOS::Security::AccessToken;
 constexpr int DEFAULT_NUMBER = -1;
 constexpr int PERMISSION_ERROR_NUMBER = -2;
 DataShareStub::DataShareStub()
@@ -110,6 +111,32 @@ int DataShareStub::OnRemoteRequest(uint32_t code, MessageParcel& data, MessagePa
     }
     LOG_DEBUG("remote request unhandled: %{public}d", code);
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
+}
+
+bool DataShareStub::VerifyPermissionAndUri(std::string uri, uint32_t tokenId)
+{
+    DataShareNonSilentConfig config = GetConfig();
+    size_t pos = uri.find('?');
+    std::string pureUri = (pos != std::string::npos) ? uri.substr(0, pos) : uri;
+
+    for (const auto& record : config.records) {
+        if (record.uri != pureUri) {
+            continue;
+        }
+        if (!record.readPermission.empty()) {
+            auto status = AccessTokenKit::VerifyAccessToken(tokenId, record.readPermission);
+            if (status == PermissionState::PERMISSION_GRANTED) {
+                return true;
+            }
+        }
+        if (!record.writePermission.empty()) {
+            auto status = AccessTokenKit::VerifyAccessToken(tokenId, record.writePermission);
+            if (status == PermissionState::PERMISSION_GRANTED) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 ErrCode DataShareStub::CmdGetFileTypes(MessageParcel &data, MessageParcel &reply)
@@ -686,6 +713,12 @@ int DataShareStub::UnregisterObserverExtProvider(const Uri &uri, const sptr<AAFw
 int DataShareStub::NotifyChangeExtProvider(const ChangeInfo &changeInfo)
 {
     return 0;
+}
+
+DataShareNonSilentConfig DataShareStub::GetConfig()
+{
+    DataShareNonSilentConfig config;
+    return config;
 }
 } // namespace DataShare
 } // namespace OHOS

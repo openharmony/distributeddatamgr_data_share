@@ -436,5 +436,75 @@ HWTEST_F(DataShareURIUtilsTest, ExtractFirstPathSegment_006, TestSize.Level0)
     EXPECT_EQ(result, "");
     ZLOGI("ExtractFirstPathSegment_006 ends");
 }
+
+/**
+ * @tc.name: GetSystemAbilityId_001
+ * @tc.desc: Test getting system ability ID from URI with various formats, including invalid URIs,
+ *           missing authority, invalid SAID values, and valid SAID values.
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon: NA
+ * @tc.step:
+ * 1. Test URI "datashare:/" - expect result false, value -1
+ * 2. Test URI "datashare://SAID=1301" - expect result false, value -1 (missing authority)
+ * 3. Test URI "datashare:///SAID=1301" - expect result false, value -1 (missing authority)
+ * 4. Test URI "datashare:///SAID=/" - expect result false, value -1 (empty SAID)
+ * 5. Test URI "datashare://distributeddata/SAID=rrrr" - expect result false, value -1 (invalid SAID)
+ * 6. Test URI "datashare://distributeddata/SAID=1301" - expect result true, value 1301 (valid)
+ * 7. Test URI "datashare://distributeddata/SAID=1301/test" - expect result true, value 1301 (valid with path)
+ * 8. Test URI "datashare://distributeddata/SAID=16777215" - expect result true, value 16777215 (valid)
+ * 9. Test URI "datashare://distributeddata/SAID=16777216" - expect result false (out of saId boundary)
+ * 6. Test URI "datashare://distributeddata/SAID=1301/SAID=1111" - expect result true, value 1301 (valid)
+ * @tc.expect:
+ * 1. URIs without proper authority format return false or -1
+ * 2. URIs with invalid SAID values return true with -1
+ * 3. URIs with valid SAID values return true with correct ID (1301)
+ */
+HWTEST_F(DataShareURIUtilsTest, GetSystemAbilityId_001, TestSize.Level0)
+{
+    ZLOGI("GetSystemAbilityId_001 starts");
+    std::string uri = "datashare:/";
+    auto [res, value] = DataShareURIUtils::GetSystemAbilityId(uri);
+    EXPECT_FALSE(res);
+    EXPECT_EQ(value, -1);
+    uri = "datashare://SAID=1301";
+    std::tie(res, value) = DataShareURIUtils::GetSystemAbilityId(uri);
+    EXPECT_FALSE(res);
+    EXPECT_EQ(value, -1);
+    uri = "datashare:///SAID=1301";
+    std::tie(res, value) = DataShareURIUtils::GetSystemAbilityId(uri);
+    EXPECT_FALSE(res);
+    EXPECT_EQ(value, -1);
+    uri = "datashare:///SAID=/";
+    std::tie(res, value) = DataShareURIUtils::GetSystemAbilityId(uri);
+    EXPECT_FALSE(res);
+    EXPECT_EQ(value, -1);
+    uri = "datashare://distributeddata/SAID=rrrr";
+    std::tie(res, value) = DataShareURIUtils::GetSystemAbilityId(uri);
+    EXPECT_FALSE(res);
+    EXPECT_EQ(value, -1);
+    uri = "datashare://distributeddata/SAID=1301";
+    std::tie(res, value) = DataShareURIUtils::GetSystemAbilityId(uri);
+    EXPECT_TRUE(res);
+    EXPECT_EQ(value, 1301);
+    uri = "datashare://distributeddata/SAID=1301/test";
+    std::tie(res, value) = DataShareURIUtils::GetSystemAbilityId(uri);
+    EXPECT_TRUE(res);
+    EXPECT_EQ(value, 1301);
+    ZLOGI("GetSystemAbilityId_001 ends");
+    uri = "datashare://distributeddata/SAID=16777215";
+    std::tie(res, value) = DataShareURIUtils::GetSystemAbilityId(uri);
+    EXPECT_TRUE(res);
+    EXPECT_EQ(value, 16777215); // 16777215 is boundary value
+    uri = "datashare://distributeddata/SAID=16777216";
+    std::tie(res, value) = DataShareURIUtils::GetSystemAbilityId(uri);
+    EXPECT_FALSE(res);
+    EXPECT_EQ(value, -1);
+    uri = "datashare://distributeddata/SAID=1301/SAID=1111";
+    std::tie(res, value) = DataShareURIUtils::GetSystemAbilityId(uri);
+    EXPECT_TRUE(res);
+    EXPECT_EQ(value, 1301);
+    ZLOGI("GetSystemAbilityId_001 ends");
+}
 } // namespace DataShare
 }

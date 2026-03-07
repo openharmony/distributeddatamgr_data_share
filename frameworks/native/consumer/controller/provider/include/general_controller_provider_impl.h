@@ -16,7 +16,7 @@
 #ifndef GENERAL_CONTROLLER_PORVIDER_IMPL_H
 #define GENERAL_CONTROLLER_PORVIDER_IMPL_H
 
-#include "datashare_connection.h"
+#include "datashare_connection_base.h"
 #include "datashare_option.h"
 #include "general_controller.h"
 
@@ -29,7 +29,7 @@ namespace DataShare {
 using ChangeInfo = AAFwk::ChangeInfo;
 class GeneralControllerProviderImpl : public GeneralController {
 public:
-    GeneralControllerProviderImpl(std::shared_ptr<DataShareConnection> connection,
+    GeneralControllerProviderImpl(std::shared_ptr<DataShareConnectionBase> connection,
         const Uri &uri, const sptr<IRemoteObject> &token);
 
     virtual ~GeneralControllerProviderImpl() = default;
@@ -64,7 +64,7 @@ public:
     int NotifyChangeExtProvider(const ChangeInfo &changeInfo) override;
 
 private:
-    std::shared_ptr<DataShareConnection> connection_ = nullptr;
+    std::shared_ptr<DataShareConnectionBase> connection_ = nullptr;
     sptr<IRemoteObject> token_ = {};
     Uri uri_ = Uri("");
 };

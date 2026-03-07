@@ -204,7 +204,7 @@ int32_t ExtSpecialController::UserDefineFunc(
 }
 
 ExtSpecialController::ExtSpecialController(
-    std::shared_ptr<DataShareConnection> connection, const Uri &uri, const sptr<IRemoteObject> &token)
+    std::shared_ptr<DataShareConnectionBase> connection, const Uri &uri, const sptr<IRemoteObject> &token)
     : connection_(connection), token_(token), uri_(uri)
 {
 }

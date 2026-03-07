@@ -289,6 +289,11 @@ constexpr int E_FIELD_ILLEGAL = (E_BASE + 87);
 * @brief The error code for invalid predicate field.
 */
 constexpr int E_FIELD_INVALID = (E_BASE + 88);
+
+/**
+* @brief The error code for system ability manager operate failed.
+*/
+constexpr int E_SYSTEM_ABILITY_OPERATE_FAILED = (E_BASE + 89);
 } // namespace DataShare
 } // namespace OHOS
 

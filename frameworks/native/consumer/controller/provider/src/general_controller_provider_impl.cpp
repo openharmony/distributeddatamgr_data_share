@@ -258,7 +258,7 @@ int GeneralControllerProviderImpl::NotifyChangeExtProvider(const ChangeInfo &cha
     return ret;
 }
 
-GeneralControllerProviderImpl::GeneralControllerProviderImpl(std::shared_ptr<DataShareConnection> connection,
+GeneralControllerProviderImpl::GeneralControllerProviderImpl(std::shared_ptr<DataShareConnectionBase> connection,
     const Uri &uri, const sptr<IRemoteObject> &token) : connection_(connection), token_(token), uri_(uri)
 {
 }

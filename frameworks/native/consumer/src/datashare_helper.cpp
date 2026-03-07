@@ -20,9 +20,12 @@
 
 #include "adaptor.h"
 #include "dataobs_mgr_client.h"
+#include "datashare_connection.h"
+#include "datashare_sa_connection.h"
 #include "datashare_errno.h"
 #include "datashare_log.h"
 #include "datashare_string_utils.h"
+#include "datashare_uri_utils.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -170,6 +173,12 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
             DataShareStringUtils::Anonymous(uri.ToString()).c_str());
         return nullptr;
     }
+    
+    auto [isSAUri, saId] = DataShareURIUtils::GetSystemAbilityId(uri.ToString());
+    if (isSAUri) {
+        return CreateSAProviderHelper(uri, token, saId, waitTime, isSystem);
+    }
+
     sptr<DataShareConnection> connection = new (std::nothrow) DataShareConnection(uri, token, waitTime);
     if (connection == nullptr) {
         LOG_ERROR("Create DataShareConnection failed.");
@@ -191,6 +200,21 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
         return nullptr;
     }
     return std::make_shared<DataShareHelperImpl>(uri, token, dataShareConnection, isSystem);
+}
+
+std::shared_ptr<DataShareHelper> DataShareHelper::CreateSAProviderHelper(Uri &uri, const sptr<IRemoteObject> &token,
+    const int32_t saId, const int waitTime, bool isSystem)
+{
+    std::shared_ptr<DataShareSAConnection> connection = std::make_shared<DataShareSAConnection>(uri, saId, waitTime);
+    if (connection == nullptr) {
+        LOG_ERROR("Create DataShareSAConnection failed.");
+        return nullptr;
+    }
+    if (connection->GetDataShareProxy(uri, token) == nullptr) {
+        LOG_ERROR("connect sa provider failed");
+        return nullptr;
+    }
+    return std::make_shared<DataShareHelperImpl>(uri, token, connection, isSystem);
 }
 
 /**

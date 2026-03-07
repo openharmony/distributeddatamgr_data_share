@@ -32,6 +32,7 @@
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "ishared_result_set.h"
+#include "mock_token.h"
 
 
 namespace OHOS {
@@ -39,6 +40,7 @@ namespace DataShare {
 using namespace testing::ext;
 using namespace DistributedShare::DataShare;
 using namespace OHOS::AAFwk;
+using namespace OHOS::Security::AccessToken;
 using ChangeInfo = AAFwk::ChangeInfo;
 class DataShareStubTest : public testing::Test {
 public:
@@ -122,13 +124,87 @@ public:
     {
         return {};
     }
+    DataShareNonSilentConfig GetConfig()
+    {
+        NonSilentConfigRecord record = {
+            "datashare://distributeddata/SAID=1301",
+            "ohos.permission.APPROXIMATELY_LOCATION",
+            "ohos.permission.GET_BUNDLE_INFO"
+        };
+        NonSilentConfigRecord record2 = {
+            "datashare://appgallery_service/SAID=65974",
+            "ohos.permission.GET_BUNDLE_INFO",
+            "ohos.permission.APPROXIMATELY_LOCATION"
+        };
+        NonSilentConfigRecord record3 = {
+            "datashare://test/SAID=11111",
+            "ohos.permission.APPROXIMATELY_LOCATION",
+            "ohos.permission.APPROXIMATELY_LOCATION"
+        };
+        DataShareNonSilentConfig saconfig;
+        saconfig.records.push_back(record);
+        saconfig.records.push_back(record2);
+        saconfig.records.push_back(record3);
+        return saconfig;
+    }
 };
 
 std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
 std::shared_ptr<DataShareStub> dataShareStub = std::make_shared<TestDataShareStub>();
 std::u16string InterfaceToken = u"OHOS.DataShare.IDataShare";
 
-void DataShareStubTest::SetUpTestCase(void) {}
+HapPolicyParams GetPolicy()
+{
+    HapPolicyParams policy = { .apl = APL_SYSTEM_CORE,
+        .domain = "test.domain",
+        .permList = { { .permissionName = "ohos.permission.test",
+            .bundleName = "ohos.datashareclienttest.demo",
+            .grantMode = 1,
+            .availableLevel = APL_SYSTEM_CORE,
+            .label = "label",
+            .labelId = 1,
+            .description = "ohos.datashareclienttest.demo",
+            .descriptionId = 1 } },
+        .permStateList = {
+            { .permissionName = "ohos.permission.test",
+                .isGeneral = true,
+                .resDeviceID = { "local" },
+                .grantStatus = { PermissionState::PERMISSION_GRANTED },
+                .grantFlags = { 1 } },
+            { .permissionName = "ohos.permission.GET_BUNDLE_INFO",
+                .isGeneral = true,
+                .resDeviceID = { "local" },
+                .grantStatus = { PermissionState::PERMISSION_GRANTED },
+                .grantFlags = { 1 } } } };
+    return policy;
+}
+
+void DataShareStubTest::SetUpTestCase(void)
+{
+    LOG_INFO("JoinTest SetUpTestCase invoked. get tokenId start.");
+    MockToken::SetTestEnvironment();
+    int sleepTime = 3;
+    sleep(sleepTime);
+
+    HapInfoParams info = {
+        .userID = 100,
+        .bundleName = "ohos.datashareclienttest.demo",
+        .instIndex = 0,
+        .isSystemApp = true,
+        .appIDDesc = "ohos.datashareclienttest.demo" };
+    HapPolicyParams policy = GetPolicy();
+    AccessTokenIDEx tokenIdEx = MockToken::AllocTestHapToken(info, policy);
+    uint64_t token = tokenIdEx.tokenIdExStruct.tokenID;
+    if (token == INVALID_TOKENID) {
+        LOG_ERROR("JoinTest token invalid.");
+        return;
+    }
+    int ret = SetSelfTokenID(token);
+    if (ret != E_OK) {
+        LOG_ERROR("JoinTest SetSelfTokenID: %{public}d", ret);
+        return;
+    }
+}
 void DataShareStubTest::TearDownTestCase(void) {}
 void DataShareStubTest::SetUp(void) {}
 void DataShareStubTest::TearDown(void) {}
@@ -300,6 +376,42 @@ HWTEST_F(DataShareStubTest, DataShareStub_CmdNotifyChangeExtProvider_Test_001, T
     EXPECT_EQ(errCode, 0);
 
     LOG_INFO("DataShareStub_CmdNotifyChangeExtProvider_Test_001::End");
+}
+
+/**
+ * @tc.name: DataShareStub_VerifyPermissionAndUri_Test_001
+ * @tc.desc: Verify VerifyPermissionAndUri method of DataShareStub class correctly validates
+ *           permissions and URIs for different system ability configurations.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+ *     1. The test environment supports calling GetSelfTokenID() to obtain current token ID.
+ *     2. The TestDataShareStub class provides a GetConfig() method that returns a DataShareNonSilentConfig
+ *        containing predefined URI and permission configurations.
+ *     3. The DataShareNonSilentConfig contains records for:
+ *        - "datashare://distributeddata/SAID=1301" with read/write permissions
+ *        - "datashare://appgallery_service/SAID=65974" with read/write permissions
+ *        - "datashare://test/SAID=11111" with read/write permissions
+ *     4. The DataShareStub class provides a VerifyPermissionAndUri method that accepts URI and token ID.
+ * @tc.step:
+ *     1. Call VerifyPermissionAndUri with "datashare://distributeddata/SAID=1301" and current token ID;
+ *        verify return is true.
+ *     2. Call VerifyPermissionAndUri with "datashare://appgallery_service/SAID=65974" and current token ID;
+ *        verify return is true.
+ *     3. Call VerifyPermissionAndUri with "datashare://test/SAID=11111" and current token ID;
+ *        verify return is false.
+ * @tc.expect:
+ *     1. First call returns true (URI and permissions are valid).
+ *     2. Second call returns true (URI and permissions are valid).
+ *     3. Third call returns false (URI or permissions are invalid).
+ */
+HWTEST_F(DataShareStubTest, DataShareStub_VerifyPermissionAndUri_Test_001, TestSize.Level0)
+{
+    LOG_INFO("DataShareStub_VerifyPermissionAndUri_Test_001::Start");
+    EXPECT_TRUE(dataShareStub->VerifyPermissionAndUri("datashare://distributeddata/SAID=1301", GetSelfTokenID()));
+    EXPECT_TRUE(dataShareStub->VerifyPermissionAndUri("datashare://appgallery_service/SAID=65974", GetSelfTokenID()));
+    EXPECT_FALSE(dataShareStub->VerifyPermissionAndUri("datashare://test/SAID=11111", GetSelfTokenID()));
+    LOG_INFO("DataShareStub_VerifyPermissionAndUri_Test_001::End");
 }
 }
 }

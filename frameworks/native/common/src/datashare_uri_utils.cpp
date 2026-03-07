@@ -133,4 +133,32 @@ std::string DataShareURIUtils::ExtractFirstPathSegment(const std::string& uri)
         return uri.substr(startPos, endPos - startPos);
     }
 }
+
+std::pair<bool, int32_t> DataShareURIUtils::GetSystemAbilityId(const std::string &uri)
+{
+    // The non-silent URI of an SA starts with "datashare://" and contains "/SAID=".
+    if (uri.find(SA_NON_SILENT_SCHEMA) != 0) {
+        return std::make_pair(false, -1);
+    }
+    
+    size_t saIdPos = uri.find(SA_ID);
+    if (saIdPos <= SA_NON_SILENT_SCHEMA_LEN || saIdPos == std::string::npos) {
+        return std::make_pair(false, -1);
+    }
+
+    size_t saIdEndPos = uri.find(URI_SEPARATOR, saIdPos + SA_ID_LEN);
+    if (saIdEndPos == std::string::npos) {
+        saIdEndPos = uri.length();
+    }
+    std::string saIdStr = uri.substr(saIdPos + SA_ID_LEN, saIdEndPos - (saIdPos + SA_ID_LEN));
+    if (saIdStr.empty()) {
+        return std::make_pair(false, -1);
+    }
+
+    auto [res, saId] = Strtoul(saIdStr);
+    if (!res || saId > LAST_SYS_ABILITY_ID) {
+        return std::make_pair(false, -1);
+    }
+    return std::make_pair(true, static_cast<int32_t>(saId));
+}
 } // namespace OHOS::DataShare

@@ -21,6 +21,7 @@
 
 #include "datashare_business_error.h"
 #include "datashare_errno.h"
+#include "datashare_sa_provider_info.h"
 #include "idatashare.h"
 
 namespace OHOS {
@@ -30,7 +31,12 @@ public:
     DataShareStub();
     ~DataShareStub();
     int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
-
+    /**
+     * Not configuring read and write permissions is considered as not allowing other processes to access,
+     * and the visitors are only allowed to create a data share if they have at least one of the permissions
+    */
+    bool VerifyPermissionAndUri(std::string uri, uint32_t tokenId);
+    virtual DataShareNonSilentConfig GetConfig();
 private:
     ErrCode CmdGetFileTypes(MessageParcel &data, MessageParcel &reply);
     ErrCode CmdOpenFile(MessageParcel &data, MessageParcel &reply);

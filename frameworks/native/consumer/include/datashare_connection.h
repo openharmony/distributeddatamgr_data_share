@@ -22,19 +22,19 @@
 
 #include "ability_connect_callback_stub.h"
 #include "data_ability_observer_interface.h"
-#include "datashare_proxy.h"
-#include "executor_pool.h"
+#include "datashare_connection_base.h"
 #include "want.h"
 
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
 class DataShareConnection : public AAFwk::AbilityConnectionStub,
-    public std::enable_shared_from_this<DataShareConnection> {
+    public std::enable_shared_from_this<DataShareConnection>,
+    public DataShareConnectionBase {
 public:
     DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime = 2) : uri_(uri),
         token_(token), waitTime_(waitTime) {}
-    virtual ~DataShareConnection();
+    ~DataShareConnection() override;
 
     /**
      * @brief This method is called back to receive the connection result after an ability calls the
@@ -69,14 +69,14 @@ public:
      *
      * @return the proxy of datashare extension ability.
      */
-    std::shared_ptr<DataShareProxy> GetDataShareProxy(const Uri &uri, const sptr<IRemoteObject> &token);
+    std::shared_ptr<DataShareProxy> GetDataShareProxy(const Uri &uri, const sptr<IRemoteObject> &token) override;
 
     void SetConnectInvalid();
 
     void UpdateObserverExtsProviderMap(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
-        bool isDescendants);
+        bool isDescendants) override;
 
-    void DeleteObserverExtsProviderMap(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver);
+    void DeleteObserverExtsProviderMap(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver) override;
 
 private:
     struct DataShareConnectionInfo {

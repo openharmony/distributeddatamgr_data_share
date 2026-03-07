@@ -20,6 +20,7 @@
 
 #include "concurrent_map.h"
 #include "data_ability_observer_stub.h"
+#include "datashare_connection_base.h"
 #include "datashare_helper.h"
 #include "ext_special_controller.h"
 #include "general_controller.h"
@@ -50,7 +51,7 @@ private:
 class DataShareHelperImpl : public DataShareHelper {
 public:
     DataShareHelperImpl(const Uri &uri, const sptr<IRemoteObject> &token,
-        std::shared_ptr<DataShareConnection> connection, bool isSystem = false);
+        std::shared_ptr<DataShareConnectionBase> connection, bool isSystem = false);
     DataShareHelperImpl(std::string extUri = "", bool isSystem = false);
 
     ~DataShareHelperImpl() override;
