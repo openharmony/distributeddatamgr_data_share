@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Huawei Device Co., Ltd.
+// Copyright (C) 2025-2026 Huawei Device Co., Ltd.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -12,7 +12,7 @@
 // limitations under the License.
 
 use std::{
-    ffi::{c_void, CStr},
+    ffi::{c_void, CStr, CString},
     marker::PhantomData,
     ops::Deref,
     ptr::null_mut,
@@ -873,11 +873,13 @@ impl<'local> AniEnv<'local> {
         index: usize,
     ) -> Result<AniRef<'local>, AniError> {
         let mut ret = null_mut() as ani_ref;
+        let item_num = CString::new(format!("${}", index))
+            .map_err(|_| AniError::from_code(String::from("Failed to create field name"), 1))?; //ANI_ERROR
         let res = unsafe {
-            (**self.inner).TupleValue_GetItem_Ref.unwrap()(
+            (**self.inner).Object_GetFieldByName_Ref.unwrap()(
                 self.inner,
                 tuple.as_raw(),
-                index,
+                item_num.as_ptr(),
                 &mut ret as *mut _,
             )
         };
