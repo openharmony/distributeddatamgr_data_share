@@ -104,6 +104,9 @@ public:
 
     std::vector<DataProxyResult> UnsubscribeProxyData(const std::vector<std::string> &uris) override;
 
+    virtual std::pair<int32_t, ConnectionInterfaceInfo> GetConnectionInterfaceInfo(int32_t saId,
+        uint32_t waitTime) override;
+
     static bool IsSystem();
 
     static bool& GetSystem();

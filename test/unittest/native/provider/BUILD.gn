@@ -42,13 +42,17 @@ ohos_unittest("DataShareStubTest") {
   module_out_path = "data_share/data_share/native/provider"
  
   include_dirs = [
+    "${datashare_base_path}/test/unittest/test_helper/include",
     "${datashare_innerapi_path}/consumer/include",
     "${datashare_innerapi_path}/common/include",
     "${datashare_native_provider_path}/include",
     "${datashare_native_proxy_path}/include",
   ]
  
-  sources = [ "${datashare_base_path}/test/unittest/native/provider/src/datashare_stub_test.cpp" ]
+  sources = [
+    "${datashare_base_path}/test/unittest/native/provider/src/datashare_stub_test.cpp",
+    "${datashare_base_path}/test/unittest/test_helper/src/mock_token.cpp"
+  ]
  
   deps = [
     "${datashare_innerapi_path}:datashare_consumer_static",

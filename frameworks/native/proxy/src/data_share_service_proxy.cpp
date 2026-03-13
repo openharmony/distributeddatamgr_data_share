@@ -839,5 +839,37 @@ std::vector<DataProxyResult> DataShareServiceProxy::UnsubscribeProxyData(const s
     ITypesUtil::Unmarshal(reply, results);
     return results;
 }
+
+std::pair<int32_t, ConnectionInterfaceInfo> DataShareServiceProxy::GetConnectionInterfaceInfo(int32_t saId,
+    uint32_t waitTime)
+{
+    MessageParcel data;
+    ConnectionInterfaceInfo info;
+    if (!data.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return std::make_pair(E_WRITE_TO_PARCE_ERROR, info);
+    }
+    if (!ITypesUtil::Marshal(data, saId, waitTime)) {
+        LOG_ERROR("Write to message parcel failed!");
+        return std::make_pair(E_MARSHAL_ERROR, info);
+    }
+
+    int32_t errCode = -1;
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_GET_CONNECTION_INTERFACE_INFO), data,
+        reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("GetConnectionInterfaceInfo fail to SendRequest. err: %{public}d", err);
+        return std::make_pair(err, info);
+    }
+
+    if (!ITypesUtil::Unmarshal(reply, errCode, info)) {
+        LOG_ERROR("fail to Unmarshal");
+        return std::make_pair(E_UNMARSHAL_ERROR, info);
+    }
+    return std::make_pair(errCode, info);
+}
 } // namespace DataShare
 } // namespace OHOS

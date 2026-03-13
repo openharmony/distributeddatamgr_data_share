@@ -27,10 +27,18 @@ public:
     static std::pair<bool, uint32_t> Strtoul(const std::string &str);
     static std::pair<bool, int32_t> GetUserFromUri(const std::string &uri);
     static std::string ExtractFirstPathSegment(const std::string& uri);
+    static std::pair<bool, int32_t> GetSystemAbilityId(const std::string &uri);
 
 private:
     static constexpr const char USER_PARAM[] = "user";
     static constexpr const int BASE_TEN = 10;
+    static constexpr const char *SA_NON_SILENT_SCHEMA = "datashare://";
+    static constexpr uint32_t SA_NON_SILENT_SCHEMA_LEN = 12;
+    static constexpr const char *SA_ID = "/SAID=";
+    static constexpr const char *URI_SEPARATOR = "/";
+    static constexpr uint32_t SA_ID_LEN = 6;
+    // LAST_SYS_ABILITY_ID is 0x00ffffff(16777215)
+    static constexpr const uint32_t LAST_SYS_ABILITY_ID = 0x00ffffff;
 };
 
 } // namespace OHOS::DataShare

@@ -347,5 +347,38 @@ HWTEST_F(DataShareHelperTest, CreateServiceHelper001, TestSize.Level0)
     EXPECT_EQ(result, nullptr);
     LOG_INFO("DataShareHelperTest CreateServiceHelper001::End");
 }
+
+/**
+ * @tc.name: CreateExtHelper002
+ * @tc.desc: Test CreateExtHelper function of DataShareHelper when input URI contains
+ *           "SAID=1301" system ability identifier but token is nullptr, verifying if function
+ *           fails and returns nullptr.
+ * @tc.type: FUNC
+ * @tc.require: issueIC413F
+ * @tc.precon:
+ *     1. The test environment supports instantiation of Uri and calling static DataShareHelper::CreateExtHelper
+ *        method.
+ *     2. Predefined parameters (waitTime, isSystem flag) are valid for method call.
+ *     3. The DataShareHelper::CreateExtHelper method accepts input parameters (Uri, IRemoteObject*, int waitTime,
+ *        bool isSystem).
+ * @tc.step:
+ *     1. Create an Uri instance with string "datashare://distributeddata/SAID=1301/test" containing SAID.
+ *     2. Set IRemoteObject* token to nullptr, waitTime to 1, and isSystem to false.
+ *     3. Call DataShareHelper::CreateExtHelper with created Uri, token, waitTime, and isSystem as parameters.
+ *     4. Check return value of CreateExtHelper function to verify if it is nullptr.
+ * @tc.expect:
+ *     1. The DataShareHelper::CreateExtHelper function fails and returns nullptr when token is nullptr.
+ */
+HWTEST_F(DataShareHelperTest, CreateExtHelper002, TestSize.Level0)
+{
+    LOG_INFO("DataShareHelperTest CreateExtHelper001::Start");
+    OHOS::Uri uri("datashare://distributeddata/SAID=1301/test");
+    sptr<IRemoteObject> token = nullptr;
+    int waitTime = 1;
+    bool isSystem = false;
+    auto result = DataShareHelper::CreateExtHelper(uri, token, waitTime, isSystem);
+    EXPECT_EQ(result, nullptr);
+    LOG_INFO("DataShareHelperTest CreateExtHelper002::End");
+}
 } // namespace DataShare
 } // namespace OHOS

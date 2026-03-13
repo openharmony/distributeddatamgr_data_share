@@ -16,7 +16,7 @@
 #ifndef EXT_SPECIAL_CONTROLLER_H
 #define EXT_SPECIAL_CONTROLLER_H
 
-#include "datashare_connection.h"
+#include "datashare_connection_base.h"
 #include "datashare_operation_statement.h"
 #include "datashare_values_bucket.h"
 #include "uri.h"
@@ -25,7 +25,7 @@ namespace OHOS {
 namespace DataShare {
 class ExtSpecialController {
 public:
-    ExtSpecialController(std::shared_ptr<DataShareConnection> connection, const Uri &uri,
+    ExtSpecialController(std::shared_ptr<DataShareConnectionBase> connection, const Uri &uri,
         const sptr<IRemoteObject> &token);
     virtual ~ExtSpecialController() = default;
 
@@ -53,7 +53,7 @@ public:
 
     int32_t UserDefineFunc(MessageParcel &data, MessageParcel &reply, MessageOption &option);
 private:
-    std::shared_ptr<DataShareConnection> connection_ = nullptr;
+    std::shared_ptr<DataShareConnectionBase> connection_ = nullptr;
     sptr<IRemoteObject> token_ = {};
     Uri uri_ = Uri("");
 };

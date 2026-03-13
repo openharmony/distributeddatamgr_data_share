@@ -33,7 +33,7 @@ namespace DataShare {
 using namespace AppExecFwk;
 // non-silent access
 DataShareHelperImpl::DataShareHelperImpl(const Uri &uri, const sptr<IRemoteObject> &token,
-    std::shared_ptr<DataShareConnection> connection, bool isSystem)
+    std::shared_ptr<DataShareConnectionBase> connection, bool isSystem)
 {
     LOG_DEBUG("starts");
     isSystem_ = isSystem;

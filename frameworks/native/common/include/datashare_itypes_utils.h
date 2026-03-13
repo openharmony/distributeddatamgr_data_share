@@ -20,6 +20,7 @@
 #include "datashare_operation_statement.h"
 #include "datashare_common.h"
 #include "datashare_predicates.h"
+#include "datashare_sa_provider_info.h"
 #include "datashare_template.h"
 #include "datashare_value_object.h"
 #include "datashare_values_bucket.h"
@@ -55,6 +56,7 @@ using DataProxyChangeInfo = DataShare::DataProxyChangeInfo;
 using UriInfo = DataShare::UriInfo;
 using RegisterOption = DataShare::RegisterOption;
 using BackReference = DataShare::BackReference;
+using ConnectionInterfaceInfo = DataShare::ConnectionInterfaceInfo;
 
 template<>
 bool Marshalling(const BatchUpdateResult &result, MessageParcel &parcel);
@@ -232,5 +234,11 @@ bool Marshalling(const RegisterOption &option, MessageParcel &parcel);
 
 template<>
 bool Unmarshalling(RegisterOption &option, MessageParcel &parcel);
+
+template<>
+bool Marshalling(const ConnectionInterfaceInfo &info, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(ConnectionInterfaceInfo &info, MessageParcel &parcel);
 }
 #endif

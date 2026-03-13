@@ -1262,5 +1262,35 @@ HWTEST_F(DatashareItypesUtilsTest, MarshalExecResultSetCapacity_001, TestSize.Le
     ASSERT_FALSE(ITypesUtil::Marshalling(execResultSet, parcel));
     LOG_INFO("MarshalExecResultSetCapacity_001 ends");
 }
+
+/**
+ * @tc.name: MarshalConnectionInterfaceInfo_001
+ * @tc.desc: Test marshalling and unmarshalling functionality of ConnectionInterfaceInfo
+ *           with valid interface code and descriptor.
+ * @tc.type: FUNC
+ * @tc.require: 1014
+ * @tc.precon: None
+ * @tc.step:
+ *    1. Create a MessageParcel and two ConnectionInterfaceInfo objects (input and output).
+ *    2. Initialize input ConnectionInterfaceInfo with code=1 and descriptor=u"datasharetest".
+ *    3. Marshal input ConnectionInterfaceInfo to MessageParcel and verify operation succeeds.
+ *    4. Unmarshal ConnectionInterfaceInfo from MessageParcel to output and verify operation succeeds.
+ *    5. Compare code_ and descriptor_ members of input and output to ensure data consistency.
+ * @tc.expect: The marshalling and unmarshalling operations should succeed, and unmarshaled
+ *    ConnectionInterfaceInfo should match original: one.
+ */
+HWTEST_F(DatashareItypesUtilsTest, MarshalConnectionInterfaceInfo_001, TestSize.Level0) {
+    LOG_INFO("MarshalConnectionInterfaceInfo_001 starts");
+    MessageParcel parcel;
+    ConnectionInterfaceInfo input = ConnectionInterfaceInfo(1, u"datasharetest");
+    ConnectionInterfaceInfo output = ConnectionInterfaceInfo();
+
+    ASSERT_TRUE(ITypesUtil::Marshalling(input, parcel));
+
+    ASSERT_TRUE(ITypesUtil::Unmarshalling(output, parcel));
+    EXPECT_EQ(input.code_, output.code_);
+    EXPECT_EQ(input.descriptor_, output.descriptor_);
+    LOG_INFO("MarshalConnectionInterfaceInfo_001 ends");
+}
 }
 }
