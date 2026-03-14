@@ -1,0 +1,736 @@
+/*
+* Copyright (c) 2025 Huawei Device Co., Ltd.
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+ 
+import { describe, beforeAll, beforeEach, afterEach, afterAll, it, expect, TestType, Size, Level } from '../../../hypium/index';
+import dataShare from '@ohos.data.dataShare';
+import dataSharePredicates from '@ohos.data.dataSharePredicates';
+import DataShareResultSet,{DataType} from '@ohos.data.DataShareResultSet';
+import common from '@ohos.app.ability.common';
+import { ValuesBucket } from "@ohos.data.ValuesBucket";
+import Utils from './Util.test';
+import { BusinessError } from '@ohos.base';
+import { AppStorage } from '@ohos.arkui.stateManagement';
+ 
+let context: common.UIAbilityContext;
+let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+let dataShareHelper: dataShare.DataShareHelper;
+const TAG = '[ttt] '
+ 
+export default function dataShareResultSetMultiThreadTest() {
+  describe('dataShareResultSetMultiThreadTest', () => {
+    beforeAll(async () => {
+      console.info(TAG + "beforeAll")
+      try {
+        context = AppStorage.get<common.UIAbilityContext>("context") as common.UIAbilityContext;
+        dataShareHelper = await dataShare.createDataShareHelper(context, uri, {isProxy: true});
+        expect(dataShareHelper != undefined).assertTrue();
+        console.info(TAG + " createDataShareHelper succeed, dataShareHelper : " + dataShareHelper);
+        let predicates = new dataSharePredicates.DataSharePredicates();
+        let res = await dataShareHelper!.delete(uri, predicates);
+        console.info(TAG + "beforeAll delete success:" + res);
+      } catch (err: BusinessError) {
+        console.error(TAG + ` createDataShareHelper error: code: ${err.code}, message: ${err.message} `);
+      }
+    })
+ 
+    beforeEach(async () => {
+      for (let i = 0; i < 10; i++) {
+        let vb: ValuesBucket = {
+          "name0": "zhangSan" + i,
+          "age": i as Long,
+          "isStudent": true,
+          "phoneNumber": new Uint8Array([i, i, i])
+        };
+        try {
+          let ret = await dataShareHelper!.insert(uri, vb);
+          console.log(TAG + "beforeEach insert end rowNum is " + ret);
+        } catch (err: BusinessError) {
+          console.error(TAG + 'beforeEach insert error' + err.code + "  " + err.message);
+          expect().assertFail()
+        }
+      }
+    })
+ 
+    afterEach(async () => {
+      let predicates = new dataSharePredicates.DataSharePredicates();
+      let res = await dataShareHelper!.delete(uri, predicates);
+      console.info(TAG + "afterEach delete success:" + res);
+    })
+ 
+    afterAll(async () => {
+      await dataShareHelper.close();
+    })
+ 
+    /**
+     * @tc.name Test_SUB_DistributedData_DataShare_SDK_RdbJsApiTest_0440
+     * @tc.number SUB_DistributedData_DataShare_SDK_RdbJsApiTest_0440
+     * @tc.desc DataShareResultSet loop row operation
+     * @tc.level: Level 2
+     * @tc.type: RELIABILITY
+     * @tc.size: MediumTest
+     */
+    it("Test_SUB_DistributedData_DataShare_SDK_RdbJsApiTest_0440", TestType.FUNCTION | Size.MEDIUMTEST | Level.LEVEL2, async () => {
+      console.info(TAG + "************* Test_SUB_DistributedData_DataShare_SDK_RdbJsApiTest_0440 start *************");
+      let value: Array<int> = new Array<int>();
+      let taskGroupName: string = "RDBResultSetMultiThread0420";
+      let taskCloseGroup: taskpool.TaskGroup = new taskpool.TaskGroup(taskGroupName);
+      let task9_insertTest: taskpool.Task = new taskpool.Task(insertTest, context, value);
+      let task9_updateTest: taskpool.Task = new taskpool.Task(updateTest, context, value);
+      let task9_deleteTest: taskpool.Task = new taskpool.Task(deleteTest, context, value);
+      let task9_goToFirstRowTest: taskpool.Task = new taskpool.Task(goToFirstRowTest, context, value);
+      let task9_goToLastRowTest: taskpool.Task = new taskpool.Task(goToLastRowTest, context, value);
+      let task9_goToNextRowTest: taskpool.Task = new taskpool.Task(goToNextRowTest, context, value);
+      let task9_goToPreviousRowTest: taskpool.Task = new taskpool.Task(goToPreviousRowTest, context, value);
+      let task9_goToTest: taskpool.Task = new taskpool.Task(goToTest, context, value);
+      let task9_goToRowTest: taskpool.Task = new taskpool.Task(goToRowTest, context, value);
+      let task9_getBlobTest: taskpool.Task = new taskpool.Task(getBlobTest, context, value);
+      let task9_getStringTest: taskpool.Task = new taskpool.Task(getStringTest, context, value);
+      let task9_getLongTest: taskpool.Task = new taskpool.Task(getLongTest, context, value);
+      let task9_getDoubleTest: taskpool.Task = new taskpool.Task(getDoubleTest, context, value);
+      let task9_getColumnIndexTest: taskpool.Task = new taskpool.Task(getColumnIndexTest, context, value);
+      let task9_getColumnNameTest: taskpool.Task = new taskpool.Task(getColumnNameTest, context, value);
+      let task9_getDataTypeTest: taskpool.Task = new taskpool.Task(getDataTypeTest, context, value);
+      taskCloseGroup.addTask(task9_insertTest)
+      taskCloseGroup.addTask(task9_updateTest)
+      taskCloseGroup.addTask(task9_deleteTest)
+      taskCloseGroup.addTask(task9_goToFirstRowTest)
+      taskCloseGroup.addTask(task9_goToLastRowTest)
+      taskCloseGroup.addTask(task9_goToNextRowTest)
+      taskCloseGroup.addTask(task9_goToPreviousRowTest)
+      taskCloseGroup.addTask(task9_goToTest)
+      taskCloseGroup.addTask(task9_goToRowTest)
+      taskCloseGroup.addTask(task9_getBlobTest)
+      taskCloseGroup.addTask(task9_getStringTest)
+      taskCloseGroup.addTask(task9_getLongTest)
+      taskCloseGroup.addTask(task9_getDoubleTest)
+      taskCloseGroup.addTask(task9_getColumnIndexTest)
+      taskCloseGroup.addTask(task9_getColumnNameTest)
+      taskCloseGroup.addTask(task9_getDataTypeTest)
+      try {
+        await taskpool.execute(taskCloseGroup).then((data: Array<Any>) => {
+          console.info(TAG + "Test_SUB_DistributedData_DataShare_SDK_RdbJsApiTest_0440 done.data is :" + JSON.stringify(data));
+          let da1 = data[0] as Object[];
+          let da2 = data[1] as Object[];
+          let da3 = data[2] as Object[];
+          let da4 = data[3] as Object[];
+          let da5 = data[4] as Object[];
+          let da6 = data[5] as Object[];
+          let da7 = data[6] as Object[];
+          let da8 = data[7] as Object[];
+          let da9 = data[8] as Object[];
+          let da10 = data[9] as Object[];
+          let da11= data[10] as Object[];
+          let da12= data[11] as Object[];
+          let da13 = data[12] as Object[];
+          let da14= data[13] as Object[];
+          let da15= data[14] as Object[];
+          let da16= data[15] as Object[];
+          expect(da1[0]).assertEqual(1);
+          expect(da2[0]).assertEqual(1);
+          expect(da3[0]).assertEqual(1);
+          expect(da4[0]).assertEqual(1);
+          expect(da5[0]).assertEqual(1);
+          expect(da6[0]).assertEqual(1);
+          expect(da7[0]).assertEqual(1);
+          expect(da8[0]).assertEqual(1);
+          expect(da9[0]).assertEqual(1);
+          expect(da10[0]).assertEqual(1);
+          expect(da11[0]).assertEqual(1);
+          expect(da12[0]).assertEqual(1);
+          expect(da13[0]).assertEqual(1);
+          expect(da14[0]).assertEqual(1);
+          expect(da15[0]).assertEqual(1);
+          expect(da16[0]).assertEqual(1);
+        }).catch((err: Error) => {
+          console.error(TAG + "Failed to Test_SUB_DistributedData_DataShare_SDK_RdbJsApiTest_0440. code =" + err.code + ", message =" + err.message);
+          expect().assertFail()
+        })
+      } catch (err: BusinessError) {
+        console.error(TAG + "Failed to Test_SUB_DistributedData_DataShare_SDK_RdbJsApiTest_0440. code =" + err.code + ", message =" + err.message);
+        expect().assertFail()
+      }
+      console.info(TAG + "************* Test_SUB_DistributedData_DataShare_SDK_RdbJsApiTest_0440 end   *************");
+    })
+  })
+}
+ 
+async function insertTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-insertTest] "
+  console.info(TAG + "start 1");
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  try {
+    console.info(TAG + "start 2");
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    let vb: ValuesBucket = {
+      "name0": "lisi",
+      "age": 99 as Long,
+      "isStudent":false,
+      "phoneNumber": new Uint8Array([1, 2, 3])
+    };
+    console.info(TAG + "start 3");
+    let ret = await dataShareHelper!.insert(uri, vb);
+    console.info(TAG + 'ret is ' + ret);
+    console.info(TAG + "start 4");
+    ReturnCode = 1;
+    value.push(ReturnCode);
+    console.info(TAG + 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG+ 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG+ 'error value is ' + JSON.stringify(value));
+  }
+  console.info(TAG + "end");
+  return value;
+}
+ 
+async function updateTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-updateTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    let vb: ValuesBucket = {
+      "name0": "wangwu",
+      "age": 99 as Long,
+      "isStudent":false,
+      "phoneNumber": new Uint8Array([1, 2, 3])
+    };
+    da.equalTo("name0", "zhangSan2");
+    let ret = await dataShareHelper!.update(uri, da, vb);
+    console.info(TAG + 'ret is ' + ret);
+    if (ret == 1) {
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG+ 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  }
+  console.info(TAG + "end");
+  return value;
+}
+ 
+async function deleteTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-deleteTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    da.equalTo("name0", "zhangSan3");
+    let ret = await dataShareHelper!.delete(uri, da);
+    console.info(TAG + 'ret is ' + ret);
+    if (ret == 1) {
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG + 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  }
+  console.info(TAG + "end");
+  return value;
+}
+ 
+async function goToFirstRowTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-goToFirstRowTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  let resultSet: DataShareResultSet | undefined;
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    resultSet = await dataShareHelper!.query(uri, da, columns);
+    expect(resultSet != undefined).assertTrue();
+    console.info(TAG + "rowcount:" + resultSet!.rowCount);
+    let ret = resultSet!.goToFirstRow();
+    if (ret) {
+      console.info(TAG + "goToFirstRow success");
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG + 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  } finally {
+    resultSet?.close()
+  }
+  console.info(TAG + "end");
+  return value;
+}
+ 
+async function goToLastRowTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-goToLastRowTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  let resultSet: DataShareResultSet | undefined;
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    resultSet = await dataShareHelper!.query(uri, da, columns);
+    expect(resultSet != undefined).assertTrue();
+    console.info(TAG + "rowcount:" + resultSet!.rowCount);
+    let ret = resultSet!.goToLastRow();
+    console.info(TAG + "goToLastRow success" + ret);
+    if (ret) {
+      console.info(TAG + "goToLastRow success");
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG + 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  } finally {
+    resultSet?.close()
+  }
+  console.info(TAG + "end");
+  return value;
+}
+ 
+async function goToNextRowTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-goToNextRowTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined;
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  let resultSet: DataShareResultSet | undefined;
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    resultSet = await dataShareHelper!.query(uri, da, columns);
+    expect(resultSet != undefined).assertTrue();
+    let ret = resultSet!.goToNextRow();
+    if (ret) {
+      console.info(TAG + "goToNextRow success");
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG + 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  } finally {
+    resultSet?.close()
+  }
+  console.info(TAG + "end");
+  return value;
+}
+ 
+async function goToPreviousRowTest(context: common.UIAbilityContext, value:Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-goToPreviousRowTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  let resultSet: DataShareResultSet | undefined;
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    resultSet = await dataShareHelper!.query(uri, da, columns);
+    expect(resultSet != undefined).assertTrue();
+    resultSet!.goToRow(6);
+    console.info(TAG + "goToRow(6) success");
+    let ret = resultSet!.goToPreviousRow();
+    if (ret) {
+      console.info(TAG + "goToPreviousRow success");
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG + 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  } finally {
+    resultSet?.close()
+  }
+  console.info(TAG + "end");
+  return value;
+}
+ 
+async function goToTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-goToTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  let resultSet: DataShareResultSet | undefined;
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    resultSet = await dataShareHelper!.query(uri, da, columns);
+    expect(resultSet != undefined).assertTrue();
+    let ret = resultSet!.goTo(12);
+    if (!ret) {
+      console.info(TAG + "goTo 12 fail");
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG + 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  } finally {
+    resultSet?.close()
+  }
+  console.info(TAG + "end");
+  return value;
+}
+ 
+async function goToRowTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-goToRowTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  let resultSet: DataShareResultSet | undefined;
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    resultSet = await dataShareHelper!.query(uri, da, columns);
+    expect(resultSet != undefined).assertTrue();
+    let ret = resultSet!.goToRow(5);
+    if (ret) {
+      console.info(TAG + "goToRow 5 success");
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG + 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  } finally {
+    resultSet?.close()
+  }
+  console.info(TAG + "end");
+  return value;
+}
+ 
+async function getBlobTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-getBlobTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  let resultSet: DataShareResultSet | undefined;
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    resultSet = await dataShareHelper!.query(uri, da, columns);
+    expect(resultSet != undefined).assertTrue();
+    resultSet!.goToFirstRow()
+    let blob1 = resultSet.getBlob(resultSet!.getColumnIndex("phoneNumber"));
+    console.info(TAG + "blob1:" + JSON.stringify(blob1));
+    if (JSON.stringify(new Uint8Array([0, 0, 0])) == JSON.stringify(blob1)) {
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG + 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  } finally {
+    resultSet?.close()
+  }
+  console.info(TAG + "end");
+  return value;
+}
+
+async function getStringTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-getStringTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  let resultSet: DataShareResultSet | undefined;
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    resultSet = await dataShareHelper!.query(uri, da, columns);
+    expect(resultSet != undefined).assertTrue();
+    resultSet!.goToFirstRow()
+    let str1 = resultSet!.getString(resultSet!.getColumnIndex("name0"));
+    console.info(TAG + "str1:" + JSON.stringify(str1));
+    if ("zhangSan0" == str1) {
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG + 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  } finally {
+    resultSet?.close()
+  }
+  console.info(TAG + "end");
+  return value;
+}
+ 
+async function getLongTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-getLongTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  let resultSet: DataShareResultSet | undefined;
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    resultSet = await dataShareHelper!.query(uri, da, columns);
+    expect(resultSet != undefined).assertTrue();
+    resultSet!.goToFirstRow()
+    let long1 = resultSet!.getLong(resultSet!.getColumnIndex("age"));
+    console.info(TAG + "long1:" + JSON.stringify(long1));
+    if (0 == long1) {
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG + 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  } finally {
+    resultSet?.close()
+  }
+  console.info(TAG + "end");
+  return value;
+}
+ 
+async function getDoubleTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-getDoubleTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  let resultSet: DataShareResultSet | undefined;
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    resultSet = await dataShareHelper!.query(uri, da, columns);
+    expect(resultSet != undefined).assertTrue();
+    resultSet!.goToFirstRow()
+    let double1 = resultSet!.getDouble(resultSet!.getColumnIndex("age"));
+    console.info(TAG + "double1:" + JSON.stringify(double1));
+    if (0 == double1) {
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG+ 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  } finally {
+    resultSet?.close()
+  }
+  console.info(TAG + "end");
+  return value;
+}
+ 
+async function getColumnIndexTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-getColumnIndexTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  let resultSet: DataShareResultSet | undefined;
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    resultSet = await dataShareHelper!.query(uri, da, columns);
+    expect(resultSet != undefined).assertTrue();
+    resultSet!.goToFirstRow()
+    let res = resultSet!.getColumnIndex("name0");
+    console.info(TAG + "res:" + JSON.stringify(res));
+    if (res == 1) {
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG + 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  } finally {
+    resultSet?.close()
+  }
+  console.info(TAG + "end");
+  return value;
+}
+ 
+async function getColumnNameTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-getColumnNameTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  let resultSet: DataShareResultSet | undefined;
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    resultSet = await dataShareHelper!.query(uri, da, columns);
+    expect(resultSet != undefined).assertTrue();
+    resultSet!.goToFirstRow()
+    let res = resultSet!.getColumnName(1);
+    console.info(TAG + "res:" + JSON.stringify(res));
+    if (res == "name0") {
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG + 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  } finally {
+    resultSet?.close()
+  }
+  console.info(TAG + "end");
+  return value;
+}
+ 
+async function getDataTypeTest(context: common.UIAbilityContext, value: Array<int>): Promise<Array<int>> {
+  const TAG = "[ttt-getDataTypeTest] "
+  value = new Array<int>();
+  let dataShareHelper: dataShare.DataShareHelper | undefined = undefined
+  let uri = ("datashareproxy://com.acts.ohos.data.datasharetest.static/test");
+  let ReturnCode = 0;
+  let columns = ["*"];
+  let da = new dataSharePredicates.DataSharePredicates();
+  let resultSet: DataShareResultSet | undefined;
+  try {
+    dataShareHelper = await dataShare.createDataShareHelper(context, uri, { isProxy: true });
+    console.log(TAG + "dsProxyHelper:" + JSON.stringify(dataShareHelper));
+    resultSet = await dataShareHelper!.query(uri, da, columns);
+    expect(resultSet != undefined).assertTrue();
+    resultSet!.goToFirstRow();
+    let res = resultSet!.getDataType(resultSet!.getColumnIndex("name0"));
+    console.info(TAG + "res:" + JSON.stringify(res));
+    if (res == 3) {
+      ReturnCode = 1;
+    } else {
+      ReturnCode = -1;
+    }
+    value.push(ReturnCode);
+    console.info(TAG + 'value is ' + JSON.stringify(value));
+  } catch (err: BusinessError) {
+    console.error(TAG + 'error' + err.code + "  " + err.message);
+    ReturnCode = err.code;
+    value.push(ReturnCode);
+    console.info(TAG + 'error value is ' + JSON.stringify(value));
+  } finally {
+    resultSet?.close()
+  }
+  console.info(TAG + "end");
+  return value;
+}
