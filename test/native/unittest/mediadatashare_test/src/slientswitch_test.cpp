@@ -113,7 +113,7 @@ void SlientSwitchTest::SetUpTestCase(void)
         LOG_ERROR("SlientSwitchTest token invalid.");
         return;
     }
-    int ret = SetSelfTokenID(token);
+    int ret = SetSelfTokenID(tokenIdEx.tokenIDEx);
     if (ret != E_OK) {
         LOG_ERROR("SlientSwitchTest SetSelfTokenID: %{public}d", ret);
         return;
