@@ -73,7 +73,8 @@ napi_value AsyncCall::Call(napi_env env, Context::ExecAction exec)
     napi_create_string_utf8(env, "DataShareAsyncCall", NAPI_AUTO_LENGTH, &resource);
     napi_create_async_work(env, nullptr, resource, AsyncCall::OnExecute, AsyncCall::OnComplete, context_, &work);
     context_->work = work;
-    auto status = napi_queue_async_work_with_qos(env, work, napi_qos_user_initiated);
+    // napi will provide new qos enum in the future. Here directly use qos number temporarily
+    auto status = napi_queue_async_work_with_qos(env, work, static_cast<napi_qos_t>(5));
     if (status != napi_ok) {
         LOG_ERROR("queue async work failed, status %{public}d", status);
         napi_get_undefined(env, &promise);
