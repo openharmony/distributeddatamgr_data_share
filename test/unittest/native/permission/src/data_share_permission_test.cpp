@@ -64,27 +64,6 @@ HWTEST_F(DataSharePermissionTest, VerifyPermissionTest001, TestSize.Level0)
 }
 
 /**
- * @tc.name: CheckExtensionTrusts001
- * @tc.desc: test CheckExtensionTrusts function when consumerToken and providerToken do not have corresponding haps
- * @tc.type: FUNC
- * @tc.require:issueICU06G
- * @tc.precon: None
- * @tc.step:
-    1.Create False consumerToken and providerToken
-    2.call CheckExtensionTrusts function and check the result
- * @tc.experct: CheckExtensionTrusts reutrn nullptr
- */
-HWTEST_F(DataSharePermissionTest, CheckExtensionTrusts001, TestSize.Level0)
-{
-    LOG_INFO("DataSharePermissionTest CheckExtensionTrusts001::Start");
-    uint32_t consumerToken = 123;
-    uint32_t providerToken = 123;
-    int result = DataSharePermission::CheckExtensionTrusts(consumerToken, providerToken);
-    EXPECT_EQ(result, DataShare::E_GET_CALLER_NAME_FAILED);
-    LOG_INFO("DataSharePermissionTest CheckExtensionTrusts001::End");
-}
-
-/**
  * @tc.name: Init001
  * @tc.desc: test Init function
  * @tc.type: FUNC
@@ -236,5 +215,64 @@ HWTEST_F(DataSharePermissionTest, OnUpdate001, TestSize.Level0)
     LOG_INFO("DataSharePermissionTest OnUpdate001::End");
 }
 
+/**
+ * @tc.name: IsUriPathSegmentAllowed_001
+ * @tc.desc: Test IsUriPathSegmentAllowed when ExtractFirstPathSegment fails
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon: NA
+ * @tc.step:
+ * 1. Call DataSharePermission::IsUriPathSegmentAllowed() with an invalid URI
+ * 2. Check the result
+ * @tc.expect: The result is false
+ */
+HWTEST_F(DataSharePermissionTest, IsUriPathSegmentAllowed_001, TestSize.Level0)
+{
+    LOG_INFO("IsUriPathSegmentAllowed_001 starts");
+    Uri uri("invalid_uri_format");
+    bool result = DataSharePermission::IsUriPathSegmentAllowed(uri);
+    EXPECT_FALSE(result);
+    LOG_INFO("IsUriPathSegmentAllowed_001 ends");
+}
+
+/**
+ * @tc.name: IsUriPathSegmentAllowed_002
+ * @tc.desc: Test IsUriPathSegmentAllowed when path segment is in publicProvider
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon: NA
+ * @tc.step:
+ * 1. Call DataSharePermission::IsUriPathSegmentAllowed() with a valid URI
+ * 2. Check the result
+ * @tc.expect: The result is true
+ */
+HWTEST_F(DataSharePermissionTest, IsUriPathSegmentAllowed_002, TestSize.Level0)
+{
+    LOG_INFO("IsUriPathSegmentAllowed_002 starts");
+    Uri uri("datashare://com.ohos.contactsdataability");
+    bool result = DataSharePermission::IsUriPathSegmentAllowed(uri);
+    EXPECT_TRUE(result);
+    LOG_INFO("IsUriPathSegmentAllowed_002 ends");
+}
+
+/**
+ * @tc.name: IsUriPathSegmentAllowed_003
+ * @tc.desc: Test IsUriPathSegmentAllowed when path segment is not in publicProvider
+ * @tc.type: FUNC
+ * @tc.require: NA
+ * @tc.precon: NA
+ * @tc.step:
+ * 1. Call DataSharePermission::IsUriPathSegmentAllowed() with a valid URI
+ * 2. Check the result
+ * @tc.expect: The result is false
+ */
+HWTEST_F(DataSharePermissionTest, IsUriPathSegmentAllowed_003, TestSize.Level0)
+{
+    LOG_INFO("IsUriPathSegmentAllowed_003 starts");
+    Uri uri("datashare://com.other.app");
+    bool result = DataSharePermission::IsUriPathSegmentAllowed(uri);
+    EXPECT_FALSE(result);
+    LOG_INFO("IsUriPathSegmentAllowed_003 ends");
+}
 }
 }

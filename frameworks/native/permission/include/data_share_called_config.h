@@ -32,7 +32,7 @@ public:
 
     struct ProviderInfo {
         std::string uri;
-        std::string schema;
+        std::string scheme;
         std::string bundleName;
         std::string moduleName;
         std::string readPermission;
@@ -41,15 +41,17 @@ public:
         bool isExtension = false;
     };
     std::pair<int, ProviderInfo> GetProviderInfo(int32_t user);
-    static std::pair<bool, OHOS::AppExecFwk::BundleInfo> GetBundleInfoFromBMS(std::string bundleName, int32_t user);
-    static std::pair<bool, AppExecFwk::ExtensionAbilityInfo> GetExtensionInfoFromBMS(std::string &uri, int32_t user);
+    static std::pair<bool, OHOS::AppExecFwk::BundleInfo> GetBundleInfoFromBMS(const std::string &bundleName,
+         int32_t user);
+    static std::pair<bool, AppExecFwk::ExtensionAbilityInfo> GetExtensionInfoFromBMS(const std::string &uri,
+        int32_t user);
     static int32_t GetUserByToken(uint32_t tokenId);
     std::string BundleName();
 private:
     int GetFromProxyData();
-    static constexpr const char *PROXY_URI_SCHEMA = "datashareproxy";
-    static constexpr const char *PROXY_URI_SCHEMA_SEPARATOR = "datashareproxy://";
-    static constexpr const char *EXT_URI_SCHEMA_SEPARATOR = "datashare://";
+    static constexpr const char *PROXY_URI_SCHEME = "datashareproxy";
+    static constexpr const char *PROXY_URI_SCHEME_SEPARATOR = "datashareproxy://";
+    static constexpr const char *EXT_URI_SCHEME_SEPARATOR = "datashare://";
     ProviderInfo providerInfo_;
 };
 } // namespace DataShare

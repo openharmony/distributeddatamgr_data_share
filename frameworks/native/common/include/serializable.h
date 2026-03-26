@@ -34,7 +34,7 @@ public:
     using size_type = nlohmann::json::size_type;
     using error_handler_t = nlohmann::detail::error_handler_t;
 
-    API_EXPORT json Marshall() const;
+    json Marshall() const;
     template<typename T>
     static std::string Marshall(T &values)
     {
@@ -43,50 +43,50 @@ public:
         return root.dump(-1, ' ', false, error_handler_t::replace);
     }
 
-    API_EXPORT bool Unmarshall(const std::string &jsonStr);
+    bool Unmarshall(const std::string &jsonStr);
     template<typename T>
     static bool Unmarshall(const std::string &body, T &values)
     {
         return GetValue(ToJson(body), "", values);
     }
-    API_EXPORT static json ToJson(const std::string &jsonStr);
-    API_EXPORT static bool IsJson(const std::string &jsonStr);
+    static json ToJson(const std::string &jsonStr);
+    static bool IsJson(const std::string &jsonStr);
     virtual bool Marshal(json &node) const = 0;
     virtual bool Unmarshal(const json &node) = 0;
-    API_EXPORT static bool GetValue(const json &node, const std::string &name, std::string &value);
-    API_EXPORT static bool GetValue(const json &node, const std::string &name, uint32_t &value);
-    API_EXPORT static bool GetValue(const json &node, const std::string &name, int32_t &value);
-    API_EXPORT static bool GetValue(const json &node, const std::string &name, int64_t &value);
-    API_EXPORT static bool GetValue(const json &node, const std::string &name, uint64_t &value);
-    API_EXPORT static bool GetValue(const json &node, const std::string &name, uint16_t &value);
-    API_EXPORT static bool GetValue(const json &node, const std::string &name, bool &value);
-    API_EXPORT static bool GetValue(const json &node, const std::string &name, std::vector<uint8_t> &value);
-    API_EXPORT static bool GetValue(const json &node, const std::string &name, Serializable &value);
-    API_EXPORT static bool SetValue(json &node, const std::string &value);
-    API_EXPORT static bool SetValue(json &node, const uint32_t &value);
-    API_EXPORT static bool SetValue(json &node, const int32_t &value);
-    API_EXPORT static bool SetValue(json &node, const int64_t &value);
-    API_EXPORT static bool SetValue(json &node, const double &value);
-    API_EXPORT static bool SetValue(json &node, const uint64_t &value);
-    API_EXPORT static bool SetValue(json &node, const uint16_t &value);
+    static bool GetValue(const json &node, const std::string &name, std::string &value);
+    static bool GetValue(const json &node, const std::string &name, uint32_t &value);
+    static bool GetValue(const json &node, const std::string &name, int32_t &value);
+    static bool GetValue(const json &node, const std::string &name, int64_t &value);
+    static bool GetValue(const json &node, const std::string &name, uint64_t &value);
+    static bool GetValue(const json &node, const std::string &name, uint16_t &value);
+    static bool GetValue(const json &node, const std::string &name, bool &value);
+    static bool GetValue(const json &node, const std::string &name, std::vector<uint8_t> &value);
+    static bool GetValue(const json &node, const std::string &name, Serializable &value);
+    static bool SetValue(json &node, const std::string &value);
+    static bool SetValue(json &node, const uint32_t &value);
+    static bool SetValue(json &node, const int32_t &value);
+    static bool SetValue(json &node, const int64_t &value);
+    static bool SetValue(json &node, const double &value);
+    static bool SetValue(json &node, const uint64_t &value);
+    static bool SetValue(json &node, const uint16_t &value);
     // Use bool & to forbid the const T * auto convert to bool, const bool will convert to const uint32_t &value;
     template<typename T>
-    API_EXPORT static std::enable_if_t<std::is_same_v<T, bool>, bool> SetValue(json &node, const T &value)
+    static std::enable_if_t<std::is_same_v<T, bool>, bool> SetValue(json &node, const T &value)
     {
         node = static_cast<bool>(value);
         return true;
     }
 
-    API_EXPORT static bool SetValue(json &node, const std::vector<uint8_t> &value);
-    API_EXPORT static bool SetValue(json &node, const Serializable &value);
+    static bool SetValue(json &node, const std::vector<uint8_t> &value);
+    static bool SetValue(json &node, const Serializable &value);
 
     template<typename... _Types>
-    API_EXPORT static bool SetValue(json &node, const std::variant<_Types...> &input);
+    static bool SetValue(json &node, const std::variant<_Types...> &input);
 
     template<typename... _Types>
-    API_EXPORT static bool GetValue(const json &node, const std::string &name, std::variant<_Types...> &value);
+    static bool GetValue(const json &node, const std::string &name, std::variant<_Types...> &value);
 protected:
-    API_EXPORT ~Serializable() = default;
+    ~Serializable() = default;
 
     template<typename T>
     static bool GetValue(const json &node, const std::string &name, std::vector<T> &values);
@@ -117,7 +117,7 @@ protected:
 
     template<typename _InTp, typename _First, typename... _Rest>
     static bool WriteVariant(json &node, uint32_t step, const _InTp &input);
-    API_EXPORT static const json &GetSubNode(const json &node, const std::string &name);
+    static const json &GetSubNode(const json &node, const std::string &name);
 };
 
 template<typename T>

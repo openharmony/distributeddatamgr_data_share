@@ -41,6 +41,7 @@ public:
     bool Unmarshal(const Serializable::json &node) override;
     std::vector<std::string> dataShareExtNames;
     std::vector<std::string> uriTrusts;
+    std::vector<std::string> publicProvider;
     std::vector<ConsumerProvider> extensionObsTrusts;
 };
 
@@ -54,9 +55,9 @@ public:
 
 class ConfigFactory {
 public:
-    API_EXPORT static ConfigFactory &GetInstance();
-    API_EXPORT int32_t Initialize();
-    API_EXPORT DataShareConfig *GetDataShareConfig();
+    static ConfigFactory &GetInstance();
+    int32_t Initialize();
+    DataShareConfig *GetDataShareConfig();
 private:
     static constexpr const char *CONF_PATH = "/system/etc/distributeddata/conf";
     ConfigFactory();
@@ -68,4 +69,4 @@ private:
 };
 } // namespace DistributedData
 } // namespace OHOS
-#endif // OHOS_DISTRIBUTED_DATA_SERVICES_CONFIG_CONFIG_FACTORY_H
+#endif // OHOS_DISTRIBUTED_DATA_SERVICES_CONFIG_CONFIG_FACTORY_H
