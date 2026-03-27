@@ -33,13 +33,13 @@ pub const ARRAY_BUFFER: &CStr = cstr(b"std.core.ArrayBuffer\0");
 pub const RECORD: &CStr = cstr(b"std.core.Record\0");
 pub const ITERATOR: &CStr = cstr(b"std.core.Iterator\0");
 
-pub const INT8_ARRAY: &CStr = cstr(b"escompat.Int8Array\0");
-pub const INT16_ARRAY: &CStr = cstr(b"escompat.Int16Array\0");
-pub const INT32_ARRAY: &CStr = cstr(b"escompat.Int32Array\0");
+pub const INT8_ARRAY: &CStr = cstr(b"std.core.Int8Array\0");
+pub const INT16_ARRAY: &CStr = cstr(b"std.core.Int16Array\0");
+pub const INT32_ARRAY: &CStr = cstr(b"std.core.Int32Array\0");
 
-pub const UINT8_ARRAY: &CStr = cstr(b"escompat.Uint8Array\0");
-pub const UINT16_ARRAY: &CStr = cstr(b"escompat.Uint16Array\0");
-pub const UINT32_ARRAY: &CStr = cstr(b"escompat.Uint32Array\0");
+pub const UINT8_ARRAY: &CStr = cstr(b"std.core.Uint8Array\0");
+pub const UINT16_ARRAY: &CStr = cstr(b"std.core.Uint16Array\0");
+pub const UINT32_ARRAY: &CStr = cstr(b"std.core.Uint32Array\0");
 
 pub const SET: &CStr = cstr(b"$_set\0");
 pub const GET: &CStr = cstr(b"$_get\0");

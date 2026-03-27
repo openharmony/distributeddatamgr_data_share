@@ -561,7 +561,7 @@ ani_object Uint8ArrayToObject(ani_env *env, const std::vector<uint8_t> &values)
         LOG_ERROR("values is empty");
         return aniObject;
     }
-    ani_status retCode = env->FindClass("escompat.Uint8Array", &arrayClass);
+    ani_status retCode = env->FindClass("std.core.Uint8Array", &arrayClass);
     if (retCode != ANI_OK) {
         LOG_ERROR("Failed: env->FindClass()");
         return aniObject;
