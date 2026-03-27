@@ -480,6 +480,7 @@ bool StsDataShareExtAbility::NotifyChangeWithUser(const Uri &uri, int32_t userId
     opt.SetFirstCallerTokenID(callingToken);
     opt.SetFirstCallerPid(callingPid);
     opt.SetDataShare(true);
+    opt.SetFirstCallerFullTokenID(IPCSkeleton::GetCallingFullTokenID());
     Uri innerUri = uri;
     ErrCode ret = obsMgrClient->NotifyChangeFromExtension(innerUri, userId, opt);
     if (ret != ERR_OK) {
