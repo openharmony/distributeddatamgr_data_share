@@ -118,13 +118,12 @@ Datashare 支持两种数据访问模式：
 | DataObsManager | ability_ability_runtime | `interfaces/inner_api/dataobs_manager/include/dataobs_mgr_client.h` |
 | IDataAbilityObserver | ability_ability_runtime | `interfaces/inner_api/dataobs_manager/include/data_ability_observer_interface.h` |
 | DataProxyHandle (配置共享) | distributeddatamgr_data_share | `frameworks/native/consumer/include/datashare_helper.h` |
-| ConfigFactory (配置加载) | distributeddatamgr_data_share | `frameworks/native/permission/include/data_share_config.h` |
 
 ### URI 格式
 
 ```
-静默访问：datashare://<bundleName>/<extensionAbilityName>/<dataKey>
-非静默访问：datashareproxy://<bundleName>/<dataKey>
+静默访问：datashareproxy://<bundleName>/<dataKey>
+非静默访问：datashare://<bundleName>/<extensionAbilityName>/<dataKey>
 配置共享：datashareproxy://<bundleName>/<path>
 ```
 
@@ -144,6 +143,10 @@ DataObs: `0xD001312`
 | 文档 | 路径 |
 |------|------|
 | 配置共享特性 | [docs/share_config.md](docs/share_config.md) |
+| └─ C++ 接口实现 | [docs/implementation/config_data/cpp_interfaces.md](docs/implementation/config_data/cpp_interfaces.md) |
+| └─ 权限校验 | [docs/implementation/config_data/permission_check.md](docs/implementation/config_data/permission_check.md) |
+| └─ 数据存储 | [docs/implementation/config_data/storage_structure.md](docs/implementation/config_data/storage_structure.md) |
+| └─ 静态配置加载 | [docs/implementation/config_data/static_config_loading.md](docs/implementation/config_data/static_config_loading.md) |
 | 问题定位 | [docs/troubleshooting.md](docs/troubleshooting.md) |
 | 架构详解 | [docs/architecture.md](docs/architecture.md) |
 | 代码结构 | [docs/code_structure.md](docs/code_structure.md) |

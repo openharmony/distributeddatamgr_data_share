@@ -30,7 +30,6 @@ data_share/
 | 错误码 | `interfaces/inner_api/common/include/datashare_errno.h` | 错误码定义 |
 | ResultSet | `interfaces/inner_api/common/include/basic/result_set.h` | 结果集接口 |
 | DataProxyHandle | `frameworks/native/consumer/include/datashare_helper.h` | 配置共享句柄（API 20+） |
-| ConfigFactory | `frameworks/native/permission/include/data_share_config.h` | 配置工厂类 |
 
 **核心能力**：
 - **消费者（Consumer）**：提供 DataShareHelper，支持增删改查、观察者注册、文件操作等
@@ -61,7 +60,6 @@ datamgr_service/
 |------|------|------|
 | IDataShareService | `services/distributeddataservice/service/data_share/idata_share_service.h` | 服务接口 |
 | DataShareServiceImpl | `services/distributeddataservice/service/data_share/data_share_service_impl.h` | 服务实现 |
-| ConfigFactory | `services/distributeddataservice/service/config/src/model/datashare_config.cpp` | 配置加载实现 |
 | DataShareConfig | `services/distributeddataservice/service/config/include/model/datashare_config.h` | 配置模型定义 |
 
 **核心能力**：
@@ -135,21 +133,6 @@ ability_ability_runtime/
 |------|---------|------|
 | DataProxyHandle | `data_share/frameworks/ets/ani/src/cxx/dataproxy_handle_ani.cpp` | ArkTS 接口实现 |
 | NAPI 绑定 | `data_share/frameworks/js/napi/dataShare/src/napi_dataproxy_handle.cpp` | JS NAPI 绑定 |
-| 权限配置 | `data_share/frameworks/native/permission/src/data_share_config.cpp` | 配置加载与解析 |
-
-### 服务端实现
-
-| 模块 | 文件路径 | 说明 |
-|------|---------|------|
-| 配置模型 | `datamgr_service/services/distributeddataservice/service/config/src/model/datashare_config.cpp` | 配置数据模型 |
-| 配置头文件 | `datamgr_service/services/distributeddataservice/service/config/include/model/datashare_config.h` | 配置类定义 |
-
-### 配置文件
-
-| 类型 | 路径 | 说明 |
-|------|------|------|
-| 系统配置 | `/system/etc/distributeddata/conf/config.json` | 全局配置（uriTrusts、extensionObsTrusts 等） |
-| 应用配置 | `<app>/resources/base/profile/shared_config.json` | 应用静态配置（crossAppSharedConfig） |
 
 ---
 

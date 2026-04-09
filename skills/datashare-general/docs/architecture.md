@@ -194,7 +194,7 @@ DataProxyHandle ← IPC → DataShare Service ←→ 配置存储
 4. 验证失败则返回 NO_PERMISSION
 ```
 
-详见 [share_config.md](share_config.md)。
+详见 [share_config.md](share_config.md)、[C++ 接口实现](implementation/config_data/cpp_interfaces.md) 和 [权限校验](implementation/config_data/permission_check.md)。
 
 ---
 
@@ -202,4 +202,8 @@ DataProxyHandle ← IPC → DataShare Service ←→ 配置存储
 - [代码结构](code_structure.md) - 各代码仓的目录结构和核心文件
 - [问题定位](troubleshooting.md) - 错误码速查和日志分析方法
 - [配置共享](share_config.md) - 应用间配置共享特性
+  - [C++ 接口实现](implementation/config_data/cpp_interfaces.md) - 配置共享 C++ 层接口详解
+  - [权限校验](implementation/config_data/permission_check.md) - allowList 权限校验逻辑
+  - [配置数据存储](implementation/config_data/storage_structure.md) - KvDB 存储结构
+  - [静态配置加载](implementation/config_data/static_config_loading.md) - 事件监听和配置加载机制
 - [代码仓清单](../repositories.md) - 完整的依赖仓列表
