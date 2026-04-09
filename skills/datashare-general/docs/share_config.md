@@ -43,6 +43,7 @@ datashareproxy://{bundleName}/{path}
 **约束**：
 - URI 最大长度：256 字节
 - path 可随意填写，但同一应用内不允许重复
+- uri 如果配置的bundleName与配置发布方应用的bundleName必须相同，不同则配置不生效
 
 **示例**：
 ```
@@ -230,6 +231,21 @@ off(event: 'dataChange', uris: string[], config: DataProxyConfig,
 
 应用包安装时提供的默认共享配置项，不依赖应用启动即生效。
 
+**触发时机**：
+
+通过 `SysEventSubscriber` 监听 BMS 的公共事件触发配置加载：
+
+| 事件 | Action | 触发时机 |
+|------|--------|---------|
+| 应用安装 | `COMMON_EVENT_PACKAGE_ADDED` | 应用安装完成后 |
+| 应用更新 | `COMMON_EVENT_PACKAGE_CHANGED` | 应用更新完成后 |
+| 应用卸载 | `COMMON_EVENT_PACKAGE_REMOVED` | 应用卸载完成后 |
+
+**处理逻辑**：
+- **应用安装** → `ProxyDataManager::OnAppInstall()` - 读取并加载静态配置到 KvDB
+- **应用更新** → `ProxyDataManager::OnAppUpdate()` - 先删除旧配置，再加载新配置
+- **应用卸载** → `ProxyDataManager::OnAppUninstall()` - 自动删除该应用的所有配置
+
 **配置步骤**：
 
 1. **创建共享配置文件**
@@ -267,7 +283,9 @@ off(event: 'dataChange', uris: string[], config: DataProxyConfig,
 
 3. **构建安装**
 
-   应用安装后，静态配置自动生效。
+   应用安装后，静态配置自动加载到服务端 KvDB 数据库。
+
+**实现细节**：详见 [静态配置加载机制](implementation/share_config/static_config_loading.md)。
 
 ---
 
@@ -352,14 +370,6 @@ function deleteSharedConfig() {
 | 模块 | 文件路径 | 说明 |
 |------|---------|------|
 | DataShare Service | `datamgr_service/services/distributeddataservice/service/data_share/` | 服务实现 |
-| 配置管理 | `datamgr_service/services/distributeddataservice/service/config/` | 配置加载与管理 |
-
-### 配置加载
-
-| 模块 | 文件路径 | 说明 |
-|------|---------|------|
-| 配置工厂 | `data_share/frameworks/native/permission/src/data_share_config.cpp` | ConfigFactory 单例 |
-| 配置头文件 | `data_share/frameworks/native/permission/include/data_share_config.h` | 配置类定义 |
 
 ---
 
@@ -413,7 +423,8 @@ const appIdentifier = bundleInfo.appIdentifier;
 
 ## 相关文档
 
-- [接口参考](../../reference/apis-arkdata/js-apis-data-dataShare.md) - ArkTS API 文档
+- [开发参考](https://gitcode.com/openharmony/docs/blob/master/zh-cn/application-dev/database/share-config.md) - ArkTS 开发者指南
+- [应用间配置共享ArkTS接口](https://gitcode.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis-arkdata/js-apis-data-dataShare.md#datasharecreatedataproxyhandle20) - ArkTS接口
 - [架构说明](architecture.md) - DataShare 整体架构
 - [错误码](errorcode-datashare.md) - 数据共享错误码速查
 
@@ -432,6 +443,9 @@ const themeConfig = [{
   value: 'dark',
   allowList: ['appB_id', 'appC_id']
 }];
+const config: dataShare.DataProxyConfig = {
+      type: dataShare.DataProxyType.SHARED_CONFIG,
+};
 await dataProxyHandle.publish(themeConfig, config);
 
 // 应用 B - 订阅变化
@@ -440,18 +454,22 @@ dataProxyHandle.on('dataChange', [themeUri], config, (err, changes) => {
 });
 ```
 
-### 场景 2：系统全局配置
+### 场景 2：应用私有配置
 
-系统服务发布全局配置，所有应用可读：
+应用发布私有配置，仅自身可访问（allowList 为空）：
 
 ```typescript
-// 系统服务 - 发布全局配置
-const globalConfig = [{
-  uri: 'datashareproxy://com.system.settings/global/brightness',
-  value: '80',
-  allowList: []  // 空列表，仅系统自身可写
+// 应用 - 发布私有配置
+const privateConfig = [{
+  uri: 'datashareproxy://com.example.app/private/token',
+  value: 'secret_value',
+  allowList: []  // 空列表，仅发布者自身可访问
 }];
-await dataProxyHandle.publish(globalConfig, config);
+await dataProxyHandle.publish(privateConfig, config);
 ```
+
+**使用说明**：
+- `allowList` 为空或省略：仅配置发布者自身可访问
+- 适用于应用内跨模块共享配置、临时参数传递等场景
 
 ---
