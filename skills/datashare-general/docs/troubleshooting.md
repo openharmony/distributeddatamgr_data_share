@@ -1,19 +1,3 @@
-/*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License"),
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/* 
 # Datashare 问题定位指南
 
 ## 错误码速查
@@ -203,4 +187,3 @@ cat log.txt | grep "0xD001312" | grep -E "E_[A-Z_]+"
 1. 根据日志标签或错误类型确定涉及的代码仓
 2. 查阅 [code_structure.md](code_structure.md) 找到核心文件路径
 3. 直接阅读源代码理解逻辑
-*/
