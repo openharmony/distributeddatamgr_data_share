@@ -57,7 +57,8 @@ public:
     virtual Data GetPublishedData(const std::string &bundleName, int &resultCode) = 0;
 
     virtual std::vector<OperationResult> SubscribeRdbData(const std::vector<std::string> &uris,
-        const TemplateId &templateId, const sptr<IDataProxyRdbObserver> &observer) = 0;
+        const TemplateId &templateId, const sptr<IDataProxyRdbObserver> &observer,
+        const SubscribeOption &subscribeOption = {}) = 0;
 
     virtual std::vector<OperationResult> UnSubscribeRdbData(const std::vector<std::string> &uris,
         const TemplateId &templateId) = 0;

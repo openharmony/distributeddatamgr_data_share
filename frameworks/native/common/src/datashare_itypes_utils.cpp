@@ -1426,4 +1426,16 @@ bool UnmarshalOperationStatementVec(std::vector<OperationStatement> &operationSt
     std::istringstream iss(std::string(buffer, length));
     return UnmarshalOperationStatementVecToBuffer(iss, operationStatements);
 }
+
+template<>
+bool Marshalling(const SubscribeOption &subscribeOption, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, subscribeOption.subscribeStatus);
+}
+
+template<>
+bool Unmarshalling(SubscribeOption &subscribeOption, MessageParcel &parcel)
+{
+    return ITypesUtil::Unmarshal(parcel, subscribeOption.subscribeStatus);
+}
 }  // namespace OHOS::ITypesUtil
