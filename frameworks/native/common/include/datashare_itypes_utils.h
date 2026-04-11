@@ -57,6 +57,7 @@ using UriInfo = DataShare::UriInfo;
 using RegisterOption = DataShare::RegisterOption;
 using BackReference = DataShare::BackReference;
 using ConnectionInterfaceInfo = DataShare::ConnectionInterfaceInfo;
+using SubscribeOption = DataShare::SubscribeOption;
 
 template<>
 bool Marshalling(const BatchUpdateResult &result, MessageParcel &parcel);
@@ -240,5 +241,11 @@ bool Marshalling(const ConnectionInterfaceInfo &info, MessageParcel &parcel);
 
 template<>
 bool Unmarshalling(ConnectionInterfaceInfo &info, MessageParcel &parcel);
+
+template<>
+bool Marshalling(const SubscribeOption &subscribeOption, MessageParcel &parcel);
+
+template<>
+bool Unmarshalling(SubscribeOption &subscribeOption, MessageParcel &parcel);
 }
 #endif
