@@ -739,12 +739,19 @@ export namespace dataShare {
     SHARED_CONFIG = 0
   }
 
+  export enum DataProxyMaxValueLength {
+    MAX_LENGTH_4K = 4096,
+    MAX_LENGTH_100K = 102400,
+  }
+
   export interface DataProxyConfig {
     type: DataProxyType;
+    maxValueLength?: DataProxyMaxValueLength;
   }
 
   class DataProxyConfigInner implements DataProxyConfig {
     type: DataProxyType;
+    maxValueLength?: DataProxyMaxValueLength;
   }
 
   class DataProxyHandleCleaner {
@@ -774,6 +781,7 @@ export namespace dataShare {
     
     publish(data: ProxyData[], config: DataProxyConfig): Promise<DataProxyResult[]>;
     delete(uris: string[], config: DataProxyConfig): Promise<DataProxyResult[]>;
+    delete(config: DataProxyConfig): Promise<DataProxyResult[]>;
     get(uris: string[], config: DataProxyConfig): Promise<DataProxyGetResult[]>;
   }
 
@@ -782,6 +790,7 @@ export namespace dataShare {
   export native function native_off_data_proxy_handle_data_change(obj: DataProxyHandle, uris: string[], config: DataProxyConfig, callback?: Callback<DataProxyChangeInfo[]>): DataProxyResult[]
   export native function native_data_proxy_handle_publish(obj: DataProxyHandle, data: ProxyData[], config: DataProxyConfig): Promise<DataProxyResult[]>
   export native function native_data_proxy_handle_delete(obj: DataProxyHandle, uris: string[], config: DataProxyConfig): Promise<DataProxyResult[]>
+  export native function native_data_proxy_handle_delete_all(obj: DataProxyHandle, config: DataProxyConfig): Promise<DataProxyResult[]>
   export native function native_data_proxy_handle_get(obj: DataProxyHandle, uris: string[], config: DataProxyConfig): Promise<DataProxyGetResult[]>
   native function check_uris(uris: string[]): int;
   native function publish_check_uris(data: ProxyData[]): int;
@@ -853,6 +862,18 @@ export namespace dataShare {
         let result = check_uris(uris);
         return new Promise<DataProxyResult[]>((resolve, reject) => {
             let p = taskpool.execute(native_data_proxy_handle_delete, this, uris, config)
+            p.then((e: Any) => {
+                let r = e as DataProxyResult[]
+                resolve(r)
+            }).catch((e: Error): void => {
+                reject(e)
+            })
+        })
+    }
+
+    delete(config: DataProxyConfig): Promise<DataProxyResult[]> {
+        return new Promise<DataProxyResult[]>((resolve, reject) => {
+            let p = taskpool.execute(native_data_proxy_handle_delete_all, this, config)
             p.then((e: Any) => {
                 let r = e as DataProxyResult[]
                 resolve(r)

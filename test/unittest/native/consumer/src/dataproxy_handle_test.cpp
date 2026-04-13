@@ -505,7 +505,8 @@ HWTEST_F(DataProxyHandleTest, Subscribe_Test_001, TestSize.Level0)
     uris.push_back(TEST_URI1);
     // subscribe data
     g_callbackTimes = 0;
-    auto ret4 = handle->SubscribeProxyData(uris, [](const std::vector<DataProxyChangeInfo> &changeNode) {
+    DataProxyConfig config;
+    auto ret4 = handle->SubscribeProxyData(uris, config, [](const std::vector<DataProxyChangeInfo> &changeNode) {
         LOG_INFO("DataProxyHandleTest_Subscribe_Test_001::CallBack success");
         g_callbackTimes++;
         EXPECT_EQ(changeNode.size(), 1);
@@ -554,7 +555,8 @@ HWTEST_F(DataProxyHandleTest, Subscribe_Test_002, TestSize.Level0)
     uris.push_back(TEST_UNUSED_URI);
     // subscribe data
     g_callbackTimes = 0;
-    auto ret4 = handle->SubscribeProxyData(uris, [](const std::vector<DataProxyChangeInfo> &changeNode) {
+    DataProxyConfig config;
+    auto ret4 = handle->SubscribeProxyData(uris, config, [](const std::vector<DataProxyChangeInfo> &changeNode) {
         LOG_INFO("DataProxyHandleTest_Subscribe_Test_002::CallBack success");
         g_callbackTimes++;
         EXPECT_EQ(changeNode.size(), 1);
@@ -605,7 +607,8 @@ HWTEST_F(DataProxyHandleTest, Unsubscribe_Test_001, TestSize.Level0)
     uris.push_back(TEST_URI1);
     // subscribe data
     g_callbackTimes = 0;
-    auto ret4 = handle->SubscribeProxyData(uris, [](const std::vector<DataProxyChangeInfo> &changeNode) {
+    DataProxyConfig config;
+    auto ret4 = handle->SubscribeProxyData(uris, config, [](const std::vector<DataProxyChangeInfo> &changeNode) {
         LOG_INFO("DataProxyHandleTest_Unsubscribe_Test_001::CallBack success");
         g_callbackTimes++;
         EXPECT_EQ(changeNode.size(), 1);
@@ -669,7 +672,8 @@ HWTEST_F(DataProxyHandleTest, Unsubscribe_Test_002, TestSize.Level0)
     uris.push_back(TEST_URI1);
     // subscribe data
     g_callbackTimes = 0;
-    auto ret4 = handle->SubscribeProxyData(uris, [](const std::vector<DataProxyChangeInfo> &changeNode) {
+    DataProxyConfig config;
+    auto ret4 = handle->SubscribeProxyData(uris, config, [](const std::vector<DataProxyChangeInfo> &changeNode) {
         LOG_INFO("DataProxyHandleTest_Unsubscribe_Test_002::CallBack success");
         g_callbackTimes++;
         EXPECT_EQ(changeNode.size(), 1);

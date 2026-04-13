@@ -766,6 +766,12 @@ pub mod ffi {
             set: &mut AniDataProxyResultSetParam,
         ) -> i32;
 
+        fn DataShareNativeDataProxyHandleDeleteAll(
+            dataShareProxyHandlePtr: i64,
+            config: &AniDataProxyConfig,
+            set: &mut AniDataProxyResultSetParam,
+        ) -> i32;
+
         fn DataShareNativeDataProxyHandleGet(
             dataShareProxyHandlePtr: i64,
             uris: Vec<String>,
