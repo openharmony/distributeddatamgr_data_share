@@ -87,6 +87,7 @@ public:
     static int32_t Convert2Value(napi_env env, napi_value input, UpdateOperation &operation);
     static int32_t Convert2Value(napi_env env, napi_value input, DataShareObserver::ChangeInfo &changeInfo);
     static int32_t Convert2Value(napi_env env, napi_value input, DataProxyType &proxyType);
+    static int32_t Convert2Value(napi_env env, napi_value input, DataProxyMaxValueLength &maxValueLength);
     static std::string Convert2String(napi_env env, napi_value jsStr, size_t max = DEFAULT_BUF_SIZE);
     static std::vector<std::string> Convert2StrVector(napi_env env, napi_value value, size_t strMax);
     static std::vector<uint8_t> Convert2U8Vector(napi_env env, napi_value jsValue);

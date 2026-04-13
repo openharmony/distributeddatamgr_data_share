@@ -347,7 +347,8 @@ std::vector<DataProxyResult> AniProxyDataSubscriberManager::AddObservers(
             if (firstAddUris.empty()) {
                 return;
             }
-            auto subResults = dataProxyHandle->SubscribeProxyData(firstAddUris,
+            DataProxyConfig config;
+            auto subResults = dataProxyHandle->SubscribeProxyData(firstAddUris, config,
                 [this](const std::vector<DataShare::DataProxyChangeInfo> &changeInfo) {
                     Emit(changeInfo);
                 });

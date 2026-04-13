@@ -65,6 +65,18 @@ static napi_value ExportDataProxyType(napi_env env)
     return dataProxyType;
 }
 
+static napi_value ExportDataProxyMaxValueLength(napi_env env)
+{
+    napi_value maxValueLength = nullptr;
+    napi_create_object(env, &maxValueLength);
+    SetNamedProperty(
+        env, maxValueLength, "MAX_LENGTH_4K", static_cast<uint32_t>(DataProxyMaxValueLength::MAX_LENGTH_4K));
+    SetNamedProperty(
+        env, maxValueLength, "MAX_LENGTH_100K", static_cast<uint32_t>(DataProxyMaxValueLength::MAX_LENGTH_100K));
+    napi_object_freeze(env, maxValueLength);
+    return maxValueLength;
+}
+
 static napi_value ExportDataProxyErrorCode(napi_env env)
 {
     napi_value dataProxyErrorCode = nullptr;
@@ -84,6 +96,7 @@ napi_status InitConstProperties(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("SubscriptionType", ExportSubscriptionType(env)),
         DECLARE_NAPI_PROPERTY("DataProxyType", ExportDataProxyType(env)),
         DECLARE_NAPI_PROPERTY("DataProxyErrorCode", ExportDataProxyErrorCode(env)),
+        DECLARE_NAPI_PROPERTY("DataProxyMaxValueLength", ExportDataProxyMaxValueLength(env)),
     };
     size_t count = sizeof(properties) / sizeof(properties[0]);
 

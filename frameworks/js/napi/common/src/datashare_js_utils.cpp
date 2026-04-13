@@ -978,6 +978,33 @@ bool DataShareJSUtils::UnwrapDataProxyConfig(napi_env env, napi_value value, Dat
         LOG_ERROR("Convert DataProxyType failed");
         return false;
     }
+
+    // maxValueLength is an optional parameter. If it is not configured, true is returned.
+    // If it is configured but the type or value is incorrect, a failure message is returned.
+    status = napi_get_named_property(env, value, "maxValueLength", &jsResult);
+    if ((status != napi_ok || jsResult == nullptr)) {
+        config.maxValueLength_ = DataProxyMaxValueLength::MAX_LENGTH_4K;
+        return true;
+    }
+    napi_typeof(env, jsResult, &valueType);
+    if (valueType == napi_null || valueType == napi_undefined) {
+        config.maxValueLength_ = DataProxyMaxValueLength::MAX_LENGTH_4K;
+        return true;
+    }
+    if (valueType != napi_number) {
+        LOG_ERROR("Convert DataProxyType error, maxValueLength is not number:%{public}d", valueType);
+        return false;
+    }
+
+    if (Convert2Value(env, jsResult, config.maxValueLength_) != napi_ok) {
+        LOG_ERROR("Convert MaxValueLength failed");
+        return false;
+    }
+    if (config.maxValueLength_ != DataProxyMaxValueLength::MAX_LENGTH_4K &&
+        config.maxValueLength_ != DataProxyMaxValueLength::MAX_LENGTH_100K) {
+        LOG_ERROR("Invalid MaxValueLength value: %{public}d", static_cast<int32_t>(config.maxValueLength_));
+        return false;
+    }
     return true;
 }
 
@@ -1119,6 +1146,14 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, DataProx
     uint32_t number = 0;
     napi_status status = napi_get_value_uint32(env, input, &number);
     proxyType = static_cast<DataProxyType>(number);
+    return status;
+}
+
+int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, DataProxyMaxValueLength &maxValueLength)
+{
+    uint32_t number = 0;
+    napi_status status = napi_get_value_uint32(env, input, &number);
+    maxValueLength = static_cast<DataProxyMaxValueLength>(number);
     return status;
 }
 
