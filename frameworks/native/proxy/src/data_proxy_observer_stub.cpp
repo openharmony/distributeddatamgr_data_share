@@ -215,8 +215,8 @@ int ProxyDataObserverStub::OnRemoteRequest(uint32_t code, MessageParcel &data, M
         return ERR_INVALID_STATE;
     }
     std::vector<DataProxyChangeInfo> changeInfo;
-    if (!ITypesUtil::Unmarshal(data, changeInfo)) {
-        LOG_ERROR("Unmarshalling  is nullptr");
+    if (!ITypesUtil::UnmarshalDataProxyChangeInfoVec(changeInfo, data)) {
+        LOG_ERROR("Unmarshalling proxyData changeInfo failed");
         return ERR_INVALID_VALUE;
     }
     OnChangeFromProxyData(changeInfo);

@@ -36,6 +36,20 @@ public:
         bool isNotifyOnEnabled_;
     };
 
+    struct ObserverNode {
+        std::shared_ptr<Observer> observer_;
+        bool enabled_;
+        void *subscriber_;
+        bool isNotifyOnEnabled_;
+        DataProxyConfig config_;
+        ObserverNode(const std::shared_ptr<Observer> &observer, void *subscriber)
+            : observer_(observer), subscriber_(subscriber)
+        {
+            enabled_ = true;
+            isNotifyOnEnabled_ = false;
+        };
+    };
+
     std::vector<OperationResult> AddObservers(const std::vector<Key> &keys, void *subscriber,
         const std::shared_ptr<Observer> observer,
         std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer)>,
@@ -45,7 +59,7 @@ public:
     std::vector<DataProxyResult> AddObservers(const std::vector<Key> &keys, void *subscriber,
         const std::shared_ptr<Observer> observer,
         std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
-            std::vector<DataProxyResult> &)>);
+            std::vector<DataProxyResult> &)>, const DataProxyConfig &config);
 
     std::vector<OperationResult> DelObservers(const std::vector<Key> &keys, void *subscriber,
         std::function<void(const std::vector<Key> &, std::vector<OperationResult> &)> processOnLastDel =
@@ -73,6 +87,9 @@ public:
             CallbacksManager::DefaultProcess);
 
     std::vector<std::shared_ptr<Observer>> GetEnabledObservers(const Key &);
+
+    std::vector<ObserverNode> GetEnabledProxyDataObseverNodes(const Key &);
+
     std::vector<std::shared_ptr<Observer>> GetObserversAndSetNotifiedOn(const Key &);
 
     int GetAllSubscriberSize();
@@ -85,18 +102,6 @@ private:
     static void DefaultProcess(const std::vector<Key> &, std::vector<OperationResult> &){};
     static void ProxyDataDefaultProcess(const std::vector<Key> &, std::vector<DataProxyResult> &){};
     static void DefaultProcessOnLocalEnabled(std::map<Key, std::vector<ObserverNodeOnEnabled>> &){};
-    struct ObserverNode {
-        std::shared_ptr<Observer> observer_;
-        bool enabled_;
-        void *subscriber_;
-        bool isNotifyOnEnabled_;
-        ObserverNode(const std::shared_ptr<Observer> &observer, void *subscriber)
-            : observer_(observer), subscriber_(subscriber)
-        {
-            enabled_ = true;
-            isNotifyOnEnabled_ = false;
-        };
-    };
     void DelLocalObservers(const Key &key, void *subscriber, std::vector<Key> &lastDelKeys,
         std::vector<OperationResult> &result);
     void DelLocalObservers(const Key &key, void *subscriber, std::vector<Key> &lastDelKeys,
@@ -142,13 +147,16 @@ template<class Key, class Observer>
 std::vector<DataProxyResult> CallbacksManager<Key, Observer>::AddObservers(const std::vector<Key> &keys,
     void *subscriber, const std::shared_ptr<Observer> observer,
     std::function<void(const std::vector<Key> &,
-        const std::shared_ptr<Observer> &observer, std::vector<DataProxyResult> &)> processOnFirstAdd)
+        const std::shared_ptr<Observer> &observer, std::vector<DataProxyResult> &)> processOnFirstAdd,
+    const DataProxyConfig &config)
 {
     std::vector<DataProxyResult> result;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
         for (auto &key : keys) {
-            callbacks_[key].emplace_back(observer, subscriber);
+            ObserverNode node(observer, subscriber);
+            node.config_ = config;
+            callbacks_[key].emplace_back(node);
         }
     }
     processOnFirstAdd(keys, observer, result);
@@ -332,6 +340,23 @@ std::vector<std::shared_ptr<Observer>> CallbacksManager<Key, Observer>::GetEnabl
     for (const auto &value : it->second) {
         if (value.enabled_ && value.observer_ != nullptr) {
             results.emplace_back(value.observer_);
+        }
+    }
+    return results;
+}
+
+template <class Key, class Observer>
+auto CallbacksManager<Key, Observer>::GetEnabledProxyDataObseverNodes(const Key &inputKey) -> std::vector<ObserverNode>
+{
+    std::lock_guard<decltype(mutex_)> lck(mutex_);
+    auto it = callbacks_.find(inputKey);
+    if (it == callbacks_.end()) {
+        return std::vector<ObserverNode>();
+    }
+    std::vector<ObserverNode> results;
+    for (const auto &value : it->second) {
+        if (value.enabled_ && value.observer_ != nullptr) {
+            results.emplace_back(value);
         }
     }
     return results;

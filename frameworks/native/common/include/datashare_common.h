@@ -23,7 +23,7 @@ constexpr int MAX_THREADS = 2;
 constexpr int MIN_THREADS = 0;
 constexpr const char *DATASHARE_EXECUTOR_NAME = "DShare_Executor";
 
-struct UriInfo {
+struct TimedQueryUriInfo {
     std::string uri;
     std::string extUri;
     DataShareOption option;

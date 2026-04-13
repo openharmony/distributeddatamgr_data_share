@@ -28,7 +28,7 @@ namespace OHOS {
 namespace DataShare {
 std::vector<DataProxyResult> ProxyDataSubscriberManager::AddObservers(void *subscriber,
     std::shared_ptr<DataShareServiceProxy> proxy, const std::vector<std::string> &uris,
-    const ProxyDataCallback &callback)
+    const DataProxyConfig &config, const ProxyDataCallback &callback)
 {
     std::vector<DataProxyResult> result = {};
     if (proxy == nullptr) {
@@ -65,7 +65,7 @@ std::vector<DataProxyResult> ProxyDataSubscriberManager::AddObservers(void *subs
             if (failedKeys.size() > 0) {
                 BaseCallbacks::DelProxyDataObservers(failedKeys, subscriber);
             }
-        });
+        }, config);
 }
 
 std::vector<DataProxyResult> ProxyDataSubscriberManager::DelObservers(void *subscriber,
@@ -130,6 +130,9 @@ void ProxyDataSubscriberManager::RecoverObservers(std::shared_ptr<DataShareServi
     for (const auto& key : keys) {
         uris.emplace_back(key.uri_);
     }
+    if (uris.empty()) {
+        return;
+    }
     auto results = proxy->SubscribeProxyData(uris, serviceCallback_);
     for (const auto& result : results) {
         if (result.result_ != SUCCESS) {
@@ -139,18 +142,40 @@ void ProxyDataSubscriberManager::RecoverObservers(std::shared_ptr<DataShareServi
     }
 }
 
+DataProxyValue ProxyDataSubscriberManager::GetValidDataProxyValue(const DataProxyValue &value,
+    const DataProxyConfig &config)
+{
+    if (config.maxValueLength_ != DataProxyMaxValueLength::MAX_LENGTH_4K &&
+        config.maxValueLength_ != DataProxyMaxValueLength::MAX_LENGTH_100K) {
+        LOG_ERROR("Invalid maxValueLength");
+        return false;
+    }
+    size_t maxLength = static_cast<size_t>(config.maxValueLength_);
+    if (value.index() == DataProxyValueType::VALUE_STRING) {
+        std::string valueStr = std::get<std::string>(value);
+        if (valueStr.size() > maxLength) {
+            LOG_WARN("DataProxyValue over limit, size %{public}zu", valueStr.size());
+            valueStr.resize(maxLength);
+            return valueStr;
+        }
+    }
+    return value;
+}
+
 void ProxyDataSubscriberManager::Emit(std::vector<DataProxyChangeInfo> &changeInfo)
 {
     std::map<std::shared_ptr<Observer>, std::vector<DataProxyChangeInfo>> results;
     for (auto &data : changeInfo) {
         ProxyDataObserverMapKey key(data.uri_);
-        auto callbacks = BaseCallbacks::GetEnabledObservers(key);
-        for (auto const &obs : callbacks) {
-            results[obs].emplace_back(data.changeType_, data.uri_, data.value_);
+        std::vector<ObserverNode> nodes = BaseCallbacks::GetEnabledProxyDataObseverNodes(key);
+        for (auto const &node : nodes) {
+            // if value size exceeds maxValueLength, the value will be truncated
+            DataProxyValue validValue = GetValidDataProxyValue(data.value_, node.config_);
+            results[node.observer_].emplace_back(data.changeType_, data.uri_, validValue);
         }
     }
-    for (auto &[callback, node] : results) {
-        callback->OnChange(node);
+    for (auto &[callback, info] : results) {
+        callback->OnChange(info);
     }
 }
 
