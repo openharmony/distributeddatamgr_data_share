@@ -270,6 +270,9 @@ int DataShareNativeDataProxyHandlePublish(int64_t dataShareProxyHandlePtr, rust:
 int DataShareNativeDataProxyHandleDelete(int64_t dataShareProxyHandlePtr, rust::Vec<rust::String> uris,
     const AniDataProxyConfig& config, AniDataProxyResultSetParam& param);
 
+int DataShareNativeDataProxyHandleDeleteAll(int64_t dataShareProxyHandlePtr, const AniDataProxyConfig& config,
+    AniDataProxyResultSetParam& param);
+
 int DataShareNativeDataProxyHandleGet(int64_t dataShareProxyHandlePtr, rust::Vec<rust::String> uris,
     const AniDataProxyConfig& config, AniDataProxyGetResultSetParam& param);
 } // namespace DataShareAni

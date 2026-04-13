@@ -107,6 +107,8 @@ public:
     virtual std::vector<DataProxyResult> DeleteProxyData(const std::vector<std::string> &uris,
         const DataProxyConfig &proxyConfig) = 0;
 
+    virtual std::vector<DataProxyResult> DeleteAllProxyData(const DataProxyConfig &proxyConfig) = 0;
+
     virtual std::vector<DataProxyGetResult> GetProxyData(const std::vector<std::string> uris,
         const DataProxyConfig &proxyConfig) = 0;
 

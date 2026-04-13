@@ -96,6 +96,8 @@ public:
     std::vector<DataProxyResult> DeleteProxyData(
         const std::vector<std::string> &uris, const DataProxyConfig &proxyConfig) override;
 
+    std::vector<DataProxyResult> DeleteAllProxyData(const DataProxyConfig &proxyConfig) override;
+
     std::vector<DataProxyGetResult> GetProxyData(
         const std::vector<std::string> uris, const DataProxyConfig &proxyConfig) override;
 

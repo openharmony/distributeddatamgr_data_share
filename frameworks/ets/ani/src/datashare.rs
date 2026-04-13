@@ -1273,6 +1273,27 @@ pub fn native_data_proxy_handle_delete<'local>(
 }
 
 #[ani_rs::native]
+pub fn native_data_proxy_handle_delete_all<'local>(
+    env: &AniEnv<'local>,
+    datashare_proxy: AniObject<'local>,
+    config: AniObject<'local>,
+) -> Result<AniRef<'local>, BusinessError> {
+    let datashare_data_proxy_handle = get_native_ptr(&env, &datashare_proxy);
+    let config_inner: AniDataProxyConfig = env.deserialize(config)?;
+    let mut set_param = AniDataProxyResultSetParam::new();
+    let err_code = wrapper::ffi::DataShareNativeDataProxyHandleDeleteAll(
+        datashare_data_proxy_handle,
+        &config_inner,
+        &mut set_param,
+    );
+    if err_code != 0 {
+        return Err(convert_to_business_error(err_code));
+    }
+    let ret = set_param.into_inner();
+    Ok(env.serialize(&ret)?)
+}
+
+#[ani_rs::native]
 pub fn native_data_proxy_handle_get<'local>(
     env: &AniEnv<'local>,
     datashare_proxy: AniObject<'local>,

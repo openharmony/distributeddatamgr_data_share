@@ -68,6 +68,16 @@ std::vector<DataProxyResult> DataProxyHandle::DeleteProxyData(
     return proxy->DeleteProxyData(uris, proxyConfig);
 }
 
+std::vector<DataProxyResult> DataProxyHandle::DeleteProxyData(const DataProxyConfig &proxyConfig)
+{
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return std::vector<DataProxyResult>();
+    }
+    return proxy->DeleteAllProxyData(proxyConfig);
+}
+
 std::vector<DataProxyGetResult> DataProxyHandle::GetProxyData(
     const std::vector<std::string> uris, const DataProxyConfig &proxyConfig)
 {
@@ -79,7 +89,8 @@ std::vector<DataProxyGetResult> DataProxyHandle::GetProxyData(
     return proxy->GetProxyData(uris, proxyConfig);
 }
 
-std::vector<DataProxyResult> DataProxyHandle::SubscribeProxyData(const std::vector<std::string> &uris,
+std::vector<DataProxyResult> DataProxyHandle::SubscribeProxyData(
+    const std::vector<std::string> &uris, const DataProxyConfig &proxyConfig,
     const std::function<void(const std::vector<DataProxyChangeInfo> &changeNode)> &callback)
 {
     auto proxy = DataShareManagerImpl::GetServiceProxy();
@@ -87,7 +98,7 @@ std::vector<DataProxyResult> DataProxyHandle::SubscribeProxyData(const std::vect
         LOG_ERROR("proxy is nullptr");
         return std::vector<DataProxyResult>();
     }
-    return ProxyDataSubscriberManager::GetInstance().AddObservers(this, proxy, uris, callback);
+    return ProxyDataSubscriberManager::GetInstance().AddObservers(this, proxy, uris, proxyConfig, callback);
 }
 
 std::vector<DataProxyResult> DataProxyHandle::UnsubscribeProxyData(const std::vector<std::string> &uris)
