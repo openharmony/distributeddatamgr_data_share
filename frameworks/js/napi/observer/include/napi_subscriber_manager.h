@@ -150,7 +150,8 @@ public:
     using BaseCallbacks = NapiCallbacksManager<NapiProxyDataObserverMapKey, NapiProxyDataObserver>;
     explicit NapiProxyDataSubscriberManager(std::weak_ptr<DataProxyHandle> dataProxyHandle)
         : dataProxyHandle_(dataProxyHandle){};
-    std::vector<DataProxyResult> AddObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris);
+    std::vector<DataProxyResult> AddObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris,
+        const DataProxyConfig &config);
     std::vector<DataProxyResult> DelObservers(napi_env env, napi_value callback, const std::vector<std::string> &uris);
     void Emit(const std::vector<DataProxyChangeInfo> &changeNode);
 

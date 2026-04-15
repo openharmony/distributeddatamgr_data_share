@@ -53,7 +53,7 @@ using DataShareValueObject = DataShare::DataShareValueObject;
 using DataProxyValue = DataShare::DataProxyValue;
 using DataProxyGetResult = DataShare::DataProxyGetResult;
 using DataProxyChangeInfo = DataShare::DataProxyChangeInfo;
-using UriInfo = DataShare::UriInfo;
+using TimedQueryUriInfo = DataShare::TimedQueryUriInfo;
 using RegisterOption = DataShare::RegisterOption;
 using BackReference = DataShare::BackReference;
 using ConnectionInterfaceInfo = DataShare::ConnectionInterfaceInfo;
@@ -182,6 +182,18 @@ bool MarshalOperationStatementVec(const std::vector<OperationStatement> &operati
 
 bool UnmarshalOperationStatementVec(std::vector<OperationStatement> &operationStatements, MessageParcel &parcel);
 
+bool MarshalProxyDataVec(const std::vector<DataShareProxyData> &proxyDatas, MessageParcel &parcel);
+
+bool UnmarshalProxyDataVec(std::vector<DataShareProxyData> &proxyDatas, MessageParcel &parcel);
+
+bool MarshalDataProxyGetResultVec(const std::vector<DataProxyGetResult> &results, MessageParcel &parcel);
+
+bool UnmarshalDataProxyGetResultVec(std::vector<DataProxyGetResult> &results, MessageParcel &parcel);
+
+bool MarshalDataProxyChangeInfoVec(const std::vector<DataProxyChangeInfo> &changeInfos, MessageParcel &parcel);
+
+bool UnmarshalDataProxyChangeInfoVec(std::vector<DataProxyChangeInfo> &changeInfos, MessageParcel &parcel);
+
 template<>
 bool Marshalling(const DataShareProxyData &proxyData, MessageParcel &parcel);
 
@@ -225,10 +237,10 @@ template<>
 bool Unmarshalling(DataProxyChangeInfo &result, MessageParcel &parcel);
 
 template<>
-bool Marshalling(const UriInfo &result, MessageParcel &parcel);
+bool Marshalling(const TimedQueryUriInfo &result, MessageParcel &parcel);
 
 template<>
-bool Unmarshalling(UriInfo &result, MessageParcel &parcel);
+bool Unmarshalling(TimedQueryUriInfo &result, MessageParcel &parcel);
 
 template<>
 bool Marshalling(const RegisterOption &option, MessageParcel &parcel);

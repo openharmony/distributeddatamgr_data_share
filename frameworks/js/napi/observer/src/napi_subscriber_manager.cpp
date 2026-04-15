@@ -262,7 +262,7 @@ void NapiPublishedSubscriberManager::Emit(const std::vector<Key> &keys, const st
 }
 
 std::vector<DataProxyResult> NapiProxyDataSubscriberManager::AddObservers(napi_env env, napi_value callback,
-    const std::vector<std::string> &uris)
+    const std::vector<std::string> &uris, const DataProxyConfig &config)
 {
     std::vector<DataProxyResult> result = {};
     auto dataProxyHandle = dataProxyHandle_.lock();
@@ -279,7 +279,7 @@ std::vector<DataProxyResult> NapiProxyDataSubscriberManager::AddObservers(napi_e
     proxyDataObserver->RegisterEnvCleanHook();
     return BaseCallbacks::AddObservers(
         keys, proxyDataObserver,
-        [&dataProxyHandle, this](const std::vector<Key> &firstAddKeys,
+        [&dataProxyHandle, &config, this](const std::vector<Key> &firstAddKeys,
             const std::shared_ptr<Observer> observer, std::vector<DataProxyResult> &opResult) {
             std::vector<std::string> firstAddUris;
             std::for_each(firstAddKeys.begin(), firstAddKeys.end(), [&firstAddUris](auto &result) {
@@ -288,7 +288,7 @@ std::vector<DataProxyResult> NapiProxyDataSubscriberManager::AddObservers(napi_e
             if (firstAddUris.empty()) {
                 return;
             }
-            auto subResults = dataProxyHandle->SubscribeProxyData(firstAddUris,
+            auto subResults = dataProxyHandle->SubscribeProxyData(firstAddUris, config,
                 [this](const std::vector<DataProxyChangeInfo> &changeInfo) {
                     Emit(changeInfo);
                 });

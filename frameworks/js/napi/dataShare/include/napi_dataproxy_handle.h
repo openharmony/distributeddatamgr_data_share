@@ -45,7 +45,8 @@ private:
         napi_value callback, std::shared_ptr<DataProxyHandle> handle);
     void SetHandle(std::shared_ptr<DataProxyHandle> dataProxyHandle);
     std::shared_ptr<DataProxyHandle> GetHandle();
-    static bool CheckIsParameterExceed(const std::vector<DataShareProxyData> &proxyDatas);
+    static bool CheckIsParameterExceed(const std::vector<DataShareProxyData> &proxyDatas,
+        const DataProxyConfig &config);
     static bool CheckIsParameterExceed(const std::vector<std::string> &uris);
     std::shared_ptr<DataProxyHandle> dataProxyHandle_ = nullptr;
     std::shared_mutex mutex_;
@@ -80,10 +81,12 @@ private:
         std::vector<DataProxyResult> proxyResult;
         std::vector<DataProxyGetResult> proxyGetResult;
         int32_t resultNumber = 0;
+        bool isDeleteAll = false;
 
         ContextInfo() : Context(nullptr, nullptr)
         {
             config.type_ = DataProxyType::SHARED_CONFIG;
+            config.maxValueLength_ = DataProxyMaxValueLength::MAX_LENGTH_4K;
         };
         ContextInfo(InputAction input, OutputAction output) : Context(std::move(input), std::move(output)) {};
         virtual ~ContextInfo() {};
@@ -103,6 +106,7 @@ private:
             return Context::operator()(env, result);
         }
     };
+    static napi_status ExecuteDelete(std::shared_ptr<ContextInfo> context);
 };
 } // namespace DataShare
 } // namespace OHOS
