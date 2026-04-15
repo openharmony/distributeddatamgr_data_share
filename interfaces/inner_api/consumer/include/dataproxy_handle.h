@@ -46,10 +46,13 @@ public:
     std::vector<DataProxyResult> DeleteProxyData(
         const std::vector<std::string> &uris, const DataProxyConfig &proxyConfig);
 
+    std::vector<DataProxyResult> DeleteProxyData(const DataProxyConfig &proxyConfig);
+
     static std::vector<DataProxyGetResult> GetProxyData(
         const std::vector<std::string> uris, const DataProxyConfig &proxyConfig);
 
-    std::vector<DataProxyResult> SubscribeProxyData(const std::vector<std::string> &uris,
+    std::vector<DataProxyResult> SubscribeProxyData(
+        const std::vector<std::string> &uris, const DataProxyConfig &proxyConfig,
         const std::function<void(const std::vector<DataProxyChangeInfo> &changeNode)> &callback);
 
     std::vector<DataProxyResult> UnsubscribeProxyData(const std::vector<std::string> &uris);

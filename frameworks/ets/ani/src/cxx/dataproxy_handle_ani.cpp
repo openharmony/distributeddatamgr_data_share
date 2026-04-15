@@ -230,6 +230,12 @@ int DataShareNativeDataProxyHandleDelete(int64_t dataShareProxyHandlePtr, rust::
     return E_OK;
 }
 
+int DataShareNativeDataProxyHandleDeleteAll(int64_t dataShareProxyHandlePtr, const AniDataProxyConfig& config,
+    AniDataProxyResultSetParam& param)
+{
+    return E_OK;
+}
+
 int DataShareNativeDataProxyHandleGet(int64_t dataShareProxyHandlePtr, rust::Vec<rust::String> uris,
     const AniDataProxyConfig& config, AniDataProxyGetResultSetParam& param)
 {

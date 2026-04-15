@@ -707,7 +707,11 @@ std::vector<DataProxyResult> DataShareServiceProxy::PublishProxyData(
         LOG_ERROR("Write descriptor failed!");
         return results;
     }
-    if (!ITypesUtil::Marshal(parcel, proxyDatas, proxyConfig)) {
+    if (!ITypesUtil::MarshalProxyDataVec(proxyDatas, parcel)) {
+        LOG_ERROR("Marshal proxyDatas failed!");
+        return results;
+    }
+    if (!ITypesUtil::Marshal(parcel, proxyConfig)) {
         LOG_ERROR("Marshal failed!");
         return results;
     }
@@ -752,6 +756,32 @@ std::vector<DataProxyResult> DataShareServiceProxy::DeleteProxyData(
     return results;
 }
 
+std::vector<DataProxyResult> DataShareServiceProxy::DeleteAllProxyData(const DataProxyConfig &proxyConfig)
+{
+    std::vector<DataProxyResult> results;
+    MessageParcel parcel;
+    if (!parcel.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        return results;
+    }
+    if (!ITypesUtil::Marshal(parcel, proxyConfig)) {
+        LOG_ERROR("Marshal failed!");
+        return results;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_PROXY_DELETE_ALL), parcel, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("DeleteProxyData fail to sendRequest. err: %{public}d", err);
+        return results;
+    }
+
+    ITypesUtil::Unmarshal(reply, results);
+    return results;
+}
+
 std::vector<DataProxyGetResult> DataShareServiceProxy::GetProxyData(const std::vector<std::string> uris,
     const DataProxyConfig &proxyConfig)
 {
@@ -775,7 +805,7 @@ std::vector<DataProxyGetResult> DataShareServiceProxy::GetProxyData(const std::v
         return results;
     }
 
-    ITypesUtil::Unmarshal(reply, results);
+    ITypesUtil::UnmarshalDataProxyGetResultVec(results, reply);
     return results;
 }
 

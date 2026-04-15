@@ -89,7 +89,7 @@ private:
     bool IsExtUri(const std::string &extUri);
 
     std::pair<std::shared_ptr<DataShareResultSet>, DatashareBusinessError> TimedQuery(
-        std::shared_ptr<DataShareServiceProxy> proxy, const UriInfo &paramSet,
+        std::shared_ptr<DataShareServiceProxy> proxy, const TimedQueryUriInfo &paramSet,
         const DataSharePredicates &predicates, const std::vector<std::string> &columns);
 
     ConcurrentMap<sptr<AAFwk::IDataAbilityObserver>, std::list<Uri>> observers_;

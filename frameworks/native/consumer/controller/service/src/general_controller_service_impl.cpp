@@ -183,7 +183,7 @@ std::shared_ptr<DataShareResultSet> GeneralControllerServiceImpl::Query(const Ur
 
     std::string extUri = GetExtUri();
     if (option.timeout > 0) {
-        UriInfo uriInfo = {
+        TimedQueryUriInfo uriInfo = {
             .uri = uri.ToString(),
             .extUri = extUri,
             .option = { .timeout = option.timeout },
@@ -301,7 +301,7 @@ void GeneralControllerServiceImpl::ReRegisterObserver()
 }
 
 std::pair<std::shared_ptr<DataShareResultSet>, DatashareBusinessError> GeneralControllerServiceImpl::TimedQuery(
-    std::shared_ptr<DataShareServiceProxy> proxy, const UriInfo &uriInfo,
+    std::shared_ptr<DataShareServiceProxy> proxy, const TimedQueryUriInfo &uriInfo,
     const DataSharePredicates &predicates, const std::vector<std::string> &columns)
 {
     DatashareBusinessError businessError;

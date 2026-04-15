@@ -69,7 +69,7 @@ public:
     static ProxyDataSubscriberManager &GetInstance();
 
     std::vector<DataProxyResult> AddObservers(void *subscriber, std::shared_ptr<DataShareServiceProxy> proxy,
-        const std::vector<std::string> &uris, const ProxyDataCallback &callback);
+        const std::vector<std::string> &uris, const DataProxyConfig &config, const ProxyDataCallback &callback);
     std::vector<DataProxyResult> DelObservers(void *subscriber, std::shared_ptr<DataShareServiceProxy> proxy,
         const std::vector<std::string> &uris);
     std::vector<DataProxyResult> DelObservers(void *subscriber, std::shared_ptr<DataShareServiceProxy> proxy);
@@ -80,6 +80,7 @@ public:
 private:
     void Emit(const std::vector<Key> &keys, const std::shared_ptr<Observer> &observer);
     ProxyDataSubscriberManager();
+    DataProxyValue GetValidDataProxyValue(const DataProxyValue &value, const DataProxyConfig &config);
     std::map<Key, std::vector<Observer>> callbacks_;
     sptr<ProxyDataObserverStub> serviceCallback_;
     std::recursive_mutex mutex_{};
