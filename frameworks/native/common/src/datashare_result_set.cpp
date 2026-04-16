@@ -34,19 +34,23 @@ namespace DataShare {
 namespace {
 // The default position of the cursor
 static const int INITIAL_POS = -1;
-static const size_t DEFAULT_SHARE_BLOCK_SIZE = 2 * 1024 * 1024;
 } // namespace
-int DataShareResultSet::blockId_ = 0;
+std::atomic<int32_t> DataShareResultSet::blockId_ = 0;
 DataShareResultSet::DataShareResultSet()
 {
 }
 
-DataShareResultSet::DataShareResultSet(std::shared_ptr<ResultSetBridge> &bridge)
+DataShareResultSet::DataShareResultSet(std::shared_ptr<ResultSetBridge> &bridge, size_t blockSize)
     : bridge_(bridge)
 {
-    std::string name = "DataShare" + std::to_string(blockId_++);
-    blockWriter_ = std::make_shared<DataShareBlockWriterImpl>(name, DEFAULT_SHARE_BLOCK_SIZE);
+    std::string name = "DataShare" + std::to_string(blockId_.fetch_add(1));
+    if (blockSize > MAX_SHARE_BLOCK_SIZE) {
+        LOG_ERROR("blockSize: %{public}zu over limit!", blockSize);
+        return;
+    }
+    blockWriter_ = std::make_shared<DataShareBlockWriterImpl>(name, blockSize);
     if (blockWriter_ == nullptr) {
+        LOG_ERROR("blockWriter_ is null!");
         return;
     }
     sharedBlock_ = blockWriter_->GetBlock();

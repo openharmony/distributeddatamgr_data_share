@@ -28,10 +28,13 @@
 #include "ishared_result_set_stub.h"
 #include "itypes_util.h"
 #include "message_parcel.h"
+#include "shared_block.h"
 
 namespace OHOS {
 namespace DataShare {
 using namespace testing::ext;
+static const size_t DEFAULT_SHARE_BLOCK_SIZE = 2 * 1024 * 1024;
+static const size_t MAX_SHARE_BLOCK_SIZE = 5 * 1024 * 1024;
 class DatashareResultSetTest : public testing::Test {
 public:
     static void SetUpTestCase(void){};
@@ -266,6 +269,69 @@ HWTEST_F(DatashareResultSetTest, CloseResulteSetTest001, TestSize.Level0)
     ASSERT_EQ(dataShareResultSet.blockWriter_, nullptr);
     ASSERT_EQ(dataShareResultSet.bridge_, nullptr);
     LOG_INFO("DatashareResultSetTest CloseResulteSetTest001::End");
+}
+
+/**
+ * @tc.name: Constructor001
+ * @tc.desc: Verify the constructor of DataShareResultSet without block size
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.step:
+ *     1. Create a DataShareResultSet without block size
+ * @tc.expect:
+ *     1. The sharedBlock_ of DataShareResultSet is not nullptr, and size equal to DEFAULT_SHARE_BLOCK_SIZE
+ */
+HWTEST_F(DatashareResultSetTest, Constructor001, TestSize.Level0)
+{
+    LOG_INFO("DatashareResultSetTest Constructor001::Start");
+    std::shared_ptr<ResultSetBridge> bridge = nullptr;
+    auto dataShareResultSet = std::make_shared<DataShareResultSet>(bridge);
+    ASSERT_NE(dataShareResultSet->sharedBlock_, nullptr);
+    ASSERT_EQ(dataShareResultSet->sharedBlock_->Size(), DEFAULT_SHARE_BLOCK_SIZE);
+    LOG_INFO("DatashareResultSetTest Constructor001::End");
+}
+
+/**
+ * @tc.name: Constructor002
+ * @tc.desc: Verify the constructor of DataShareResultSet with block size
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.step:
+ *     1. Create a DataShareResultSet with block size
+ * @tc.expect:
+ *     1. The sharedBlock_ of DataShareResultSet is not a null pointer
+ *        and its size is equal to the parameter named blockSize.
+ */
+HWTEST_F(DatashareResultSetTest, Constructor002, TestSize.Level0)
+{
+    LOG_INFO("DatashareResultSetTest Constructor002::Start");
+    std::shared_ptr<ResultSetBridge> bridge = nullptr;
+    size_t blockSize = 1024; // 1024 is expect block size
+    auto dataShareResultSet = std::make_shared<DataShareResultSet>(bridge, blockSize);
+    ASSERT_NE(dataShareResultSet->sharedBlock_, nullptr);
+    ASSERT_EQ(dataShareResultSet->sharedBlock_->Size(), blockSize);
+    LOG_INFO("DatashareResultSetTest Constructor002::End");
+}
+
+/**
+ * @tc.name: Constructor003
+ * @tc.desc: Verify the constructor of DataShareResultSet with the block size which over limit.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.step:
+ *     1. Create a DataShareResultSet with the block size which over limit.
+ * @tc.expect:
+ *     1. The sharedBlock_ and blockWriter_ of DataShareResultSet is nullptr.
+ */
+HWTEST_F(DatashareResultSetTest, Constructor003, TestSize.Level0)
+{
+    LOG_INFO("DatashareResultSetTest Constructor003::Start");
+    std::shared_ptr<ResultSetBridge> bridge = nullptr;
+    size_t blockSize = MAX_SHARE_BLOCK_SIZE + 1;
+    auto dataShareResultSet = std::make_shared<DataShareResultSet>(bridge, blockSize);
+    ASSERT_EQ(dataShareResultSet->sharedBlock_, nullptr);
+    ASSERT_EQ(dataShareResultSet->blockWriter_, nullptr);
+    LOG_INFO("DatashareResultSetTest Constructor003::End");
 }
 }
 }
