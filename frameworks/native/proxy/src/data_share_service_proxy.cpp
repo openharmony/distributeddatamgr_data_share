@@ -341,7 +341,7 @@ Data DataShareServiceProxy::GetPublishedData(const std::string &bundleName, int 
 }
 
 std::vector<OperationResult> DataShareServiceProxy::SubscribeRdbData(const std::vector<std::string> &uris,
-    const TemplateId &templateId, const sptr<IDataProxyRdbObserver> &observer)
+    const TemplateId &templateId, const sptr<IDataProxyRdbObserver> &observer, const SubscribeOption &subscribeOption)
 {
     std::vector<OperationResult> results;
     if (observer == nullptr) {
@@ -354,7 +354,7 @@ std::vector<OperationResult> DataShareServiceProxy::SubscribeRdbData(const std::
         return results;
     }
 
-    if (!ITypesUtil::Marshal(data, uris, templateId.subscriberId_, templateId.bundleName_)) {
+    if (!ITypesUtil::Marshal(data, uris, templateId.subscriberId_, templateId.bundleName_, subscribeOption)) {
         LOG_ERROR("Write to message parcel failed!");
         return results;
     }

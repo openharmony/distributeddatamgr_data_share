@@ -45,7 +45,7 @@ public:
     Data GetPublishedData(const std::string &bundleName, int &resultCode) override;
 
     std::vector<OperationResult> SubscribeRdbData(const std::vector<std::string> &uris, const TemplateId &templateId,
-        const sptr<IDataProxyRdbObserver> &observer) override;
+        const sptr<IDataProxyRdbObserver> &observer, const SubscribeOption &subscribeOption = {}) override;
 
     std::vector<OperationResult> UnSubscribeRdbData(
         const std::vector<std::string> &uris, const TemplateId &templateId) override;

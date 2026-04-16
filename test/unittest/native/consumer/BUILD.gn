@@ -715,13 +715,24 @@ ohos_unittest("DataShareHelperTimeoutTest") {
 ohos_unittest("DataShareHelperProxyTest") {
   module_out_path = "data_share/data_share/native/consumer"
 
+  include_dirs = [
+    "//foundation/distributeddatamgr/data_share/frameworks/native/proxy/include/",
+  ]
+
   sources = [ "${datashare_base_path}/test/unittest/native/consumer/src/datashare_helper_proxy_test.cpp" ]
 
   deps = [
     "${datashare_innerapi_path}:datashare_consumer",
+    "${datashare_innerapi_path}:datashare_consumer_static",
     "${datashare_innerapi_path}/common:datashare_common",
     "${datashare_base_path}/test/unittest/native/resource/datashare_proxy_bundle:proxydatas_with_permission",
     "${datashare_base_path}/test/unittest/native/resource/ohos_test:copy_ohos_test",
+  ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 
   external_deps = [
@@ -737,6 +748,15 @@ ohos_unittest("DataShareHelperProxyTest") {
     "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
+
+  sanitize = {
+    integer_overflow = true
+    ubsan = true
+    boundary_sanitize = true
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+  }
 }
 
 ohos_unittest("DataShareResultSetTest") {

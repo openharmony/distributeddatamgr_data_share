@@ -1915,4 +1915,16 @@ bool UnmarshalDataProxyChangeInfoVec(std::vector<DataProxyChangeInfo> &changeInf
     std::istringstream iss(std::string(buffer, length));
     return UnmarshalDataProxyChangeInfoVecToBuffer(iss, changeInfos);
 }
+
+template<>
+bool Marshalling(const SubscribeOption &subscribeOption, MessageParcel &parcel)
+{
+    return ITypesUtil::Marshal(parcel, subscribeOption.subscribeStatus);
+}
+
+template<>
+bool Unmarshalling(SubscribeOption &subscribeOption, MessageParcel &parcel)
+{
+    return ITypesUtil::Unmarshal(parcel, subscribeOption.subscribeStatus);
+}
 }  // namespace OHOS::ITypesUtil

@@ -22,8 +22,10 @@
 #include "datashare_helper.h"
 #include "datashare_log.h"
 #include "datashare_template.h"
+#include "data_share_manager_impl.h"
 #include "hap_token_info.h"
 #include "iservice_registry.h"
+#include "rdb_subscriber_manager.h"
 #include "system_ability_definition.h"
 #include "token_setproc.h"
 #include "datashare_errno.h"
@@ -921,6 +923,65 @@ HWTEST_F(DataShareHelperProxyTest, CombinationRdbData_Test_001, TestSize.Level1)
     EXPECT_EQ((retVal2 > 0), true);
     EXPECT_EQ(g_callbackTimes, 2);
     LOG_INFO("CombinationRdbData_Test_001::End");
+}
+
+/**
+ * @tc.name: RecoverRdbSubscribe_Test_001
+ * @tc.desc: Verify recover disabled observers won't receive notify
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+    1. Register a query template and add a callback which is disabled
+    2. Insert data to trigger the subscription callback
+    3. Verify the callback is invoked the expected number of times
+ * @tc.expect:
+    1. Template registration return 0 (success)
+    2. Insert operations return values > 0 (success)
+    3. Callback is invoked 0 times before unsubscription
+ */
+HWTEST_F(DataShareHelperProxyTest, RecoverRdbSubscribe_Test_001, TestSize.Level1)
+{
+    LOG_INFO("RecoverRdbSubscribe_Test_001::Start");
+    auto helper = dataShareHelper;
+    PredicateTemplateNode node("p1", "select name0 as name from TBL00");
+    std::vector<PredicateTemplateNode> nodes;
+    nodes.emplace_back(node);
+    Template tpl(nodes, "select name1 as name from TBL00");
+    auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
+    EXPECT_EQ(result, 0);
+
+    int callbackTimes = 0;
+    TemplateId templateId;
+    templateId.subscriberId_ = SUBSCRIBER_ID;
+    templateId.bundleName_ = "ohos.datashareproxyclienttest.demo";
+    RdbObserverMapKey key(DATA_SHARE_PROXY_URI, templateId);
+    auto callback = [&templateId, &callbackTimes](const RdbChangeNode &changeNode) {
+            EXPECT_EQ(changeNode.uri_, DATA_SHARE_PROXY_URI);
+            EXPECT_EQ(changeNode.templateId_.bundleName_, templateId.bundleName_);
+            EXPECT_EQ(changeNode.templateId_.subscriberId_, templateId.subscriberId_);
+            callbackTimes++;
+        };
+    auto observer = std::make_shared<RdbObserver>(callback);
+    RdbSubscriberManager::ObserverNode obsNode(observer, &dataShareHelper);
+    obsNode.enabled_ = false;
+    RdbSubscriberManager::GetInstance().callbacks_[key].emplace_back(obsNode);
+
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    EXPECT_NE(proxy, nullptr);
+    RdbSubscriberManager::GetInstance().RecoverObservers(proxy);
+
+    Uri uri(DATA_SHARE_PROXY_URI);
+    DataShare::DataShareValuesBucket valuesBucket1, valuesBucket2;
+    std::string name1 = "wu";
+    std::string name2 = "liu";
+    valuesBucket1.Put(TBL_NAME1, name1);
+    int retVal1 = helper->Insert(uri, valuesBucket1);
+    EXPECT_GT(retVal1, 0);
+    EXPECT_EQ(callbackTimes, 0);
+
+    RdbSubscriberManager::GetInstance().callbacks_.erase(key);
+    LOG_INFO("RecoverRdbSubscribe_Test_001::End");
 }
 } // namespace DataShare
 } // namespace OHOS

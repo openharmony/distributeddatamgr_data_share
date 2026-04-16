@@ -16,6 +16,7 @@
 #ifndef DATASHARE_TEMPLATE_H
 #define DATASHARE_TEMPLATE_H
 
+#include <map>
 #include <string>
 #include <variant>
 #include <vector>
@@ -193,6 +194,12 @@ struct OperationResult {
     std::string key_;
     /** Specifies the operation result error code. */
     int errCode_;
+};
+
+struct SubscribeOption {
+    SubscribeOption() = default;
+    // subscribeStatus is a summary of the status of all uris registered for each templateId.
+    std::map<std::string, bool> subscribeStatus;
 };
 }  // namespace DataShare
 }  // namespace OHOS
