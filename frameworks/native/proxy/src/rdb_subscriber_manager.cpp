@@ -214,12 +214,21 @@ void RdbSubscriberManager::RecoverObservers(std::shared_ptr<DataShareServiceProx
         return;
     }
     std::map<TemplateId, std::vector<std::string>> keysMap;
+    std::map<TemplateId, SubscribeOption> optionMap;
     std::vector<Key> keys = CallbacksManager::GetKeys();
     for (const auto& key : keys) {
         keysMap[key.templateId_].emplace_back(key.uri_);
+        auto enabledObservers = GetEnabledObservers(key);
+        bool enabled = enabledObservers.empty() ? false : true;
+        optionMap[key.templateId_].subscribeStatus.emplace(key.uri_, enabled);
     }
     for (const auto& [templateId, uris] : keysMap) {
-        auto results = proxy->SubscribeRdbData(uris, templateId, serviceCallback_);
+        SubscribeOption subscribeOption;
+        auto it = optionMap.find(templateId);
+        if (it != optionMap.end()) {
+            subscribeOption = it->second;
+        }
+        auto results = proxy->SubscribeRdbData(uris, templateId, serviceCallback_, subscribeOption);
         for (const auto& result : results) {
             if (result.errCode_ != E_OK) {
                 LOG_WARN("RecoverObservers failed, uri is %{public}s, errCode is %{public}d",
