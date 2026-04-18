@@ -37,7 +37,7 @@ public:
 
     std::vector<DataProxyResult> AddObservers(const std::vector<Key> &keys, const std::shared_ptr<Observer> observer,
         std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
-            std::vector<DataProxyResult> &)>);
+            std::vector<DataProxyResult> &)>, const DataProxyConfig &config);
 
     std::vector<OperationResult> DelObservers(const std::vector<Key> &keys,
         const std::shared_ptr<Observer> observer = nullptr,
@@ -59,6 +59,7 @@ private:
     struct ObserverNode {
         std::shared_ptr<Observer> observer_;
         bool enabled_;
+        DataProxyConfig config_;
         ObserverNode(const std::shared_ptr<Observer> &observer) : observer_(observer)
         {
             enabled_ = true;
@@ -67,6 +68,7 @@ private:
             : observer_(observer), enabled_(enabled){};
     };
     bool IsRegistered(const Observer &, const std::vector<ObserverNode> &);
+    bool FindAndUpdateObserverConfig(const Observer &, std::vector<ObserverNode> &, const DataProxyConfig &);
     std::recursive_mutex mutex_{};
     std::map<Key, std::vector<ObserverNode>> callbacks_;
 };
@@ -110,20 +112,22 @@ template<class Key, class Observer>
 std::vector<DataProxyResult> AniCallbacksManager<Key, Observer>::AddObservers(
     const std::vector<Key> &keys, const std::shared_ptr<Observer> observer,
     std::function<void(const std::vector<Key> &, const std::shared_ptr<Observer> &observer,
-        std::vector<DataProxyResult> &)> processOnFirstAdd)
+    std::vector<DataProxyResult> &)> processOnFirstAdd, const DataProxyConfig &config)
 {
     std::vector<DataProxyResult> result;
     std::vector<Key> firstRegisterKey;
     {
         std::lock_guard<decltype(mutex_)> lck(mutex_);
         for (auto &key : keys) {
+            ObserverNode node(observer);
+            node.config_ = config;
             std::vector<std::shared_ptr<Observer>> enabledObservers = GetEnabledObservers(key);
             if (enabledObservers.empty()) {
-                callbacks_[key].emplace_back(ObserverNode(observer));
+                callbacks_[key].emplace_back(node);
                 firstRegisterKey.emplace_back(key);
                 continue;
             }
-            if (IsRegistered(*observer, callbacks_[key])) {
+            if (FindAndUpdateObserverConfig(*observer, callbacks_[key], config)) {
                 result.emplace_back(static_cast<std::string>(key), DataShare::SUCCESS);
                 continue;
             }
@@ -141,6 +145,22 @@ bool AniCallbacksManager<Key, Observer>::IsRegistered(const Observer &observer,
 {
     for (auto &item : observers) {
         if ((item.observer_ != nullptr) && (*(item.observer_) == observer)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+template<class Key, class Observer>
+bool AniCallbacksManager<Key, Observer>::FindAndUpdateObserverConfig(const Observer &observer,
+    std::vector<ObserverNode> &observers, const DataProxyConfig &config)
+{
+    for (auto &item : observers) {
+        if ((item.observer_ != nullptr) && (*(item.observer_) == observer)) {
+            if (item.config_ == config) {
+                return true;
+            }
+            item.config_ = config;
             return true;
         }
     }

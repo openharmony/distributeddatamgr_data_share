@@ -793,7 +793,7 @@ export namespace dataShare {
   export native function native_data_proxy_handle_delete_all(obj: DataProxyHandle, config: DataProxyConfig): Promise<DataProxyResult[]>
   export native function native_data_proxy_handle_get(obj: DataProxyHandle, uris: string[], config: DataProxyConfig): Promise<DataProxyGetResult[]>
   native function check_uris(uris: string[]): int;
-  native function publish_check_uris(data: ProxyData[]): int;
+  native function publish_check_uris(data: ProxyData[], config: DataProxyConfig): int;
 
   export function createDataProxyHandle(): Promise<DataProxyHandle> {
     return new Promise<DataProxyHandle>((resolve, reject) => {
@@ -846,7 +846,7 @@ export namespace dataShare {
     }
 
     publish(data: ProxyData[], config: DataProxyConfig): Promise<DataProxyResult[]> {
-        let result = publish_check_uris(data);
+        let result = publish_check_uris(data, config);
         return new Promise<DataProxyResult[]>((resolve, reject) => {
             let p = taskpool.execute(native_data_proxy_handle_publish, this, data, config)
             p.then((e: Any) => {

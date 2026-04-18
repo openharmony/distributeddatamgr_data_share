@@ -1292,5 +1292,496 @@ HWTEST_F(DatashareItypesUtilsTest, MarshalConnectionInterfaceInfo_001, TestSize.
     EXPECT_EQ(input.descriptor_, output.descriptor_);
     LOG_INFO("MarshalConnectionInterfaceInfo_001 ends");
 }
+
+/**
+* @tc.name: MarshalProxyDataVec_001
+* @tc.desc: Test the marshalling and unmarshalling functionality of ProxyDataVec with normal data.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a vector of DataShareProxyData objects.
+*    2. Initialize the vector with DataShareProxyData containing different value types (int, double, string, bool).
+*    3. Marshal the vector to the MessageParcel and verify the operation succeeds.
+*    4. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    5. Compare the unmarshaled vector with the original vector to ensure data consistency.
+* @tc.expect: The marshalling and unmarshalling operations should succeed, and the unmarshaled data should match
+*    the original data.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalProxyDataVec_001, TestSize.Level0)
+{
+    LOG_INFO("MarshalProxyDataVec_001 starts");
+    MessageParcel parcel;
+    std::vector<DataShareProxyData> proxyDatas;
+
+    DataShareProxyData data1("datashareproxy://test1", static_cast<int64_t>(123), {"app1", "app2"});
+    DataShareProxyData data2("datashareproxy://test2", static_cast<double>(3.14), {});
+    DataShareProxyData data3("datashareproxy://test3", std::string("test_string"), {"app3"});
+    DataShareProxyData data4("datashareproxy://test4", static_cast<bool>(true), {});
+
+    proxyDatas.push_back(data1);
+    proxyDatas.push_back(data2);
+    proxyDatas.push_back(data3);
+    proxyDatas.push_back(data4);
+
+    ASSERT_TRUE(ITypesUtil::MarshalProxyDataVec(proxyDatas, parcel));
+
+    std::vector<DataShareProxyData> proxyDatasOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalProxyDataVec(proxyDatasOut, parcel));
+
+    EXPECT_EQ(proxyDatas.size(), proxyDatasOut.size());
+    for (size_t i = 0; i < proxyDatas.size(); ++i) {
+        EXPECT_EQ(proxyDatas[i].uri_, proxyDatasOut[i].uri_);
+        EXPECT_EQ(proxyDatas[i].allowList_, proxyDatasOut[i].allowList_);
+    }
+    LOG_INFO("MarshalProxyDataVec_001 ends");
+}
+
+/**
+* @tc.name: MarshalProxyDataVec_002
+* @tc.desc: Test the marshalling and unmarshalling functionality of ProxyDataVec with undefined values.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a vector of DataShareProxyData objects.
+*    2. Initialize the vector with DataShareProxyData where isValueUndefined and isAllowListUndefined are set.
+*    3. Marshal the vector to the MessageParcel and verify the operation succeeds.
+*    4. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    5. Compare the unmarshaled vector with the original vector to ensure data consistency.
+* @tc.expect: The marshalling and unmarshalling operations should succeed, undefined flags should be preserved.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalProxyDataVec_002, TestSize.Level0)
+{
+    LOG_INFO("MarshalProxyDataVec_002 starts");
+    MessageParcel parcel;
+    std::vector<DataShareProxyData> proxyDatas;
+
+    DataShareProxyData data1("datashareproxy://test1", static_cast<int64_t>(100));
+    data1.isValueUndefined = true;
+    data1.isAllowListUndefined = true;
+
+    DataShareProxyData data2("datashareproxy://test2", std::string("value"));
+    data2.isValueUndefined = false;
+    data2.isAllowListUndefined = true;
+
+    proxyDatas.push_back(data1);
+    proxyDatas.push_back(data2);
+
+    ASSERT_TRUE(ITypesUtil::MarshalProxyDataVec(proxyDatas, parcel));
+
+    std::vector<DataShareProxyData> proxyDatasOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalProxyDataVec(proxyDatasOut, parcel));
+
+    EXPECT_EQ(proxyDatas.size(), proxyDatasOut.size());
+    EXPECT_EQ(proxyDatasOut[0].isValueUndefined, true);
+    EXPECT_EQ(proxyDatasOut[0].isAllowListUndefined, true);
+    EXPECT_EQ(proxyDatasOut[1].isValueUndefined, false);
+    EXPECT_EQ(proxyDatasOut[1].isAllowListUndefined, true);
+    LOG_INFO("MarshalProxyDataVec_002 ends");
+}
+
+/**
+* @tc.name: MarshalProxyDataVec_003
+* @tc.desc: Test the marshalling functionality of ProxyDataVec with empty vector.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and an empty vector of DataShareProxyData.
+*    2. Marshal the empty vector to the MessageParcel and verify the operation succeeds.
+*    3. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    4. Verify that the unmarshaled vector is empty.
+* @tc.expect: The marshalling and unmarshalling operations should succeed, and the unmarshaled vector should be empty.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalProxyDataVec_003, TestSize.Level0)
+{
+    LOG_INFO("MarshalProxyDataVec_003 starts");
+    MessageParcel parcel;
+    std::vector<DataShareProxyData> proxyDatas;
+
+    ASSERT_TRUE(ITypesUtil::MarshalProxyDataVec(proxyDatas, parcel));
+
+    std::vector<DataShareProxyData> proxyDatasOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalProxyDataVec(proxyDatasOut, parcel));
+
+    EXPECT_TRUE(proxyDatasOut.empty());
+    LOG_INFO("MarshalProxyDataVec_003 ends");
+}
+
+/**
+* @tc.name: MarshalProxyDataVec_004
+* @tc.desc: Test the marshalling functionality of ProxyDataVec with boolean value type.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a vector of DataShareProxyData with boolean value.
+*    2. Marshal the vector to the MessageParcel and verify the operation succeeds.
+*    3. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    4. Compare the unmarshaled vector with the original vector.
+* @tc.expect: The marshalling and unmarshalling operations should succeed with boolean value type.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalProxyDataVec_004, TestSize.Level0)
+{
+    LOG_INFO("MarshalProxyDataVec_004 starts");
+    MessageParcel parcel;
+    std::vector<DataShareProxyData> proxyDatas;
+
+    DataShareProxyData data("datashareproxy://test_bool", static_cast<bool>(true), {"app1"});
+    proxyDatas.push_back(data);
+
+    ASSERT_TRUE(ITypesUtil::MarshalProxyDataVec(proxyDatas, parcel));
+
+    std::vector<DataShareProxyData> proxyDatasOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalProxyDataVec(proxyDatasOut, parcel));
+
+    EXPECT_EQ(proxyDatas.size(), proxyDatasOut.size());
+    EXPECT_EQ(proxyDatas[0].uri_, proxyDatasOut[0].uri_);
+    LOG_INFO("MarshalProxyDataVec_004 ends");
+}
+
+/**
+* @tc.name: UnmarshalProxyDataVec_001
+* @tc.desc: Test the unmarshalling functionality of ProxyDataVec with invalid length.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and write an invalid length (negative value).
+*    2. Call UnmarshalProxyDataVec and verify the operation fails.
+* @tc.expect: The unmarshalling operation should fail when length is invalid.
+*/
+HWTEST_F(DatashareItypesUtilsTest, UnmarshalProxyDataVec_001, TestSize.Level0)
+{
+    LOG_INFO("UnmarshalProxyDataVec_001 starts");
+    MessageParcel parcel;
+    std::vector<DataShareProxyData> proxyDatas;
+
+    parcel.WriteInt32(-1);
+    EXPECT_FALSE(ITypesUtil::UnmarshalProxyDataVec(proxyDatas, parcel));
+
+    LOG_INFO("UnmarshalProxyDataVec_001 ends");
+}
+
+/**
+* @tc.name: UnmarshalProxyDataVec_002
+* @tc.desc: Test the unmarshalling functionality of ProxyDataVec with length exceeding MAX_IPC_SIZE.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and write a length exceeding MAX_IPC_SIZE (128 * 1024 * 1024 + 1).
+*    2. Call UnmarshalProxyDataVec and verify the operation fails.
+* @tc.expect: The unmarshalling operation should fail when length exceeds limit.
+*/
+HWTEST_F(DatashareItypesUtilsTest, UnmarshalProxyDataVec_002, TestSize.Level0)
+{
+    LOG_INFO("UnmarshalProxyDataVec_002 starts");
+    MessageParcel parcel;
+    std::vector<DataShareProxyData> proxyDatas;
+
+    int32_t abnormalSize = 128 * 1024 * 1024 + 1;
+    parcel.WriteInt32(abnormalSize);
+    EXPECT_FALSE(ITypesUtil::UnmarshalProxyDataVec(proxyDatas, parcel));
+
+    LOG_INFO("UnmarshalProxyDataVec_002 ends");
+}
+
+/**
+* @tc.name: UnmarshalProxyDataVec_003
+* @tc.desc: Test the unmarshalling functionality of ProxyDataVec with corrupted serialized data.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and write valid length with corrupted serialized data.
+*    2. Call UnmarshalProxyDataVec and verify the operation fails.
+* @tc.expect: The unmarshalling operation should fail when serialized data is corrupted.
+*/
+HWTEST_F(DatashareItypesUtilsTest, UnmarshalProxyDataVec_003, TestSize.Level0)
+{
+    LOG_INFO("UnmarshalProxyDataVec_003 starts");
+    MessageParcel parcel;
+    std::vector<DataShareProxyData> proxyDatas;
+
+    std::string corruptedData = "corrupted_data_that_is_not_valid_serialized_format";
+    parcel.WriteInt32(static_cast<int32_t>(corruptedData.size()));
+    parcel.WriteRawData(reinterpret_cast<const void *>(corruptedData.data()), corruptedData.size());
+    EXPECT_FALSE(ITypesUtil::UnmarshalProxyDataVec(proxyDatas, parcel));
+    
+    LOG_INFO("UnmarshalProxyDataVec_003 ends");
+}
+
+/**
+* @tc.name: MarshalDataProxyGetResultVec_001
+* @tc.desc: Test the marshalling and unmarshalling functionality of DataProxyGetResultVec with normal data.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a vector of DataProxyGetResult objects.
+*    2. Initialize the vector with DataProxyGetResult containing different value types and error codes.
+*    3. Marshal the vector to the MessageParcel and verify the operation succeeds.
+*    4. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    5. Compare the unmarshaled vector with the original vector to ensure data consistency.
+* @tc.expect: The marshalling and unmarshalling operations should succeed, and the unmarshaled data should match
+*    the original data.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalDataProxyGetResultVec_001, TestSize.Level0)
+{
+    LOG_INFO("MarshalDataProxyGetResultVec_001 starts");
+    MessageParcel parcel;
+    std::vector<DataProxyGetResult> results;
+
+    DataProxyGetResult result1("datashareproxy://test1", DataProxyErrorCode::SUCCESS,
+        static_cast<int64_t>(100), {"app1"});
+    DataProxyGetResult result2("datashareproxy://test2", DataProxyErrorCode::URI_NOT_EXIST,
+        std::string("test_value"), {});
+    DataProxyGetResult result3("datashareproxy://test3", DataProxyErrorCode::NO_PERMISSION,
+        static_cast<double>(2.5), {"app2", "app3"});
+    DataProxyGetResult result4("datashareproxy://test4", DataProxyErrorCode::OVER_LIMIT,
+        static_cast<bool>(false), {});
+
+    results.push_back(result1);
+    results.push_back(result2);
+    results.push_back(result3);
+    results.push_back(result4);
+
+    ASSERT_TRUE(ITypesUtil::MarshalDataProxyGetResultVec(results, parcel));
+
+    std::vector<DataProxyGetResult> resultsOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalDataProxyGetResultVec(resultsOut, parcel));
+
+    EXPECT_EQ(results.size(), resultsOut.size());
+    for (size_t i = 0; i < results.size(); ++i) {
+        EXPECT_EQ(results[i].uri_, resultsOut[i].uri_);
+        EXPECT_EQ(results[i].result_, resultsOut[i].result_);
+        EXPECT_EQ(results[i].allowList_, resultsOut[i].allowList_);
+    }
+    LOG_INFO("MarshalDataProxyGetResultVec_001 ends");
+}
+
+/**
+* @tc.name: MarshalDataProxyGetResultVec_002
+* @tc.desc: Test the marshalling functionality of DataProxyGetResultVec with empty vector.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and an empty vector of DataProxyGetResult.
+*    2. Marshal the empty vector to the MessageParcel and verify the operation succeeds.
+*    3. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    4. Verify that the unmarshaled vector is empty.
+* @tc.expect: The marshalling and unmarshalling operations should succeed, and the unmarshaled vector should be empty.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalDataProxyGetResultVec_002, TestSize.Level0)
+{
+    LOG_INFO("MarshalDataProxyGetResultVec_002 starts");
+    MessageParcel parcel;
+    std::vector<DataProxyGetResult> results;
+
+    ASSERT_TRUE(ITypesUtil::MarshalDataProxyGetResultVec(results, parcel));
+
+    std::vector<DataProxyGetResult> resultsOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalDataProxyGetResultVec(resultsOut, parcel));
+
+    EXPECT_TRUE(resultsOut.empty());
+    LOG_INFO("MarshalDataProxyGetResultVec_002 ends");
+}
+
+/**
+* @tc.name: UnmarshalDataProxyGetResultVec_001
+* @tc.desc: Test the unmarshalling functionality of DataProxyGetResultVec with invalid length.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and write an invalid length (zero value).
+*    2. Call UnmarshalDataProxyGetResultVec and verify the operation fails.
+* @tc.expect: The unmarshalling operation should fail when length is invalid.
+*/
+HWTEST_F(DatashareItypesUtilsTest, UnmarshalDataProxyGetResultVec_001, TestSize.Level0)
+{
+    LOG_INFO("UnmarshalDataProxyGetResultVec_001 starts");
+    MessageParcel parcel;
+    std::vector<DataProxyGetResult> results;
+
+    parcel.WriteInt32(0);
+    EXPECT_FALSE(ITypesUtil::UnmarshalDataProxyGetResultVec(results, parcel));
+    
+    LOG_INFO("UnmarshalDataProxyGetResultVec_001 ends");
+}
+
+/**
+* @tc.name: UnmarshalDataProxyGetResultVec_002
+* @tc.desc: Test the unmarshalling functionality of DataProxyGetResultVec with corrupted serialized data.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and write valid length with corrupted serialized data.
+*    2. Call UnmarshalDataProxyGetResultVec and verify the operation fails.
+* @tc.expect: The unmarshalling operation should fail when serialized data is corrupted.
+*/
+HWTEST_F(DatashareItypesUtilsTest, UnmarshalDataProxyGetResultVec_002, TestSize.Level0)
+{
+    LOG_INFO("UnmarshalDataProxyGetResultVec_002 starts");
+    MessageParcel parcel;
+    std::vector<DataProxyGetResult> results;
+
+    std::string corruptedData = "corrupted_data_that_is_not_valid_serialized_format";
+    parcel.WriteInt32(static_cast<int32_t>(corruptedData.size()));
+    parcel.WriteRawData(reinterpret_cast<const void *>(corruptedData.data()), corruptedData.size());
+    EXPECT_FALSE(ITypesUtil::UnmarshalDataProxyGetResultVec(results, parcel));
+    
+    LOG_INFO("UnmarshalDataProxyGetResultVec_002 ends");
+}
+
+/**
+* @tc.name: MarshalDataProxyChangeInfoVec_001
+* @tc.desc: Test the marshalling and unmarshalling functionality of DataProxyChangeInfoVec with normal data.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and a vector of DataProxyChangeInfo objects.
+*    2. Initialize the vector with DataProxyChangeInfo containing different change types and value types.
+*    3. Marshal the vector to the MessageParcel and verify the operation succeeds.
+*    4. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    5. Compare the unmarshaled vector with the original vector to ensure data consistency.
+* @tc.expect: The marshalling and unmarshalling operations should succeed, and the unmarshaled data should match
+*    the original data.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalDataProxyChangeInfoVec_001, TestSize.Level0)
+{
+    LOG_INFO("MarshalDataProxyChangeInfoVec_001 starts");
+    MessageParcel parcel;
+    std::vector<DataProxyChangeInfo> changeInfos;
+
+    DataProxyChangeInfo info1(DataShareObserver::ChangeType::INSERT,
+        "datashareproxy://test1", static_cast<int64_t>(100));
+    DataProxyChangeInfo info2(DataShareObserver::ChangeType::UPDATE,
+        "datashareproxy://test2", std::string("change_value"));
+    DataProxyChangeInfo info3(DataShareObserver::ChangeType::DELETE,
+        "datashareproxy://test3", static_cast<double>(1.5));
+
+    changeInfos.push_back(info1);
+    changeInfos.push_back(info2);
+    changeInfos.push_back(info3);
+
+    ASSERT_TRUE(ITypesUtil::MarshalDataProxyChangeInfoVec(changeInfos, parcel));
+    
+    std::vector<DataProxyChangeInfo> changeInfosOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalDataProxyChangeInfoVec(changeInfosOut, parcel));
+
+    EXPECT_EQ(changeInfos.size(), changeInfosOut.size());
+    for (size_t i = 0; i < changeInfos.size(); ++i) {
+        EXPECT_EQ(changeInfos[i].uri_, changeInfosOut[i].uri_);
+        EXPECT_EQ(static_cast<int>(changeInfos[i].changeType_),
+                  static_cast<int>(changeInfosOut[i].changeType_));
+    }
+    LOG_INFO("MarshalDataProxyChangeInfoVec_001 ends");
+}
+
+/**
+* @tc.name: MarshalDataProxyChangeInfoVec_002
+* @tc.desc: Test the marshalling functionality of DataProxyChangeInfoVec with empty vector.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and an empty vector of DataProxyChangeInfo.
+*    2. Marshal the empty vector to the MessageParcel and verify the operation succeeds.
+*    3. Unmarshal the vector from the MessageParcel and verify the operation succeeds.
+*    4. Verify that the unmarshaled vector is empty.
+* @tc.expect: The marshalling and unmarshalling operations should succeed, and the unmarshaled vector should be empty.
+*/
+HWTEST_F(DatashareItypesUtilsTest, MarshalDataProxyChangeInfoVec_002, TestSize.Level0)
+{
+    LOG_INFO("MarshalDataProxyChangeInfoVec_002 starts");
+    MessageParcel parcel;
+    std::vector<DataProxyChangeInfo> changeInfos;
+
+    ASSERT_TRUE(ITypesUtil::MarshalDataProxyChangeInfoVec(changeInfos, parcel));
+
+    std::vector<DataProxyChangeInfo> changeInfosOut;
+    ASSERT_TRUE(ITypesUtil::UnmarshalDataProxyChangeInfoVec(changeInfosOut, parcel));
+
+    EXPECT_TRUE(changeInfosOut.empty());
+    LOG_INFO("MarshalDataProxyChangeInfoVec_002 ends");
+}
+
+/**
+* @tc.name: UnmarshalDataProxyChangeInfoVec_001
+* @tc.desc: Test the unmarshalling functionality of DataProxyChangeInfoVec with invalid length.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and write an invalid length (negative value).
+*    2. Call UnmarshalDataProxyChangeInfoVec and verify the operation fails.
+* @tc.expect: The unmarshalling operation should fail when length is invalid.
+*/
+HWTEST_F(DatashareItypesUtilsTest, UnmarshalDataProxyChangeInfoVec_001, TestSize.Level0)
+{
+    LOG_INFO("UnmarshalDataProxyChangeInfoVec_001 starts");
+    MessageParcel parcel;
+    std::vector<DataProxyChangeInfo> changeInfos;
+
+    parcel.WriteInt32(-1);
+    EXPECT_FALSE(ITypesUtil::UnmarshalDataProxyChangeInfoVec(changeInfos, parcel));
+
+    LOG_INFO("UnmarshalDataProxyChangeInfoVec_001 ends");
+}
+
+/**
+* @tc.name: UnmarshalDataProxyChangeInfoVec_002
+* @tc.desc: Test the unmarshalling functionality of DataProxyChangeInfoVec with length exceeding MAX_IPC_SIZE.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and write a length exceeding MAX_IPC_SIZE.
+*    2. Call UnmarshalDataProxyChangeInfoVec and verify the operation fails.
+* @tc.expect: The unmarshalling operation should fail when length exceeds limit.
+*/
+HWTEST_F(DatashareItypesUtilsTest, UnmarshalDataProxyChangeInfoVec_002, TestSize.Level0)
+{
+    LOG_INFO("UnmarshalDataProxyChangeInfoVec_002 starts");
+    MessageParcel parcel;
+    std::vector<DataProxyChangeInfo> changeInfos;
+
+    int32_t abnormalSize = 128 * 1024 * 1024 + 1;
+    parcel.WriteInt32(abnormalSize);
+    EXPECT_FALSE(ITypesUtil::UnmarshalDataProxyChangeInfoVec(changeInfos, parcel));
+
+    LOG_INFO("UnmarshalDataProxyChangeInfoVec_002 ends");
+}
+
+/**
+* @tc.name: UnmarshalDataProxyChangeInfoVec_003
+* @tc.desc: Test the unmarshalling functionality of DataProxyChangeInfoVec with corrupted serialized data.
+* @tc.type: FUNC
+* @tc.require: issueNumber
+* @tc.precon: None
+* @tc.step:
+*    1. Create a MessageParcel and write valid length with corrupted serialized data.
+*    2. Call UnmarshalDataProxyChangeInfoVec and verify the operation fails.
+* @tc.expect: The unmarshalling operation should fail when serialized data is corrupted.
+*/
+HWTEST_F(DatashareItypesUtilsTest, UnmarshalDataProxyChangeInfoVec_003, TestSize.Level0)
+{
+    LOG_INFO("UnmarshalDataProxyChangeInfoVec_003 starts");
+    MessageParcel parcel;
+    std::vector<DataProxyChangeInfo> changeInfos;
+
+    std::string corruptedData = "corrupted_data_that_is_not_valid_serialized_format";
+    parcel.WriteInt32(static_cast<int32_t>(corruptedData.size()));
+    parcel.WriteRawData(reinterpret_cast<const void *>(corruptedData.data()), corruptedData.size());
+    EXPECT_FALSE(ITypesUtil::UnmarshalDataProxyChangeInfoVec(changeInfos, parcel));
+
+    LOG_INFO("UnmarshalDataProxyChangeInfoVec_003 ends");
+}
 }
 }
