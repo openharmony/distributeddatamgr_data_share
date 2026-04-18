@@ -145,11 +145,6 @@ void ProxyDataSubscriberManager::RecoverObservers(std::shared_ptr<DataShareServi
 DataProxyValue ProxyDataSubscriberManager::GetValidDataProxyValue(const DataProxyValue &value,
     const DataProxyConfig &config)
 {
-    if (config.maxValueLength_ != DataProxyMaxValueLength::MAX_LENGTH_4K &&
-        config.maxValueLength_ != DataProxyMaxValueLength::MAX_LENGTH_100K) {
-        LOG_ERROR("Invalid maxValueLength");
-        return false;
-    }
     size_t maxLength = static_cast<size_t>(config.maxValueLength_);
     if (value.index() == DataProxyValueType::VALUE_STRING) {
         std::string valueStr = std::get<std::string>(value);
@@ -169,6 +164,12 @@ void ProxyDataSubscriberManager::Emit(std::vector<DataProxyChangeInfo> &changeIn
         ProxyDataObserverMapKey key(data.uri_);
         std::vector<ObserverNode> nodes = BaseCallbacks::GetEnabledProxyDataObseverNodes(key);
         for (auto const &node : nodes) {
+            // invalid config maxValueLength, just skip this observer
+            if (node.config_.maxValueLength_ != DataProxyMaxValueLength::MAX_LENGTH_4K &&
+                node.config_.maxValueLength_ != DataProxyMaxValueLength::MAX_LENGTH_100K) {
+                LOG_ERROR("Invalid maxValueLength");
+                continue;
+            }
             // if value size exceeds maxValueLength, the value will be truncated
             DataProxyValue validValue = GetValidDataProxyValue(data.value_, node.config_);
             results[node.observer_].emplace_back(data.changeType_, data.uri_, validValue);

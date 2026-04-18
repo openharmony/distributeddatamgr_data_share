@@ -21,7 +21,6 @@
 namespace OHOS {
 namespace DataShare {
 static constexpr int32_t URI_MAX_SIZE = 256;
-static constexpr int32_t VALUE_MAX_SIZE = 102400;
 static constexpr int32_t APPIDENTIFIER_MAX_SIZE = 128;
 static constexpr int32_t URI_MAX_COUNT = 64;
 static constexpr int32_t PROXY_DATA_MAX_COUNT = 64;
@@ -65,6 +64,11 @@ enum DataProxyMaxValueLength : int32_t {
 struct DataProxyConfig {
     DataProxyType type_ = DataProxyType::SHARED_CONFIG;
     DataProxyMaxValueLength maxValueLength_ = DataProxyMaxValueLength::MAX_LENGTH_4K;
+
+    bool operator==(const DataProxyConfig& other) const
+    {
+        return (type_ == other.type_) && (maxValueLength_ == other.maxValueLength_);
+    }
 };
 
 struct DataShareProxyData {
