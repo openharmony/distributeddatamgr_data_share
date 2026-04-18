@@ -88,7 +88,35 @@ Datashare 支持两种数据访问模式：静默访问和非静默访问。
 - 支持多种数据类型（int, double, string, blob 等）
 - 支持随机访问和遍历
 
-### 4. DataShare Service (服务端服务)
+### 4. DataProxyHandle (配置共享句柄)
+
+**位置**：`distributeddatamgr_data_share/frameworks/native/consumer/`
+
+**职责**：
+- 提供应用间配置共享的操作接口
+- 支持配置的发布、删除、获取
+- 支持配置变更事件的订阅和取消订阅
+- 基于 allowList 的访问控制
+
+**关键接口**：
+- `createDataProxyHandle()` - 创建配置共享句柄
+- `publish()` - 发布或修改配置项
+- `delete()` - 删除配置项
+- `get()` - 获取配置项
+- `on('dataChange')` - 订阅配置变更
+- `off('dataChange')` - 取消订阅配置变更
+
+**使用场景**：
+- 跨应用配置同步（如主题、语言等）
+- 系统全局配置发布
+- 应用间共享参数配置
+
+**URI 格式**：
+```
+datashareproxy://{bundleName}/{path}
+```
+
+### 5. DataShare Service (服务端服务)
 
 **位置**：`distributeddatamgr_datamgr_service/services/distributeddataservice/service/data_share/`
 
@@ -96,6 +124,7 @@ Datashare 支持两种数据访问模式：静默访问和非静默访问。
 
 **职责**：
 - 提供 DataShare Silent/Non-Silent 模式支持
+- 提供配置共享服务端支持（DataProxyHandle 后端）
 - 处理权限验证
 
 **关键组件**：
@@ -138,9 +167,43 @@ Datashare 支持两种数据访问模式：静默访问和非静默访问。
 
 详见 [code_structure.md](code_structure.md#ability_ability_runtimedataobs)。
 
+### 3. 配置共享架构 (Share-Config Architecture)
+
+配置共享通过 DataProxyHandle 实现应用间配置数据的安全共享。
+
+**核心特性**：
+- **静态配置**：应用安装时通过 `shared_config.json` 预置配置
+- **动态配置**：运行时通过 `publish/delete` 接口动态管理配置
+- **访问控制**：基于 `allowList` 的细粒度权限控制
+- **变更通知**：支持 `on/off` 订阅配置变更事件
+
+**数据流**：
+```
+配置发布方                          配置访问方
+    ↓                                   ↓
+DataProxyHandle ← IPC → DataShare Service ←→ 配置存储
+    ↓                                   ↓
+发布/删除/修改                      获取/订阅变更
+```
+
+**权限校验流程**：
+```
+1. 访问方调用 get() 获取配置
+2. DataShare Service 检查 allowList
+3. 验证通过则返回配置值
+4. 验证失败则返回 NO_PERMISSION
+```
+
+详见 [share_config.md](share_config.md)、[C++ 接口实现](implementation/config_data/cpp_interfaces.md) 和 [权限校验](implementation/config_data/permission_check.md)。
+
 ---
 
 **相关文档**：
 - [代码结构](code_structure.md) - 各代码仓的目录结构和核心文件
 - [问题定位](troubleshooting.md) - 错误码速查和日志分析方法
+- [配置共享](share_config.md) - 应用间配置共享特性
+  - [C++ 接口实现](implementation/config_data/cpp_interfaces.md) - 配置共享 C++ 层接口详解
+  - [权限校验](implementation/config_data/permission_check.md) - allowList 权限校验逻辑
+  - [配置数据存储](implementation/config_data/storage_structure.md) - KvDB 存储结构
+  - [静态配置加载](implementation/config_data/static_config_loading.md) - 事件监听和配置加载机制
 - [代码仓清单](../repositories.md) - 完整的依赖仓列表

@@ -29,11 +29,13 @@ data_share/
 | DataShareExtAbility | `frameworks/native/provider/include/datashare_ext_ability.h` | Provider 端基类 |
 | 错误码 | `interfaces/inner_api/common/include/datashare_errno.h` | 错误码定义 |
 | ResultSet | `interfaces/inner_api/common/include/basic/result_set.h` | 结果集接口 |
+| DataProxyHandle | `frameworks/native/consumer/include/datashare_helper.h` | 配置共享句柄（API 20+） |
 
 **核心能力**：
 - **消费者（Consumer）**：提供 DataShareHelper，支持增删改查、观察者注册、文件操作等
 - **提供者（Provider）**：提供 DataShareExtAbility，实现数据提供方的业务逻辑
 - **ResultSet**：共享内存结果集，避免 IPC 大数据传输
+- **配置共享（Share-Config）**：API 20+ 支持应用间配置数据共享（DataProxyHandle）
 
 ---
 
@@ -58,16 +60,20 @@ datamgr_service/
 |------|------|------|
 | IDataShareService | `services/distributeddataservice/service/data_share/idata_share_service.h` | 服务接口 |
 | DataShareServiceImpl | `services/distributeddataservice/service/data_share/data_share_service_impl.h` | 服务实现 |
+| DataShareConfig | `services/distributeddataservice/service/config/include/model/datashare_config.h` | 配置模型定义 |
 
 **核心能力**：
 - **静默访问数据库操作**：直接管理数据，无需 ExtensionAbility
 - **数据代理**：支持卡片等场景的数据代理访问
-- **配置共享**：支持应用间配置数据的共享
+- **配置共享**：支持应用间配置数据的共享（DataProxyHandle 服务端支持）
+- **权限校验**：URI 信任列表、allowList 访问控制
 
 **构建命令**：
 ```bash
 ./build.sh --product-name <product> --gn-flags='--export-compile-commands' \
   --build-target foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/service/data_share:data_share_service
+./build.sh --product-name <product> --gn-flags='--export-compile-commands' \
+  --build-target foundation/distributeddatamgr/datamgr_service/services/distributeddataservice/service/config:config_service
 ```
 
 ---
@@ -119,5 +125,17 @@ ability_ability_runtime/
 
 ---
 
+## 配置共享（Share-Config）代码路径
+
+### 客户端实现
+
+| 模块 | 文件路径 | 说明 |
+|------|---------|------|
+| DataProxyHandle | `data_share/frameworks/ets/ani/src/cxx/dataproxy_handle_ani.cpp` | ArkTS 接口实现 |
+| NAPI 绑定 | `data_share/frameworks/js/napi/dataShare/src/napi_dataproxy_handle.cpp` | JS NAPI 绑定 |
+
+---
+
 **相关文档**：
 - [代码仓清单](../repositories.md) - 完整依赖仓列表（按需查阅）
+- [配置共享特性](share_config.md) - Share-Config 详细说明
