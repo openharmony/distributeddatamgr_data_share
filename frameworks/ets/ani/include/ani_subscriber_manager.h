@@ -159,7 +159,7 @@ public:
     explicit AniProxyDataSubscriberManager(std::weak_ptr<DataProxyHandle> dataProxyHandle)
         : dataProxyHandle_(dataProxyHandle){};
     std::vector<DataProxyResult> AddObservers(
-        rust::Box<DataShareCallback> &callback, const std::vector<std::string> &uris);
+        rust::Box<DataShareCallback> &callback, const std::vector<std::string> &uris, const DataProxyConfig &config);
     std::vector<DataProxyResult> DelObservers(
         rust::Box<DataShareCallback> &callback, const std::vector<std::string> &uris);
     std::vector<DataProxyResult> DelObservers(const std::vector<std::string> &uris);

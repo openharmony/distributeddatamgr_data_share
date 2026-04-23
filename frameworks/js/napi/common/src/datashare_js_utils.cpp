@@ -31,6 +31,9 @@
 
 namespace OHOS {
 namespace DataShare {
+
+static constexpr int32_t INVALID_MAX_VALUE_LENGTH = -1;
+
 std::string DataShareJSUtils::Convert2String(napi_env env, napi_value jsStr, const size_t max)
 {
     size_t str_buffer_size = max;
@@ -993,11 +996,13 @@ bool DataShareJSUtils::UnwrapDataProxyConfig(napi_env env, napi_value value, Dat
     }
     if (valueType != napi_number) {
         LOG_ERROR("Convert DataProxyType error, maxValueLength is not number:%{public}d", valueType);
+        config.maxValueLength_ = static_cast<DataProxyMaxValueLength>(INVALID_MAX_VALUE_LENGTH);
         return false;
     }
 
     if (Convert2Value(env, jsResult, config.maxValueLength_) != napi_ok) {
         LOG_ERROR("Convert MaxValueLength failed");
+        config.maxValueLength_ = static_cast<DataProxyMaxValueLength>(INVALID_MAX_VALUE_LENGTH);
         return false;
     }
     if (config.maxValueLength_ != DataProxyMaxValueLength::MAX_LENGTH_4K &&

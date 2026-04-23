@@ -17,6 +17,7 @@ use crate::datashare::{
     ani_proxy_data_get_value_i64, ani_proxy_data_get_value_f64, ani_proxy_data_get_value_boolean,
     ani_proxy_data_get_data, rust_create_proxy_data_change_info, data_proxy_change_info_push_i64,
     data_proxy_change_info_push_f64, data_proxy_change_info_push_bool, data_proxy_change_info_push_string,
+    data_share_data_proxy_config_get_max_value_length,
 };
 use crate::datashare_extension::*;
 use crate::predicates::ValueType;
@@ -426,6 +427,7 @@ pub mod ffi {
         type AniDataProxyGetResultSetParam;
         pub fn data_proxy_result_set_push(set: &mut AniDataProxyResultSetParam, uri: String, result: i32);
         pub fn data_share_data_proxy_config_get_type(config: &AniDataProxyConfig) -> i32;
+        pub fn data_share_data_proxy_config_get_max_value_length(config: &AniDataProxyConfig) -> i32;
         pub fn ani_proxy_data_get_uri(data: &AniProxyData) -> String;
         pub fn ani_proxy_data_get_enum_type(data: &AniProxyData) -> EnumType;
         pub fn ani_proxy_data_get_value_string(data: &AniProxyData) -> String;
@@ -728,7 +730,7 @@ pub mod ffi {
 
         fn ValidateUrisForDataProxy(uris: Vec<String>) -> i32;
 
-        fn ValidateDataShareNativePublishParameters(proxydata: Vec<AniProxyData>) -> i32;
+        fn ValidateDataShareNativePublishParameters(proxydata: Vec<AniProxyData>, config: &AniDataProxyConfig) -> i32;
 
         fn DataProxyHandleNativeCreate() -> I64ResultWrap;
 
@@ -737,18 +739,21 @@ pub mod ffi {
         fn DataShareNativeDataProxyHandleOnDataProxy(
             ptrWrap: PtrWrap,
             uris: Vec<String>,
+            config: &AniDataProxyConfig,
             set: &mut AniDataProxyResultSetParam,
         ) -> i32;
 
         fn DataShareNativeDataProxyHandleOffDataProxy(
             ptrWrap: PtrWrap,
             uris: Vec<String>,
+            config: &AniDataProxyConfig,
             set: &mut AniDataProxyResultSetParam,
         ) -> i32;
 
         fn DataShareNativeDataProxyHandleOffDataProxyNone(
             dataShareProxyHandlePtr: i64,
             uris: Vec<String>,
+            config: &AniDataProxyConfig,
             set: &mut AniDataProxyResultSetParam,
         ) -> i32;
 

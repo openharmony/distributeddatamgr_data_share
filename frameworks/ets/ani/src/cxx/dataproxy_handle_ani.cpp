@@ -22,6 +22,7 @@
 #include "datashare_log.h"
 #include "datashare_predicates.h"
 #include "datashare_result.h"
+#include "datashare_string_utils.h"
 #include "datashare_value_object.h"
 #include "datashare_values_bucket.h"
 #include "ikvstore_data_service.h"
@@ -81,20 +82,29 @@ void CleanupDataProxyHandle(int64_t dataProxyHandlePtr)
 }
 
 int DataShareNativeDataProxyHandleOnDataProxy(
-    PtrWrap ptrWrap, rust::Vec<rust::String> uris, AniDataProxyResultSetParam& param)
+    PtrWrap ptrWrap, rust::Vec<rust::String> uris, const AniDataProxyConfig& config, AniDataProxyResultSetParam& param)
 {
     auto proxyHandleHolder = reinterpret_cast<DataProxyHandleHolder *>(ptrWrap.dataShareHelperPtr);
     if (proxyHandleHolder == nullptr || proxyHandleHolder->dataProxyHandle_ == nullptr) {
         LOG_ERROR("DataShareNativeDataProxyHandleOnDataProxy failed, helper is nullptr.");
         return EXCEPTION_HELPER_CLOSED;
     }
+    int32_t type = data_share_data_proxy_config_get_type(config);
+    int32_t maxValueLength = data_share_data_proxy_config_get_max_value_length(config);
+    if (maxValueLength == INVALID_MAX_VALUE_LENGTH) {
+        LOG_ERROR("Invalid maxValueLength");
+        return EXCEPTION_PROXY_PARAMETER_CHECK;
+    }
+    DataProxyConfig proxyConfig;
+    proxyConfig.type_ = static_cast<DataProxyType>(type);
+    proxyConfig.maxValueLength_ = static_cast<DataProxyMaxValueLength>(maxValueLength);
     std::vector<DataProxyResult> results;
     auto curis = convert_rust_vec_to_cpp_vector(uris);
     if (proxyHandleHolder->jsProxyDataObsManager_ == nullptr) {
         LOG_ERROR("proxyHandleHolder->jsProxyDataObsManager_ is nullptr.");
         return E_OK;
     }
-    results = proxyHandleHolder->jsProxyDataObsManager_->AddObservers(ptrWrap.callback, curis);
+    results = proxyHandleHolder->jsProxyDataObsManager_->AddObservers(ptrWrap.callback, curis, proxyConfig);
 
     for (const auto &result : results) {
         data_proxy_result_set_push(param, rust::String(result.uri_), (int32_t)result.result_);
@@ -103,13 +113,22 @@ int DataShareNativeDataProxyHandleOnDataProxy(
 }
 
 int DataShareNativeDataProxyHandleOffDataProxy(PtrWrap ptrWrap, rust::Vec<rust::String> uris,
-    AniDataProxyResultSetParam& param)
+    const AniDataProxyConfig& config, AniDataProxyResultSetParam& param)
 {
     auto proxyHandleHolder = reinterpret_cast<DataProxyHandleHolder *>(ptrWrap.dataShareHelperPtr);
     if (proxyHandleHolder == nullptr || proxyHandleHolder->dataProxyHandle_ == nullptr) {
         LOG_ERROR("DataShareNativeDataProxyHandleOffDataProxy failed, helper is nullptr.");
         return EXCEPTION_HELPER_CLOSED;
     }
+    int32_t type = data_share_data_proxy_config_get_type(config);
+    int32_t maxValueLength = data_share_data_proxy_config_get_max_value_length(config);
+    if (maxValueLength == INVALID_MAX_VALUE_LENGTH) {
+        LOG_ERROR("Invalid maxValueLength");
+        return EXCEPTION_PROXY_PARAMETER_CHECK;
+    }
+    DataProxyConfig proxyConfig;
+    proxyConfig.type_ = static_cast<DataProxyType>(type);
+    proxyConfig.maxValueLength_ = static_cast<DataProxyMaxValueLength>(maxValueLength);
     auto curis = convert_rust_vec_to_cpp_vector(uris);
     std::vector<DataProxyResult> results;
     if (proxyHandleHolder->jsProxyDataObsManager_ == nullptr) {
@@ -124,13 +143,22 @@ int DataShareNativeDataProxyHandleOffDataProxy(PtrWrap ptrWrap, rust::Vec<rust::
 }
 
 int DataShareNativeDataProxyHandleOffDataProxyNone(int64_t dataShareProxyHandlePtr,
-    rust::Vec<rust::String> uris, AniDataProxyResultSetParam& param)
+    rust::Vec<rust::String> uris, const AniDataProxyConfig& config, AniDataProxyResultSetParam& param)
 {
     auto proxyHandleHolder = reinterpret_cast<DataProxyHandleHolder *>(dataShareProxyHandlePtr);
     if (proxyHandleHolder == nullptr || proxyHandleHolder->dataProxyHandle_ == nullptr) {
         LOG_ERROR("DataShareNativeDataProxyHandleOffDataProxyNone failed, helper is nullptr.");
         return EXCEPTION_HELPER_CLOSED;
     }
+    int32_t type = data_share_data_proxy_config_get_type(config);
+    int32_t maxValueLength = data_share_data_proxy_config_get_max_value_length(config);
+    if (maxValueLength == INVALID_MAX_VALUE_LENGTH) {
+        LOG_ERROR("Invalid maxValueLength");
+        return EXCEPTION_PROXY_PARAMETER_CHECK;
+    }
+    DataProxyConfig proxyConfig;
+    proxyConfig.type_ = static_cast<DataProxyType>(type);
+    proxyConfig.maxValueLength_ = static_cast<DataProxyMaxValueLength>(maxValueLength);
     auto curis = convert_rust_vec_to_cpp_vector(uris);
     std::vector<DataProxyResult> results;
     if (proxyHandleHolder->jsProxyDataObsManager_ == nullptr) {
@@ -184,7 +212,8 @@ std::vector<DataShareProxyData> ConvertProxyDataVec(const rust::Vec<AniProxyData
             }
         }
         if (dspd.allowList_.size() > ALLOW_LIST_MAX_COUNT) {
-            LOG_WARN("ProxyData's allowList is over limit, uri: %{public}s", dspd.uri_.c_str());
+            LOG_WARN("ProxyData's allowList is over limit, uri: %{public}s",
+                DataShareStringUtils::Anonymous(dspd.uri_).c_str());
             dspd.allowList_.resize(ALLOW_LIST_MAX_COUNT);
         }
         vec_proxyData.push_back(dspd);
@@ -196,9 +225,15 @@ int DataShareNativeDataProxyHandlePublish(int64_t dataShareProxyHandlePtr, rust:
     const AniDataProxyConfig& config, AniDataProxyResultSetParam& param)
 {
     std::vector<DataShareProxyData> vec_proxyData = ConvertProxyDataVec(proxydata);
-    DataProxyConfig proxyConfig;
     int32_t type = data_share_data_proxy_config_get_type(config);
+    int32_t maxValueLength = data_share_data_proxy_config_get_max_value_length(config);
+    if (maxValueLength == INVALID_MAX_VALUE_LENGTH) {
+        LOG_ERROR("Invalid maxValueLength");
+        return EXCEPTION_PROXY_PARAMETER_CHECK;
+    }
+    DataProxyConfig proxyConfig;
     proxyConfig.type_ = static_cast<DataProxyType>(type);
+    proxyConfig.maxValueLength_ = static_cast<DataProxyMaxValueLength>(maxValueLength);
     auto handlePtr = reinterpret_cast<DataProxyHandleHolder*>(dataShareProxyHandlePtr);
     if (handlePtr == nullptr || handlePtr->dataProxyHandle_ == nullptr) {
         LOG_ERROR("DataShareNativeDataProxyHandlePublish failed, dataShareProxyHandlePtr is nullptr.");
@@ -215,9 +250,15 @@ int DataShareNativeDataProxyHandleDelete(int64_t dataShareProxyHandlePtr, rust::
     const AniDataProxyConfig& config, AniDataProxyResultSetParam& param)
 {
     auto curis = convert_rust_vec_to_cpp_vector(uris);
-    DataProxyConfig proxyConfig;
     int32_t type = data_share_data_proxy_config_get_type(config);
-    proxyConfig.type_ = (DataProxyType)type;
+    int32_t maxValueLength = data_share_data_proxy_config_get_max_value_length(config);
+    if (maxValueLength == INVALID_MAX_VALUE_LENGTH) {
+        LOG_ERROR("Invalid maxValueLength");
+        return EXCEPTION_PROXY_PARAMETER_CHECK;
+    }
+    DataProxyConfig proxyConfig;
+    proxyConfig.type_ = static_cast<DataProxyType>(type);
+    proxyConfig.maxValueLength_ = static_cast<DataProxyMaxValueLength>(maxValueLength);
     auto handlePtr = reinterpret_cast<DataProxyHandleHolder*>(dataShareProxyHandlePtr);
     if (handlePtr == nullptr || handlePtr->dataProxyHandle_ == nullptr) {
         LOG_ERROR("DataShareNativeDataProxyHandleDelete failed, dataShareProxyHandlePtr is nullptr.");
@@ -233,6 +274,24 @@ int DataShareNativeDataProxyHandleDelete(int64_t dataShareProxyHandlePtr, rust::
 int DataShareNativeDataProxyHandleDeleteAll(int64_t dataShareProxyHandlePtr, const AniDataProxyConfig& config,
     AniDataProxyResultSetParam& param)
 {
+    int32_t type = data_share_data_proxy_config_get_type(config);
+    int32_t maxValueLength = data_share_data_proxy_config_get_max_value_length(config);
+    if (maxValueLength == INVALID_MAX_VALUE_LENGTH) {
+        LOG_ERROR("Invalid maxValueLength");
+        return EXCEPTION_PROXY_PARAMETER_CHECK;
+    }
+    DataProxyConfig proxyConfig;
+    proxyConfig.type_ = static_cast<DataProxyType>(type);
+    proxyConfig.maxValueLength_ = static_cast<DataProxyMaxValueLength>(maxValueLength);
+    auto handlePtr = reinterpret_cast<DataProxyHandleHolder*>(dataShareProxyHandlePtr);
+    if (handlePtr == nullptr || handlePtr->dataProxyHandle_ == nullptr) {
+        LOG_ERROR("DataShareNativeDataProxyHandleDeleteAll failed, dataShareProxyHandlePtr is nullptr.");
+        return EXCEPTION_INNER;
+    }
+    auto results = handlePtr->dataProxyHandle_->DeleteProxyData(proxyConfig);
+    for (const auto &result : results) {
+        data_proxy_result_set_push(param, rust::String(result.uri_), (int32_t)result.result_);
+    }
     return E_OK;
 }
 
@@ -245,9 +304,15 @@ int DataShareNativeDataProxyHandleGet(int64_t dataShareProxyHandlePtr, rust::Vec
         return EXCEPTION_INNER;
     }
     auto curis = convert_rust_vec_to_cpp_vector(uris);
-    DataProxyConfig proxyConfig;
     int32_t type = data_share_data_proxy_config_get_type(config);
-    proxyConfig.type_ = (DataProxyType)type;
+    int32_t maxValueLength = data_share_data_proxy_config_get_max_value_length(config);
+    if (maxValueLength == INVALID_MAX_VALUE_LENGTH) {
+        LOG_ERROR("Invalid maxValueLength");
+        return EXCEPTION_PROXY_PARAMETER_CHECK;
+    }
+    DataProxyConfig proxyConfig;
+    proxyConfig.type_ = static_cast<DataProxyType>(type);
+    proxyConfig.maxValueLength_ = static_cast<DataProxyMaxValueLength>(maxValueLength);
     auto results = handlePtr->dataProxyHandle_->GetProxyData(curis, proxyConfig);
     for (const auto &result : results) {
         if (std::holds_alternative<int64_t>(result.value_)) {

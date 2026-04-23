@@ -22,6 +22,7 @@
 #include "datashare_log.h"
 #include "datashare_predicates.h"
 #include "datashare_result.h"
+#include "datashare_string_utils.h"
 #include "datashare_value_object.h"
 #include "datashare_values_bucket.h"
 #include "ikvstore_data_service.h"
@@ -1935,15 +1936,24 @@ int ValidateUrisForDataProxy(rust::Vec<rust::String> uris)
     auto curis = convert_rust_vec_to_cpp_vector(uris);
     for (const auto &uri : curis) {
         if (uri.size() > URI_MAX_SIZE) {
-            LOG_ERROR("the size of uri %{public}s is over limit", uri.c_str());
+            LOG_ERROR("the size of uri %{public}s is over limit", DataShareStringUtils::Anonymous(uri).c_str());
             return EXCEPTION_PROXY_PARAMETER_CHECK;
         }
     }
     return E_OK;
 }
 
-int ValidateDataShareNativePublishParameters(rust::Vec<AniProxyData> proxydata)
+int ValidateDataShareNativePublishParameters(rust::Vec<AniProxyData> proxydata, const AniDataProxyConfig& config)
 {
+    int32_t type = data_share_data_proxy_config_get_type(config);
+    int32_t maxValueLength = data_share_data_proxy_config_get_max_value_length(config);
+    if (maxValueLength == INVALID_MAX_VALUE_LENGTH) {
+        LOG_ERROR("Invalid maxValueLength");
+        return EXCEPTION_PROXY_PARAMETER_CHECK;
+    }
+    DataProxyConfig proxyConfig;
+    proxyConfig.type_ = static_cast<DataProxyType>(type);
+    proxyConfig.maxValueLength_ = static_cast<DataProxyMaxValueLength>(maxValueLength);
     std::vector<DataShareProxyData> vec_proxyData;
     for (const auto &item : proxydata) {
         EnumType type = ani_proxy_data_get_enum_type(item);
@@ -1951,13 +1961,14 @@ int ValidateDataShareNativePublishParameters(rust::Vec<AniProxyData> proxydata)
         dspd.uri_ = std::string(ani_proxy_data_get_uri(item));
         if (type == EnumType::StringType) {
             std::string valStr = std::string(ani_proxy_data_get_value_string(item));
-            if (valStr.size() > VALUE_MAX_SIZE) {
-                LOG_ERROR("ProxyData's value is over limit, uri: %{public}s", dspd.uri_.c_str());
+            if (valStr.size() > static_cast<size_t>(maxValueLength)) {
+                LOG_ERROR("ProxyData's value: %{public}zu is over limit, uri: %{public}s",
+                    valStr.size(), DataShareStringUtils::Anonymous(dspd.uri_).c_str());
                 return EXCEPTION_PROXY_PARAMETER_CHECK;
             }
         }
         if (dspd.uri_.size() > URI_MAX_SIZE) {
-            LOG_ERROR("the size of uri %{public}s is over limit", dspd.uri_.c_str());
+            LOG_ERROR("the size of uri %{public}s is over limit", DataShareStringUtils::Anonymous(dspd.uri_).c_str());
             return EXCEPTION_PROXY_PARAMETER_CHECK;
         }
         vec_proxyData.push_back(dspd);

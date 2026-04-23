@@ -174,6 +174,9 @@ napi_value NapiDataProxyHandle::Napi_Publish(napi_env env, napi_callback_info in
         NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
             context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
         DataShareJSUtils::UnwrapDataProxyConfig(env, argv[1], context->config);
+        NAPI_ASSERT_CALL_ERRCODE(env, context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_4K ||
+            context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_100K,
+            context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
         NAPI_ASSERT_CALL_ERRCODE(env, CheckIsParameterExceed(context->proxyDatas, context->config), context->error =
             std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
         return napi_ok;
@@ -397,7 +400,9 @@ napi_value NapiDataProxyHandle::Napi_SubscribeProxyData(napi_env env, size_t arg
         error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), error, jsResults);
     DataProxyConfig config;
     DataShareJSUtils::UnwrapDataProxyConfig(env, argv[PARAM2], config);
-
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_4K ||
+        config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_100K,
+        error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), error, jsResults);
     NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
         error = std::make_shared<ParametersTypeError>("callback", "function"), error, jsResults);
@@ -436,6 +441,9 @@ napi_value NapiDataProxyHandle::Napi_UnSubscribeProxyData(napi_env env, size_t a
         error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), error, jsResults);
     DataProxyConfig config;
     DataShareJSUtils::UnwrapDataProxyConfig(env, argv[PARAM2], config);
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_4K ||
+        config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_100K,
+        error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), error, jsResults);
     if (proxy->jsProxyDataObsManager_ == nullptr) {
         LOG_ERROR("proxy->jsManager_ is nullptr");
         return jsResults;
