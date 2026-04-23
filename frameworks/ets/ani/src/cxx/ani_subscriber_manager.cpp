@@ -323,7 +323,7 @@ void AniPublishedSubscriberManager::Emit(const std::vector<Key> &keys, const std
 }
 
 std::vector<DataProxyResult> AniProxyDataSubscriberManager::AddObservers(
-    rust::Box<DataShareCallback> &callback, const std::vector<std::string> &uris)
+    rust::Box<DataShareCallback> &callback, const std::vector<std::string> &uris, const DataProxyConfig &config)
 {
     std::vector<DataProxyResult> result = {};
     auto dataProxyHandle = dataProxyHandle_.lock();
@@ -338,7 +338,7 @@ std::vector<DataProxyResult> AniProxyDataSubscriberManager::AddObservers(
     });
     return AniBaseCallbacks::AddObservers(
         keys, std::make_shared<Observer>(std::move(callback)),
-        [&dataProxyHandle, this](const std::vector<Key> &firstAddKeys,
+        [&dataProxyHandle, config, this](const std::vector<Key> &firstAddKeys,
             const std::shared_ptr<Observer> observer, std::vector<DataProxyResult> &opResult) {
             std::vector<std::string> firstAddUris;
             std::for_each(firstAddKeys.begin(), firstAddKeys.end(), [&firstAddUris](auto &result) {
@@ -347,7 +347,6 @@ std::vector<DataProxyResult> AniProxyDataSubscriberManager::AddObservers(
             if (firstAddUris.empty()) {
                 return;
             }
-            DataProxyConfig config;
             auto subResults = dataProxyHandle->SubscribeProxyData(firstAddUris, config,
                 [this](const std::vector<DataShare::DataProxyChangeInfo> &changeInfo) {
                     Emit(changeInfo);
@@ -363,7 +362,7 @@ std::vector<DataProxyResult> AniProxyDataSubscriberManager::AddObservers(
             if (failedKeys.size() > 0) {
                 AniBaseCallbacks::DelObservers(failedKeys, observer);
             }
-        });
+        }, config);
 }
 
 std::vector<DataProxyResult> AniProxyDataSubscriberManager::DelObservers(

@@ -87,6 +87,7 @@
               "uri": "datashare://com.example.myapplication",
               "visible": true
             }
-        ] 
+        ],
+        "crossAppSharedConfig": "$profile:shareConfig"
     }
 }

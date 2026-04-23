@@ -18,6 +18,7 @@ import DataSharePredicatesKVErrCodeEtsTest from './dataSharePredicatesKVErrCode.
 import DataSharePredicatesRDBEtsTest from './dataSharePredicatesRDB.test.ets';
 import DataSharePredicatesRDBErrCodeEtsTest from './dataSharePredicatesRDBErrCode.test.ets';
 import DataShareSubscribeTest from './dataShareSubscribe.test.ets';
+import DataShareConfigEtsTest from './dataShareConfigEts.test.ets';
 
 export default function testsuite() {
   DataSharePredicatesKVEtsTest();
@@ -25,4 +26,5 @@ export default function testsuite() {
   DataSharePredicatesRDBEtsTest();
   DataSharePredicatesRDBErrCodeEtsTest();
   DataShareSubscribeTest();
+  DataShareConfigEtsTest();
 }

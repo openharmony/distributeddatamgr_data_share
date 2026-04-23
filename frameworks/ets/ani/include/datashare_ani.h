@@ -64,6 +64,7 @@ const int EXCEPTION_URI_NOT_EXIST = 15700011;
 const int EXCEPTION_DATA_AREA_NOT_EXIST = 15700012;
 const int EXCEPTION_HELPER_CLOSED = 15700013;
 const int EXCEPTION_PROXY_PARAMETER_CHECK = 15700014;
+const int INVALID_MAX_VALUE_LENGTH = -1;
 class SharedPtrHolder {
 public:
     SharedPtrHolder(const std::shared_ptr<DataShareHelper> &datashareHelper) : datashareHelper_(datashareHelper)
@@ -249,20 +250,20 @@ void DataShareNativeExtensionCallbackBatchUpdate(double errorCode, rust::String 
 
 int ValidateUrisForDataProxy(rust::Vec<rust::String> uris);
 
-int ValidateDataShareNativePublishParameters(rust::Vec<AniProxyData> proxydata);
+int ValidateDataShareNativePublishParameters(rust::Vec<AniProxyData> proxydata, const AniDataProxyConfig& config);
 
 I64ResultWrap DataProxyHandleNativeCreate();
 
 void CleanupDataProxyHandle(int64_t dataProxyHandlePtr);
 
 int DataShareNativeDataProxyHandleOnDataProxy(
-    PtrWrap ptrWrap, rust::Vec<rust::String> uris, AniDataProxyResultSetParam& param);
+    PtrWrap ptrWrap, rust::Vec<rust::String> uris, const AniDataProxyConfig& config, AniDataProxyResultSetParam& param);
 
 int DataShareNativeDataProxyHandleOffDataProxy(
-    PtrWrap ptrWrap, rust::Vec<rust::String> uris, AniDataProxyResultSetParam& param);
+    PtrWrap ptrWrap, rust::Vec<rust::String> uris, const AniDataProxyConfig& config, AniDataProxyResultSetParam& param);
 
-int DataShareNativeDataProxyHandleOffDataProxyNone(
-    int64_t dataShareProxyHandlePtr, rust::Vec<rust::String> uris, AniDataProxyResultSetParam& param);
+int DataShareNativeDataProxyHandleOffDataProxyNone(int64_t dataShareProxyHandlePtr, rust::Vec<rust::String> uris,
+    const AniDataProxyConfig& config, AniDataProxyResultSetParam& param);
 
 int DataShareNativeDataProxyHandlePublish(int64_t dataShareProxyHandlePtr, rust::Vec<AniProxyData> proxydata,
     const AniDataProxyConfig& config, AniDataProxyResultSetParam& param);

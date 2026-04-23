@@ -1099,20 +1099,59 @@ impl AniDataProxyType {
     }
 }
 
+#[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.DataProxyMaxValueLength")]
+#[derive(Debug)]
+pub enum AniDataProxyMaxValueLength {
+    MAX_LENGTH_4K = 4096,
+    MAX_LENGTH_100K = 102400,
+}
+
+impl AniDataProxyMaxValueLength {
+    /// 将 `i32` 转换为 `AniDataProxyMaxValueLength`。
+    pub fn from_i32(value: i32) -> Self {
+        match value {
+            4096 => Self::MAX_LENGTH_4K,
+            102400 => Self::MAX_LENGTH_100K,
+            _ => Self::MAX_LENGTH_4K,
+        }
+    }
+
+    /// 将 `AniDataProxyMaxValueLength` 转换为 `i32`。
+    pub fn as_i32(&self) -> i32 {
+        match self {
+            Self::MAX_LENGTH_4K => 4096,
+            Self::MAX_LENGTH_100K => 102400,
+            _ => -1,  // 异常值返回 -1
+        }
+    }
+}
+
 #[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.DataProxyConfigInner")]
 #[derive(Debug)]
 pub struct AniDataProxyConfig {
     type_: AniDataProxyType,
+    maxValueLength_: Option<AniDataProxyMaxValueLength>,
 }
 
 impl AniDataProxyConfig {
-    pub fn new(type_: AniDataProxyType) -> Self {
-        Self { type_ }
+    pub fn new(type_: AniDataProxyType, maxValueLength_: Option<AniDataProxyMaxValueLength>) -> Self {
+        Self {
+            type_,
+            maxValueLength_: Some(maxValueLength_.unwrap_or(AniDataProxyMaxValueLength::MAX_LENGTH_4K)),
+        }
     }
 }
 
 pub fn data_share_data_proxy_config_get_type(config: &AniDataProxyConfig) -> i32 {
     config.type_.as_i32()
+}
+
+pub fn data_share_data_proxy_config_get_max_value_length(config: &AniDataProxyConfig) -> i32 {
+    if let Some(max_length) = &config.maxValueLength_ {
+        max_length.as_i32()
+    } else {
+        4096  // 用户没传，返回默认值
+    }
 }
 
 #[ani_rs::native]
@@ -1143,10 +1182,11 @@ pub fn native_on_data_proxy_handle_data_change<'local>(
     env: &AniEnv<'local>,
     datashare_proxy: AniObject<'local>,
     uris: Vec<String>,
-    config: AniDataProxyConfig,
+    config: AniObject<'local>,
     callback: AniFnObject<'local>,
 ) -> Result<AniRef<'local>, BusinessError> {
     let datashare_data_proxy_handle = get_native_ptr(&env, &datashare_proxy);
+    let config_inner: AniDataProxyConfig = env.deserialize(config)?;
     let callback_global = callback.into_global_callback(&env)?;
     let datashare_callback = DataShareCallback::new(CallbackFlavor::ProxyDataChange(callback_global));
     let ptr_wrap = PtrWrap::new(datashare_data_proxy_handle, Box::new(datashare_callback));
@@ -1154,6 +1194,7 @@ pub fn native_on_data_proxy_handle_data_change<'local>(
     let err_code = wrapper::ffi::DataShareNativeDataProxyHandleOnDataProxy(
         ptr_wrap,
         uris,
+        &config_inner,
         &mut set_param,
     );
     if err_code != 0 {
@@ -1179,6 +1220,7 @@ pub fn native_off_data_proxy_handle_data_change<'local>(
         err_code = wrapper::ffi::DataShareNativeDataProxyHandleOffDataProxyNone(
             datashare_data_proxy_handle,
             uris,
+            &config_inner,
             &mut set_param,
         );
     } else {
@@ -1188,6 +1230,7 @@ pub fn native_off_data_proxy_handle_data_change<'local>(
         err_code = wrapper::ffi::DataShareNativeDataProxyHandleOffDataProxy(
             ptr_wrap,
             uris,
+            &config_inner,
             &mut set_param,
         );
     };
@@ -1215,10 +1258,11 @@ pub fn check_uris<'local>(
 pub fn publish_check_uris<'local>(
     env: &AniEnv<'local>,
     proxydata: AniObject<'local>,
+    config: AniObject<'local>,
 ) -> Result<i32, BusinessError> {
     let vec_proxydata: Vec<AniProxyData> = env.deserialize(proxydata)?;
-
-    let err_code = wrapper::ffi::ValidateDataShareNativePublishParameters(vec_proxydata);
+    let config_inner: AniDataProxyConfig = env.deserialize(config)?;
+    let err_code = wrapper::ffi::ValidateDataShareNativePublishParameters(vec_proxydata, &config_inner);
     if err_code != 0 {
         return Err(convert_to_business_error(err_code));
     }

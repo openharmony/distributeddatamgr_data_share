@@ -279,7 +279,7 @@ std::vector<DataProxyResult> NapiProxyDataSubscriberManager::AddObservers(napi_e
     proxyDataObserver->RegisterEnvCleanHook();
     return BaseCallbacks::AddObservers(
         keys, proxyDataObserver,
-        [&dataProxyHandle, &config, this](const std::vector<Key> &firstAddKeys,
+        [&dataProxyHandle, config, this](const std::vector<Key> &firstAddKeys,
             const std::shared_ptr<Observer> observer, std::vector<DataProxyResult> &opResult) {
             std::vector<std::string> firstAddUris;
             std::for_each(firstAddKeys.begin(), firstAddKeys.end(), [&firstAddUris](auto &result) {
@@ -303,7 +303,7 @@ std::vector<DataProxyResult> NapiProxyDataSubscriberManager::AddObservers(napi_e
             if (failedKeys.size() > 0) {
                 BaseCallbacks::DelObservers(failedKeys, observer);
             }
-        });
+        }, config);
 }
 
 std::vector<DataProxyResult> NapiProxyDataSubscriberManager::DelObservers(napi_env env, napi_value callback,
