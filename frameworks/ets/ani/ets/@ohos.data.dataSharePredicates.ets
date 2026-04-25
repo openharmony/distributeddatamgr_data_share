@@ -25,8 +25,8 @@ class Cleaner {
   native native_clean(): void
 }
 
-let destroyRegister = new FinalizationRegistry<Cleaner>((cleaner: Cleaner) => {cleaner.native_clean()})
-let unregisterToken = new object()
+let destroyRegister: FinalizationRegistry<Cleaner> = new FinalizationRegistry<Cleaner>((cleaner: Cleaner) => {cleaner.native_clean()})
+let unregisterToken: Object = new object()
 
 export native function native_create(): long
 export class DataSharePredicates {

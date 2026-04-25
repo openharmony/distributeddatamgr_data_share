@@ -31,8 +31,8 @@ export namespace dataShare {
     native native_clean(): void
   }
 
-  let destroyRegister = new FinalizationRegistry<Cleaner>((cleaner: Cleaner) => {cleaner.native_clean()})
-  let unregisterToken = new object()
+  let destroyRegister: FinalizationRegistry<Cleaner> = new FinalizationRegistry<Cleaner>((cleaner: Cleaner) => {cleaner.native_clean()})
+  let unregisterToken: Object = new object()
 
   export interface DataShareHelperOptions {
     isProxy?: boolean;
@@ -762,9 +762,9 @@ export namespace dataShare {
     native native_proxy_handle_clean(): void
   }
 
-  let destroyRegisterDataProxy = new FinalizationRegistry<DataProxyHandleCleaner>((
+  let destroyRegisterDataProxy: FinalizationRegistry<DataProxyHandleCleaner> = new FinalizationRegistry<DataProxyHandleCleaner>((
     cleaner: DataProxyHandleCleaner) => {cleaner.native_proxy_handle_clean()})
-  let unregisterTokenDataProxy = new object()
+  let unregisterTokenDataProxy: Object = new object()
 
   export interface DataProxyHandle {
     onDataChange(
