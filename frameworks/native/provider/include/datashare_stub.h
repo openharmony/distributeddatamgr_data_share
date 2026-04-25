@@ -83,6 +83,17 @@ private:
     // default return true, need override by users
     virtual int NotifyChangeExtProvider(const ChangeInfo &changeInfo) override;
 
+    /**
+     * @brief Report OpenFile/OpenRawFile usage via HiSysEvent.
+     *
+     * Records the provider's bundleName, caller's token ID, and open mode
+     * to HiSysEvent for instrumentation. Does not block or validate permissions.
+     *
+     * @param funcName Calling function name (e.g. __func__ gives "OpenFileInner").
+     * @param mode Open mode string (e.g. "r", "w", "rw").
+     */
+    void ReportOpenFileUsage(const std::string &funcName, const std::string &mode);
+
     using RequestFuncType = int (DataShareStub::*)(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, RequestFuncType> stubFuncMap_;
     static constexpr int VALUEBUCKET_MAX_COUNT = 3000;
