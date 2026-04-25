@@ -38,7 +38,7 @@ class DataShareBlockWriterImpl;
 class DataShareResultSet : public DataShareAbsResultSet, public DataShareSharedResultSet {
 public:
     DataShareResultSet();
-    explicit DataShareResultSet(std::shared_ptr<ResultSetBridge> &bridge);
+    explicit DataShareResultSet(std::shared_ptr<ResultSetBridge> &bridge, size_t blockSize = DEFAULT_SHARE_BLOCK_SIZE);
     virtual ~DataShareResultSet();
 
     /**
@@ -179,7 +179,9 @@ protected:
     bool Marshalling(MessageParcel &parcel);
 
 private:
-    static int blockId_;
+    static const size_t DEFAULT_SHARE_BLOCK_SIZE = 2 * 1024 * 1024;
+    static const size_t MAX_SHARE_BLOCK_SIZE = 5 * 1024 * 1024;
+    static std::atomic<int32_t> blockId_;
     // The actual position of the first row of data in the shareblock
     int startRowPos_ = -1;
     // The actual position of the last row of data in the shareblock
