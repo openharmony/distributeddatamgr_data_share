@@ -23,12 +23,15 @@
 #include "data_ability_observer_interface.h"
 #include "datashare_itypes_utils.h"
 #include "datashare_log.h"
+#include "hiview_datashare.h"
 #include "ipc_skeleton.h"
 #include "ipc_types.h"
 #include "ishared_result_set.h"
 #include "datashare_operation_statement.h"
 #include "unistd.h"
 #include "string_ex.h"
+#include "bundle_mgr_helper.h"
+#include "datashare_errno.h"
 
 using namespace OHOS::DistributedShare::DataShare;
 namespace OHOS {
@@ -139,6 +142,31 @@ bool DataShareStub::VerifyPermissionAndUri(std::string uri, uint32_t tokenId)
     return false;
 }
 
+void DataShareStub::ReportOpenFileUsage(const std::string &funcName, const std::string &mode)
+{
+    static std::string providerBundleName = []() {
+        auto bmsHelper = DelayedSingleton<AppExecFwk::BundleMgrHelper>::GetInstance();
+        if (bmsHelper != nullptr) {
+            AppExecFwk::BundleInfo bundleInfo;
+            int32_t ret = bmsHelper->GetBundleInfoForSelf(
+                static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION) |
+                static_cast<int32_t>(AppExecFwk::GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO), bundleInfo);
+            if (ret == E_OK) {
+                return bundleInfo.applicationInfo.bundleName;
+            }
+        }
+        return std::string();
+    }();
+
+    uint32_t callingTokenId = IPCSkeleton::GetCallingTokenID();
+    DataShareFaultInfo faultInfo{
+        HiViewFaultAdapter::OPEN_FILE_USED,
+        providerBundleName, "", "", funcName, 0,
+        "mode=" + mode + ",callingTokenId=" + std::to_string(callingTokenId)
+    };
+    HiViewFaultAdapter::ReportDataFault(faultInfo);
+}
+
 ErrCode DataShareStub::CmdGetFileTypes(MessageParcel &data, MessageParcel &reply)
 {
     Uri uri("");
@@ -172,6 +200,9 @@ ErrCode DataShareStub::OpenFileInner(MessageParcel &data, MessageParcel &reply, 
         return ERR_INVALID_VALUE;
     }
     fd = OpenFile(uri, mode);
+
+    ReportOpenFileUsage(__func__, mode);
+
     return E_OK;
 }
 
@@ -224,6 +255,9 @@ ErrCode DataShareStub::CmdOpenRawFile(MessageParcel &data, MessageParcel &reply)
         return ERR_INVALID_VALUE;
     }
     int fd = OpenRawFile(uri, mode);
+
+    ReportOpenFileUsage(__func__, mode);
+
     if (!ITypesUtil::Marshal(reply, fd)) {
         LOG_ERROR("Marshal value is nullptr");
         return ERR_INVALID_VALUE;
