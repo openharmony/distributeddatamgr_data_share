@@ -369,6 +369,8 @@ macro_rules! common_impl {
                 "@Uint8Array" => Some(TypedArray::Uint8),
                 "@Uint16Array" => Some(TypedArray::Uint16),
                 "@Uint32Array" => Some(TypedArray::Uint32),
+                "@Float32Array" => Some(TypedArray::Float32),
+                "@Float64Array" => Some(TypedArray::Float64),
                 _ => None,
             };
             let mut ser = AniSer::new(&self.env)?;
