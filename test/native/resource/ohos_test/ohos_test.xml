@@ -16,8 +16,8 @@
 <configuration ver="2.0">
     <target name="NativeDataShareTest">
         <preparer>
-            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
+            <option name="push" value="datashare_ext_bundle/datashare_ext_native.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext_native.hap"/>
         </preparer>
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
@@ -25,10 +25,10 @@
     </target>
     <target name="PermissionTest">
         <preparer>
-            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="push" value="datashareproxy_bundle/proxydatas_with_permission.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/proxydatas_with_permission.hap"/>
+            <option name="push" value="datashare_ext_bundle/datashare_ext_native.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="push" value="datashareproxy_bundle/proxydatas_with_permission_native.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext_native.hap"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/proxydatas_with_permission_native.hap"/>
         </preparer>
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
@@ -37,8 +37,8 @@
     </target>
     <target name="ProxyDatasTest">
         <preparer>
-            <option name="push" value="datashareproxy_bundle/proxydatas_with_permission.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/proxydatas_with_permission.hap"/>
+            <option name="push" value="datashareproxy_bundle/proxydatas_with_permission_native.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/proxydatas_with_permission_native.hap"/>
             <option name="shell" value="aa start -b com.acts.ohos.data.datasharetest -a MainAbility"/>
         </preparer>
         <cleaner>
@@ -47,8 +47,8 @@
     </target>
     <target name="SlientAccessTest">
         <preparer>
-            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
+            <option name="push" value="datashare_ext_bundle/datashare_ext_native.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext_native.hap"/>
         </preparer>
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
@@ -56,8 +56,8 @@
     </target>
     <target name="SlientTimeoutTest">
         <preparer>
-            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
+            <option name="push" value="datashare_ext_bundle/datashare_ext_native.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext_native.hap"/>
         </preparer>
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
@@ -65,8 +65,8 @@
     </target>
     <target name="SlientSwitchTest">
         <preparer>
-            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
+            <option name="push" value="datashare_ext_bundle/datashare_ext_native.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext_native.hap"/>
         </preparer>
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
@@ -74,8 +74,8 @@
     </target>
     <target name="JoinTest">
         <preparer>
-            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
+            <option name="push" value="datashare_ext_bundle/datashare_ext_native.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext_native.hap"/>
         </preparer>
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
@@ -83,8 +83,8 @@
     </target>
     <target name="ErrorCodeTest">
         <preparer>
-            <option name="push" value="errorcode_ext_bundle/errorcode_ext.hap -> /data/test/resource/datashare/errortest" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/errortest/errorcode_ext.hap"/>
+            <option name="push" value="errorcode_ext_bundle/errorcode_ext_native.hap -> /data/test/resource/datashare/errortest" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/errortest/errorcode_ext_native.hap"/>
         </preparer>
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.errorcodetest"/>
@@ -92,8 +92,8 @@
     </target>
     <target name="ConcurrentTest">
         <preparer>
-            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
+            <option name="push" value="datashare_ext_bundle/datashare_ext_native.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext_native.hap"/>
         </preparer>
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
@@ -101,8 +101,8 @@
     </target>
     <target name="DataShareAccessThresholdTest">
         <preparer>
-            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
+            <option name="push" value="datashare_ext_bundle/datashare_ext_native.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext_native.hap"/>
         </preparer>
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
@@ -110,8 +110,8 @@
     </target>
     <target name="DataShareProxyTest">
         <preparer>
-            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
+            <option name="push" value="datashare_ext_bundle/datashare_ext_native.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext_native.hap"/>
         </preparer>
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
@@ -119,8 +119,8 @@
     </target>
     <target name="DataShareHelperTest">
         <preparer>
-            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
+            <option name="push" value="datashare_ext_bundle/datashare_ext_native.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext_native.hap"/>
         </preparer>
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
@@ -128,8 +128,8 @@
     </target>
     <target name="DataShareHelperImplRegisterTest">
         <preparer>
-            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
+            <option name="push" value="datashare_ext_bundle/datashare_ext_native.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext_native.hap"/>
         </preparer>
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
@@ -137,8 +137,8 @@
     </target>
     <target name="DataShareResultSetTest">
         <preparer>
-            <option name="push" value="datashare_ext_bundle/datashare_ext.hap -> /data/test/resource/datashare" src="res"/>
-            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext.hap"/>
+            <option name="push" value="datashare_ext_bundle/datashare_ext_native.hap -> /data/test/resource/datashare" src="res"/>
+            <option name="shell" value="bm install -r -p /data/test/resource/datashare/datashare_ext_native.hap"/>
         </preparer>
         <cleaner>
             <option name="shell" value="bm uninstall -n com.acts.datasharetest"/>
