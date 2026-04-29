@@ -262,5 +262,32 @@ HWTEST_F(DataShareNormalDfxTest, NormalApp_Active_Insert_Test001, TestSize.Level
     EXPECT_EQ((retVal > 0), true);
     LOG_INFO("NormalApp_Active_Insert_Test001::End");
 }
+
+/**
+ * @tc.name: NormalApp_Openfile_Test001
+ * @tc.desc: Verify OpenFile operation returns error when caller is normal app.
+ *     OpenFile is only supported in non-silent access mode, where the provider
+ *     must implement the OpenFile method. The default implementation returns
+ *     a negative error code.
+ * @tc.type: FUNC
+ * @tc.require: issues1113
+ * @tc.precon: Test process is set to be equivalent to a normal app and
+ *     DataShareHelper instance g_exHelper is created in SetUpTestCase
+ * @tc.step:
+ *     1. Create a Uri object with DATA_SHARE_URI
+ *     2. Call OpenFile method of g_exHelper with mode "rw"
+ * @tc.expect:
+ *     1. OpenFile returns a negative value, indicating the default
+ *        implementation is invoked and no custom OpenFile is provided
+ */
+HWTEST_F(DataShareNormalDfxTest, NormalApp_Openfile_Test001, TestSize.Level0)
+{
+    LOG_INFO("NormalApp_Openfile_Test001::Start");
+    Uri uri(DATA_SHARE_URI);
+
+    int retVal = g_exHelper->OpenFile(uri, "rw");
+    EXPECT_EQ((retVal < 0), true);
+    LOG_INFO("NormalApp_Openfile_Test001::End");
+}
 }
 }
