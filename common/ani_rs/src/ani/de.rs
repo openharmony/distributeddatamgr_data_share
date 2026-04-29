@@ -283,6 +283,8 @@ impl<'local> EnumDe<'local> {
                     "Uint8Array" => signature::UINT8_ARRAY,
                     "Uint16Array" => signature::UINT16_ARRAY,
                     "Uint32Array" => signature::UINT32_ARRAY,
+                    "Float32Array" => signature::FLOAT32_ARRAY,
+                    "Float64Array" => signature::FLOAT64_ARRAY,
                     _ => variant_cstring.as_c_str(),
                 };
                 
@@ -545,6 +547,8 @@ macro_rules! impl_de {
                     "@Uint8Array" => Some(TypedArray::Uint8),
                     "@Uint16Array" => Some(TypedArray::Uint16),
                     "@Uint32Array" => Some(TypedArray::Uint32),
+                    "@Float32Array" => Some(TypedArray::Float32),
+                    "@Float64Array" => Some(TypedArray::Float64),
                     _ => None,
                 };
                 if name == "@AniRef" {
