@@ -13,33 +13,19 @@
 
 import("//build/ohos.gni")
 
-ohos_hap("errorcode_ext") {
-  hap_profile = "entry/src/main/module.json"
-  hap_name = "errorcode_ext"
+ohos_app("errorcode_ext_native") {
+  certificate_profile = "signature/openharmony_sx.p7b"
+  hap_name = "errorcode_ext_native"
+  hap_out_dir = "$root_out_dir/tests/unittest/data_share/resource/errorcode_ext_bundle"
+  
   subsystem_name = "distributeddatamgr"
   part_name = "data_share"
-  final_hap_path = "$root_out_dir/tests/unittest/data_share/resource/errorcode_ext_bundle/${hap_name}.hap"
-  testonly = true
-  deps = [
-    ":datashare_ext_ets_assets",
-    ":datashare_ext_ets_resources",
-  ]
-  certificate_profile = "signature/openharmony_sx.p7b"
-}
 
-ohos_js_assets("datashare_ext_ets_assets") {
-  ets2abc = true
-  source_dir = "entry/src/main/ets"
-  hap_profile = "entry/src/main/module.json"
-}
-
-ohos_app_scope("datashare_ext_app_profile") {
-  app_profile = "AppScope/app.json"
-  sources = [ "AppScope/resources" ]
-}
-
-ohos_resources("datashare_ext_ets_resources") {
-  sources = [ "entry/src/main/resources" ]
-  deps = [ ":datashare_ext_app_profile" ]
-  hap_profile = "entry/src/main/module.json"
+  js_build_mode = "release"
+  sdk_home = "//prebuilts/ohos-sdk/linux"
+  sdk_type_name = [ "sdk.dir" ]
+  assemble_type = "assembleHap"
+  build_level = "module"
+  build_modules = [ "entry" ]
+  module_libs_dir = "entry"
 }
