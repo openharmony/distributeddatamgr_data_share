@@ -1,28 +1,16 @@
 {
   "string": [
     {
-      "name": "entry_desc",
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
       "value": "description"
     },
     {
-      "name": "MainAbility_desc",
-      "value": "description"
-    },
-    {
-      "name": "MainAbility_label",
-      "value": "DataShareTest"
-    },
-    {
-      "name": "description_application",
-      "value": "DataShareTest"
-    },
-    {
-      "name": "app_name",
-      "value": "DataShareTest"
-    },
-    {
-      "name": "description_datashareextability",
-      "value": "description_datashareextability"
+      "name": "EntryAbility_label",
+      "value": "label"
     }
   ]
 }
