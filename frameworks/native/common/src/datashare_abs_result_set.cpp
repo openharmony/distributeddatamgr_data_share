@@ -91,7 +91,7 @@ int DataShareAbsResultSet::GoTo(int offset)
 {
     int ret = GoToRow(rowPos_ + offset);
     if (ret != E_OK) {
-        LOG_WARN("return GoTo ret is wrong!");
+        LOG_WARN("return GoTo ret %{public}d is wrong!", ret);
     }
     return ret;
 }
@@ -106,13 +106,13 @@ int DataShareAbsResultSet::GoToLastRow()
     int rowCnt = 0;
     int ret = GetRowCount(rowCnt);
     if (ret != E_OK) {
-        LOG_WARN("return GoToLastRow.GetRowCount ret is wrong!");
+        LOG_WARN("return GoToLastRow.GetRowCount ret %{public}d is wrong!", ret);
         return ret;
     }
 
     ret = GoToRow(rowCnt - 1);
     if (ret != E_OK) {
-        LOG_WARN("return GoToLastRow.GoToRow ret is wrong!");
+        LOG_WARN("return GoToLastRow.GoToRow ret %{public}d is wrong!", ret);
     }
     return ret;
 }
@@ -138,7 +138,7 @@ int DataShareAbsResultSet::IsAtLastRow(bool &result)
     int rowCnt = 0;
     int ret = GetRowCount(rowCnt);
     if (ret != E_OK) {
-        LOG_ERROR("return GetRowCount ret is wrong!");
+        LOG_ERROR("return GetRowCount ret %{public}d is wrong!", ret);
         return ret;
     }
     result = (rowPos_ == (rowCnt - 1));
@@ -216,10 +216,11 @@ int DataShareAbsResultSet::GetColumnName(int columnIndex, std::string &columnNam
     int rowCnt = 0;
     int ret = GetColumnCount(rowCnt);
     if (ret != E_OK) {
-        LOG_ERROR("return GetColumnCount ret is wrong!");
+        LOG_ERROR("return GetColumnCount ret %{public}d is wrong!", ret);
         return ret;
     }
     if (columnIndex >= rowCnt || columnIndex < 0) {
+        LOG_ERROR("columnIndex oor idx %{public}d, cnt %{public}d", columnIndex, rowCnt);
         return E_INVALID_COLUMN_INDEX;
     }
     std::vector<std::string> columnNames;
