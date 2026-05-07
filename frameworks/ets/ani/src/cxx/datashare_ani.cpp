@@ -1786,7 +1786,7 @@ void DataShareNativeExtensionCallbackInt(double errorCode, rust::string errorMsg
     }
     resultWrap->callbackResultNumber_ = data;
     DatashareBusinessError businessError;
-    businessError.SetCode((int)errorCode);
+    businessError.SetCode(static_cast<int>(errorCode));
     businessError.SetMessage(std::string(errorMsg));
     resultWrap->businessError_= businessError;
     resultWrap->isRecvReply_ = true;
@@ -1813,7 +1813,7 @@ void DataShareNativeExtensionCallbackObject(double errorCode, rust::string error
     std::shared_ptr<ResultSetBridge> resultPtr = proxy->Create();
     resultWrap->callbackResultObject_ = std::make_shared<DataShareResultSet>(resultPtr);
     DatashareBusinessError businessError;
-    businessError.SetCode((int)errorCode);
+    businessError.SetCode(static_cast<int>(errorCode));
     businessError.SetMessage(std::string(errorMsg));
     resultWrap->businessError_= businessError;
     resultWrap->isRecvReply_ = true;
@@ -1878,7 +1878,7 @@ void DataShareNativeExtensionCallbackString(double errorCode, rust::String error
     }
     jsResult->callbackResultString_ = std::string(value);
     DatashareBusinessError businessError;
-    businessError.SetCode((int)errorCode);
+    businessError.SetCode(static_cast<int>(errorCode));
     businessError.SetMessage(std::string(errorMsg));
     jsResult->businessError_= businessError;
     jsResult->isRecvReply_ = true;
@@ -1916,7 +1916,7 @@ void DataShareNativeExtensionCallbackBatchUpdate(double errorCode, rust::String 
         jsResult->updateResults_.push_back(bur);
     }
     DatashareBusinessError businessError;
-    businessError.SetCode((int)errorCode);
+    businessError.SetCode(static_cast<int>(errorCode));
     businessError.SetMessage(std::string(errorMsg));
     jsResult->businessError_= businessError;
     jsResult->callbackResultNumber_ = E_OK;

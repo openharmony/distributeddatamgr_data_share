@@ -52,7 +52,7 @@ static napi_module _module = {
     .nm_filename = nullptr,
     .nm_register_func = Init,
     .nm_modname = "data.dataShare",
-    .nm_priv = ((void *)0),
+    .nm_priv = nullptr,
     .reserved = {0}
 };
 
