@@ -155,10 +155,12 @@ int DataShareResultSet::GoToRow(int position)
     GetRowCount(rowCnt);
     if (position >= rowCnt) {
         rowPos_ = rowCnt;
+        LOG_ERROR("pos oor %{public}d, %{public}d", position, rowCnt);
         return E_ERROR;
     }
     if (position < 0) {
         rowPos_ = INITIAL_POS;
+        LOG_ERROR("pos invalid %{public}d", position);
         return E_ERROR;
     }
     if (position == rowPos_) {
@@ -175,6 +177,7 @@ int DataShareResultSet::GoToRow(int position)
     }
 
     if (!result) {
+        LOG_ERROR("OnGo fail pos %{public}d, s %{public}d, e %{public}d", position, startRowPos_, endRowPos_);
         rowPos_ = rowCnt;
         startRowPos_ = INITIAL_POS;
         endRowPos_ = INITIAL_POS;
@@ -194,6 +197,7 @@ int DataShareResultSet::GetBlob(int columnIndex, std::vector<uint8_t> &value)
     }
     int errorCode = CheckState(columnIndex);
     if (errorCode != E_OK) {
+        LOG_ERROR("CheckState fail err %{public}d", errorCode);
         return errorCode;
     }
 
@@ -330,6 +334,7 @@ int DataShareResultSet::GetDouble(int columnIndex, double &value)
     }
     int errorCode = CheckState(columnIndex);
     if (errorCode != E_OK) {
+        LOG_ERROR("CheckState fail err %{public}d", errorCode);
         return errorCode;
     }
     AppDataFwk::SharedBlock::CellUnit *cellUnit = block->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
@@ -370,6 +375,7 @@ int DataShareResultSet::IsColumnNull(int columnIndex, bool &isNull)
     }
     int errorCode = CheckState(columnIndex);
     if (errorCode != E_OK) {
+        LOG_ERROR("CheckState fail err %{public}d", errorCode);
         return errorCode;
     }
     AppDataFwk::SharedBlock::CellUnit *cellUnit = block->GetCellUnit(rowPos_ - startRowPos_, columnIndex);
