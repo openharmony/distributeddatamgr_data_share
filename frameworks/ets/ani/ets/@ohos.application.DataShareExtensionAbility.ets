@@ -52,7 +52,7 @@ export namespace dataShareExtensionAbilityHelper {
             this.nativePtr = nativePtr;
         }
 
-        doExtensionCallbackInt(err: BusinessError|null, data: int|undefined) {
+        doExtensionCallbackInt(err: BusinessError|null, data: int|undefined): void {
             if ((err instanceof BusinessError) && (data instanceof int)) {
                 let error: BusinessError = err as BusinessError
                 let dataVal: int = data as int
@@ -62,7 +62,7 @@ export namespace dataShareExtensionAbilityHelper {
             }
         }
 
-        doExtensionCallbackObject(err: BusinessError|null, data: Object|undefined) {
+        doExtensionCallbackObject(err: BusinessError|null, data: Object|undefined): void {
             if ((err instanceof BusinessError) && (data instanceof Object)) {
                 let error: BusinessError = err as BusinessError
                 let dataVal: Object = data as Object
@@ -72,7 +72,7 @@ export namespace dataShareExtensionAbilityHelper {
             }
         }
 
-        doExtensionCallbackVoid(err: BusinessError|null) {
+        doExtensionCallbackVoid(err: BusinessError|null): void {
             if (err instanceof BusinessError) {
                 let error: BusinessError = err as BusinessError
                 nativeExtensionCallbackVoid(error.code, error.message, this.nativePtr)
@@ -81,7 +81,7 @@ export namespace dataShareExtensionAbilityHelper {
             }
         }
 
-        doExtensionCallbackString(err: BusinessError | null, data: string | undefined) {
+        doExtensionCallbackString(err: BusinessError | null, data: string | undefined): void {
             if ((err instanceof BusinessError) && (data instanceof string)) {
                 let error: BusinessError = err as BusinessError
                 let dataVal: string = data as string
@@ -91,7 +91,7 @@ export namespace dataShareExtensionAbilityHelper {
             }
         }
 
-        doExtensionCallbackBatchUpdate(err: BusinessError | null, data: Record<string, Array<int>> | undefined) {
+        doExtensionCallbackBatchUpdate(err: BusinessError | null, data: Record<string, Array<int>> | undefined): void {
             if ((err instanceof BusinessError) && (data instanceof Record)) {
                 let error: BusinessError = err as BusinessError
                 let dataVal: Record<string, Array<int>> = data as Record<string, Array<int>>
