@@ -156,7 +156,7 @@ int DataShareAbsResultSet::IsEnded(bool &result)
     int rowCnt = 0;
     int ret =  GetRowCount(rowCnt);
     if (ret != E_OK) {
-        LOG_ERROR("return GetRowCount ret is wrong!");
+        LOG_ERROR("return GetRowCount ret %{public}d is wrong!", ret);
         return ret;
     }
     result = (rowCnt == 0) ? true : (rowPos_ == rowCnt);
@@ -169,7 +169,7 @@ int DataShareAbsResultSet::GetColumnCount(int &count)
         std::vector<std::string> columnNames;
         int ret = GetAllColumnNames(columnNames);
         if (ret != E_OK) {
-            LOG_ERROR("return GetAllColumnNames ret is wrong!");
+            LOG_ERROR("return GetAllColumnNames ret %{public}d is wrong!", ret);
             return ret;
         }
         count_ = static_cast<int>(columnNames.size());
@@ -193,7 +193,7 @@ int DataShareAbsResultSet::GetColumnIndex(const std::string &columnName, int &co
     std::vector<std::string> columnNames;
     int ret = GetAllColumnNames(columnNames);
     if (ret != E_OK) {
-        LOG_ERROR("return GetAllColumnNames ret is wrong!");
+        LOG_ERROR("return GetAllColumnNames ret %{public}d is wrong!", ret);
         return ret;
     }
 
