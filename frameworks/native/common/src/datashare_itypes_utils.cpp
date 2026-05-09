@@ -585,8 +585,9 @@ bool MarshalBasicTypeVecToBuffer(std::ostringstream &oss, const std::vector<T> &
     if (!MarshalBasicTypeToBuffer(oss, valSize)) {
         return false;
     }
-    if (valSize > 0)
+    if (valSize > 0) {
         oss.write(reinterpret_cast<const char *>(values.data()), valSize * sizeof(T));
+    }
     return oss.good();
 }
 
