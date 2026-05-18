@@ -109,5 +109,15 @@ int HelperAlreadyClosedError::GetCode() const
 {
     return EXCEPTION_HELPER_CLOSED;
 }
+
+std::string NoPermissionAccessUriError::GetMessage() const
+{
+    return "No permission to access the data specified by the URI.";
+}
+
+int NoPermissionAccessUriError::GetCode() const
+{
+    return EXCEPTION_NO_PERMISSION_ACCESS_URI;
+}
 } // namespace DataShare
 } // namespace OHOS

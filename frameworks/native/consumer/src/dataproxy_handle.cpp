@@ -110,5 +110,37 @@ std::vector<DataProxyResult> DataProxyHandle::UnsubscribeProxyData(const std::ve
     }
     return ProxyDataSubscriberManager::GetInstance().DelObservers(this, proxy, uris);
 }
+
+DataProxyResult DataProxyHandle::PutValues(const std::string &uri, const std::string &key,
+    const DataProxyValue &value, const DataProxyConfig &proxyConfig)
+{
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return DataProxyResult(uri, DataProxyErrorCode::INNER_ERROR);
+    }
+    return proxy->PutValues(uri, key, value, proxyConfig);
+}
+
+DataProxyResult DataProxyHandle::RemoveValue(const std::string &uri, const std::string &key,
+    const DataProxyConfig &proxyConfig)
+{
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return DataProxyResult(uri, DataProxyErrorCode::INNER_ERROR);
+    }
+    return proxy->RemoveValue(uri, key, proxyConfig);
+}
+
+DataProxyGetResult DataProxyHandle::GetValues(const std::string &uri, const DataProxyConfig &proxyConfig)
+{
+    auto proxy = DataShareManagerImpl::GetServiceProxy();
+    if (proxy == nullptr) {
+        LOG_ERROR("proxy is nullptr");
+        return DataProxyGetResult();
+    }
+    return proxy->GetValues(uri, proxyConfig);
+}
 } // namespace DataShare
 } // namespace OHOS
