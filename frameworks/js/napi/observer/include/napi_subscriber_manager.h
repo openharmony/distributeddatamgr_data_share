@@ -143,7 +143,8 @@ struct NapiProxyDataObserverMapKey {
     }
 };
 
-class NapiProxyDataSubscriberManager : public NapiCallbacksManager<NapiProxyDataObserverMapKey, NapiProxyDataObserver> {
+class NapiProxyDataSubscriberManager : public NapiCallbacksManager<NapiProxyDataObserverMapKey, NapiProxyDataObserver>,
+                                       public std::enable_shared_from_this<NapiProxyDataSubscriberManager> {
 public:
     using Key = NapiProxyDataObserverMapKey;
     using Observer = NapiProxyDataObserver;

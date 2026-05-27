@@ -288,9 +288,15 @@ std::vector<DataProxyResult> NapiProxyDataSubscriberManager::AddObservers(napi_e
             if (firstAddUris.empty()) {
                 return;
             }
+            std::weak_ptr<NapiProxyDataSubscriberManager> thisWp = weak_from_this();
             auto subResults = dataProxyHandle->SubscribeProxyData(firstAddUris, config,
-                [this](const std::vector<DataProxyChangeInfo> &changeInfo) {
-                    Emit(changeInfo);
+                [thisWp](const std::vector<DataProxyChangeInfo> &changeInfo) {
+                    auto thisPtr = thisWp.lock();
+                    if (thisPtr == nullptr) {
+                        LOG_WARN("NapiProxyDataSubscriberManager::AddObservers invalid this ptr in lambda");
+                        return;
+                    }
+                    thisPtr->Emit(changeInfo);
                 });
             std::vector<Key> failedKeys;
             for (auto &subResult : subResults) {
