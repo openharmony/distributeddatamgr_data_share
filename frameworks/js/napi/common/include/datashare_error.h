@@ -30,6 +30,7 @@ public:
     static const int EXCEPTION_DATA_AREA_NOT_EXIST = 15700012;
     static const int EXCEPTION_HELPER_CLOSED = 15700013;
     static const int EXCEPTION_PROXY_PARAMETER_CHECK = 15700014;
+    static const int EXCEPTION_NO_PERMISSION_ACCESS_URI = 15700015;
     virtual ~Error() {};
     virtual std::string GetMessage() const = 0;
     virtual int GetCode() const = 0;

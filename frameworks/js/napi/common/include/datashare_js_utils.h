@@ -122,6 +122,7 @@ public:
     static napi_value Convert2JSValue(napi_env env, const std::vector<DataProxyResult> &results);
     static napi_value Convert2JSValue(napi_env env, const DataProxyGetResult &result);
     static napi_value Convert2JSValue(napi_env env, const std::vector<DataProxyGetResult> &results);
+    static napi_value Convert2JSValue(napi_env env, const std::vector<DataProxyValue> &values);
     static napi_value Convert2JSValue(napi_env env, const DataShareValueObject &valueObject);
     static napi_value Convert2JSValue(napi_env env, const DataProxyChangeInfo &changeInfo);
     static napi_value Convert2JSValue(napi_env env, const DataShareValuesBucket &valueBucket);
@@ -138,7 +139,17 @@ public:
         std::vector<PredicateTemplateNode> &predicates);
     static bool UnwrapStringByPropertyName(napi_env env, napi_value jsObject, const char *propertyName,
         std::string &value);
+    static bool UnwrapBooleanByPropertyName(napi_env env, napi_value jsValue, const char *propertyName, bool &value);
+    static bool UnwrapOptionalBoolean(napi_env env, napi_value jsObject, const char *propertyName, bool &value);
+    static bool UnwrapOptionalMultiValues(napi_env env, napi_value jsObject,
+        std::map<std::string, std::map<std::string, DataProxyValue>> &multiValues);
+    static bool UnwrapStringListProperty(napi_env env, napi_value jsObject, const char *propertyName,
+        std::vector<std::string> &result, bool &isUndefined);
     static bool UnwrapDataProxyValue(napi_env env, napi_value jsObject, DataProxyValue &value, bool &isValueUndefined);
+    static bool UnwrapMultiValues(napi_env &env, napi_value &arg,
+        std::map<std::string, std::map<std::string, DataProxyValue>> &multiValues);
+    static bool UnwrapDataProxyPropertyValue(napi_env env, napi_value propertyValue,
+        DataProxyValue &result);
     static bool UnwrapProxyDataItem(napi_env env, napi_value jsObject, DataShareProxyData &proxyData);
     static bool UnwrapProxyDataItemVector(napi_env env, napi_value value, std::vector<DataShareProxyData> &proxyDatas);
     static bool UnwrapDataProxyConfig(napi_env env, napi_value value, DataProxyConfig &config);

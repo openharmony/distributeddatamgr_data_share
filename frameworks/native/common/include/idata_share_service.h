@@ -118,6 +118,15 @@ public:
 
     virtual std::vector<DataProxyResult> UnsubscribeProxyData(const std::vector<std::string> &uris) = 0;
 
+    virtual DataProxyResult PutValues(const std::string &uri, const std::string &key,
+        const DataProxyValue &value, const DataProxyConfig &proxyConfig) = 0;
+
+    virtual DataProxyResult RemoveValue(const std::string &uri, const std::string &key,
+        const DataProxyConfig &proxyConfig) = 0;
+
+    virtual DataProxyGetResult GetValues(const std::string &uri,
+        const DataProxyConfig &proxyConfig) = 0;
+
     virtual std::pair<int32_t, ConnectionInterfaceInfo> GetConnectionInterfaceInfo(int32_t saId,
         uint32_t waitTime) = 0;
 };

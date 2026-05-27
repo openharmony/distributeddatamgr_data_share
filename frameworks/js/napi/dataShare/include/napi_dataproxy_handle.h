@@ -34,6 +34,9 @@ public:
     static napi_value Napi_Get(napi_env env, napi_callback_info info);
     static napi_value Napi_On(napi_env env, napi_callback_info info);
     static napi_value Napi_Off(napi_env env, napi_callback_info info);
+    static napi_value Napi_PutValue(napi_env env, napi_callback_info info);
+    static napi_value Napi_RemoveValue(napi_env env, napi_callback_info info);
+    static napi_value Napi_GetValues(napi_env env, napi_callback_info info);
 private:
     static napi_value GetConstructor(napi_env env);
     static napi_value Initialize(napi_env env, napi_callback_info info);
@@ -81,6 +84,8 @@ private:
         std::vector<DataProxyResult> proxyResult;
         std::vector<DataProxyGetResult> proxyGetResult;
         int32_t resultNumber = 0;
+        std::string key;
+        DataProxyValue value = 0;
         bool isDeleteAll = false;
 
         ContextInfo() : Context(nullptr, nullptr)
@@ -107,6 +112,12 @@ private:
         }
     };
     static napi_status ExecuteDelete(std::shared_ptr<ContextInfo> context);
+    static napi_status ResolveDataProxyErrorCode(const DataProxyErrorCode err,
+        std::shared_ptr<ContextInfo> context);
+    static napi_status ParsePutValueInput(napi_env env, size_t argc, napi_value *argv,
+        std::shared_ptr<ContextInfo> context);
+    static napi_status ParseRemoveValueInput(napi_env env, size_t argc, napi_value *argv,
+        std::shared_ptr<ContextInfo> context);
 };
 } // namespace DataShare
 } // namespace OHOS
