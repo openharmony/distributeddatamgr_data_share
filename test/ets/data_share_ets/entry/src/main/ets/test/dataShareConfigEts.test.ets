@@ -72,7 +72,7 @@ export default function DataShareConfigEtsTest() {
 
     afterEach(async () => {
       // delete all data
-      await g_handle!.delete(g_config_default);
+      await g_handle!.deleteMyPublishedData(g_config_default);
     });
 
     afterAll(async () => {
@@ -374,7 +374,7 @@ export default function DataShareConfigEtsTest() {
      * @tc.step:
      *   1. Publish 4K and 100K data with g_config_100K
      *   2. Verify publish succeeds, results[1].uri equals uri100K
-     *   3. Call delete(g_config_default) to delete all data
+     *   3. Call deleteMyPublishedData(g_config_default) to delete all data
      *   4. Call get() to verify data is deleted
      * @tc.expect:
      *   1. Publish succeeds, results[1].uri equals uri100K, results[1].result equals SUCCESS
@@ -397,7 +397,7 @@ export default function DataShareConfigEtsTest() {
           expect().assertFail();
         })
 
-        await g_handle!.delete(g_config_default).then((results : dataShare.DataProxyResult[]) => {
+        await g_handle!.deleteMyPublishedData(g_config_default).then((results : dataShare.DataProxyResult[]) => {
             results.forEach((result) => {
                 console.info(TAG + ` URI: ${result.uri}, Result: ${result.result}`);
             });

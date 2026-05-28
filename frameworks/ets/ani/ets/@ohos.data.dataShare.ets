@@ -781,7 +781,7 @@ export namespace dataShare {
     
     publish(data: ProxyData[], config: DataProxyConfig): Promise<DataProxyResult[]>;
     delete(uris: string[], config: DataProxyConfig): Promise<DataProxyResult[]>;
-    delete(config: DataProxyConfig): Promise<DataProxyResult[]>;
+    deleteMyPublishedData(config: DataProxyConfig): Promise<DataProxyResult[]>;
     get(uris: string[], config: DataProxyConfig): Promise<DataProxyGetResult[]>;
   }
 
@@ -871,7 +871,7 @@ export namespace dataShare {
         })
     }
 
-    delete(config: DataProxyConfig): Promise<DataProxyResult[]> {
+    deleteMyPublishedData(config: DataProxyConfig): Promise<DataProxyResult[]> {
         return new Promise<DataProxyResult[]>((resolve, reject) => {
             let p = taskpool.execute(native_data_proxy_handle_delete_all, this, config)
             p.then((e: Any) => {

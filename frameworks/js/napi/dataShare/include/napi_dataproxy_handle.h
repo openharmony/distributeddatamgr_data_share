@@ -31,6 +31,7 @@ public:
     static napi_value Napi_CreateDataProxyHandle(napi_env env, napi_callback_info info);
     static napi_value Napi_Publish(napi_env env, napi_callback_info info);
     static napi_value Napi_Delete(napi_env env, napi_callback_info info);
+    static napi_value Napi_DeleteMyPublishedData(napi_env env, napi_callback_info info);
     static napi_value Napi_Get(napi_env env, napi_callback_info info);
     static napi_value Napi_On(napi_env env, napi_callback_info info);
     static napi_value Napi_Off(napi_env env, napi_callback_info info);
@@ -86,7 +87,6 @@ private:
         int32_t resultNumber = 0;
         std::string key;
         DataProxyValue value = 0;
-        bool isDeleteAll = false;
 
         ContextInfo() : Context(nullptr, nullptr)
         {
@@ -112,6 +112,7 @@ private:
         }
     };
     static napi_status ExecuteDelete(std::shared_ptr<ContextInfo> context);
+    static napi_status ExecuteDeleteMyPublishedData(std::shared_ptr<ContextInfo> context);
     static napi_status ResolveDataProxyErrorCode(const DataProxyErrorCode err,
         std::shared_ptr<ContextInfo> context);
     static napi_status ParsePutValueInput(napi_env env, size_t argc, napi_value *argv,

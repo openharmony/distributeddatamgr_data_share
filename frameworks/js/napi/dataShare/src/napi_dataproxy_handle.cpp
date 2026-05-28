@@ -41,6 +41,7 @@ napi_value NapiDataProxyHandle::GetConstructor(napi_env env)
     napi_property_descriptor clzDes[] = {
         DECLARE_NAPI_FUNCTION("publish", Napi_Publish),
         DECLARE_NAPI_FUNCTION("delete", Napi_Delete),
+        DECLARE_NAPI_FUNCTION("deleteMyPublishedData", Napi_DeleteMyPublishedData),
         DECLARE_NAPI_FUNCTION("get", Napi_Get),
         DECLARE_NAPI_FUNCTION("on", Napi_On),
         DECLARE_NAPI_FUNCTION("off", Napi_Off),
@@ -328,11 +329,20 @@ napi_status NapiDataProxyHandle::ExecuteDelete(std::shared_ptr<ContextInfo> cont
         context->error = std::make_shared<InnerError>();
         return napi_generic_failure;
     }
-    if (context->isDeleteAll) {
-        context->proxyResult = handle->DeleteProxyData(context->config);
-    } else {
-        context->proxyResult = handle->DeleteProxyData(context->uris, context->config);
+    context->proxyResult = handle->DeleteProxyData(context->uris, context->config);
+    context->status = napi_ok;
+    return napi_ok;
+}
+
+napi_status NapiDataProxyHandle::ExecuteDeleteMyPublishedData(std::shared_ptr<ContextInfo> context)
+{
+    auto handle = context->proxy->GetHandle();
+    if (handle == nullptr) {
+        LOG_ERROR("dataProxyHandle is nullptr");
+        context->error = std::make_shared<InnerError>();
+        return napi_generic_failure;
     }
+    context->proxyResult = handle->DeleteProxyData(context->config);
     context->status = napi_ok;
     return napi_ok;
 }
@@ -341,35 +351,24 @@ napi_value NapiDataProxyHandle::Napi_Delete(napi_env env, napi_callback_info inf
 {
     auto context = std::make_shared<ContextInfo>();
     auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
-        NAPI_ASSERT_CALL_ERRCODE(env, argc == 1 || argc == 2,
-            context->error = std::make_shared<ParametersNumError>("1 or 2"), napi_invalid_arg);
+        NAPI_ASSERT_CALL_ERRCODE(env, argc == 2,
+            context->error = std::make_shared<ParametersNumError>("2"), napi_invalid_arg);
         napi_valuetype valueType;
-        if (argc == 1) {
-            NAPI_CALL_BASE(env, napi_typeof(env, argv[0], &valueType), napi_invalid_arg);
-            NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
-                context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
-            if (!DataShareJSUtils::UnwrapDataProxyConfig(env, argv[0], context->config)) {
-                context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig");
-                return napi_invalid_arg;
-            }
-            context->isDeleteAll = true;
-        } else {
-            NAPI_CALL_BASE(env, napi_typeof(env, argv[0], &valueType), napi_invalid_arg);
-            NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
-                context->error = std::make_shared<ParametersTypeError>("uris", "Array<String>"), napi_invalid_arg);
-            context->uris = DataShareJSUtils::Convert2StrVector(env, argv[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
-            NAPI_ASSERT_CALL_ERRCODE(env, !(context->uris.empty()),
-                context->error = std::make_shared<ParametersTypeError>("uris", "not empty"), napi_invalid_arg);
-            NAPI_ASSERT_CALL_ERRCODE(env, context->uris.size() <= URI_MAX_COUNT &&
-                CheckIsParameterExceed(context->uris), context->error =
-                std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
-            NAPI_CALL_BASE(env, napi_typeof(env, argv[1], &valueType), napi_invalid_arg);
-            NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
-                context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
-            if (!DataShareJSUtils::UnwrapDataProxyConfig(env, argv[1], context->config)) {
-                context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig");
-                return napi_invalid_arg;
-            }
+        NAPI_CALL_BASE(env, napi_typeof(env, argv[0], &valueType), napi_invalid_arg);
+        NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
+            context->error = std::make_shared<ParametersTypeError>("uris", "Array<String>"), napi_invalid_arg);
+        context->uris = DataShareJSUtils::Convert2StrVector(env, argv[0], DataShareJSUtils::DEFAULT_BUF_SIZE);
+        NAPI_ASSERT_CALL_ERRCODE(env, !(context->uris.empty()),
+            context->error = std::make_shared<ParametersTypeError>("uris", "not empty"), napi_invalid_arg);
+        NAPI_ASSERT_CALL_ERRCODE(env, context->uris.size() <= URI_MAX_COUNT &&
+            CheckIsParameterExceed(context->uris), context->error =
+            std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
+        NAPI_CALL_BASE(env, napi_typeof(env, argv[1], &valueType), napi_invalid_arg);
+        NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
+            context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
+        if (!DataShareJSUtils::UnwrapDataProxyConfig(env, argv[1], context->config)) {
+            context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig");
+            return napi_invalid_arg;
         }
         return napi_ok;
     };
@@ -381,6 +380,36 @@ napi_value NapiDataProxyHandle::Napi_Delete(napi_env env, napi_callback_info inf
     };
     auto exec = [context](AsyncCall::Context *ctx) {
         return ExecuteDelete(context);
+    };
+    context->SetAction(std::move(input), std::move(output));
+    AsyncCall asyncCall(env, info, context);
+    return asyncCall.Call(env, exec);
+}
+
+napi_value NapiDataProxyHandle::Napi_DeleteMyPublishedData(napi_env env, napi_callback_info info)
+{
+    auto context = std::make_shared<ContextInfo>();
+    auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
+        NAPI_ASSERT_CALL_ERRCODE(env, argc == 1,
+            context->error = std::make_shared<ParametersNumError>("1"), napi_invalid_arg);
+        napi_valuetype valueType;
+        NAPI_CALL_BASE(env, napi_typeof(env, argv[0], &valueType), napi_invalid_arg);
+        NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
+            context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
+        if (!DataShareJSUtils::UnwrapDataProxyConfig(env, argv[0], context->config)) {
+            context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig");
+            return napi_invalid_arg;
+        }
+        return napi_ok;
+    };
+    auto output = [context](napi_env env, napi_value *result) -> napi_status {
+        NAPI_ASSERT_BASE(env, context->status == napi_ok, "exec failed", napi_generic_failure);
+        *result = DataShareJSUtils::Convert2JSValue(env, context->proxyResult);
+        context->proxyResult.clear();
+        return napi_ok;
+    };
+    auto exec = [context](AsyncCall::Context *ctx) {
+        return ExecuteDeleteMyPublishedData(context);
     };
     context->SetAction(std::move(input), std::move(output));
     AsyncCall asyncCall(env, info, context);
