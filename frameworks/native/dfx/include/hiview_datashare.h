@@ -39,6 +39,7 @@ public:
     static constexpr const char* TRUSTS_FAILED = "TRUSTS_FAILED";
     static constexpr const char* UNAPPROVED_PROVIDER = "UNAPPROVED_PROVIDER";
     static constexpr const char* INVALID_PREDICATES = "INVALID_PREDICATES";
+    static constexpr const char* OPEN_FILE_USED = "OPEN_FILE_USED";
     static void ReportDataFault(DataShareFaultInfo &faultInfo);
     static std::pair<std::string, int> GetCallingName(uint32_t callingTokenid);
 };

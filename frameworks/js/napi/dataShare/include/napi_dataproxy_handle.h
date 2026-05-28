@@ -35,6 +35,9 @@ public:
     static napi_value Napi_Get(napi_env env, napi_callback_info info);
     static napi_value Napi_On(napi_env env, napi_callback_info info);
     static napi_value Napi_Off(napi_env env, napi_callback_info info);
+    static napi_value Napi_PutValue(napi_env env, napi_callback_info info);
+    static napi_value Napi_RemoveValue(napi_env env, napi_callback_info info);
+    static napi_value Napi_GetValues(napi_env env, napi_callback_info info);
 private:
     static napi_value GetConstructor(napi_env env);
     static napi_value Initialize(napi_env env, napi_callback_info info);

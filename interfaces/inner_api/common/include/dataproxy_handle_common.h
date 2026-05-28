@@ -25,6 +25,8 @@ static constexpr int32_t APPIDENTIFIER_MAX_SIZE = 128;
 static constexpr int32_t URI_MAX_COUNT = 64;
 static constexpr int32_t PROXY_DATA_MAX_COUNT = 64;
 static constexpr int32_t ALLOW_LIST_MAX_COUNT = 256;
+static constexpr size_t MAX_MULTIVALUE_COUNT_PER_APP = 10;
+static constexpr uint32_t MAX_SINGLE_MULTIVALUE_LENGTH = 4096;
 constexpr const char* ALLOW_ALL = "all";
 constexpr const char* DATA_PROXY_SCHEME = "datashareproxy://";
 
@@ -34,6 +36,8 @@ enum DataProxyErrorCode {
     NO_PERMISSION,
     OVER_LIMIT,
     INNER_ERROR,
+    INCOMPATIBLE_CONFIG_TYPE,
+    KEY_NOT_EXIST,
 };
 
 /**
@@ -88,8 +92,13 @@ struct DataShareProxyData {
     std::string uri_;
     DataProxyValue value_ = "";
     std::vector<std::string> allowList_;
+    std::vector<std::string> trustProviders_;
+    std::map<std::string, std::map<std::string, DataProxyValue>> multiValues_;
+    DataProxyMaxValueLength maxValueLength_ = DataProxyMaxValueLength::MAX_LENGTH_4K;
     bool isValueUndefined = false;
     bool isAllowListUndefined = false;
+    bool isTrustProvidersUndefined = false;
+    bool isMultiValues_ = false;
 };
 
 struct DataProxyResult {
@@ -108,6 +117,7 @@ struct DataProxyGetResult {
     DataProxyErrorCode result_;
     DataProxyValue value_;
     std::vector<std::string> allowList_;
+    std::vector<DataProxyValue> multiValues_;
 };
 
 struct DataProxyChangeInfo {
@@ -118,6 +128,7 @@ struct DataProxyChangeInfo {
     DataShareObserver::ChangeType changeType_ = DataShareObserver::INVAILD;
     std::string uri_;
     DataProxyValue value_;
+    std::vector<DataProxyValue> multiValues_;
 };
 } // namespace DataShare
 } // namespace OHOS

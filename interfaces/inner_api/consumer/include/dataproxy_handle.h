@@ -56,6 +56,14 @@ public:
         const std::function<void(const std::vector<DataProxyChangeInfo> &changeNode)> &callback);
 
     std::vector<DataProxyResult> UnsubscribeProxyData(const std::vector<std::string> &uris);
+
+    DataProxyResult PutValues(const std::string &uri, const std::string &key,
+        const DataProxyValue &value, const DataProxyConfig &proxyConfig);
+
+    DataProxyResult RemoveValue(const std::string &uri, const std::string &key,
+        const DataProxyConfig &proxyConfig);
+
+    DataProxyGetResult GetValues(const std::string &uri, const DataProxyConfig &proxyConfig);
 };
 } // namespace DataShare
 } // namespace OHOS

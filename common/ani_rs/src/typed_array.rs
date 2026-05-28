@@ -27,6 +27,8 @@ pub enum TypedArray {
     Uint8,
     Uint16,
     Uint32,
+    Float32,
+    Float64,
 }
 
 impl TypedArray {
@@ -38,6 +40,8 @@ impl TypedArray {
             TypedArray::Uint8 => signature::UINT8_ARRAY,
             TypedArray::Uint16 => signature::UINT16_ARRAY,
             TypedArray::Uint32 => signature::UINT32_ARRAY,
+            TypedArray::Float32 => signature::FLOAT32_ARRAY,
+            TypedArray::Float64 => signature::FLOAT64_ARRAY,
         };
         env.find_class(class_name)
     }
@@ -50,6 +54,8 @@ impl TypedArray {
             TypedArray::Uint8 => 1,
             TypedArray::Uint16 => 2,
             TypedArray::Uint32 => 4,
+            TypedArray::Float32 => 4,
+            TypedArray::Float64 => 8,
         }
     }
 }
@@ -217,6 +223,20 @@ impl_typed_array!(
     u32,
     TypedArray::Uint32,
     "@Uint32Array"
+);
+impl_typed_array!(
+    Float32Array,
+    Float32ArrayHelper,
+    f32,
+    TypedArray::Float32,
+    "@Float32Array"
+);
+impl_typed_array!(
+    Float64Array,
+    Float64ArrayHelper,
+    f64,
+    TypedArray::Float64,
+    "@Float64Array"
 );
 
 #[derive(Serialize, Deserialize)]

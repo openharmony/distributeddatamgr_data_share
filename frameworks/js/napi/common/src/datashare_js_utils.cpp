@@ -651,6 +651,21 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataProxyChange
     return jsDataProxyChangeInfo;
 }
 
+
+napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<DataProxyValue> &values)
+{
+    napi_value jsValue;
+    napi_status status = napi_create_array_with_length(env, values.size(), &jsValue);
+    if (status != napi_ok) {
+        return nullptr;
+    }
+
+    for (size_t i = 0; i < values.size(); ++i) {
+        napi_set_element(env, jsValue, i, Convert2JSValue(env, values[i]));
+    }
+    return jsValue;
+}
+
 bool DataShareJSUtils::UnwrapTemplatePredicates(napi_env env, napi_value jsPredicates,
     std::vector<PredicateTemplateNode> &predicates)
 {
@@ -869,6 +884,75 @@ bool DataShareJSUtils::UnwrapDataProxyValue(napi_env env, napi_value jsObject,
     return true;
 }
 
+// Unwrap a napi_value of primitive type (number/string/boolean) directly into DataProxyValue.
+// Unlike UnwrapDataProxyValue which expects a JS object containing a "value" property,
+// this function parses the napi_value itself as the raw DataProxyValue.
+bool DataShareJSUtils::UnwrapDataProxyPropertyValue(napi_env env, napi_value propertyValue,
+    DataProxyValue &result)
+{
+    napi_valuetype propertyType = napi_undefined;
+    napi_typeof(env, propertyValue, &propertyType);
+    switch (propertyType) {
+        case napi_number: {
+            double num = 0;
+            napi_get_value_double(env, propertyValue, &num);
+            result = num;
+            break;
+        }
+        case napi_string: {
+            result = Convert2String(env, propertyValue);
+            break;
+        }
+        case napi_boolean: {
+            bool b = false;
+            napi_get_value_bool(env, propertyValue, &b);
+            result = b;
+            break;
+        }
+        default: {
+            LOG_ERROR("unwrap dataProxy property value type err: %{public}d", propertyType);
+            return false;
+        }
+    }
+    return true;
+}
+
+bool DataShareJSUtils::UnwrapMultiValues(napi_env &env, napi_value &arg,
+    std::map<std::string, std::map<std::string, DataProxyValue>> &multiValues)
+{
+    napi_value keys = 0;
+    napi_get_property_names(env, arg, &keys);
+    uint32_t arrLen = 0;
+    napi_status status = napi_get_array_length(env, keys, &arrLen);
+    if (status != napi_ok || arrLen == 0) {
+        LOG_ERROR("unwrap multiValues err");
+        return false;
+    }
+    for (size_t i = 0; i < arrLen; ++i) {
+        napi_value key = 0;
+        status = napi_get_element(env, keys, i, &key);
+        if (status != napi_ok) {
+            LOG_ERROR("unwrap multiValues element err");
+            return false;
+        }
+        napi_valuetype valueType = napi_undefined;
+        napi_typeof(env, key, &valueType);
+        if (valueType != napi_string) {
+            LOG_ERROR("unwrap multiValues key err");
+            return false;
+        }
+        std::string multiValueKey = Convert2String(env, key);
+        napi_value propertyValue = 0;
+        napi_get_property(env, arg, key, &propertyValue);
+        DataProxyValue multiValueProperty;
+        if (!UnwrapDataProxyPropertyValue(env, propertyValue, multiValueProperty)) {
+            return false;
+        }
+        multiValues["appIdentifier"][multiValueKey] = multiValueProperty;
+    }
+    return true;
+}
+
 bool DataShareJSUtils::UnwrapProxyDataItem(napi_env env, napi_value jsObject, DataShareProxyData &proxyData)
 {
     napi_valuetype valueType = napi_undefined;
@@ -890,34 +974,26 @@ bool DataShareJSUtils::UnwrapProxyDataItem(napi_env env, napi_value jsObject, Da
     }
     proxyData.isValueUndefined = isValueUndefined;
 
-    std::string keyStr = "allowList";
-    napi_value jsDataKey = Convert2JSValue(env, keyStr);
-    napi_value jsDataValue = nullptr;
-    napi_get_property(env, jsObject, jsDataKey, &jsDataValue);
-    napi_typeof(env, jsDataValue, &valueType);
-    if (valueType != napi_object) {
-        if (valueType == napi_undefined || valueType == napi_null) {
-            proxyData.isAllowListUndefined = true;
-        } else {
-            LOG_ERROR("Convert allowList failed");
+    if (!UnwrapOptionalBoolean(env, jsObject, "isMultiValues", proxyData.isMultiValues_)) {
+        return false;
+    }
+
+    if (proxyData.isMultiValues_) {
+        if (!UnwrapOptionalMultiValues(env, jsObject, proxyData.multiValues_)) {
             return false;
         }
     }
-    Convert2Value(env, jsDataValue, proxyData.allowList_);
-    auto it = proxyData.allowList_.begin();
-    while (it != proxyData.allowList_.end()) {
-        if (it->size() > APPIDENTIFIER_MAX_SIZE) {
-            LOG_WARN("appIdentifier is over limit");
-            it = proxyData.allowList_.erase(it);
-        } else {
-            it++;
-        }
+
+    if (!UnwrapStringListProperty(env, jsObject, "allowList", proxyData.allowList_,
+        proxyData.isAllowListUndefined)) {
+        return false;
     }
-    if (proxyData.allowList_.size() > ALLOW_LIST_MAX_COUNT) {
-        LOG_WARN("ProxyData's allowList is over limit, uri: %{public}s",
-            DataShareStringUtils::Anonymous(proxyData.uri_).c_str());
-        proxyData.allowList_.resize(ALLOW_LIST_MAX_COUNT);
+
+    if (!UnwrapStringListProperty(env, jsObject, "trustProviders", proxyData.trustProviders_,
+        proxyData.isTrustProvidersUndefined)) {
+        return false;
     }
+
     return true;
 }
 
@@ -1045,6 +1121,102 @@ bool DataShareJSUtils::UnwrapStringByPropertyName(
         return false;
     }
     value = DataShareJSUtils::Convert2String(env, jsResult);
+    return true;
+}
+
+bool DataShareJSUtils::UnwrapBooleanByPropertyName(napi_env env, napi_value jsValue, const char *propertyName,
+    bool &value)
+{
+    napi_valuetype type = napi_undefined;
+    napi_value jsResult = nullptr;
+    napi_status status = napi_get_named_property(env, jsValue, propertyName, &jsResult);
+    if (status != napi_ok) {
+        LOG_ERROR("napi_get_named_property failed %{public}d", status);
+        return false;
+    }
+    napi_typeof(env, jsResult, &type);
+    if (type != napi_boolean) {
+        LOG_ERROR("%{public}s is not bool", propertyName);
+        return false;
+    }
+    status = napi_get_value_bool(env, jsResult, &value);
+    if (status != napi_ok) {
+        LOG_ERROR("napi_get_value_bool failed %{public}d", status);
+        return false;
+    }
+    return true;
+}
+
+bool DataShareJSUtils::UnwrapOptionalBoolean(napi_env env, napi_value jsObject, const char *propertyName,
+    bool &value)
+{
+    napi_value jsResult = nullptr;
+    napi_get_named_property(env, jsObject, propertyName, &jsResult);
+    napi_valuetype type = napi_undefined;
+    napi_typeof(env, jsResult, &type);
+    if (type == napi_boolean) {
+        napi_get_value_bool(env, jsResult, &value);
+        return true;
+    }
+    // Optional parameter not provided, keep the default value set by constructor
+    if (type == napi_undefined || type == napi_null) {
+        return true;
+    }
+    LOG_ERROR("%{public}s is not a boolean", propertyName);
+    return false;
+}
+
+bool DataShareJSUtils::UnwrapOptionalMultiValues(napi_env env, napi_value jsObject,
+    std::map<std::string, std::map<std::string, DataProxyValue>> &multiValues)
+{
+    napi_value jsMultiValues = nullptr;
+    napi_get_named_property(env, jsObject, "values", &jsMultiValues);
+    napi_valuetype type = napi_undefined;
+    napi_typeof(env, jsMultiValues, &type);
+    if (type == napi_undefined || type == napi_null) {
+        LOG_ERROR("multiValues not provided when isMultiValues is true");
+        return false;
+    }
+    if (type != napi_object) {
+        LOG_ERROR("multiValues is not an object");
+        return false;
+    }
+    if (!UnwrapMultiValues(env, jsMultiValues, multiValues)) {
+        LOG_ERROR("Unwrap multiValues failed");
+        return false;
+    }
+    return true;
+}
+
+bool DataShareJSUtils::UnwrapStringListProperty(napi_env env, napi_value jsObject, const char *propertyName,
+    std::vector<std::string> &result, bool &isUndefined)
+{
+    napi_value jsDataKey = Convert2JSValue(env, std::string(propertyName));
+    napi_value jsDataValue = nullptr;
+    napi_get_property(env, jsObject, jsDataKey, &jsDataValue);
+    napi_valuetype valueType = napi_undefined;
+    napi_typeof(env, jsDataValue, &valueType);
+    if (valueType != napi_object) {
+        if (valueType == napi_undefined || valueType == napi_null) {
+            isUndefined = true;
+            return true;
+        }
+        LOG_ERROR("Convert %{public}s failed", propertyName);
+        return false;
+    }
+    Convert2Value(env, jsDataValue, result);
+    for (auto it = result.begin(); it != result.end();) {
+        if (it->size() > APPIDENTIFIER_MAX_SIZE) {
+            LOG_WARN("%{public}s item is over limit", propertyName);
+            it = result.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    if (result.size() > ALLOW_LIST_MAX_COUNT) {
+        LOG_WARN("ProxyData's %{public}s is over limit", propertyName);
+        result.resize(ALLOW_LIST_MAX_COUNT);
+    }
     return true;
 }
 

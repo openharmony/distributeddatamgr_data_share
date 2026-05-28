@@ -515,7 +515,7 @@ template<>
 bool Marshalling(const DataProxyGetResult &result, MessageParcel &parcel)
 {
     return ITypesUtil::Marshal(parcel, static_cast<int32_t>(result.result_),
-        result.uri_, result.value_, result.allowList_);
+        result.uri_, result.value_, result.allowList_, result.multiValues_);
 }
 
 template<>
@@ -526,14 +526,14 @@ bool Unmarshalling(DataProxyGetResult &result, MessageParcel &parcel)
         return false;
     }
     result.result_ = static_cast<DataProxyErrorCode>(errorCode);
-    return ITypesUtil::Unmarshal(parcel, result.uri_, result.value_, result.allowList_);
+    return ITypesUtil::Unmarshal(parcel, result.uri_, result.value_, result.allowList_, result.multiValues_);
 }
 
 template<>
 bool Marshalling(const DataProxyChangeInfo &changeInfo, MessageParcel &parcel)
 {
     return ITypesUtil::Marshal(parcel, static_cast<int32_t>(changeInfo.changeType_),
-        changeInfo.uri_, changeInfo.value_);
+        changeInfo.uri_, changeInfo.value_, changeInfo.multiValues_);
 }
 
 template<>
@@ -544,7 +544,7 @@ bool Unmarshalling(DataProxyChangeInfo &changeInfo, MessageParcel &parcel)
         return false;
     }
     changeInfo.changeType_ = static_cast<DataShareObserver::ChangeType>(errorCode);
-    return ITypesUtil::Unmarshal(parcel, changeInfo.uri_, changeInfo.value_);
+    return ITypesUtil::Unmarshal(parcel, changeInfo.uri_, changeInfo.value_, changeInfo.multiValues_);
 }
 
 template<>
@@ -585,8 +585,9 @@ bool MarshalBasicTypeVecToBuffer(std::ostringstream &oss, const std::vector<T> &
     if (!MarshalBasicTypeToBuffer(oss, valSize)) {
         return false;
     }
-    if (valSize > 0)
+    if (valSize > 0) {
         oss.write(reinterpret_cast<const char *>(values.data()), valSize * sizeof(T));
+    }
     return oss.good();
 }
 
@@ -1481,31 +1482,81 @@ bool MarshalDataProxyValueToBuffer(std::ostringstream &oss, const DataProxyValue
     return true;
 }
 
+static bool MarshalMultiValuesToBuffer(std::ostringstream &oss,
+    const std::map<std::string, std::map<std::string, DataProxyValue>> &multiValues)
+{
+    size_t outerSize = multiValues.size();
+    if (!MarshalBasicTypeToBuffer(oss, outerSize)) {
+        LOG_ERROR("Marshal multiValues outer size failed");
+        return false;
+    }
+    for (const auto &outerPair : multiValues) {
+        if (!MarshalStringToBuffer(oss, outerPair.first)) {
+            LOG_ERROR("Marshal multiValues appIdentifier failed");
+            return false;
+        }
+        size_t innerSize = outerPair.second.size();
+        if (!MarshalBasicTypeToBuffer(oss, innerSize)) {
+            LOG_ERROR("Marshal multiValues inner size failed");
+            return false;
+        }
+        for (const auto &innerPair : outerPair.second) {
+            if (!MarshalStringToBuffer(oss, innerPair.first)) {
+                LOG_ERROR("Marshal multiValues key failed");
+                return false;
+            }
+            if (!MarshalDataProxyValueToBuffer(oss, innerPair.second)) {
+                LOG_ERROR("Marshal multiValues value failed");
+                return false;
+            }
+        }
+    }
+    return oss.good();
+}
+
 bool MarshalProxyDataToBuffer(std::ostringstream &oss, const DataShareProxyData &data)
 {
-    // Write uri_
     if (!MarshalStringToBuffer(oss, data.uri_)) {
         LOG_ERROR("Marshal uri failed");
         return false;
     }
-    // Write isValueUndefined and isAllowListUndefined
     if (!MarshalBasicTypeToBuffer(oss, data.isValueUndefined) ||
-        !MarshalBasicTypeToBuffer(oss, data.isAllowListUndefined)) {
+        !MarshalBasicTypeToBuffer(oss, data.isAllowListUndefined) ||
+        !MarshalBasicTypeToBuffer(oss, data.isTrustProvidersUndefined) ||
+        !MarshalBasicTypeToBuffer(oss, data.isMultiValues_)) {
+        LOG_ERROR("Marshal bool flags failed");
         return false;
     }
-    // Write value_ if it is not undefined
     if (!data.isValueUndefined) {
         if (!MarshalDataProxyValueToBuffer(oss, data.value_)) {
             LOG_ERROR("Marshal value failed");
             return false;
         }
     }
-    // Write allowList_ if it is not undefined
     if (!data.isAllowListUndefined) {
         if (!MarshalStringVecToBuffer(oss, data.allowList_)) {
             LOG_ERROR("Marshal allowList failed");
             return false;
         }
+    }
+    if (!data.isTrustProvidersUndefined) {
+        if (!MarshalStringVecToBuffer(oss, data.trustProviders_)) {
+            LOG_ERROR("Marshal trustProviders failed");
+            return false;
+        }
+    }
+
+    if (data.isMultiValues_) {
+        if (!MarshalMultiValuesToBuffer(oss, data.multiValues_)) {
+            LOG_ERROR("Marshal multiValues failed");
+            return false;
+        }
+    }
+
+    int32_t maxValueLength = static_cast<int32_t>(data.maxValueLength_);
+    if (!MarshalBasicTypeToBuffer(oss, maxValueLength)) {
+        LOG_ERROR("Marshal maxValueLength failed");
+        return false;
     }
 
     return oss.good();
@@ -1529,25 +1580,33 @@ bool MarshalProxyDataVecToBuffer(std::ostringstream &oss, const std::vector<Data
 
 bool MarshalDataProxyGetResultToBuffer(std::ostringstream &oss, const DataProxyGetResult &result)
 {
-    // Write uri_
     if (!MarshalStringToBuffer(oss, result.uri_)) {
         LOG_ERROR("Marshal getResult.uri_ failed.");
         return false;
     }
-    // Write result_
     if (!MarshalBasicTypeToBuffer(oss, result.result_)) {
         LOG_ERROR("Marshal getResult.result_ failed.");
         return false;
     }
-    // Write value_
     if (!MarshalDataProxyValueToBuffer(oss, result.value_)) {
         LOG_ERROR("Marshal getResult.value_ failed.");
         return false;
     }
-    // Write allowList_
     if (!MarshalStringVecToBuffer(oss, result.allowList_)) {
         LOG_ERROR("Marshal getResult.allowList_ failed.");
         return false;
+    }
+
+    size_t multiValuesSize = result.multiValues_.size();
+    if (!MarshalBasicTypeToBuffer(oss, multiValuesSize)) {
+        LOG_ERROR("Marshal getResult.multiValues_ size failed.");
+        return false;
+    }
+    for (const auto &value : result.multiValues_) {
+        if (!MarshalDataProxyValueToBuffer(oss, value)) {
+            LOG_ERROR("Marshal getResult.multiValues_ value failed.");
+            return false;
+        }
     }
 
     return oss.good();
@@ -1571,20 +1630,29 @@ bool MarshalDataProxyGetResultVecToBuffer(std::ostringstream &oss, const std::ve
 
 bool MarshalDataProxyChangeInfoToBuffer(std::ostringstream &oss, const DataProxyChangeInfo &info)
 {
-    // Write changeType_
     if (!MarshalBasicTypeToBuffer(oss, info.changeType_)) {
         LOG_ERROR("Marshal info.changeType_ failed");
         return false;
     }
-    // Write uri_
     if (!MarshalStringToBuffer(oss, info.uri_)) {
         LOG_ERROR("Marshal info.uri_ failed");
         return false;
     }
-    // Write value_
     if (!MarshalDataProxyValueToBuffer(oss, info.value_)) {
         LOG_ERROR("Marshal info.value_ failed");
         return false;
+    }
+
+    size_t multiValuesSize = info.multiValues_.size();
+    if (!MarshalBasicTypeToBuffer(oss, multiValuesSize)) {
+        LOG_ERROR("Marshal info.multiValues_ size failed");
+        return false;
+    }
+    for (const auto &value : info.multiValues_) {
+        if (!MarshalDataProxyValueToBuffer(oss, value)) {
+            LOG_ERROR("Marshal info.multiValues_ value failed");
+            return false;
+        }
     }
 
     return oss.good();
@@ -1658,33 +1726,96 @@ bool UnmarshalDataProxyValueFromBuffer(std::istringstream &iss, DataProxyValue &
     return true;
 }
 
+static bool UnmarshalMultiValuesFromBuffer(std::istringstream &iss,
+    std::map<std::string, std::map<std::string, DataProxyValue>> &multiValues)
+{
+    size_t outerSize;
+    if (!UnmarshalBasicTypeToBuffer(iss, outerSize)) {
+        LOG_ERROR("Unmarshal multiValues outer size failed");
+        return false;
+    }
+    if (outerSize > ALLOW_LIST_MAX_COUNT) {
+        LOG_ERROR("multiValues outer size: %{public}zu over limit", outerSize);
+        return false;
+    }
+    for (size_t i = 0; i < outerSize; ++i) {
+        std::string appIdentifier;
+        if (!UnmarshalStringToBuffer(iss, appIdentifier)) {
+            LOG_ERROR("Unmarshal multiValues appIdentifier failed");
+            return false;
+        }
+        size_t innerSize;
+        if (!UnmarshalBasicTypeToBuffer(iss, innerSize)) {
+            LOG_ERROR("Unmarshal multiValues inner size failed");
+            return false;
+        }
+        if (innerSize > MAX_MULTIVALUE_COUNT_PER_APP) {
+            LOG_ERROR("multiValues inner size: %{public}zu over limit", innerSize);
+            return false;
+        }
+        for (size_t j = 0; j < innerSize; ++j) {
+            std::string key;
+            if (!UnmarshalStringToBuffer(iss, key)) {
+                LOG_ERROR("Unmarshal multiValues key failed");
+                return false;
+            }
+            DataProxyValue value;
+            if (!UnmarshalDataProxyValueFromBuffer(iss, value)) {
+                LOG_ERROR("Unmarshal multiValues value failed");
+                return false;
+            }
+            multiValues[appIdentifier][key] = value;
+        }
+    }
+    return true;
+}
+
 bool UnmarshalProxyDataFromBuffer(std::istringstream &iss, DataShareProxyData &data)
 {
-    // Read uri_
     if (!UnmarshalStringToBuffer(iss, data.uri_)) {
         LOG_ERROR("Unmarshal data.uri_ failed");
         return false;
     }
-    // Read isValueUndefined and isAllowListUndefined
     if (!UnmarshalBasicTypeToBuffer(iss, data.isValueUndefined) ||
-        !UnmarshalBasicTypeToBuffer(iss, data.isAllowListUndefined)) {
-        LOG_ERROR("Unmarshal isValueUndefined or isAllowListUndefined failed");
+        !UnmarshalBasicTypeToBuffer(iss, data.isAllowListUndefined) ||
+        !UnmarshalBasicTypeToBuffer(iss, data.isTrustProvidersUndefined) ||
+        !UnmarshalBasicTypeToBuffer(iss, data.isMultiValues_)) {
+        LOG_ERROR("Unmarshal bool flags failed");
         return false;
     }
-    // Read value_ if it is not undefined
     if (!data.isValueUndefined) {
         if (!UnmarshalDataProxyValueFromBuffer(iss, data.value_)) {
             LOG_ERROR("Unmarshal data.value_ failed");
             return false;
         }
     }
-    // Read allowList_ if it is not undefined
     if (!data.isAllowListUndefined) {
         if (!UnmarshalStringVecToBuffer(iss, data.allowList_)) {
             LOG_ERROR("Unmarshal data.allowList_ failed");
             return false;
         }
     }
+    if (!data.isTrustProvidersUndefined) {
+        if (!UnmarshalStringVecToBuffer(iss, data.trustProviders_)) {
+            LOG_ERROR("Unmarshal data.trustProviders_ failed");
+            return false;
+        }
+    }
+
+    if (data.isMultiValues_) {
+        if (!UnmarshalMultiValuesFromBuffer(iss, data.multiValues_)) {
+            LOG_ERROR("Unmarshal multiValues failed");
+            return false;
+        }
+    }
+
+    int32_t maxValueLength;
+    if (!UnmarshalBasicTypeToBuffer(iss, maxValueLength)) {
+        LOG_ERROR("Unmarshal maxValueLength failed");
+        return false;
+    }
+    data.maxValueLength_ = static_cast<DataProxyMaxValueLength>(maxValueLength);
+
     return iss.good();
 }
 
@@ -1712,26 +1843,40 @@ bool UnmarshalProxyDataVecToBuffer(std::istringstream &iss, std::vector<DataShar
 
 bool UnmarshalDataProxyGetResultFromBuffer(std::istringstream &iss, DataProxyGetResult &result)
 {
-    // Read uri_
     if (!UnmarshalStringToBuffer(iss, result.uri_)) {
         LOG_ERROR("Unmarshal uri failed");
         return false;
     }
-    // Read result_
     if (!UnmarshalBasicTypeToBuffer(iss, result.result_)) {
         LOG_ERROR("Unmarshal result failed");
         return false;
     }
-    // Read value_
     if (!UnmarshalDataProxyValueFromBuffer(iss, result.value_)) {
         LOG_ERROR("Unmarshal value failed");
         return false;
     }
-    // Read allowList_
     if (!UnmarshalStringVecToBuffer(iss, result.allowList_)) {
         LOG_ERROR("Unmarshal allowList failed");
         return false;
     }
+
+    size_t multiValuesSize;
+    if (!UnmarshalBasicTypeToBuffer(iss, multiValuesSize)) {
+        LOG_ERROR("Unmarshal multiValues size failed");
+        return false;
+    }
+    if (multiValuesSize > PROXY_DATA_MAX_COUNT) {
+        LOG_ERROR("multiValues size: %{public}zu over limit", multiValuesSize);
+        return false;
+    }
+    result.multiValues_.resize(multiValuesSize);
+    for (size_t i = 0; i < multiValuesSize; ++i) {
+        if (!UnmarshalDataProxyValueFromBuffer(iss, result.multiValues_[i])) {
+            LOG_ERROR("Unmarshal multiValues value failed");
+            return false;
+        }
+    }
+
     return iss.good();
 }
 
@@ -1759,21 +1904,36 @@ bool UnmarshalDataProxyGetResultVecToBuffer(std::istringstream &iss, std::vector
 
 bool UnmarshalDataProxyChangeInfoFromBuffer(std::istringstream &iss, DataProxyChangeInfo &info)
 {
-    // Read changeType_
     if (!UnmarshalBasicTypeToBuffer(iss, info.changeType_)) {
         LOG_ERROR("Unmarshal info.changeType_ failed");
         return false;
     }
-    // Read uri_
     if (!UnmarshalStringToBuffer(iss, info.uri_)) {
         LOG_ERROR("Unmarshal info.uri_ failed");
         return false;
     }
-    // Read value_
     if (!UnmarshalDataProxyValueFromBuffer(iss, info.value_)) {
         LOG_ERROR("Unmarshal info.value_ failed");
         return false;
     }
+
+    size_t multiValuesSize;
+    if (!UnmarshalBasicTypeToBuffer(iss, multiValuesSize)) {
+        LOG_ERROR("Unmarshal info.multiValues_ size failed");
+        return false;
+    }
+    if (multiValuesSize > PROXY_DATA_MAX_COUNT) {
+        LOG_ERROR("multiValues size: %{public}zu over limit", multiValuesSize);
+        return false;
+    }
+    info.multiValues_.resize(multiValuesSize);
+    for (size_t i = 0; i < multiValuesSize; ++i) {
+        if (!UnmarshalDataProxyValueFromBuffer(iss, info.multiValues_[i])) {
+            LOG_ERROR("Unmarshal info.multiValues_ value failed");
+            return false;
+        }
+    }
+
     return iss.good();
 }
 

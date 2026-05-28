@@ -45,6 +45,9 @@ napi_value NapiDataProxyHandle::GetConstructor(napi_env env)
         DECLARE_NAPI_FUNCTION("get", Napi_Get),
         DECLARE_NAPI_FUNCTION("on", Napi_On),
         DECLARE_NAPI_FUNCTION("off", Napi_Off),
+        DECLARE_NAPI_FUNCTION("putValue", Napi_PutValue),
+        DECLARE_NAPI_FUNCTION("removeValue", Napi_RemoveValue),
+        DECLARE_NAPI_FUNCTION("getValues", Napi_GetValues),
     };
     NAPI_CALL(env, napi_define_class(env, "DataProxyHandle", NAPI_AUTO_LENGTH, Initialize, nullptr,
         sizeof(clzDes) / sizeof(napi_property_descriptor), clzDes, &cons));
@@ -155,6 +158,122 @@ bool NapiDataProxyHandle::CheckIsParameterExceed(const std::vector<std::string> 
         }
     }
     return true;
+}
+
+napi_status NapiDataProxyHandle::ResolveDataProxyErrorCode(const DataProxyErrorCode err,
+    std::shared_ptr<ContextInfo> context)
+{
+    if  (err == DataProxyErrorCode::SUCCESS) {
+        return napi_ok;
+    }
+
+    if (err == DataProxyErrorCode::URI_NOT_EXIST) {
+        context->error = std::make_shared<UriNotExistError>();
+        return napi_invalid_arg;
+    }
+
+    if (err == DataProxyErrorCode::NO_PERMISSION) {
+        context->error = std::make_shared<NoPermissionAccessUriError>();
+        return napi_invalid_arg;
+    }
+
+    if (err == DataProxyErrorCode::OVER_LIMIT) {
+        context->error = std::make_shared<DataProxyHandleParamError>();
+        return napi_invalid_arg;
+    }
+
+    if (err == DataProxyErrorCode::INNER_ERROR) {
+        context->error = std::make_shared<InnerError>();
+        return napi_generic_failure;
+    }
+
+    if (err == DataProxyErrorCode::INCOMPATIBLE_CONFIG_TYPE) {
+        context->error = std::make_shared<DataProxyHandleParamError>();
+        return napi_invalid_arg;
+    }
+
+    if (err == DataProxyErrorCode::KEY_NOT_EXIST) {
+        context->error = std::make_shared<DataProxyHandleParamError>();
+        return napi_invalid_arg;
+    }
+
+    LOG_ERROR("Unknown DataProxyErrorCode: %{public}d", static_cast<int32_t>(err));
+    context->error = std::make_shared<InnerError>();
+    return napi_generic_failure;
+}
+
+napi_status NapiDataProxyHandle::ParsePutValueInput(napi_env env, size_t argc, napi_value *argv,
+    std::shared_ptr<ContextInfo> context)
+{
+    // PutValue suppose to have 4 arguments
+    if (argc != 4) {
+        context->error = std::make_shared<ParametersNumError>("4");
+        return napi_invalid_arg;
+    }
+    napi_valuetype valueType;
+    NAPI_CALL_BASE(env, napi_typeof(env, argv[PARAM0], &valueType), napi_invalid_arg);
+    NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_string,
+        context->error = std::make_shared<ParametersTypeError>("uri", "string"), napi_invalid_arg);
+    context->uris.emplace_back(DataShareJSUtils::Convert2String(env, argv[PARAM0]));
+
+    NAPI_CALL_BASE(env, napi_typeof(env, argv[PARAM1], &valueType), napi_invalid_arg);
+    NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_number,
+        context->error = std::make_shared<ParametersTypeError>("key", "int"), napi_invalid_arg);
+    int32_t intKey = 0;
+    napi_get_value_int32(env, argv[PARAM1], &intKey);
+    context->key = std::to_string(intKey);
+
+    NAPI_CALL_BASE(env, napi_typeof(env, argv[PARAM2], &valueType), napi_invalid_arg);
+    NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
+        context->error = std::make_shared<ParametersTypeError>("value", "ValueType"), napi_invalid_arg);
+    bool isValueUndefined = false;
+    DataShareJSUtils::UnwrapDataProxyValue(env, argv[PARAM2], context->value, isValueUndefined);
+
+    NAPI_CALL_BASE(env, napi_typeof(env, argv[PARAM3], &valueType), napi_invalid_arg);
+    NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
+        context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
+    DataShareJSUtils::UnwrapDataProxyConfig(env, argv[PARAM3], context->config);
+
+    NAPI_ASSERT_CALL_ERRCODE(env, context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_4K ||
+        context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_100K,
+        context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
+    NAPI_ASSERT_CALL_ERRCODE(env, CheckIsParameterExceed(context->proxyDatas, context->config),
+        context->error = std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
+    return napi_ok;
+}
+
+napi_status NapiDataProxyHandle::ParseRemoveValueInput(napi_env env, size_t argc, napi_value *argv,
+    std::shared_ptr<ContextInfo> context)
+{
+    // PutValue suppose to have 3 arguments
+    if (argc != 3) {
+        context->error = std::make_shared<ParametersNumError>("3");
+        return napi_invalid_arg;
+    }
+    napi_valuetype valueType;
+    NAPI_CALL_BASE(env, napi_typeof(env, argv[PARAM0], &valueType), napi_invalid_arg);
+    NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_string,
+        context->error = std::make_shared<ParametersTypeError>("uri", "string"), napi_invalid_arg);
+    context->uris.emplace_back(DataShareJSUtils::Convert2String(env, argv[PARAM0]));
+
+    NAPI_CALL_BASE(env, napi_typeof(env, argv[PARAM1], &valueType), napi_invalid_arg);
+    NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_number,
+        context->error = std::make_shared<ParametersTypeError>("key", "int"), napi_invalid_arg);
+    int32_t intKey = 0;
+    napi_get_value_int32(env, argv[PARAM1], &intKey);
+    context->key = std::to_string(intKey);
+
+    NAPI_CALL_BASE(env, napi_typeof(env, argv[PARAM2], &valueType), napi_invalid_arg);
+    NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
+        context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
+    DataShareJSUtils::UnwrapDataProxyConfig(env, argv[PARAM2], context->config);
+
+    NAPI_ASSERT_CALL_ERRCODE(env, context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_4K ||
+        context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_100K,
+        context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
+    NAPI_ASSERT_CALL_ERRCODE(env, CheckIsParameterExceed(context->proxyDatas, context->config),
+        context->error = std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
+    return napi_ok;
 }
 
 napi_value NapiDataProxyHandle::Napi_Publish(napi_env env, napi_callback_info info)
@@ -493,6 +612,108 @@ napi_value NapiDataProxyHandle::Napi_UnSubscribeProxyData(napi_env env, size_t a
 
     results = proxy->jsProxyDataObsManager_->DelObservers(env, nullptr, uris);
     return DataShareJSUtils::Convert2JSValue(env, results);
+}
+
+napi_value NapiDataProxyHandle::Napi_PutValue(napi_env env, napi_callback_info info)
+{
+    auto context = std::make_shared<ContextInfo>();
+    auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
+        return ParsePutValueInput(env, argc, argv, context);
+    };
+    auto output = [context](napi_env env, napi_value *result) -> napi_status {
+        napi_get_null(env, result);
+        return napi_ok;
+    };
+    auto exec = [context](AsyncCall::Context *ctx) {
+        auto handle = context->proxy->GetHandle();
+        if (handle == nullptr) {
+            LOG_ERROR("dataProxyHandle is nullptr");
+            context->error = std::make_shared<InnerError>();
+            return;
+        }
+        context->proxyResult.emplace_back(handle->PutValues(context->uris.front(),
+            context->key, context->value, context->config));
+        context->status = ResolveDataProxyErrorCode(context->proxyResult.front().result_, context);
+        context->proxyResult.clear();
+    };
+    context->SetAction(std::move(input), std::move(output));
+    AsyncCall asyncCall(env, info, context);
+    return asyncCall.Call(env, exec);
+}
+
+napi_value NapiDataProxyHandle::Napi_RemoveValue(napi_env env, napi_callback_info info)
+{
+    auto context = std::make_shared<ContextInfo>();
+    auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
+        return ParseRemoveValueInput(env, argc, argv, context);
+    };
+    auto output = [context](napi_env env, napi_value *result) -> napi_status {
+        napi_get_null(env, result);
+        return napi_ok;
+    };
+    auto exec = [context](AsyncCall::Context *ctx) {
+        auto handle = context->proxy->GetHandle();
+        if (handle == nullptr) {
+            LOG_ERROR("dataProxyHandle is nullptr");
+            context->error = std::make_shared<InnerError>();
+            return;
+        }
+        context->proxyResult.emplace_back(handle->RemoveValue(context->uris.front(),
+            context->key, context->config));
+        context->status = ResolveDataProxyErrorCode(context->proxyResult.front().result_, context);
+        context->proxyResult.clear();
+    };
+    context->SetAction(std::move(input), std::move(output));
+    AsyncCall asyncCall(env, info, context);
+    return asyncCall.Call(env, exec);
+}
+
+napi_value NapiDataProxyHandle::Napi_GetValues(napi_env env, napi_callback_info info)
+{
+    auto context = std::make_shared<ContextInfo>();
+    auto input = [context](napi_env env, size_t argc, napi_value *argv, napi_value self) -> napi_status {
+        if (argc != 2) {
+            context->error = std::make_shared<ParametersNumError>("2");
+            return napi_invalid_arg;
+        }
+
+        napi_valuetype valueType;
+        NAPI_CALL_BASE(env, napi_typeof(env, argv[PARAM0], &valueType), napi_invalid_arg);
+        NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_string,
+            context->error = std::make_shared<ParametersTypeError>("uri", "string"), napi_invalid_arg);
+        context -> uris.emplace_back(DataShareJSUtils::Convert2String(env, argv[PARAM0]));
+
+        NAPI_CALL_BASE(env, napi_typeof(env, argv[PARAM1], &valueType), napi_invalid_arg);
+        NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
+            context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
+        DataShareJSUtils::UnwrapDataProxyConfig(env, argv[PARAM1], context->config);
+
+        NAPI_ASSERT_CALL_ERRCODE(env, context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_4K ||
+            context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_100K,
+            context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
+        NAPI_ASSERT_CALL_ERRCODE(env, CheckIsParameterExceed(context->proxyDatas, context->config), context->error =
+            std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
+        return napi_ok;
+    };
+    auto output = [context](napi_env env, napi_value *result) -> napi_status {
+        NAPI_ASSERT_BASE(env, context->status == napi_ok, "get MultiValues failed", context->status);
+        *result = DataShareJSUtils::Convert2JSValue(env, context->proxyGetResult.front().multiValues_);
+        context->proxyGetResult.clear();
+        return napi_ok;
+    };
+    auto exec = [context](AsyncCall::Context *ctx) {
+        auto handle = context->proxy->GetHandle();
+        if (handle == nullptr) {
+            LOG_ERROR("dataProxyHandle is nullptr");
+            context->error = std::make_shared<InnerError>();
+            return;
+        }
+        context->proxyGetResult.emplace_back(handle->GetValues(context->uris.front(), context->config));
+        context->status = ResolveDataProxyErrorCode(context->proxyGetResult.front().result_, context);
+    };
+    context->SetAction(std::move(input), std::move(output));
+    AsyncCall asyncCall(env, info, context);
+    return asyncCall.Call(env, exec);
 }
 } // namespace DataShare
 } // namespace OHOS

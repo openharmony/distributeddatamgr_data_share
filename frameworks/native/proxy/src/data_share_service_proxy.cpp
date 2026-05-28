@@ -901,5 +901,104 @@ std::pair<int32_t, ConnectionInterfaceInfo> DataShareServiceProxy::GetConnection
     }
     return std::make_pair(errCode, info);
 }
+
+DataProxyResult DataShareServiceProxy::PutValues(const std::string &uri, const std::string &key,
+    const DataProxyValue &value, const DataProxyConfig &proxyConfig)
+{
+    DataProxyResult result;
+    MessageParcel parcel;
+    if (!parcel.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        result.result_ = DataProxyErrorCode::INNER_ERROR;
+        return result;
+    }
+    if (!ITypesUtil::Marshal(parcel, uri, key, value, proxyConfig)) {
+        LOG_ERROR("Marshal failed!");
+        result.result_ = DataProxyErrorCode::INNER_ERROR;
+        return result;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_PROXY_PUT_VALUES), parcel, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("PutValues fail to sendRequest. err: %{public}d", err);
+        result.result_ = DataProxyErrorCode::INNER_ERROR;
+        return result;
+    }
+
+    if (!ITypesUtil::Unmarshal(reply, result)) {
+        LOG_ERROR("PutValues fail to Unmarshal");
+        result.result_ = DataProxyErrorCode::INNER_ERROR;
+    }
+    return result;
+}
+
+DataProxyResult DataShareServiceProxy::RemoveValue(const std::string &uri, const std::string &key,
+    const DataProxyConfig &proxyConfig)
+{
+    DataProxyResult result;
+    MessageParcel parcel;
+    if (!parcel.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        result.result_ = DataProxyErrorCode::INNER_ERROR;
+        return result;
+    }
+    if (!ITypesUtil::Marshal(parcel, uri, key, proxyConfig)) {
+        LOG_ERROR("Marshal failed!");
+        result.result_ = DataProxyErrorCode::INNER_ERROR;
+        return result;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_PROXY_REMOVE_VALUE), parcel, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("RemoveValue fail to sendRequest. err: %{public}d", err);
+        result.result_ = DataProxyErrorCode::INNER_ERROR;
+        return result;
+    }
+
+    if (!ITypesUtil::Unmarshal(reply, result)) {
+        LOG_ERROR("RemoveValue fail to Unmarshal");
+        result.result_ = DataProxyErrorCode::INNER_ERROR;
+    }
+    return result;
+}
+
+DataProxyGetResult DataShareServiceProxy::GetValues(const std::string &uri,
+    const DataProxyConfig &proxyConfig)
+{
+    DataProxyGetResult result;
+    MessageParcel parcel;
+    if (!parcel.WriteInterfaceToken(IDataShareService::GetDescriptor())) {
+        LOG_ERROR("Write descriptor failed!");
+        result.result_ = DataProxyErrorCode::INNER_ERROR;
+        return result;
+    }
+    if (!ITypesUtil::Marshal(parcel, uri, proxyConfig)) {
+        LOG_ERROR("Marshal failed!");
+        result.result_ = DataProxyErrorCode::INNER_ERROR;
+        return result;
+    }
+
+    MessageParcel reply;
+    MessageOption option;
+    int32_t err = Remote()->SendRequest(
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_PROXY_GET_VALUES), parcel, reply, option);
+    if (err != NO_ERROR) {
+        LOG_ERROR("GetValues fail to sendRequest. err: %{public}d", err);
+        result.result_ = DataProxyErrorCode::INNER_ERROR;
+        return result;
+    }
+
+    if (!ITypesUtil::Unmarshal(reply, result)) {
+        LOG_ERROR("GetValues fail to Unmarshal");
+        result.result_ = DataProxyErrorCode::INNER_ERROR;
+    }
+    return result;
+}
 } // namespace DataShare
 } // namespace OHOS

@@ -41,6 +41,9 @@ pub const UINT8_ARRAY: &CStr = cstr(b"std.core.Uint8Array\0");
 pub const UINT16_ARRAY: &CStr = cstr(b"std.core.Uint16Array\0");
 pub const UINT32_ARRAY: &CStr = cstr(b"std.core.Uint32Array\0");
 
+pub const FLOAT32_ARRAY: &CStr = cstr(b"std.core.Float32Array\0");
+pub const FLOAT64_ARRAY: &CStr = cstr(b"std.core.Float64Array\0");
+
 pub const SET: &CStr = cstr(b"$_set\0");
 pub const GET: &CStr = cstr(b"$_get\0");
 pub const CTOR: &CStr = cstr(b"<ctor>\0");
