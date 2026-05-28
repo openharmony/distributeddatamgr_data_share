@@ -47,6 +47,8 @@ bool unsubscribe_common_event(std::shared_ptr<CppCommonEventSubscriber> subscrib
 
 bool publish_common_event(rust::Str event_name, int32_t code);
 
+bool publish_sticky_common_event(rust::Str event_name, int32_t code);
+
 } // namespace OHOS::EventFwk
 
 #endif // FFI_COMMONEVENT_BRIDGE_H
