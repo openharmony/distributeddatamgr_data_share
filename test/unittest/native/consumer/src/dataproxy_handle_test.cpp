@@ -35,7 +35,9 @@ std::string TEST_URI2 = "datashareproxy://com.acts.datasharetest.other/test1";
 std::string TEST_UNUSED_URI = "datashareproxy://com.acts.datasharetest/unused";
 static std::string TEST_TRUNCATE_URI1 = "datashareproxy://com.acts.datasharetest/truncate1";
 static std::string TEST_TRUNCATE_URI2 = "datashareproxy://com.acts.datasharetest/truncate2";
+static std::string TEST_MULTIVALUES_URI1 = "datashareproxy://com.acts.datasharetest/multiValues1";
 std::atomic_int g_callbackTimes = 0;
+constexpr const char* APPID_PLACEHOLDER = "123456789";
 
 class DataProxyHandleTest : public testing::Test {
 public:
@@ -1215,6 +1217,81 @@ HWTEST_F(DataProxyHandleTest, Subscribe_StringWithinLimit_Test_001, TestSize.Lev
     handle->DeleteProxyData(deleteUris, proxyConfig);
 
     LOG_INFO("DataProxyHandleTest_Subscribe_StringWithinLimit_Test_001::End");
+}
+
+/**
+ * @tc.name: PutValues_Test_001
+ * @tc.desc: Verify DataProxyHandle PutValues operation for publish, put, remove and get multi-value data
+ * @tc.type: FUNC
+ * @tc.require: issueNumber
+ * @tc.precon:
+    1. TEST_MULTIVALUES_URI1 (URI for multi-value data operation) is predefined
+    2. APPID_PLACEHOLDER (placeholder app ID) is predefined
+    3. DataProxyType::SHARED_CONFIG supports multi-value data transmission
+ * @tc.step:
+    1. Create a DataProxyHandle instance via DataShare::DataProxyHandle::Create()
+    2. Set DataProxyConfig's type to DataProxyType::SHARED_CONFIG
+    3. Prepare multi-value data with integer value 12, bind it with TEST_MULTIVALUES_URI1 into DataShareProxyData
+    4. Publish the multi-value data via PublishProxyData and verify success
+    5. Retrieve values via GetValues and verify the integer value matches
+    6. Remove the value via RemoveValue and verify success
+    7. Put a new string value "value2" via PutValues and verify success
+    8. Retrieve values again via GetValues and verify the string value matches
+ * @tc.expect:
+    1. DataProxyHandle creation returns E_OK
+    2. PublishProxyData returns DataProxyErrorCode::SUCCESS
+    3. Retrieved multi-values contain the published integer value 12
+    4. removeValue returns DataProxyErrorCode::SUCCESS
+    5. PutValue returns DataProxyErrorCode::SUCCESS
+    6. Retrieved multi-values contain the updated string value "value2"
+ */
+HWTEST_F(DataProxyHandleTest, PutValues_Test_001, TestSize.Level0)
+{
+    LOG_INFO("DataProxyHandleTest_PutValues_Test_001::Start");
+    auto [ret, handle] = DataShare::DataProxyHandle::Create();
+    EXPECT_EQ(ret, E_OK);
+
+    DataProxyConfig proxyConfig;
+    proxyConfig.type_ = DataProxyType::SHARED_CONFIG;
+
+    DataProxyValue value = 12;
+    DataProxyValue value1 = "value2";
+    std::string index = "1";
+    std::map<std::string, std::map<std::string, DataProxyValue>> multiValues = {
+        { APPID_PLACEHOLDER, {
+            {index, value}
+        }}
+    };
+    DataShareProxyData data;
+    data.isMultiValues_ = true;
+    data.multiValues_ = multiValues;
+    data.uri_ = TEST_MULTIVALUES_URI1;
+    std::vector<DataShareProxyData> proxyData;
+    proxyData.push_back(data);
+
+    auto publishRet = handle->PublishProxyData(proxyData, proxyConfig);
+    EXPECT_EQ(publishRet[0].result_, DataProxyErrorCode::SUCCESS);
+
+    auto publishGetRet = handle->GetValues(TEST_MULTIVALUES_URI1, proxyConfig);
+	// use expect not empty preventing crash
+    EXPECT_EQ(publishGetRet.multiValues_.empty(), false);
+    if (!publishGetRet.multiValues_.empty()) {
+        EXPECT_EQ(publishGetRet.multiValues_[0], value);
+    }
+    auto removeRet = handle->RemoveValue(TEST_MULTIVALUES_URI1, index, proxyConfig);
+    EXPECT_EQ(removeRet.result_, DataProxyErrorCode::SUCCESS);
+
+    auto putRet = handle->PutValues(TEST_MULTIVALUES_URI1, index, value1, proxyConfig);
+    EXPECT_EQ(putRet.result_, DataProxyErrorCode::SUCCESS);
+
+    auto putGetRet = handle->GetValues(TEST_MULTIVALUES_URI1, proxyConfig);
+	// use expect not empty preventing crash
+    EXPECT_EQ(putGetRet.multiValues_.empty(), false);
+    if (!putGetRet.multiValues_.empty()) {
+        EXPECT_EQ(putGetRet.multiValues_[0], value1);
+    }
+    handle->DeleteProxyData(proxyConfig);
+    LOG_INFO("DataProxyHandleTest_PutValues_Test_001::End");
 }
 } // namespace DataShare
 } // namespace OHOS
