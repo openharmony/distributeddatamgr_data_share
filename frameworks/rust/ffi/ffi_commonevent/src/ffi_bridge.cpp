@@ -13,17 +13,19 @@
 
 // C++ bridge implementation for CommonEvent FFI.
 
-#include "ffi_commonevent_bridge.h"
-#include "wrapper.rs.h"
 #include "common_event_manager.h"
+#include "common_event_publish_info.h"
+#include "ffi_commonevent_bridge.h"
 #include "matching_skills.h"
+#include "wrapper.rs.h"
 
 namespace OHOS::EventFwk {
 
 CppCommonEventSubscriber::CppCommonEventSubscriber(
-    const CommonEventSubscribeInfo &info,
-    rust::Box<CommonEventCallback> cb)
-    : CommonEventSubscriber(info), callback_(std::move(cb)) {}
+    const CommonEventSubscribeInfo &info, rust::Box<CommonEventCallback> cb)
+    : CommonEventSubscriber(info), callback_(std::move(cb))
+{
+}
 
 CppCommonEventSubscriber::~CppCommonEventSubscriber() = default;
 
@@ -43,8 +45,7 @@ bool publish_common_event(rust::Str event_name, int32_t code)
 }
 
 std::shared_ptr<CppCommonEventSubscriber> subscribe_common_event(
-    rust::Str event_name,
-    rust::Box<CommonEventCallback> callback)
+    rust::Str event_name, rust::Box<CommonEventCallback> callback)
 {
     MatchingSkills skills;
     skills.AddEvent(std::string(event_name));
@@ -54,6 +55,17 @@ std::shared_ptr<CppCommonEventSubscriber> subscribe_common_event(
         return nullptr;
     }
     return subscriber;
+}
+
+bool publish_sticky_common_event(rust::Str event_name, int32_t code)
+{
+    Want want;
+    want.SetAction(std::string(event_name));
+    CommonEventData data(want);
+    data.SetCode(code);
+    CommonEventPublishInfo publishInfo;
+    publishInfo.SetSticky(true);
+    return CommonEventManager::PublishCommonEvent(data, publishInfo);
 }
 
 bool unsubscribe_common_event(std::shared_ptr<CppCommonEventSubscriber> subscriber)

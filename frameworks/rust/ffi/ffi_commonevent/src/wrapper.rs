@@ -32,6 +32,8 @@ pub mod ffi {
 
         /// Publishes a common event with the given name and code.
         fn publish_common_event(event_name: &str, code: i32) -> bool;
+        /// Publishes a sticky common event with the given name and code.
+        fn publish_sticky_common_event(event_name: &str, code: i32) -> bool;
         /// Subscribes to a common event and returns a subscriber handle.
         fn subscribe_common_event(
             event_name: &str,
@@ -96,6 +98,11 @@ impl CommonEventPublisher {
     /// Publishes a common event with the given name and code.
     pub fn publish(event_name: &str, code: i32) -> bool {
         ffi::publish_common_event(event_name, code)
+    }
+
+    /// Publishes a sticky common event with the given name and code.
+    pub fn publish_sticky(event_name: &str, code: i32) -> bool {
+        ffi::publish_sticky_common_event(event_name, code)
     }
 }
 
