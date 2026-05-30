@@ -28,6 +28,7 @@ group("unittest") {
     "resource/errorcode_ext_bundle:errorcode_ext",
     "resource/datashare_proxy_bundle:proxydatas_with_permission",
     "resource/ohos_test:copy_ohos_test",
+    "../../ets/data_share_ets:ActsDataShareEtsTest",
   ]
 }
 ##################################################################

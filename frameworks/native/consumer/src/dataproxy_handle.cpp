@@ -111,7 +111,7 @@ std::vector<DataProxyResult> DataProxyHandle::UnsubscribeProxyData(const std::ve
     return ProxyDataSubscriberManager::GetInstance().DelObservers(this, proxy, uris);
 }
 
-DataProxyResult DataProxyHandle::PutValues(const std::string &uri, const std::string &key,
+DataProxyResult DataProxyHandle::PutValue(const std::string &uri, const std::string &key,
     const DataProxyValue &value, const DataProxyConfig &proxyConfig)
 {
     auto proxy = DataShareManagerImpl::GetServiceProxy();
@@ -119,7 +119,7 @@ DataProxyResult DataProxyHandle::PutValues(const std::string &uri, const std::st
         LOG_ERROR("proxy is nullptr");
         return DataProxyResult(uri, DataProxyErrorCode::INNER_ERROR);
     }
-    return proxy->PutValues(uri, key, value, proxyConfig);
+    return proxy->PutValue(uri, key, value, proxyConfig);
 }
 
 DataProxyResult DataProxyHandle::RemoveValue(const std::string &uri, const std::string &key,
