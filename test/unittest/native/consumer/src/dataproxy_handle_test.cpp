@@ -1220,8 +1220,8 @@ HWTEST_F(DataProxyHandleTest, Subscribe_StringWithinLimit_Test_001, TestSize.Lev
 }
 
 /**
- * @tc.name: PutValues_Test_001
- * @tc.desc: Verify DataProxyHandle PutValues operation for publish, put, remove and get multi-value data
+ * @tc.name: PutValue_Test_001
+ * @tc.desc: Verify DataProxyHandle PutValue operation for publish, put, remove and get multi-value data
  * @tc.type: FUNC
  * @tc.require: issueNumber
  * @tc.precon:
@@ -1235,7 +1235,7 @@ HWTEST_F(DataProxyHandleTest, Subscribe_StringWithinLimit_Test_001, TestSize.Lev
     4. Publish the multi-value data via PublishProxyData and verify success
     5. Retrieve values via GetValues and verify the integer value matches
     6. Remove the value via RemoveValue and verify success
-    7. Put a new string value "value2" via PutValues and verify success
+    7. Put a new string value "value2" via PutValue and verify success
     8. Retrieve values again via GetValues and verify the string value matches
  * @tc.expect:
     1. DataProxyHandle creation returns E_OK
@@ -1245,9 +1245,9 @@ HWTEST_F(DataProxyHandleTest, Subscribe_StringWithinLimit_Test_001, TestSize.Lev
     5. PutValue returns DataProxyErrorCode::SUCCESS
     6. Retrieved multi-values contain the updated string value "value2"
  */
-HWTEST_F(DataProxyHandleTest, PutValues_Test_001, TestSize.Level0)
+HWTEST_F(DataProxyHandleTest, PutValue_Test_001, TestSize.Level0)
 {
-    LOG_INFO("DataProxyHandleTest_PutValues_Test_001::Start");
+    LOG_INFO("DataProxyHandleTest_PutValue_Test_001::Start");
     auto [ret, handle] = DataShare::DataProxyHandle::Create();
     EXPECT_EQ(ret, E_OK);
 
@@ -1281,7 +1281,7 @@ HWTEST_F(DataProxyHandleTest, PutValues_Test_001, TestSize.Level0)
     auto removeRet = handle->RemoveValue(TEST_MULTIVALUES_URI1, index, proxyConfig);
     EXPECT_EQ(removeRet.result_, DataProxyErrorCode::SUCCESS);
 
-    auto putRet = handle->PutValues(TEST_MULTIVALUES_URI1, index, value1, proxyConfig);
+    auto putRet = handle->PutValue(TEST_MULTIVALUES_URI1, index, value1, proxyConfig);
     EXPECT_EQ(putRet.result_, DataProxyErrorCode::SUCCESS);
 
     auto putGetRet = handle->GetValues(TEST_MULTIVALUES_URI1, proxyConfig);
@@ -1291,7 +1291,7 @@ HWTEST_F(DataProxyHandleTest, PutValues_Test_001, TestSize.Level0)
         EXPECT_EQ(putGetRet.multiValues_[0], value1);
     }
     handle->DeleteProxyData(proxyConfig);
-    LOG_INFO("DataProxyHandleTest_PutValues_Test_001::End");
+    LOG_INFO("DataProxyHandleTest_PutValue_Test_001::End");
 }
 } // namespace DataShare
 } // namespace OHOS

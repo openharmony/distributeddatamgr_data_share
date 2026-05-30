@@ -106,7 +106,7 @@ public:
 
     std::vector<DataProxyResult> UnsubscribeProxyData(const std::vector<std::string> &uris) override;
 
-    DataProxyResult PutValues(const std::string &uri, const std::string &key,
+    DataProxyResult PutValue(const std::string &uri, const std::string &key,
         const DataProxyValue &value, const DataProxyConfig &proxyConfig) override;
 
     DataProxyResult RemoveValue(const std::string &uri, const std::string &key,

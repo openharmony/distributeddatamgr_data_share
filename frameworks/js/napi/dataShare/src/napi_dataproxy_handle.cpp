@@ -633,7 +633,7 @@ napi_value NapiDataProxyHandle::Napi_PutValue(napi_env env, napi_callback_info i
             context->error = std::make_shared<InnerError>();
             return;
         }
-        context->proxyResult.emplace_back(handle->PutValues(context->uris.front(),
+        context->proxyResult.emplace_back(handle->PutValue(context->uris.front(),
             context->key, context->value, context->config));
         context->status = ResolveDataProxyErrorCode(context->proxyResult.front().result_, context);
         context->proxyResult.clear();

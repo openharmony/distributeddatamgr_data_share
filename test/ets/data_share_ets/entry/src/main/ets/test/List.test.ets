@@ -19,6 +19,9 @@ import DataSharePredicatesRDBEtsTest from './dataSharePredicatesRDB.test.ets';
 import DataSharePredicatesRDBErrCodeEtsTest from './dataSharePredicatesRDBErrCode.test.ets';
 import DataShareSubscribeTest from './dataShareSubscribe.test.ets';
 import DataShareConfigEtsTest from './dataShareConfigEts.test.ets';
+import DataShareSelfAccessPutValueTest from './dataShareSelfAccessPutValue.test.ets';
+import DataShareSelfAccessRemoveValueTest from './dataShareSelfAccessRemoveValue.test.ets';
+import DataShareSelfAccessGetValuesTest from './dataShareSelfAccessGetValues.test.ets';
 
 export default function testsuite() {
   DataSharePredicatesKVEtsTest();
@@ -27,4 +30,7 @@ export default function testsuite() {
   DataSharePredicatesRDBErrCodeEtsTest();
   DataShareSubscribeTest();
   DataShareConfigEtsTest();
+  DataShareSelfAccessPutValueTest();
+  DataShareSelfAccessRemoveValueTest();
+  DataShareSelfAccessGetValuesTest();
 }

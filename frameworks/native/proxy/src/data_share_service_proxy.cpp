@@ -902,7 +902,7 @@ std::pair<int32_t, ConnectionInterfaceInfo> DataShareServiceProxy::GetConnection
     return std::make_pair(errCode, info);
 }
 
-DataProxyResult DataShareServiceProxy::PutValues(const std::string &uri, const std::string &key,
+DataProxyResult DataShareServiceProxy::PutValue(const std::string &uri, const std::string &key,
     const DataProxyValue &value, const DataProxyConfig &proxyConfig)
 {
     DataProxyResult result;
@@ -921,15 +921,15 @@ DataProxyResult DataShareServiceProxy::PutValues(const std::string &uri, const s
     MessageParcel reply;
     MessageOption option;
     int32_t err = Remote()->SendRequest(
-        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_PROXY_PUT_VALUES), parcel, reply, option);
+        static_cast<uint32_t>(InterfaceCode::DATA_SHARE_SERVICE_CMD_PROXY_PUT_VALUE), parcel, reply, option);
     if (err != NO_ERROR) {
-        LOG_ERROR("PutValues fail to sendRequest. err: %{public}d", err);
+        LOG_ERROR("PutValue fail to sendRequest. err: %{public}d", err);
         result.result_ = DataProxyErrorCode::INNER_ERROR;
         return result;
     }
 
     if (!ITypesUtil::Unmarshal(reply, result)) {
-        LOG_ERROR("PutValues fail to Unmarshal");
+        LOG_ERROR("PutValue fail to Unmarshal");
         result.result_ = DataProxyErrorCode::INNER_ERROR;
     }
     return result;
