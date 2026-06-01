@@ -1,0 +1,46 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+use crate::error::DataShareError;
+
+/// Convert DataShare error to C error code
+#[no_mangle]
+pub extern "C" fn DataShareErrorToCode(err: i32) -> i32 {
+    DataShareError::from(err) as i32
+}
+
+/// Check if error code indicates success
+#[no_mangle]
+pub extern "C" fn DataShareErrorIsOk(err: i32) -> bool {
+    err == 0
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_error_conversion() {
+        assert_eq!(DataShareErrorToCode(0), 0);
+        assert_eq!(DataShareErrorToCode(1001), 1001);
+    }
+
+    #[test]
+    fn test_error_is_ok() {
+        assert!(DataShareErrorIsOk(0));
+        assert!(!DataShareErrorIsOk(-1));
+        assert!(!DataShareErrorIsOk(1001));
+    }
+}
