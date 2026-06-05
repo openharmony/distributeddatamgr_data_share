@@ -23,6 +23,7 @@ namespace OHOS {
 using namespace DataShare;
 namespace DataShareAni {
 struct DataShareCallback;
+struct DataProxyChangeInfo;
 class AniObserver {
 public:
     AniObserver(rust::Box<DataShareCallback> &&callback) : callback_(std::move(callback)) {};
@@ -49,6 +50,9 @@ class AniProxyDataObserver final: public AniObserver, public std::enable_shared_
 public:
     AniProxyDataObserver(rust::Box<DataShareCallback> &&callback) : AniObserver(std::move(callback)) {};
     void OnChange(const std::vector<DataShare::DataProxyChangeInfo> &changeNode);
+private:
+    void PushProxyMultiValues(rust::Vec<DataShareAni::DataProxyChangeInfo> &node,
+        const std::vector<DataShare::DataProxyValue> &multiValues);
 };
 } // namespace DataShareAni
 } // namespace OHOS

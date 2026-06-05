@@ -138,6 +138,9 @@ ani_constructor!(
         "native_data_proxy_handle_delete": datashare::native_data_proxy_handle_delete,
         "native_data_proxy_handle_delete_all": datashare::native_data_proxy_handle_delete_all,
         "native_data_proxy_handle_get": datashare::native_data_proxy_handle_get,
+        "native_data_proxy_handle_put_value": datashare::native_data_proxy_handle_put_value,
+        "native_data_proxy_handle_remove_value": datashare::native_data_proxy_handle_remove_value,
+        "native_data_proxy_handle_get_values": datashare::native_data_proxy_handle_get_values,
     ]
     class "@ohos.data.dataShare.dataShare.DataShareHelperInner"
     [

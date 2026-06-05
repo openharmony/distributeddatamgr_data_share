@@ -123,11 +123,12 @@ struct DataProxyGetResult {
 struct DataProxyChangeInfo {
     DataProxyChangeInfo() = default;
     DataProxyChangeInfo(const DataShareObserver::ChangeType &changeType,
-        const std::string &uri, const DataProxyValue &value)
-        : changeType_(changeType), uri_(uri), value_(value) {}
+        const std::string &uri, const DataProxyValue &value, bool isMultiValues = false)
+        : changeType_(changeType), uri_(uri), value_(value), isMultiValues_(isMultiValues) {}
     DataShareObserver::ChangeType changeType_ = DataShareObserver::INVAILD;
     std::string uri_;
     DataProxyValue value_;
+    bool isMultiValues_ = false;
     std::vector<DataProxyValue> multiValues_;
 };
 } // namespace DataShare

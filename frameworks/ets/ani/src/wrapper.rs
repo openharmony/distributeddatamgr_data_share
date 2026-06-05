@@ -15,8 +15,16 @@ use crate::datashare::{
     ChangeInfo, PublishedDataChangeNode, PublishedItem, RdbDataChangeNode, Template, TemplateId,
     AniDataProxyConfig, AniProxyData, AniDataProxyType, DataProxyChangeInfo, data_share_data_proxy_config_get_type,ani_proxy_data_get_uri, ani_proxy_data_get_enum_type, ani_proxy_data_get_value_string,
     ani_proxy_data_get_value_i64, ani_proxy_data_get_value_f64, ani_proxy_data_get_value_boolean,
-    ani_proxy_data_get_data, rust_create_proxy_data_change_info, data_proxy_change_info_push_i64,
+    ani_proxy_data_get_data, ani_proxy_data_get_is_multi_values, ani_proxy_data_get_values_size,
+    ani_proxy_data_get_values_key_at, ani_proxy_data_get_values_type_at,
+    ani_proxy_data_get_values_string_at, ani_proxy_data_get_values_i64_at,
+    ani_proxy_data_get_values_f64_at, ani_proxy_data_get_values_bool_at,
+    ani_proxy_data_get_trust_providers,
+    rust_create_proxy_data_change_info, data_proxy_change_info_push_i64,
     data_proxy_change_info_push_f64, data_proxy_change_info_push_bool, data_proxy_change_info_push_string,
+    data_proxy_change_info_set_values_empty,
+    data_proxy_change_info_push_value_i64, data_proxy_change_info_push_value_f64,
+    data_proxy_change_info_push_value_bool, data_proxy_change_info_push_value_string,
     data_share_data_proxy_config_get_max_value_length,
 };
 use crate::datashare_extension::*;
@@ -53,6 +61,8 @@ pub const fn convert_to_business_error(code: i32) -> BusinessError {
         15700011 => BusinessError::new_static(code, "The URI does not exist."),
         15700012 => BusinessError::new_static(code, "The data area does not exist."),
         15700013 => BusinessError::new_static(code, "The DataShareHelper instance is already closed."),
+        15700014 => BusinessError::new_static(code, "Proxy parameter check error. Possible causes: 1. Over limit; 2. Incompatible config type; 3. Key not exist."),
+        15700015 => BusinessError::new_static(code, "No permission to access the URI."),
         _ => BusinessError::new_static(code, "Unknown error"),
     }
 }
@@ -229,6 +239,25 @@ pub mod ffi {
             change_type: i32,
             change_info_uri: String,
             change_info_value: String,
+        );
+        fn data_proxy_change_info_set_values_empty(
+            node: &mut Vec<DataProxyChangeInfo>,
+        );
+        fn data_proxy_change_info_push_value_i64(
+            node: &mut Vec<DataProxyChangeInfo>,
+            value: i64,
+        );
+        fn data_proxy_change_info_push_value_f64(
+            node: &mut Vec<DataProxyChangeInfo>,
+            value: f64,
+        );
+        fn data_proxy_change_info_push_value_bool(
+            node: &mut Vec<DataProxyChangeInfo>,
+            value: bool,
+        );
+        fn data_proxy_change_info_push_value_string(
+            node: &mut Vec<DataProxyChangeInfo>,
+            value: String,
         );
 
         type DataShareCallback;
@@ -435,6 +464,15 @@ pub mod ffi {
         pub fn ani_proxy_data_get_value_f64(data: &AniProxyData) -> f64;
         pub fn ani_proxy_data_get_value_boolean(data: &AniProxyData) -> bool;
         pub fn ani_proxy_data_get_data(data: &AniProxyData, vec: &mut Vec<String>) -> bool;
+        pub fn ani_proxy_data_get_is_multi_values(data: &AniProxyData) -> bool;
+        pub fn ani_proxy_data_get_values_size(data: &AniProxyData) -> usize;
+        pub fn ani_proxy_data_get_values_key_at(data: &AniProxyData, index: usize) -> String;
+        pub fn ani_proxy_data_get_values_type_at(data: &AniProxyData, index: usize) -> EnumType;
+        pub fn ani_proxy_data_get_values_string_at(data: &AniProxyData, index: usize) -> String;
+        pub fn ani_proxy_data_get_values_i64_at(data: &AniProxyData, index: usize) -> i64;
+        pub fn ani_proxy_data_get_values_f64_at(data: &AniProxyData, index: usize) -> f64;
+        pub fn ani_proxy_data_get_values_bool_at(data: &AniProxyData, index: usize) -> bool;
+        pub fn ani_proxy_data_get_trust_providers(data: &AniProxyData, vec: &mut Vec<String>) -> bool;
         pub fn data_proxy_get_result_set_push_i64(
             set: &mut AniDataProxyGetResultSetParam,
             uri: String,
@@ -463,6 +501,12 @@ pub mod ffi {
             value: String,
             allowList: Vec<String>,
         );
+
+        type AniDataProxyGetValuesResultParam;
+        pub fn data_proxy_get_values_push_string(set: &mut AniDataProxyGetValuesResultParam, value: String);
+        pub fn data_proxy_get_values_push_i64(set: &mut AniDataProxyGetValuesResultParam, value: i64);
+        pub fn data_proxy_get_values_push_f64(set: &mut AniDataProxyGetValuesResultParam, value: f64);
+        pub fn data_proxy_get_values_push_bool(set: &mut AniDataProxyGetValuesResultParam, value: bool);
     }
 
     unsafe extern "C++" {
@@ -782,6 +826,28 @@ pub mod ffi {
             uris: Vec<String>,
             config: &AniDataProxyConfig,
             set: &mut AniDataProxyGetResultSetParam,
+        ) -> i32;
+
+        fn DataShareNativeDataProxyHandlePutValue(
+            dataShareProxyHandlePtr: i64,
+            uri: String,
+            key: i32,
+            value: &ValueType,
+            config: &AniDataProxyConfig,
+        ) -> i32;
+
+        fn DataShareNativeDataProxyHandleRemoveValue(
+            dataShareProxyHandlePtr: i64,
+            uri: String,
+            key: i32,
+            config: &AniDataProxyConfig,
+        ) -> i32;
+
+        fn DataShareNativeDataProxyHandleGetValues(
+            dataShareProxyHandlePtr: i64,
+            uri: String,
+            config: &AniDataProxyConfig,
+            set: &mut AniDataProxyGetValuesResultParam,
         ) -> i32;
     }
 }

@@ -253,7 +253,7 @@ export default function DataShareSelfAccessGetValuesTest() {
         expect().assertFail();
       } catch (err) {
         let businessErr = err as BusinessError;
-        expect(businessErr.code).assertEqual('15700014');
+        expect(businessErr.code).assertEqual(15700014);
       }
       console.log(TAG + "************* ShareConfig_SelfAccess_GetValues_Test103 end *************");
     });

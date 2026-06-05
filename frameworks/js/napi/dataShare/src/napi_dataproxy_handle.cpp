@@ -639,7 +639,7 @@ napi_value NapiDataProxyHandle::Napi_PutValue(napi_env env, napi_callback_info i
         context->proxyResult.clear();
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, context);
+    AsyncCall asyncCall(env, info, context, true);
     return asyncCall.Call(env, exec);
 }
 
@@ -666,7 +666,7 @@ napi_value NapiDataProxyHandle::Napi_RemoveValue(napi_env env, napi_callback_inf
         context->proxyResult.clear();
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, context);
+    AsyncCall asyncCall(env, info, context, true);
     return asyncCall.Call(env, exec);
 }
 
@@ -714,7 +714,7 @@ napi_value NapiDataProxyHandle::Napi_GetValues(napi_env env, napi_callback_info 
         context->status = ResolveDataProxyErrorCode(context->proxyGetResult.front().result_, context);
     };
     context->SetAction(std::move(input), std::move(output));
-    AsyncCall asyncCall(env, info, context);
+    AsyncCall asyncCall(env, info, context, true);
     return asyncCall.Call(env, exec);
 }
 } // namespace DataShare

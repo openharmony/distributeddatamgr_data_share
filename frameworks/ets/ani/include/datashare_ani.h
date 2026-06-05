@@ -49,6 +49,7 @@ struct AniProxyData;
 struct AniDataProxyConfig;
 struct AniDataProxyResultSetParam;
 struct AniDataProxyGetResultSetParam;
+struct AniDataProxyGetValuesResultParam;
 struct AniDataProxyResult;
 struct DataShareBatchUpdateParamIn;
 struct DataShareBatchUpdateParamOut;
@@ -64,6 +65,7 @@ const int EXCEPTION_URI_NOT_EXIST = 15700011;
 const int EXCEPTION_DATA_AREA_NOT_EXIST = 15700012;
 const int EXCEPTION_HELPER_CLOSED = 15700013;
 const int EXCEPTION_PROXY_PARAMETER_CHECK = 15700014;
+const int EXCEPTION_NO_PERMISSION_ACCESS_URI = 15700015;
 const int INVALID_MAX_VALUE_LENGTH = -1;
 class SharedPtrHolder {
 public:
@@ -276,6 +278,15 @@ int DataShareNativeDataProxyHandleDeleteAll(int64_t dataShareProxyHandlePtr, con
 
 int DataShareNativeDataProxyHandleGet(int64_t dataShareProxyHandlePtr, rust::Vec<rust::String> uris,
     const AniDataProxyConfig& config, AniDataProxyGetResultSetParam& param);
+
+int DataShareNativeDataProxyHandlePutValue(int64_t dataShareProxyHandlePtr, rust::String uri,
+    int32_t key, const ValueType& value, const AniDataProxyConfig& config);
+
+int DataShareNativeDataProxyHandleRemoveValue(int64_t dataShareProxyHandlePtr, rust::String uri,
+    int32_t key, const AniDataProxyConfig& config);
+
+int DataShareNativeDataProxyHandleGetValues(int64_t dataShareProxyHandlePtr, rust::String uri,
+    const AniDataProxyConfig& config, AniDataProxyGetValuesResultParam& param);
 } // namespace DataShareAni
 } // namespace OHOS
 

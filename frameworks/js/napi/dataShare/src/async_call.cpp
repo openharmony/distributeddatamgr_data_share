@@ -22,7 +22,7 @@
 
 namespace OHOS::DataShare {
 __attribute__((no_sanitize("undefined"))) AsyncCall::AsyncCall(napi_env env, napi_callback_info info,
-    std::shared_ptr<Context> context) : env_(env)
+    std::shared_ptr<Context> context, bool isBusinessErrorNumber) : env_(env)
 {
     context_ = new AsyncContext();
     size_t argc = ARGS_MAX_COUNT;
@@ -40,7 +40,16 @@ __attribute__((no_sanitize("undefined"))) AsyncCall::AsyncCall(napi_env env, nap
         LOG_DEBUG("get argc value less than zero");
     }
     napi_status status = (*context)(env, argc, argv, self);
-    NAPI_ASSERT_ERRCODE(env, status == napi_ok, context->error);
+    // napi_throw_error sets code as string, but SetBusinessError (exec path) sets code as int32.
+    // Use napi_throw_business_error to keep input-validation code type consistent with exec path.
+    if (status != napi_ok) {
+        if (isBusinessErrorNumber) {
+            napi_throw_business_error(env, context->error->GetCode(), context->error->GetMessage().c_str());
+        } else {
+            NAPI_ASSERT_ERRCODE(env, false, context->error);
+        }
+        return;
+    }
     context_->ctx = std::move(context);
     napi_create_reference(env, self, 1, &context_->self);
 }

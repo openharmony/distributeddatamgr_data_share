@@ -172,7 +172,9 @@ void ProxyDataSubscriberManager::Emit(std::vector<DataProxyChangeInfo> &changeIn
             }
             // if value size exceeds maxValueLength, the value will be truncated
             DataProxyValue validValue = GetValidDataProxyValue(data.value_, node.config_);
-            results[node.observer_].emplace_back(data.changeType_, data.uri_, validValue);
+            DataProxyChangeInfo info = data;
+            info.value_ = validValue;
+            results[node.observer_].push_back(std::move(info));
         }
     }
     for (auto &[callback, info] : results) {

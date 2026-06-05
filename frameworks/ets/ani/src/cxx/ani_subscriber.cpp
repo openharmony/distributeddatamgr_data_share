@@ -75,6 +75,23 @@ void AniPublishedObserver::OnChange(DataShare::PublishedDataChangeNode &changeNo
     callback_->execute_callback_published_data_change(*node);
 }
 
+void AniProxyDataObserver::PushProxyMultiValues(rust::Vec<DataShareAni::DataProxyChangeInfo> &node,
+    const std::vector<DataShare::DataProxyValue> &multiValues)
+{
+    data_proxy_change_info_set_values_empty(node);
+    for (const auto &v : multiValues) {
+        if (std::holds_alternative<int64_t>(v)) {
+            data_proxy_change_info_push_value_i64(node, std::get<int64_t>(v));
+        } else if (std::holds_alternative<double>(v)) {
+            data_proxy_change_info_push_value_f64(node, std::get<double>(v));
+        } else if (std::holds_alternative<bool>(v)) {
+            data_proxy_change_info_push_value_bool(node, std::get<bool>(v));
+        } else if (std::holds_alternative<std::string>(v)) {
+            data_proxy_change_info_push_value_string(node, rust::String(std::get<std::string>(v)));
+        }
+    }
+}
+
 void AniProxyDataObserver::OnChange(const std::vector<DataShare::DataProxyChangeInfo> &changeNode)
 {
     auto time =
@@ -94,6 +111,9 @@ void AniProxyDataObserver::OnChange(const std::vector<DataShare::DataProxyChange
         } else if (std::holds_alternative<std::string>(result.value_)) {
             data_proxy_change_info_push_string(
                 node, (int32_t)result.changeType_, result.uri_, std::get<std::string>(result.value_));
+        }
+        if (result.isMultiValues_) {
+            PushProxyMultiValues(node, result.multiValues_);
         }
     }
 
