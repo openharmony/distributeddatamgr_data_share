@@ -84,6 +84,7 @@ ohos_unittest("DataShareAbsResultSetTest") {
     "ipc:ipc_single",
     "ipc:rpc",
     "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
     "samgr:samgr_proxy",
   ]
  
@@ -304,6 +305,7 @@ ohos_unittest("IsharedResultSetStubTest") {
     "ipc:ipc_single",
     "ipc:rpc",
     "ipc:ipc_core",
+    "kv_store:distributeddata_inner",
     "samgr:samgr_proxy",
   ]
 
@@ -376,6 +378,7 @@ ohos_unittest("IkvStoreDataServiceTest") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "relational_store:rdb_data_ability_adapter",
     "samgr:samgr_proxy",
   ]

@@ -62,6 +62,7 @@ ohos_fuzztest("DataShareHelpFuzzTest") {
     "hitrace:libhitracechain",
     "ipc:ipc_single",
     "ipc:rpc",
+    "kv_store:distributeddata_inner",
     "samgr:samgr_proxy",
   ]
 }
