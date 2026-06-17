@@ -102,8 +102,6 @@ int DataSharePredicatesVerify::VerifyPredicatesByType(const PredicatesVerifyType
 {
     // VERIFY_DEFAULT and invalid params num do not need verify
     if (verifyType == PredicatesVerifyType::VERIFY_DEFAULT || !CheckParamNum(verifyType, item)) {
-        LOG_WARN("predicates missing elements Verifytype:%{public}d, operation:%{public}d",
-            static_cast<int>(verifyType), item.operation);
         return E_OK;
     }
     // public interfaces add hiview when field invalid
