@@ -101,6 +101,13 @@ ohos_unittest("DataShareStubTest") {
 }
 
 ohos_unittest("DataShareStubImplSystemTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "${datashare_base_path}/cfi_blocklist.txt"
+  }
+
   module_out_path = "data_share/data_share/native/provider"
  
   include_dirs = [
@@ -145,6 +152,13 @@ ohos_unittest("DataShareStubImplSystemTest") {
 }
 
 ohos_unittest("DataShareNormalDfxTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "${datashare_base_path}/cfi_blocklist.txt"
+  }
+
   module_out_path = "data_share/data_share/native/provider"
 
   include_dirs = [

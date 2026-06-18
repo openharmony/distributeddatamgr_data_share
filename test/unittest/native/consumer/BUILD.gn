@@ -433,6 +433,13 @@ ohos_unittest("GeneralControllerServiceImplTest") {
 }
 
 ohos_unittest("DataShareHelperErrorCodeTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "${datashare_base_path}/cfi_blocklist.txt"
+  }
+
   module_out_path = "data_share/data_share/native/consumer"
 
   sources =
@@ -462,6 +469,13 @@ ohos_unittest("DataShareHelperErrorCodeTest") {
 }
 
 ohos_unittest("DataShareHelperJoinTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "${datashare_base_path}/cfi_blocklist.txt"
+  }
+
   module_out_path = "data_share/data_share/native/consumer"
 
   sources =
@@ -597,6 +611,13 @@ ohos_unittest("DataShareHelperImplRegisterTest") {
 }
 
 ohos_unittest("DataShareHelperThresholdTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "${datashare_base_path}/cfi_blocklist.txt"
+  }
+
   module_out_path = "data_share/data_share/native/consumer"
 
   sources = [ "${datashare_base_path}/test/unittest/native/consumer/src/datashare_helper_threshold_test.cpp" ]
