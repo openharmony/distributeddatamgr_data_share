@@ -183,6 +183,13 @@ ohos_unittest("DatashareItypesUtilsTest") {
 }
 
 ohos_unittest("DatashareResultSetTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "${datashare_base_path}/cfi_blocklist.txt"
+  }
+
   module_out_path = "data_share/data_share/native/common"
  
   include_dirs = [ "${datashare_base_path}/frameworks/native/common/include/" ]
@@ -308,6 +315,13 @@ ohos_unittest("IsharedResultSetStubTest") {
 }
 
 ohos_unittest("SharedBlockTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "${datashare_base_path}/cfi_blocklist.txt"
+  }
+
   module_out_path = "data_share/data_share/native/common"
 
   include_dirs = [ "${datashare_common_native_path}/include" ]
