@@ -22,6 +22,7 @@
 #include "datashare_log.h"
 #include "datashare_predicates_proxy.h"
 #include "datashare_result_set_proxy.h"
+#include "datashare_string_utils.h"
 #include "datashare_valuebucket_convert.h"
 #include "napi_base_context.h"
 #include "napi_common_util.h"
@@ -1064,6 +1065,10 @@ bool NapiDataShareHelper::HasRegisteredObserver(napi_env env, std::list<sptr<NAP
 void NapiDataShareHelper::RegisteredObserver(napi_env env, const std::string &uri, napi_value callback,
     std::shared_ptr<DataShareHelper> helper, bool isNotifyDetails)
 {
+    if (uri.size() > URI_MAX_SIZE) {
+        LOG_ERROR("RegisteredObserver, uri %{public}s size %{public}zu is over limit, "
+            "need check compatibility.", DataShareStringUtils::Anonymous(uri).c_str(), uri.size());
+    }
     std::lock_guard<std::mutex> lck(listMutex_);
     observerMap_.try_emplace(uri);
 
@@ -1079,12 +1084,20 @@ void NapiDataShareHelper::RegisteredObserver(napi_env env, const std::string &ur
         LOG_ERROR("observer is nullptr");
         return;
     }
+    int errCode = E_OK;
     if (!isNotifyDetails) {
-        helper->RegisterObserver(Uri(uri), observer);
+        errCode = helper->RegisterObserver(Uri(uri), observer);
     } else {
-        helper->RegisterObserverExt(Uri(uri),
+        errCode = helper->TryRegisterObserverExt(Uri(uri),
             std::shared_ptr<DataShareObserver>(observer.GetRefPtr(), [holder = observer](const auto*) {}),
             false, true);
+    }
+    if (errCode != E_OK) {
+        LOG_ERROR("RegisterObserver failed, errCode: %{public}d.", errCode);
+        if (list.empty()) {
+            observerMap_.erase(uri);
+        }
+        return;
     }
     list.push_back(observer);
 }

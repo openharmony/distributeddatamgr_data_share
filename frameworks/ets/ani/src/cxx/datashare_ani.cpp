@@ -1489,6 +1489,10 @@ int DataShareNativeClose(int64_t dataShareHelperPtr)
 int ANIRegisterObserver(const std::string &strUri, long long dataShareHelperPtr,
     rust::Box<DataShareCallback> &callback, bool isNotifyDetails)
 {
+    if (strUri.size() > URI_MAX_SIZE) {
+        LOG_ERROR("ANIRegisterObserver, uri %{public}s size %{public}zu is over limit, "
+            "need check compatibility.", DataShareStringUtils::Anonymous(strUri).c_str(), strUri.size());
+    }
     auto helperHolder = reinterpret_cast<SharedPtrHolder *>(dataShareHelperPtr);
     if (helperHolder == nullptr || helperHolder->datashareHelper_ == nullptr) {
         LOG_ERROR("ANIRegisterObserver failed, helper is nullptr.");
@@ -1511,11 +1515,19 @@ int ANIRegisterObserver(const std::string &strUri, long long dataShareHelperPtr,
         return E_OK;
     }
     Uri uri(strUri);
+    int errCode = E_OK;
     if (!isNotifyDetails) {
-        helperHolder->datashareHelper_->RegisterObserver(uri, observer);
+        errCode = helperHolder->datashareHelper_->RegisterObserver(uri, observer);
     } else {
-        helperHolder->datashareHelper_->RegisterObserverExt(uri,
+        errCode = helperHolder->datashareHelper_->TryRegisterObserverExt(uri,
             std::shared_ptr<DataShareObserver>(observer.GetRefPtr(), [holder = observer](const auto*) {}), false);
+    }
+    if (errCode != E_OK) {
+        LOG_ERROR("ANIRegisterObserver failed, ret: %{public}d", errCode);
+        if (list.empty()) {
+            observerMap_.erase(strUri);
+        }
+        return E_OK;
     }
     list.push_back(observer);
     return E_OK;
