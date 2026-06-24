@@ -52,6 +52,7 @@ private:
     static bool CheckIsParameterExceed(const std::vector<DataShareProxyData> &proxyDatas,
         const DataProxyConfig &config);
     static bool CheckIsParameterExceed(const std::vector<std::string> &uris);
+    static bool IsValidMaxValueLength(const DataProxyConfig &config);
     std::shared_ptr<DataProxyHandle> dataProxyHandle_ = nullptr;
     std::shared_mutex mutex_;
     std::shared_ptr<NapiProxyDataSubscriberManager> jsProxyDataObsManager_ = nullptr;
