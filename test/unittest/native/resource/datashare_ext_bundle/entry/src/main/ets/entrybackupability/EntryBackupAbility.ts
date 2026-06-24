@@ -192,4 +192,11 @@ extends Extension {
     await callback(err, ret);
     console.info('[ttt] [DataShareTest] [denormalizeUri] leave, ret:' + ret);
   }
+
+  async openFile(uri: string, mode: string, callback) {
+    console.info('[ttt] [DataShareTest] [openFile] enter');
+    let err = {"code":0};
+    await callback(err, -1);
+    console.info('[ttt] [DataShareTest] [openFile] leave');
+  }
 };
