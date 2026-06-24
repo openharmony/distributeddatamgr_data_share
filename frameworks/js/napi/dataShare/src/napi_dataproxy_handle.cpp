@@ -160,6 +160,12 @@ bool NapiDataProxyHandle::CheckIsParameterExceed(const std::vector<std::string> 
     return true;
 }
 
+bool NapiDataProxyHandle::IsValidMaxValueLength(const DataProxyConfig &config)
+{
+    return config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_4K ||
+        config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_100K;
+}
+
 napi_status NapiDataProxyHandle::ResolveDataProxyErrorCode(const DataProxyErrorCode err,
     std::shared_ptr<ContextInfo> context)
 {
@@ -236,9 +242,8 @@ napi_status NapiDataProxyHandle::ParsePutValueInput(napi_env env, size_t argc, n
         context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
     DataShareJSUtils::UnwrapDataProxyConfig(env, argv[PARAM3], context->config);
 
-    NAPI_ASSERT_CALL_ERRCODE(env, context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_4K ||
-        context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_100K,
-        context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
+    NAPI_ASSERT_CALL_ERRCODE(env, IsValidMaxValueLength(context->config),
+        context->error = std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
     NAPI_ASSERT_CALL_ERRCODE(env, CheckIsParameterExceed(context->uris),
         context->error = std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
     return napi_ok;
@@ -270,9 +275,8 @@ napi_status NapiDataProxyHandle::ParseRemoveValueInput(napi_env env, size_t argc
         context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
     DataShareJSUtils::UnwrapDataProxyConfig(env, argv[PARAM2], context->config);
 
-    NAPI_ASSERT_CALL_ERRCODE(env, context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_4K ||
-        context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_100K,
-        context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
+    NAPI_ASSERT_CALL_ERRCODE(env, IsValidMaxValueLength(context->config),
+        context->error = std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
     NAPI_ASSERT_CALL_ERRCODE(env, CheckIsParameterExceed(context->uris), context->error =
         std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
     return napi_ok;
@@ -296,9 +300,8 @@ napi_value NapiDataProxyHandle::Napi_Publish(napi_env env, napi_callback_info in
         NAPI_ASSERT_CALL_ERRCODE(env, valueType == napi_object,
             context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
         DataShareJSUtils::UnwrapDataProxyConfig(env, argv[1], context->config);
-        NAPI_ASSERT_CALL_ERRCODE(env, context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_4K ||
-            context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_100K,
-            context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
+        NAPI_ASSERT_CALL_ERRCODE(env, IsValidMaxValueLength(context->config),
+            context->error = std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
         NAPI_ASSERT_CALL_ERRCODE(env, CheckIsParameterExceed(context->proxyDatas, context->config), context->error =
             std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
         return napi_ok;
@@ -372,6 +375,8 @@ napi_value NapiDataProxyHandle::Napi_Delete(napi_env env, napi_callback_info inf
             context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig");
             return napi_invalid_arg;
         }
+        NAPI_ASSERT_CALL_ERRCODE(env, IsValidMaxValueLength(context->config),
+            context->error = std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
@@ -402,6 +407,8 @@ napi_value NapiDataProxyHandle::Napi_DeleteMyPublishedData(napi_env env, napi_ca
             context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig");
             return napi_invalid_arg;
         }
+        NAPI_ASSERT_CALL_ERRCODE(env, IsValidMaxValueLength(context->config),
+            context->error = std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
@@ -442,6 +449,8 @@ napi_value NapiDataProxyHandle::Napi_Get(napi_env env, napi_callback_info info)
             context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig");
             return napi_invalid_arg;
         }
+        NAPI_ASSERT_CALL_ERRCODE(env, IsValidMaxValueLength(context->config),
+            context->error = std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
         return napi_ok;
     };
     auto output = [context](napi_env env, napi_value *result) -> napi_status {
@@ -550,9 +559,8 @@ napi_value NapiDataProxyHandle::Napi_SubscribeProxyData(napi_env env, size_t arg
         error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), error, jsResults);
     DataProxyConfig config;
     DataShareJSUtils::UnwrapDataProxyConfig(env, argv[PARAM2], config);
-    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_4K ||
-        config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_100K,
-        error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), error, jsResults);
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, IsValidMaxValueLength(config),
+        error = std::make_shared<DataProxyHandleParamError>(), error, jsResults);
     NAPI_CALL(env, napi_typeof(env, argv[PARAM3], &valueType));
     NAPI_ASSERT_CALL_ERRCODE_SYNC(env, valueType == napi_function,
         error = std::make_shared<ParametersTypeError>("callback", "function"), error, jsResults);
@@ -591,9 +599,8 @@ napi_value NapiDataProxyHandle::Napi_UnSubscribeProxyData(napi_env env, size_t a
         error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), error, jsResults);
     DataProxyConfig config;
     DataShareJSUtils::UnwrapDataProxyConfig(env, argv[PARAM2], config);
-    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_4K ||
-        config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_100K,
-        error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), error, jsResults);
+    NAPI_ASSERT_CALL_ERRCODE_SYNC(env, IsValidMaxValueLength(config),
+        error = std::make_shared<DataProxyHandleParamError>(), error, jsResults);
     if (proxy->jsProxyDataObsManager_ == nullptr) {
         LOG_ERROR("proxy->jsManager_ is nullptr");
         return jsResults;
@@ -690,9 +697,8 @@ napi_value NapiDataProxyHandle::Napi_GetValues(napi_env env, napi_callback_info 
             context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
         DataShareJSUtils::UnwrapDataProxyConfig(env, argv[PARAM1], context->config);
 
-        NAPI_ASSERT_CALL_ERRCODE(env, context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_4K ||
-            context->config.maxValueLength_ == DataProxyMaxValueLength::MAX_LENGTH_100K,
-            context->error = std::make_shared<ParametersTypeError>("config", "DataProxyConfig"), napi_invalid_arg);
+        NAPI_ASSERT_CALL_ERRCODE(env, IsValidMaxValueLength(context->config),
+            context->error = std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
         NAPI_ASSERT_CALL_ERRCODE(env, CheckIsParameterExceed(context->uris), context->error =
             std::make_shared<DataProxyHandleParamError>(), napi_invalid_arg);
         return napi_ok;

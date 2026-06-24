@@ -1058,8 +1058,7 @@ bool DataShareJSUtils::UnwrapDataProxyConfig(napi_env env, napi_value value, Dat
         return false;
     }
 
-    // maxValueLength is an optional parameter. If it is not configured, true is returned.
-    // If it is configured but the type or value is incorrect, a failure message is returned.
+    // maxValueLength is an optional parameter.
     status = napi_get_named_property(env, value, "maxValueLength", &jsResult);
     if ((status != napi_ok || jsResult == nullptr)) {
         config.maxValueLength_ = DataProxyMaxValueLength::MAX_LENGTH_4K;
@@ -1083,8 +1082,9 @@ bool DataShareJSUtils::UnwrapDataProxyConfig(napi_env env, napi_value value, Dat
     }
     if (config.maxValueLength_ != DataProxyMaxValueLength::MAX_LENGTH_4K &&
         config.maxValueLength_ != DataProxyMaxValueLength::MAX_LENGTH_100K) {
+        // Out-of-range: set INVALID_MAX_VALUE_LENGTH and return true, caller checks with DataProxyHandleParamError.
         LOG_ERROR("Invalid MaxValueLength value: %{public}d", static_cast<int32_t>(config.maxValueLength_));
-        return false;
+        config.maxValueLength_ = static_cast<DataProxyMaxValueLength>(INVALID_MAX_VALUE_LENGTH);
     }
     return true;
 }
