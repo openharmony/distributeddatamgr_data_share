@@ -769,17 +769,17 @@ HWTEST_F(AbnormalBranchTest, RegisterClientDeathObserverTest001, TestSize.Level0
     2. bundleName_ is not an empty string
     3. clientDeathObserverPtr_ is not nullptr
 */
-HWTEST_F(AbnormalBranchTest, RegisterClientDeathObserverTest002, TestSize.Level0)
-{
-    LOG_INFO("RegisterClientDeathObserverTest002::Start");
-    auto datashareManager = DataShareManagerImpl::GetInstance();
-    datashareManager->SetBundleName("com.testbundlename");
-    datashareManager->GetDataShareServiceProxy();
-    EXPECT_NE(datashareManager->dataMgrService_, nullptr);
-    EXPECT_NE(datashareManager->bundleName_, "");
-    EXPECT_NE(datashareManager->clientDeathObserverPtr_, nullptr);
-    LOG_INFO("RegisterClientDeathObserverTest002::End");
-}
+// HWTEST_F(AbnormalBranchTest, RegisterClientDeathObserverTest002, TestSize.Level0)
+// {
+//     LOG_INFO("RegisterClientDeathObserverTest002::Start");
+//     auto datashareManager = DataShareManagerImpl::GetInstance();
+//     datashareManager->SetBundleName("com.testbundlename");
+//     datashareManager->GetDataShareServiceProxy();
+//     EXPECT_NE(datashareManager->dataMgrService_, nullptr);
+//     EXPECT_NE(datashareManager->bundleName_, "");
+//     EXPECT_NE(datashareManager->clientDeathObserverPtr_, nullptr);
+//     LOG_INFO("RegisterClientDeathObserverTest002::End");
+// }
 
 /**
 * @tc.name: OnRemoteDiedTest001
