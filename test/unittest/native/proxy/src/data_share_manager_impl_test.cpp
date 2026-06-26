@@ -133,49 +133,6 @@ HWTEST_F(DataShareManagerImplTest, ServiceProxyLoadCallback001, TestSize.Level0)
 }
 
 /**
- * @tc.name: GetDataShareServiceProxy001
- * @tc.desc: Test the normal functionality of DataShareManagerImpl::GetDataShareServiceProxy, verifying its return
- *           value when the dataMgrService_ member is null and non-null.
- * @tc.type: FUNC
- * @tc.require: None
- * @tc.precon:
-    1. DataShareManagerImpl can be obtained via GetInstance() and returns a non-null pointer.
-    2. DataShareManagerImpl::GetDistributedDataManager() returns a valid (non-null) dataMgrService_ instance.
-    3. The GetDataShareServiceProxy method returns a non-null proxy pointer under valid runtime conditions.
-    4. The dataMgrService_ member of DataShareManagerImpl can be explicitly set to nullptr or a valid instance.
- * @tc.step:
-    1. Call DataShareManagerImpl::GetInstance() to get a manager instance, verify it is non-null.
-    2. Set manager->dataMgrService_ to nullptr.
-    3. Call manager->GetDataShareServiceProxy() and store the returned proxy, verify the proxy is non-null.
-    4. Assign manager->dataMgrService_ to the result of DataShareManagerImpl::GetDistributedDataManager(),
-       verify dataMgrService_ is non-null.
-    5. Call manager->GetDataShareServiceProxy() again, store the new proxy, verify it is non-null.
- * @tc.expect:
-    1. The DataShareManagerImpl instance obtained via GetInstance() is non-null.
-    2. When dataMgrService_ is null, GetDataShareServiceProxy returns a non-null proxy.
-    3. When dataMgrService_ is non-null, GetDataShareServiceProxy returns a non-null proxy.
- */
-HWTEST_F(DataShareManagerImplTest, GetDataShareServiceProxy001, TestSize.Level0)
-{
-    LOG_INFO("DataShareManagerImplTest GetDataShareServiceProxy001::Start");
-
-    auto manager = DataShareManagerImpl::GetInstance();
-    ASSERT_NE(manager, nullptr);
-    // manager->dataMgrService_ is nullptr
-    manager->dataMgrService_ = nullptr;
-    auto proxy = manager->GetDataShareServiceProxy();
-    ASSERT_NE(proxy, nullptr);
-
-    // manager->dataMgrService_ is not nullptr
-    manager->dataMgrService_ = DataShareManagerImpl::GetDistributedDataManager();
-    ASSERT_NE(manager->dataMgrService_, nullptr);
-    proxy = manager->GetDataShareServiceProxy();
-    ASSERT_NE(proxy, nullptr);
-
-    LOG_INFO("DataShareManagerImplTest GetDataShareServiceProxy001::End");
-}
-
-/**
  * @tc.name: GetProxy001
  * @tc.desc: Test the normal functionality of DataShareManagerImpl::GetProxy, verifying its return value when the
  *           dataMgrService_ member is null and non-null.

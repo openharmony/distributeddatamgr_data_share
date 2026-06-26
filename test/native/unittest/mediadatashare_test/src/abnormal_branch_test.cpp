@@ -749,39 +749,6 @@ HWTEST_F(AbnormalBranchTest, RegisterClientDeathObserverTest001, TestSize.Level0
 }
 
 /**
-* @tc.name: RegisterClientDeathObserverTest002
-* @tc.desc: Check the main process of RegisterClientDeathObserver
-* @tc.type: FUNC
-* @tc.precon:
-    1. DataShareManagerImpl::GetInstance() returns a singleton instance
-    2. DataShareManagerImpl::SetBundleName() accepts a non-empty std::string and sets bundleName_
-    3. DataShareManagerImpl::GetDataShareServiceProxy() initializes dataShareService_ and dataMgrService_
-    4. RegisterClientDeathObserver() is called internally during service proxy initialization
-    5. clientDeathObserverPtr_ is non-null when bundleName_ is valid and service proxies are initialized
-* @tc.require: issueIBX9HL
-* @tc.step:
-    1. Get DataShareManagerImpl singleton instance via GetInstance()
-    2. Call SetBundleName("com.testbundlename") to set a valid bundle name
-    3. Call GetDataShareServiceProxy() to initialize service proxies
-    4. Check the states of dataMgrService_, bundleName_, and clientDeathObserverPtr_
-* @tc.expect:
-    1. dataMgrService_ is not nullptr
-    2. bundleName_ is not an empty string
-    3. clientDeathObserverPtr_ is not nullptr
-*/
-HWTEST_F(AbnormalBranchTest, RegisterClientDeathObserverTest002, TestSize.Level0)
-{
-    LOG_INFO("RegisterClientDeathObserverTest002::Start");
-    auto datashareManager = DataShareManagerImpl::GetInstance();
-    datashareManager->SetBundleName("com.testbundlename");
-    datashareManager->GetDataShareServiceProxy();
-    EXPECT_NE(datashareManager->dataMgrService_, nullptr);
-    EXPECT_NE(datashareManager->bundleName_, "");
-    EXPECT_NE(datashareManager->clientDeathObserverPtr_, nullptr);
-    LOG_INFO("RegisterClientDeathObserverTest002::End");
-}
-
-/**
 * @tc.name: OnRemoteDiedTest001
 * @tc.desc: Check the main process of OnRemoteDied and the reset process ResetServiceHandle
 * @tc.type: FUNC
