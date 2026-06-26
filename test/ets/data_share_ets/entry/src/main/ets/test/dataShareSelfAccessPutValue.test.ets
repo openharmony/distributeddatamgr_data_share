@@ -520,7 +520,7 @@ export default function DataShareSelfAccessPutValueTest() {
         expect().assertFail();
       } catch (err) {
         let businessErr = err as BusinessError;
-        expect(businessErr.code).assertEqual('15700014');
+        expect(businessErr.code).assertEqual(15700014);
       }
       console.log(TAG + "************* ShareConfig_SelfAccess_PutValue_Test107 end *************");
     });
@@ -709,7 +709,7 @@ export default function DataShareSelfAccessPutValueTest() {
         expect().assertFail();
       } catch (err) {
         let businessErr = err as BusinessError;
-        expect(businessErr.code).assertEqual('15700014');
+        expect(businessErr.code).assertEqual(15700014);
       }
       console.log(TAG + "************* ShareConfig_SelfAccess_PutValue_Test302 end *************");
     });

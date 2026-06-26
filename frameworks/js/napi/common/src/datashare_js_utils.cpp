@@ -630,14 +630,14 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataProxyChange
 {
     napi_value jsDataProxyChangeInfo = nullptr;
     napi_create_object(env, &jsDataProxyChangeInfo);
-
-    napi_value type = nullptr;
-    type = Convert2JSValue(env, changeInfo.changeType_);
+    if (jsDataProxyChangeInfo == nullptr) {
+        return nullptr;
+    }
+    napi_value type = Convert2JSValue(env, changeInfo.changeType_);
     if (type == nullptr) {
         return nullptr;
     }
-    napi_value uri = nullptr;
-    uri = Convert2JSValue(env, changeInfo.uri_);
+    napi_value uri = Convert2JSValue(env, changeInfo.uri_);
     if (uri == nullptr) {
         return nullptr;
     }
@@ -648,6 +648,17 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataProxyChange
     napi_set_named_property(env, jsDataProxyChangeInfo, "type", type);
     napi_set_named_property(env, jsDataProxyChangeInfo, "uri", uri);
     napi_set_named_property(env, jsDataProxyChangeInfo, "value", value);
+    if (changeInfo.isMultiValues_) {
+        napi_value values = Convert2JSValue(env, changeInfo.multiValues_);
+        if (values == nullptr) {
+            return nullptr;
+        }
+        napi_set_named_property(env, jsDataProxyChangeInfo, "values", values);
+    } else {
+        napi_value undefined = nullptr;
+        napi_get_undefined(env, &undefined);
+        napi_set_named_property(env, jsDataProxyChangeInfo, "values", undefined);
+    }
     return jsDataProxyChangeInfo;
 }
 

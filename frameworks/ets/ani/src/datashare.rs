@@ -28,6 +28,7 @@ use crate::{
         ffi::{PtrWrap, VersionWrap, I32ResultWrap, StringResultWrap, I64ResultWrap},
         GetPublishedDataSretParam, PublishSretParam, ValuesBucketKvItem, ValuesBucketWrap, CallbackFlavor,
         DataShareCallback,AniDataProxyResultSetParam, AniDataProxyGetResultSetParam,
+        AniDataProxyGetValuesResultParam,
         DataShareBatchUpdateParamIn, DataShareBatchUpdateParamOut,
         convert_to_business_error,
     },
@@ -873,7 +874,10 @@ pub fn native_off_published_data_change<'local>(
 pub struct AniProxyData {
     uri: String,
     value: Option<ValueType>,
+    values: Option<HashMap<String, ValueType>>,
+    isMultiValues: Option<bool>,
     allowList: Option<Vec<String>>,
+    trustProviders: Option<Vec<String>>,
 }
 
 impl AniProxyData {
@@ -881,7 +885,10 @@ impl AniProxyData {
         Self {
             uri: "".to_string(),
             value: None,
+            values: None,
+            isMultiValues: None,
             allowList: None,
+            trustProviders: None,
         }
     }
 }
@@ -958,17 +965,142 @@ pub fn ani_proxy_data_get_data(data: &AniProxyData, vec: &mut Vec<String>) -> bo
     }
 }
 
+pub fn ani_proxy_data_get_is_multi_values(data: &AniProxyData) -> bool {
+    data.isMultiValues.unwrap_or(false)
+}
+
+pub fn ani_proxy_data_get_values_size(data: &AniProxyData) -> usize {
+    if let Some(v) = &data.values {
+        v.len()
+    } else {
+        0
+    }
+}
+
+pub fn ani_proxy_data_get_values_key_at(data: &AniProxyData, index: usize) -> String {
+    if let Some(v) = &data.values {
+        let mut keys: Vec<String> = v.keys().cloned().collect();
+        keys.sort();
+        if index < keys.len() {
+            keys[index].clone()
+        } else {
+            "".to_string()
+        }
+    } else {
+        "".to_string()
+    }
+}
+
+pub fn ani_proxy_data_get_values_type_at(data: &AniProxyData, index: usize) -> wrapper::ffi::EnumType {
+    if let Some(v) = &data.values {
+        let mut keys: Vec<String> = v.keys().cloned().collect();
+        keys.sort();
+        if index < keys.len() {
+            match &v[&keys[index]] {
+                ValueType::S(_) => wrapper::ffi::EnumType::StringType,
+                ValueType::F64(_) => wrapper::ffi::EnumType::F64Type,
+                ValueType::Boolean(_) => wrapper::ffi::EnumType::BooleanType,
+                ValueType::I64(_) => wrapper::ffi::EnumType::I64Type,
+            }
+        } else {
+            wrapper::ffi::EnumType::NullType
+        }
+    } else {
+        wrapper::ffi::EnumType::NullType
+    }
+}
+
+pub fn ani_proxy_data_get_values_string_at(data: &AniProxyData, index: usize) -> String {
+    if let Some(v) = &data.values {
+        let mut keys: Vec<String> = v.keys().cloned().collect();
+        keys.sort();
+        if index < keys.len() {
+            match &v[&keys[index]] {
+                ValueType::S(s) => s.clone(),
+                _ => "".to_string(),
+            }
+        } else {
+            "".to_string()
+        }
+    } else {
+        "".to_string()
+    }
+}
+
+pub fn ani_proxy_data_get_values_i64_at(data: &AniProxyData, index: usize) -> i64 {
+    if let Some(v) = &data.values {
+        let mut keys: Vec<String> = v.keys().cloned().collect();
+        keys.sort();
+        if index < keys.len() {
+            match &v[&keys[index]] {
+                ValueType::I64(i) => *i,
+                _ => 0,
+            }
+        } else {
+            0
+        }
+    } else {
+        0
+    }
+}
+
+pub fn ani_proxy_data_get_values_f64_at(data: &AniProxyData, index: usize) -> f64 {
+    if let Some(v) = &data.values {
+        let mut keys: Vec<String> = v.keys().cloned().collect();
+        keys.sort();
+        if index < keys.len() {
+            match &v[&keys[index]] {
+                ValueType::F64(f) => *f,
+                _ => 0.0,
+            }
+        } else {
+            0.0
+        }
+    } else {
+        0.0
+    }
+}
+
+pub fn ani_proxy_data_get_values_bool_at(data: &AniProxyData, index: usize) -> bool {
+    if let Some(v) = &data.values {
+        let mut keys: Vec<String> = v.keys().cloned().collect();
+        keys.sort();
+        if index < keys.len() {
+            match &v[&keys[index]] {
+                ValueType::Boolean(b) => *b,
+                _ => false,
+            }
+        } else {
+            false
+        }
+    } else {
+        false
+    }
+}
+
+pub fn ani_proxy_data_get_trust_providers(data: &AniProxyData, vec: &mut Vec<String>) -> bool {
+    if let Some(v) = &data.trustProviders {
+        vec.clear();
+        vec.extend(v.iter().cloned());
+        false
+    } else {
+        vec.clear();
+        true
+    }
+}
+
 #[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.DataProxyChangeInfoInner")]
 #[derive(Clone)]
 pub struct DataProxyChangeInfo {
     type_: ChangeType,
     uri: String,
     value: ValueType,
+    values: Option<Vec<ValueType>>,
 }
 
 impl DataProxyChangeInfo {
     pub fn new(type_: ChangeType, uri: String, value: ValueType) -> Self {
-        Self { type_, uri, value }
+        Self { type_, uri, value, values: None }
     }
 }
 
@@ -983,6 +1115,7 @@ pub fn data_proxy_change_info_push_i64(
         type_: ChangeType::from_i32(change_type),
         uri: change_info_uri,
         value: ValueType::I64(change_info_value),
+        values: None,
     };
     node.push(adpgr);
 }
@@ -994,6 +1127,7 @@ pub fn data_proxy_change_info_push_f64(
         type_: ChangeType::from_i32(change_type),
         uri: change_info_uri,
         value: ValueType::F64(change_info_value),
+        values: None,
     };
     node.push(adpgr);
 }
@@ -1005,6 +1139,7 @@ pub fn data_proxy_change_info_push_bool(
         type_: ChangeType::from_i32(change_type),
         uri: change_info_uri,
         value: ValueType::Boolean(change_info_value),
+        values: None,
     };
     node.push(adpgr);
 }
@@ -1016,8 +1151,52 @@ pub fn data_proxy_change_info_push_string(
         type_: ChangeType::from_i32(change_type),
         uri: change_info_uri,
         value: ValueType::S(change_info_value),
+        values: None,
     };
     node.push(adpgr);
+}
+
+pub fn data_proxy_change_info_set_values_empty(
+    node: &mut Vec<DataProxyChangeInfo>) {
+    if let Some(last) = node.last_mut() {
+        last.values = Some(Vec::new());
+    }
+}
+
+pub fn data_proxy_change_info_push_value_i64(
+    node: &mut Vec<DataProxyChangeInfo>, value: i64) {
+    if let Some(last) = node.last_mut() {
+        if let Some(ref mut vec) = last.values {
+            vec.push(ValueType::I64(value));
+        }
+    }
+}
+
+pub fn data_proxy_change_info_push_value_f64(
+    node: &mut Vec<DataProxyChangeInfo>, value: f64) {
+    if let Some(last) = node.last_mut() {
+        if let Some(ref mut vec) = last.values {
+            vec.push(ValueType::F64(value));
+        }
+    }
+}
+
+pub fn data_proxy_change_info_push_value_bool(
+    node: &mut Vec<DataProxyChangeInfo>, value: bool) {
+    if let Some(last) = node.last_mut() {
+        if let Some(ref mut vec) = last.values {
+            vec.push(ValueType::Boolean(value));
+        }
+    }
+}
+
+pub fn data_proxy_change_info_push_value_string(
+    node: &mut Vec<DataProxyChangeInfo>, value: String) {
+    if let Some(last) = node.last_mut() {
+        if let Some(ref mut vec) = last.values {
+            vec.push(ValueType::S(value));
+        }
+    }
 }
 
 #[ani_rs::ani(path = "@ohos.data.dataShare.dataShare.DataProxyErrorCode")]
@@ -1350,6 +1529,75 @@ pub fn native_data_proxy_handle_get<'local>(
     let err_code = wrapper::ffi::DataShareNativeDataProxyHandleGet(
         datashare_data_proxy_handle,
         uris,
+        &config_inner,
+        &mut set_param,
+    );
+    if err_code != 0 {
+        return Err(convert_to_business_error(err_code));
+    }
+    let ret = set_param.into_inner();
+    Ok(env.serialize(&ret)?)
+}
+
+#[ani_rs::native]
+pub fn native_data_proxy_handle_put_value<'local>(
+    env: &AniEnv<'local>,
+    datashare_proxy: AniObject<'local>,
+    uri: String,
+    key: i32,
+    value: ValueType,
+    config: AniObject<'local>,
+) -> Result<(), BusinessError> {
+    let datashare_data_proxy_handle = get_native_ptr(&env, &datashare_proxy);
+    let config_inner: AniDataProxyConfig = env.deserialize(config)?;
+    let err_code = wrapper::ffi::DataShareNativeDataProxyHandlePutValue(
+        datashare_data_proxy_handle,
+        uri,
+        key,
+        &value,
+        &config_inner,
+    );
+    if err_code != 0 {
+        return Err(convert_to_business_error(err_code));
+    }
+    Ok(())
+}
+
+#[ani_rs::native]
+pub fn native_data_proxy_handle_remove_value<'local>(
+    env: &AniEnv<'local>,
+    datashare_proxy: AniObject<'local>,
+    uri: String,
+    key: i32,
+    config: AniObject<'local>,
+) -> Result<(), BusinessError> {
+    let datashare_data_proxy_handle = get_native_ptr(&env, &datashare_proxy);
+    let config_inner: AniDataProxyConfig = env.deserialize(config)?;
+    let err_code = wrapper::ffi::DataShareNativeDataProxyHandleRemoveValue(
+        datashare_data_proxy_handle,
+        uri,
+        key,
+        &config_inner,
+    );
+    if err_code != 0 {
+        return Err(convert_to_business_error(err_code));
+    }
+    Ok(())
+}
+
+#[ani_rs::native]
+pub fn native_data_proxy_handle_get_values<'local>(
+    env: &AniEnv<'local>,
+    datashare_proxy: AniObject<'local>,
+    uri: String,
+    config: AniObject<'local>,
+) -> Result<AniRef<'local>, BusinessError> {
+    let datashare_data_proxy_handle = get_native_ptr(&env, &datashare_proxy);
+    let config_inner: AniDataProxyConfig = env.deserialize(config)?;
+    let mut set_param = AniDataProxyGetValuesResultParam::new();
+    let err_code = wrapper::ffi::DataShareNativeDataProxyHandleGetValues(
+        datashare_data_proxy_handle,
+        uri,
         &config_inner,
         &mut set_param,
     );

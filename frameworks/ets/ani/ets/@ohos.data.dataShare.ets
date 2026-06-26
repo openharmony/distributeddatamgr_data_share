@@ -683,25 +683,33 @@ export namespace dataShare {
   export interface ProxyData {
     uri: string;
     value?: ValueType;
+    values?: Record<string, ValueType>;
+    isMultiValues?: boolean;
     allowList?: string[];
+    trustProviders?: string[];
   }
 
   class ProxyDataInner implements ProxyData {
     uri: string;
     value?: ValueType;
+    values?: Record<string, ValueType>;
+    isMultiValues?: boolean;
     allowList?: string[];
+    trustProviders?: string[];
   }
 
   export interface DataProxyChangeInfo {
     type: ChangeType;
     uri: string;
     value: ValueType;
+    values?: ValueType[];
   }
 
   class DataProxyChangeInfoInner implements DataProxyChangeInfo {
     type: ChangeType;
     uri: string;
     value: ValueType;
+    values: ValueType[] | undefined;
   }
 
   export enum DataProxyErrorCode {
@@ -783,6 +791,9 @@ export namespace dataShare {
     delete(uris: string[], config: DataProxyConfig): Promise<DataProxyResult[]>;
     deleteMyPublishedData(config: DataProxyConfig): Promise<DataProxyResult[]>;
     get(uris: string[], config: DataProxyConfig): Promise<DataProxyGetResult[]>;
+    putValue(uri: string, key: int, value: ValueType, config: DataProxyConfig): Promise<void>;
+    removeValue(uri: string, key: int, config: DataProxyConfig): Promise<void>;
+    getValues(uri: string, config: DataProxyConfig): Promise<ValueType[]>;
   }
 
   export native function native_create_data_proxy_handle(): DataProxyHandle
@@ -792,6 +803,9 @@ export namespace dataShare {
   export native function native_data_proxy_handle_delete(obj: DataProxyHandle, uris: string[], config: DataProxyConfig): Promise<DataProxyResult[]>
   export native function native_data_proxy_handle_delete_all(obj: DataProxyHandle, config: DataProxyConfig): Promise<DataProxyResult[]>
   export native function native_data_proxy_handle_get(obj: DataProxyHandle, uris: string[], config: DataProxyConfig): Promise<DataProxyGetResult[]>
+  export native function native_data_proxy_handle_put_value(obj: DataProxyHandle, uri: string, key: int, value: ValueType, config: DataProxyConfig): void
+  export native function native_data_proxy_handle_remove_value(obj: DataProxyHandle, uri: string, key: int, config: DataProxyConfig): void
+  export native function native_data_proxy_handle_get_values(obj: DataProxyHandle, uri: string, config: DataProxyConfig): ValueType[]
   native function check_uris(uris: string[]): int;
   native function publish_check_uris(data: ProxyData[], config: DataProxyConfig): int;
 
@@ -889,6 +903,40 @@ export namespace dataShare {
             let p = taskpool.execute(native_data_proxy_handle_get, this, uris, config)
             p.then((e: Any) => {
                 let r = e as DataProxyGetResult[]
+                resolve(r)
+            }).catch((e: Error): void => {
+                reject(e)
+            })
+        })
+    }
+
+    putValue(uri: string, key: int, value: ValueType, config: DataProxyConfig): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            let p = taskpool.execute(native_data_proxy_handle_put_value, this, uri, key, value, config)
+            p.then(() => {
+                resolve(undefined)
+            }).catch((e: Error): void => {
+                reject(e)
+            })
+        })
+    }
+
+    removeValue(uri: string, key: int, config: DataProxyConfig): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            let p = taskpool.execute(native_data_proxy_handle_remove_value, this, uri, key, config)
+            p.then(() => {
+                resolve(undefined)
+            }).catch((e: Error): void => {
+                reject(e)
+            })
+        })
+    }
+
+    getValues(uri: string, config: DataProxyConfig): Promise<ValueType[]> {
+        return new Promise<ValueType[]>((resolve, reject) => {
+            let p = taskpool.execute(native_data_proxy_handle_get_values, this, uri, config)
+            p.then((e: Any) => {
+                let r = e as ValueType[]
                 resolve(r)
             }).catch((e: Error): void => {
                 reject(e)

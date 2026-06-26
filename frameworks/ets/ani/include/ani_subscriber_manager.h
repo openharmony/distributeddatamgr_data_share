@@ -163,7 +163,7 @@ public:
     std::vector<DataProxyResult> DelObservers(
         rust::Box<DataShareCallback> &callback, const std::vector<std::string> &uris);
     std::vector<DataProxyResult> DelObservers(const std::vector<std::string> &uris);
-    void Emit(const std::vector<DataProxyChangeInfo> &changeNode);
+    void Emit(const std::vector<DataShare::DataProxyChangeInfo> &changeNode);
 
 private:
     std::weak_ptr<DataProxyHandle> dataProxyHandle_;

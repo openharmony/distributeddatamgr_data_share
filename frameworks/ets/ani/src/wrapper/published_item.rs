@@ -237,3 +237,30 @@ pub fn data_proxy_get_result_set_push_string(set: &mut AniDataProxyGetResultSetP
     }
     set.0.push(adpgr);
 }
+
+pub struct AniDataProxyGetValuesResultParam(Vec<ValueType>);
+impl AniDataProxyGetValuesResultParam {
+    pub fn new() -> Self {
+        Self(Vec::new())
+    }
+
+    pub fn into_inner(self) -> Vec<ValueType> {
+        self.0
+    }
+}
+
+pub fn data_proxy_get_values_push_string(set: &mut AniDataProxyGetValuesResultParam, value: String) {
+    set.0.push(ValueType::S(value));
+}
+
+pub fn data_proxy_get_values_push_i64(set: &mut AniDataProxyGetValuesResultParam, value: i64) {
+    set.0.push(ValueType::I64(value));
+}
+
+pub fn data_proxy_get_values_push_f64(set: &mut AniDataProxyGetValuesResultParam, value: f64) {
+    set.0.push(ValueType::F64(value));
+}
+
+pub fn data_proxy_get_values_push_bool(set: &mut AniDataProxyGetValuesResultParam, value: bool) {
+    set.0.push(ValueType::Boolean(value));
+}

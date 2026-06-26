@@ -304,7 +304,7 @@ export default function DataShareSelfAccessRemoveValueTest() {
         expect().assertFail();
       } catch (err) {
         let businessErr = err as BusinessError;
-        expect(businessErr.code).assertEqual('15700014');
+        expect(businessErr.code).assertEqual(15700014);
       }
       console.log(TAG + "************* ShareConfig_SelfAccess_RemoveValue_Test104 end *************");
     });

@@ -1642,6 +1642,10 @@ bool MarshalDataProxyChangeInfoToBuffer(std::ostringstream &oss, const DataProxy
         LOG_ERROR("Marshal info.value_ failed");
         return false;
     }
+    if (!MarshalBasicTypeToBuffer(oss, info.isMultiValues_)) {
+        LOG_ERROR("Marshal info.isMultiValues_ failed");
+        return false;
+    }
 
     size_t multiValuesSize = info.multiValues_.size();
     if (!MarshalBasicTypeToBuffer(oss, multiValuesSize)) {
@@ -1914,6 +1918,10 @@ bool UnmarshalDataProxyChangeInfoFromBuffer(std::istringstream &iss, DataProxyCh
     }
     if (!UnmarshalDataProxyValueFromBuffer(iss, info.value_)) {
         LOG_ERROR("Unmarshal info.value_ failed");
+        return false;
+    }
+    if (!UnmarshalBasicTypeToBuffer(iss, info.isMultiValues_)) {
+        LOG_ERROR("Unmarshal info.isMultiValues_ failed");
         return false;
     }
 
