@@ -200,9 +200,6 @@ ErrCode DataShareStub::OpenFileInner(MessageParcel &data, MessageParcel &reply, 
         return ERR_INVALID_VALUE;
     }
     fd = OpenFile(uri, mode);
-
-    ReportOpenFileUsage(__func__, mode);
-
     return E_OK;
 }
 
