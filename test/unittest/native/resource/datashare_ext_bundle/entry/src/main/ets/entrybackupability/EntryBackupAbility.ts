@@ -199,4 +199,11 @@ extends Extension {
     await callback(err, -1);
     console.info('[ttt] [DataShareTest] [openFile] leave');
   }
+  
+  async openRawFile(uri: string, mode: string, callback) {
+    console.info('[ttt] [DataShareTest] [openRawFile] enter');
+    let err = {"code":0};
+    await callback(err, -1);
+    console.info('[ttt] [DataShareTest] [openRawFile] leave');
+  }
 };

@@ -252,9 +252,6 @@ ErrCode DataShareStub::CmdOpenRawFile(MessageParcel &data, MessageParcel &reply)
         return ERR_INVALID_VALUE;
     }
     int fd = OpenRawFile(uri, mode);
-
-    ReportOpenFileUsage(__func__, mode);
-
     if (!ITypesUtil::Marshal(reply, fd)) {
         LOG_ERROR("Marshal value is nullptr");
         return ERR_INVALID_VALUE;
