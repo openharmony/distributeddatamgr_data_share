@@ -121,6 +121,9 @@ HWTEST_F(DataShareOpenFilePermissionTest, OpenFilePermissionTest001, TestSize.Le
     int result = dataShareHelper->OpenFile(uri, "r");
 
     EXPECT_EQ(result, ERR_INVALID_DATA);
+    result = dataShareHelper->OpenRawFile(uri, "r");
+
+    EXPECT_EQ(result, ERR_INVALID_DATA);
     LOG_INFO("OpenFilePermissionTest001::End");
 }
 
@@ -159,6 +162,9 @@ HWTEST_F(DataShareOpenFilePermissionTest, OpenFilePermissionTest002, TestSize.Le
 
     Uri uri(DATA_SHARE_URI);
     int result = dataShareHelper->OpenFile(uri, "w");
+
+    EXPECT_EQ(result, ERR_INVALID_DATA);
+    result = dataShareHelper->OpenRawFile(uri, "w");
 
     EXPECT_EQ(result, ERR_INVALID_DATA);
     LOG_INFO("OpenFilePermissionTest002::End");
@@ -212,6 +218,9 @@ HWTEST_F(DataShareOpenFilePermissionTest, OpenFilePermissionTest003, TestSize.Le
     int result = dataShareHelper->OpenFile(uri, "rw");
 
     EXPECT_EQ(result, ERR_INVALID_DATA);
+    result = dataShareHelper->OpenRawFile(uri, "rw");
+
+    EXPECT_EQ(result, ERR_INVALID_DATA);
     LOG_INFO("OpenFilePermissionTest003::End");
 }
 
@@ -262,6 +271,9 @@ HWTEST_F(DataShareOpenFilePermissionTest, OpenFilePermissionTest004, TestSize.Le
 
     Uri uri(DATA_SHARE_URI);
     int result = dataShareHelper->OpenFile(uri, "rw");
+
+    EXPECT_EQ(result, ERR_INVALID_DATA);
+    result = dataShareHelper->OpenRawFile(uri, "rw");
 
     EXPECT_EQ(result, ERR_INVALID_DATA);
     LOG_INFO("OpenFilePermissionTest004::End");
@@ -326,6 +338,9 @@ HWTEST_F(DataShareOpenFilePermissionTest, OpenFilePermissionTest005, TestSize.Le
 
     Uri uri(DATA_SHARE_URI);
     int result = dataShareHelper->OpenFile(uri, "rw");
+
+    EXPECT_EQ(result, ERR_INVALID_DATA);
+    result = dataShareHelper->OpenRawFile(uri, "rw");
 
     EXPECT_EQ(result, ERR_INVALID_DATA);
     LOG_INFO("OpenFilePermissionTest005::End");
