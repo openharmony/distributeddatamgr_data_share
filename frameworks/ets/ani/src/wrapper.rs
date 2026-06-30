@@ -15,7 +15,8 @@ use crate::datashare::{
     ChangeInfo, PublishedDataChangeNode, PublishedItem, RdbDataChangeNode, Template, TemplateId,
     AniDataProxyConfig, AniProxyData, AniDataProxyType, DataProxyChangeInfo, data_share_data_proxy_config_get_type,ani_proxy_data_get_uri, ani_proxy_data_get_enum_type, ani_proxy_data_get_value_string,
     ani_proxy_data_get_value_i64, ani_proxy_data_get_value_f64, ani_proxy_data_get_value_boolean,
-    ani_proxy_data_get_data, ani_proxy_data_get_is_multi_values, ani_proxy_data_get_values_size,
+    ani_proxy_data_get_data, ani_proxy_data_get_is_multi_values, ani_proxy_data_is_values_none,
+    ani_proxy_data_get_values_size,
     ani_proxy_data_get_values_key_at, ani_proxy_data_get_values_type_at,
     ani_proxy_data_get_values_string_at, ani_proxy_data_get_values_i64_at,
     ani_proxy_data_get_values_f64_at, ani_proxy_data_get_values_bool_at,
@@ -465,8 +466,9 @@ pub mod ffi {
         pub fn ani_proxy_data_get_value_boolean(data: &AniProxyData) -> bool;
         pub fn ani_proxy_data_get_data(data: &AniProxyData, vec: &mut Vec<String>) -> bool;
         pub fn ani_proxy_data_get_is_multi_values(data: &AniProxyData) -> bool;
+        pub fn ani_proxy_data_is_values_none(data: &AniProxyData) -> bool;
         pub fn ani_proxy_data_get_values_size(data: &AniProxyData) -> usize;
-        pub fn ani_proxy_data_get_values_key_at(data: &AniProxyData, index: usize) -> String;
+        pub fn ani_proxy_data_get_values_key_at(data: &AniProxyData, index: usize) -> i32;
         pub fn ani_proxy_data_get_values_type_at(data: &AniProxyData, index: usize) -> EnumType;
         pub fn ani_proxy_data_get_values_string_at(data: &AniProxyData, index: usize) -> String;
         pub fn ani_proxy_data_get_values_i64_at(data: &AniProxyData, index: usize) -> i64;
