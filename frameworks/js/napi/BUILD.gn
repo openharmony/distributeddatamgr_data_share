@@ -21,4 +21,5 @@ group("datashare_napi_packages") {
     "${datashare_napi_path}/datashare_ext_ability:datashareextensionability_napi",
     "${datashare_napi_path}/datashare_ext_ability_context:datashareextensionabilitycontext_napi",
   ]
+  external_deps = [ "node:node_header_notice" ]
 }

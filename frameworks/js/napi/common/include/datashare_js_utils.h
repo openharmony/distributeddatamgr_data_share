@@ -27,6 +27,7 @@
 #include "datashare_template.h"
 #include "datashare_value_object.h"
 #include "napi/native_api.h"
+#include "node_api.h"
 #include "dataproxy_handle_common.h"
 
 #define NAPI_ASSERT_ERRCODE(env, assertion, error)                                                          \
