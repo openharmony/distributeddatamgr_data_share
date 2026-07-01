@@ -195,7 +195,7 @@ bool ConvertMultiValues(const AniProxyData &item, std::map<std::string, DataProx
 {
     size_t valuesSize = ani_proxy_data_get_values_size(item);
     for (size_t i = 0; i < valuesSize; ++i) {
-        std::string key = std::string(ani_proxy_data_get_values_key_at(item, i));
+        std::string key = std::to_string(ani_proxy_data_get_values_key_at(item, i));
         EnumType valueType = ani_proxy_data_get_values_type_at(item, i);
         DataProxyValue proxyValue;
         switch (valueType) {
@@ -255,6 +255,11 @@ bool ConvertProxyDataVec(const rust::Vec<AniProxyData>& proxydata,
 
         dspd.isMultiValues_ = ani_proxy_data_get_is_multi_values(item);
         if (dspd.isMultiValues_) {
+            if (ani_proxy_data_is_values_none(item)) {
+                LOG_ERROR("values not provided when isMultiValues is true, uri: %{public}s",
+                    DataShareStringUtils::Anonymous(dspd.uri_).c_str());
+                return false;
+            }
             if (!ConvertMultiValues(item, dspd.multiValues_["appIdentifier"])) {
                 return false;
             }

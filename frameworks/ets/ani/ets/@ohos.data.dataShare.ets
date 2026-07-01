@@ -683,7 +683,7 @@ export namespace dataShare {
   export interface ProxyData {
     uri: string;
     value?: ValueType;
-    values?: Record<string, ValueType>;
+    values?: Record<int, ValueType>;
     isMultiValues?: boolean;
     allowList?: string[];
     trustProviders?: string[];
@@ -692,7 +692,7 @@ export namespace dataShare {
   class ProxyDataInner implements ProxyData {
     uri: string;
     value?: ValueType;
-    values?: Record<string, ValueType>;
+    values?: Record<int, ValueType>;
     isMultiValues?: boolean;
     allowList?: string[];
     trustProviders?: string[];
@@ -911,6 +911,7 @@ export namespace dataShare {
     }
 
     putValue(uri: string, key: int, value: ValueType, config: DataProxyConfig): Promise<void> {
+        check_uris([uri]);
         return new Promise<void>((resolve, reject) => {
             let p = taskpool.execute(native_data_proxy_handle_put_value, this, uri, key, value, config)
             p.then(() => {
@@ -922,6 +923,7 @@ export namespace dataShare {
     }
 
     removeValue(uri: string, key: int, config: DataProxyConfig): Promise<void> {
+        check_uris([uri]);
         return new Promise<void>((resolve, reject) => {
             let p = taskpool.execute(native_data_proxy_handle_remove_value, this, uri, key, config)
             p.then(() => {
@@ -933,6 +935,7 @@ export namespace dataShare {
     }
 
     getValues(uri: string, config: DataProxyConfig): Promise<ValueType[]> {
+        check_uris([uri]);
         return new Promise<ValueType[]>((resolve, reject) => {
             let p = taskpool.execute(native_data_proxy_handle_get_values, this, uri, config)
             p.then((e: Any) => {

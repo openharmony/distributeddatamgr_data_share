@@ -874,7 +874,7 @@ pub fn native_off_published_data_change<'local>(
 pub struct AniProxyData {
     uri: String,
     value: Option<ValueType>,
-    values: Option<HashMap<String, ValueType>>,
+    values: Option<HashMap<i32, ValueType>>,
     isMultiValues: Option<bool>,
     allowList: Option<Vec<String>>,
     trustProviders: Option<Vec<String>>,
@@ -969,6 +969,10 @@ pub fn ani_proxy_data_get_is_multi_values(data: &AniProxyData) -> bool {
     data.isMultiValues.unwrap_or(false)
 }
 
+pub fn ani_proxy_data_is_values_none(data: &AniProxyData) -> bool {
+    data.values.is_none()
+}
+
 pub fn ani_proxy_data_get_values_size(data: &AniProxyData) -> usize {
     if let Some(v) = &data.values {
         v.len()
@@ -977,23 +981,23 @@ pub fn ani_proxy_data_get_values_size(data: &AniProxyData) -> usize {
     }
 }
 
-pub fn ani_proxy_data_get_values_key_at(data: &AniProxyData, index: usize) -> String {
+pub fn ani_proxy_data_get_values_key_at(data: &AniProxyData, index: usize) -> i32 {
     if let Some(v) = &data.values {
-        let mut keys: Vec<String> = v.keys().cloned().collect();
+        let mut keys: Vec<i32> = v.keys().cloned().collect();
         keys.sort();
         if index < keys.len() {
-            keys[index].clone()
+            keys[index]
         } else {
-            "".to_string()
+            0
         }
     } else {
-        "".to_string()
+        0
     }
 }
 
 pub fn ani_proxy_data_get_values_type_at(data: &AniProxyData, index: usize) -> wrapper::ffi::EnumType {
     if let Some(v) = &data.values {
-        let mut keys: Vec<String> = v.keys().cloned().collect();
+        let mut keys: Vec<i32> = v.keys().cloned().collect();
         keys.sort();
         if index < keys.len() {
             match &v[&keys[index]] {
@@ -1012,7 +1016,7 @@ pub fn ani_proxy_data_get_values_type_at(data: &AniProxyData, index: usize) -> w
 
 pub fn ani_proxy_data_get_values_string_at(data: &AniProxyData, index: usize) -> String {
     if let Some(v) = &data.values {
-        let mut keys: Vec<String> = v.keys().cloned().collect();
+        let mut keys: Vec<i32> = v.keys().cloned().collect();
         keys.sort();
         if index < keys.len() {
             match &v[&keys[index]] {
@@ -1029,7 +1033,7 @@ pub fn ani_proxy_data_get_values_string_at(data: &AniProxyData, index: usize) ->
 
 pub fn ani_proxy_data_get_values_i64_at(data: &AniProxyData, index: usize) -> i64 {
     if let Some(v) = &data.values {
-        let mut keys: Vec<String> = v.keys().cloned().collect();
+        let mut keys: Vec<i32> = v.keys().cloned().collect();
         keys.sort();
         if index < keys.len() {
             match &v[&keys[index]] {
@@ -1046,7 +1050,7 @@ pub fn ani_proxy_data_get_values_i64_at(data: &AniProxyData, index: usize) -> i6
 
 pub fn ani_proxy_data_get_values_f64_at(data: &AniProxyData, index: usize) -> f64 {
     if let Some(v) = &data.values {
-        let mut keys: Vec<String> = v.keys().cloned().collect();
+        let mut keys: Vec<i32> = v.keys().cloned().collect();
         keys.sort();
         if index < keys.len() {
             match &v[&keys[index]] {
@@ -1063,7 +1067,7 @@ pub fn ani_proxy_data_get_values_f64_at(data: &AniProxyData, index: usize) -> f6
 
 pub fn ani_proxy_data_get_values_bool_at(data: &AniProxyData, index: usize) -> bool {
     if let Some(v) = &data.values {
-        let mut keys: Vec<String> = v.keys().cloned().collect();
+        let mut keys: Vec<i32> = v.keys().cloned().collect();
         keys.sort();
         if index < keys.len() {
             match &v[&keys[index]] {
