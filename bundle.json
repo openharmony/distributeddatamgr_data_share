@@ -65,6 +65,7 @@
                 "kv_store",
                 "libuv",
                 "napi",
+                "node",
                 "relational_store",
                 "runtime_core",
                 "rust_bindgen",

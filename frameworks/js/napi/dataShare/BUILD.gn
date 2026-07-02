@@ -65,6 +65,7 @@ ohos_shared_library("datashare_jscommon") {
     "ipc:ipc_single",
     "kv_store:distributeddata_inner",
     "napi:ace_napi",
+    "node:node_header_notice"
   ]
 
   subsystem_name = "distributeddatamgr"
