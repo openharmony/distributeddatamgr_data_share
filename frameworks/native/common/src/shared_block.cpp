@@ -341,7 +341,7 @@ SharedBlock::CellUnit *SharedBlock::GetCellUnit(uint32_t row, uint32_t column)
         return nullptr;
     }
 
-    CellUnit *cellUnit = static_cast<CellUnit *>(OffsetToPtr(*rowOffset, sizeof(CellUnit)));
+    CellUnit *cellUnit = static_cast<CellUnit *>(OffsetToPtr(*rowOffset, (column + 1) * sizeof(CellUnit)));
     if (!cellUnit) {
         LOG_ERROR("Failed to find cellUnit for rowOffset %{public}" PRIu32 ".", *rowOffset);
         return nullptr;
