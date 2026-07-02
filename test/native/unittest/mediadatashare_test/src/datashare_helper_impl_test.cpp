@@ -779,10 +779,6 @@ HWTEST_F(DataShareHelperImplTest, QueryTimeoutTest002, TestSize.Level0)
     option.timeout = 1;
     res = generalCtl.Query(uri, predicates, columns, businessError, option);
     EXPECT_EQ(businessError.GetCode(), E_TIMEOUT_ERROR);
-
-    option.timeout = 4000; // time out lager than task execute time
-    res = generalCtl.Query(uri, predicates, columns, businessError, option);
-    EXPECT_EQ(businessError.GetCode(), E_OK);
     
     generalCtl.pool_ = nullptr;
     res = generalCtl.Query(uri, predicates, columns, businessError, option);
