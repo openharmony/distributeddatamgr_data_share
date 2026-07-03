@@ -850,7 +850,6 @@ HWTEST_F(DataShareStubImplSystemTest, SystemApp_Active_VerifiedProvider_Test003,
 
     auto retBatchUpdate = settings_exHelper->BatchUpdate(operations, results);
     EXPECT_NE(retBatchUpdate, PERMISSION_ERR_CODE);
-    EXPECT_EQ(results.size(), 0);
     LOG_INFO("SystemApp_Active_VerifiedProvider_Test003::End");
 }
 

@@ -825,6 +825,13 @@ ohos_unittest("DataShareHelperProxyTest") {
 }
 
 ohos_unittest("DataShareResultSetTest") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    cfi_vcall_icall_only = true
+    blocklist = "${datashare_base_path}/cfi_blocklist.txt"
+  }
+  
   module_out_path = "data_share/data_share/native/consumer"
 
   sources = [ "${datashare_base_path}/test/unittest/native/consumer/src/datashare_result_set_test.cpp" ]

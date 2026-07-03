@@ -341,7 +341,13 @@ SharedBlock::CellUnit *SharedBlock::GetCellUnit(uint32_t row, uint32_t column)
         return nullptr;
     }
 
-    CellUnit *cellUnit = static_cast<CellUnit *>(OffsetToPtr(*rowOffset, sizeof(CellUnit)));
+    size_t needSize = (static_cast<size_t>(column) + 1) * sizeof(CellUnit);
+    if (needSize > UINT32_MAX) {
+        LOG_ERROR("Buffer size overflow for column %{public}" PRIu32 ".", column);
+        return nullptr;
+    }
+
+    CellUnit *cellUnit = static_cast<CellUnit *>(OffsetToPtr(*rowOffset, static_cast<uint32_t>(needSize)));
     if (!cellUnit) {
         LOG_ERROR("Failed to find cellUnit for rowOffset %{public}" PRIu32 ".", *rowOffset);
         return nullptr;
