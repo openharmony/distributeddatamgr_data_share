@@ -120,4 +120,4 @@ ability_ability_runtime/
 ---
 
 **相关文档**：
-- [代码仓清单](../repositories.md) - 完整依赖仓列表（按需查阅）
+- [代码仓清单](../skills/repositories.md) - 完整依赖仓列表（按需查阅）

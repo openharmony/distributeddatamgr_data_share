@@ -61,7 +61,7 @@ RDB(数据存储)
 RDB(数据存储)
 ```
 
-详细架构见 [docs/architecture.md](docs/architecture.md)。
+详细架构见 [architecture.md](../datashare_general/architecture.md)。
 
 ## 静默访问 vs 非静默访问
 
@@ -93,7 +93,7 @@ Datashare 支持两种数据访问模式：
 应用 A (DataShareHelper) → IPC → 应用 B (DataShareExtAbility) → RDB(数据存储)
 ```
 
-详细说明见 [docs/architecture.md](docs/architecture.md#两种访问模式)。
+详细说明见 [architecture.md](../datashare_general/architecture.md#两种访问模式)。
 
 ## 适用场景
 
@@ -129,20 +129,20 @@ Datashare 支持两种数据访问模式：
 DataShare: `0xD001651`
 DataObs: `0xD001312`
 
-日志分析方法见 [docs/troubleshooting.md](docs/troubleshooting.md#错误日志分析方法)。
+日志分析方法见 [troubleshooting.md](../datashare_general/troubleshooting.md#错误日志分析方法)。
 
 ### 构建命令
 
-构建命令见 [docs/build_guide.md](docs/build_guide.md)。
+构建命令见 [build_guide.md](../datashare_general/build_guide.md)。
 
 ## 快速参考
 
 | 文档 | 路径 |
 |------|------|
-| 问题定位 | [docs/troubleshooting.md](docs/troubleshooting.md) |
-| 架构详解 | [docs/architecture.md](docs/architecture.md) |
-| 代码结构 | [docs/code_structure.md](docs/code_structure.md) |
-| 构建指南 | [docs/build_guide.md](docs/build_guide.md) |
+| 问题定位 | [troubleshooting.md](../datashare_general/troubleshooting.md) |
+| 架构详解 | [architecture.md](../datashare_general/architecture.md) |
+| 代码结构 | [code_structure.md](../datashare_general/code_structure.md) |
+| 构建指南 | [build_guide.md](../datashare_general/build_guide.md) |
 | 代码仓清单 | [repositories.md](repositories.md) |
 
 ## 官方文档
@@ -162,4 +162,4 @@ DataObs: `0xD001312`
 git clone https://gitcode.com/openharmony/docs.git
 ```
 
-问题定位指南见 [docs/troubleshooting.md](docs/troubleshooting.md)。
+问题定位指南见 [troubleshooting.md](../datashare_general/troubleshooting.md)。

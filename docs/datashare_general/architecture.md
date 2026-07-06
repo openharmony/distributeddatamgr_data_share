@@ -143,4 +143,4 @@ Datashare 支持两种数据访问模式：静默访问和非静默访问。
 **相关文档**：
 - [代码结构](code_structure.md) - 各代码仓的目录结构和核心文件
 - [问题定位](troubleshooting.md) - 错误码速查和日志分析方法
-- [代码仓清单](../repositories.md) - 完整的依赖仓列表
+- [代码仓清单](../skills/repositories.md) - 完整的依赖仓列表
