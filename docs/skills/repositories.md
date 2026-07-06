@@ -8,7 +8,7 @@
 | 2 | distributeddatamgr_datamgr_service | https://gitcode.com/openharmony/distributeddatamgr_datamgr_service | 分布式数据管理服务（包含 DataShare Service） |
 | 3 | ability_ability_runtime | https://gitcode.com/openharmony/ability_ability_runtime | DataObs（数据观察者），提供数据订阅和变更通知能力 |
 
-完整仓清单和依赖关系见 [代码结构详解](docs/code_structure.md)。
+完整仓清单和依赖关系见 [代码结构详解](../datashare_general/code_structure.md)。
 
 ---
 
