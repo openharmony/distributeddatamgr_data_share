@@ -78,6 +78,7 @@ ohos_unittest("DataShareStubTest") {
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
     "ipc:ipc_napi",
+    "kv_store:distributeddata_inner",
     "relational_store:rdb_data_ability_adapter",
     "runtime_core:ani",
     "samgr:samgr_proxy",

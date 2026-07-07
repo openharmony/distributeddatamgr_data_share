@@ -93,6 +93,7 @@ ohos_fuzztest("DataShareStubFuzzTest") {
     "ipc:ipc_single",
     "ipc:rpc",
     "ipc:ipc_napi",
+    "kv_store:distributeddata_inner",
     "napi:ace_napi",
     "runtime_core:ani",
     "hisysevent:libhisysevent",

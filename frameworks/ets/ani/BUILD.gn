@@ -64,6 +64,7 @@ ohos_static_library("datashare_ani_cxx") {
     "hitrace:libhitracechain",
     "ipc:ipc_core",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "runtime_core:ani",
     "rust_cxx:cxx_cppdeps",
     "samgr:samgr_proxy",

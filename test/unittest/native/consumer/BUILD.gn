@@ -88,6 +88,7 @@ ohos_unittest("GeneralControllerProviderImplTest") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "relational_store:rdb_data_ability_adapter",
     "samgr:samgr_proxy",
   ]
@@ -259,6 +260,7 @@ ohos_unittest("DataShareHelperTest") {
     "hitrace:libhitracechain",
     "ipc:ipc_single",
     "ipc:rpc",
+    "kv_store:distributeddata_inner",
     "samgr:samgr_proxy",
   ]
 
@@ -304,6 +306,7 @@ ohos_unittest("DataShareProxyTest") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "relational_store:rdb_data_ability_adapter",
     "samgr:samgr_proxy",
   ]
@@ -360,6 +363,7 @@ ohos_unittest("DataShareConnectionTest") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "relational_store:rdb_data_ability_adapter",
     "samgr:samgr_proxy",
   ]
@@ -417,6 +421,7 @@ ohos_unittest("ExtSpecialControllerTest") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "relational_store:rdb_data_ability_adapter",
     "samgr:samgr_proxy",
   ]
@@ -465,6 +470,7 @@ ohos_unittest("GeneralControllerServiceImplTest") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "relational_store:rdb_data_ability_adapter",
     "samgr:samgr_proxy",
   ]
@@ -583,6 +589,7 @@ ohos_unittest("DataShareProxyExecuteBatchTest") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "samgr:samgr_proxy",
   ]
 
@@ -644,6 +651,7 @@ ohos_unittest("DataShareHelperImplRegisterTest") {
     "hitrace:libhitracechain",
     "ipc:ipc_single",
     "ipc:rpc",
+    "kv_store:distributeddata_inner",
     "samgr:samgr_proxy",
   ]
 
@@ -811,6 +819,7 @@ ohos_unittest("DataShareHelperProxyTest") {
     "c_utils:utils",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "samgr:samgr_proxy",
   ]
 
@@ -856,6 +865,7 @@ ohos_unittest("DataShareResultSetTest") {
     "common_event_service:cesfwk_innerkits",
     "hilog:libhilog",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "samgr:samgr_proxy",
   ]
 }
@@ -896,6 +906,7 @@ ohos_unittest("DataShareSAConnectionTest") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
     "relational_store:rdb_data_ability_adapter",
     "samgr:samgr_proxy",
   ]
