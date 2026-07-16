@@ -254,6 +254,7 @@ ohos_shared_library("datashare_provider") {
     "ipc:ipc_single",
     "kv_store:distributeddata_inner",
     "napi:ace_napi",
+    "node:node_header_notice",
     "runtime_core:ani",
     "rust_cxx:cxx_cppdeps",
     "samgr:samgr_proxy",
@@ -294,6 +295,7 @@ ohos_shared_library("datashare_ext_ability_module") {
     "ipc:ipc_napi",
     "ipc:ipc_single",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "extensionability/"
