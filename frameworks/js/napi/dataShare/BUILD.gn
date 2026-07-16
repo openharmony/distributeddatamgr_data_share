@@ -127,6 +127,7 @@ ohos_shared_library("datashare") {
     "kv_store:distributeddata_inner",
     "libuv:uv",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module/data"
@@ -163,6 +164,7 @@ ohos_shared_library("datasharepredicates") {
     "ipc:ipc_single",
     "kv_store:distributeddata_inner",
     "napi:ace_napi",
+    "node:node_header_notice",
   ]
 
   relative_install_dir = "module/data"
