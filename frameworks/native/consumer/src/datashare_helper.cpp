@@ -184,11 +184,12 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
         LOG_ERROR("Create DataShareConnection failed.");
         return nullptr;
     }
+    // The sptr `holder` only keeps the RefBase object alive while the shared_ptr
+    // control block exists. Disconnect is performed explicitly via Close() in
+    // DataShareHelperImpl::Release()/destructor, never inside this deleter, so that
+    // no IPC or re-entrant callback runs during shared_ptr destruction.
     auto dataShareConnection =
-        std::shared_ptr<DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
-            holder->SetConnectInvalid();
-            holder->DisconnectDataShareExtAbility();
-        });
+        std::shared_ptr<DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {});
     if (dataShareConnection->GetDataShareProxy(uri, token) == nullptr) {
         LOG_ERROR("connect failed");
         return nullptr;

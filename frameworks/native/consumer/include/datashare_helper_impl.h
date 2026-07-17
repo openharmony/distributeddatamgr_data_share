@@ -198,6 +198,7 @@ private:
     std::shared_mutex mutex_;
     std::shared_ptr<ExtSpecialController> extSpCtl_ = nullptr;
     std::shared_ptr<GeneralController> generalCtl_ = nullptr;
+    std::shared_ptr<DataShareConnectionBase> connection_ = nullptr;
     std::shared_ptr<PersistentDataController> persistentDataCtl_ = nullptr;
     std::shared_ptr<PublishedDataController> publishedDataCtl_ = nullptr;
     bool isSystem_;

@@ -583,5 +583,116 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ConcurrentOnAbilityConnect
     t4.join();
     LOG_INFO("DataShareConnection_ConcurrentOnAbilityConnectDone_Test_001::End");
 }
+
+/**
+ * @tc.name: DataShareConnection_Close_Test_001
+ * @tc.desc: Verify Close() marks the connection invalid and returns early without disconnecting when
+ *           dataShareProxy_ is nullptr.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+     1. A DataShareConnection object can be created with a valid Uri and IRemoteObject token.
+     2. The dataShareProxy_ member is nullptr by default and the isInvalid_ member can be read.
+ * @tc.step:
+     1. Create a DataShareConnection object with the test URI and a valid token.
+     2. Ensure dataShareProxy_ is nullptr.
+     3. Call Close().
+     4. Check that isInvalid_ is true after Close().
+ * @tc.expect:
+     1. Close() completes without crashing (DisconnectDataShareExtAbility returns early when proxy is null).
+     2. isInvalid_ is set to true.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_Close_Test_001, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_Close_Test_001::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    sptr<DataShare::DataShareConnection> connection =
+        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    ASSERT_NE(connection, nullptr);
+    connection->dataShareProxy_ = nullptr;
+    EXPECT_FALSE(connection->isInvalid_.load());
+    connection->Close();
+    EXPECT_TRUE(connection->isInvalid_.load());
+    connection = nullptr;
+    LOG_INFO("DataShareConnection_Close_Test_001::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_Close_Test_002
+ * @tc.desc: Verify Close() marks the connection invalid and triggers disconnect when dataShareProxy_ is not
+ *           nullptr.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+     1. A DataShareConnection object can be created with a valid Uri and IRemoteObject token.
+     2. A DataShareProxy instance can be created and assigned to dataShareProxy_.
+ * @tc.step:
+     1. Create a DataShareConnection object with the test URI and a valid token.
+     2. Assign a DataShareProxy to dataShareProxy_.
+     3. Call Close().
+     4. Check that isInvalid_ is true after Close().
+ * @tc.expect:
+     1. Close() completes without crashing (Disconnect tolerates AmsMgrProxy being unavailable in the test env).
+     2. isInvalid_ is set to true.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_Close_Test_002, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_Close_Test_002::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    sptr<DataShare::DataShareConnection> connection =
+        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    ASSERT_NE(connection, nullptr);
+    std::shared_ptr<DataShareProxy> tokenProxy = std::make_shared<DataShareProxy>(token);
+    ASSERT_NE(tokenProxy, nullptr);
+    connection->dataShareProxy_ = tokenProxy;
+    EXPECT_FALSE(connection->isInvalid_.load());
+    connection->Close();
+    EXPECT_TRUE(connection->isInvalid_.load());
+    connection = nullptr;
+    LOG_INFO("DataShareConnection_Close_Test_002::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_Close_Test_003
+ * @tc.desc: Verify Close() is idempotent; calling it multiple times does not crash and isInvalid_ stays true.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+     1. A DataShareConnection object can be created with a valid Uri and IRemoteObject token.
+     2. A DataShareProxy can be assigned to dataShareProxy_.
+ * @tc.step:
+     1. Create a DataShareConnection object with the test URI and a valid token.
+     2. Assign a DataShareProxy to dataShareProxy_.
+     3. Call Close() twice in succession.
+     4. Check that isInvalid_ is true after the second call.
+ * @tc.expect:
+     1. Calling Close() repeatedly does not crash.
+     2. isInvalid_ remains true.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_Close_Test_003, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_Close_Test_003::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    sptr<DataShare::DataShareConnection> connection =
+        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    ASSERT_NE(connection, nullptr);
+    std::shared_ptr<DataShareProxy> tokenProxy = std::make_shared<DataShareProxy>(token);
+    ASSERT_NE(tokenProxy, nullptr);
+    connection->dataShareProxy_ = tokenProxy;
+    connection->Close();
+    connection->Close();
+    EXPECT_TRUE(connection->isInvalid_.load());
+    connection = nullptr;
+    LOG_INFO("DataShareConnection_Close_Test_003::End");
+}
 }
 }
