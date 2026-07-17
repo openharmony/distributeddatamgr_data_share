@@ -308,6 +308,12 @@ void DataShareConnection::SetConnectInvalid()
     isInvalid_.store(true);
 }
 
+void DataShareConnection::Close()
+{
+    SetConnectInvalid();
+    DisconnectDataShareExtAbility();
+}
+
 ErrCode DataShareConnection::Disconnect()
 {
     AmsMgrProxy* instance = AmsMgrProxy::GetInstance();

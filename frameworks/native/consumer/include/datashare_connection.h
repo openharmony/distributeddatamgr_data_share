@@ -73,6 +73,14 @@ public:
 
     void SetConnectInvalid();
 
+    /**
+     * @brief Release connection resources before the connection is released.
+     *
+     * Mark the connection invalid and disconnect from the DataShareExtAbility. It is
+     * idempotent and safe to be called from both Release and the destructor.
+     */
+    void Close() override;
+
     void UpdateObserverExtsProviderMap(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
         bool isDescendants) override;
 
