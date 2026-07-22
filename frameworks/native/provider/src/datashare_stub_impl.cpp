@@ -173,6 +173,10 @@ int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
     if (extension == nullptr) {
         return DEFAULT_NUMBER;
     }
+    if (extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("OpenFile: extension->abilityInfo_ is nullptr.");
+        return DEFAULT_NUMBER;
+    }
     bool needWrite = (mode.find('w') != std::string::npos);
     if (needWrite) {
         if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
@@ -220,6 +224,10 @@ int DataShareStubImpl::OpenRawFile(const Uri &uri, const std::string &mode)
     if (extension == nullptr) {
         return DEFAULT_NUMBER;
     }
+    if (extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("OpenRawFile: extension->abilityInfo_ is nullptr.");
+        return DEFAULT_NUMBER;
+    }
     bool needWrite = (mode.find('w') != std::string::npos);
     if (needWrite) {
         if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
@@ -259,6 +267,10 @@ int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value
     auto extension = client->GetOwner();
     if (extension == nullptr) {
         LOG_ERROR("extension is nullptr.");
+        return DEFAULT_NUMBER;
+    }
+    if (extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("Insert: extension->abilityInfo_ is nullptr.");
         return DEFAULT_NUMBER;
     }
 
@@ -310,6 +322,10 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
     if (extension == nullptr) {
         return DEFAULT_NUMBER;
     }
+    if (extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("Update: extension->abilityInfo_ is nullptr.");
+        return DEFAULT_NUMBER;
+    }
 
     if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
         LOG_ERROR("Check calling permission failed.");
@@ -350,6 +366,10 @@ int DataShareStubImpl::BatchUpdate(const UpdateOperations &operations, std::vect
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
     if (extension == nullptr) {
+        return DEFAULT_NUMBER;
+    }
+    if (extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("BatchUpdate: extension->abilityInfo_ is nullptr.");
         return DEFAULT_NUMBER;
     }
     if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
@@ -399,6 +419,10 @@ int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predica
     if (extension == nullptr) {
         return DEFAULT_NUMBER;
     }
+    if (extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("Delete: extension->abilityInfo_ is nullptr.");
+        return DEFAULT_NUMBER;
+    }
 
     if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
         LOG_ERROR("Check calling permission failed.");
@@ -439,6 +463,10 @@ std::pair<int32_t, int32_t> DataShareStubImpl::InsertEx(const Uri &uri, const Da
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
     if (extension == nullptr) {
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    if (extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("InsertEx: extension->abilityInfo_ is nullptr.");
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
 
@@ -489,6 +517,10 @@ std::pair<int32_t, int32_t> DataShareStubImpl::UpdateEx(const Uri &uri, const Da
     if (extension == nullptr) {
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
+    if (extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("UpdateEx: extension->abilityInfo_ is nullptr.");
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
 
     if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
         LOG_ERROR("Check calling permission failed.");
@@ -534,6 +566,10 @@ std::pair<int32_t, int32_t> DataShareStubImpl::DeleteEx(const Uri &uri, const Da
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
     if (extension == nullptr) {
+        return std::make_pair(DATA_SHARE_ERROR, 0);
+    }
+    if (extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("DeleteEx: extension->abilityInfo_ is nullptr.");
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
 
@@ -582,7 +618,8 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
     std::shared_ptr<DataShareResultSet> resultSet = nullptr;
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
-    if (extension == nullptr) {
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("Query: extension or abilityInfo_ is nullptr.");
         return resultSet;
     }
 
@@ -664,6 +701,10 @@ int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareVa
     if (extension == nullptr) {
         return DEFAULT_NUMBER;
     }
+    if (extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("BatchInsert: extension->abilityInfo_ is nullptr.");
+        return DEFAULT_NUMBER;
+    }
 
     if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
         LOG_ERROR("Check calling permission failed.");
@@ -713,6 +754,10 @@ bool DataShareStubImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IData
     if (extension == nullptr) {
         return false;
     }
+    if (extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("RegisterObserver: extension->abilityInfo_ is nullptr.");
+        return false;
+    }
     if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {
         LOG_ERROR("Register observer check permission failed. uri: %{public}s, pid %{public}d",
             DataShareStringUtils::Anonymous(uri.ToString()).c_str(), IPCSkeleton::GetCallingPid());
@@ -725,6 +770,10 @@ bool DataShareStubImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDa
 {
     auto extension = GetOwner();
     if (extension == nullptr) {
+        return false;
+    }
+    if (extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("UnregisterObserver: extension->abilityInfo_ is nullptr.");
         return false;
     }
     if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {

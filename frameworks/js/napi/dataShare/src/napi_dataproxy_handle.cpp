@@ -92,22 +92,26 @@ napi_value NapiDataProxyHandle::Napi_CreateDataProxyHandle(napi_env env, napi_ca
         }
         NAPI_ASSERT_CALL_ERRCODE(env, handleProxy != nullptr && status == napi_ok,
             ctxInfo->error = std::make_shared<InnerError>(), napi_generic_failure);
-        napi_create_reference(env, handleProxy, 1, &(ctxInfo->ref));
+        status = napi_create_reference(env, handleProxy, 1, &(ctxInfo->ref));
+        NAPI_ASSERT_CALL_ERRCODE(env, status == napi_ok,
+            ctxInfo->error = std::make_shared<InnerError>(), napi_generic_failure);
         ctxInfo->env = env;
         return napi_ok;
     };
     auto output = [ctxInfo](napi_env env, napi_value *result) -> napi_status {
         NAPI_ASSERT_CALL_ERRCODE(env, ctxInfo->dataProxyHandle != nullptr,
             ctxInfo->error = std::make_shared<InnerError>(), napi_generic_failure);
-        napi_status status = napi_get_reference_value(env, ctxInfo->ref, result);
-        NAPI_ASSERT_CALL_ERRCODE(env, result != nullptr,
+        napi_value handleProxy = nullptr;
+        napi_status status = napi_get_reference_value(env, ctxInfo->ref, &handleProxy);
+        NAPI_ASSERT_CALL_ERRCODE(env, status == napi_ok && handleProxy != nullptr,
             ctxInfo->error = std::make_shared<InnerError>(), napi_generic_failure);
         NapiDataProxyHandle *proxy = nullptr;
-        status = napi_unwrap(env, *result, reinterpret_cast<void **>(&proxy));
+        status = napi_unwrap(env, handleProxy, reinterpret_cast<void **>(&proxy));
         NAPI_ASSERT_CALL_ERRCODE(env, proxy != nullptr, ctxInfo->error = std::make_shared<InnerError>(),
             status);
         proxy->jsProxyDataObsManager_ = std::make_shared<NapiProxyDataSubscriberManager>(ctxInfo->dataProxyHandle);
         proxy->SetHandle(std::move(ctxInfo->dataProxyHandle));
+        *result = handleProxy;
         return status;
     };
     auto exec = [ctxInfo](AsyncCall::Context *ctx) {

@@ -58,6 +58,10 @@ std::string SharedBlock::ToUtf8(const std::u16string& str16)
 
 bool SharedBlock::Init()
 {
+    if (ashmem_ == nullptr) {
+        LOG_ERROR("Init: ashmem_ is nullptr");
+        return false;
+    }
     mData = const_cast<void *>(ashmem_->ReadFromAshmem(sizeof(SharedBlockHeader), 0));
     mHeader = static_cast<SharedBlockHeader *>(mData);
     if (mHeader == nullptr) {
@@ -69,6 +73,10 @@ bool SharedBlock::Init()
 int SharedBlock::CreateSharedBlock(const std::string &name, size_t size, sptr<Ashmem> ashmem,
     SharedBlock *&outSharedBlock)
 {
+    if (ashmem == nullptr) {
+        LOG_ERROR("CreateSharedBlock: ashmem is nullptr");
+        return SHARED_BLOCK_ASHMEM_ERROR;
+    }
     outSharedBlock = new (std::nothrow)SharedBlock(name, ashmem, size, false);
     if (outSharedBlock == nullptr) {
         LOG_ERROR("CreateSharedBlock: new SharedBlock error.");
@@ -153,6 +161,10 @@ int SharedBlock::ReadMessageParcel(MessageParcel &parcel, SharedBlock *&block)
 int SharedBlock::Clear()
 {
     if (mReadOnly) {
+        return SHARED_BLOCK_INVALID_OPERATION;
+    }
+    if (mHeader == nullptr) {
+        LOG_ERROR("Clear: mHeader is nullptr");
         return SHARED_BLOCK_INVALID_OPERATION;
     }
 
@@ -369,6 +381,10 @@ int SharedBlock::PutString(uint32_t row, uint32_t column, const char *value, siz
 int SharedBlock::PutBlobOrString(uint32_t row, uint32_t column, const void *value, size_t size, int32_t type)
 {
     if (mReadOnly) {
+        return SHARED_BLOCK_INVALID_OPERATION;
+    }
+    if (mHeader == nullptr) {
+        LOG_ERROR("PutBlobOrString: mHeader is nullptr");
         return SHARED_BLOCK_INVALID_OPERATION;
     }
 

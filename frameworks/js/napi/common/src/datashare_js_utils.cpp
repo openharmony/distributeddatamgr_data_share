@@ -86,13 +86,14 @@ std::vector<uint8_t> DataShareJSUtils::Convert2U8Vector(napi_env env, napi_value
         napi_typedarray_type type;
         napi_value input_buffer = nullptr;
         size_t byte_offset = 0;
-        napi_get_typedarray_info(env, input_array, &type, &length, &data, &input_buffer, &byte_offset);
+        NAPI_CALL_BASE(env,
+            napi_get_typedarray_info(env, input_array, &type, &length, &data, &input_buffer, &byte_offset), {});
         if (type != napi_uint8_array || data == nullptr) {
             LOG_ERROR("napi_get_typedarray_info err");
             return {};
         }
     } else {
-        napi_get_arraybuffer_info(env, input_array, &data, &length);
+        NAPI_CALL_BASE(env, napi_get_arraybuffer_info(env, input_array, &data, &length), {});
         if (data == nullptr || length <= 0) {
             LOG_ERROR("napi_get_arraybuffer_info err");
             return {};
@@ -119,6 +120,10 @@ std::vector<uint8_t> DataShareJSUtils::ConvertU8Vector(napi_env env, napi_value 
     uint8_t *data = nullptr;
     size_t total = 0;
     NAPI_CALL_BASE(env, napi_get_arraybuffer_info(env, buffer, reinterpret_cast<void **>(&data), &total), {});
+    if (data == nullptr || offset > total) {
+        LOG_ERROR("napi_get_arraybuffer_info invalid data or offset");
+        return {};
+    }
     length = std::min<size_t>(length, total - offset);
     std::vector<uint8_t> result(sizeof(uint8_t) + length);
     int retCode = memcpy_s(result.data(), result.size(), &data[offset], length);
@@ -399,7 +404,9 @@ bool DataShareJSUtils::Equals(napi_env env, napi_value value, napi_ref copy)
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const TemplateId &templateId)
 {
     napi_value tplId = nullptr;
-    napi_create_object(env, &tplId);
+    if (napi_create_object(env, &tplId) != napi_ok) {
+        return nullptr;
+    }
     napi_value subscriberId = Convert2JSValue(env, std::to_string(templateId.subscriberId_));
     if (subscriberId == nullptr) {
         return nullptr;
@@ -417,7 +424,9 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const TemplateId &tem
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const RdbChangeNode &changeNode)
 {
     napi_value jsRdbChangeNode = nullptr;
-    napi_create_object(env, &jsRdbChangeNode);
+    if (napi_create_object(env, &jsRdbChangeNode) != napi_ok) {
+        return nullptr;
+    }
 
     napi_value uri = nullptr;
     uri = Convert2JSValue(env, changeNode.uri_);
@@ -442,7 +451,9 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const RdbChangeNode &
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, PublishedDataItem &publishedDataItem)
 {
     napi_value jsPublishedDataItem = nullptr;
-    napi_create_object(env, &jsPublishedDataItem);
+    if (napi_create_object(env, &jsPublishedDataItem) != napi_ok) {
+        return nullptr;
+    }
 
     napi_value key = Convert2JSValue(env, publishedDataItem.key_);
     if (key == nullptr) {
@@ -488,7 +499,9 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, std::vector<Published
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, PublishedDataChangeNode &changeNode)
 {
     napi_value jsPublishedDataChangeNode = nullptr;
-    napi_create_object(env, &jsPublishedDataChangeNode);
+    if (napi_create_object(env, &jsPublishedDataChangeNode) != napi_ok) {
+        return nullptr;
+    }
 
     napi_value bundleName = nullptr;
     bundleName = Convert2JSValue(env, changeNode.ownerBundleName_);
@@ -508,7 +521,9 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, PublishedDataChangeNo
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const OperationResult &results)
 {
     napi_value jsOperationResult = nullptr;
-    napi_create_object(env, &jsOperationResult);
+    if (napi_create_object(env, &jsOperationResult) != napi_ok) {
+        return nullptr;
+    }
 
     napi_value key = nullptr;
     key = Convert2JSValue(env, results.key_);
@@ -543,7 +558,9 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<Ope
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataProxyResult &result)
 {
     napi_value jsDataProxyResult = nullptr;
-    napi_create_object(env, &jsDataProxyResult);
+    if (napi_create_object(env, &jsDataProxyResult) != napi_ok) {
+        return nullptr;
+    }
 
     napi_value uri = Convert2JSValue(env, result.uri_);
     if (uri == nullptr) {
@@ -576,7 +593,9 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<Dat
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataProxyGetResult &result)
 {
     napi_value jsDataProxyGetResult = nullptr;
-    napi_create_object(env, &jsDataProxyGetResult);
+    if (napi_create_object(env, &jsDataProxyGetResult) != napi_ok) {
+        return nullptr;
+    }
 
     napi_value uri = Convert2JSValue(env, result.uri_);
     if (uri == nullptr) {
@@ -629,8 +648,7 @@ napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const std::vector<Dat
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataProxyChangeInfo &changeInfo)
 {
     napi_value jsDataProxyChangeInfo = nullptr;
-    napi_create_object(env, &jsDataProxyChangeInfo);
-    if (jsDataProxyChangeInfo == nullptr) {
+    if (napi_create_object(env, &jsDataProxyChangeInfo) != napi_ok) {
         return nullptr;
     }
     napi_value type = Convert2JSValue(env, changeInfo.changeType_);
@@ -681,9 +699,13 @@ bool DataShareJSUtils::UnwrapTemplatePredicates(napi_env env, napi_value jsPredi
     std::vector<PredicateTemplateNode> &predicates)
 {
     napi_value keys = nullptr;
-    napi_get_property_names(env, jsPredicates, &keys);
+    napi_status status = napi_get_property_names(env, jsPredicates, &keys);
+    if (status != napi_ok || keys == nullptr) {
+        LOG_ERROR("UnwrapTemplatePredicates error");
+        return false;
+    }
     uint32_t arrLen = 0;
-    napi_status status = napi_get_array_length(env, keys, &arrLen);
+    status = napi_get_array_length(env, keys, &arrLen);
     if (status != napi_ok) {
         LOG_ERROR("UnwrapTemplatePredicates error");
         return false;
@@ -932,9 +954,13 @@ bool DataShareJSUtils::UnwrapMultiValues(napi_env &env, napi_value &arg,
     std::map<std::string, std::map<std::string, DataProxyValue>> &multiValues)
 {
     napi_value keys = 0;
-    napi_get_property_names(env, arg, &keys);
+    napi_status status = napi_get_property_names(env, arg, &keys);
+    if (status != napi_ok || keys == nullptr) {
+        LOG_ERROR("unwrap multiValues err");
+        return false;
+    }
     uint32_t arrLen = 0;
-    napi_status status = napi_get_array_length(env, keys, &arrLen);
+    status = napi_get_array_length(env, keys, &arrLen);
     if (status != napi_ok || arrLen == 0) {
         LOG_ERROR("unwrap multiValues err");
         return false;
@@ -1141,7 +1167,7 @@ bool DataShareJSUtils::UnwrapBooleanByPropertyName(napi_env env, napi_value jsVa
     napi_valuetype type = napi_undefined;
     napi_value jsResult = nullptr;
     napi_status status = napi_get_named_property(env, jsValue, propertyName, &jsResult);
-    if (status != napi_ok) {
+    if (status != napi_ok || jsResult == nullptr) {
         LOG_ERROR("napi_get_named_property failed %{public}d", status);
         return false;
     }
@@ -1203,6 +1229,10 @@ bool DataShareJSUtils::UnwrapStringListProperty(napi_env env, napi_value jsObjec
     std::vector<std::string> &result, bool &isUndefined)
 {
     napi_value jsDataKey = Convert2JSValue(env, std::string(propertyName));
+    if (jsDataKey == nullptr) {
+        LOG_ERROR("Convert %{public}s key failed", propertyName);
+        return false;
+    }
     napi_value jsDataValue = nullptr;
     napi_get_property(env, jsObject, jsDataKey, &jsDataValue);
     napi_valuetype valueType = napi_undefined;
@@ -1281,13 +1311,19 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, UpdateOp
 int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, std::string &str)
 {
     size_t strBufferSize = DEFAULT_BUF_SIZE;
-    napi_get_value_string_utf8(env, input, nullptr, 0, &strBufferSize);
+    if (napi_get_value_string_utf8(env, input, nullptr, 0, &strBufferSize) != napi_ok ||
+        strBufferSize == SIZE_MAX) {
+        return napi_invalid_arg;
+    }
     char *buf = new (std::nothrow) char[strBufferSize + 1];
     if (buf == nullptr) {
         return napi_invalid_arg;
     }
     size_t len = 0;
-    napi_get_value_string_utf8(env, input, buf, strBufferSize + 1, &len);
+    if (napi_get_value_string_utf8(env, input, buf, strBufferSize + 1, &len) != napi_ok) {
+        delete[] buf;
+        return napi_invalid_arg;
+    }
     buf[len] = 0;
     str = std::string(buf);
     delete[] buf;
@@ -1348,9 +1384,15 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, DataProx
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataShareObserver::ChangeInfo &changeInfo)
 {
     napi_value napiValue = nullptr;
-    napi_create_object(env, &napiValue);
+    if (napi_create_object(env, &napiValue) != napi_ok) {
+        return nullptr;
+    }
     napi_value changeType = Convert2JSValue(env, changeInfo.changeType_);
     if (changeType == nullptr) {
+        return nullptr;
+    }
+    if (changeInfo.uris_.empty()) {
+        LOG_ERROR("ChangeInfo uris_ is empty");
         return nullptr;
     }
     napi_value uri = Convert2JSValue(env, changeInfo.uris_.front().ToString());
