@@ -58,7 +58,10 @@ int32_t ConfigFactory::Initialize()
         std::getline(fin, line);
         jsonStr += line;
     }
-    config_.Unmarshall(jsonStr);
+    if (!config_.Unmarshall(jsonStr)) {
+        LOG_ERROR("ConfigFactory unmarshall config failed");
+        return -1;
+    }
     isInited = true;
     return 0;
 }

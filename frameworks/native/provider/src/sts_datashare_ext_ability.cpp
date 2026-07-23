@@ -426,7 +426,15 @@ bool StsDataShareExtAbility::RegisterObserver(const Uri &uri, const sptr<AAFwk::
         return false;
     }
 
-    ErrCode ret = obsMgrClient->RegisterObserver(uri, dataObserver);
+    int32_t callingUserId = DataShareStubImpl::GetCallingUserId();
+    uint32_t token = IPCSkeleton::GetCallingTokenID();
+    DataObsOption opt;
+    opt.SetFirstCallerTokenID(token);
+    opt.SetFirstCallerPid(IPCSkeleton::GetCallingPid());
+    opt.SetDataShare(true);
+    opt.SetFirstCallerFullTokenID(IPCSkeleton::GetCallingFullTokenID());
+    Uri innerUri = uri;
+    ErrCode ret = obsMgrClient->RegisterObserverFromExtension(innerUri, dataObserver, callingUserId, opt);
     if (ret != ERR_OK) {
         LOG_ERROR("obsMgrClient->RegisterObserver error return %{public}d", ret);
         return false;
