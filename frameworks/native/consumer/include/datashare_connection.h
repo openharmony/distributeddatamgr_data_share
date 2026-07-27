@@ -31,8 +31,7 @@ using namespace AppExecFwk;
 class DataShareConnection : public std::enable_shared_from_this<DataShareConnection>,
     public DataShareConnectionBase {
 public:
-    DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime = 2) : callback_(
-        new DataShareConnectionCallback()), uri_(uri), token_(token), waitTime_(waitTime) {}
+    DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime = 2);
     ~DataShareConnection() override;
 
     /**

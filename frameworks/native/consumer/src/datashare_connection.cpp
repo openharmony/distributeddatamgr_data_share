@@ -308,6 +308,15 @@ void DataShareConnection::DisconnectDataShareExtAbility()
     }
 }
 
+DataShareConnection::DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime) : uri_(uri),
+    token_(token), waitTime_(waitTime)
+{
+    callback_ = new (std::nothrow) DataShareConnectionCallback();
+    if (callback_ == nullptr) {
+        LOG_ERROR("Create DataShareConnectionCallback failed");
+    }
+}
+
 DataShareConnection::~DataShareConnection()
 {
 }
