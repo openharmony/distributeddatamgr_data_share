@@ -119,7 +119,12 @@ void DataShareConnection::ReconnectExtAbility(const std::string &uri)
             LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri_.ToString()).c_str());
             return;
         }
-        ErrCode ret = instance->Connect(uri, this, token_);
+        sptr<DataShareConnectionCallback> callback = GetCallback();
+        if (callback == nullptr) {
+            LOG_ERROR("callback is nullptr");
+            return;
+        }
+        ErrCode ret = instance->Connect(uri, callback, token_);
         LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d",
             DataShareStringUtils::Change(uri).c_str(), ret);
         if (ret == E_OK) {
@@ -150,7 +155,12 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
         delay = std::chrono::seconds(0);
     }
     std::weak_ptr<DataShareConnection> self = weak_from_this();
-    auto taskid = pool_->Schedule(delay, [uri, self]() {
+    sptr<DataShareConnectionCallback> callback = GetCallback();
+    if (callback == nullptr) {
+        LOG_ERROR("callback is nullptr");
+        return;
+    }
+    auto taskid = pool_->Schedule(delay, [uri, self, callback]() {
         auto selfSharedPtr = self.lock();
         if (selfSharedPtr) {
             AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
@@ -158,7 +168,7 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
                 LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri).c_str());
                 return;
             }
-            ErrCode ret = instance->Connect(uri, selfSharedPtr.get(), selfSharedPtr->token_);
+            ErrCode ret = instance->Connect(uri, callback, selfSharedPtr->token_);
             LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d",
                 DataShareStringUtils::Change(uri).c_str(), ret);
             if (ret == E_OK) {
@@ -244,7 +254,12 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
         LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(reqUri).c_str());
         return nullptr;
     }
-    ErrCode ret = instance->Connect(reqUri, this, token);
+    sptr<DataShareConnectionCallback> callback = GetCallback();
+    if (callback == nullptr) {
+        LOG_ERROR("callback is nullptr");
+        return nullptr;
+    }
+    ErrCode ret = instance->Connect(reqUri, callback, token);
     LOG_INFO("uri = %{public}s. ret = %{public}d", DataShareStringUtils::Change(reqUri).c_str(), ret);
     if (ret != ERR_OK) {
         return nullptr;
@@ -320,13 +335,29 @@ ErrCode DataShareConnection::Disconnect()
     if (instance == nullptr) {
         return -1;
     }
-    return instance->DisConnect(this);
+    sptr<DataShareConnectionCallback> callback = GetCallback();
+    if (callback == nullptr) {
+        return -1;
+    }
+    return instance->DisConnect(callback);
 }
 
 std::shared_ptr<DataShareProxy> DataShareConnection::GetDataShareProxy()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     return dataShareProxy_;
+}
+
+sptr<DataShareConnectionCallback> DataShareConnection::GetCallback()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callback_ == nullptr) {
+        return nullptr;
+    }
+    if (callback_->TargetExpired()) {
+        callback_->SetTarget(weak_from_this());
+    }
+    return callback_;
 }
 }  // namespace DataShare
 }  // namespace OHOS

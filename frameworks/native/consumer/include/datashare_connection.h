@@ -20,20 +20,19 @@
 #include <memory>
 #include <mutex>
 
-#include "ability_connect_callback_stub.h"
 #include "data_ability_observer_interface.h"
 #include "datashare_connection_base.h"
+#include "datashare_connection_callback.h"
 #include "want.h"
 
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-class DataShareConnection : public AAFwk::AbilityConnectionStub,
-    public std::enable_shared_from_this<DataShareConnection>,
+class DataShareConnection : public std::enable_shared_from_this<DataShareConnection>,
     public DataShareConnectionBase {
 public:
-    DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime = 2) : uri_(uri),
-        token_(token), waitTime_(waitTime) {}
+    DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime = 2) : callback_(
+        new DataShareConnectionCallback()), uri_(uri), token_(token), waitTime_(waitTime) {}
     ~DataShareConnection() override;
 
     /**
@@ -46,7 +45,7 @@ public:
      * other value indicates a connection failure.
      */
     void OnAbilityConnectDone(
-        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
+        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode);
 
     /**
      * @brief This method is called back to receive the disconnection result after the connected extension ability
@@ -55,9 +54,9 @@ public:
      *
      * @param element: Indicates information about the disconnected extension ability.
      * @param resultCode: Indicates the disconnection result code. The value 0 indicates a successful disconnection,
-     * and any other value indicates a disconnection failure.
+     * and any other value indicates a connection failure.
      */
-    void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
+    void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode);
 
     /**
      * @brief disconnect remote ability of DataShareExtAbility.
@@ -97,12 +96,14 @@ private:
     };
     std::shared_ptr<DataShareProxy> ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
     std::shared_ptr<DataShareProxy> GetDataShareProxy();
+    sptr<DataShareConnectionCallback> GetCallback();
     ErrCode Disconnect();
     void ReconnectExtAbility(const std::string &uri);
     void DelayConnectExtAbility(const std::string &uri);
     void ReRegisterObserverExtProvider();
     std::mutex mutex_{};
     std::shared_ptr<DataShareProxy> dataShareProxy_;
+    sptr<DataShareConnectionCallback> callback_;
     ConnectCondition condition_;
     Uri uri_;
     sptr<IRemoteObject> token_ = {};

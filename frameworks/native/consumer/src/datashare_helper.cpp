@@ -179,28 +179,23 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
         return CreateSAProviderHelper(uri, token, saId, waitTime, isSystem);
     }
 
-    sptr<DataShareConnection> connection = new (std::nothrow) DataShareConnection(uri, token, waitTime);
+    std::shared_ptr<DataShareConnection> connection =
+        std::make_shared<DataShareConnection>(uri, token, waitTime);
     if (connection == nullptr) {
         LOG_ERROR("Create DataShareConnection failed.");
         return nullptr;
     }
-    // The sptr `holder` only keeps the RefBase object alive while the shared_ptr
-    // control block exists. Disconnect is performed explicitly via Close() in
-    // DataShareHelperImpl::Release()/destructor, never inside this deleter, so that
-    // no IPC or re-entrant callback runs during shared_ptr destruction.
-    auto dataShareConnection =
-        std::shared_ptr<DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {});
-    auto manager = DataShareManagerImpl::GetInstance();
+auto manager = DataShareManagerImpl::GetInstance();
     if (manager == nullptr) {
         LOG_ERROR("Manager is nullptr");
         return nullptr;
     }
     manager->SetCallCount(__FUNCTION__, uri.ToString());
-    if (dataShareConnection->GetDataShareProxy(uri, token) == nullptr) {
+    if (connection->GetDataShareProxy(uri, token) == nullptr) {
         LOG_ERROR("connect failed");
         return nullptr;
     }
-    return std::make_shared<DataShareHelperImpl>(uri, token, dataShareConnection, isSystem);
+    return std::make_shared<DataShareHelperImpl>(uri, token, connection, isSystem);
 }
 
 std::shared_ptr<DataShareHelper> DataShareHelper::CreateSAProviderHelper(Uri &uri, const sptr<IRemoteObject> &token,
