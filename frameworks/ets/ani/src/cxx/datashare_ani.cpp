@@ -945,7 +945,7 @@ I64ResultWrap DataShareNativeCreate(int64_t context, rust::String strUri,
     helperHolder->jsPublishedObsManager_ =
         std::make_shared<AniPublishedSubscriberManager>(helperHolder->datashareHelper_);
     if (helperHolder->jsRdbObsManager_ == nullptr || helperHolder->jsPublishedObsManager_ == nullptr) {
-        LOG_ERROR("create observer manager failed!");
+        LOG_ERROR("creatre observer manager failed!");
     }
     return I64ResultWrap{reinterpret_cast<long long>(helperHolder), E_OK};
 }

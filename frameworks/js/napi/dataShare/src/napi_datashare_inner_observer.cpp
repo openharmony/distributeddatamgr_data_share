@@ -43,12 +43,10 @@ NAPIInnerObserver::~NAPIInnerObserver()
         return;
     }
     // SAFETY: observerEnvHookWorker will not be accessed in napi_remove_env_cleanup_hook.
-    // Temporary workaround for timing-related crashes：pointer lifetime may be mishandled only if
-    // napi_remove_env_cleanup_hook or napi_send_event fails.
     auto task = [env = env_, observerEnvHookWorker = observerEnvHookWorker_]() {
         napi_status status = napi_remove_env_cleanup_hook(env, &CleanEnv, observerEnvHookWorker);
         if (status != napi_ok) {
-            LOG_ERROR("remove hook failed: %{public}d, env:%{public}d, worker:%{public}d", status, env == nullptr,
+            LOG_ERROR("remove hook fialed: %{public}d, env:%{public}d, worker:%{public}d", status, env == nullptr,
                 observerEnvHookWorker == nullptr);
             return;
         }
