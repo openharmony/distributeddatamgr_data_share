@@ -52,7 +52,6 @@ ohos_static_library("ani_rs_static") {
 }
 
 ohos_rust_static_library("ani_rs") {
-  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
