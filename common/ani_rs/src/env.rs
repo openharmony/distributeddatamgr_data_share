@@ -602,7 +602,7 @@ impl<'local> AniEnv<'local> {
     pub fn new_error(&self, message: &str) -> Result<AniRef<'local>, AniError> {
         unsafe {
             let class =
-                self.find_class(CStr::from_bytes_with_nul_unchecked(b"escompat.Error\0"))?;
+                self.find_class(CStr::from_bytes_with_nul_unchecked(b"std.core.Error\0"))?;
 
             let mut method = null_mut() as ani_method;
 
@@ -611,7 +611,7 @@ impl<'local> AniEnv<'local> {
                 class.as_raw(),
                 CStr::from_bytes_with_nul_unchecked(b"<ctor>\0").as_ptr(),
                 CStr::from_bytes_with_nul_unchecked(
-                    b"C{std.core.String}C{escompat.ErrorOptions}:\0",
+                    b"C{std.core.String}C{std.core.ErrorOptions}:\0",
                 )
                 .as_ptr(),
                 &mut method as *mut _,
@@ -661,7 +661,7 @@ impl<'local> AniEnv<'local> {
             let method = self.find_method_with_signature(
                 &class,
                 CStr::from_bytes_with_nul_unchecked(b"<ctor>\0"),
-                CStr::from_bytes_with_nul_unchecked(b"iC{escompat.Error}:\0"),
+                CStr::from_bytes_with_nul_unchecked(b"iC{std.core.Error}:\0"),
             )?;
             let error = self.new_error(message)?;
             let mut business_error = null_mut() as ani_error;
