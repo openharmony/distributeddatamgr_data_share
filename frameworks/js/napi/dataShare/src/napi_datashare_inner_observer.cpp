@@ -42,7 +42,7 @@ NAPIInnerObserver::~NAPIInnerObserver()
         LOG_ERROR("env_ is nullptr");
         return;
     }
-    // SAFETY: observerEnvHookWorker will not be accessed in napi_remove_env_cleanup_hook.
+    // SAFETY: observerEnvHookWorker will not be accessed in napi_remove_env_cleanup_hook
     auto task = [env = env_, observerEnvHookWorker = observerEnvHookWorker_]() {
         napi_status status = napi_remove_env_cleanup_hook(env, &CleanEnv, observerEnvHookWorker);
         if (status != napi_ok) {
