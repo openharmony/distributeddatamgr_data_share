@@ -1383,16 +1383,14 @@ int32_t DataShareJSUtils::Convert2Value(napi_env env, napi_value input, DataProx
 
 napi_value DataShareJSUtils::Convert2JSValue(napi_env env, const DataShareObserver::ChangeInfo &changeInfo)
 {
+    napi_value changeType = Convert2JSValue(env, changeInfo.changeType_);
+    if (changeType == nullptr || changeInfo.uris_.empty()) {
+        LOG_ERROR("ChangeInfo invalid, type=%{public}u, uris_.empty=%{public}d",
+            static_cast<uint32_t>(changeInfo.changeType_), changeInfo.uris_.empty());
+        return nullptr;
+    }
     napi_value napiValue = nullptr;
     if (napi_create_object(env, &napiValue) != napi_ok) {
-        return nullptr;
-    }
-    napi_value changeType = Convert2JSValue(env, changeInfo.changeType_);
-    if (changeType == nullptr) {
-        return nullptr;
-    }
-    if (changeInfo.uris_.empty()) {
-        LOG_ERROR("ChangeInfo uris_ is empty");
         return nullptr;
     }
     napi_value uri = Convert2JSValue(env, changeInfo.uris_.front().ToString());

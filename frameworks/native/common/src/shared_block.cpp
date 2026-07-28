@@ -160,11 +160,8 @@ int SharedBlock::ReadMessageParcel(MessageParcel &parcel, SharedBlock *&block)
 
 int SharedBlock::Clear()
 {
-    if (mReadOnly) {
-        return SHARED_BLOCK_INVALID_OPERATION;
-    }
-    if (mHeader == nullptr) {
-        LOG_ERROR("Clear: mHeader is nullptr");
+    if (mReadOnly || mHeader == nullptr) {
+        LOG_ERROR("Clear: mReadOnly=%{public}d", mReadOnly);
         return SHARED_BLOCK_INVALID_OPERATION;
     }
 
@@ -380,11 +377,8 @@ int SharedBlock::PutString(uint32_t row, uint32_t column, const char *value, siz
 
 int SharedBlock::PutBlobOrString(uint32_t row, uint32_t column, const void *value, size_t size, int32_t type)
 {
-    if (mReadOnly) {
-        return SHARED_BLOCK_INVALID_OPERATION;
-    }
-    if (mHeader == nullptr) {
-        LOG_ERROR("PutBlobOrString: mHeader is nullptr");
+    if (mReadOnly || mHeader == nullptr) {
+        LOG_ERROR("PutBlobOrString: mReadOnly=%{public}d", mReadOnly);
         return SHARED_BLOCK_INVALID_OPERATION;
     }
 

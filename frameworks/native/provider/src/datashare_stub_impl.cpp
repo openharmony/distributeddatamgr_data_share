@@ -170,11 +170,9 @@ int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
     GetCallingInfo(info);
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
-    if (extension == nullptr) {
-        return DEFAULT_NUMBER;
-    }
-    if (extension->abilityInfo_ == nullptr) {
-        LOG_ERROR("OpenFile: extension->abilityInfo_ is nullptr.");
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("OpenFile: extension is nullptr : %{public}d, abilityInfo_ is nullptr : %{public}d",
+            extension == nullptr, extension != nullptr && extension->abilityInfo_ == nullptr);
         return DEFAULT_NUMBER;
     }
     bool needWrite = (mode.find('w') != std::string::npos);
@@ -698,11 +696,9 @@ int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareVa
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
-    if (extension == nullptr) {
-        return DEFAULT_NUMBER;
-    }
-    if (extension->abilityInfo_ == nullptr) {
-        LOG_ERROR("BatchInsert: extension->abilityInfo_ is nullptr.");
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("BatchInsert: extension is nullptr : %{public}d, abilityInfo_ is nullptr : %{public}d",
+            extension == nullptr, extension != nullptr && extension->abilityInfo_ == nullptr);
         return DEFAULT_NUMBER;
     }
 
