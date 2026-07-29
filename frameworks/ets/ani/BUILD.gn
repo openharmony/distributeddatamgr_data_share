@@ -22,6 +22,7 @@ rust_cxx("datashare_ani_cxx_gen") {
 }
 
 ohos_static_library("datashare_ani_cxx") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
     integer_overflow = true
     ubsan = true
@@ -74,6 +75,7 @@ ohos_static_library("datashare_ani_cxx") {
 }
 
 ohos_rust_shared_ffi("datashare_ani_rs") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
     cfi = true
     cfi_cross_dso = true
