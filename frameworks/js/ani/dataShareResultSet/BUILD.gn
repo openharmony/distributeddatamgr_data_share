@@ -16,6 +16,7 @@ import("//build/ohos.gni")
 import("//foundation/distributeddatamgr/data_share/datashare.gni")
 
 ohos_shared_library("data_share_result_set") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
     ubsan = true
     boundary_sanitize = true

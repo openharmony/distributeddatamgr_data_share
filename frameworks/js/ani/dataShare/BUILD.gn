@@ -87,6 +87,7 @@ group("data_share") {
 }
 
 ohos_shared_library("datasharepredicates_ani") {
+  branch_protector_ret = "pac_ret"
   sanitize = {
     ubsan = true
     boundary_sanitize = true
