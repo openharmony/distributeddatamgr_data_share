@@ -151,7 +151,8 @@ struct AniProxyDataObserverMapKey {
 };
 
 class AniProxyDataSubscriberManager
-    : public OHOS::DataShareAni::AniCallbacksManager<AniProxyDataObserverMapKey, AniProxyDataObserver> {
+    : public OHOS::DataShareAni::AniCallbacksManager<AniProxyDataObserverMapKey, AniProxyDataObserver>,
+      public std::enable_shared_from_this<AniProxyDataSubscriberManager> {
 public:
     using Key = AniProxyDataObserverMapKey;
     using Observer = AniProxyDataObserver;
