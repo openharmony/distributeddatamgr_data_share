@@ -91,7 +91,7 @@ bool DataShareStubImpl::VerifyProvider(const CallingInfo &callingInfo, const uin
     }
 
     auto ret = bmsHelper->GetBundleInfoForSelf(
-        (static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION) +
+        (static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_APPLICATION) |
             static_cast<int32_t>(GetBundleInfoFlag::GET_BUNDLE_INFO_WITH_SIGNATURE_INFO)), bundleInfo);
     if (ret != E_OK) {
         LOG_ERROR("Get BundleInfo failed! uri: %{public}s, ret: %{public}d",

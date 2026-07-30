@@ -195,6 +195,10 @@ int SharedBlock::SetColumnNum(uint32_t numColumns)
 
 int SharedBlock::AllocRow()
 {
+    if (mHeader == nullptr) {
+        LOG_ERROR("mHeader is nullptr");
+        return SHARED_BLOCK_INVALID_OPERATION;
+    }
     if (mReadOnly) {
         return SHARED_BLOCK_INVALID_OPERATION;
     }
@@ -204,10 +208,13 @@ int SharedBlock::AllocRow()
         return SHARED_BLOCK_NO_MEMORY;
     }
 
-    /* Allocate the units for the field directory */
     size_t fieldDirSize = mHeader->columnNums * sizeof(CellUnit);
+    if (mHeader->columnNums > SIZE_MAX / sizeof(CellUnit)) {
+        LOG_ERROR("fieldDirSize overflow");
+        mHeader->rowNums--;
+        return SHARED_BLOCK_NO_MEMORY;
+    }
 
-    /* Aligned */
     uint32_t fieldDirOffset = Alloc(fieldDirSize, true);
     if (!fieldDirOffset) {
         mHeader->rowNums--;
@@ -218,11 +225,14 @@ int SharedBlock::AllocRow()
 
     CellUnit *fieldDir = static_cast<CellUnit *>(OffsetToPtr(fieldDirOffset, sizeof(CellUnit)));
     if (fieldDir == nullptr) {
+        LOG_ERROR("OffsetToPtr failed");
+        mHeader->rowNums--;
         return SHARED_BLOCK_BAD_VALUE;
     }
     int result = memset_s(fieldDir, fieldDirSize, 0, fieldDirSize);
     if (result != 0) {
         LOG_ERROR("Set memory failed");
+        mHeader->rowNums--;
         return SHARED_BLOCK_NO_MEMORY;
     }
 
@@ -246,19 +256,31 @@ int SharedBlock::FreeLastRow()
 
 uint32_t SharedBlock::Alloc(size_t size, bool aligned)
 {
-    /* Number of unused offsets in the header */
+    if (mHeader == nullptr) {
+        LOG_ERROR("mHeader is nullptr");
+        return 0;
+    }
     uint32_t offsetDigit = 3;
     uint32_t padding = aligned ? (~mHeader->unusedOffset + 1) & offsetDigit : 0;
+    
+    if (padding > UINT32_MAX - mHeader->unusedOffset) {
+        LOG_ERROR("Alloc padding overflow");
+        return 0;
+    }
     uint32_t offset = mHeader->unusedOffset + padding;
-    uint32_t nextFreeOffset;
-
-    if (offset + size >= mSize) {
+    
+    if (size > UINT32_MAX - offset) {
+        LOG_ERROR("Alloc size overflow");
+        return 0;
+    }
+    uint32_t nextFreeOffset = offset + static_cast<uint32_t>(size);
+    
+    if (nextFreeOffset >= mSize) {
         LOG_ERROR("SharedBlock is full: requested allocation %{public}zu bytes,"
             " free space %{public}zu bytes, block size %{public}zu bytes",
             size, mSize - mHeader->unusedOffset, mSize);
         return 0;
     }
-    nextFreeOffset = offset + size;
     mHeader->unusedOffset = nextFreeOffset;
     return offset;
 }
@@ -469,7 +491,17 @@ size_t SharedBlock::SetRawData(const void *rawData, size_t size)
 
 uint32_t SharedBlock::OffsetFromPtr(void *ptr)
 {
-    return static_cast<uint8_t *>(ptr) - static_cast<uint8_t *>(mData);
+    if (ptr == nullptr || mData == nullptr) {
+        return INVALID_ROW_RECORD;
+    }
+    if (ptr < mData) {
+        return INVALID_ROW_RECORD;
+    }
+    uintptr_t offset = static_cast<uint8_t *>(ptr) - static_cast<uint8_t *>(mData);
+    if (offset >= mSize) {
+        return INVALID_ROW_RECORD;
+    }
+    return static_cast<uint32_t>(offset);
 }
 } // namespace AppDataFwk
 } // namespace OHOS
