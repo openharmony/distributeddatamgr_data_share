@@ -254,6 +254,9 @@ ErrCode DataShareStub::CmdOpenRawFile(MessageParcel &data, MessageParcel &reply)
     int fd = OpenRawFile(uri, mode);
     if (!ITypesUtil::Marshal(reply, fd)) {
         LOG_ERROR("Marshal value is nullptr");
+        if (fd >= 0) {
+            close(fd);
+        }
         return ERR_INVALID_VALUE;
     }
     return E_OK;

@@ -115,6 +115,7 @@ void StsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &rec
 
     if ((status = env->Object_SetField_Ref(stsObj_->aniObj, contextField, contextRef)) != ANI_OK) {
         LOG_ERROR("Failed to set contextField, status:%{public}d", status);
+        env->GlobalReference_Delete(contextRef);
         ResetEnv(env);
     }
 }
@@ -595,6 +596,7 @@ int StsDataShareExtAbility::BatchUpdate(const UpdateOperations &operations, std:
     AsyncCallBackPoint *point = new (std::nothrow)AsyncCallBackPoint();
     if (point == nullptr) {
         LOG_ERROR("New AsyncCallBackPoint error.");
+        CleanupPredicates(vec_predicates);
         return ret;
     }
     point->result = std::move(result_);
