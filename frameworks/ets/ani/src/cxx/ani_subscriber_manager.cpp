@@ -347,9 +347,14 @@ std::vector<DataProxyResult> AniProxyDataSubscriberManager::AddObservers(
             if (firstAddUris.empty()) {
                 return;
             }
+            std::weak_ptr<AniProxyDataSubscriberManager> weakSelf = weak_from_this();
             auto subResults = dataProxyHandle->SubscribeProxyData(firstAddUris, config,
-                [this](const std::vector<DataShare::DataProxyChangeInfo> &changeInfo) {
-                    Emit(changeInfo);
+                [weakSelf](const std::vector<DataShare::DataProxyChangeInfo> &changeInfo) {
+                    auto self = weakSelf.lock();
+                    if (self == nullptr) {
+                        return;
+                    }
+                    self->Emit(changeInfo);
                 });
             std::vector<Key> failedKeys;
             for (auto &subResult : subResults) {

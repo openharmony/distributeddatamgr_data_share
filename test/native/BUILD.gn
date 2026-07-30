@@ -28,6 +28,7 @@ group("unittest") {
     ":DataShareHelperImplRegisterTest",
     ":DataShareHelperImplTest",
     ":DataShareHelperTest",
+    ":DataProxyHandleHolderTest",
     ":DataShareProxyTest",
     ":DataShareStubTest",
     ":DatashareItypesUtilsTest",
@@ -621,6 +622,42 @@ ohos_unittest("SharedBlockTest") {
     "googletest:gmock_main",
     "hilog:libhilog",
     "ipc:ipc_single",
+  ]
+
+  cflags = [
+    "-fvisibility=hidden",
+    "-Dprivate=public",
+    "-Dprotected=public",
+  ]
+}
+
+ohos_unittest("DataProxyHandleHolderTest") {
+  module_out_path = "data_share/data_share/inner_tests"
+
+  include_dirs = [
+    "${datashare_base_path}/frameworks/ets/ani/include",
+    "${datashare_common_native_path}/include",
+    "${datashare_innerapi_path}/common/include",
+    "${datashare_innerapi_path}/consumer/include",
+  ]
+
+  sources = [ "./unittest/mediadatashare_test/src/data_proxy_handle_holder_test.cpp" ]
+
+  deps = [
+    "${datashare_innerapi_path}:datashare_consumer_static",
+    "${datashare_innerapi_path}/common:datashare_common_static",
+  ]
+
+  external_deps = [
+    "ability_runtime:dataobs_manager",
+    "c_utils:utils",
+    "googletest:gmock_main",
+    "hilog:libhilog",
+    "ipc:ipc_core",
+    "ipc:ipc_single",
+    "kv_store:distributeddata_inner",
+    "runtime_core:ani",
+    "rust_cxx:cxx_cppdeps",
   ]
 
   cflags = [
