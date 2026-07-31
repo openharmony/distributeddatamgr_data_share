@@ -174,13 +174,17 @@ int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
         return DEFAULT_NUMBER;
     }
     bool needWrite = (mode.find('w') != std::string::npos);
+    bool needRead = (mode.find('r') != std::string::npos);
+    if (!needWrite && !needRead) {
+        LOG_ERROR("mode must contain 'r' or 'w'");
+        return PERMISSION_ERROR_NUMBER;
+    }
     if (needWrite) {
         if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
             LOG_ERROR("OpenFile check write permission failed.");
             return PERMISSION_ERROR_NUMBER;
         }
     }
-    bool needRead = (mode.find('r') != std::string::npos);
     if (needRead) {
         if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {
             LOG_ERROR("OpenFile check read permission failed.");
@@ -221,13 +225,17 @@ int DataShareStubImpl::OpenRawFile(const Uri &uri, const std::string &mode)
         return DEFAULT_NUMBER;
     }
     bool needWrite = (mode.find('w') != std::string::npos);
+    bool needRead = (mode.find('r') != std::string::npos);
+    if (!needWrite && !needRead) {
+        LOG_ERROR("mode must contain 'r' or 'w'");
+        return PERMISSION_ERROR_NUMBER;
+    }
     if (needWrite) {
         if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
             LOG_ERROR("OpenRawFile check write permission failed.");
             return PERMISSION_ERROR_NUMBER;
         }
     }
-    bool needRead = (mode.find('r') != std::string::npos);
     if (needRead) {
         if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {
             LOG_ERROR("OpenRawFile check read permission failed.");

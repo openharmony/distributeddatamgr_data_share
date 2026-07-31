@@ -113,7 +113,8 @@ int SharedBlock::Create(const std::string &name, size_t size, SharedBlock *&outS
 
 int SharedBlock::WriteMessageParcel(MessageParcel &parcel)
 {
-    return parcel.WriteString16(ToUtf16(mName)) && parcel.WriteAshmem(ashmem_);
+    bool result = parcel.WriteString16(ToUtf16(mName)) && parcel.WriteAshmem(ashmem_);
+    return static_cast<int>(result);
 }
 
 int SharedBlock::ReadMessageParcel(MessageParcel &parcel, SharedBlock *&block)
@@ -297,6 +298,10 @@ inline uint32_t *SharedBlock::GetRowOffset(uint32_t row)
     }
 
     while (rowPos >= ROW_OFFSETS_NUM) {
+        if (group->nextGroupOffset == 0) {
+            LOG_ERROR("GetRowOffset: nextGroupOffset is 0, invalid link");
+            return nullptr;
+        }
         group = static_cast<RowGroupHeader *>(OffsetToPtr(group->nextGroupOffset, sizeof(RowGroupHeader)));
         if (group == nullptr) {
             LOG_ERROR("Failed to get group in OffsetToPtr(group->nextGroupOffset) when while loop.");
@@ -385,6 +390,10 @@ int SharedBlock::PutBlob(uint32_t row, uint32_t column, const void *value, size_
 
 int SharedBlock::PutString(uint32_t row, uint32_t column, const char *value, size_t sizeIncludingNull)
 {
+    if (value == nullptr && sizeIncludingNull > 0) {
+        LOG_ERROR("PutString: value is nullptr but sizeIncludingNull > 0");
+        return SHARED_BLOCK_BAD_VALUE;
+    }
     return PutBlobOrString(row, column, value, sizeIncludingNull, CELL_UNIT_TYPE_STRING);
 }
 
@@ -473,8 +482,16 @@ int SharedBlock::PutNull(uint32_t row, uint32_t column)
 
 size_t SharedBlock::SetRawData(const void *rawData, size_t size)
 {
+    if (mHeader == nullptr) {
+        LOG_ERROR("SetRawData: mHeader is nullptr");
+        return SHARED_BLOCK_INVALID_OPERATION;
+    }
     if (size <= 0) {
         LOG_ERROR("SharedBlock rawData is less than or equal to 0M");
+        return SHARED_BLOCK_INVALID_OPERATION;
+    }
+    if (rawData == nullptr) {
+        LOG_ERROR("SetRawData: rawData is nullptr");
         return SHARED_BLOCK_INVALID_OPERATION;
     }
     if (size > mSize) {

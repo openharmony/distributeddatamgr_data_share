@@ -83,7 +83,6 @@ void StsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &rec
 
     auto env = stsRuntime_.GetAniEnv();
     if (env == nullptr) {
-        LOG_ERROR("Failed to init ability, env is null");
         return;
     }
 

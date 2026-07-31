@@ -689,6 +689,10 @@ ErrCode DataShareStub::CmdInsertExt(MessageParcel &data, MessageParcel &reply)
         LOG_ERROR("Insert inner error");
         return ERR_INVALID_VALUE;
     }
+    if (index == PERMISSION_ERROR_NUMBER) {
+        LOG_ERROR("InsertExt permission error");
+        return ERR_PERMISSION_DENIED;
+    }
     if (!ITypesUtil::Marshal(reply, index, result)) {
         LOG_ERROR("fail to write result");
         return ERR_INVALID_VALUE;
