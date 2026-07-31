@@ -110,6 +110,7 @@ void StsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &rec
     ani_ref contextRef = nullptr;
     if ((status = env->GlobalReference_Create(contextObj, &contextRef)) != ANI_OK) {
         LOG_ERROR("Failed to get contextRef, status:%{public}d", status);
+        ResetEnv(env);
         return;
     }
 
@@ -511,6 +512,10 @@ void StsDataShareExtAbility::SaveNewCallingInfo(ani_env *env)
 
 Uri StsDataShareExtAbility::NormalizeUri(const Uri &uri)
 {
+    if (stsObj_ == nullptr) {
+        LOG_ERROR("NormalizeUri failed, stsObj is nullptr");
+        return uri;
+    }
     AsyncCallBackPoint *point = new (std::nothrow)AsyncCallBackPoint();
     if (point == nullptr) {
         LOG_ERROR("New AsyncCallBackPoint error.");
@@ -531,6 +536,10 @@ Uri StsDataShareExtAbility::NormalizeUri(const Uri &uri)
 
 Uri StsDataShareExtAbility::DenormalizeUri(const Uri &uri)
 {
+    if (stsObj_ == nullptr) {
+        LOG_ERROR("DenormalizeUri failed, stsObj is nullptr");
+        return uri;
+    }
     AsyncCallBackPoint *point = new (std::nothrow)AsyncCallBackPoint();
     if (point == nullptr) {
         LOG_ERROR("New AsyncCallBackPoint error.");
