@@ -82,13 +82,9 @@ void StsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &rec
     }
 
     auto env = stsRuntime_.GetAniEnv();
-    if (env == nullptr) {
-        return;
-    }
-
     auto context = GetContext();
-    if (context == nullptr) {
-        LOG_ERROR("Failed to get context, moduleName:%{public}s.", moduleName.c_str());
+    if (env == nullptr || context == nullptr) {
+        LOG_ERROR("Failed to get env or context, moduleName:%{public}s.", moduleName.c_str());
         return;
     }
 
