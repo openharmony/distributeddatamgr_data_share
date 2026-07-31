@@ -142,6 +142,11 @@ void StsDataShareExtAbility::OnStart(const AAFwk::Want &want)
     }
     point->context = asyncContext;
     ani_object aniWant = WrapWant(env, want);
+    if (aniWant == nullptr) {
+        LOG_ERROR("WrapWant failed, aniWant is nullptr");
+        delete point;
+        return;
+    }
 
     call_arkts_on_create(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
         reinterpret_cast<int64_t>(aniWant), reinterpret_cast<int64_t>(point));
