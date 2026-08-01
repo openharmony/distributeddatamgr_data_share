@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace DataShare {
-DataShareAbsResultSet::DataShareAbsResultSet() : rowPos_(INIT_POS), count_(-1), isClosed_(false)
+DataShareAbsResultSet::DataShareAbsResultSet() : rowPos_(INIT_POS), count_(-1), isClosed_{false}
 {}
 
 DataShareAbsResultSet::~DataShareAbsResultSet() {}
@@ -235,12 +235,12 @@ int DataShareAbsResultSet::GetColumnName(int columnIndex, std::string &columnNam
 
 bool DataShareAbsResultSet::IsClosed() const
 {
-    return isClosed_;
+    return isClosed_.load(std::memory_order_acquire);
 }
 
 int DataShareAbsResultSet::Close()
 {
-    isClosed_ = true;
+    isClosed_.store(true, std::memory_order_release);
     return E_OK;
 }
 } // namespace DataShare

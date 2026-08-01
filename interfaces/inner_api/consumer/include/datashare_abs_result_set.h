@@ -16,6 +16,7 @@
 #ifndef DATASHARE_ABS_RESULT_SET_H
 #define DATASHARE_ABS_RESULT_SET_H
 
+#include <atomic>
 #include <map>
 #include <string>
 #include "basic/result_set.h"
@@ -71,7 +72,7 @@ protected:
     int rowPos_;
     int count_;
     // Indicates whether the result set is closed
-    bool isClosed_;
+    std::atomic<bool> isClosed_;
     std::map<std::string, int> indexCache_;
 };
 } // namespace DataShare
