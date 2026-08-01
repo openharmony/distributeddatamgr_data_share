@@ -210,12 +210,6 @@ int SharedBlock::AllocRow()
     }
 
     size_t fieldDirSize = mHeader->columnNums * sizeof(CellUnit);
-    if (mHeader->columnNums > SIZE_MAX / sizeof(CellUnit)) {
-        LOG_ERROR("fieldDirSize overflow");
-        mHeader->rowNums--;
-        return SHARED_BLOCK_NO_MEMORY;
-    }
-
     uint32_t fieldDirOffset = Alloc(fieldDirSize, true);
     if (!fieldDirOffset) {
         mHeader->rowNums--;
