@@ -421,6 +421,10 @@ int StsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataSh
 
 bool StsDataShareExtAbility::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
+    if (dataObserver == nullptr) {
+        LOG_ERROR("dataObserver is nullptr");
+        return false;
+    }
     DataShareExtAbility::RegisterObserver(uri, dataObserver);
     auto obsMgrClient = DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
