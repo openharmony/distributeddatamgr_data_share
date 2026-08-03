@@ -121,7 +121,7 @@ void DataShareConnection::ReconnectExtAbility(const std::string &uri)
         }
         sptr<ConnectionCallback> callback = GetCallback();
         if (callback == nullptr) {
-            LOG_ERROR("callback is nullptr");
+            LOG_ERROR("callback is nullptr, uri:%{public}s", DataShareStringUtils::Change(uri).c_str());
             return;
         }
         ErrCode ret = instance->Connect(uri, callback, token_);
@@ -157,7 +157,7 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
     std::weak_ptr<DataShareConnection> self = weak_from_this();
     sptr<ConnectionCallback> callback = GetCallback();
     if (callback == nullptr) {
-        LOG_ERROR("callback is nullptr");
+        LOG_ERROR("callback is nullptr, uri:%{public}s", DataShareStringUtils::Change(uri).c_str());
         return;
     }
     auto taskid = pool_->Schedule(delay, [uri, self, callback]() {
@@ -256,7 +256,7 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
     }
     sptr<ConnectionCallback> callback = GetCallback();
     if (callback == nullptr) {
-        LOG_ERROR("callback is nullptr");
+        LOG_ERROR("callback is nullptr, uri:%{public}s", DataShareStringUtils::Change(reqUri).c_str());
         return nullptr;
     }
     ErrCode ret = instance->Connect(reqUri, callback, token);
@@ -313,7 +313,8 @@ DataShareConnection::DataShareConnection(const Uri &uri, const sptr<IRemoteObjec
 {
     callback_ = new (std::nothrow) ConnectionCallback();
     if (callback_ == nullptr) {
-        LOG_ERROR("Create DataShareConnection::ConnectionCallback failed");
+        LOG_ERROR("Create DataShareConnection::ConnectionCallback failed, uri:%{public}s",
+            DataShareStringUtils::Change(uri_.ToString()).c_str());
     }
 }
 
