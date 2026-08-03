@@ -141,7 +141,7 @@ bool NapiCallbacksManager<Key, Observer>::IsRegistered(const Observer &observer,
     const std::vector<ObserverNode> &observers)
 {
     for (auto &item : observers) {
-        if (*(item.observer_) == observer) {
+        if ((item.observer_ != nullptr) && (*(item.observer_) == observer)) {
             return true;
         }
     }
@@ -198,7 +198,7 @@ std::vector<OperationResult> NapiCallbacksManager<Key, Observer>::DelObservers(
             std::vector<ObserverNode> &callbacks = it->second;
             auto callbackIt = callbacks.begin();
             while (callbackIt != callbacks.end()) {
-                if (!(*(callbackIt->observer_) == *observer)) {
+                if ((callbackIt->observer_ == nullptr) || !(*(callbackIt->observer_) == *observer)) {
                     callbackIt++;
                     continue;
                 }
@@ -253,7 +253,7 @@ std::vector<DataProxyResult> NapiCallbacksManager<Key, Observer>::DelObservers(
             std::vector<ObserverNode> &callbacks = it->second;
             auto callbackIt = callbacks.begin();
             while (callbackIt != callbacks.end()) {
-                if (!(*(callbackIt->observer_) == *observer)) {
+                if ((callbackIt->observer_ == nullptr) || !(*(callbackIt->observer_) == *observer)) {
                     callbackIt++;
                     continue;
                 }

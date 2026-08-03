@@ -170,7 +170,9 @@ int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
     GetCallingInfo(info);
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
-    if (extension == nullptr) {
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("OpenFile: extension is nullptr : %{public}d, abilityInfo_ is nullptr : %{public}d",
+            extension == nullptr, extension != nullptr && extension->abilityInfo_ == nullptr);
         return DEFAULT_NUMBER;
     }
     bool needWrite = (mode.find('w') != std::string::npos);
@@ -217,7 +219,9 @@ int DataShareStubImpl::OpenRawFile(const Uri &uri, const std::string &mode)
     GetCallingInfo(info);
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
-    if (extension == nullptr) {
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("OpenRawFile: extension is nullptr : %{public}d, abilityInfo_ is nullptr : %{public}d",
+            extension == nullptr, extension != nullptr && extension->abilityInfo_ == nullptr);
         return DEFAULT_NUMBER;
     }
     bool needWrite = (mode.find('w') != std::string::npos);
@@ -257,8 +261,9 @@ int DataShareStubImpl::Insert(const Uri &uri, const DataShareValuesBucket &value
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
-    if (extension == nullptr) {
-        LOG_ERROR("extension is nullptr.");
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("Insert: extension is nullptr : %{public}d, abilityInfo_ is nullptr : %{public}d",
+            extension == nullptr, extension != nullptr && extension->abilityInfo_ == nullptr);
         return DEFAULT_NUMBER;
     }
 
@@ -307,7 +312,9 @@ int DataShareStubImpl::Update(const Uri &uri, const DataSharePredicates &predica
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
-    if (extension == nullptr) {
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("Update: extension is nullptr : %{public}d, abilityInfo_ is nullptr : %{public}d",
+            extension == nullptr, extension != nullptr && extension->abilityInfo_ == nullptr);
         return DEFAULT_NUMBER;
     }
 
@@ -349,7 +356,9 @@ int DataShareStubImpl::BatchUpdate(const UpdateOperations &operations, std::vect
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
-    if (extension == nullptr) {
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("BatchUpdate: extension is nullptr : %{public}d, abilityInfo_ is nullptr : %{public}d",
+            extension == nullptr, extension != nullptr && extension->abilityInfo_ == nullptr);
         return DEFAULT_NUMBER;
     }
     if (!CheckCallingPermission(extension->abilityInfo_->writePermission)) {
@@ -396,7 +405,9 @@ int DataShareStubImpl::Delete(const Uri &uri, const DataSharePredicates &predica
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
-    if (extension == nullptr) {
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("Delete: extension is nullptr : %{public}d, abilityInfo_ is nullptr : %{public}d",
+            extension == nullptr, extension != nullptr && extension->abilityInfo_ == nullptr);
         return DEFAULT_NUMBER;
     }
 
@@ -438,7 +449,9 @@ std::pair<int32_t, int32_t> DataShareStubImpl::InsertEx(const Uri &uri, const Da
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
-    if (extension == nullptr) {
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("InsertEx: extension is nullptr : %{public}d, abilityInfo_ is nullptr : %{public}d",
+            extension == nullptr, extension != nullptr && extension->abilityInfo_ == nullptr);
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
 
@@ -486,7 +499,9 @@ std::pair<int32_t, int32_t> DataShareStubImpl::UpdateEx(const Uri &uri, const Da
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
-    if (extension == nullptr) {
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("UpdateEx: extension is nullptr : %{public}d, abilityInfo_ is nullptr : %{public}d",
+            extension == nullptr, extension != nullptr && extension->abilityInfo_ == nullptr);
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
 
@@ -533,7 +548,9 @@ std::pair<int32_t, int32_t> DataShareStubImpl::DeleteEx(const Uri &uri, const Da
     
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
-    if (extension == nullptr) {
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("DeleteEx: extension is nullptr : %{public}d, abilityInfo_ is nullptr : %{public}d",
+            extension == nullptr, extension != nullptr && extension->abilityInfo_ == nullptr);
         return std::make_pair(DATA_SHARE_ERROR, 0);
     }
 
@@ -582,7 +599,8 @@ std::shared_ptr<DataShareResultSet> DataShareStubImpl::Query(const Uri &uri,
     std::shared_ptr<DataShareResultSet> resultSet = nullptr;
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
-    if (extension == nullptr) {
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("Query: extension or abilityInfo_ is nullptr.");
         return resultSet;
     }
 
@@ -661,7 +679,9 @@ int DataShareStubImpl::BatchInsert(const Uri &uri, const std::vector<DataShareVa
 
     auto client = sptr<DataShareStubImpl>(this);
     auto extension = client->GetOwner();
-    if (extension == nullptr) {
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("BatchInsert: extension is nullptr : %{public}d, abilityInfo_ is nullptr : %{public}d",
+            extension == nullptr, extension != nullptr && extension->abilityInfo_ == nullptr);
         return DEFAULT_NUMBER;
     }
 
@@ -710,7 +730,9 @@ int32_t DataShareStubImpl::GetCallingUserId()
 bool DataShareStubImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     auto extension = GetOwner();
-    if (extension == nullptr) {
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("RegisterObserver: extension is nullptr : %{public}d, abilityInfo_ is nullptr : %{public}d",
+            extension == nullptr, extension != nullptr && extension->abilityInfo_ == nullptr);
         return false;
     }
     if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {
@@ -724,7 +746,9 @@ bool DataShareStubImpl::RegisterObserver(const Uri &uri, const sptr<AAFwk::IData
 bool DataShareStubImpl::UnregisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
     auto extension = GetOwner();
-    if (extension == nullptr) {
+    if (extension == nullptr || extension->abilityInfo_ == nullptr) {
+        LOG_ERROR("UnregisterObserver: extension is nullptr : %{public}d, abilityInfo_ is nullptr : %{public}d",
+            extension == nullptr, extension != nullptr && extension->abilityInfo_ == nullptr);
         return false;
     }
     if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {

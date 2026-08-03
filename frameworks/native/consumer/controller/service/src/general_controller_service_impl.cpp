@@ -36,7 +36,9 @@ GeneralControllerServiceImpl::GeneralControllerServiceImpl(const std::string &ex
 GeneralControllerServiceImpl::~GeneralControllerServiceImpl()
 {
     auto manager = DataShareManagerImpl::GetInstance();
-    manager->RemoveRegisterCallback(this);
+    if (manager != nullptr) {
+        manager->RemoveRegisterCallback(this);
+    }
 }
 
 int GeneralControllerServiceImpl::Insert(const Uri &uri, const DataShareValuesBucket &value)

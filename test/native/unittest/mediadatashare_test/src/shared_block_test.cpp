@@ -659,5 +659,143 @@ HWTEST_F(SharedBlockTest, SetRawDataTest001, TestSize.Level0)
     EXPECT_EQ(sharedBlock->Clear(), SharedBlock::SHARED_BLOCK_OK);
     LOG_INFO("SetRawDataTest001::End");
 }
+
+/**
+ * @tc.name: InitWithNullAshmemTest001
+ * @tc.desc: Test the Init function of the SharedBlock class when the Ashmem smart pointer is null,
+ *           verifying the new defensive null check returns false without dereferencing the null pointer.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The SharedBlock class accepts an sptr<Ashmem> parameter in its constructor.
+    2. A null sptr<Ashmem> can be passed to the SharedBlock constructor.
+    3. The SharedBlock::Init() method returns a boolean value indicating initialization success or failure.
+ * @tc.step:
+    1. Create a SharedBlock instance with a null Ashmem smart pointer (name "name", size 0, read-only flag true).
+    2. Call the Init() method on the SharedBlock instance.
+    3. Check the boolean return value of the Init() method.
+    4. Clean up by deleting the SharedBlock instance.
+ * @tc.expect:
+    1. The SharedBlock::Init() method returns false (defensive null check triggers before dereferencing ashmem_).
+ */
+HWTEST_F(SharedBlockTest, InitWithNullAshmemTest001, TestSize.Level0)
+{
+    LOG_INFO("InitWithNullAshmemTest001::Start");
+    sptr<Ashmem> nullAshmem = nullptr;
+    SharedBlock *sharedBlock = new SharedBlock("name", nullAshmem, 0, true);
+    EXPECT_NE(sharedBlock, nullptr);
+    EXPECT_EQ(sharedBlock->Init(), false);
+    delete sharedBlock;
+    LOG_INFO("InitWithNullAshmemTest001::End");
+}
+
+/**
+ * @tc.name: CreateSharedBlockWithNullAshmemTest001
+ * @tc.desc: Test the CreateSharedBlock function of the SharedBlock class when the Ashmem parameter is null,
+ *           verifying the new defensive null check returns SHARED_BLOCK_ASHMEM_ERROR.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. A valid SharedBlock instance is required to invoke the instance method CreateSharedBlock.
+    2. The SharedBlock::CreateSharedBlock function accepts parameters including name, size, Ashmem instance,
+       and a SharedBlock pointer, returning an error code.
+    3. The SharedBlock::SHARED_BLOCK_ASHMEM_ERROR constant is predefined and accessible.
+ * @tc.step:
+    1. Create a valid SharedBlock instance via the constructor (with a placeholder Ashmem) to obtain a non-null pointer.
+    2. Declare a null pointer of type AppDataFwk::SharedBlock (named outBlock).
+    3. Call CreateSharedBlock with parameters: name "name", size 128, a null Ashmem smart pointer, and outBlock.
+    4. Check the error code returned by CreateSharedBlock.
+    5. Clean up the valid SharedBlock instance.
+ * @tc.expect:
+    1. The SharedBlock::CreateSharedBlock function returns SharedBlock::SHARED_BLOCK_ASHMEM_ERROR
+       (defensive null check on the ashmem parameter triggers before allocation).
+ */
+HWTEST_F(SharedBlockTest, CreateSharedBlockWithNullAshmemTest001, TestSize.Level0)
+{
+    LOG_INFO("CreateSharedBlockWithNullAshmemTest001::Start");
+    sptr<Ashmem> placeholder = Ashmem::CreateAshmem("placeholder", sizeof(SharedBlock::SharedBlockHeader));
+    EXPECT_NE(placeholder, nullptr);
+    SharedBlock *selfBlock = new SharedBlock("name", placeholder,
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, true);
+    EXPECT_NE(selfBlock, nullptr);
+    AppDataFwk::SharedBlock *outBlock = nullptr;
+    sptr<Ashmem> nullAshmem = nullptr;
+    EXPECT_EQ(selfBlock->CreateSharedBlock("name",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, nullAshmem, outBlock),
+        SharedBlock::SHARED_BLOCK_ASHMEM_ERROR);
+    delete selfBlock;
+    LOG_INFO("CreateSharedBlockWithNullAshmemTest001::End");
+}
+
+/**
+ * @tc.name: ClearWithNullHeaderTest001
+ * @tc.desc: Test the Clear function of the SharedBlock class when mHeader is null (i.e. Init was not called),
+ *           verifying the new defensive null check returns SHARED_BLOCK_INVALID_OPERATION.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The SharedBlock class allows construction without calling Init() afterwards, leaving mHeader as nullptr.
+    2. The SharedBlock::Clear() method returns an error code.
+    3. The SharedBlock::SHARED_BLOCK_INVALID_OPERATION constant is predefined and accessible.
+ * @tc.step:
+    1. Create an Ashmem instance named "ahsmem" with a size equal to sizeof(SharedBlock::SharedBlockHeader).
+    2. Construct a SharedBlock instance (read-write mode) using the created Ashmem but do NOT call Init() so mHeader
+       remains nullptr.
+    3. Call Clear() and check the returned error code.
+    4. Clean up the SharedBlock and Ashmem instance.
+ * @tc.expect:
+    1. Clear() returns SharedBlock::SHARED_BLOCK_INVALID_OPERATION (defensive mHeader null check triggers).
+ */
+HWTEST_F(SharedBlockTest, ClearWithNullHeaderTest001, TestSize.Level0)
+{
+    LOG_INFO("ClearWithNullHeaderTest001::Start");
+    sptr<Ashmem> ashmem = Ashmem::CreateAshmem("ahsmem",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1);
+    EXPECT_NE(ashmem, nullptr);
+    SharedBlock *sharedBlock = new SharedBlock("name", ashmem,
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, false);
+    EXPECT_NE(sharedBlock, nullptr);
+    // mHeader is nullptr because Init() was never called.
+    EXPECT_EQ(sharedBlock->mHeader, nullptr);
+    EXPECT_EQ(sharedBlock->Clear(), SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    delete sharedBlock;
+    LOG_INFO("ClearWithNullHeaderTest001::End");
+}
+
+/**
+ * @tc.name: PutBlobOrStringWithNullHeaderTest001
+ * @tc.desc: Test the PutBlobOrString function of the SharedBlock class when mHeader is null (i.e. Init was not called),
+ *           verifying the new defensive null check returns SHARED_BLOCK_INVALID_OPERATION.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+    1. The SharedBlock class allows construction without calling Init() afterwards, leaving mHeader as nullptr.
+    2. The SharedBlock::PutBlobOrString method returns an error code.
+    3. The SharedBlock::SHARED_BLOCK_INVALID_OPERATION constant is predefined and accessible.
+ * @tc.step:
+    1. Create an Ashmem instance named "ahsmem" with a size equal to sizeof(SharedBlock::SharedBlockHeader).
+    2. Construct a SharedBlock instance (read-write mode) using the created Ashmem but do NOT call Init() so mHeader
+       remains nullptr.
+    3. Call PutBlobOrString(0, 0, "data", 4, 1) and check the returned error code.
+    4. Clean up the SharedBlock and Ashmem instance.
+ * @tc.expect:
+    1. PutBlobOrString returns SharedBlock::SHARED_BLOCK_INVALID_OPERATION (defensive mHeader null check triggers).
+ */
+HWTEST_F(SharedBlockTest, PutBlobOrStringWithNullHeaderTest001, TestSize.Level0)
+{
+    LOG_INFO("PutBlobOrStringWithNullHeaderTest001::Start");
+    sptr<Ashmem> ashmem = Ashmem::CreateAshmem("ahsmem",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1);
+    EXPECT_NE(ashmem, nullptr);
+    SharedBlock *sharedBlock = new SharedBlock("name", ashmem,
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, false);
+    EXPECT_NE(sharedBlock, nullptr);
+    // mHeader is nullptr because Init() was never called.
+    EXPECT_EQ(sharedBlock->mHeader, nullptr);
+    const char *data = "data";
+    EXPECT_EQ(sharedBlock->PutBlobOrString(0, 0, data, 4, 1), SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    delete sharedBlock;
+    LOG_INFO("PutBlobOrStringWithNullHeaderTest001::End");
+}
 } // namespace DataShare
 } // namespace OHOS
