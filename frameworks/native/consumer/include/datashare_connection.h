@@ -20,9 +20,9 @@
 #include <memory>
 #include <mutex>
 
+#include "ability_connect_callback_stub.h"
 #include "data_ability_observer_interface.h"
 #include "datashare_connection_base.h"
-#include "datashare_connection_callback.h"
 #include "want.h"
 
 namespace OHOS {
@@ -33,6 +33,20 @@ class DataShareConnection : public std::enable_shared_from_this<DataShareConnect
 public:
     DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime = 2);
     ~DataShareConnection() override;
+
+    class Callback : public AAFwk::AbilityConnectionStub {
+    public:
+        Callback();
+        void SetTarget(std::weak_ptr<DataShareConnection> target);
+        bool TargetExpired() const;
+
+        void OnAbilityConnectDone(
+            const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
+        void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
+
+    private:
+        std::weak_ptr<DataShareConnection> target_;
+    };
 
     /**
      * @brief This method is called back to receive the connection result after an ability calls the
@@ -95,14 +109,14 @@ private:
     };
     std::shared_ptr<DataShareProxy> ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
     std::shared_ptr<DataShareProxy> GetDataShareProxy();
-    sptr<DataShareConnectionCallback> GetCallback();
+    sptr<Callback> GetCallback();
     ErrCode Disconnect();
     void ReconnectExtAbility(const std::string &uri);
     void DelayConnectExtAbility(const std::string &uri);
     void ReRegisterObserverExtProvider();
     std::mutex mutex_{};
     std::shared_ptr<DataShareProxy> dataShareProxy_;
-    sptr<DataShareConnectionCallback> callback_;
+    sptr<Callback> callback_;
     ConnectCondition condition_;
     Uri uri_;
     sptr<IRemoteObject> token_ = {};

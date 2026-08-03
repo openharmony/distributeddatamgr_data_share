@@ -21,7 +21,6 @@
 
 #include "accesstoken_kit.h"
 #include "data_ability_observer_interface.h"
-#include "datashare_connection_callback.h"
 #include "datashare_errno.h"
 #include "datashare_helper.h"
 #include "datashare_log.h"
@@ -706,8 +705,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnAbilityConnectDo
     auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
 
-    sptr<DataShareConnectionCallback> callback =
-        new (std::nothrow) DataShareConnectionCallback();
+    sptr<DataShare::DataShareConnection::Callback> callback =
+        new (std::nothrow) DataShare::DataShareConnection::Callback();
     ASSERT_NE(callback, nullptr);
     callback->SetTarget(connection);
 
@@ -725,7 +724,7 @@ HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnAbilityConnectDo
 HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnAbilityConnectDone_TargetExpired_002, TestSize.Level0)
 {
     LOG_INFO("DataShareConnectionCallback_OnAbilityConnectDone_TargetExpired_002::Start");
-    sptr<DataShareConnectionCallback> callback = new (std::nothrow) DataShareConnectionCallback();
+    sptr<DataShare::DataShareConnection::Callback> callback = new (std::nothrow) DataShare::DataShareConnection::Callback();
     ASSERT_NE(callback, nullptr);
 
     std::string deviceId = "deviceId";
@@ -750,8 +749,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnAbilityDisconnec
     ASSERT_NE(tokenProxy, nullptr);
     connection->dataShareProxy_ = tokenProxy;
 
-    sptr<DataShareConnectionCallback> callback =
-        new (std::nothrow) DataShareConnectionCallback();
+    sptr<DataShare::DataShareConnection::Callback> callback =
+        new (std::nothrow) DataShare::DataShareConnection::Callback();
     ASSERT_NE(callback, nullptr);
     callback->SetTarget(connection);
 
@@ -769,7 +768,7 @@ HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnAbilityDisconnec
 HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnAbilityDisconnectDone_TargetExpired_002, TestSize.Level0)
 {
     LOG_INFO("DataShareConnectionCallback_OnAbilityDisconnectDone_TargetExpired_002::Start");
-    sptr<DataShareConnectionCallback> callback = new (std::nothrow) DataShareConnectionCallback();
+    sptr<DataShare::DataShareConnection::Callback> callback = new (std::nothrow) DataShare::DataShareConnection::Callback();
     ASSERT_NE(callback, nullptr);
 
     std::string deviceId = "deviceId";
@@ -790,7 +789,7 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_GetCallback_NonNullAfterCo
     auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
 
-    sptr<DataShareConnectionCallback> callback = connection->GetCallback();
+    sptr<DataShare::DataShareConnection::Callback> callback = connection->GetCallback();
     EXPECT_NE(callback, nullptr);
     connection.reset();
     LOG_INFO("DataShareConnection_GetCallback_NonNullAfterConstruction_001::End");
@@ -806,9 +805,9 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_GetCallback_CachedOnSecond
     auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
 
-    sptr<DataShareConnectionCallback> first = connection->GetCallback();
+    sptr<DataShare::DataShareConnection::Callback> first = connection->GetCallback();
     ASSERT_NE(first, nullptr);
-    sptr<DataShareConnectionCallback> second = connection->GetCallback();
+    sptr<DataShare::DataShareConnection::Callback> second = connection->GetCallback();
     ASSERT_NE(second, nullptr);
     EXPECT_EQ(first, second);
     connection.reset();
