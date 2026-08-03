@@ -119,7 +119,7 @@ void DataShareConnection::ReconnectExtAbility(const std::string &uri)
             LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri_.ToString()).c_str());
             return;
         }
-        sptr<DataShareConnectionCallback> callback = GetCallback();
+        sptr<Callback> callback = GetCallback();
         if (callback == nullptr) {
             LOG_ERROR("callback is nullptr");
             return;
@@ -155,7 +155,7 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
         delay = std::chrono::seconds(0);
     }
     std::weak_ptr<DataShareConnection> self = weak_from_this();
-    sptr<DataShareConnectionCallback> callback = GetCallback();
+    sptr<Callback> callback = GetCallback();
     if (callback == nullptr) {
         LOG_ERROR("callback is nullptr");
         return;
@@ -254,7 +254,7 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
         LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(reqUri).c_str());
         return nullptr;
     }
-    sptr<DataShareConnectionCallback> callback = GetCallback();
+    sptr<Callback> callback = GetCallback();
     if (callback == nullptr) {
         LOG_ERROR("callback is nullptr");
         return nullptr;
@@ -311,7 +311,7 @@ void DataShareConnection::DisconnectDataShareExtAbility()
 DataShareConnection::DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime) : uri_(uri),
     token_(token), waitTime_(waitTime)
 {
-    callback_ = new (std::nothrow) DataShareConnectionCallback();
+    callback_ = new (std::nothrow) Callback();
     if (callback_ == nullptr) {
         LOG_ERROR("Create DataShareConnectionCallback failed");
     }
@@ -319,6 +319,39 @@ DataShareConnection::DataShareConnection(const Uri &uri, const sptr<IRemoteObjec
 
 DataShareConnection::~DataShareConnection()
 {
+}
+
+DataShareConnection::Callback::Callback() : target_() {}
+
+void DataShareConnection::Callback::SetTarget(std::weak_ptr<DataShareConnection> target)
+{
+    target_ = std::move(target);
+}
+
+bool DataShareConnection::Callback::TargetExpired() const
+{
+    return target_.expired();
+}
+
+void DataShareConnection::Callback::OnAbilityConnectDone(
+    const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
+{
+    auto target = target_.lock();
+    if (target == nullptr) {
+        LOG_WARN("DataShareConnection target is gone before OnAbilityConnectDone");
+        return;
+    }
+    target->OnAbilityConnectDone(element, remoteObject, resultCode);
+}
+
+void DataShareConnection::Callback::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
+{
+    auto target = target_.lock();
+    if (target == nullptr) {
+        LOG_WARN("DataShareConnection target is gone before OnAbilityDisconnectDone");
+        return;
+    }
+    target->OnAbilityDisconnectDone(element, resultCode);
 }
 
 std::shared_ptr<DataShareProxy> DataShareConnection::GetDataShareProxy(const Uri &uri,
@@ -344,7 +377,7 @@ ErrCode DataShareConnection::Disconnect()
     if (instance == nullptr) {
         return -1;
     }
-    sptr<DataShareConnectionCallback> callback = GetCallback();
+    sptr<Callback> callback = GetCallback();
     if (callback == nullptr) {
         return -1;
     }
@@ -357,7 +390,7 @@ std::shared_ptr<DataShareProxy> DataShareConnection::GetDataShareProxy()
     return dataShareProxy_;
 }
 
-sptr<DataShareConnectionCallback> DataShareConnection::GetCallback()
+sptr<DataShareConnection::Callback> DataShareConnection::GetCallback()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (callback_ == nullptr) {

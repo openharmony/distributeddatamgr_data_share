@@ -57,7 +57,6 @@ datashare_consumer_sources = [
   "${datashare_native_consumer_path}/controller/service/src/persistent_data_controller.cpp",
   "${datashare_native_consumer_path}/controller/service/src/published_data_controller.cpp",
   "${datashare_native_consumer_path}/src/datashare_connection.cpp",
-  "${datashare_native_consumer_path}/src/datashare_connection_callback.cpp",
   "${datashare_native_consumer_path}/src/datashare_helper.cpp",
   "${datashare_native_consumer_path}/src/datashare_helper_impl.cpp",
   "${datashare_native_consumer_path}/src/dataproxy_handle.cpp",
