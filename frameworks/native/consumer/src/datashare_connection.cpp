@@ -308,8 +308,8 @@ void DataShareConnection::DisconnectDataShareExtAbility()
     }
 }
 
-DataShareConnection::DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime) : uri_(uri),
-    token_(token), waitTime_(waitTime)
+DataShareConnection::DataShareConnection(
+    const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime) : uri_(uri), token_(token), waitTime_(waitTime)
 {
     callback_ = new (std::nothrow) ConnectionCallback();
     if (callback_ == nullptr) {
@@ -345,7 +345,8 @@ void DataShareConnection::ConnectionCallback::OnAbilityConnectDone(
     target->OnAbilityConnectDone(element, remoteObject, resultCode);
 }
 
-void DataShareConnection::ConnectionCallback::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
+void DataShareConnection::ConnectionCallback::OnAbilityDisconnectDone(
+    const AppExecFwk::ElementName &element, int resultCode)
 {
     auto target = target_.lock();
     if (target == nullptr) {
@@ -380,6 +381,7 @@ ErrCode DataShareConnection::Disconnect()
     }
     sptr<ConnectionCallback> callback = GetCallback();
     if (callback == nullptr) {
+        LOG_ERROR("callback is nullptr, uri:%{public}s", DataShareStringUtils::Change(uri_.ToString()).c_str());
         return -1;
     }
     return instance->DisConnect(callback);
