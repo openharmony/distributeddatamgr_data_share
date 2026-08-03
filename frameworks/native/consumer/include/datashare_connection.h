@@ -34,9 +34,9 @@ public:
     DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime = 2);
     ~DataShareConnection() override;
 
-    class Callback : public AAFwk::AbilityConnectionStub {
+    class ConnectionCallback : public AAFwk::AbilityConnectionStub {
     public:
-        Callback();
+        ConnectionCallback();
         void SetTarget(std::weak_ptr<DataShareConnection> target);
         bool TargetExpired() const;
 
@@ -109,14 +109,14 @@ private:
     };
     std::shared_ptr<DataShareProxy> ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
     std::shared_ptr<DataShareProxy> GetDataShareProxy();
-    sptr<Callback> GetCallback();
+    sptr<ConnectionCallback> GetCallback();
     ErrCode Disconnect();
     void ReconnectExtAbility(const std::string &uri);
     void DelayConnectExtAbility(const std::string &uri);
     void ReRegisterObserverExtProvider();
     std::mutex mutex_{};
     std::shared_ptr<DataShareProxy> dataShareProxy_;
-    sptr<Callback> callback_;
+    sptr<ConnectionCallback> callback_;
     ConnectCondition condition_;
     Uri uri_;
     sptr<IRemoteObject> token_ = {};
