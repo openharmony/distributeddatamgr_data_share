@@ -87,8 +87,8 @@ public:
 
     /**
      * @brief Initialize the connection. Must be called once after construction, before the
-     *        connection is used. Returns false on initialization failure (e.g. the AMS
-     *        callback cannot be allocated); callers should drop the connection in that case.
+     *        connection is used. Returns false on initialization failure; callers should
+     *        drop the connection in that case.
      */
     bool Init();
 
