@@ -31,7 +31,8 @@ using namespace AppExecFwk;
 class DataShareConnection : public std::enable_shared_from_this<DataShareConnection>,
     public DataShareConnectionBase {
 public:
-    DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime = 2);
+    DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime = 2)
+        : uri_(uri), token_(token), waitTime_(waitTime) {}
     ~DataShareConnection() override;
 
     class ConnectionCallback : public AAFwk::AbilityConnectionStub {
@@ -66,7 +67,7 @@ public:
      *
      * @param element: Indicates information about the disconnected extension ability.
      * @param resultCode: Indicates the disconnection result code. The value 0 indicates a successful disconnection,
-     * and any other value indicates a connection failure.
+     * and any other value indicates a disconnection failure.
      */
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode);
 

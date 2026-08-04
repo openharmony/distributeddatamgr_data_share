@@ -294,11 +294,6 @@ void DataShareConnection::DisconnectDataShareExtAbility()
     }
 }
 
-DataShareConnection::DataShareConnection(
-    const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime) : uri_(uri), token_(token), waitTime_(waitTime)
-{
-}
-
 DataShareConnection::~DataShareConnection()
 {
 }
@@ -364,6 +359,5 @@ std::shared_ptr<DataShareProxy> DataShareConnection::GetDataShareProxy()
     std::lock_guard<std::mutex> lock(mutex_);
     return dataShareProxy_;
 }
-
 }  // namespace DataShare
 }  // namespace OHOS
