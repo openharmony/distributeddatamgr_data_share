@@ -26,14 +26,6 @@ public:
     virtual ~DataShareConnectionBase() = default;
 
     /**
-     * @brief Release connection resources, such as disconnecting from the provider.
-     *
-     * Called explicitly before the connection is released. The implementation must be
-     * idempotent so that it is safe to be invoked from both Release and the destructor.
-     */
-    virtual void Close() {}
-
-    /**
      * @brief get the proxy of datashare provider.
      *
      * @return the proxy of datashare provider.
