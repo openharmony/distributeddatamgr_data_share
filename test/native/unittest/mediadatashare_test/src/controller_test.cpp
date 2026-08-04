@@ -117,12 +117,8 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplInsertTest_002, TestSize.Lev
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
-        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(connection, uri, nullptr);
     DataShare::DataShareValuesBucket valuesBucket;
     double valueD1 = 20.07;
     valuesBucket.Put("phoneNumber", valueD1);
@@ -191,12 +187,8 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplUpdateTest_002, TestSize.Lev
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
-        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(connection, uri, nullptr);
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo("name", "Controller_Test001");
     DataShare::DataShareValuesBucket valuesBucket;
@@ -264,12 +256,8 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplDeleteTest_002, TestSize.Lev
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
-        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(connection, uri, nullptr);
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo("name", "Controller_Test001");
     int result = tempGenConProImp->Delete(uri, predicates);
@@ -339,12 +327,8 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplInsertExTest_002, TestSize
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
-        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(connection, uri, nullptr);
     DataShare::DataShareValuesBucket valuesBucket;
     double valueD1 = 20.07;
     valuesBucket.Put("phoneNumber", valueD1);
@@ -419,12 +403,8 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplUpdateExTest_002, TestSize
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
-        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(connection, uri, nullptr);
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo("name", "Controller_Test001");
     DataShare::DataShareValuesBucket valuesBucket;
@@ -498,12 +478,8 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplDeleteExTest_002, TestSize
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
-        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(connection, uri, nullptr);
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo("name", "Controller_Test001");
     std::pair result = tempGenConProImp->DeleteEx(uri, predicates);
@@ -577,12 +553,8 @@ HWTEST_F(ControllerTest, ControllerTest_ProviderImplQueryTest_002, TestSize.Leve
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
-        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(connection, uri, nullptr);
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo("name", "Controller_Test001");
     vector<string> columns;
@@ -652,12 +624,8 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplRegisterObserverTest_002, 
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
-        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(connection, uri, nullptr);
     sptr<AAFwk::IDataAbilityObserver> dataObserver;
     tempGenConProImp->RegisterObserver(uri, dataObserver);
     EXPECT_EQ(uri, Uri(""));
@@ -722,12 +690,8 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplUnregisterObserverTest_002
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
-        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(connection, uri, nullptr);
     sptr<AAFwk::IDataAbilityObserver> dataObserver;
     tempGenConProImp->UnregisterObserver(uri, dataObserver);
     EXPECT_EQ(uri, Uri(""));
@@ -789,12 +753,8 @@ HWTEST_F(ControllerTest, Generalcontroller_ServiceImplNotifyChangeTest_002, Test
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::GeneralController> tempGenConProImp =
-        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(connection, uri, nullptr);
     tempGenConProImp->NotifyChange(uri);
     EXPECT_EQ(uri, Uri(""));
     LOG_INFO("Generalcontroller_ServiceImplNotifyChangeTest_002::End");
@@ -839,12 +799,8 @@ HWTEST_F(ControllerTest, Generalcontroller_ProviderImpl_RegisterObserverExtProvi
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
     ASSERT_NE(connection, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     tempGenConProImp =
-        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(connection, uri, nullptr);
     ret = tempGenConProImp->RegisterObserverExtProvider(uri, dataObserver, false);
     EXPECT_EQ(ret, E_PROVIDER_NOT_CONNECTED);
 
@@ -893,12 +849,8 @@ HWTEST_F(ControllerTest, Generalcontroller_ProviderImpl_UnregisterObserverExtPro
     ASSERT_NE(connection, nullptr);
     connection->dataShareProxy_ = nullptr;
     ASSERT_EQ(connection->dataShareProxy_, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     tempGenConProImp =
-        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(connection, uri, nullptr);
     ret = tempGenConProImp->UnregisterObserverExtProvider(uri, dataObserver);
     EXPECT_EQ(ret, E_PROVIDER_NOT_CONNECTED);
 
@@ -943,12 +895,8 @@ HWTEST_F(ControllerTest, Generalcontroller_ProviderImpl_NotifyChangeExtProvider_
     // connection not null
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     tempGenConProImp =
-        std::make_shared<DataShare::GeneralControllerProviderImpl>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::GeneralControllerProviderImpl>(connection, uri, nullptr);
     ret = tempGenConProImp->NotifyChangeExtProvider(changeInfo);
     EXPECT_EQ(ret, E_PROVIDER_NOT_CONNECTED);
 
@@ -1123,12 +1071,8 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileTest_002, Te
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::ExtSpecialController> tempExtSpeCon =
-        std::make_shared<DataShare::ExtSpecialController>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::ExtSpecialController>(connection, uri, nullptr);
     std::string mode = "test001";
     int result = tempExtSpeCon->OpenFile(uri, mode);
     EXPECT_EQ((result < 0), true);
@@ -1187,7 +1131,7 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileWithErrCodeT
     1. Create an empty Uri object (uri) with no specific path or authority.
     2. Create a DataShareConnection instance (connection) using the empty uri and a null IRemoteObject token,
        then wrap it in a shared_ptr (dataShareConnection) with a custom deleter for disconnection.
-    3. Create an ExtSpecialController instance (tempExtSpeCon) by passing dataShareConnection, the empty uri,
+    3. Create an ExtSpecialController instance (tempExtSpeCon) by passing connection, the empty uri,
        and null as the third constructor parameter.
     4. Define a std::string mode ("test001") and an int32_t errCode initialized to 0.
     5. Call tempExtSpeCon->OpenFileWithErrCode(uri, mode, errCode) and record the returned file descriptor.
@@ -1201,12 +1145,8 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenFileWithErrCodeT
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::ExtSpecialController> tempExtSpeCon =
-        std::make_shared<DataShare::ExtSpecialController>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::ExtSpecialController>(connection, uri, nullptr);
     std::string mode = "test001";
     int32_t errCode = 0;
     int fd = tempExtSpeCon->OpenFileWithErrCode(uri, mode, errCode);
@@ -1263,7 +1203,7 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerOpenRawFileTest_001,
     1. Create an empty Uri object (uri) with no specific path.
     2. Create a DataShareConnection instance (connection) using the empty uri and null IRemoteObject token,
        then wrap it in a shared_ptr (dataShareConnection) with a deleter that calls DisconnectDataShareExtAbility.
-    3. Create an ExtSpecialController instance (tempExtSpeCon) by passing dataShareConnection, the empty uri,
+    3. Create an ExtSpecialController instance (tempExtSpeCon) by passing connection, the empty uri,
        and null as the third constructor parameter.
     4. Define a std::string mode ("test001") for the OpenRawFile call.
     5. Call tempExtSpeCon->OpenRawFile(uri, mode) and record the returned int result.
@@ -1277,12 +1217,8 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControlleOpenRawFileTest_002, 
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::ExtSpecialController> tempExtSpeCon =
-        std::make_shared<DataShare::ExtSpecialController>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::ExtSpecialController>(connection, uri, nullptr);
     std::string mode = "test001";
     int result = tempExtSpeCon->OpenRawFile(uri, mode);
     EXPECT_EQ((result < 0), true);
@@ -1335,7 +1271,7 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerGetTypeTest_001, Tes
     1. Create an empty Uri object (uri) with no specific content.
     2. Create a DataShareConnection instance (connection) using the empty uri and null IRemoteObject token,
        then wrap it in a shared_ptr (dataShareConnection) with a deleter for disconnection.
-    3. Create an ExtSpecialController instance (tempExtSpeCon) by passing dataShareConnection, the empty uri,
+    3. Create an ExtSpecialController instance (tempExtSpeCon) by passing connection, the empty uri,
        and null as the third constructor parameter.
     4. Call tempExtSpeCon->GetType(uri) and record the returned std::string result.
     5. Check if the returned string is empty.
@@ -1348,12 +1284,8 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControlleGetTypeTest_002, Test
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::ExtSpecialController> tempExtSpeCon =
-        std::make_shared<DataShare::ExtSpecialController>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::ExtSpecialController>(connection, uri, nullptr);
     std::string result = tempExtSpeCon->GetType(uri);
     EXPECT_EQ(result, "");
     LOG_INFO("ControllerTest_ExtSpecialControllerGetTypeTest_002::End");
@@ -1418,7 +1350,7 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerBatchInsertTest_001,
     1. Create an empty Uri object (uri) with no specific content.
     2. Create a DataShareConnection instance (connection) using the empty uri and null IRemoteObject token,
        then wrap it in a shared_ptr (dataShareConnection) with a deleter that calls DisconnectDataShareExtAbility.
-    3. Create an ExtSpecialController instance (tempExtSpeCon) by passing dataShareConnection, the empty uri,
+    3. Create an ExtSpecialController instance (tempExtSpeCon) by passing connection, the empty uri,
        and null as the third constructor parameter.
     4. Create two DataShareValuesBucket objects: add "name" = "dataShareTest006" + "phoneNumber" = 20.6 to the first,
        and "name" = "dataShareTest007" + "phoneNumber" = 20.5 to the second; push both into a vector (values).
@@ -1433,12 +1365,8 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerBatchInsertTest_002,
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::ExtSpecialController> tempExtSpeCon =
-        std::make_shared<DataShare::ExtSpecialController>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::ExtSpecialController>(connection, uri, nullptr);
     DataShare::DataShareValuesBucket valuesBucket1;
     valuesBucket1.Put("name", "dataShareTest006");
     valuesBucket1.Put("phoneNumber", 20.6);
@@ -1503,7 +1431,7 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerBatchUpdateTest_001,
     1. Create an empty Uri object (uri) with no specific content.
     2. Create a DataShareConnection instance (connection) using the empty uri and null IRemoteObject token,
        then wrap it in a shared_ptr (dataShareConnection) with a deleter for disconnection.
-    3. Create an ExtSpecialController instance (tempExtSpeCon) by passing dataShareConnection, the empty uri,
+    3. Create an ExtSpecialController instance (tempExtSpeCon) by passing connection, the empty uri,
        and null as the third constructor parameter.
     4. Create an empty UpdateOperations object (operations) and an empty std::vector<BatchUpdateResult> (results).
     5. Call tempExtSpeCon->BatchUpdate(operations, results) and record the returned int result.
@@ -1517,12 +1445,8 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerBatchUpdateTest_002,
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::ExtSpecialController> tempExtSpeCon =
-        std::make_shared<DataShare::ExtSpecialController>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::ExtSpecialController>(connection, uri, nullptr);
     DataShare::UpdateOperations operations;
     std::vector<DataShare::BatchUpdateResult> results;
     int result = tempExtSpeCon->BatchUpdate(operations, results);
@@ -1583,7 +1507,7 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerInsertExtTest_001, T
     1. Create an empty Uri object (uri) with no specific content.
     2. Create a DataShareConnection instance (connection) using the empty uri and null IRemoteObject token,
        then wrap it in a shared_ptr (dataShareConnection) with a deleter that calls DisconnectDataShareExtAbility.
-    3. Create an ExtSpecialController instance (tempExtSpeCon) by passing dataShareConnection, the empty uri,
+    3. Create an ExtSpecialController instance (tempExtSpeCon) by passing connection, the empty uri,
        and null as the third constructor parameter.
     4. Create a DataShareValuesBucket (valuesBucket) and add "name" = "dataShareTest006" + "phoneNumber" = 20.6 to it.
     5. Define a std::string (result1) initialized to "test001"; call tempExtSpeCon->InsertExt.
@@ -1597,12 +1521,8 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerInsertExtTest_002, T
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::ExtSpecialController> tempExtSpeCon =
-        std::make_shared<DataShare::ExtSpecialController>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::ExtSpecialController>(connection, uri, nullptr);
     DataShare::DataShareValuesBucket valuesBucket;
     valuesBucket.Put("name", "dataShareTest006");
     valuesBucket.Put("phoneNumber", 20.6);
@@ -1673,12 +1593,8 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerExecuteBatchTest_002
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::ExtSpecialController> tempExtSpeCon =
-        std::make_shared<DataShare::ExtSpecialController>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::ExtSpecialController>(connection, uri, nullptr);
     std::vector<DataShare::OperationStatement> statements;
     std::vector<DataShare::BatchUpdateResult> results;
     ExecResultSet result1;
@@ -1740,12 +1656,8 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControlleGetFileTypesTest_002,
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::ExtSpecialController> tempExtSpeCon =
-        std::make_shared<DataShare::ExtSpecialController>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::ExtSpecialController>(connection, uri, nullptr);
     std::string getFileTypes = "test001";
     std::vector<std::string> result = tempExtSpeCon->GetFileTypes(uri, getFileTypes);
     EXPECT_EQ(result, std::vector<std::string>());
@@ -1804,12 +1716,8 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerNormalizeUriTest_002
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::ExtSpecialController> tempExtSpeCon =
-        std::make_shared<DataShare::ExtSpecialController>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::ExtSpecialController>(connection, uri, nullptr);
     Uri result = tempExtSpeCon->NormalizeUri(uri);
     EXPECT_EQ(result, Uri(""));
     LOG_INFO("ControllerTest_ExtSpecialControllerNormalizeUriTest_002::End");
@@ -1867,12 +1775,8 @@ HWTEST_F(ControllerTest, ControllerTest_ExtSpecialControllerDenormalizeUriTest_0
     Uri uri("");
     std::shared_ptr<DataShare::DataShareConnection> connection =
         std::make_shared<DataShare::DataShareConnection>(uri, nullptr);
-    auto dataShareConnection =
-        std::shared_ptr<DataShare::DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->DisconnectDataShareExtAbility();
-        });
     std::shared_ptr<DataShare::ExtSpecialController> tempExtSpeCon =
-        std::make_shared<DataShare::ExtSpecialController>(dataShareConnection, uri, nullptr);
+        std::make_shared<DataShare::ExtSpecialController>(connection, uri, nullptr);
     Uri result = tempExtSpeCon->DenormalizeUri(uri);
     EXPECT_EQ(result, Uri(""));
     LOG_INFO("ControllerTest_ExtSpecialControllerDenormalizeUriTest_002::End");

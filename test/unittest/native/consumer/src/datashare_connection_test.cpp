@@ -744,12 +744,12 @@ HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnDisconnectDone_T
  *     1. A DataShareConnection can be instantiated via std::make_shared.
  * @tc.step:
  *     1. Create a DataShareConnection with the test URI and a valid token.
- *     2. Verify connection->GetCallback() is nullptr before Init() is called.
+ *     2. Verify connection->callback_ is nullptr before Init() is called.
  *     3. Invoke connection->Init().
- *     4. Verify connection->GetCallback() is non-null after Init().
+ *     4. Verify connection->callback_ is non-null after Init().
  * @tc.expect:
- *     1. GetCallback() is nullptr before Init() is called.
- *     2. After Init(), GetCallback() returns a non-null sptr.
+ *     1. callback_ is nullptr before Init() is called.
+ *     2. After Init(), callback_ is non-null after Init().
  */
 HWTEST_F(DataShareConnectionTest, DataShareConnection_Init_AllocatesCallback_001, TestSize.Level0)
 {
@@ -770,7 +770,7 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_Init_AllocatesCallback_001
 
 /**
  * @tc.name: DataShareConnection_GetCallback_CachedOnSecondCall_002
- * @tc.desc: Verify GetCallback() returns the same underlying callback on subsequent calls (cached).
+ * @tc.desc: Verify connection->callback_ returns the same underlying callback on subsequent reads.
  * @tc.type: FUNC
  * @tc.require: None
  * @tc.precon:
@@ -778,7 +778,7 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_Init_AllocatesCallback_001
  * @tc.step:
  *     1. Create a DataShareConnection with the test URI and a valid token.
  *     2. Invoke connection->Init() to allocate the callback.
- *     3. Invoke connection->GetCallback() twice.
+ *     3. Invoke connection->callback_ twice.
  * @tc.expect:
  *     1. Both calls return sptrs that compare equal (same underlying object).
  */
