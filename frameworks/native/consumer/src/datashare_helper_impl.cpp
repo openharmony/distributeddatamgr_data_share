@@ -37,7 +37,6 @@ DataShareHelperImpl::DataShareHelperImpl(const Uri &uri, const sptr<IRemoteObjec
 {
     LOG_DEBUG("starts");
     isSystem_ = isSystem;
-    connection_ = connection;
     generalCtl_ = std::make_shared<GeneralControllerProviderImpl>(connection, uri, token);
     extSpCtl_ = std::make_shared<ExtSpecialController>(connection, uri, token);
     type_ = NON_SILENT;
@@ -59,11 +58,6 @@ DataShareHelperImpl::~DataShareHelperImpl()
         persistentDataCtl_->UnSubscribeRdbData(this, {}, {});
         publishedDataCtl_->UnSubscribePublishedData(this, {}, {});
     }
-    if (connection_ != nullptr) {
-        // Release() was not called, disconnect here as a fallback. Close() is idempotent.
-        connection_->Close();
-        connection_ = nullptr;
-    }
 }
 
 std::shared_ptr<GeneralController> DataShareHelperImpl::GetGeneralCtl()
@@ -80,25 +74,9 @@ std::shared_ptr<ExtSpecialController> DataShareHelperImpl::GetExtSpCtl()
 
 bool DataShareHelperImpl::Release()
 {
-    std::shared_ptr<ExtSpecialController> extSpCtl;
-    std::shared_ptr<GeneralController> generalCtl;
-    std::shared_ptr<DataShareConnectionBase> connection;
-    {
-        std::unique_lock<std::shared_mutex> lock(mutex_);
-        extSpCtl = std::move(extSpCtl_);
-        generalCtl = std::move(generalCtl_);
-        connection = connection_;
-        connection_ = nullptr;
-    }
-    // Disconnect outside the helper mutex so that the synchronous IPC and its
-    // re-entrant callbacks do not race with shared_ptr destruction or deadlock.
-    if (connection != nullptr) {
-        connection->Close();
-    }
-    // Drop controller refs after Close(). The shared_ptr deleter is now trivial,
-    // so no IPC runs here.
-    extSpCtl = nullptr;
-    generalCtl = nullptr;
+    std::unique_lock<std::shared_mutex> lock(mutex_);
+    extSpCtl_ = nullptr;
+    generalCtl_ = nullptr;
     return true;
 }
 

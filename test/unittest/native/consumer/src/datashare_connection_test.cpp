@@ -725,9 +725,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnConnectDone_Targ
     ASSERT_NE(connection, nullptr);
 
     sptr<DataShare::DataShareConnection::ConnectionCallback> callback =
-        new (std::nothrow) DataShare::DataShareConnection::ConnectionCallback();
+        new (std::nothrow) DataShare::DataShareConnection::ConnectionCallback(connection);
     ASSERT_NE(callback, nullptr);
-    callback->SetTarget(connection);
 
     std::string deviceId = "deviceId";
     std::string bundleName = "bundleName";
@@ -758,7 +757,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnConnectDone_Targ
 {
     LOG_INFO("DataShareConnectionCallback_OnConnectDone_TargetExpired_002::Start");
     sptr<DataShare::DataShareConnection::ConnectionCallback> callback =
-        new (std::nothrow) DataShare::DataShareConnection::ConnectionCallback();
+        new (std::nothrow) DataShare::DataShareConnection::ConnectionCallback(
+            std::weak_ptr<DataShare::DataShareConnection>());
     ASSERT_NE(callback, nullptr);
 
     std::string deviceId = "deviceId";
@@ -801,9 +801,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnDisconnectDone_T
     connection->dataShareProxy_ = tokenProxy;
 
     sptr<DataShare::DataShareConnection::ConnectionCallback> callback =
-        new (std::nothrow) DataShare::DataShareConnection::ConnectionCallback();
+        new (std::nothrow) DataShare::DataShareConnection::ConnectionCallback(connection);
     ASSERT_NE(callback, nullptr);
-    callback->SetTarget(connection);
 
     std::string deviceId = "deviceId";
     std::string bundleName = "bundleName";
@@ -834,7 +833,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnDisconnectDone_T
 {
     LOG_INFO("DataShareConnectionCallback_OnDisconnectDone_TargetExpired_002::Start");
     sptr<DataShare::DataShareConnection::ConnectionCallback> callback =
-        new (std::nothrow) DataShare::DataShareConnection::ConnectionCallback();
+        new (std::nothrow) DataShare::DataShareConnection::ConnectionCallback(
+            std::weak_ptr<DataShare::DataShareConnection>());
     ASSERT_NE(callback, nullptr);
 
     std::string deviceId = "deviceId";
@@ -846,25 +846,25 @@ HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnDisconnectDone_T
 }
 
 /**
- * @tc.name: DataShareConnection_GetCallback_NonNullAfterConstruction_001
- * @tc.desc: Verify GetCallback() lazily creates the DataShareConnectionCallback on first call and stores it in
- *           the connection's callback_ member.
+ * @tc.name: DataShareConnection_Init_AllocatesCallback_001
+ * @tc.desc: Verify Init() allocates the DataShareConnectionCallback and stores it in the connection's
+ *           callback_ member.
  * @tc.type: FUNC
  * @tc.require: None
  * @tc.precon:
  *     1. A DataShareConnection can be instantiated via std::make_shared.
  * @tc.step:
  *     1. Create a DataShareConnection with the test URI and a valid token.
- *     2. Verify connection->callback_ is nullptr before any GetCallback() call.
- *     3. Invoke connection->GetCallback() once.
- *     4. Verify connection->callback_ is non-null after the call.
+ *     2. Verify connection->GetCallback() is nullptr before Init() is called.
+ *     3. Invoke connection->Init().
+ *     4. Verify connection->GetCallback() is non-null after Init().
  * @tc.expect:
- *     1. callback_ is nullptr before GetCallback() is called.
- *     2. After the first GetCallback() call, callback_ is non-null.
+ *     1. GetCallback() is nullptr before Init() is called.
+ *     2. After Init(), GetCallback() returns a non-null sptr.
  */
-HWTEST_F(DataShareConnectionTest, DataShareConnection_GetCallback_NonNullAfterConstruction_001, TestSize.Level0)
+HWTEST_F(DataShareConnectionTest, DataShareConnection_Init_AllocatesCallback_001, TestSize.Level0)
 {
-    LOG_INFO("DataShareConnection_GetCallback_NonNullAfterConstruction_001::Start");
+    LOG_INFO("DataShareConnection_Init_AllocatesCallback_001::Start");
     Uri uri(DATA_SHARE_URI);
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
     sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
@@ -872,10 +872,11 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_GetCallback_NonNullAfterCo
     auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
 
-    sptr<DataShare::DataShareConnection::ConnectionCallback> callback = connection->GetCallback();
-    EXPECT_NE(callback, nullptr);
+    EXPECT_EQ(connection->callback_, nullptr);
+    EXPECT_TRUE(connection->Init());
+    EXPECT_NE(connection->callback_, nullptr);
     connection.reset();
-    LOG_INFO("DataShareConnection_GetCallback_NonNullAfterConstruction_001::End");
+    LOG_INFO("DataShareConnection_Init_AllocatesCallback_001::End");
 }
 
 /**
@@ -887,7 +888,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_GetCallback_NonNullAfterCo
  *     1. A DataShareConnection can be instantiated via std::make_shared.
  * @tc.step:
  *     1. Create a DataShareConnection with the test URI and a valid token.
- *     2. Invoke connection->GetCallback() twice.
+ *     2. Invoke connection->Init() to allocate the callback.
+ *     3. Invoke connection->GetCallback() twice.
  * @tc.expect:
  *     1. Both calls return sptrs that compare equal (same underlying object).
  */
@@ -900,10 +902,11 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_GetCallback_CachedOnSecond
     ASSERT_NE(token, nullptr);
     auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
+    ASSERT_TRUE(connection->Init());
 
-    sptr<DataShare::DataShareConnection::ConnectionCallback> first = connection->GetCallback();
+    sptr<DataShare::DataShareConnection::ConnectionCallback> first = connection->callback_;
     ASSERT_NE(first, nullptr);
-    sptr<DataShare::DataShareConnection::ConnectionCallback> second = connection->GetCallback();
+    sptr<DataShare::DataShareConnection::ConnectionCallback> second = connection->callback_;
     ASSERT_NE(second, nullptr);
     EXPECT_EQ(first, second);
     connection.reset();

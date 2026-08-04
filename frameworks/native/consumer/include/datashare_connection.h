@@ -36,9 +36,8 @@ public:
 
     class ConnectionCallback : public AAFwk::AbilityConnectionStub {
     public:
-        ConnectionCallback();
-        void SetTarget(std::weak_ptr<DataShareConnection> target);
-        bool TargetExpired() const;
+        explicit ConnectionCallback(std::weak_ptr<DataShareConnection> target);
+        ~ConnectionCallback() override = default;
 
         void OnAbilityConnectDone(
             const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
@@ -86,12 +85,11 @@ public:
     void SetConnectInvalid();
 
     /**
-     * @brief Release connection resources before the connection is released.
-     *
-     * Mark the connection invalid and disconnect from the DataShareExtAbility. It is
-     * idempotent and safe to be called from both Release and the destructor.
+     * @brief Initialize the connection. Must be called once after construction, before the
+     *        connection is used. Returns false on initialization failure (e.g. the AMS
+     *        callback cannot be allocated); callers should drop the connection in that case.
      */
-    void Close() override;
+    bool Init();
 
     void UpdateObserverExtsProviderMap(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
         bool isDescendants) override;
@@ -109,7 +107,6 @@ private:
     };
     std::shared_ptr<DataShareProxy> ConnectDataShareExtAbility(const Uri &uri, const sptr<IRemoteObject> &token);
     std::shared_ptr<DataShareProxy> GetDataShareProxy();
-    sptr<ConnectionCallback> GetCallback();
     ErrCode Disconnect();
     void ReconnectExtAbility(const std::string &uri);
     void DelayConnectExtAbility(const std::string &uri);
