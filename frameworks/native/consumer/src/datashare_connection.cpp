@@ -296,6 +296,8 @@ void DataShareConnection::DisconnectDataShareExtAbility()
 
 DataShareConnection::~DataShareConnection()
 {
+    SetConnectInvalid();
+    DisconnectDataShareExtAbility();
 }
 
 bool DataShareConnection::Init()
