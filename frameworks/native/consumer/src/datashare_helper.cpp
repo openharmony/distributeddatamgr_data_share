@@ -191,16 +191,11 @@ auto manager = DataShareManagerImpl::GetInstance();
         return nullptr;
     }
     manager->SetCallCount(__FUNCTION__, uri.ToString());
-    auto dataShareConnection =
-        std::shared_ptr<DataShareConnection>(connection.get(), [holder = connection](const auto *) {
-            holder->SetConnectInvalid();
-            holder->DisconnectDataShareExtAbility();
-        });
-    if (dataShareConnection->GetDataShareProxy(uri, token) == nullptr) {
+    if (connection->GetDataShareProxy(uri, token) == nullptr) {
         LOG_ERROR("connect failed");
         return nullptr;
     }
-    return std::make_shared<DataShareHelperImpl>(uri, token, dataShareConnection, isSystem);
+    return std::make_shared<DataShareHelperImpl>(uri, token, connection, isSystem);
 }
 
 std::shared_ptr<DataShareHelper> DataShareHelper::CreateSAProviderHelper(Uri &uri, const sptr<IRemoteObject> &token,
