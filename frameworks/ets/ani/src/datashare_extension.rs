@@ -160,18 +160,17 @@ pub fn call_arkts_update(
     value_bucket: &ValuesBucketHashWrap,
     native_ptr: i64,
 ) {
-    let result = call_arkts_update_inner(
+    call_arkts_update_inner(
         extension_ability_ptr,
         env_ptr,
         uri,
         predicates_ptr,
         value_bucket,
         native_ptr,
-    );
-    if result.is_err() {
-        datashare_error!("Panic occurred: call arkts update failed, err: {:?}", result.err());
-        wrapper::ffi::DataSharePredicatesClean(predicates_ptr);
-    }
+    )
+    .map_err(|err| {
+        datashare_error!("Panic occurred: call arkts update failed, err: {}", err);
+    });
 }
 
 fn call_arkts_delete_inner(
@@ -213,17 +212,16 @@ pub fn call_arkts_delete(
     predicates_ptr: i64,
     native_ptr: i64,
 ) {
-    let result = call_arkts_delete_inner(
+    call_arkts_delete_inner(
         extension_ability_ptr,
         env_ptr,
         uri,
         predicates_ptr,
         native_ptr,
-    );
-    if result.is_err() {
-        datashare_error!("Panic occurred: call arkts delete failed, err: {:?}", result.err());
-        wrapper::ffi::DataSharePredicatesClean(predicates_ptr);
-    }
+    )
+    .map_err(|err| {
+        datashare_error!("Panic occurred: call arkts delete failed, err: {}", err);
+    });
 }
 
 fn call_arkts_query_inner(
@@ -267,18 +265,17 @@ pub fn call_arkts_query(
     columns: Vec<String>,
     native_ptr: i64,
 ) {
-    let result = call_arkts_query_inner(
+    call_arkts_query_inner(
         extension_ability_ptr,
         env_ptr,
         uri,
         predicates_ptr,
         columns,
         native_ptr,
-    );
-    if result.is_err() {
-        datashare_error!("Panic occurred: call arkts query failed, err: {:?}", result.err());
-        wrapper::ffi::DataSharePredicatesClean(predicates_ptr);
-    }
+    )
+    .map_err(|err| {
+        datashare_error!("Panic occurred: call arkts query failed, err: {}", err);
+    });
 }
 
 fn call_arkts_on_create_inner(

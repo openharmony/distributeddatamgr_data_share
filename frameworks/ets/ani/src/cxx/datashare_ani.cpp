@@ -1802,7 +1802,6 @@ void DataShareNativeExtensionCallbackInt(double errorCode, rust::string errorMsg
     businessError.SetMessage(std::string(errorMsg));
     resultWrap->businessError_= businessError;
     resultWrap->isRecvReply_ = true;
-    delete point;
 }
 
 void DataShareNativeExtensionCallbackObject(double errorCode, rust::string errorMsg, int64_t ptr, int64_t nativePtr)
@@ -1830,7 +1829,6 @@ void DataShareNativeExtensionCallbackObject(double errorCode, rust::string error
     businessError.SetMessage(std::string(errorMsg));
     resultWrap->businessError_= businessError;
     resultWrap->isRecvReply_ = true;
-    delete point;
 }
 
 void DataShareNativeExtensionCallbackVoid(double errorCode, rust::string errorMsg, int64_t nativePtr)
@@ -1875,7 +1873,6 @@ void DataShareNativeExtensionCallbackVoid(double errorCode, rust::string errorMs
         remote->SendRequest(
             static_cast<uint32_t>(DataShareServiceInterfaceCode::DATA_SHARE_SERVICE_CMD_NOTIFY), data, reply, option);
     }
-    delete point;
 }
 
 void DataShareNativeExtensionCallbackString(double errorCode, rust::String errorMsg,
@@ -1897,7 +1894,6 @@ void DataShareNativeExtensionCallbackString(double errorCode, rust::String error
     businessError.SetMessage(std::string(errorMsg));
     jsResult->businessError_= businessError;
     jsResult->isRecvReply_ = true;
-    delete point;
 }
 
 void DataShareNativeExtensionCallbackBatchUpdate(double errorCode, rust::String errorMsg,
@@ -1937,7 +1933,6 @@ void DataShareNativeExtensionCallbackBatchUpdate(double errorCode, rust::String 
     jsResult->businessError_= businessError;
     jsResult->callbackResultNumber_ = E_OK;
     jsResult->isRecvReply_ = true;
-    delete point;
 }
 
 int ValidateUrisForDataProxy(rust::Vec<rust::String> uris)
