@@ -725,5 +725,35 @@ HWTEST_F(SharedBlockTest, AllocTest001, TestSize.Level0)
     EXPECT_EQ(sharedBlock->Clear(), SharedBlock::SHARED_BLOCK_OK);
     LOG_INFO("AllocTest001::End");
 }
+
+HWTEST_F(SharedBlockTest, GetCellUnit_NoOverflowCheck_001, TestSize.Level0)
+{
+    LOG_INFO("GetCellUnit_NoOverflowCheck_001::Start");
+    SharedBlock *block = nullptr;
+    int ret = SharedBlock::Create("test", 4096, block);
+    EXPECT_EQ(ret, SharedBlock::SHARED_BLOCK_OK);
+    EXPECT_NE(block, nullptr);
+    ret = block->SetColumnNum(1000);
+    EXPECT_EQ(ret, SharedBlock::SHARED_BLOCK_OK);
+    ret = block->AllocRow();
+    EXPECT_EQ(ret, SharedBlock::SHARED_BLOCK_OK);
+    delete block;
+    LOG_INFO("GetCellUnit_NoOverflowCheck_001::End");
+}
+
+HWTEST_F(SharedBlockTest, AllocRow_NoOverflowCheck_001, TestSize.Level0)
+{
+    LOG_INFO("AllocRow_NoOverflowCheck_001::Start");
+    SharedBlock *block = nullptr;
+    int ret = SharedBlock::Create("test", 8192, block);
+    EXPECT_EQ(ret, SharedBlock::SHARED_BLOCK_OK);
+    EXPECT_NE(block, nullptr);
+    ret = block->SetColumnNum(32767);
+    EXPECT_EQ(ret, SharedBlock::SHARED_BLOCK_OK);
+    ret = block->AllocRow();
+    EXPECT_EQ(ret, SharedBlock::SHARED_BLOCK_OK);
+    delete block;
+    LOG_INFO("AllocRow_NoOverflowCheck_001::End");
+}
 } // namespace DataShare
 } // namespace OHOS

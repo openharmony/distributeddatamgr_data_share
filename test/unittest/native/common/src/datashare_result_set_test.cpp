@@ -333,5 +333,37 @@ HWTEST_F(DatashareResultSetTest, Constructor003, TestSize.Level0)
     ASSERT_EQ(dataShareResultSet->blockWriter_, nullptr);
     LOG_INFO("DatashareResultSetTest Constructor003::End");
 }
+
+HWTEST_F(DatashareResultSetTest, ResultWrap_ThreadSafe_001, TestSize.Level0)
+{
+    LOG_INFO("ResultWrap_ThreadSafe_001::Start");
+    auto resultWrap = std::make_shared<ResultWrap>();
+    std::atomic<bool> ready{false};
+    std::atomic<bool> error{false};
+    auto writer = [&]() {
+        while (!ready.load()) {
+            std::this_thread::yield();
+        }
+        resultWrap->isRecvReply_ = true;
+        resultWrap->callbackResultNumber_ = 100;
+    };
+    auto reader = [&]() {
+        while (!ready.load()) {
+            std::this_thread::yield();
+        }
+        for (int i = 0; i < 100; ++i) {
+            bool isRecv = resultWrap->GetRecvReply();
+            int value = 0;
+            resultWrap->GetResult(value);
+        }
+    };
+    std::thread t1(writer);
+    std::thread t2(reader);
+    ready = true;
+    t1.join();
+    t2.join();
+    EXPECT_FALSE(error);
+    LOG_INFO("ResultWrap_ThreadSafe_001::End");
+}
 }
 }

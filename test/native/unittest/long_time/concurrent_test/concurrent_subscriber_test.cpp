@@ -718,5 +718,22 @@ HWTEST_F(ConcurrentSubscriberTest, ConcurrentExecuteBatchProviderTest, TestSize.
     t2.join();
     LOG_INFO("ConcurrentExecuteBatchProviderTest::end");
 }
+
+HWTEST_F(ConcurrentSubscriberTest, RdbSubscriber_TOCTOU_001, TestSize.Level0)
+{
+    LOG_INFO("RdbSubscriber_TOCTOU_001::Start");
+    CreateOptions options;
+    options.enabled_ = true;
+    std::shared_ptr<DataShare::DataShareHelper> helper =
+        DataShare::DataShareHelper::Creator(DATA_SHARE_PROXY_URI, options);
+    ASSERT_NE(helper, nullptr);
+    std::string uri = "test_uri";
+    int64_t subscriberId = 100;
+    auto addRet = helper->On("rdbDataChange", nullptr, {uri}, subscriberId);
+    EXPECT_EQ(addRet, E_OK);
+    auto delRet = helper->Off("rdbDataChange", {uri}, subscriberId);
+    EXPECT_EQ(delRet, E_OK);
+    LOG_INFO("RdbSubscriber_TOCTOU_001::End");
+}
 } // namespace DataShare
 } // namespace OHOS

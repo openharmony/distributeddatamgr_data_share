@@ -248,5 +248,33 @@ HWTEST_F(DataShareStubOpenFileTest, ReportOpenFileUsage_Test_002, TestSize.Level
     stub->CallReportOpenFileUsage(funcName, mode);
     LOG_INFO("ReportOpenFileUsage_Test_002::End");
 }
+
+HWTEST_F(DataShareStubOpenFileTest, OpenRawFile_FDClose_001, TestSize.Level0)
+{
+    LOG_INFO("OpenRawFile_FDClose_001::Start");
+    MessageParcel data;
+    MessageParcel reply;
+    Uri uri("datashare:///com.test");
+    std::string mode = "r";
+    data.WriteInterfaceToken(InterfaceToken);
+    ITypesUtil::Marshal(data, uri, mode);
+    ErrCode ret = stub->CmdOpenRawFile(data, reply);
+    EXPECT_EQ(ret, E_OK);
+    LOG_INFO("OpenRawFile_FDClose_001::End");
+}
+
+HWTEST_F(DataShareStubOpenFileTest, OpenFile_InvalidMode_001, TestSize.Level0)
+{
+    LOG_INFO("OpenFile_InvalidMode_001::Start");
+    MessageParcel data;
+    MessageParcel reply;
+    Uri uri("datashare:///com.test");
+    std::string mode = "x";
+    data.WriteInterfaceToken(InterfaceToken);
+    ITypesUtil::Marshal(data, uri, mode);
+    ErrCode ret = stub->CmdOpenFile(data, reply);
+    EXPECT_EQ(ret, ERR_INVALID_VALUE);
+    LOG_INFO("OpenFile_InvalidMode_001::End");
+}
 } // namespace DataShare
 } // namespace OHOS
