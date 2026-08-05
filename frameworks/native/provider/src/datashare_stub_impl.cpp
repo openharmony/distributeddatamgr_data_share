@@ -180,6 +180,7 @@ int DataShareStubImpl::OpenFile(const Uri &uri, const std::string &mode)
             return PERMISSION_ERROR_NUMBER;
         }
     }
+    bool needRead = (mode.find('r') != std::string::npos);
     if (needRead) {
         if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {
             LOG_ERROR("OpenFile check read permission failed.");
@@ -226,6 +227,7 @@ int DataShareStubImpl::OpenRawFile(const Uri &uri, const std::string &mode)
             return PERMISSION_ERROR_NUMBER;
         }
     }
+    bool needRead = (mode.find('r') != std::string::npos);
     if (needRead) {
         if (!CheckCallingPermission(extension->abilityInfo_->readPermission)) {
             LOG_ERROR("OpenRawFile check read permission failed.");
