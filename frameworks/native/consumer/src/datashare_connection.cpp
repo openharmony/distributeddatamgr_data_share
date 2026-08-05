@@ -302,7 +302,7 @@ DataShareConnection::~DataShareConnection()
 
 bool DataShareConnection::Init()
 {
-    callback_ = new ConnectionCallback(weak_from_this());
+    callback_ = new (std::nothrow) ConnectionCallback(weak_from_this());
     if (callback_ == nullptr) {
         LOG_ERROR("Create DataShareConnection::ConnectionCallback failed, uri:%{public}s",
             DataShareStringUtils::Change(uri_.ToString()).c_str());
