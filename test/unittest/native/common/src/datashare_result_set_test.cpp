@@ -340,12 +340,22 @@ HWTEST_F(DatashareResultSetTest, ResultWrap_ThreadSafe_001, TestSize.Level0)
     auto resultWrap = std::make_shared<ResultWrap>();
     std::atomic<bool> ready{false};
     std::atomic<bool> error{false};
-    auto writer = [&]() {
+    auto writer = [resultWrap]() {
         while (!ready.load()) {
             std::this_thread::yield();
         }
         resultWrap->isRecvReply_ = true;
         resultWrap->callbackResultNumber_ = 100;
+    };
+    auto reader = [resultWrap, &error]() {
+        while (!ready.load()) {
+            std::this_thread::yield();
+        }
+        for (int i = 0; i < 100; ++i) {
+            bool isRecv = resultWrap->GetRecvReply();
+            int value = 0;
+            resultWrap->GetResult(value);
+        }
     };
     auto reader = [&]() {
         while (!ready.load()) {

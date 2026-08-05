@@ -338,11 +338,23 @@ HWTEST_F(DataShareAbsResultSetTest, IsClosed_Atomic_002, TestSize.Level0)
     DataShareAbsResultSet resultSet;
     std::atomic<bool> ready{false};
     std::atomic<bool> error{false};
-    auto writer = [&]() {
+auto writer = [&resultSet]() {
         while (!ready.load()) {
             std::this_thread::yield();
         }
         resultSet.Close();
+    };
+    
+    auto reader = [&resultSet, &error]() {
+        while (!ready.load()) {
+            std::this_thread::yield();
+        }
+        for (int i = 0; i < 100; ++i) {
+            bool isClosed = resultSet.IsClosed();
+            if (isClosed != true && isClosed != false) {
+                error = true;
+            }
+        }
     };
     auto reader = [&]() {
         while (!ready.load()) {
