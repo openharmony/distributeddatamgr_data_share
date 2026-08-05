@@ -72,7 +72,7 @@ protected:
     int rowPos_;
     int count_;
     // Indicates whether the result set is closed
-    std::atomic<bool> isClosed_;
+    std::atomic<bool> isClosed_ = false;
     std::map<std::string, int> indexCache_;
 };
 } // namespace DataShare

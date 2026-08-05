@@ -196,11 +196,8 @@ int SharedBlock::SetColumnNum(uint32_t numColumns)
 
 int SharedBlock::AllocRow()
 {
-    if (mHeader == nullptr) {
-        LOG_ERROR("mHeader is nullptr");
-        return SHARED_BLOCK_INVALID_OPERATION;
-    }
-    if (mReadOnly) {
+    if (mHeader == nullptr || mReadOnly) {
+        LOG_ERROR("mHeader is nullptr or read only");
         return SHARED_BLOCK_INVALID_OPERATION;
     }
 

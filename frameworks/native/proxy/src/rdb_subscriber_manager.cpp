@@ -99,7 +99,7 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
     return BaseCallbacks::DelObservers(keys, subscriber,
         [&proxy, &templateId, this](const std::vector<Key> &lastDelKeys, std::vector<OperationResult> &opResult) {
             std::vector<std::string> lastDelUris;
-            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris](auto &result) {
+            std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
                 lastDelUris.emplace_back(result);
             });
             if (lastDelUris.empty()) {

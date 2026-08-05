@@ -89,10 +89,6 @@ int DataShareAbsResultSet::GetRowIndex(int &position) const
 
 int DataShareAbsResultSet::GoTo(int offset)
 {
-    if ((offset > 0 && rowPos_ > INT_MAX - offset) || (offset < 0 && rowPos_ < INT_MIN - offset)) {
-        LOG_WARN("GoTo offset overflow, rowPos_: %{public}d, offset: %{public}d", rowPos_, offset);
-        return E_ERROR;
-    }
     int ret = GoToRow(rowPos_ + offset);
     if (ret != E_OK) {
         LOG_WARN("return GoTo ret %{public}d is wrong!", ret);
@@ -235,12 +231,12 @@ int DataShareAbsResultSet::GetColumnName(int columnIndex, std::string &columnNam
 
 bool DataShareAbsResultSet::IsClosed() const
 {
-    return isClosed_.load(std::memory_order_acquire);
+    return isClosed_;
 }
 
 int DataShareAbsResultSet::Close()
 {
-    isClosed_.store(true, std::memory_order_release);
+    isClosed_ = true;
     return E_OK;
 }
 } // namespace DataShare
