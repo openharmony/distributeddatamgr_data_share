@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace DataShare {
-DataShareAbsResultSet::DataShareAbsResultSet() : rowPos_(INIT_POS), count_(-1), isClosed_{false}
+DataShareAbsResultSet::DataShareAbsResultSet() : rowPos_(INIT_POS), count_(-1), isClosed_(false)
 {}
 
 DataShareAbsResultSet::~DataShareAbsResultSet() {}
