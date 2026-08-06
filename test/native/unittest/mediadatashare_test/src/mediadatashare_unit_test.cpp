@@ -3407,6 +3407,10 @@ HWTEST_F(MediaDataShareUnitTest, ReadAshmem, TestSize.Level1)
     EXPECT_EQ(strRead, DATA_SHARE_URI);
 
     // Error path test
+    readRet = stub.ReadAshmem(node, (const void**)&str, -1, offset);
+    EXPECT_EQ(readRet, E_ERROR);
+    readRet = stub.ReadAshmem(node, (const void**)&str, INT_MAX, offset);
+    EXPECT_EQ(readRet, E_ERROR);
     readRet = stub.ReadAshmem(node, (const void**)&str, DATA_SIZE_ASHMEM_TRANSFER_LIMIT, offset);
     EXPECT_EQ(readRet, E_ERROR);
     LOG_INFO("ReadAshmem ends");

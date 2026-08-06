@@ -17,10 +17,12 @@
 #include "shared_block.h"
 #include <gtest/gtest.h>
 #include <cstdint>
+#include <cstring>
 #include <memory>
 #include <string>
 #include "ashmem.h"
 #include "datashare_log.h"
+#include "message_parcel.h"
 #include "refbase.h"
 
 namespace OHOS {
@@ -639,6 +641,7 @@ HWTEST_F(SharedBlockTest, SetRawDataTest001, TestSize.Level0)
     EXPECT_EQ(sharedBlock->SetRawData(&mHeader, sizeof(mHeader)), SharedBlock::SHARED_BLOCK_NO_MEMORY);
     sharedBlock->mSize = sizeTemp;
     EXPECT_EQ(sharedBlock->SetRawData(&mHeader, sizeof(mHeader)), SharedBlock::SHARED_BLOCK_OK);
+    EXPECT_EQ(sharedBlock->SetRawData(nullptr, sizeof(mHeader)), SHARED_BLOCK_INVALID_OPERATION);
     EXPECT_EQ(sharedBlock->Clear(), SharedBlock::SHARED_BLOCK_OK);
     LOG_INFO("SetRawDataTest001::End");
 }
@@ -715,6 +718,7 @@ HWTEST_F(SharedBlockTest, AllocTest001, TestSize.Level0)
     EXPECT_NE(sharedBlock, nullptr);
     sharedBlock->mHeader->unusedOffset = 1;
     sharedBlock->mSize = 0;
+    EXPECT_NE(sharedBlock->Alloc(UINT32_MAX, false), 1);
     uint32_t size = 2;
     EXPECT_EQ(sharedBlock->Alloc(size, false), 0);
     sharedBlock->mSize = size + sharedBlock->mHeader->unusedOffset;
@@ -726,6 +730,11 @@ HWTEST_F(SharedBlockTest, AllocTest001, TestSize.Level0)
     LOG_INFO("AllocTest001::End");
 }
 
+/**
+* @tc.name: GetCellUnit_NoOverflowCheck_001
+* @tc.desc: Test AllocRow
+* @tc.type: FUNC
+*/
 HWTEST_F(SharedBlockTest, GetCellUnit_NoOverflowCheck_001, TestSize.Level0)
 {
     LOG_INFO("GetCellUnit_NoOverflowCheck_001::Start");
@@ -741,6 +750,11 @@ HWTEST_F(SharedBlockTest, GetCellUnit_NoOverflowCheck_001, TestSize.Level0)
     LOG_INFO("GetCellUnit_NoOverflowCheck_001::End");
 }
 
+/**
+* @tc.name: AllocRow_NoOverflowCheck_001
+* @tc.desc: Test AllocRow
+* @tc.type: FUNC
+*/
 HWTEST_F(SharedBlockTest, AllocRow_NoOverflowCheck_001, TestSize.Level0)
 {
     LOG_INFO("AllocRow_NoOverflowCheck_001::Start");
@@ -754,6 +768,150 @@ HWTEST_F(SharedBlockTest, AllocRow_NoOverflowCheck_001, TestSize.Level0)
     EXPECT_EQ(ret, SharedBlock::SHARED_BLOCK_OK);
     delete block;
     LOG_INFO("AllocRow_NoOverflowCheck_001::End");
+}
+
+/**
+* @tc.name: PutString_001
+* @tc.desc: Test PutString function with read-only mode and invalid parameters
+* @tc.type: FUNC
+*/
+HWTEST_F(SharedBlockTest, PutString_001, TestSize.Level0)
+{
+    LOG_INFO("PutString_001::Start");
+    AppDataFwk::SharedBlock *sharedBlock = nullptr;
+    EXPECT_EQ(SharedBlock::Create("name",
+        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, sharedBlock),
+        SharedBlock::SHARED_BLOCK_OK);
+    EXPECT_NE(sharedBlock, nullptr);
+    sharedBlock->mReadOnly = true;
+    const char *str = "test";
+    EXPECT_EQ(sharedBlock->PutString(sharedBlock->mHeader->rowNums, 1, str, strlen(str) + 1),
+        SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
+    sharedBlock->mReadOnly = false;
+    EXPECT_EQ(sharedBlock->PutString(sharedBlock->mHeader->rowNums, 1, str, strlen(str) + 1),
+        SharedBlock::SHARED_BLOCK_BAD_VALUE);
+    EXPECT_EQ(sharedBlock->PutString(0, 1, nullptr, 1), SharedBlock::SHARED_BLOCK_BAD_VALUE);
+    EXPECT_EQ(sharedBlock->Clear(), SharedBlock::SHARED_BLOCK_OK);
+    LOG_INFO("PutString_001::End");
+}
+
+/**
+* @tc.name: WriteMessageParcel_001
+* @tc.desc: Test WriteMessageParcel function
+* @tc.type: FUNC
+*/
+HWTEST_F(SharedBlockTest, WriteMessageParcel_001, TestSize.Level0)
+{
+    LOG_INFO("WriteMessageParcel_001::Start");
+    SharedBlock *block = nullptr;
+    int ret = SharedBlock::Create("test", 4096, block);
+    EXPECT_EQ(ret, SharedBlock::SHARED_BLOCK_OK);
+    EXPECT_NE(block, nullptr);
+    MessageParcel parcel;
+    int result = block->WriteMessageParcel(parcel);
+    EXPECT_EQ(result, 1);
+    delete block;
+    LOG_INFO("WriteMessageParcel_001::End");
+}
+
+/**
+* @tc.name: OffsetFromPtr_001
+* @tc.desc: Test OffsetFromPtr function with nullptr parameter
+* @tc.type: FUNC
+*/
+HWTEST_F(SharedBlockTest, OffsetFromPtr_001, TestSize.Level0)
+{
+    LOG_INFO("OffsetFromPtr_001::Start");
+    SharedBlock *block = nullptr;
+    int ret = SharedBlock::Create("test", 4096, block);
+    EXPECT_EQ(ret, SharedBlock::SHARED_BLOCK_OK);
+    EXPECT_NE(block, nullptr);
+    uint32_t offset = block->OffsetFromPtr(nullptr);
+    EXPECT_EQ(offset, SharedBlock::INVALID_ROW_RECORD);
+    delete block;
+    LOG_INFO("OffsetFromPtr_001::End");
+}
+
+/**
+* @tc.name: OffsetFromPtr_002
+* @tc.desc: Test OffsetFromPtr function with invalid mData
+* @tc.type: FUNC
+*/
+HWTEST_F(SharedBlockTest, OffsetFromPtr_002, TestSize.Level0)
+{
+    LOG_INFO("OffsetFromPtr_002::Start");
+    sptr<Ashmem> ashmem = Ashmem::CreateAshmem("test", sizeof(SharedBlock::SharedBlockHeader));
+    EXPECT_NE(ashmem, nullptr);
+    ashmem->startAddr_ = nullptr;
+    SharedBlock block("test", ashmem, 0, true);
+    EXPECT_EQ(block.Init(), false);
+    uint32_t offset = block.OffsetFromPtr(reinterpret_cast<void*>(0x12345678));
+    EXPECT_EQ(offset, SharedBlock::INVALID_ROW_RECORD);
+    LOG_INFO("OffsetFromPtr_002::End");
+}
+
+/**
+* @tc.name: OffsetFromPtr_003
+* @tc.desc: Test OffsetFromPtr function with pointer before mData
+* @tc.type: FUNC
+*/
+HWTEST_F(SharedBlockTest, OffsetFromPtr_003, TestSize.Level0)
+{
+    LOG_INFO("OffsetFromPtr_003::Start");
+    SharedBlock *block = nullptr;
+    int ret = SharedBlock::Create("test", 4096, block);
+    EXPECT_EQ(ret, SharedBlock::SHARED_BLOCK_OK);
+    EXPECT_NE(block, nullptr);
+    void *invalidPtr = reinterpret_cast<void*>(0x1000);
+    uint32_t offset = block->OffsetFromPtr(invalidPtr);
+    EXPECT_EQ(offset, SharedBlock::INVALID_ROW_RECORD);
+    delete block;
+    LOG_INFO("OffsetFromPtr_003::End");
+}
+
+/**
+* @tc.name: OffsetFromPtr_004
+* @tc.desc: Test OffsetFromPtr function with valid pointer
+* @tc.type: FUNC
+*/
+HWTEST_F(SharedBlockTest, OffsetFromPtr_004, TestSize.Level0)
+{
+    LOG_INFO("OffsetFromPtr_004::Start");
+    SharedBlock *block = nullptr;
+    int ret = SharedBlock::Create("test", 4096, block);
+    EXPECT_EQ(ret, SharedBlock::SHARED_BLOCK_OK);
+    EXPECT_NE(block, nullptr);
+    void *ptr = block->OffsetToPtr(0);
+    EXPECT_NE(ptr, nullptr);
+    uint32_t offset = block->OffsetFromPtr(ptr);
+    EXPECT_EQ(offset, 0);
+    void *ptr2 = block->OffsetToPtr(100);
+    EXPECT_NE(ptr2, nullptr);
+    uint32_t offset2 = block->OffsetFromPtr(ptr2);
+    EXPECT_EQ(offset2, 100);
+    delete block;
+    LOG_INFO("OffsetFromPtr_004::End");
+}
+
+/**
+* @tc.name: OffsetFromPtr_005
+* @tc.desc: Test OffsetFromPtr function with pointer exceeding mSize
+* @tc.type: FUNC
+*/
+HWTEST_F(SharedBlockTest, OffsetFromPtr_005, TestSize.Level0)
+{
+    LOG_INFO("OffsetFromPtr_005::Start");
+    SharedBlock *block = nullptr;
+    int ret = SharedBlock::Create("test", 4096, block);
+    EXPECT_EQ(ret, SharedBlock::SHARED_BLOCK_OK);
+    EXPECT_NE(block, nullptr);
+    void *ptr = block->OffsetToPtr(0);
+    EXPECT_NE(ptr, nullptr);
+    void *exceedPtr = static_cast<uint8_t*>(ptr) + 4097;
+    uint32_t offset = block->OffsetFromPtr(exceedPtr);
+    EXPECT_EQ(offset, SharedBlock::INVALID_ROW_RECORD);
+    delete block;
+    LOG_INFO("OffsetFromPtr_005::End");
 }
 } // namespace DataShare
 } // namespace OHOS

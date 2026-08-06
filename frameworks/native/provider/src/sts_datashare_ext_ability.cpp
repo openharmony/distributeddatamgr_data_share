@@ -535,6 +535,7 @@ Uri StsDataShareExtAbility::NormalizeUri(const Uri &uri)
     Uri normalizedUri = DataShareExtAbility::NormalizeUri(uri);
     call_arkts_normalize_uri(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
         rust::String(normalizedUri.ToString()), reinterpret_cast<int64_t>(point));
+    delete point;
     return normalizedUri;
 }
 
@@ -559,6 +560,7 @@ Uri StsDataShareExtAbility::DenormalizeUri(const Uri &uri)
     Uri denormalizedUri = DataShareExtAbility::DenormalizeUri(uri);
     call_arkts_denormalize_uri(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
         rust::String(denormalizedUri.ToString()), reinterpret_cast<int64_t>(point));
+    delete point;
     return denormalizedUri;
 }
 
