@@ -330,7 +330,7 @@ void DataShareConnection::ConnectionCallback::OnAbilityDisconnectDone(
 {
     auto target = target_.lock();
     if (target == nullptr) {
-        LOG_WARN("DataShareConnection target is gone before OnAbilityDisconnectDone");
+        LOG_DEBUG("DataShareConnection target is gone before OnAbilityDisconnectDone");
         return;
     }
     target->OnAbilityDisconnectDone(element, resultCode);
