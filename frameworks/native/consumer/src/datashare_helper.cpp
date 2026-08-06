@@ -179,21 +179,17 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
         return CreateSAProviderHelper(uri, token, saId, waitTime, isSystem);
     }
 
-    sptr<DataShareConnection> connection = new (std::nothrow) DataShareConnection(uri, token, waitTime);
-    if (connection == nullptr) {
-        LOG_ERROR("Create DataShareConnection failed.");
+    auto connection = std::make_shared<DataShareConnection>(uri, token, waitTime);
+    if (!connection->Init()) {
+        LOG_ERROR("Init DataShareConnection failed, uri:%{public}s",
+            DataShareStringUtils::Anonymous(uri.ToString()).c_str());
         return nullptr;
     }
-    auto dataShareConnection =
-        std::shared_ptr<DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
-            holder->SetConnectInvalid();
-            holder->DisconnectDataShareExtAbility();
-        });
-    if (dataShareConnection->GetDataShareProxy(uri, token) == nullptr) {
+    if (connection->GetDataShareProxy(uri, token) == nullptr) {
         LOG_ERROR("connect failed");
         return nullptr;
     }
-    return std::make_shared<DataShareHelperImpl>(uri, token, dataShareConnection, isSystem);
+    return std::make_shared<DataShareHelperImpl>(uri, token, connection, isSystem);
 }
 
 std::shared_ptr<DataShareHelper> DataShareHelper::CreateSAProviderHelper(Uri &uri, const sptr<IRemoteObject> &token,
