@@ -115,11 +115,11 @@ std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::Create(const s
             return std::make_pair(E_OK, helper);
         }
         if (ret == E_BMS_NOT_READY) {
-            LOG_ERROR("BMS not ready, uri:%{publish}s", DataShareStringUtils::Change(strUri).c_str());
+            LOG_ERROR("BMS not ready, uri:%{public}s", DataShareStringUtils::Change(strUri).c_str());
             return std::make_pair(E_DATA_SHARE_NOT_READY, nullptr);
         }
         if (ret == E_BUNDLE_NAME_NOT_EXIST) {
-            LOG_ERROR("BundleName not exist, uri:%{publish}s", DataShareStringUtils::Change(strUri).c_str());
+            LOG_ERROR("BundleName not exist, uri:%{public}s", DataShareStringUtils::Change(strUri).c_str());
             return std::make_pair(E_BUNDLE_NAME_NOT_EXIST, nullptr);
         }
         if (extUri.empty()) {
