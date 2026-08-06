@@ -16,6 +16,7 @@
 #ifndef DATASHARE_CONNECTION_H
 #define DATASHARE_CONNECTION_H
 
+#include <atomic>
 #include <condition_variable>
 #include <memory>
 #include <mutex>
@@ -80,9 +81,9 @@ public:
 
 private:
     struct DataShareConnectionInfo {
-        int count = 0;
-        int64_t firstTime = 0;
-        int64_t prevTime = 0;
+        std::atomic<int> count = 0;
+        std::atomic<int64_t> firstTime = 0;
+        std::atomic<int64_t> prevTime = 0;
     };
     struct ConnectCondition {
         std::condition_variable condition;

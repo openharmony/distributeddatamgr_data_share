@@ -165,6 +165,7 @@ int DataShareAbsResultSet::IsEnded(bool &result)
 
 int DataShareAbsResultSet::GetColumnCount(int &count)
 {
+    std::lock_guard<std::mutex> lock(cacheMutex_);
     if (count_ == -1) {
         std::vector<std::string> columnNames;
         int ret = GetAllColumnNames(columnNames);
@@ -180,6 +181,7 @@ int DataShareAbsResultSet::GetColumnCount(int &count)
 
 int DataShareAbsResultSet::GetColumnIndex(const std::string &columnName, int &columnIndex)
 {
+    std::lock_guard<std::mutex> lock(cacheMutex_);
     if (indexCache_.find(columnName) != indexCache_.end()) {
         columnIndex = indexCache_[columnName];
         return E_OK;
@@ -231,12 +233,12 @@ int DataShareAbsResultSet::GetColumnName(int columnIndex, std::string &columnNam
 
 bool DataShareAbsResultSet::IsClosed() const
 {
-    return isClosed_;
+    return isClosed_.load();
 }
 
 int DataShareAbsResultSet::Close()
 {
-    isClosed_ = true;
+    isClosed_.store(true);
     return E_OK;
 }
 } // namespace DataShare

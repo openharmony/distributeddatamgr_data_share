@@ -376,11 +376,15 @@ int32_t GeneralControllerServiceImpl::SetExtUri(const std::string &extUri)
             DataShareStringUtils::Anonymous(extUri).c_str());
         return E_DATASHARE_INVALID_URI;
     }
+    std::string oldExtUri;
+    {
+        std::unique_lock<std::shared_mutex> lock(mutex_);
+        oldExtUri = extUri_;
+        extUri_ = extUri;
+    }
     LOG_INFO("SetExtUri old: %{public}s, new: %{public}s",
-        DataShareStringUtils::Anonymous(extUri_).c_str(),
+        DataShareStringUtils::Anonymous(oldExtUri).c_str(),
         DataShareStringUtils::Anonymous(extUri).c_str());
-    std::unique_lock<std::shared_mutex> lock(mutex_);
-    extUri_ = extUri;
     return E_OK;
 }
 } // namespace DataShare

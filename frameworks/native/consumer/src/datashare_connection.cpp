@@ -102,7 +102,7 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
     if (uri.empty()) {
         return;
     }
-    if (pool_ == nullptr) {
+    {
         std::lock_guard<std::mutex> lock(mutex_);
         if (pool_ == nullptr) {
             pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS, DATASHARE_EXECUTOR_NAME);
@@ -113,7 +113,7 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
 
 void DataShareConnection::ReconnectExtAbility(const std::string &uri)
 {
-    if (reConnects_.count == 0) {
+    if (reConnects_.count.load() == 0) {
         AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
         if (instance == nullptr) {
             LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri_.ToString()).c_str());
@@ -124,9 +124,9 @@ void DataShareConnection::ReconnectExtAbility(const std::string &uri)
             DataShareStringUtils::Change(uri).c_str(), ret);
         if (ret == E_OK) {
             auto curr = std::chrono::system_clock::now().time_since_epoch();
-            reConnects_.count = 1;
-            reConnects_.firstTime = std::chrono::duration_cast<std::chrono::milliseconds>(curr).count();
-            reConnects_.prevTime = std::chrono::duration_cast<std::chrono::milliseconds>(curr).count();
+            reConnects_.count.store(1);
+            reConnects_.firstTime.store(std::chrono::duration_cast<std::chrono::milliseconds>(curr).count());
+            reConnects_.prevTime.store(std::chrono::duration_cast<std::chrono::milliseconds>(curr).count());
         }
         return;
     }
@@ -137,16 +137,16 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
 {
     int64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch()).count();
-    if (now - reConnects_.prevTime >= MAX_RECONNECT_TIME_INTERVAL.count()) {
-        reConnects_.count = 0;
-        reConnects_.firstTime = now;
-        reConnects_.prevTime = now;
+    if (now - reConnects_.prevTime.load() >= MAX_RECONNECT_TIME_INTERVAL.count()) {
+        reConnects_.count.store(0);
+        reConnects_.firstTime.store(now);
+        reConnects_.prevTime.store(now);
     }
-    if (reConnects_.count >= MAX_RECONNECT) {
+    if (reConnects_.count.load() >= MAX_RECONNECT) {
         return;
     }
     auto delay = RECONNECT_TIME_INTERVAL;
-    if (now - reConnects_.prevTime >= RECONNECT_TIME_INTERVAL.count()) {
+    if (now - reConnects_.prevTime.load() >= RECONNECT_TIME_INTERVAL.count()) {
         delay = std::chrono::seconds(0);
     }
     std::weak_ptr<DataShareConnection> self = weak_from_this();
@@ -162,9 +162,9 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
             LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d",
                 DataShareStringUtils::Change(uri).c_str(), ret);
             if (ret == E_OK) {
-                selfSharedPtr->reConnects_.count++;
-                selfSharedPtr->reConnects_.prevTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-                    std::chrono::system_clock::now().time_since_epoch()).count();
+                selfSharedPtr->reConnects_.count.fetch_add(1);
+                selfSharedPtr->reConnects_.prevTime.store(std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::system_clock::now().time_since_epoch()).count());
             }
         }
     });
@@ -180,6 +180,7 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
 void DataShareConnection::UpdateObserverExtsProviderMap(const Uri &uri,
     const sptr<AAFwk::IDataAbilityObserver> &dataObserver, bool isDescendants)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     observerExtsProvider_.Compute(dataObserver, [&uri, isDescendants](const auto &key, auto &value) {
         value.emplace_back(uri, isDescendants);
         return true;
@@ -190,6 +191,7 @@ void DataShareConnection::UpdateObserverExtsProviderMap(const Uri &uri,
 void DataShareConnection::DeleteObserverExtsProviderMap(const Uri &uri,
     const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     observerExtsProvider_.Compute(dataObserver, [&uri](const auto &key, auto &value) {
         value.remove_if([&uri](const auto &param) {
             return uri == param.uri;
@@ -202,8 +204,12 @@ void DataShareConnection::DeleteObserverExtsProviderMap(const Uri &uri,
 void DataShareConnection::ReRegisterObserverExtProvider()
 {
     LOG_INFO("ReRegisterObserverExtProvider start");
-    decltype(observerExtsProvider_) observerExtsProvider(std::move(observerExtsProvider_));
-    observerExtsProvider_.Clear();
+    decltype(observerExtsProvider_) observerExtsProvider;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        observerExtsProvider = std::move(observerExtsProvider_);
+        observerExtsProvider_.Clear();
+    }
     auto dataShareProxy = GetDataShareProxy();
     if (dataShareProxy == nullptr) {
         LOG_ERROR("dataShareProxy_ is nullptr");
