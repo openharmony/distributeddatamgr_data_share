@@ -360,11 +360,12 @@ HWTEST_F(DatashareResultSetTest, ResultWrap_ThreadSafe_001, TestSize.Level0)
             resultWrap->GetResult(value);
         }
     };
-    std::thread thread_1(writer);
-    std::thread thread_2(reader);
+
+    std::thread t1(writer);
+    std::thread t2(reader);
     ready = true;
-    thread_1.join();
-    thread_2.join();
+    t1.join();
+    t2.join();
     EXPECT_FALSE(error);
     LOG_INFO("ResultWrap_ThreadSafe_001::End");
 }
