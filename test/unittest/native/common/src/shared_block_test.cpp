@@ -827,7 +827,7 @@ HWTEST_F(SharedBlockTest, OffsetFromPtr_001, TestSize.Level0)
     EXPECT_EQ(ret, SharedBlock::SHARED_BLOCK_OK);
     EXPECT_NE(block, nullptr);
     uint32_t offset = block->OffsetFromPtr(nullptr);
-    EXPECT_EQ(offset, SharedBlock::INVALID_ROW_RECORD);
+    EXPECT_EQ(offset, INVALID_ROW_RECORD);
     delete block;
     LOG_INFO("OffsetFromPtr_001::End");
 }
@@ -846,7 +846,7 @@ HWTEST_F(SharedBlockTest, OffsetFromPtr_002, TestSize.Level0)
     SharedBlock block("test", ashmem, 0, true);
     EXPECT_EQ(block.Init(), false);
     uint32_t offset = block.OffsetFromPtr(reinterpret_cast<void*>(0x12345678));
-    EXPECT_EQ(offset, SharedBlock::INVALID_ROW_RECORD);
+    EXPECT_EQ(offset, INVALID_ROW_RECORD);
     LOG_INFO("OffsetFromPtr_002::End");
 }
 
@@ -864,7 +864,7 @@ HWTEST_F(SharedBlockTest, OffsetFromPtr_003, TestSize.Level0)
     EXPECT_NE(block, nullptr);
     void *invalidPtr = reinterpret_cast<void*>(0x1000);
     uint32_t offset = block->OffsetFromPtr(invalidPtr);
-    EXPECT_EQ(offset, SharedBlock::INVALID_ROW_RECORD);
+    EXPECT_EQ(offset, INVALID_ROW_RECORD);
     delete block;
     LOG_INFO("OffsetFromPtr_003::End");
 }
@@ -909,7 +909,7 @@ HWTEST_F(SharedBlockTest, OffsetFromPtr_005, TestSize.Level0)
     EXPECT_NE(ptr, nullptr);
     void *exceedPtr = static_cast<uint8_t*>(ptr) + 4097;
     uint32_t offset = block->OffsetFromPtr(exceedPtr);
-    EXPECT_EQ(offset, SharedBlock::INVALID_ROW_RECORD);
+    EXPECT_EQ(offset, INVALID_ROW_RECORD);
     delete block;
     LOG_INFO("OffsetFromPtr_005::End");
 }
