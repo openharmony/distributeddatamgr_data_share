@@ -16,6 +16,8 @@
 #define LOG_TAG "datashare_result_set_test"
 
 #include <gtest/gtest.h>
+#include <thread>
+#include <atomic>
 #include <unistd.h>
 
 #include "datashare_errno.h"
@@ -23,6 +25,7 @@
 #include "datashare_log.h"
 #include "datashare_abs_result_set.h"
 #include "datashare_result_set.h"
+#include "datashare_result.h"
 #include "ikvstore_data_service.h"
 #include "ipc_types.h"
 #include "ishared_result_set_stub.h"
@@ -340,29 +343,19 @@ HWTEST_F(DatashareResultSetTest, ResultWrap_ThreadSafe_001, TestSize.Level0)
     auto resultWrap = std::make_shared<ResultWrap>();
     std::atomic<bool> ready{false};
     std::atomic<bool> error{false};
-    auto writer = [resultWrap]() {
+    auto writer = [resultWrap, &ready]() {
         while (!ready.load()) {
             std::this_thread::yield();
         }
         resultWrap->isRecvReply_ = true;
         resultWrap->callbackResultNumber_ = 100;
     };
-    auto reader = [resultWrap, &error]() {
+    auto reader = [resultWrap, &error, &ready]() {
         while (!ready.load()) {
             std::this_thread::yield();
         }
         for (int i = 0; i < 100; ++i) {
-            bool isRecv = resultWrap->GetRecvReply();
-            int value = 0;
-            resultWrap->GetResult(value);
-        }
-    };
-    auto reader = [&]() {
-        while (!ready.load()) {
-            std::this_thread::yield();
-        }
-        for (int i = 0; i < 100; ++i) {
-            bool isRecv = resultWrap->GetRecvReply();
+            (void)resultWrap->GetRecvReply();
             int value = 0;
             resultWrap->GetResult(value);
         }

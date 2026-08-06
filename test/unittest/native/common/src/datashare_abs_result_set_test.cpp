@@ -16,6 +16,8 @@
 #define LOG_TAG "datashare_abs_result_set_test"
 
 #include <gtest/gtest.h>
+#include <thread>
+#include <atomic>
 #include <unistd.h>
 
 #include "datashare_errno.h"
@@ -338,10 +340,34 @@ HWTEST_F(DataShareAbsResultSetTest, IsClosed_Atomic_002, TestSize.Level0)
     DataShareAbsResultSet resultSet;
     std::atomic<bool> ready{false};
     std::atomic<bool> error{false};
-auto writer = [&resultSet]() {
+    auto writer = [&resultSet, &ready]() {
         while (!ready.load()) {
             std::this_thread::yield();
         }
+        resultSet.Close();
+    };
+    auto reader = [&resultSet, &error, &ready]() {
+        while (!ready.load()) {
+            std::this_thread::yield();
+        }
+        for (int i = 0; i < 100; ++i) {
+            bool isClosed = resultSet.IsClosed();
+            if (isClosed != true && isClosed != false) {
+                error = true;
+            }
+        }
+    };
+    
+    std::thread t1(writer);
+    std::thread t2(reader);
+    ready = true;
+    t1.join();
+    t2.join();
+    EXPECT_FALSE(error);
+    LOG_INFO("IsClosed_Atomic_002::End");
+}
+}
+}
         resultSet.Close();
     };
     
