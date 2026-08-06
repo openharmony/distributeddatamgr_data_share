@@ -641,7 +641,7 @@ HWTEST_F(SharedBlockTest, SetRawDataTest001, TestSize.Level0)
     EXPECT_EQ(sharedBlock->SetRawData(&mHeader, sizeof(mHeader)), SharedBlock::SHARED_BLOCK_NO_MEMORY);
     sharedBlock->mSize = sizeTemp;
     EXPECT_EQ(sharedBlock->SetRawData(&mHeader, sizeof(mHeader)), SharedBlock::SHARED_BLOCK_OK);
-    EXPECT_EQ(sharedBlock->SetRawData(nullptr, sizeof(mHeader)), SHARED_BLOCK_INVALID_OPERATION);
+    EXPECT_EQ(sharedBlock->SetRawData(nullptr, sizeof(mHeader)), SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
     EXPECT_EQ(sharedBlock->Clear(), SharedBlock::SHARED_BLOCK_OK);
     LOG_INFO("SetRawDataTest001::End");
 }
