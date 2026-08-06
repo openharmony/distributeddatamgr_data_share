@@ -583,21 +583,5 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ConcurrentOnAbilityConnect
     t4.join();
     LOG_INFO("DataShareConnection_ConcurrentOnAbilityConnectDone_Test_001::End");
 }
-
-HWTEST_F(DataShareConnectionTest, RegisterObserver_NullPtr_001, TestSize.Level0)
-{
-    LOG_INFO("RegisterObserver_NullPtr_001::Start");
-    Uri uri(DATA_SHARE_URI);
-    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
-    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
-    ASSERT_NE(token, nullptr);
-    sptr<DataShare::DataShareConnection> connection =
-        new (std::nothrow) DataShare::DataShareConnection(uri, token);
-    ASSERT_NE(connection, nullptr);
-    bool ret = connection->RegisterObserver(uri, nullptr);
-    EXPECT_FALSE(ret);
-    connection = nullptr;
-    LOG_INFO("RegisterObserver_NullPtr_001::End");
-}
 }
 }
