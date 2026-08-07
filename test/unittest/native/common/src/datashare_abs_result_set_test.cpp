@@ -326,6 +326,26 @@ HWTEST_F(DataShareAbsResultSetTest, GetColumnName003, TestSize.Level0)
     LOG_INFO("DataShareAbsResultSetTest MarshallingTest002::End");
 }
 
+/**
+ * @tc.name: GetColumnIndex_Concurrent_Test
+ * @tc.desc: Verify that GetColumnIndex is thread-safe under concurrent access. Multiple threads
+ *           concurrently call GetColumnIndex with different column names, triggering the find-then-insert
+ *           path on the indexCache_ map. The test verifies no crash and all returned column indices are correct.
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.precon:
+ *     1. MockDataShareAbsResultSet2 is instantiated with count_ set to -1.
+ *     2. GetAllColumnNames returns a fixed list of column names.
+ *     3. Four threads are spawned, each calling GetColumnIndex with a distinct column name.
+ * @tc.step:
+ *     1. Create a MockDataShareAbsResultSet2 instance and configure GetAllColumnNames.
+ *     2. Spawn 4 threads, each executing GetColumnIndex in a loop for 1000 iterations.
+ *     3. Each thread verifies that the returned column index matches the expected value.
+ *     4. After all threads finish, verify that errorCount is zero.
+ * @tc.expect:
+ *     1. No crash or data corruption occurs.
+ *     2. errorCount remains zero, indicating all GetColumnIndex calls returned correct results.
+ */
 HWTEST_F(DataShareAbsResultSetTest, GetColumnIndex_Concurrent_Test, TestSize.Level0)
 {
     LOG_INFO("DataShareAbsResultSetTest GetColumnIndex_Concurrent_Test::Start");
@@ -343,7 +363,7 @@ HWTEST_F(DataShareAbsResultSetTest, GetColumnIndex_Concurrent_Test, TestSize.Lev
     std::atomic<int> ready{ 0 };
     std::atomic<int> errorCount{ 0 };
 
-    auto worker = [&](int tid) {
+    auto worker = [&ready, &start, &errorCount, &mockResultSet](int tid) {
         ready.fetch_add(1);
         while (!start.load()) {
         }
@@ -374,6 +394,25 @@ HWTEST_F(DataShareAbsResultSetTest, GetColumnIndex_Concurrent_Test, TestSize.Lev
     LOG_INFO("DataShareAbsResultSetTest GetColumnIndex_Concurrent_Test::End");
 }
 
+/**
+ * @tc.name: IsClosed_Close_Concurrent_Test
+ * @tc.desc: Verify that IsClosed and Close are thread-safe under concurrent access. One thread
+ *           repeatedly calls Close to set isClosed_ to true, while another thread repeatedly calls
+ *           IsClosed to read the state. The test verifies no crash and Close always returns E_OK.
+ * @tc.type: FUNC
+ * @tc.require:
+ * @tc.precon:
+ *     1. A DataShareAbsResultSet instance is created.
+ *     2. Two threads are spawned: one calling Close, one calling IsClosed.
+ * @tc.step:
+ *     1. Create a DataShareAbsResultSet instance.
+ *     2. Spawn a closer thread that calls Close in a loop for 10000 iterations.
+ *     3. Spawn a reader thread that calls IsClosed in a loop for 10000 iterations.
+ *     4. After both threads finish, verify that closeFailures is zero.
+ * @tc.expect:
+ *     1. No crash or data corruption occurs.
+ *     2. closeFailures remains zero, indicating all Close calls returned E_OK.
+ */
 HWTEST_F(DataShareAbsResultSetTest, IsClosed_Close_Concurrent_Test, TestSize.Level0)
 {
     LOG_INFO("DataShareAbsResultSetTest IsClosed_Close_Concurrent_Test::Start");
@@ -383,7 +422,7 @@ HWTEST_F(DataShareAbsResultSetTest, IsClosed_Close_Concurrent_Test, TestSize.Lev
     std::atomic<int> ready{ 0 };
     std::atomic<int> closeFailures{ 0 };
 
-    auto closer = [&]() {
+    auto closer = [&ready, &start, &closeFailures, &resultSet]() {
         ready.fetch_add(1);
         while (!start.load()) {
         }
@@ -394,7 +433,7 @@ HWTEST_F(DataShareAbsResultSetTest, IsClosed_Close_Concurrent_Test, TestSize.Lev
         }
     };
 
-    auto reader = [&]() {
+    auto reader = [&ready, &start, &resultSet]() {
         ready.fetch_add(1);
         while (!start.load()) {
         }
