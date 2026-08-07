@@ -341,6 +341,7 @@ HWTEST_F(DataShareAbsResultSetTest, GetColumnIndex_Concurrent_Test, TestSize.Lev
     constexpr int iterations = 1000;
     std::atomic<bool> start{ false };
     std::atomic<int> ready{ 0 };
+    std::atomic<int> errorCount{ 0 };
 
     auto worker = [&](int tid) {
         ready.fetch_add(1);
@@ -349,8 +350,10 @@ HWTEST_F(DataShareAbsResultSetTest, GetColumnIndex_Concurrent_Test, TestSize.Lev
         for (int i = 0; i < iterations; ++i) {
             int idx = -1;
             std::string col = "c" + std::to_string(tid % 4);
-            mockResultSet.GetColumnIndex(col, idx);
-            EXPECT_GE(idx, 0);
+            int ret = mockResultSet.GetColumnIndex(col, idx);
+            if (ret != E_OK || idx != (tid % 4)) {
+                errorCount.fetch_add(1);
+            }
         }
     };
 
@@ -367,6 +370,7 @@ HWTEST_F(DataShareAbsResultSetTest, GetColumnIndex_Concurrent_Test, TestSize.Lev
     t2.join();
     t3.join();
     t4.join();
+    EXPECT_EQ(errorCount.load(), 0);
     LOG_INFO("DataShareAbsResultSetTest GetColumnIndex_Concurrent_Test::End");
 }
 
@@ -377,13 +381,16 @@ HWTEST_F(DataShareAbsResultSetTest, IsClosed_Close_Concurrent_Test, TestSize.Lev
     constexpr int iterations = 10000;
     std::atomic<bool> start{ false };
     std::atomic<int> ready{ 0 };
+    std::atomic<int> closeFailures{ 0 };
 
     auto closer = [&]() {
         ready.fetch_add(1);
         while (!start.load()) {
         }
         for (int i = 0; i < iterations; ++i) {
-            resultSet.Close();
+            if (resultSet.Close() != E_OK) {
+                closeFailures.fetch_add(1);
+            }
         }
     };
 
@@ -405,6 +412,7 @@ HWTEST_F(DataShareAbsResultSetTest, IsClosed_Close_Concurrent_Test, TestSize.Lev
 
     t1.join();
     t2.join();
+    EXPECT_EQ(closeFailures.load(), 0);
     LOG_INFO("DataShareAbsResultSetTest IsClosed_Close_Concurrent_Test::End");
 }
 }
