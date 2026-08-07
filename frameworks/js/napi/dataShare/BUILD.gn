@@ -25,6 +25,7 @@ config("datashare_jscommon_public_config") {
 
 ohos_shared_library("datashare_jscommon") {
   branch_protector_ret = "pac_ret"
+  branch_protector_ret = "bti"
   sanitize = {
     ubsan = true
     boundary_sanitize = true
@@ -74,6 +75,7 @@ ohos_shared_library("datashare_jscommon") {
 
 ohos_shared_library("datashare") {
   branch_protector_ret = "pac_ret"
+  branch_protector_ret = "bti"
   sanitize = {
     ubsan = true
     boundary_sanitize = true
@@ -138,6 +140,7 @@ ohos_shared_library("datashare") {
 
 ohos_shared_library("datasharepredicates") {
   branch_protector_ret = "pac_ret"
+  branch_protector_ret = "bti"
   sanitize = {
     ubsan = true
     boundary_sanitize = true

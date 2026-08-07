@@ -144,6 +144,7 @@ ohos_shared_library("datashare_consumer") {
 
 ohos_shared_library("datashare_permission") {
   branch_protector_ret = "pac_ret"
+  branch_protector_ret = "bti"
   sanitize = {
     ubsan = true
     boundary_sanitize = true
@@ -268,6 +269,7 @@ ohos_shared_library("datashare_provider") {
 
 ohos_shared_library("datashare_ext_ability_module") {
   branch_protector_ret = "pac_ret"
+  branch_protector_ret = "bti"
   sanitize = {
     ubsan = true
     boundary_sanitize = true
