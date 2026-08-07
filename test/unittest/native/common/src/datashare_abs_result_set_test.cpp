@@ -18,6 +18,10 @@
 #include <gtest/gtest.h>
 #include <unistd.h>
 
+#include <atomic>
+#include <thread>
+#include <vector>
+
 #include "datashare_errno.h"
 #include "datashare_itypes_utils.h"
 #include "datashare_log.h"
@@ -320,6 +324,88 @@ HWTEST_F(DataShareAbsResultSetTest, GetColumnName003, TestSize.Level0)
     auto result = dataShareAbsResultSet.GetColumnName(columnIndex, columnName);
     EXPECT_EQ(result, E_INVALID_COLUMN_INDEX);
     LOG_INFO("DataShareAbsResultSetTest MarshallingTest002::End");
+}
+
+HWTEST_F(DataShareAbsResultSetTest, GetColumnIndex_Concurrent_Test, TestSize.Level0)
+{
+    LOG_INFO("DataShareAbsResultSetTest GetColumnIndex_Concurrent_Test::Start");
+    MockDataShareAbsResultSet2 mockResultSet;
+    mockResultSet.count_ = -1;
+    std::vector<std::string> columnNames = { "c0", "c1", "c2", "c3" };
+    EXPECT_CALL(mockResultSet, GetAllColumnNames(testing::_))
+        .WillRepeatedly([&columnNames](std::vector<std::string> &names) {
+            names = columnNames;
+            return E_OK;
+        });
+
+    constexpr int iterations = 1000;
+    std::atomic<bool> start{ false };
+    std::atomic<int> ready{ 0 };
+
+    auto worker = [&](int tid) {
+        ready.fetch_add(1);
+        while (!start.load()) {
+        }
+        for (int i = 0; i < iterations; ++i) {
+            int idx = -1;
+            std::string col = "c" + std::to_string(tid % 4);
+            mockResultSet.GetColumnIndex(col, idx);
+            EXPECT_GE(idx, 0);
+        }
+    };
+
+    std::thread t1(worker, 0);
+    std::thread t2(worker, 1);
+    std::thread t3(worker, 2);
+    std::thread t4(worker, 3);
+
+    while (ready.load() < 4) {
+    }
+    start.store(true);
+
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+    LOG_INFO("DataShareAbsResultSetTest GetColumnIndex_Concurrent_Test::End");
+}
+
+HWTEST_F(DataShareAbsResultSetTest, IsClosed_Close_Concurrent_Test, TestSize.Level0)
+{
+    LOG_INFO("DataShareAbsResultSetTest IsClosed_Close_Concurrent_Test::Start");
+    DataShareAbsResultSet resultSet;
+    constexpr int iterations = 10000;
+    std::atomic<bool> start{ false };
+    std::atomic<int> ready{ 0 };
+
+    auto closer = [&]() {
+        ready.fetch_add(1);
+        while (!start.load()) {
+        }
+        for (int i = 0; i < iterations; ++i) {
+            resultSet.Close();
+        }
+    };
+
+    auto reader = [&]() {
+        ready.fetch_add(1);
+        while (!start.load()) {
+        }
+        for (int i = 0; i < iterations; ++i) {
+            (void)resultSet.IsClosed();
+        }
+    };
+
+    std::thread t1(closer);
+    std::thread t2(reader);
+
+    while (ready.load() < 2) {
+    }
+    start.store(true);
+
+    t1.join();
+    t2.join();
+    LOG_INFO("DataShareAbsResultSetTest IsClosed_Close_Concurrent_Test::End");
 }
 }
 }
