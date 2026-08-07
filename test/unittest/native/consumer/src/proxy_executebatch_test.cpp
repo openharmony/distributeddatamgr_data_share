@@ -91,8 +91,8 @@ HWTEST_F(DataShareProxyTest, DataShareProxyExecuteBatch_Test_001, TestSize.Level
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
     sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
     ASSERT_NE(token, nullptr);
-    sptr<DataShare::DataShareConnection> connection =
-        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    std::shared_ptr<DataShare::DataShareConnection> connection =
+        std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
 
     // get proxy not null

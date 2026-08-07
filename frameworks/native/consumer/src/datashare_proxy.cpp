@@ -657,8 +657,8 @@ int DataShareProxy::NotifyChangeExtProvider(const ChangeInfo &changeInfo)
         return E_WRITE_TO_PARCE_ERROR;
     }
     if (!ChangeInfo::Marshalling(changeInfo, data)) {
-        LOG_ERROR("changeInfo marshalling failed, changeType:%{public}ud, num:%{public}zu,"
-            "null data:%{public}d, size:%{public}ud",
+        LOG_ERROR("changeInfo marshalling failed, changeType:%{public}u, num:%{public}zu,"
+            "null data:%{public}d, size:%{public}u",
             changeInfo.changeType_, changeInfo.uris_.size(), changeInfo.data_ == nullptr, changeInfo.size_);
         return E_MARSHAL_ERROR;
     }

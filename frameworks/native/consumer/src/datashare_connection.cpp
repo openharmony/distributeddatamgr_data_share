@@ -119,7 +119,7 @@ void DataShareConnection::ReconnectExtAbility(const std::string &uri)
             LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri_.ToString()).c_str());
             return;
         }
-        ErrCode ret = instance->Connect(uri, this, token_);
+    ErrCode ret = instance->Connect(uri, callback_, token_);
         LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d",
             DataShareStringUtils::Change(uri).c_str(), ret);
         if (ret == E_OK) {
@@ -152,20 +152,21 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
     std::weak_ptr<DataShareConnection> self = weak_from_this();
     auto taskid = pool_->Schedule(delay, [uri, self]() {
         auto selfSharedPtr = self.lock();
-        if (selfSharedPtr) {
-            AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
-            if (instance == nullptr) {
-                LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri).c_str());
-                return;
-            }
-            ErrCode ret = instance->Connect(uri, selfSharedPtr.get(), selfSharedPtr->token_);
-            LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d",
-                DataShareStringUtils::Change(uri).c_str(), ret);
-            if (ret == E_OK) {
-                selfSharedPtr->reConnects_.count.fetch_add(1);
-                selfSharedPtr->reConnects_.prevTime.store(std::chrono::duration_cast<std::chrono::milliseconds>(
-                    std::chrono::system_clock::now().time_since_epoch()).count());
-            }
+        if (selfSharedPtr == nullptr) {
+            return;
+        }
+        AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
+        if (instance == nullptr) {
+            LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri).c_str());
+            return;
+        }
+        ErrCode ret = instance->Connect(uri, selfSharedPtr->callback_, selfSharedPtr->token_);
+        LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d",
+            DataShareStringUtils::Change(uri).c_str(), ret);
+        if (ret == E_OK) {
+            selfSharedPtr->reConnects_.count.fetch_add(1);
+            selfSharedPtr->reConnects_.prevTime.store(std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch()).count());
         }
     });
     if (taskid == ExecutorPool::INVALID_TASK_ID) {
@@ -250,7 +251,7 @@ std::shared_ptr<DataShareProxy> DataShareConnection::ConnectDataShareExtAbility(
         LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(reqUri).c_str());
         return nullptr;
     }
-    ErrCode ret = instance->Connect(reqUri, this, token);
+    ErrCode ret = instance->Connect(reqUri, callback_, token);
     LOG_INFO("uri = %{public}s. ret = %{public}d", DataShareStringUtils::Change(reqUri).c_str(), ret);
     if (ret != ERR_OK) {
         return nullptr;
@@ -301,6 +302,44 @@ void DataShareConnection::DisconnectDataShareExtAbility()
 
 DataShareConnection::~DataShareConnection()
 {
+    SetConnectInvalid();
+    DisconnectDataShareExtAbility();
+}
+
+bool DataShareConnection::Init()
+{
+    callback_ = new (std::nothrow) ConnectionCallback(weak_from_this());
+    if (callback_ == nullptr) {
+        LOG_ERROR("Create DataShareConnection::ConnectionCallback failed, uri:%{public}s",
+            DataShareStringUtils::Change(uri_.ToString()).c_str());
+        return false;
+    }
+    return true;
+}
+
+DataShareConnection::ConnectionCallback::ConnectionCallback(std::weak_ptr<DataShareConnection> target)
+    : target_(std::move(target)) {}
+
+void DataShareConnection::ConnectionCallback::OnAbilityConnectDone(
+    const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
+{
+    auto target = target_.lock();
+    if (target == nullptr) {
+        LOG_WARN("DataShareConnection target is gone before OnAbilityConnectDone");
+        return;
+    }
+    target->OnAbilityConnectDone(element, remoteObject, resultCode);
+}
+
+void DataShareConnection::ConnectionCallback::OnAbilityDisconnectDone(
+    const AppExecFwk::ElementName &element, int resultCode)
+{
+    auto target = target_.lock();
+    if (target == nullptr) {
+        LOG_DEBUG("DataShareConnection target is gone before OnAbilityDisconnectDone");
+        return;
+    }
+    target->OnAbilityDisconnectDone(element, resultCode);
 }
 
 std::shared_ptr<DataShareProxy> DataShareConnection::GetDataShareProxy(const Uri &uri,
@@ -320,7 +359,7 @@ ErrCode DataShareConnection::Disconnect()
     if (instance == nullptr) {
         return -1;
     }
-    return instance->DisConnect(this);
+    return instance->DisConnect(callback_);
 }
 
 std::shared_ptr<DataShareProxy> DataShareConnection::GetDataShareProxy()

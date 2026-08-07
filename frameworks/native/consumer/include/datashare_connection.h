@@ -29,13 +29,25 @@
 namespace OHOS {
 namespace DataShare {
 using namespace AppExecFwk;
-class DataShareConnection : public AAFwk::AbilityConnectionStub,
-    public std::enable_shared_from_this<DataShareConnection>,
+class DataShareConnection : public std::enable_shared_from_this<DataShareConnection>,
     public DataShareConnectionBase {
 public:
     DataShareConnection(const Uri &uri, const sptr<IRemoteObject> &token, int32_t waitTime = 2) : uri_(uri),
         token_(token), waitTime_(waitTime) {}
     ~DataShareConnection() override;
+
+    class ConnectionCallback : public AAFwk::AbilityConnectionStub {
+    public:
+        explicit ConnectionCallback(std::weak_ptr<DataShareConnection> target);
+        ~ConnectionCallback() override = default;
+
+        void OnAbilityConnectDone(
+            const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
+        void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
+
+    private:
+        std::weak_ptr<DataShareConnection> target_;
+    };
 
     /**
      * @brief This method is called back to receive the connection result after an ability calls the
@@ -47,7 +59,7 @@ public:
      * other value indicates a connection failure.
      */
     void OnAbilityConnectDone(
-        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode) override;
+        const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode);
 
     /**
      * @brief This method is called back to receive the disconnection result after the connected extension ability
@@ -58,7 +70,7 @@ public:
      * @param resultCode: Indicates the disconnection result code. The value 0 indicates a successful disconnection,
      * and any other value indicates a disconnection failure.
      */
-    void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode) override;
+    void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode);
 
     /**
      * @brief disconnect remote ability of DataShareExtAbility.
@@ -73,6 +85,13 @@ public:
     std::shared_ptr<DataShareProxy> GetDataShareProxy(const Uri &uri, const sptr<IRemoteObject> &token) override;
 
     void SetConnectInvalid();
+
+    /**
+     * @brief Initialize the connection. Must be called once after construction, before the
+     *        connection is used. Returns false on initialization failure; callers should
+     *        drop the connection in that case.
+     */
+    bool Init();
 
     void UpdateObserverExtsProviderMap(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver,
         bool isDescendants) override;
@@ -96,6 +115,7 @@ private:
     void ReRegisterObserverExtProvider();
     std::mutex mutex_{};
     std::shared_ptr<DataShareProxy> dataShareProxy_;
+    sptr<ConnectionCallback> callback_;
     ConnectCondition condition_;
     Uri uri_;
     sptr<IRemoteObject> token_ = {};

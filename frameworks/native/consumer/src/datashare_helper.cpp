@@ -117,11 +117,11 @@ std::pair<int, std::shared_ptr<DataShareHelper>> DataShareHelper::Create(const s
             return std::make_pair(E_OK, helper);
         }
         if (ret == E_BMS_NOT_READY) {
-            LOG_ERROR("BMS not ready, uri:%{publish}s", DataShareStringUtils::Change(strUri).c_str());
+            LOG_ERROR("BMS not ready, uri:%{public}s", DataShareStringUtils::Change(strUri).c_str());
             return std::make_pair(E_DATA_SHARE_NOT_READY, nullptr);
         }
         if (ret == E_BUNDLE_NAME_NOT_EXIST) {
-            LOG_ERROR("BundleName not exist, uri:%{publish}s", DataShareStringUtils::Change(strUri).c_str());
+            LOG_ERROR("BundleName not exist, uri:%{public}s", DataShareStringUtils::Change(strUri).c_str());
             return std::make_pair(E_BUNDLE_NAME_NOT_EXIST, nullptr);
         }
         if (extUri.empty()) {
@@ -181,21 +181,17 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
         return CreateSAProviderHelper(uri, token, saId, waitTime, isSystem);
     }
 
-    sptr<DataShareConnection> connection = new (std::nothrow) DataShareConnection(uri, token, waitTime);
-    if (connection == nullptr) {
-        LOG_ERROR("Create DataShareConnection failed.");
+    auto connection = std::make_shared<DataShareConnection>(uri, token, waitTime);
+    if (!connection->Init()) {
+        LOG_ERROR("Init DataShareConnection failed, uri:%{public}s",
+            DataShareStringUtils::Anonymous(uri.ToString()).c_str());
         return nullptr;
     }
-    auto dataShareConnection =
-        std::shared_ptr<DataShareConnection>(connection.GetRefPtr(), [holder = connection](const auto *) {
-            holder->SetConnectInvalid();
-            holder->DisconnectDataShareExtAbility();
-        });
-    if (dataShareConnection->GetDataShareProxy(uri, token) == nullptr) {
+    if (connection->GetDataShareProxy(uri, token) == nullptr) {
         LOG_ERROR("connect failed");
         return nullptr;
     }
-    return std::make_shared<DataShareHelperImpl>(uri, token, dataShareConnection, isSystem);
+    return std::make_shared<DataShareHelperImpl>(uri, token, connection, isSystem);
 }
 
 std::shared_ptr<DataShareHelper> DataShareHelper::CreateSAProviderHelper(Uri &uri, const sptr<IRemoteObject> &token,
