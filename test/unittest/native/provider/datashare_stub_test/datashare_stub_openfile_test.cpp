@@ -252,6 +252,20 @@ HWTEST_F(DataShareStubOpenFileTest, ReportOpenFileUsage_Test_002, TestSize.Level
 HWTEST_F(DataShareStubOpenFileTest, OpenRawFile_FDClose_001, TestSize.Level0)
 {
     LOG_INFO("OpenRawFile_FDClose_001::Start");
+    MockToken::SetTestEnvironment();
+    HapInfoParams info = {
+        .userID = 100,
+        .bundleName = "ohos.datashareclienttest.demo",
+        .instIndex = 0,
+        .appIDDesc = "ohos.datashareclienttest.demo",
+        .isSystemApp = true
+    };
+    HapPolicyParams policy = GetPolicy();
+    AccessTokenIDEx tokenIdEx = MockToken::AllocTestHapToken(info, policy);
+    uint64_t token = tokenIdEx.tokenIDEx;
+    auto originalToken = GetSelfTokenID();
+    SetSelfTokenID(token);
+
     MessageParcel data;
     MessageParcel reply;
     Uri uri("datashare:///com.test");
@@ -260,12 +274,29 @@ HWTEST_F(DataShareStubOpenFileTest, OpenRawFile_FDClose_001, TestSize.Level0)
     ITypesUtil::Marshal(data, uri, mode);
     ErrCode ret = stub->CmdOpenRawFile(data, reply);
     EXPECT_EQ(ret, E_OK);
+
+    SetSelfTokenID(originalToken);
+    MockToken::ResetTestEnvironment();
     LOG_INFO("OpenRawFile_FDClose_001::End");
 }
 
 HWTEST_F(DataShareStubOpenFileTest, OpenFile_InvalidMode_001, TestSize.Level0)
 {
     LOG_INFO("OpenFile_InvalidMode_001::Start");
+    MockToken::SetTestEnvironment();
+    HapInfoParams info = {
+        .userID = 100,
+        .bundleName = "ohos.datashareclienttest.demo",
+        .instIndex = 0,
+        .appIDDesc = "ohos.datashareclienttest.demo",
+        .isSystemApp = true
+    };
+    HapPolicyParams policy = GetPolicy();
+    AccessTokenIDEx tokenIdEx = MockToken::AllocTestHapToken(info, policy);
+    uint64_t token = tokenIdEx.tokenIDEx;
+    auto originalToken = GetSelfTokenID();
+    SetSelfTokenID(token);
+
     MessageParcel data;
     MessageParcel reply;
     Uri uri("datashare:///com.test");
@@ -274,6 +305,9 @@ HWTEST_F(DataShareStubOpenFileTest, OpenFile_InvalidMode_001, TestSize.Level0)
     ITypesUtil::Marshal(data, uri, mode);
     ErrCode ret = stub->CmdOpenFile(data, reply);
     EXPECT_EQ(ret, ERR_INVALID_VALUE);
+
+    SetSelfTokenID(originalToken);
+    MockToken::ResetTestEnvironment();
     LOG_INFO("OpenFile_InvalidMode_001::End");
 }
 } // namespace DataShare
