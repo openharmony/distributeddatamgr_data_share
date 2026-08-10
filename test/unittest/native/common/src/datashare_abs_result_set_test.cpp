@@ -16,8 +16,6 @@
 #define LOG_TAG "datashare_abs_result_set_test"
 
 #include <gtest/gtest.h>
-#include <thread>
-#include <atomic>
 #include <unistd.h>
 
 #include "datashare_errno.h"
