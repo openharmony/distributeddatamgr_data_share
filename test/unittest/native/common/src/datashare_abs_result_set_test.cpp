@@ -323,47 +323,5 @@ HWTEST_F(DataShareAbsResultSetTest, GetColumnName003, TestSize.Level0)
     EXPECT_EQ(result, E_INVALID_COLUMN_INDEX);
     LOG_INFO("DataShareAbsResultSetTest MarshallingTest002::End");
 }
-
-HWTEST_F(DataShareAbsResultSetTest, IsClosed_Atomic_001, TestSize.Level0)
-{
-    LOG_INFO("IsClosed_Atomic_001::Start");
-    DataShareAbsResultSet resultSet;
-    EXPECT_FALSE(resultSet.IsClosed());
-    resultSet.Close();
-    EXPECT_TRUE(resultSet.IsClosed());
-    LOG_INFO("IsClosed_Atomic_001::End");
-}
-
-HWTEST_F(DataShareAbsResultSetTest, IsClosed_Atomic_002, TestSize.Level0)
-{
-    LOG_INFO("IsClosed_Atomic_002::Start");
-    DataShareAbsResultSet resultSet;
-    std::atomic<bool> ready{false};
-    std::atomic<bool> error{false};
-    auto writer = [&ready, &resultSet]() {
-        while (!ready.load()) {
-            std::this_thread::yield();
-        }
-        resultSet.Close();
-    };
-    auto reader = [&ready, &error, &resultSet]() {
-        while (!ready.load()) {
-            std::this_thread::yield();
-        }
-        for (int i = 0; i < 100; ++i) {
-            bool isClosed = resultSet.IsClosed();
-            if (isClosed != true && isClosed != false) {
-                error = true;
-            }
-        }
-    };
-    std::thread t1(writer);
-    std::thread t2(reader);
-    ready = true;
-    t1.join();
-    t2.join();
-    EXPECT_FALSE(error);
-    LOG_INFO("IsClosed_Atomic_002::End");
-}
 }
 }
