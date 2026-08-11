@@ -39,6 +39,7 @@ public:
     static sptr<ObserverImpl> GetObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer);
     static bool FindObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer);
     static bool DeleteObserver(const Uri& uri, const std::shared_ptr<DataShareObserver> &observer);
+    static std::mutex observerMutex_;
 private:
     struct ObserverParam {
         sptr<ObserverImpl> obs_;

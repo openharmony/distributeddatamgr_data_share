@@ -19,6 +19,7 @@
 #include "datashare_helper_impl.h"
 
 #include "adaptor.h"
+#include <mutex>
 #include "dataobs_mgr_client.h"
 #include "datashare_connection.h"
 #include "datashare_sa_connection.h"
@@ -36,6 +37,7 @@ static constexpr const char *FILE_PREFIX = "file://";
 } // namespace
 
 ConcurrentMap<DataShareObserver *, ObserverImpl::ObserverParam> ObserverImpl::observers_;
+std::mutex ObserverImpl::observerMutex_;
 
 std::string DataShareHelper::TransferUriPrefix(const std::string &originPrefix, const std::string &replacedPrefix,
     const std::string &originUriStr)

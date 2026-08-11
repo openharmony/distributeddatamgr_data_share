@@ -16,6 +16,7 @@
 #define LOG_TAG "datashare_helper_impl"
 
 #include <cinttypes>
+#include <mutex>
 #include "datashare_helper_impl.h"
 
 #include "adaptor.h"
@@ -376,6 +377,7 @@ int DataShareHelperImpl::RegisterObserverExtProvider(const Uri &uri, std::shared
         LOG_ERROR("dataObserver is nullptr");
         return E_NULL_OBSERVER;
     }
+    std::lock_guard<std::mutex> lock(ObserverImpl::observerMutex_);
     sptr<ObserverImpl> obs = ObserverImpl::GetObserver(uri, dataObserver);
     if (obs == nullptr) {
         LOG_ERROR("new ObserverImpl failed");
@@ -411,6 +413,7 @@ int DataShareHelperImpl::UnregisterObserverExtProvider(const Uri &uri, std::shar
         LOG_ERROR("dataObserver is nullptr");
         return E_NULL_OBSERVER;
     }
+    std::lock_guard<std::mutex> lock(ObserverImpl::observerMutex_);
     if (!ObserverImpl::FindObserver(uri, dataObserver)) {
         LOG_ERROR("observer not exit!");
         return E_NULL_OBSERVER;
@@ -766,6 +769,7 @@ int TryRegisterObserverExtInner(const Uri &uri, std::shared_ptr<DataShareObserve
         return E_NULL_OBSERVER_CLIENT;
     }
 
+    std::lock_guard<std::mutex> lock(ObserverImpl::observerMutex_);
     sptr<ObserverImpl> obs = ObserverImpl::GetObserver(uri, dataObserver);
     if (obs == nullptr) {
         LOG_ERROR("new ObserverImpl failed");
@@ -807,6 +811,7 @@ int TryUnregisterObserverExtInner(const Uri &uri, std::shared_ptr<DataShareObser
         return E_NULL_OBSERVER_CLIENT;
     }
 
+    std::lock_guard<std::mutex> lock(ObserverImpl::observerMutex_);
     if (!ObserverImpl::FindObserver(uri, dataObserver)) {
         LOG_ERROR("observer not exit!");
         return E_NULL_OBSERVER;
