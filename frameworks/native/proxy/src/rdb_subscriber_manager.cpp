@@ -101,15 +101,13 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
             std::vector<std::string> lastDelUris;
             std::for_each(lastDelKeys.begin(), lastDelKeys.end(), [&lastDelUris, this](auto &result) {
                 lastDelUris.emplace_back(result);
+                lastChangeNodeMap_.Erase(key);
             });
             if (lastDelUris.empty()) {
                 return;
             }
             auto unsubResult = proxy->UnSubscribeRdbData(lastDelUris, templateId);
             opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
-            for (const auto &key : lastDelKeys) {
-                lastChangeNodeMap_.Erase(key);
-            }
         });
 }
 
@@ -126,8 +124,6 @@ std::vector<OperationResult> RdbSubscriberManager::DelObservers(void *subscriber
             for (const auto &key : lastDelKeys) {
                 auto unsubResult = proxy->UnSubscribeRdbData(std::vector<std::string>(1, key.uri_), key.templateId_);
                 opResult.insert(opResult.end(), unsubResult.begin(), unsubResult.end());
-            }
-            for (const auto &key : lastDelKeys) {
                 lastChangeNodeMap_.Erase(key);
             }
         });

@@ -430,8 +430,8 @@ std::vector<OperationResult> CallbacksManager<Key, Observer>::EnableObservers(
             }
             if (iterator->observer_ != nullptr) {
                 refreshObservers[key].emplace_back(iterator->observer_, iterator->isNotifyOnEnabled_);
+                iterator->enabled_ = true;
             }
-            iterator->enabled_ = true;
         }
     }
     enableServiceFunc(sendServiceKeys, result);
