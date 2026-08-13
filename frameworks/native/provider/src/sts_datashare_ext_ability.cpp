@@ -82,9 +82,14 @@ void StsDataShareExtAbility::Init(const std::shared_ptr<AbilityLocalRecord> &rec
     }
 
     auto env = stsRuntime_.GetAniEnv();
+    if (env == nullptr) {
+        LOG_ERROR("Failed to init ability, env is null");
+        return;
+    }
+
     auto context = GetContext();
-    if (env == nullptr || context == nullptr) {
-        LOG_ERROR("Failed to get env or context, moduleName:%{public}s.", moduleName.c_str());
+    if (context == nullptr) {
+        LOG_ERROR("Failed to get context, moduleName:%{public}s.", moduleName.c_str());
         return;
     }
 
@@ -137,11 +142,6 @@ void StsDataShareExtAbility::OnStart(const AAFwk::Want &want)
     }
     point->context = asyncContext;
     ani_object aniWant = WrapWant(env, want);
-    if (aniWant == nullptr) {
-        LOG_ERROR("WrapWant failed, aniWant is nullptr");
-        delete point;
-        return;
-    }
 
     call_arkts_on_create(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
         reinterpret_cast<int64_t>(aniWant), reinterpret_cast<int64_t>(point));
@@ -421,10 +421,6 @@ int StsDataShareExtAbility::BatchInsert(const Uri &uri, const std::vector<DataSh
 
 bool StsDataShareExtAbility::RegisterObserver(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &dataObserver)
 {
-    if (dataObserver == nullptr) {
-        LOG_ERROR("dataObserver is nullptr");
-        return false;
-    }
     DataShareExtAbility::RegisterObserver(uri, dataObserver);
     auto obsMgrClient = DataObsMgrClient::GetInstance();
     if (obsMgrClient == nullptr) {
@@ -535,7 +531,6 @@ Uri StsDataShareExtAbility::NormalizeUri(const Uri &uri)
     Uri normalizedUri = DataShareExtAbility::NormalizeUri(uri);
     call_arkts_normalize_uri(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
         rust::String(normalizedUri.ToString()), reinterpret_cast<int64_t>(point));
-    delete point;
     return normalizedUri;
 }
 
@@ -560,7 +555,6 @@ Uri StsDataShareExtAbility::DenormalizeUri(const Uri &uri)
     Uri denormalizedUri = DataShareExtAbility::DenormalizeUri(uri);
     call_arkts_denormalize_uri(reinterpret_cast<int64_t>(stsObj_->aniObj), reinterpret_cast<int64_t>(env),
         rust::String(denormalizedUri.ToString()), reinterpret_cast<int64_t>(point));
-    delete point;
     return denormalizedUri;
 }
 

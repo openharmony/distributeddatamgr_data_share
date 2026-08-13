@@ -52,14 +52,6 @@ int RdbObserverStub::ReadAshmem(RdbChangeNode &changeNode, const void **data, in
         LOG_ERROR("changeNode memory is nullptr.");
         return E_ERROR;
     }
-    if (size < 0) {
-        LOG_ERROR("invalid size: %{public}d", size);
-        return E_ERROR;
-    }
-    if (size > INT_MAX - offset) {
-        LOG_ERROR("offset overflow, offset: %{public}d, size: %{public}d", offset, size);
-        return E_ERROR;
-    }
     const void *read = changeNode.memory_->ReadFromAshmem(size, offset);
     if (read == nullptr) {
         LOG_ERROR("failed to read from ashmem.");
