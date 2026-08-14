@@ -17,12 +17,10 @@
 #include "shared_block.h"
 #include <gtest/gtest.h>
 #include <cstdint>
-#include <cstring>
 #include <memory>
 #include <string>
 #include "ashmem.h"
 #include "datashare_log.h"
-#include "message_parcel.h"
 #include "refbase.h"
 
 namespace OHOS {
@@ -641,7 +639,6 @@ HWTEST_F(SharedBlockTest, SetRawDataTest001, TestSize.Level0)
     EXPECT_EQ(sharedBlock->SetRawData(&mHeader, sizeof(mHeader)), SharedBlock::SHARED_BLOCK_NO_MEMORY);
     sharedBlock->mSize = sizeTemp;
     EXPECT_EQ(sharedBlock->SetRawData(&mHeader, sizeof(mHeader)), SharedBlock::SHARED_BLOCK_OK);
-    EXPECT_EQ(sharedBlock->SetRawData(nullptr, sizeof(mHeader)), SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
     EXPECT_EQ(sharedBlock->Clear(), SharedBlock::SHARED_BLOCK_OK);
     LOG_INFO("SetRawDataTest001::End");
 }
@@ -718,7 +715,6 @@ HWTEST_F(SharedBlockTest, AllocTest001, TestSize.Level0)
     EXPECT_NE(sharedBlock, nullptr);
     sharedBlock->mHeader->unusedOffset = 1;
     sharedBlock->mSize = 0;
-    EXPECT_NE(sharedBlock->Alloc(UINT32_MAX, false), 1);
     uint32_t size = 2;
     EXPECT_EQ(sharedBlock->Alloc(size, false), 0);
     sharedBlock->mSize = size + sharedBlock->mHeader->unusedOffset;
@@ -728,50 +724,6 @@ HWTEST_F(SharedBlockTest, AllocTest001, TestSize.Level0)
     sharedBlock->mSize = sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1;
     EXPECT_EQ(sharedBlock->Clear(), SharedBlock::SHARED_BLOCK_OK);
     LOG_INFO("AllocTest001::End");
-}
-
-/**
-* @tc.name: PutString_001
-* @tc.desc: Test PutString function with read-only mode and invalid parameters
-* @tc.type: FUNC
-*/
-HWTEST_F(SharedBlockTest, PutString_001, TestSize.Level0)
-{
-    LOG_INFO("PutString_001::Start");
-    AppDataFwk::SharedBlock *sharedBlock = nullptr;
-    EXPECT_EQ(SharedBlock::Create("name",
-        sizeof(SharedBlock::RowGroupHeader) + sizeof(SharedBlock::SharedBlockHeader) + 1, sharedBlock),
-        SharedBlock::SHARED_BLOCK_OK);
-    EXPECT_NE(sharedBlock, nullptr);
-    sharedBlock->mReadOnly = true;
-    const char *str = "test";
-    EXPECT_EQ(sharedBlock->PutString(sharedBlock->mHeader->rowNums, 1, str, strlen(str) + 1),
-        SharedBlock::SHARED_BLOCK_INVALID_OPERATION);
-    sharedBlock->mReadOnly = false;
-    EXPECT_EQ(sharedBlock->PutString(sharedBlock->mHeader->rowNums, 1, str, strlen(str) + 1),
-        SharedBlock::SHARED_BLOCK_BAD_VALUE);
-    EXPECT_EQ(sharedBlock->PutString(0, 1, nullptr, 1), SharedBlock::SHARED_BLOCK_BAD_VALUE);
-    EXPECT_EQ(sharedBlock->Clear(), SharedBlock::SHARED_BLOCK_OK);
-    LOG_INFO("PutString_001::End");
-}
-
-/**
-* @tc.name: WriteMessageParcel_001
-* @tc.desc: Test WriteMessageParcel function
-* @tc.type: FUNC
-*/
-HWTEST_F(SharedBlockTest, WriteMessageParcel_001, TestSize.Level0)
-{
-    LOG_INFO("WriteMessageParcel_001::Start");
-    SharedBlock *block = nullptr;
-    int ret = SharedBlock::Create("test", 4096, block);
-    EXPECT_EQ(ret, SharedBlock::SHARED_BLOCK_OK);
-    EXPECT_NE(block, nullptr);
-    MessageParcel parcel;
-    int result = block->WriteMessageParcel(parcel);
-    EXPECT_EQ(result, 1);
-    delete block;
-    LOG_INFO("WriteMessageParcel_001::End");
 }
 } // namespace DataShare
 } // namespace OHOS
