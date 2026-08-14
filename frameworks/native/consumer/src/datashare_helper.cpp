@@ -185,7 +185,7 @@ std::shared_ptr<DataShareHelper> DataShareHelper::CreateExtHelper(Uri &uri, cons
             DataShareStringUtils::Anonymous(uri.ToString()).c_str());
         return nullptr;
     }
-auto manager = DataShareManagerImpl::GetInstance();
+    auto manager = DataShareManagerImpl::GetInstance();
     if (manager == nullptr) {
         LOG_ERROR("Manager is nullptr");
         return nullptr;
