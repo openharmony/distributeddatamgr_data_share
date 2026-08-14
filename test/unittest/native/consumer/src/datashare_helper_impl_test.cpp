@@ -618,5 +618,6 @@ HWTEST_F(DataShareHelperImplTest, SetDataShareHelperExtUri_No_generalCtl_Test001
     DataShareHelperImplTest::GetInstance()->generalCtl_ = controller;
     LOG_INFO("SetDataShareHelperExtUri_No_generalCtl_Test001::End");
 }
+
 } // namespace DataShare
 } // namespace OHOS

@@ -40,8 +40,8 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    void OnAbilityConnectDone(const sptr<DataShare::DataShareConnection> &connection, const sptr<IRemoteObject> &token,
-       std::atomic<bool> &stop);
+    void OnAbilityConnectDone(const std::shared_ptr<DataShare::DataShareConnection> &connection,
+        const sptr<IRemoteObject> &token, std::atomic<bool> &stop);
     bool UrisEqual(std::list<Uri> uri1, std::list<Uri> uri2)
     {
         if (uri1.size() != uri2.size()) {
@@ -112,7 +112,7 @@ void DataShareConnectionTest::TearDownTestCase(void) {}
 void DataShareConnectionTest::SetUp(void) {}
 void DataShareConnectionTest::TearDown(void) {}
 
-void DataShareConnectionTest::OnAbilityConnectDone(const sptr<DataShare::DataShareConnection> &connection,
+void DataShareConnectionTest::OnAbilityConnectDone(const std::shared_ptr<DataShare::DataShareConnection> &connection,
     const sptr<IRemoteObject> &token, std::atomic<bool> &stop)
 {
     int i = 0;
@@ -162,8 +162,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_UpdateObserverExtsProvider
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
     sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
     ASSERT_NE(token, nullptr);
-    sptr<DataShare::DataShareConnection> connection =
-        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    std::shared_ptr<DataShare::DataShareConnection> connection =
+        std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
 
     // insert data
@@ -216,8 +216,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_DeleteObserverExtsProvider
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
     sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
     ASSERT_NE(token, nullptr);
-    sptr<DataShare::DataShareConnection> connection =
-        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    std::shared_ptr<DataShare::DataShareConnection> connection =
+        std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
 
     // insert data
@@ -275,8 +275,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ReRegisterObserverExtProvi
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
     sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
     ASSERT_NE(token, nullptr);
-    sptr<DataShare::DataShareConnection> connection =
-        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    std::shared_ptr<DataShare::DataShareConnection> connection =
+        std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
 
     // get proxy not null
@@ -325,8 +325,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ReRegisterObserverExtProvi
     Uri uri(DATA_SHARE_URI);
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
     sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
-    sptr<DataShare::DataShareConnection> connection =
-        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    std::shared_ptr<DataShare::DataShareConnection> connection =
+        std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
     connection->dataShareProxy_ = nullptr;
     // Add observers
@@ -371,8 +371,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityConnectDone_Test_
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
     sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
     ASSERT_NE(token, nullptr);
-    sptr<DataShare::DataShareConnection> connection =
-        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    std::shared_ptr<DataShare::DataShareConnection> connection =
+        std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
 
     // get proxy not null
@@ -435,8 +435,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityConnectDone_Test_
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
     sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
     ASSERT_NE(token, nullptr);
-    sptr<DataShare::DataShareConnection> connection =
-        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    std::shared_ptr<DataShare::DataShareConnection> connection =
+        std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
 
     // get proxy not null
@@ -497,8 +497,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityDisconnectDone_Te
     Uri uri(DATA_SHARE_URI);
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
     sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
-    sptr<DataShare::DataShareConnection> connection =
-        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    std::shared_ptr<DataShare::DataShareConnection> connection =
+        std::make_shared<DataShare::DataShareConnection>(uri, token);
  
     connection->isReconnect_.store(true);
     std::string deviceId = "deviceId";
@@ -537,8 +537,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ConcurrentOnAbilityConnect
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
     sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
     ASSERT_NE(token, nullptr);
-    sptr<DataShare::DataShareConnection> connection =
-        new (std::nothrow) DataShare::DataShareConnection(uri, token);
+    std::shared_ptr<DataShare::DataShareConnection> connection =
+        std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
 
     // get proxy not null
@@ -582,6 +582,224 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ConcurrentOnAbilityConnect
     t3.join();
     t4.join();
     LOG_INFO("DataShareConnection_ConcurrentOnAbilityConnectDone_Test_001::End");
+}
+
+/**
+ * @tc.name: DataShareConnectionCallback_OnConnectDone_TargetAlive_001
+ * @tc.desc: Verify DataShareConnectionCallback forwards OnAbilityConnectDone to the live target and updates
+ *           dataShareProxy_ on the connection.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+ *     1. A DataShareConnection can be instantiated via std::make_shared (shared ownership) so that
+ *        weak_from_this() yields a valid weak_ptr.
+ *     2. A DataShareConnectionCallback can be constructed with a weak_ptr<DataShareConnection> target.
+ * @tc.step:
+ *     1. Create a DataShareConnection with the test URI and a valid token, hold it via shared_ptr.
+ *     2. Construct a DataShareConnectionCallback bound to that weak_ptr target.
+ *     3. Invoke callback->OnAbilityConnectDone with a non-null remoteObject and resultCode=0.
+ *     4. Verify connection->dataShareProxy_ is now non-null.
+ * @tc.expect:
+ *     1. The callback forwards to DataShareConnection::OnAbilityConnectDone successfully.
+ *     2. dataShareProxy_ is populated after the callback returns.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnConnectDone_TargetAlive_001, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnectionCallback_OnConnectDone_TargetAlive_001::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+
+    sptr<DataShare::DataShareConnection::ConnectionCallback> callback =
+        new (std::nothrow) DataShare::DataShareConnection::ConnectionCallback(connection);
+    ASSERT_NE(callback, nullptr);
+
+    std::string deviceId = "deviceId";
+    std::string bundleName = "bundleName";
+    std::string abilityName = "abilityName";
+    AppExecFwk::ElementName element(deviceId, bundleName, abilityName);
+    callback->OnAbilityConnectDone(element, token, 0);
+
+    EXPECT_NE(connection->dataShareProxy_, nullptr);
+    connection.reset();
+    LOG_INFO("DataShareConnectionCallback_OnConnectDone_TargetAlive_001::End");
+}
+
+/**
+ * @tc.name: DataShareConnectionCallback_OnConnectDone_TargetExpired_002
+ * @tc.desc: Verify DataShareConnectionCallback::OnAbilityConnectDone does not crash when the target weak_ptr is
+ *           already expired (DataShareConnection destroyed).
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+ *     1. A DataShareConnectionCallback can be constructed with an empty weak_ptr.
+ * @tc.step:
+ *     1. Construct a DataShareConnectionCallback with an empty weak_ptr (target already gone).
+ *     2. Invoke callback->OnAbilityConnectDone with a non-null remoteObject and resultCode=0.
+ * @tc.expect:
+ *     1. No crash; the callback silently drops the event when target_ is expired.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnConnectDone_TargetExpired_002, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnectionCallback_OnConnectDone_TargetExpired_002::Start");
+    sptr<DataShare::DataShareConnection::ConnectionCallback> callback =
+        new (std::nothrow) DataShare::DataShareConnection::ConnectionCallback(
+            std::weak_ptr<DataShare::DataShareConnection>());
+    ASSERT_NE(callback, nullptr);
+
+    std::string deviceId = "deviceId";
+    std::string bundleName = "bundleName";
+    std::string abilityName = "abilityName";
+    AppExecFwk::ElementName element(deviceId, bundleName, abilityName);
+    callback->OnAbilityConnectDone(element, nullptr, 0);
+    LOG_INFO("DataShareConnectionCallback_OnConnectDone_TargetExpired_002::End");
+}
+
+/**
+ * @tc.name: DataShareConnectionCallback_OnDisconnectDone_TargetAlive_001
+ * @tc.desc: Verify DataShareConnectionCallback forwards OnAbilityDisconnectDone to the live target and the
+ *           connection tolerates the call (no crash).
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+ *     1. A DataShareConnection can be instantiated via std::make_shared.
+ * @tc.step:
+ *     1. Create a DataShareConnection with the test URI and a valid token, hold it via shared_ptr.
+ *     2. Construct a DataShareConnectionCallback bound to that weak_ptr target.
+ *     3. Pre-populate dataShareProxy_ so the connection has something to clear.
+ *     4. Invoke callback->OnAbilityDisconnectDone with resultCode=0.
+ * @tc.expect:
+ *     1. The callback forwards to DataShareConnection::OnAbilityDisconnectDone without crashing.
+ *     2. connection remains alive after the callback returns.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnDisconnectDone_TargetAlive_001, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnectionCallback_OnDisconnectDone_TargetAlive_001::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+
+    std::shared_ptr<DataShareProxy> tokenProxy = std::make_shared<DataShareProxy>(token);
+    ASSERT_NE(tokenProxy, nullptr);
+    connection->dataShareProxy_ = tokenProxy;
+
+    sptr<DataShare::DataShareConnection::ConnectionCallback> callback =
+        new (std::nothrow) DataShare::DataShareConnection::ConnectionCallback(connection);
+    ASSERT_NE(callback, nullptr);
+
+    std::string deviceId = "deviceId";
+    std::string bundleName = "bundleName";
+    std::string abilityName = "abilityName";
+    AppExecFwk::ElementName element(deviceId, bundleName, abilityName);
+    callback->OnAbilityDisconnectDone(element, 0);
+
+    EXPECT_NE(connection.get(), nullptr);
+    connection.reset();
+    LOG_INFO("DataShareConnectionCallback_OnDisconnectDone_TargetAlive_001::End");
+}
+
+/**
+ * @tc.name: DataShareConnectionCallback_OnDisconnectDone_TargetExpired_002
+ * @tc.desc: Verify DataShareConnectionCallback::OnAbilityDisconnectDone does not crash when the target
+ *           weak_ptr is already expired.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+ *     1. A DataShareConnectionCallback can be constructed with an empty weak_ptr.
+ * @tc.step:
+ *     1. Construct a DataShareConnectionCallback with an empty weak_ptr.
+ *     2. Invoke callback->OnAbilityDisconnectDone.
+ * @tc.expect:
+ *     1. No crash; the callback silently drops the event when target_ is expired.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnectionCallback_OnDisconnectDone_TargetExpired_002, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnectionCallback_OnDisconnectDone_TargetExpired_002::Start");
+    sptr<DataShare::DataShareConnection::ConnectionCallback> callback =
+        new (std::nothrow) DataShare::DataShareConnection::ConnectionCallback(
+            std::weak_ptr<DataShare::DataShareConnection>());
+    ASSERT_NE(callback, nullptr);
+
+    std::string deviceId = "deviceId";
+    std::string bundleName = "bundleName";
+    std::string abilityName = "abilityName";
+    AppExecFwk::ElementName element(deviceId, bundleName, abilityName);
+    callback->OnAbilityDisconnectDone(element, 0);
+    LOG_INFO("DataShareConnectionCallback_OnDisconnectDone_TargetExpired_002::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_Init_AllocatesCallback_001
+ * @tc.desc: Verify Init() allocates the DataShareConnectionCallback and stores it in the connection's
+ *           callback_ member.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+ *     1. A DataShareConnection can be instantiated via std::make_shared.
+ * @tc.step:
+ *     1. Create a DataShareConnection with the test URI and a valid token.
+ *     2. Verify connection->callback_ is nullptr before Init() is called.
+ *     3. Invoke connection->Init().
+ *     4. Verify connection->callback_ is non-null after Init().
+ * @tc.expect:
+ *     1. callback_ is nullptr before Init() is called.
+ *     2. After Init(), callback_ is non-null after Init().
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_Init_AllocatesCallback_001, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_Init_AllocatesCallback_001::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+
+    EXPECT_EQ(connection->callback_, nullptr);
+    EXPECT_TRUE(connection->Init());
+    EXPECT_NE(connection->callback_, nullptr);
+    connection.reset();
+    LOG_INFO("DataShareConnection_Init_AllocatesCallback_001::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_GetCallback_CachedOnSecondCall_002
+ * @tc.desc: Verify connection->callback_ returns the same underlying callback on subsequent reads.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+ *     1. A DataShareConnection can be instantiated via std::make_shared.
+ * @tc.step:
+ *     1. Create a DataShareConnection with the test URI and a valid token.
+ *     2. Invoke connection->Init() to allocate the callback.
+ *     3. Invoke connection->callback_ twice.
+ * @tc.expect:
+ *     1. Both calls return sptrs that compare equal (same underlying object).
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_GetCallback_CachedOnSecondCall_002, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_GetCallback_CachedOnSecondCall_002::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+    ASSERT_TRUE(connection->Init());
+
+    sptr<DataShare::DataShareConnection::ConnectionCallback> first = connection->callback_;
+    ASSERT_NE(first, nullptr);
+    sptr<DataShare::DataShareConnection::ConnectionCallback> second = connection->callback_;
+    ASSERT_NE(second, nullptr);
+    EXPECT_EQ(first, second);
+    connection.reset();
+    LOG_INFO("DataShareConnection_GetCallback_CachedOnSecondCall_002::End");
 }
 }
 }
