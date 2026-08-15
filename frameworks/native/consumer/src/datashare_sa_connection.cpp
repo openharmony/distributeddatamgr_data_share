@@ -175,7 +175,7 @@ sptr<IRemoteObject> DataShareSAConnection::ConnectToProvider(const Uri &uri,
         return nullptr;
     }
 
-    if (!ITypesUtil::Marshal(data, uri.ToString())) {
+    if (!ITypesUtil::Marshal(data, Str8ToStr16(uri.ToString()))) {
         LOG_ERROR("Write to message parcel failed!");
         return nullptr;
     }
