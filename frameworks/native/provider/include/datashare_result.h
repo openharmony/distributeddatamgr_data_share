@@ -40,13 +40,11 @@ public:
     ResultWrap() = default;
     bool GetRecvReply() const
     {
-        std::lock_guard<std::mutex> lock(asyncLock_);
         return isRecvReply_;
     }
 
     void GetResult(int &value)
     {
-        std::lock_guard<std::mutex> lock(asyncLock_);
         value = callbackResultNumber_;
     }
 
@@ -87,7 +85,6 @@ public:
     std::vector<std::string> callbackResultStringArr_ = {};
     mutable std::mutex asyncLock_;
     std::shared_ptr<DataShareResultSet> callbackResultObject_ = nullptr;
-    DatashareBusinessError businessError_;
     std::vector<BatchUpdateResult> updateResults_ = {};
 };
 
