@@ -83,8 +83,9 @@ public:
     int callbackResultNumber_ = -1;
     std::string callbackResultString_ = "";
     std::vector<std::string> callbackResultStringArr_ = {};
-    mutable std::mutex asyncLock_;
+    std::mutex asyncLock_;
     std::shared_ptr<DataShareResultSet> callbackResultObject_ = nullptr;
+    DatashareBusinessError businessError_;
     std::vector<BatchUpdateResult> updateResults_ = {};
 };
 
