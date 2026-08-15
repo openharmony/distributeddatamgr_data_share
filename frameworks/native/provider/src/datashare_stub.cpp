@@ -254,6 +254,9 @@ ErrCode DataShareStub::CmdOpenRawFile(MessageParcel &data, MessageParcel &reply)
     int fd = OpenRawFile(uri, mode);
     if (!ITypesUtil::Marshal(reply, fd)) {
         LOG_ERROR("Marshal value is nullptr");
+        if (fd >= 0) {
+            close(fd);
+        }
         return ERR_INVALID_VALUE;
     }
     return E_OK;
@@ -685,6 +688,10 @@ ErrCode DataShareStub::CmdInsertExt(MessageParcel &data, MessageParcel &reply)
     if (index == DEFAULT_NUMBER) {
         LOG_ERROR("Insert inner error");
         return ERR_INVALID_VALUE;
+    }
+    if (index == PERMISSION_ERROR_NUMBER) {
+        LOG_ERROR("InsertExt permission error");
+        return ERR_PERMISSION_DENIED;
     }
     if (!ITypesUtil::Marshal(reply, index, result)) {
         LOG_ERROR("fail to write result");
