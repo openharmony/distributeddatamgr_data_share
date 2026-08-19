@@ -616,7 +616,7 @@ private:
         order_ = "";
     }
     std::vector<OperationItem> operations_;
-    std::string whereClause_; // 仅客户端支持
+    std::string whereClause_;
     std::vector<std::string> whereArgs_;
     std::string order_;
     int16_t settingMode_ = {};
