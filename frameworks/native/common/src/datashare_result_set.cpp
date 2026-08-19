@@ -85,7 +85,8 @@ bool DataShareResultSet::OnGo(int startRowIndex, int targetRowIndex, int *cached
 {
     auto block = GetBlock();
     auto bridge = GetBridge();
-    if (bridge == nullptr || blockWriter_ == nullptr || block == nullptr) {
+    auto blockWriter = GetBlockWriter();
+    if (bridge == nullptr || blockWriter == nullptr || block == nullptr) {
         LOG_ERROR("bridge_ or blockWriter_ or sharedBlock_ is null!");
         return false;
     }
@@ -93,7 +94,7 @@ bool DataShareResultSet::OnGo(int startRowIndex, int targetRowIndex, int *cached
     GetAllColumnNames(columnNames);
     block->Clear();
     block->SetColumnNum(columnNames.size());
-    int result = bridge->OnGo(startRowIndex, targetRowIndex, *blockWriter_);
+    int result = bridge->OnGo(startRowIndex, targetRowIndex, *blockWriter);
     if (cachedIndex != nullptr) {
         *cachedIndex = result;
     }
@@ -124,6 +125,15 @@ std::shared_ptr<AppDataFwk::SharedBlock> DataShareResultSet::GetBlock()
 {
     std::shared_lock<std::shared_mutex> lock(mutex_);
     return sharedBlock_;
+}
+
+/**
+ * Get current block writer
+ */
+std::shared_ptr<DataShareBlockWriterImpl> DataShareResultSet::GetBlockWriter()
+{
+    std::shared_lock<std::shared_mutex> lock(mutex_);
+    return blockWriter_;
 }
 
 int DataShareResultSet::GetDataType(int columnIndex, DataType &dataType)

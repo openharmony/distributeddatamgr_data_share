@@ -163,6 +163,7 @@ public:
     bool HasBlock();
 
     std::shared_ptr<ResultSetBridge> GetBridge();
+    std::shared_ptr<DataShareBlockWriterImpl> GetBlockWriter();
 
     static bool Marshal(const std::shared_ptr<DataShareResultSet> resultSet, MessageParcel &parcel);
 
