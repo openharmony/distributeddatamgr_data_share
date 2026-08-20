@@ -112,6 +112,7 @@ private:
     ErrCode Disconnect();
     void ReconnectExtAbility(const std::string &uri);
     void DelayConnectExtAbility(const std::string &uri);
+    void DoReconnectTask(const std::string &uri);
     void ReRegisterObserverExtProvider();
     std::mutex mutex_{};
     std::shared_ptr<DataShareProxy> dataShareProxy_;

@@ -164,19 +164,7 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
             if (selfSharedPtr == nullptr || selfSharedPtr->isInvalid_.load()) {
                 return;
             }
-            AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
-            if (instance == nullptr) {
-                LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri).c_str());
-                return;
-            }
-            ErrCode ret = instance->Connect(uri, selfSharedPtr->callback_, selfSharedPtr->token_);
-            LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d",
-                DataShareStringUtils::Change(uri).c_str(), ret);
-            if (ret == E_OK) {
-                selfSharedPtr->reConnects_.count.fetch_add(1);
-                selfSharedPtr->reConnects_.prevTime.store(std::chrono::duration_cast<std::chrono::milliseconds>(
-                    std::chrono::system_clock::now().time_since_epoch()).count());
-            }
+            selfSharedPtr->DoReconnectTask(uri);
         });
         if (reconnectTaskId_ == ExecutorPool::INVALID_TASK_ID) {
             LOG_ERROR("create scheduler failed, over the max capacity");
@@ -185,6 +173,23 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
     }
     LOG_DEBUG("create scheduler success");
     return;
+}
+
+void DataShareConnection::DoReconnectTask(const std::string &uri)
+{
+    AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
+    if (instance == nullptr) {
+        LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri).c_str());
+        return;
+    }
+    ErrCode ret = instance->Connect(uri, callback_, token_);
+    LOG_INFO("reconnect ability, uri:%{public}s, ret = %{public}d",
+        DataShareStringUtils::Change(uri).c_str(), ret);
+    if (ret == E_OK) {
+        reConnects_.count.fetch_add(1);
+        reConnects_.prevTime.store(std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count());
+    }
 }
 
 // store observer when it was successfully registered
