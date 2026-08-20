@@ -20,7 +20,6 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
-#include <vector>
 
 #include "ability_connect_callback_stub.h"
 #include "data_ability_observer_interface.h"
@@ -128,7 +127,7 @@ private:
     static constexpr std::chrono::milliseconds MAX_RECONNECT_TIME_INTERVAL = std::chrono::milliseconds(70000);
     std::shared_ptr<ExecutorPool> pool_;
     DataShareConnectionInfo reConnects_;
-    std::vector<ExecutorPool::TaskId> reconnectTaskIds_;
+    ExecutorPool::TaskId reconnectTaskId_ = ExecutorPool::INVALID_TASK_ID;
     struct Param {
         Param(const Uri &uri, bool isDescendants) : uri(uri), isDescendants(isDescendants){};
         Uri uri;

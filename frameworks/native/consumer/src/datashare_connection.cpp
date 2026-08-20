@@ -150,7 +150,15 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
         delay = std::chrono::seconds(0);
     }
     std::weak_ptr<DataShareConnection> self = weak_from_this();
-    auto taskid = pool_->Schedule(delay, [uri, self]() {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pool_ == nullptr) {
+        return;
+    }
+    if (reconnectTaskId_ != ExecutorPool::INVALID_TASK_ID) {
+        pool_->Remove(reconnectTaskId_);
+        reconnectTaskId_ = ExecutorPool::INVALID_TASK_ID;
+    }
+    reconnectTaskId_ = pool_->Schedule(delay, [uri, self]() {
         auto selfSharedPtr = self.lock();
         if (selfSharedPtr == nullptr || selfSharedPtr->isInvalid_.load()) {
             return;
@@ -169,13 +177,9 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
                 std::chrono::system_clock::now().time_since_epoch()).count());
         }
     });
-    if (taskid == ExecutorPool::INVALID_TASK_ID) {
+    if (reconnectTaskId_ == ExecutorPool::INVALID_TASK_ID) {
         LOG_ERROR("create scheduler failed, over the max capacity");
         return;
-    }
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        reconnectTaskIds_.emplace_back(taskid);
     }
     LOG_DEBUG("create scheduler success");
     return;
@@ -307,16 +311,17 @@ void DataShareConnection::DisconnectDataShareExtAbility()
 DataShareConnection::~DataShareConnection()
 {
     SetConnectInvalid();
-    DisconnectDataShareExtAbility();
     {
         std::lock_guard<std::mutex> lock(mutex_);
         if (pool_ != nullptr) {
-            for (const auto &taskId : reconnectTaskIds_) {
-                pool_->Remove(taskId);
+            if (reconnectTaskId_ != INVALID_TASK_ID) {
+                pool_->Remove(reconnectTaskId_);
+                reconnectTaskId_ = ExecutorPool::INVALID_TASK_ID;
             }
-            reconnectTaskIds_.clear();
+            pool_ = nullptr;
         }
     }
+    DisconnectDataShareExtAbility();
 }
 
 bool DataShareConnection::Init()
