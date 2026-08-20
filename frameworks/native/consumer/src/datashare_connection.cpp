@@ -42,9 +42,7 @@ const std::chrono::milliseconds TIME_THRESHOLD = std::chrono::milliseconds(200);
 void DataShareConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    LOG_INFO("req uri:%{public}s, rev uri:%{public}s, ret=%{public}d",
-        DataShareStringUtils::Change(uri_.ToString()).c_str(),
-        DataShareStringUtils::Change(element.GetURI()).c_str(), resultCode);
+    LOG_INFO("rev uri:%{public}s, ret=%{public}d", DataShareStringUtils::Change(element.GetURI()).c_str(), resultCode);
     if (remoteObject == nullptr) {
         LOG_ERROR("remote is nullptr");
         condition_.condition.notify_all();
@@ -62,8 +60,7 @@ void DataShareConnection::OnAbilityConnectDone(
         condition_.condition.notify_all();
     }
     if (isInvalid_.load()) {
-        LOG_ERROR("connect is invalid, req uri:%{public}s, rev uri:%{public}s, ret=%{public}d",
-            DataShareStringUtils::Change(uri_.ToString()).c_str(),
+        LOG_ERROR("connect is invalid, rev uri:%{public}s, ret=%{public}d",
             DataShareStringUtils::Change(element.GetURI()).c_str(), resultCode);
         Disconnect();
         // when inInvalid is true, it means that this connection has been disconnected and does not need to be
@@ -90,9 +87,7 @@ void DataShareConnection::OnAbilityConnectDone(
  */
 void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    LOG_INFO("req uri:%{public}s, rev uri:%{public}s, ret=%{public}d",
-        DataShareStringUtils::Change(uri_.ToString()).c_str(),
-        DataShareStringUtils::Change(element.GetURI()).c_str(), resultCode);
+    LOG_INFO("rev uri:%{public}s, ret=%{public}d", DataShareStringUtils::Change(element.GetURI()).c_str(), resultCode);
     std::string uri;
     {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -116,7 +111,7 @@ void DataShareConnection::ReconnectExtAbility(const std::string &uri)
     if (reConnects_.count.load() == 0) {
         AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
         if (instance == nullptr) {
-            LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri_.ToString()).c_str());
+            LOG_ERROR("get proxy failed uri:%{public}s", DataShareStringUtils::Change(uri).c_str());
             return;
         }
     ErrCode ret = instance->Connect(uri, callback_, token_);
