@@ -150,17 +150,9 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
         delay = std::chrono::seconds(0);
     }
     std::weak_ptr<DataShareConnection> self = weak_from_this();
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (pool_ == nullptr) {
-        return;
-    }
-    if (reconnectTaskId_ != ExecutorPool::INVALID_TASK_ID) {
-        pool_->Remove(reconnectTaskId_);
-        reconnectTaskId_ = ExecutorPool::INVALID_TASK_ID;
-    }
-    reconnectTaskId_ = pool_->Schedule(delay, [uri, self]() {
+    auto taskid = pool_->Schedule(delay, [uri, self]() {
         auto selfSharedPtr = self.lock();
-        if (selfSharedPtr == nullptr || selfSharedPtr->isInvalid_.load()) {
+        if (selfSharedPtr == nullptr) {
             return;
         }
         AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
@@ -177,7 +169,7 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
                 std::chrono::system_clock::now().time_since_epoch()).count());
         }
     });
-    if (reconnectTaskId_ == ExecutorPool::INVALID_TASK_ID) {
+    if (taskid == ExecutorPool::INVALID_TASK_ID) {
         LOG_ERROR("create scheduler failed, over the max capacity");
         return;
     }
@@ -311,16 +303,6 @@ void DataShareConnection::DisconnectDataShareExtAbility()
 DataShareConnection::~DataShareConnection()
 {
     SetConnectInvalid();
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (pool_ != nullptr) {
-            if (reconnectTaskId_ != INVALID_TASK_ID) {
-                pool_->Remove(reconnectTaskId_);
-                reconnectTaskId_ = ExecutorPool::INVALID_TASK_ID;
-            }
-            pool_ = nullptr;
-        }
-    }
     DisconnectDataShareExtAbility();
 }
 
