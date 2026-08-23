@@ -167,7 +167,7 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
             selfSharedPtr->DoReconnectTask(uri);
         });
         if (reconnectTaskId_ == ExecutorPool::INVALID_TASK_ID) {
-            LOG_ERROR("create scheduler failed, over the max capacity");
+            LOG_ERROR("create scheduler failed");
             return;
         }
     }
