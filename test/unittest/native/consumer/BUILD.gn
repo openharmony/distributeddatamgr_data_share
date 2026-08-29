@@ -340,8 +340,10 @@ ohos_unittest("DataShareConnectionTest") {
     "${datashare_native_proxy_path}/include",
   ]
  
-  sources =
-      [ "${datashare_base_path}/test/unittest/native/consumer/src/datashare_connection_test.cpp" ]
+  sources = [
+    "${datashare_base_path}/test/unittest/native/consumer/src/datashare_connection_test.cpp",
+    "${datashare_base_path}/test/unittest/native/consumer/src/ams_mgr_proxy_mock.cpp",
+  ]
  
   deps = [
     "${datashare_innerapi_path}:datashare_consumer_static",
