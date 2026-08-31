@@ -19,6 +19,7 @@
 
 #include <gtest/gtest.h>
 
+#include "ams_mgr_proxy.h"
 #include "accesstoken_kit.h"
 #include "data_ability_observer_interface.h"
 #include "datashare_errno.h"
@@ -29,7 +30,6 @@
 #include "general_controller.h"
 #include "general_controller_provider_impl.h"
 #include "general_controller_service_impl.h"
-#include "ams_mgr_proxy_mock.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -103,6 +103,102 @@ public:
     }
     std::string uri_;
 };
+
+class AmsMgrProxyMock : public AmsMgrProxy {
+public:
+    explicit AmsMgrProxyMock() {}
+    ~AmsMgrProxyMock() {}
+
+    int Connect(const std::string &uri, const sptr<IRemoteObject> &connect,
+        const sptr<IRemoteObject> &callerToken)
+    {
+        (void)uri;
+        (void)connect;
+        (void)callerToken;
+        connectCount_++;
+        return connectResult_;
+    }
+    int DisConnect(sptr<IRemoteObject> connect)
+    {
+        (void)connect;
+        disConnectCount_++;
+        return 0;
+    }
+
+    static AmsMgrProxyMock* GetInstance()
+    {
+        if (GetInstanceNull()) {
+            return nullptr;
+        }
+        return GetSingleton();
+    }
+    static void SetConnectResult(int result)
+    {
+        GetSingleton()->connectResult_ = result;
+    }
+    static int GetConnectCount()
+    {
+        return GetSingleton()->connectCount_;
+    }
+    static int GetDisConnectCount()
+    {
+        return GetSingleton()->disConnectCount_;
+    }
+    static void SetGetInstanceNull(bool isNull)
+    {
+        GetInstanceNull() = isNull;
+    }
+    static void Reset()
+    {
+        AmsMgrProxyMock* instance = GetSingleton();
+        instance->connectCount_ = 0;
+        instance->disConnectCount_ = 0;
+        instance->connectResult_ = 0;
+        GetInstanceNull() = false;
+    }
+
+private:
+    static AmsMgrProxyMock* GetSingleton()
+    {
+        static AmsMgrProxyMock instance;
+        return &instance;
+    }
+    static bool& GetInstanceNull()
+    {
+        static bool isNull = false;
+        return isNull;
+    }
+
+    int connectCount_ = 0;
+    int disConnectCount_ = 0;
+    int connectResult_ = 0;
+};
+
+inline AmsMgrProxy::~AmsMgrProxy() {}
+
+inline AmsMgrProxy* AmsMgrProxy::GetInstance()
+{
+    return AmsMgrProxyMock::GetInstance();
+}
+
+inline int AmsMgrProxy::Connect(const std::string &uri, const sptr<IRemoteObject> &connect,
+    const sptr<IRemoteObject> &callerToken)
+{
+    AmsMgrProxyMock* mock = AmsMgrProxyMock::GetInstance();
+    if (mock == nullptr) {
+        return -1;
+    }
+    return mock->Connect(uri, connect, callerToken);
+}
+
+inline int AmsMgrProxy::DisConnect(sptr<IRemoteObject> connect)
+{
+    AmsMgrProxyMock* mock = AmsMgrProxyMock::GetInstance();
+    if (mock == nullptr) {
+        return -1;
+    }
+    return mock->DisConnect(connect);
+}
 
 std::string DATA_SHARE_URI = "datashare:///com.acts.datasharetest";
 std::string DATA_SHARE_URI1 = "datashare:///com.acts.datasharetest1";
@@ -828,8 +924,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_GetCallback_CachedOnSecond
 HWTEST_F(DataShareConnectionTest, DataShareConnection_ConnectTimeout_CallbackDisconnect_001, TestSize.Level0)
 {
     LOG_INFO("DataShareConnection_ConnectTimeout_CallbackDisconnect_001::Start");
-    AmsMgrProxyMockReset();
-    AmsMgrProxyMockSetConnectResult(E_OK);
+    AmsMgrProxyMock::Reset();
+    AmsMgrProxyMock::SetConnectResult(E_OK);
 
     Uri uri(DATA_SHARE_URI);
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
@@ -842,7 +938,7 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ConnectTimeout_CallbackDis
 
     std::shared_ptr<DataShareProxy> proxy = connection->ConnectDataShareExtAbility(uri, token);
     EXPECT_EQ(proxy, nullptr);
-    EXPECT_GE(AmsMgrProxyMockGetConnectCount(), 1);
+    EXPECT_GE(AmsMgrProxyMock::GetConnectCount(), 1);
 
     sptr<DataShare::DataShareConnection::ConnectionCallback> callback = connection->callback_;
     ASSERT_NE(callback, nullptr);
@@ -854,7 +950,7 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ConnectTimeout_CallbackDis
     AppExecFwk::ElementName element(deviceId, bundleName, abilityName);
     callback->OnAbilityConnectDone(element, token, 0);
 
-    EXPECT_EQ(AmsMgrProxyMockGetDisConnectCount(), 1);
+    EXPECT_EQ(AmsMgrProxyMock::GetDisConnectCount(), 1);
     LOG_INFO("DataShareConnection_ConnectTimeout_CallbackDisconnect_001::End");
 }
 
@@ -877,7 +973,7 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ConnectTimeout_CallbackDis
 HWTEST_F(DataShareConnectionTest, DataShareConnection_ConnectSuccess_CallbackNoDisconnect_002, TestSize.Level0)
 {
     LOG_INFO("DataShareConnection_ConnectSuccess_CallbackNoDisconnect_002::Start");
-    AmsMgrProxyMockReset();
+    AmsMgrProxyMock::Reset();
 
     Uri uri(DATA_SHARE_URI);
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
@@ -895,7 +991,7 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ConnectSuccess_CallbackNoD
     connection->OnAbilityConnectDone(element, token, 0);
 
     EXPECT_NE(connection->dataShareProxy_, nullptr);
-    EXPECT_EQ(AmsMgrProxyMockGetDisConnectCount(), 0);
+    EXPECT_EQ(AmsMgrProxyMock::GetDisConnectCount(), 0);
     LOG_INFO("DataShareConnection_ConnectSuccess_CallbackNoDisconnect_002::End");
 }
 
@@ -917,8 +1013,8 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ConnectSuccess_CallbackNoD
 HWTEST_F(DataShareConnectionTest, DataShareConnection_ConnectGetInstanceNull_003, TestSize.Level0)
 {
     LOG_INFO("DataShareConnection_ConnectGetInstanceNull_003::Start");
-    AmsMgrProxyMockReset();
-    AmsMgrProxyMockSetGetInstanceNull(true);
+    AmsMgrProxyMock::Reset();
+    AmsMgrProxyMock::SetGetInstanceNull(true);
 
     Uri uri(DATA_SHARE_URI);
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
@@ -931,7 +1027,7 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ConnectGetInstanceNull_003
 
     std::shared_ptr<DataShareProxy> proxy = connection->ConnectDataShareExtAbility(uri, token);
     EXPECT_EQ(proxy, nullptr);
-    EXPECT_EQ(AmsMgrProxyMockGetConnectCount(), 0);
+    EXPECT_EQ(AmsMgrProxyMock::GetConnectCount(), 0);
     LOG_INFO("DataShareConnection_ConnectGetInstanceNull_003::End");
 }
 }

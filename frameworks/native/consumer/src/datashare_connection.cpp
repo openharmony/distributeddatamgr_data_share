@@ -323,8 +323,8 @@ void DataShareConnection::ConnectionCallback::OnAbilityConnectDone(
         LOG_WARN("DataShareConnection target is gone before OnAbilityConnectDone");
         AmsMgrProxy* instance = AmsMgrProxy::GetInstance();
         if (instance != nullptr) {
-            int ret = instance->DisConnect(this);
-            LOG_INFO("disconnect after target gone, uri:%{public}s, ret:%{public}d",
+            ErrCode ret = instance->DisConnect(this);
+            LOG_INFO("disconnect abandoned connection, uri:%{public}s, ret = %{public}d",
                 DataShareStringUtils::Change(element.GetURI()).c_str(), ret);
         }
         return;
