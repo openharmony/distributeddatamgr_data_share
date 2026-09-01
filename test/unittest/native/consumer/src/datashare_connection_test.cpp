@@ -19,8 +19,8 @@
 
 #include <gtest/gtest.h>
 
-#include "ams_mgr_proxy.h"
 #include "accesstoken_kit.h"
+#include "ams_mgr_proxy.h"
 #include "data_ability_observer_interface.h"
 #include "datashare_errno.h"
 #include "datashare_helper.h"
