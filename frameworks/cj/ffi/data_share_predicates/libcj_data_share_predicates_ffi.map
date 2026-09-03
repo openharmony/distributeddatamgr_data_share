@@ -16,6 +16,9 @@
     extern "C" {
       Ffi*;
     };
+    extern "C++" {
+      OHOS::DataShare::DataSharePredicatesImpl::*;
+    };
   local:
     *;
 };
