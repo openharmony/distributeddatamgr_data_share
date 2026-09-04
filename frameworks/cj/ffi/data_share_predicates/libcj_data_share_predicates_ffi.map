@@ -15,7 +15,10 @@
   global:
     extern "C" {
       Ffi*;
-    }; 
+    };
+    extern "C++" {
+      OHOS::DataShare::DataSharePredicatesImpl::GetPredicates*;
+    };
   local:
     *;
 };
