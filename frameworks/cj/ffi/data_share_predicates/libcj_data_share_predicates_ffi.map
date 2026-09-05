@@ -17,7 +17,7 @@
       Ffi*;
     };
     extern "C++" {
-      OHOS::DataShare::DataSharePredicatesImpl::GetPredicates*;
+      "OHOS::DataShare::DataSharePredicatesImpl::GetPredicates()";
     };
   local:
     *;
