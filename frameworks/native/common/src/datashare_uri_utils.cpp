@@ -16,6 +16,7 @@
 
 #include "datashare_uri_utils.h"
 
+#include <charconv>
 #include <string>
 
 #include "log_print.h"
@@ -35,14 +36,14 @@ std::string DataShareURIUtils::FormatUri(const std::string &uri)
 
 std::pair<bool, uint32_t> DataShareURIUtils::Strtoul(const std::string &str)
 {
-    unsigned long data = 0;
+    uint32_t data = 0;
     if (str.empty()) {
         return std::make_pair(false, data);
     }
-    char* end = nullptr;
-    errno = 0;
-    data = strtoul(str.c_str(), &end, BASE_TEN);
-    if (errno == ERANGE || end == nullptr || end == str || *end != '\0') {
+    const char *begin = str.data();
+    const char *end = begin + str.size();
+    auto parsed = std::from_chars(begin, end, data, BASE_TEN);
+    if (parsed.ec != std::errc{} || parsed.ptr != end) {
         return std::make_pair(false, data);
     }
     return std::make_pair(true, data);
