@@ -619,6 +619,8 @@ napi_value NapiDataProxyHandle::Napi_UnSubscribeProxyData(napi_env env, size_t a
             results = proxy->jsProxyDataObsManager_->DelObservers(env, argv[PARAM3], uris);
         } else {
             results = proxy->jsProxyDataObsManager_->DelObservers(env, nullptr, uris);
+            std::string offType = DataShareJSUtils::Convert2String(env, argv[PARAM0]);
+            LOG_INFO("Delete callback op = off_all, kit = ArkData, type: %{public}s", offType.c_str());
         }
         return DataShareJSUtils::Convert2JSValue(env, results);
     }
