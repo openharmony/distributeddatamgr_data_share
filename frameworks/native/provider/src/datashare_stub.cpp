@@ -18,7 +18,7 @@
 #include "datashare_stub.h"
 
 #include <cinttypes>
-#include <stdio.h>
+#include <cstdio>
 
 #include "accesstoken_kit.h"
 #include "data_ability_observer_interface.h"
