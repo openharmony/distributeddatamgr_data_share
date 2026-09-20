@@ -100,7 +100,7 @@ void SlientSwitchTest::SetUpTestCase(void)
     sleep(sleepTime);
 
     HapInfoParams info = {
-        .userID = 100,
+        .userID = 0,
         .bundleName = "com.acts.datasharetest",
         .instIndex = 0,
         .isSystemApp = true,
