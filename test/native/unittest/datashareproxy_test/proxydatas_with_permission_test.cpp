@@ -32,7 +32,7 @@ namespace OHOS {
 namespace DataShare {
 using namespace testing::ext;
 using namespace OHOS::Security::AccessToken;
-std::string DATA_SHARE_PROXY_URI = "datashareproxy://com.acts.ohos.data.datasharetest/test?user=100";
+std::string DATA_SHARE_PROXY_URI = "datashareproxy://com.acts.ohos.data.datasharetest/test";
 std::shared_ptr<DataShare::DataShareHelper> dataShareHelper;
 std::shared_ptr<DataShare::DataShareHelper> dataShareHelper2;  // for another subscriber
 std::string TBL_NAME0 = "name0";
@@ -382,7 +382,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_004, TestSize.Level1)
     DataShareOption option;
     option.timeout = 1; // 1 is the query timeout time.
     std::atomic<int> count(0);
-    int threadNum = 10;
+    int threadNum = 10; // 10 is the number of threads.
     std::thread threads[threadNum];
     for (int i = 0; i < threadNum; ++i) {
         threads[i] = std::thread([&helper, &uri, &predicates, &columns, &option, &count]() {
@@ -622,7 +622,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_002, TestSize.Level1)
     nodes.emplace_back(node2);
     Template tpl(nodes, "select name1 as name from TBL00");
 
-    std::string errorUri = "datashareproxy://com.acts.ohos.data.datasharetest?user=100";
+    std::string errorUri = "datashareproxy://com.acts.ohos.data.datasharetest";
     auto result = helper->AddQueryTemplate(errorUri, SUBSCRIBER_ID, tpl);
     EXPECT_EQ(result, E_URI_NOT_EXIST);
     result = helper->DelQueryTemplate(errorUri, SUBSCRIBER_ID);
@@ -696,7 +696,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_003, TestSize.Level1)
     EXPECT_NE(resultSet, nullptr);
     int queryResult = 0;
     resultSet->GetRowCount(queryResult);
-    EXPECT_EQ(queryResult, 0);
+    EXPECT_EQ(queryResult, 1);
 
     std::vector<OperationResult> results2 = helper->UnsubscribeRdbData(uris, tplId);
     EXPECT_EQ(results2.size(), uris.size());
@@ -823,9 +823,10 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Template_Test_006, TestSize.Level1)
     nodes.emplace_back(node2);
     Template tpl(nodes, "select name1 as name from TBL00");
 
-    auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
+    std::string uri = DATA_SHARE_PROXY_URI + "?user=100";
+    auto result = helper->AddQueryTemplate(uri, SUBSCRIBER_ID, tpl);
     EXPECT_EQ(result, E_OK);
-    result = helper->DelQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID);
+    result = helper->DelQueryTemplate(uri, SUBSCRIBER_ID);
     EXPECT_EQ(result, E_OK);
     LOG_INFO("ProxyDatasTest_Template_Test_006::End");
 }
@@ -860,7 +861,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level1)
     auto helper = dataShareHelper;
     std::string bundleName = "com.acts.ohos.data.datasharetest";
     Data data;
-    data.datas_.emplace_back(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, "value1");
+    data.datas_.emplace_back("datashareproxy://com.acts.ohos.data.datasharetest/test", SUBSCRIBER_ID, "value1");
     std::vector<OperationResult> results = helper->Publish(data, bundleName);
     EXPECT_EQ(results.size(), data.datas_.size());
     for (auto const &result : results) {
@@ -869,8 +870,8 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_001, TestSize.Level1)
 
     int errCode = 0;
     auto getData = helper->GetPublishedData(bundleName, errCode);
-    EXPECT_EQ(errCode, 1049);
-    EXPECT_NE(getData.datas_.size(), data.datas_.size());
+    EXPECT_EQ(errCode, 0);
+    EXPECT_EQ(getData.datas_.size(), data.datas_.size());
     for (auto &publishedDataItem : getData.datas_) {
         EXPECT_EQ(publishedDataItem.subscriberId_, SUBSCRIBER_ID);
         bool isString = publishedDataItem.IsString();
@@ -952,7 +953,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_003, TestSize.Level1)
     auto helper = dataShareHelper;
     Data data;
     std::vector<uint8_t> buffer= {10, 20, 30};
-    data.datas_.emplace_back(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, buffer);
+    data.datas_.emplace_back("datashareproxy://com.acts.ohos.data.datasharetest/test", SUBSCRIBER_ID, buffer);
     std::string bundleName = "com.acts.ohos.data.datasharetest";
     std::vector<OperationResult> results = helper->Publish(data, bundleName);
     EXPECT_EQ(results.size(), data.datas_.size());
@@ -962,8 +963,8 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_Publish_Test_003, TestSize.Level1)
 
     int errCode = 0;
     auto getData = helper->GetPublishedData(bundleName, errCode);
-    EXPECT_EQ(errCode, 1049);
-    EXPECT_NE(getData.datas_.size(), data.datas_.size());
+    EXPECT_EQ(errCode, 0);
+    EXPECT_EQ(getData.datas_.size(), data.datas_.size());
     for (auto &publishedDataItem : getData.datas_) {
         EXPECT_EQ(publishedDataItem.subscriberId_, SUBSCRIBER_ID);
         bool isAshmem = publishedDataItem.IsAshmem();
@@ -1020,7 +1021,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Le
     tplId.bundleName_ = "ohos.datashareproxyclienttest.demo";
     std::vector<OperationResult> results1 =
         helper->SubscribeRdbData(uris, tplId, [&tplId](const RdbChangeNode &changeNode) {
-            EXPECT_EQ(changeNode.uri_, "datashareproxy://com.acts.ohos.data.datasharetest/test");
+            EXPECT_EQ(changeNode.uri_, DATA_SHARE_PROXY_URI);
             EXPECT_EQ(changeNode.templateId_.bundleName_, tplId.bundleName_);
             EXPECT_EQ(changeNode.templateId_.subscriberId_, tplId.subscriberId_);
             g_callbackTimes++;
@@ -1041,7 +1042,12 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Le
     valuesBucket1.Put(TBL_NAME1, name1);
     int retVal1 = helper->Insert(uri, valuesBucket1);
     EXPECT_EQ((retVal1 > 0), true);
-    EXPECT_EQ(g_callbackTimes, 1);
+    int waitCount = 0;
+    while (g_callbackTimes < 2 && waitCount < 100) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        waitCount++;
+    }
+    EXPECT_EQ(g_callbackTimes, 2);
     std::vector<OperationResult> results4 = helper->UnsubscribeRdbData(uris, tplId);
     EXPECT_EQ(results4.size(), uris.size());
     for (auto const &operationResult : results4) {
@@ -1050,7 +1056,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Le
     valuesBucket2.Put(TBL_NAME1, name2);
     int retVal2 = helper->Insert(uri, valuesBucket2);
     EXPECT_EQ((retVal2 > 0), true);
-    EXPECT_EQ(g_callbackTimes, 1);
+    EXPECT_EQ(g_callbackTimes, 2);
     LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_001::End");
 }
 
@@ -1131,7 +1137,7 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_002, TestSize.Le
     for (auto const &result : results) EXPECT_EQ(result.errCode_, 0);
     results = helper->EnableRdbSubs(uris, tplId);
     for (auto const &result : results) EXPECT_EQ(result.errCode_, 0);
-    EXPECT_EQ(callbackTimes, 1);
+    EXPECT_EQ(callbackTimes, 2);
     helper->UnsubscribeRdbData(uris, tplId);
     helper2->UnsubscribeRdbData(uris, tplId);
 }
