@@ -381,17 +381,24 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_QueryTimeout_Test_004, TestSize.Level1)
     std::vector<string> columns;
     DataShareOption option;
     option.timeout = 1; // 1 is the query timeout time.
-    int count = 0;
-    int queryTimes = 10; // 10 is the number of times the query is executed.
-    for (int i = 0; i < queryTimes; i++) {
-        DatashareBusinessError businessError;
-        auto resultSet = helper->Query(uri, predicates, columns, option, &businessError);
-        if (businessError.GetCode() == E_TIMEOUT_ERROR) {
-            count++;
-        }
+    std::atomic<int> count(0);
+    int threadNum = 10; // 10 is the number of threads.
+    std::thread threads[threadNum];
+    for (int i = 0; i < threadNum; ++i) {
+        threads[i] = std::thread([&helper, &uri, &predicates, &columns, &option, &count]() {
+            DatashareBusinessError businessError;
+            auto resultSet = helper->Query(uri, predicates, columns, option, &businessError);
+            if (businessError.GetCode() == E_TIMEOUT_ERROR) {
+                count++;
+            }
+        });
     }
-    LOG_INFO("ProxyDatasTest_QueryTimeout_Test_004 Query Timeout %{public}d times", count);
-    EXPECT_TRUE(count > 0);
+    for (int i = 0; i < threadNum; ++i) {
+        threads[i].join();
+    }
+
+    LOG_INFO("QueryTimeout_Test_004 Query Timeout %{public}d times", count.load());
+    EXPECT_TRUE(count.load() > 0);
     DataShare::DataSharePredicates delPredicates;
     delPredicates.EqualTo(TBL_NAME1, name);
     retVal = helper->Delete(uri, delPredicates);
@@ -1002,13 +1009,11 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Le
     LOG_INFO("ProxyDatasTest_CombinationRdbData_Test_001::Start");
     auto helper = dataShareHelper;
     PredicateTemplateNode node("p1", "select name0 as name from TBL00");
-    std::vector<PredicateTemplateNode> nodes;
-    nodes.emplace_back(node);
+    std::vector<PredicateTemplateNode> nodes = {node};
     Template tpl(nodes, "select name1 as name from TBL00");
     auto result = helper->AddQueryTemplate(DATA_SHARE_PROXY_URI, SUBSCRIBER_ID, tpl);
     EXPECT_EQ(result, 0);
-    std::vector<std::string> uris;
-    uris.emplace_back(DATA_SHARE_PROXY_URI);
+    std::vector<std::string> uris = {DATA_SHARE_PROXY_URI};
     TemplateId tplId;
     tplId.subscriberId_ = SUBSCRIBER_ID;
     tplId.bundleName_ = "ohos.datashareproxyclienttest.demo";
@@ -1020,14 +1025,9 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Le
             g_callbackTimes++;
         });
     EXPECT_EQ(results1.size(), uris.size());
-    for (auto const &operationResult : results1) {
-        EXPECT_EQ(operationResult.errCode_, 0);
-    }
-
+    for (auto const &r : results1) EXPECT_EQ(r.errCode_, 0);
     std::vector<OperationResult> results3 = helper->EnableRdbSubs(uris, tplId);
-    for (auto const &operationResult : results3) {
-        EXPECT_EQ(operationResult.errCode_, 0);
-    }
+    for (auto const &r : results3) EXPECT_EQ(r.errCode_, 0);
     Uri uri(DATA_SHARE_PROXY_URI);
     DataShare::DataShareValuesBucket valuesBucket1, valuesBucket2;
     std::string name1 = "wu";
@@ -1035,12 +1035,14 @@ HWTEST_F(ProxyDatasTest, ProxyDatasTest_CombinationRdbData_Test_001, TestSize.Le
     valuesBucket1.Put(TBL_NAME1, name1);
     int retVal1 = helper->Insert(uri, valuesBucket1);
     EXPECT_EQ((retVal1 > 0), true);
+    int waitCount = 0;
+    while (g_callbackTimes < 2 && waitCount++ < 100) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
     EXPECT_EQ(g_callbackTimes, 2);
     std::vector<OperationResult> results4 = helper->UnsubscribeRdbData(uris, tplId);
     EXPECT_EQ(results4.size(), uris.size());
-    for (auto const &operationResult : results4) {
-        EXPECT_EQ(operationResult.errCode_, 0);
-    }
+    for (auto const &r : results4) EXPECT_EQ(r.errCode_, 0);
     valuesBucket2.Put(TBL_NAME1, name2);
     int retVal2 = helper->Insert(uri, valuesBucket2);
     EXPECT_EQ((retVal2 > 0), true);
