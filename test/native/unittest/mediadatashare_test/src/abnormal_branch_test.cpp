@@ -22,6 +22,7 @@
 #include "ams_mgr_proxy.h"
 #include "data_share_manager_impl.h"
 #include "data_share_service_proxy.h"
+#include "datashare_abs_result_set.h"
 #include "datashare_helper.h"
 #include "datashare_log.h"
 #include "datashare_template.h"
@@ -85,6 +86,21 @@ void DataShareManagerImplHelper()
     
     helper->dataMgrService_ = (sptr<DataShareKvServiceProxy>)mockProxy;
 }
+
+class MockAbsResultSet : public DataShareAbsResultSet {
+public:
+    int getAllColumnNamesRet_ = E_OK;
+    std::vector<std::string> allColumnNames_;
+    void SetCachedColumnCount(int cnt)
+    {
+        count_ = cnt;
+    }
+    int GetAllColumnNames(std::vector<std::string> &columnNames) override
+    {
+        columnNames = allColumnNames_;
+        return getAllColumnNamesRet_;
+    }
+};
 
 /**
  * @tc.name: AbnormalBranchTest_shareBlock_Null_Test_001
@@ -1775,6 +1791,128 @@ HWTEST_F(AbnormalBranchTest, PublishedDataControllerSubscribeDisableSubscribePub
     auto ret = controller.DisableSubscribePublishedData(nullptr, uris, 0);
     EXPECT_EQ(ret.size(), 0);
     LOG_INFO("PublishedDataControllerSubscribeDisableSubscribePublishedDataTest001::End");
+}
+
+/**
+ * @tc.name: GetColumnName_GetAllColumnNamesFail_Test_001
+ * @tc.desc: Verify GetColumnName returns the error code when GetAllColumnNames fails after the cached
+ *           column count check passes. Covers the GetAllColumnNames return-value check branch.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+ *     1. DataShareAbsResultSet::GetColumnName calls GetColumnCount first, then GetAllColumnNames.
+ *     2. GetColumnCount uses the cached count_ and skips calling GetAllColumnNames when count_ != -1.
+ *     3. E_ERROR is a predefined error code returned by a failing GetAllColumnNames.
+ * @tc.step:
+ *     1. Create a MockAbsResultSet and pre-populate the cached column count to 1 via SetCachedColumnCount.
+ *     2. Configure GetAllColumnNames to return E_ERROR.
+ *     3. Call GetColumnName(0, columnName) and record the return value.
+ * @tc.expect:
+ *     1. GetColumnName returns E_ERROR (the failure code propagated from GetAllColumnNames).
+ */
+HWTEST_F(AbnormalBranchTest, GetColumnName_GetAllColumnNamesFail_Test_001, TestSize.Level0)
+{
+    LOG_INFO("GetColumnName_GetAllColumnNamesFail_Test_001::Start");
+    MockAbsResultSet resultSet;
+    resultSet.SetCachedColumnCount(1);
+    resultSet.getAllColumnNamesRet_ = E_ERROR;
+    std::string columnName;
+    int ret = resultSet.GetColumnName(0, columnName);
+    EXPECT_EQ(ret, E_ERROR);
+    LOG_INFO("GetColumnName_GetAllColumnNamesFail_Test_001::End");
+}
+
+/**
+ * @tc.name: GetColumnName_SizeMismatch_Test_001
+ * @tc.desc: Verify GetColumnName returns E_INVALID_COLUMN_INDEX when the cached column count is larger
+ *           than the actual column names returned by GetAllColumnNames. Covers the real-size bounds
+ *           check branch that guards against out-of-bounds access on columnNames.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+ *     1. GetColumnCount returns the cached count_ without invoking GetAllColumnNames when count_ != -1.
+ *     2. GetAllColumnNames fills a vector whose size may be smaller than the cached count.
+ *     3. E_INVALID_COLUMN_INDEX is the predefined error code for an out-of-range column index.
+ * @tc.step:
+ *     1. Create a MockAbsResultSet and set the cached column count to 2 via SetCachedColumnCount.
+ *     2. Configure GetAllColumnNames to succeed (E_OK) but return only one column name.
+ *     3. Call GetColumnName(1, columnName) and record the return value.
+ * @tc.expect:
+ *     1. GetColumnName returns E_INVALID_COLUMN_INDEX (cached count allowed index 1, but the real
+ *        columnNames size is 1, so index 1 is out of bounds).
+ */
+HWTEST_F(AbnormalBranchTest, GetColumnName_SizeMismatch_Test_001, TestSize.Level0)
+{
+    LOG_INFO("GetColumnName_SizeMismatch_Test_001::Start");
+    MockAbsResultSet resultSet;
+    resultSet.SetCachedColumnCount(2);
+    resultSet.getAllColumnNamesRet_ = E_OK;
+    resultSet.allColumnNames_ = {"only_one"};
+    std::string columnName;
+    int ret = resultSet.GetColumnName(1, columnName);
+    EXPECT_EQ(ret, E_INVALID_COLUMN_INDEX);
+    LOG_INFO("GetColumnName_SizeMismatch_Test_001::End");
+}
+
+/**
+ * @tc.name: GetColumnName_Success_Test_001
+ * @tc.desc: Verify GetColumnName returns E_OK and the correct name on the success path, as a baseline
+ *           for the GetAllColumnNames return-value and size checks.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+ *     1. When count_ == -1, GetColumnCount invokes GetAllColumnNames to fill and cache the count.
+ *     2. GetAllColumnNames returns E_OK with a non-empty column name vector.
+ * @tc.step:
+ *     1. Create a MockAbsResultSet with GetAllColumnNames returning E_OK and columns {"colA", "colB"}.
+ *     2. Call GetColumnName(1, columnName) and record the return value and output name.
+ * @tc.expect:
+ *     1. GetColumnName returns E_OK.
+ *     2. columnName equals "colB".
+ */
+HWTEST_F(AbnormalBranchTest, GetColumnName_Success_Test_001, TestSize.Level0)
+{
+    LOG_INFO("GetColumnName_Success_Test_001::Start");
+    MockAbsResultSet resultSet;
+    resultSet.getAllColumnNamesRet_ = E_OK;
+    resultSet.allColumnNames_ = {"colA", "colB"};
+    std::string columnName;
+    int ret = resultSet.GetColumnName(1, columnName);
+    EXPECT_EQ(ret, E_OK);
+    EXPECT_EQ(columnName, "colB");
+    LOG_INFO("GetColumnName_Success_Test_001::End");
+}
+
+/**
+ * @tc.name: GetColumnName_InvalidIndex_Test_001
+ * @tc.desc: Verify GetColumnName returns E_INVALID_COLUMN_INDEX for negative and out-of-range indices
+ *           based on the cached column count.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+ *     1. GetColumnCount returns the cached count_ when count_ != -1.
+ *     2. E_INVALID_COLUMN_INDEX is returned when columnIndex < 0 or columnIndex >= count.
+ * @tc.step:
+ *     1. Create a MockAbsResultSet, set cached column count to 1, GetAllColumnNames to E_OK with one column.
+ *     2. Call GetColumnName(-1, columnName) and check the return value.
+ *     3. Call GetColumnName(1, columnName) and check the return value.
+ * @tc.expect:
+ *     1. GetColumnName(-1) returns E_INVALID_COLUMN_INDEX (negative index).
+ *     2. GetColumnName(1) returns E_INVALID_COLUMN_INDEX (index >= count).
+ */
+HWTEST_F(AbnormalBranchTest, GetColumnName_InvalidIndex_Test_001, TestSize.Level0)
+{
+    LOG_INFO("GetColumnName_InvalidIndex_Test_001::Start");
+    MockAbsResultSet resultSet;
+    resultSet.SetCachedColumnCount(1);
+    resultSet.getAllColumnNamesRet_ = E_OK;
+    resultSet.allColumnNames_ = {"colA"};
+    std::string columnName;
+    int ret = resultSet.GetColumnName(-1, columnName);
+    EXPECT_EQ(ret, E_INVALID_COLUMN_INDEX);
+    ret = resultSet.GetColumnName(1, columnName);
+    EXPECT_EQ(ret, E_INVALID_COLUMN_INDEX);
+    LOG_INFO("GetColumnName_InvalidIndex_Test_001::End");
 }
 } // namespace DataShare
 } // namespace OHOS

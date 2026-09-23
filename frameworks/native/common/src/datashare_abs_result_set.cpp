@@ -226,7 +226,15 @@ int DataShareAbsResultSet::GetColumnName(int columnIndex, std::string &columnNam
         return E_INVALID_COLUMN_INDEX;
     }
     std::vector<std::string> columnNames;
-    GetAllColumnNames(columnNames);
+    ret = GetAllColumnNames(columnNames);
+    if (ret != E_OK) {
+        LOG_ERROR("return GetAllColumnNames ret %{public}d is wrong!", ret);
+        return ret;
+    }
+    if (columnIndex >= static_cast<int>(columnNames.size())) {
+        LOG_ERROR("columnIndex oor idx %{public}d, size %{public}zu", columnIndex, columnNames.size());
+        return E_INVALID_COLUMN_INDEX;
+    }
     columnName = columnNames[columnIndex];
     return E_OK;
 }

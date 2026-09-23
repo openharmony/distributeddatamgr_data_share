@@ -43,6 +43,9 @@ __attribute__((no_sanitize("undefined"))) AsyncCall::AsyncCall(napi_env env, nap
     // napi_throw_error sets code as string, but SetBusinessError (exec path) sets code as int32.
     // Use napi_throw_business_error to keep input-validation code type consistent with exec path.
     if (status != napi_ok) {
+        context->input_ = nullptr;
+        context->output_ = nullptr;
+        context->exec_ = nullptr;
         if (isBusinessErrorNumber) {
             napi_throw_business_error(env, context->error->GetCode(), context->error->GetMessage().c_str());
         } else {
