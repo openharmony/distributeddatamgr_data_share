@@ -1325,15 +1325,6 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_DoReconnectTask_DirectCall
     connection->DoReconnectTask(DATA_SHARE_URI);
     connection.reset();
     LOG_INFO("DataShareConnection_DoReconnectTask_DirectCall_Test_010::End");
-    std::shared_ptr<DataShare::DataShareConnection> connection =
-        std::make_shared<DataShare::DataShareConnection>(uri, token);
-    ASSERT_NE(connection, nullptr);
-    ASSERT_TRUE(connection->Init());
-
-    std::shared_ptr<DataShareProxy> proxy = connection->ConnectDataShareExtAbility(uri, token);
-    EXPECT_EQ(proxy, nullptr);
-    EXPECT_EQ(AmsMgrProxyMock::GetConnectCount(), 0);
-    LOG_INFO("DataShareConnection_ConnectGetInstanceNull_003::End");
 }
 
 /**
