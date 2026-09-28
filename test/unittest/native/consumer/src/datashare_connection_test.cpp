@@ -945,6 +945,10 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ConnectTimeout_CallbackDis
     AmsMgrProxyMock::Reset();
     AmsMgrProxyMock::SetConnectResult(E_OK);
 
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
     auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
 
@@ -1024,6 +1028,50 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_DelayConnectExtAbility_Inv
     TestSize.Level0)
 {
     LOG_INFO("DataShareConnection_DelayConnectExtAbility_InvalidConnSkipReconnect_Test_003::Start");
+    std::shared_ptr<DataShare::DataShareConnection> connection =
+        std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+    ASSERT_TRUE(connection->Init());
+
+    std::shared_ptr<DataShareProxy> proxy = connection->ConnectDataShareExtAbility(uri, token);
+    EXPECT_EQ(proxy, nullptr);
+    EXPECT_GE(AmsMgrProxyMock::GetConnectCount(), 1);
+
+    sptr<DataShare::DataShareConnection::ConnectionCallback> callback = connection->callback_;
+    ASSERT_NE(callback, nullptr);
+    connection.reset();
+
+    std::string deviceId = "deviceId";
+    std::string bundleName = "bundleName";
+    std::string abilityName = "abilityName";
+    AppExecFwk::ElementName element(deviceId, bundleName, abilityName);
+    callback->OnAbilityConnectDone(element, token, 0);
+
+    EXPECT_EQ(AmsMgrProxyMock::GetDisConnectCount(), 1);
+    LOG_INFO("DataShareConnection_ConnectTimeout_CallbackDisconnect_001::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_ConnectSuccess_CallbackNoDisconnect_002
+ * @tc.desc: Verify that in the normal connection path (target is alive), the callback forwards to
+ *           DataShareConnection::OnAbilityConnectDone and does NOT trigger an extra DisConnect.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+ *     1. The mock AmsMgrProxy records Connect/DisConnect calls.
+ *     2. A DataShareConnection can be instantiated and initialized so its callback target is alive.
+ * @tc.step:
+ *     1. Create and initialize a DataShareConnection.
+ *     2. Invoke callback->OnAbilityConnectDone with a non-null remoteObject while the target is still alive.
+ * @tc.expect:
+ *     1. The connection's dataShareProxy_ is populated after the callback.
+ *     2. DisConnect is NOT called in the normal (target-alive) path.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_ConnectSuccess_CallbackNoDisconnect_002, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_ConnectSuccess_CallbackNoDisconnect_002::Start");
+    AmsMgrProxyMock::Reset();
+
     Uri uri(DATA_SHARE_URI);
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
     sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
@@ -1065,6 +1113,43 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ReconnectExtAbility_Schedu
     TestSize.Level0)
 {
     LOG_INFO("DataShareConnection_ReconnectExtAbility_SchedulesDelayTask_Test_004::Start");
+    std::shared_ptr<DataShare::DataShareConnection> connection =
+        std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+    ASSERT_TRUE(connection->Init());
+
+    std::string deviceId = "deviceId";
+    std::string bundleName = "bundleName";
+    std::string abilityName = "abilityName";
+    AppExecFwk::ElementName element(deviceId, bundleName, abilityName);
+    connection->OnAbilityConnectDone(element, token, 0);
+
+    EXPECT_NE(connection->dataShareProxy_, nullptr);
+    EXPECT_EQ(AmsMgrProxyMock::GetDisConnectCount(), 0);
+    LOG_INFO("DataShareConnection_ConnectSuccess_CallbackNoDisconnect_002::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_ConnectGetInstanceNull_003
+ * @tc.desc: Verify that when AmsMgrProxy::GetInstance() returns nullptr, ConnectDataShareExtAbility returns nullptr
+ *           early without hanging, and no Connect is issued.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon:
+ *     1. The mock AmsMgrProxy can be forced to return nullptr from GetInstance().
+ * @tc.step:
+ *     1. Set the mock GetInstance() to return nullptr.
+ *     2. Call ConnectDataShareExtAbility directly.
+ * @tc.expect:
+ *     1. ConnectDataShareExtAbility returns nullptr immediately.
+ *     2. No AmsMgrProxy::Connect call is made (connect count is 0).
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_ConnectGetInstanceNull_003, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_ConnectGetInstanceNull_003::Start");
+    AmsMgrProxyMock::Reset();
+    AmsMgrProxyMock::SetGetInstanceNull(true);
+
     Uri uri(DATA_SHARE_URI);
     std::u16string tokenString = u"OHOS.DataShare.IDataShare";
     sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
@@ -1348,6 +1433,15 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_DoReconnectTask_DirectCall
     connection->DoReconnectTask(DATA_SHARE_URI);
     connection.reset();
     LOG_INFO("DataShareConnection_DoReconnectTask_DirectCall_Test_010::End");
+    std::shared_ptr<DataShare::DataShareConnection> connection =
+        std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+    ASSERT_TRUE(connection->Init());
+
+    std::shared_ptr<DataShareProxy> proxy = connection->ConnectDataShareExtAbility(uri, token);
+    EXPECT_EQ(proxy, nullptr);
+    EXPECT_EQ(AmsMgrProxyMock::GetConnectCount(), 0);
+    LOG_INFO("DataShareConnection_ConnectGetInstanceNull_003::End");
 }
 }
 }
