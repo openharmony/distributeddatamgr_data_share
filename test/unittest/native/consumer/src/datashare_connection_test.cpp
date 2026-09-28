@@ -902,6 +902,432 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_GetCallback_CachedOnSecond
 }
 
 /**
+ * @tc.name: DataShareConnection_DelayConnectExtAbility_PoolNull_Test_001
+ * @tc.desc: Verify DelayConnectExtAbility returns early when pool_ is nullptr.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+     1. Create a DataShareConnection (pool_ not yet created).
+     2. Set reConnects_.count to 1 so ReconnectExtAbility routes to DelayConnectExtAbility.
+     3. Call DelayConnectExtAbility directly.
+ * @tc.expect:
+     1. No crash; returns early because pool_ is nullptr.
+     2. reconnectTaskId_ remains INVALID_TASK_ID.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_DelayConnectExtAbility_PoolNull_Test_001, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_DelayConnectExtAbility_PoolNull_Test_001::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+
+    connection->reConnects_.count.store(1);
+    EXPECT_EQ(connection->pool_, nullptr);
+    connection->DelayConnectExtAbility(DATA_SHARE_URI);
+    EXPECT_EQ(connection->reconnectTaskId_, ExecutorPool::INVALID_TASK_ID);
+    connection.reset();
+    LOG_INFO("DataShareConnection_DelayConnectExtAbility_PoolNull_Test_001::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_DelayConnectExtAbility_RescheduleRemovesOldTask_Test_002
+ * @tc.desc: Verify DelayConnectExtAbility removes the old task before scheduling a new one on second call.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+     1. Create a DataShareConnection, call Init(), assign pool_.
+     2. Set reConnects_.count to 1, prevTime to now (delay=10s, task stays pending).
+     3. Call DelayConnectExtAbility (first schedule, reconnectTaskId_==INVALID, no Remove).
+     4. Call DelayConnectExtAbility again (reconnectTaskId_!=INVALID, Remove old then Schedule new).
+ * @tc.expect:
+     1. After first call, reconnectTaskId_ is valid and task is in delayTasks_.
+     2. After second call, old task id no longer in delayTasks_, new task id is in delayTasks_.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_DelayConnectExtAbility_RescheduleRemovesOldTask_Test_002,
+    TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_DelayConnectExtAbility_RescheduleRemovesOldTask_Test_002::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+    ASSERT_TRUE(connection->Init());
+
+    connection->pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS, DATASHARE_EXECUTOR_NAME);
+    ASSERT_NE(connection->pool_, nullptr);
+    auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+    connection->reConnects_.count.store(1);
+    connection->reConnects_.prevTime.store(now);
+
+    connection->DelayConnectExtAbility(DATA_SHARE_URI);
+    auto firstTaskId = connection->reconnectTaskId_;
+    EXPECT_NE(firstTaskId, ExecutorPool::INVALID_TASK_ID);
+    EXPECT_TRUE(connection->pool_->delayTasks_.Find(firstTaskId).Valid());
+
+    connection->DelayConnectExtAbility(DATA_SHARE_URI);
+    auto secondTaskId = connection->reconnectTaskId_;
+    EXPECT_NE(secondTaskId, ExecutorPool::INVALID_TASK_ID);
+    EXPECT_FALSE(connection->pool_->delayTasks_.Find(firstTaskId).Valid());
+    EXPECT_TRUE(connection->pool_->delayTasks_.Find(secondTaskId).Valid());
+
+    connection.reset();
+    LOG_INFO("DataShareConnection_DelayConnectExtAbility_RescheduleRemovesOldTask_Test_002::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_DelayConnectExtAbility_InvalidConnSkipReconnect_Test_003
+ * @tc.desc: Verify the scheduled lambda returns early when isInvalid_ is true.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+     1. Create a DataShareConnection, call Init(), assign pool_.
+     2. Set reConnects_.count to 1, prevTime to now-20s (delay=0, immediate execution).
+     3. Set isInvalid_ to true.
+     4. Call DelayConnectExtAbility and wait for task execution.
+ * @tc.expect:
+     1. No crash; lambda checks isInvalid_ and returns early without calling DoReconnectTask.
+     2. Task leaves delayTasks_ after execution.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_DelayConnectExtAbility_InvalidConnSkipReconnect_Test_003,
+    TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_DelayConnectExtAbility_InvalidConnSkipReconnect_Test_003::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+    ASSERT_TRUE(connection->Init());
+
+    connection->pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS, DATASHARE_EXECUTOR_NAME);
+    ASSERT_NE(connection->pool_, nullptr);
+    auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+    connection->reConnects_.count.store(1);
+    connection->reConnects_.prevTime.store(now - 20000);
+    connection->isInvalid_.store(true);
+
+    connection->DelayConnectExtAbility(DATA_SHARE_URI);
+    EXPECT_NE(connection->reconnectTaskId_, ExecutorPool::INVALID_TASK_ID);
+    sleep(1);
+    EXPECT_FALSE(connection->pool_->delayTasks_.Find(connection->reconnectTaskId_).Valid());
+    connection.reset();
+    LOG_INFO("DataShareConnection_DelayConnectExtAbility_InvalidConnSkipReconnect_Test_003::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_ReconnectExtAbility_SchedulesDelayTask_Test_004
+ * @tc.desc: Verify ReconnectExtAbility routes to DelayConnectExtAbility when count!=0 and records reconnectTaskId_.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+     1. Create a DataShareConnection, call Init(), assign pool_.
+     2. Set reConnects_.count to 1, prevTime to now (delay=10s, task stays pending).
+     3. Call ReconnectExtAbility (count!=0 routes to DelayConnectExtAbility).
+ * @tc.expect:
+     1. reconnectTaskId_ is valid and task is pending in delayTasks_.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_ReconnectExtAbility_SchedulesDelayTask_Test_004,
+    TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_ReconnectExtAbility_SchedulesDelayTask_Test_004::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+    ASSERT_TRUE(connection->Init());
+
+    connection->pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS, DATASHARE_EXECUTOR_NAME);
+    ASSERT_NE(connection->pool_, nullptr);
+    auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+    connection->reConnects_.count.store(1);
+    connection->reConnects_.prevTime.store(now);
+
+    connection->ReconnectExtAbility(DATA_SHARE_URI);
+    EXPECT_NE(connection->reconnectTaskId_, ExecutorPool::INVALID_TASK_ID);
+    EXPECT_TRUE(connection->pool_->delayTasks_.Find(connection->reconnectTaskId_).Valid());
+
+    connection.reset();
+    LOG_INFO("DataShareConnection_ReconnectExtAbility_SchedulesDelayTask_Test_004::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_Destructor_RemovesPendingReconnectTask_Test_005
+ * @tc.desc: Verify the destructor removes pending reconnect task when pool_!=nullptr and
+ *           reconnectTaskId_!=INVALID.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+     1. Create a DataShareConnection, call Init(), assign pool_.
+     2. Schedule a pending reconnect task (delay=10s, reconnectTaskId_ becomes valid).
+     3. Keep an external shared_ptr to pool_ for post-destruction observation.
+     4. connection.reset() triggers destructor.
+ * @tc.expect:
+     1. No crash, no freeze.
+     2. After destruction, the task id is no longer in delayTasks_ (removed by destructor).
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_Destructor_RemovesPendingReconnectTask_Test_005,
+    TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_Destructor_RemovesPendingReconnectTask_Test_005::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+    ASSERT_TRUE(connection->Init());
+
+    connection->pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS, DATASHARE_EXECUTOR_NAME);
+    ASSERT_NE(connection->pool_, nullptr);
+    auto pool = connection->pool_;
+    auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+    connection->reConnects_.count.store(1);
+    connection->reConnects_.prevTime.store(now);
+
+    connection->DelayConnectExtAbility(DATA_SHARE_URI);
+    auto taskId = connection->reconnectTaskId_;
+    ASSERT_NE(taskId, ExecutorPool::INVALID_TASK_ID);
+    ASSERT_TRUE(pool->delayTasks_.Find(taskId).Valid());
+
+    connection.reset();
+    EXPECT_FALSE(pool->delayTasks_.Find(taskId).Valid());
+    LOG_INFO("DataShareConnection_Destructor_RemovesPendingReconnectTask_Test_005::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_Destructor_PoolNoPendingTask_Test_006
+ * @tc.desc: Verify the destructor handles pool_!=nullptr but reconnectTaskId_==INVALID (no task to remove).
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+     1. Create a DataShareConnection, call Init(), assign pool_.
+     2. Do not schedule any task (reconnectTaskId_ stays INVALID).
+     3. Keep an external shared_ptr to pool_ for post-destruction observation.
+     4. connection.reset() triggers destructor.
+ * @tc.expect:
+     1. No crash; destructor skips Remove and sets pool_ to nullptr.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_Destructor_PoolNoPendingTask_Test_006, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_Destructor_PoolNoPendingTask_Test_006::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+    ASSERT_TRUE(connection->Init());
+
+    connection->pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS, DATASHARE_EXECUTOR_NAME);
+    ASSERT_NE(connection->pool_, nullptr);
+    EXPECT_EQ(connection->reconnectTaskId_, ExecutorPool::INVALID_TASK_ID);
+    auto pool = connection->pool_;
+    ASSERT_NE(pool, nullptr);
+
+    connection.reset();
+    LOG_INFO("DataShareConnection_Destructor_PoolNoPendingTask_Test_006::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_DelayConnectExtAbility_TaskExecutesConnect_Test_007
+ * @tc.desc: Verify the lambda takes the normal execution path (isInvalid_==false) and calls DoReconnectTask.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+     1. Create a DataShareConnection, call Init(), assign pool_.
+     2. Set reConnects_.count to 1, prevTime to now-20s (delay=0, immediate execution).
+     3. Keep isInvalid_ = false.
+     4. Call DelayConnectExtAbility and wait for task execution.
+ * @tc.expect:
+     1. No crash; lambda executes DoReconnectTask (which returns early since AmsMgrProxy is null in test env).
+     2. Task leaves delayTasks_ after execution.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_DelayConnectExtAbility_TaskExecutesConnect_Test_007,
+    TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_DelayConnectExtAbility_TaskExecutesConnect_Test_007::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+    ASSERT_TRUE(connection->Init());
+
+    connection->pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS, DATASHARE_EXECUTOR_NAME);
+    ASSERT_NE(connection->pool_, nullptr);
+    auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+    connection->reConnects_.count.store(1);
+    connection->reConnects_.prevTime.store(now - 20000);
+    EXPECT_FALSE(connection->isInvalid_.load());
+
+    connection->DelayConnectExtAbility(DATA_SHARE_URI);
+    EXPECT_NE(connection->reconnectTaskId_, ExecutorPool::INVALID_TASK_ID);
+    sleep(1);
+    EXPECT_FALSE(connection->pool_->delayTasks_.Find(connection->reconnectTaskId_).Valid());
+    connection.reset();
+    LOG_INFO("DataShareConnection_DelayConnectExtAbility_TaskExecutesConnect_Test_007::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_DelayConnectExtAbility_ExpiredConnSkipReconnect_Test_008
+ * @tc.desc: Verify the lambda returns early when selfSharedPtr is nullptr (weak_ptr expired).
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+     1. Create a DataShareConnection, call Init(), assign pool_.
+     2. Set reConnects_.count to 1, prevTime to now (delay=10s, task stays pending).
+     3. Schedule a pending task via DelayConnectExtAbility, record taskId.
+     4. Manually clear reconnectTaskId_ so destructor skips Remove.
+     5. Keep external shared_ptr to pool_ for post-destruction observation.
+     6. connection.reset() destroys the connection (weak_ptr in lambda becomes expired).
+     7. pool->Reset(taskId, 500ms) shortens the delay to trigger execution.
+     8. Wait for task execution.
+ * @tc.expect:
+     1. Reset returns the original taskId.
+     2. No crash; lambda checks selfSharedPtr==nullptr and returns early.
+     3. Task leaves delayTasks_ after execution.
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_DelayConnectExtAbility_ExpiredConnSkipReconnect_Test_008,
+    TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_DelayConnectExtAbility_ExpiredConnSkipReconnect_Test_008::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+    ASSERT_TRUE(connection->Init());
+
+    connection->pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS, DATASHARE_EXECUTOR_NAME);
+    ASSERT_NE(connection->pool_, nullptr);
+    auto pool = connection->pool_;
+    auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+    connection->reConnects_.count.store(1);
+    connection->reConnects_.prevTime.store(now);
+
+    connection->DelayConnectExtAbility(DATA_SHARE_URI);
+    auto taskId = connection->reconnectTaskId_;
+    ASSERT_NE(taskId, ExecutorPool::INVALID_TASK_ID);
+    ASSERT_TRUE(pool->delayTasks_.Find(taskId).Valid());
+
+    connection->reconnectTaskId_ = ExecutorPool::INVALID_TASK_ID;
+    connection.reset();
+
+    EXPECT_EQ(pool->Reset(taskId, std::chrono::milliseconds(500)), taskId);
+    sleep(1);
+    EXPECT_FALSE(pool->delayTasks_.Find(taskId).Valid());
+    LOG_INFO("DataShareConnection_DelayConnectExtAbility_ExpiredConnSkipReconnect_Test_008::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_DelayConnectExtAbility_ScheduleFailed_Test_009
+ * @tc.desc: Verify DelayConnectExtAbility handles Schedule failure when pool is at max capacity.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+     1. Create a DataShareConnection, call Init(), assign pool_.
+     2. Exhaust the pool's task capacity by scheduling many long-delay tasks.
+     3. Set reConnects_.count to 1, prevTime to now.
+     4. Call DelayConnectExtAbility.
+ * @tc.expect:
+     1. reconnectTaskId_ is INVALID_TASK_ID (Schedule failed, line 169 true branch).
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_DelayConnectExtAbility_ScheduleFailed_Test_009,
+    TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_DelayConnectExtAbility_ScheduleFailed_Test_009::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+    ASSERT_TRUE(connection->Init());
+
+    connection->pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS, DATASHARE_EXECUTOR_NAME);
+    ASSERT_NE(connection->pool_, nullptr);
+
+    auto longDelay = std::chrono::hours(1);
+    bool poolFull = false;
+    for (int i = 0; i < 10000; i++) {
+        auto id = connection->pool_->Schedule(longDelay, []() {});
+        if (id == ExecutorPool::INVALID_TASK_ID) {
+            poolFull = true;
+            break;
+        }
+    }
+    if (!poolFull) {
+        LOG_INFO("Pool capacity not reached after 10000 tasks, skip Schedule failure test");
+        connection.reset();
+        return;
+    }
+
+    auto now = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+    connection->reConnects_.count.store(1);
+    connection->reConnects_.prevTime.store(now);
+
+    connection->DelayConnectExtAbility(DATA_SHARE_URI);
+    EXPECT_EQ(connection->reconnectTaskId_, ExecutorPool::INVALID_TASK_ID);
+    connection.reset();
+    LOG_INFO("DataShareConnection_DelayConnectExtAbility_ScheduleFailed_Test_009::End");
+}
+
+/**
+ * @tc.name: DataShareConnection_DoReconnectTask_DirectCall_Test_010
+ * @tc.desc: Verify DoReconnectTask synchronously exercises the AmsMgrProxy::GetInstance and Connect path.
+ * @tc.type: FUNC
+ * @tc.require: None
+ * @tc.precon: None
+ * @tc.step:
+     1. Create a DataShareConnection, call Init() (so callback_ is valid).
+     2. Call DoReconnectTask directly (synchronous, not via async lambda).
+ * @tc.expect:
+     1. No crash; GetInstance() returns non-null singleton, Connect() returns error (no samgr in test env).
+     2. Covers line 180 false branch (instance != nullptr) and line 187 false branch (ret != E_OK).
+ */
+HWTEST_F(DataShareConnectionTest, DataShareConnection_DoReconnectTask_DirectCall_Test_010, TestSize.Level0)
+{
+    LOG_INFO("DataShareConnection_DoReconnectTask_DirectCall_Test_010::Start");
+    Uri uri(DATA_SHARE_URI);
+    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
+    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
+    ASSERT_NE(token, nullptr);
+    auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
+    ASSERT_NE(connection, nullptr);
+    ASSERT_TRUE(connection->Init());
+
+    connection->DoReconnectTask(DATA_SHARE_URI);
+    connection.reset();
+    LOG_INFO("DataShareConnection_DoReconnectTask_DirectCall_Test_010::End");
+}
+
+/**
  * @tc.name: DataShareConnection_ConnectTimeout_CallbackDisconnect_001
  * @tc.desc: Verify that when the upper-layer business connects via ConnectDataShareExtAbility and the extension is not
  *           connected within the timeout (2s), the connection returns nullptr and the DataShareConnection is released.

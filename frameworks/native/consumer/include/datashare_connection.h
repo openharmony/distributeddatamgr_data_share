@@ -112,6 +112,7 @@ private:
     ErrCode Disconnect();
     void ReconnectExtAbility(const std::string &uri);
     void DelayConnectExtAbility(const std::string &uri);
+    void DoReconnectTask(const std::string &uri);
     void ReRegisterObserverExtProvider();
     std::mutex mutex_{};
     std::shared_ptr<DataShareProxy> dataShareProxy_;
@@ -127,6 +128,7 @@ private:
     static constexpr std::chrono::milliseconds MAX_RECONNECT_TIME_INTERVAL = std::chrono::milliseconds(70000);
     std::shared_ptr<ExecutorPool> pool_;
     DataShareConnectionInfo reConnects_;
+    ExecutorPool::TaskId reconnectTaskId_ = ExecutorPool::INVALID_TASK_ID;
     struct Param {
         Param(const Uri &uri, bool isDescendants) : uri(uri), isDescendants(isDescendants){};
         Uri uri;
