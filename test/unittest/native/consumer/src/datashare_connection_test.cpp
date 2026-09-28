@@ -902,7 +902,6 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_GetCallback_CachedOnSecond
 }
 
 /**
-<<<<<<< HEAD
  * @tc.name: DataShareConnection_DelayConnectExtAbility_PoolNull_Test_001
  * @tc.desc: Verify DelayConnectExtAbility returns early when pool_ is nullptr.
  * @tc.type: FUNC
@@ -946,12 +945,6 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_ConnectTimeout_CallbackDis
     AmsMgrProxyMock::Reset();
     AmsMgrProxyMock::SetConnectResult(E_OK);
 
->>>>>>> 113e2a81b999bd9dc16c17d38a0980634c88fd24
-    Uri uri(DATA_SHARE_URI);
-    std::u16string tokenString = u"OHOS.DataShare.IDataShare";
-    sptr<IRemoteObject> token = new (std::nothrow) RemoteObjectTest(tokenString);
-    ASSERT_NE(token, nullptr);
-<<<<<<< HEAD
     auto connection = std::make_shared<DataShare::DataShareConnection>(uri, token);
     ASSERT_NE(connection, nullptr);
 
