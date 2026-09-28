@@ -997,9 +997,7 @@ napi_value NapiDataShareHelper::Napi_UnregisterObserver(napi_env env, size_t arg
             }
         }
         proxy->UnRegisteredObserver(env, uri, std::move(helper));
-        return nullptr;
-    }
-    if (type == napi_number) {
+    } else if (type == napi_number) {
         NAPI_ASSERT_CALL_ERRCODE_SYNC(env, argc == ARGS_THREE || argc == ARGS_FOUR,
             error = std::make_shared<ParametersNumError>("3 or 4"), error, nullptr);
         NAPI_CALL(env, napi_typeof(env, argv[PARAM2], &type));
@@ -1016,8 +1014,9 @@ napi_value NapiDataShareHelper::Napi_UnregisterObserver(napi_env env, size_t arg
             }
         }
         proxy->UnRegisteredObserver(env, uriStr, std::move(helper), true);
-        return nullptr;
     }
+    std::string offType = DataShareJSUtils::Convert2String(env, argv[PARAM0]);
+    LOG_INFO("Delete callback op = off_all, kit = ArkData, type: %{public}s", offType.c_str());
     return nullptr;
 }
 
@@ -1240,6 +1239,8 @@ napi_value NapiDataShareHelper::Napi_UnsubscribeRdbObserver(napi_env env, size_t
         }
     }
     results = proxy->jsRdbObsManager_->DelObservers(env, nullptr, uris, templateId);
+    std::string offType = DataShareJSUtils::Convert2String(env, argv[PARAM0]);
+    LOG_INFO("Delete callback op = off_all, kit = ArkData, type: %{public}s", offType.c_str());
     return DataShareJSUtils::Convert2JSValue(env, results);
 }
 
@@ -1326,6 +1327,8 @@ napi_value NapiDataShareHelper::Napi_UnsubscribePublishedObserver(napi_env env, 
         }
     }
     results = proxy->jsPublishedObsManager_->DelObservers(env, nullptr, uris, atoll(subscriberId.c_str()));
+    std::string offType = DataShareJSUtils::Convert2String(env, argv[0]);
+    LOG_INFO("Delete callback op = off_all, kit = ArkData, type: %{public}s", offType.c_str());
     return DataShareJSUtils::Convert2JSValue(env, results);
 }
 

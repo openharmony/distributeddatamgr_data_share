@@ -1594,6 +1594,7 @@ int ANIUnRegisterObserver(const std::string &strUri, long long dataShareHelperPt
         it = list.erase(it);
     }
     observerMap_.erase(strUri);
+    LOG_INFO("Delete callback op = off_all, kit = ArkData, type: dataChange");
     return E_OK;
 }
 
@@ -1728,6 +1729,7 @@ int DataShareNativeOffRdbDataChangeNone(int64_t dataShareHelperPtr, rust::Vec<ru
         return E_OK;
     }
     results = helperHolder->jsRdbObsManager_->DelObservers(stdUris, tplId);
+    LOG_INFO("Delete callback op = off_all, kit = ArkData, type: rdbDataChange");
     for (const auto &result : results) {
         publish_sret_push(sret, rust::String(result.key_), result.errCode_);
     }
@@ -1753,6 +1755,7 @@ int DataShareNativeOffPublishedDataChange(PtrWrap ptrWrap, rust::Vec<rust::Strin
         return E_OK;
     }
     results = helperHolder->jsPublishedObsManager_->DelObservers(ptrWrap.callback, stdUris, innerSubscriberId);
+    LOG_INFO("Delete callback op = off_all, kit = ArkData, type: publishedDataChange");
     for (const auto &result : results) {
         publish_sret_push(sret, rust::String(result.key_), result.errCode_);
     }

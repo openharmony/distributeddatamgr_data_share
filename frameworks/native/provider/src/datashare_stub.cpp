@@ -18,6 +18,7 @@
 #include "datashare_stub.h"
 
 #include <cinttypes>
+#include <cstdio>
 
 #include "accesstoken_kit.h"
 #include "data_ability_observer_interface.h"
@@ -39,6 +40,7 @@ namespace DataShare {
 using namespace OHOS::Security::AccessToken;
 constexpr int DEFAULT_NUMBER = -1;
 constexpr int PERMISSION_ERROR_NUMBER = -2;
+constexpr uint64_t DATASHARE_FDSAN_OWNER_TAG = 0xD001651;
 DataShareStub::DataShareStub()
 {
     stubFuncMap_[static_cast<uint32_t>(IDataShareInterfaceCode::CMD_GET_FILE_TYPES)] = &DataShareStub::CmdGetFileTypes;
@@ -214,12 +216,14 @@ ErrCode DataShareStub::CmdOpenFile(MessageParcel &data, MessageParcel &reply)
     if (fd < 0) {
         return ERR_INVALID_DATA;
     }
+    uint64_t tag = fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, DATASHARE_FDSAN_OWNER_TAG);
+    fdsan_exchange_owner_tag(fd, 0, tag);
     if (!reply.WriteFileDescriptor(fd)) {
         LOG_ERROR("fail to WriteFileDescriptor fd");
-        close(fd);
+        fdsan_close_with_tag(fd, tag);
         return ERR_INVALID_VALUE;
     }
-    close(fd);
+    fdsan_close_with_tag(fd, tag);
     return E_OK;
 }
 
@@ -234,12 +238,14 @@ ErrCode DataShareStub::CmdOpenFileWithErrCode(MessageParcel &data, MessageParcel
     if (fd < 0) {
         return fd;
     }
+    uint64_t tag = fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, DATASHARE_FDSAN_OWNER_TAG);
+    fdsan_exchange_owner_tag(fd, 0, tag);
     if (!reply.WriteFileDescriptor(fd)) {
         LOG_ERROR("fail to WriteFileDescriptor fd");
-        close(fd);
+        fdsan_close_with_tag(fd, tag);
         return ERR_INVALID_VALUE;
     }
-    close(fd);
+    fdsan_close_with_tag(fd, tag);
     return E_OK;
 }
 
@@ -255,7 +261,9 @@ ErrCode DataShareStub::CmdOpenRawFile(MessageParcel &data, MessageParcel &reply)
     if (!ITypesUtil::Marshal(reply, fd)) {
         LOG_ERROR("Marshal value is nullptr");
         if (fd >= 0) {
-            close(fd);
+            uint64_t tag = fdsan_create_owner_tag(FDSAN_OWNER_TYPE_FILE, DATASHARE_FDSAN_OWNER_TAG);
+            fdsan_exchange_owner_tag(fd, 0, tag);
+            fdsan_close_with_tag(fd, tag);
         }
         return ERR_INVALID_VALUE;
     }

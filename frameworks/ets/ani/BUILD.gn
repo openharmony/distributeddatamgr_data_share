@@ -63,6 +63,7 @@ ohos_static_library("datashare_ani_cxx") {
     "hilog:libhilog",
     "hitrace:hitrace_meter",
     "hitrace:libhitracechain",
+    "icu:shared_icuuc",
     "ipc:ipc_core",
     "ipc:ipc_single",
     "kv_store:distributeddata_inner",
