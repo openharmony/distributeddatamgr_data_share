@@ -16,6 +16,8 @@
 #ifndef DATASHARE_OPTION_H
 #define DATASHARE_OPTION_H
 
+#include <cstdint>
+
 namespace OHOS::DataShare {
 
 struct DataShareOption {

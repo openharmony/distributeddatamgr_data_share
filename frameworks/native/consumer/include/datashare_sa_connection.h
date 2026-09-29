@@ -92,7 +92,6 @@ private:
     ConnectionInterfaceInfo interfaceInfo_ = ConnectionInterfaceInfo();
     std::mutex mutex_{};
     std::shared_ptr<DataShareProxy> dataShareProxy_ = nullptr;
-    std::shared_ptr<ExecutorPool> pool_ = nullptr;
 };
 }  // namespace DataShare
 }  // namespace OHOS

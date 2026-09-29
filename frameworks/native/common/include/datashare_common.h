@@ -16,6 +16,8 @@
 #ifndef DATASHARE_COMMON_H
 #define DATASHARE_COMMON_H
 
+#include <string>
+
 #include "datashare_option.h"
 
 namespace OHOS::DataShare {

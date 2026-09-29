@@ -121,12 +121,9 @@ private:
     Uri uri_;
     sptr<IRemoteObject> token_ = {};
     std::atomic<bool> isInvalid_ = false;
-    static constexpr int MAX_THREADS = 2;
-    static constexpr int MIN_THREADS = 0;
     static constexpr int MAX_RECONNECT = 6;
     static constexpr std::chrono::milliseconds RECONNECT_TIME_INTERVAL = std::chrono::milliseconds(10000);
     static constexpr std::chrono::milliseconds MAX_RECONNECT_TIME_INTERVAL = std::chrono::milliseconds(70000);
-    std::shared_ptr<ExecutorPool> pool_;
     DataShareConnectionInfo reConnects_;
     ExecutorPool::TaskId reconnectTaskId_ = ExecutorPool::INVALID_TASK_ID;
     struct Param {

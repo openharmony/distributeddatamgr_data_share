@@ -25,6 +25,7 @@
 #include "datashare_helper.h"
 #include "datashare_log.h"
 #include "datashare_proxy.h"
+#include "datashare_task_executor.h"
 #include "extension_manager_proxy.h"
 #include "general_controller.h"
 #include "general_controller_provider_impl.h"
@@ -356,13 +357,14 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityConnectDone_Test_
 
 /**
  * @tc.name: DataShareConnection_OnAbilityDisconnectDone_Test_001
- * @tc.desc: Verify that the thread name in the connection pool of DataShareConnection is correctly set to the expected
- *           value after the OnAbilityDisconnectDone method is called during reconnection.
+ * @tc.desc: Verify that the thread name of the executor pool shared by all DataShare components through
+ *           DataShareTaskExecutor is correctly set to the expected value after the OnAbilityDisconnectDone
+ *           method is called during reconnection.
  * @tc.type: FUNC
  * @tc.require: None
  * @tc.precon:
     1. The test environment allows instantiation of DataShareConnection, IRemoteObject, and ElementName objects.
-    2. The isReconnect_ member of DataShareConnection can be set to true, and the connection pool is properly
+    2. The isReconnect_ member of DataShareConnection can be set to true, and the shared executor pool is properly
        initialized.
     3. The expected thread name is predefined and accessible.
  * @tc.step:
@@ -370,9 +372,9 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityConnectDone_Test_
     2. Set the isReconnect_ flag of the DataShareConnection to true using isReconnect_.store(true).
     3. Create an AppExecFwk::ElementName instance with test parameters and a resultCode of 0.
     4. Call the OnAbilityDisconnectDone method with the ElementName and resultCode as parameters.
-    5. Check the threadName_ member of the connection pool's pool_ in the DataShareConnection.
+    5. Get the shared executor from DataShareTaskExecutor and check the threadName_ member of its pool.
  * @tc.expect:
-    1. The threadName_ of the connection pool's pool_ is set to DATASHARE_EXECUTOR_NAME after
+    1. The threadName_ of the shared executor pool is set to DATASHARE_EXECUTOR_NAME after
        OnAbilityDisconnectDone is called.
  */
 HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityDisconnectDone_Test_001, TestSize.Level1)
@@ -391,7 +393,9 @@ HWTEST_F(DataShareConnectionTest, DataShareConnection_OnAbilityDisconnectDone_Te
     AppExecFwk::ElementName element(deviceId, bundleName, abilityName);
     int resultCode = 0;
     connection->OnAbilityDisconnectDone(element, resultCode);
-    EXPECT_EQ(connection->pool_->pool_.threadName_, DATASHARE_EXECUTOR_NAME);
+    auto executor = DataShareTaskExecutor::GetInstance().GetExecutor();
+    ASSERT_NE(executor, nullptr);
+    EXPECT_EQ(executor->pool_.threadName_, DATASHARE_EXECUTOR_NAME);
     LOG_INFO("DataShareConnection_OnAbilityDisconnectDone_Test_001::End");
 }
 }

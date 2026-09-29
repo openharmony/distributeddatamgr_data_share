@@ -22,6 +22,7 @@
 #include "datashare_itypes_utils.h"
 #include "datashare_log.h"
 #include "datashare_string_utils.h"
+#include "datashare_task_executor.h"
 #include "data_share_manager_impl.h"
 
 namespace OHOS {
@@ -29,7 +30,6 @@ namespace DataShare {
 DataShareSAConnection::DataShareSAConnection(const Uri &uri, int32_t saId, int32_t waitTime) : uri_(uri),
     saId_(saId)
 {
-    pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS, DATASHARE_EXECUTOR_NAME);
     if (waitTime < 0) {
         waitTime_ = 0;
     } else {
@@ -60,16 +60,17 @@ std::shared_ptr<DataShareProxy> DataShareSAConnection::GetDataShareProxy()
         auto result = DataShareSAConnection::GetConnectResult(uri, interfaceInfo, saId, waitTime);
         connectResult->SetValue(result);
     };
-    if (pool_ == nullptr) {
+    auto pool = DataShareTaskExecutor::GetInstance().GetExecutor();
+    if (pool == nullptr) {
         LOG_ERROR("pool is nullptr");
         return nullptr;
     }
-    auto taskId = pool_->Execute(task);
+    auto taskId = pool->Execute(task);
     auto res = connectResult->GetValue();
     if (!res.isFinish_) {
         LOG_ERROR("connect sa provider time out, waited time: %{public}d, uri: %{public}s", waitTime_,
             DataShareStringUtils::Anonymous(uri_.ToString()).c_str());
-        pool_->Remove(taskId);
+        pool->Remove(taskId);
         return nullptr;
     }
     if (res.errorCode_ != E_OK) {
