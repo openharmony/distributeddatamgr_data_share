@@ -17,6 +17,8 @@
 
 #include "datashare_result_set.h"
 
+#include <cerrno>
+#include <cstdlib>
 #include <securec.h>
 #include <sstream>
 
@@ -318,7 +320,15 @@ int DataShareResultSet::GetLong(int columnIndex, int64_t &value)
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_STRING) {
         size_t sizeIncludingNull;
         const char *tempValue = block->GetCellUnitValueString(cellUnit, &sizeIncludingNull);
-        value = ((sizeIncludingNull > 1) && (tempValue != nullptr)) ? long(strtoll(tempValue, nullptr, 0)) : 0L;
+        value = 0L;
+        if (sizeIncludingNull > 1 && tempValue != nullptr) {
+            errno = 0;
+            char *end = nullptr;
+            long long parsedValue = strtoll(tempValue, &end, 0);
+            if (errno != ERANGE && end != tempValue && *end == '\0') {
+                value = static_cast<int64_t>(parsedValue);
+            }
+        }
         return E_OK;
     } else if (type == AppDataFwk::SharedBlock::CELL_UNIT_TYPE_FLOAT) {
         value = (int64_t)cellUnit->cell.doubleValue;
