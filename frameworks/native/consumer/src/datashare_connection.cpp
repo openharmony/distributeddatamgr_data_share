@@ -19,12 +19,12 @@
 #include "datashare_connection.h"
 
 #include "ams_mgr_proxy.h"
-#include "datashare_common.h"
 #include "datashare_errno.h"
 #include "datashare_log.h"
 #include "datashare_proxy.h"
 #include "datashare_radar_reporter.h"
 #include "datashare_string_utils.h"
+#include "datashare_task_executor.h"
 
 namespace OHOS {
 namespace DataShare {
@@ -97,12 +97,6 @@ void DataShareConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName 
     if (uri.empty()) {
         return;
     }
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (pool_ == nullptr) {
-            pool_ = std::make_shared<ExecutorPool>(MAX_THREADS, MIN_THREADS, DATASHARE_EXECUTOR_NAME);
-        }
-    }
     ReconnectExtAbility(uri);
 }
 
@@ -144,17 +138,19 @@ void DataShareConnection::DelayConnectExtAbility(const std::string &uri)
     if (now - reConnects_.prevTime.load() >= RECONNECT_TIME_INTERVAL.count()) {
         delay = std::chrono::seconds(0);
     }
+    auto pool = DataShareTaskExecutor::GetInstance().GetExecutor();
+    if (pool == nullptr) {
+        LOG_ERROR("get executor failed, uri:%{public}s", DataShareStringUtils::Change(uri).c_str());
+        return;
+    }
     std::weak_ptr<DataShareConnection> self = weak_from_this();
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        if (pool_ == nullptr) {
-            return;
-        }
         if (reconnectTaskId_ != ExecutorPool::INVALID_TASK_ID) {
-            pool_->Remove(reconnectTaskId_);
+            pool->Remove(reconnectTaskId_);
             reconnectTaskId_ = ExecutorPool::INVALID_TASK_ID;
         }
-        reconnectTaskId_ = pool_->Schedule(delay, [uri, self]() {
+        reconnectTaskId_ = pool->Schedule(delay, [uri, self]() {
             auto selfSharedPtr = self.lock();
             if (selfSharedPtr == nullptr || selfSharedPtr->isInvalid_.load()) {
                 return;
@@ -315,12 +311,12 @@ DataShareConnection::~DataShareConnection()
     SetConnectInvalid();
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        if (pool_ != nullptr) {
-            if (reconnectTaskId_ != ExecutorPool::INVALID_TASK_ID) {
-                pool_->Remove(reconnectTaskId_);
-                reconnectTaskId_ = ExecutorPool::INVALID_TASK_ID;
+        if (reconnectTaskId_ != ExecutorPool::INVALID_TASK_ID) {
+            auto pool = DataShareTaskExecutor::GetInstance().GetExecutor();
+            if (pool != nullptr) {
+                pool->Remove(reconnectTaskId_);
             }
-            pool_ = nullptr;
+            reconnectTaskId_ = ExecutorPool::INVALID_TASK_ID;
         }
     }
     DisconnectDataShareExtAbility();

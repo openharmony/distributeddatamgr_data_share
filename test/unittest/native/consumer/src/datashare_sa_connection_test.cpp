@@ -18,6 +18,7 @@
 #include "datashare_sa_connection.h"
 #include "datashare_sa_provider_info.h"
 #include "datashare_proxy.h"
+#include "datashare_task_executor.h"
 #include "uri.h"
 
 namespace OHOS {
@@ -157,7 +158,8 @@ HWTEST_F(DataShareSAConnectionTest, DataShareSAConnectionGetDataShareProxy, Test
 /**
  * @tc.name: DataShareSAConnectionGetDataShareProxyWithToken
  * @tc.desc: Verify the GetDataShareProxy method of DataShareSAConnection class with URI and token parameters
- *           returns nullptr when no valid proxy is available or when pool is null.
+ *           returns nullptr when no valid proxy is available, and the connection uses the process-wide
+ *           executor pool shared through DataShareTaskExecutor.
  * @tc.type: FUNC
  * @tc.require: issueIC8OCN
  * @tc.precon:
@@ -166,19 +168,20 @@ HWTEST_F(DataShareSAConnectionTest, DataShareSAConnectionGetDataShareProxy, Test
  *     2. Predefined constants are valid: SA_ID (system ability ID = 1001) and WAIT_TIME (wait time = 10).
  *     3. The DataShareSAConnection class provides a GetDataShareProxy method that accepts Uri
           and IRemoteObject parameters.
- *     4. The DataShareSAConnection class has a public pool_ member that can be set to nullptr.
+ *     4. DataShareTaskExecutor provides the process-wide executor pool shared by all connections.
  * @tc.step:
  *     1. Create a Uri object with the string "datashare://test/SAID=111".
  *     2. Instantiate a DataShareSAConnection object by passing the created Uri, SA_ID,
           and WAIT_TIME as constructor parameters.
  *     3. Set token to nullptr and call GetDataShareProxy with the URI and token parameters.
  *     4. Verify that the returned proxy is nullptr.
- *     5. Set the pool_ member of the connection object to nullptr.
- *     6. Call GetDataShareProxy again with the same URI and token parameters.
- *     7. Verify that the returned proxy is still nullptr.
+ *     5. Call GetDataShareProxy again with the same URI and token parameters.
+ *     6. Verify that the returned proxy is still nullptr.
+ *     7. Get the shared executor from DataShareTaskExecutor and check the threadName_ member of its pool.
  * @tc.expect:
  *     1. The first GetDataShareProxy call returns nullptr (no valid proxy available).
- *     2. The second GetDataShareProxy call returns nullptr (pool is null).
+ *     2. The second GetDataShareProxy call returns nullptr.
+ *     3. The threadName_ of the shared executor pool is DATASHARE_EXECUTOR_NAME.
  */
 HWTEST_F(DataShareSAConnectionTest, DataShareSAConnectionGetDataShareProxyWithToken, TestSize.Level0)
 {
@@ -187,9 +190,11 @@ HWTEST_F(DataShareSAConnectionTest, DataShareSAConnectionGetDataShareProxyWithTo
     sptr<IRemoteObject> token = nullptr;
     auto proxy = connection.GetDataShareProxy(uri, token);
     EXPECT_EQ(proxy, nullptr);
-    connection.pool_ = nullptr;
     proxy = connection.GetDataShareProxy(uri, token);
     EXPECT_EQ(proxy, nullptr);
+    auto executor = DataShareTaskExecutor::GetInstance().GetExecutor();
+    EXPECT_NE(executor, nullptr);
+    EXPECT_EQ(executor->pool_.threadName_, DATASHARE_EXECUTOR_NAME);
 }
 
 /**
@@ -390,6 +395,60 @@ HWTEST_F(DataShareSAConnectionTest, DataShareNonSilentConfigDefault, TestSize.Le
 {
     DataShareNonSilentConfig config;
     EXPECT_TRUE(config.records.empty());
+}
+
+/**
+ * @tc.name: DataShareSAConnectionGetDataShareProxyCacheHit
+ * @tc.desc: Verify that the GetDataShareProxy method of DataShareSAConnection returns the cached
+ *           proxy directly when the proxy has already been connected, without touching the executor.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+ *     1. The test environment supports instantiation of Uri and DataShareSAConnection objects.
+ *     2. The dataShareProxy_ member of DataShareSAConnection can be preset.
+ * @tc.step:
+ *     1. Create a Uri object with the string "datashare://test/SAID=111".
+ *     2. Instantiate a DataShareSAConnection object and preset its dataShareProxy_ member.
+ *     3. Call GetDataShareProxy with the URI and a null token.
+ *     4. Compare the returned proxy with the preset one.
+ * @tc.expect:
+ *     1. GetDataShareProxy returns the preset proxy.
+ */
+HWTEST_F(DataShareSAConnectionTest, DataShareSAConnectionGetDataShareProxyCacheHit, TestSize.Level0)
+{
+    Uri uri("datashare://test/SAID=111");
+    DataShareSAConnection connection(uri, SA_ID, WAIT_TIME);
+    connection.dataShareProxy_ = std::make_shared<DataShareProxy>(nullptr);
+    sptr<IRemoteObject> token = nullptr;
+    auto proxy = connection.GetDataShareProxy(uri, token);
+    EXPECT_NE(proxy, nullptr);
+    EXPECT_EQ(proxy, connection.dataShareProxy_);
+}
+
+/**
+ * @tc.name: DataShareSAConnectionGetDataShareProxyInvalidSaId
+ * @tc.desc: Verify that the GetDataShareProxy method of DataShareSAConnection returns nullptr
+ *           immediately when the saId is invalid.
+ * @tc.type: FUNC
+ * @tc.require: issueIC8OCN
+ * @tc.precon:
+ *     1. The test environment supports instantiation of Uri and DataShareSAConnection objects.
+ *     2. The saId_ member of DataShareSAConnection can be set to INVALID_SA_ID.
+ * @tc.step:
+ *     1. Create a Uri object with the string "datashare://test/SAID=111".
+ *     2. Instantiate a DataShareSAConnection object and set its saId_ member to INVALID_SA_ID.
+ *     3. Call GetDataShareProxy with the URI and a null token.
+ * @tc.expect:
+ *     1. GetDataShareProxy returns nullptr without connecting.
+ */
+HWTEST_F(DataShareSAConnectionTest, DataShareSAConnectionGetDataShareProxyInvalidSaId, TestSize.Level0)
+{
+    Uri uri("datashare://test/SAID=111");
+    DataShareSAConnection connection(uri, SA_ID, WAIT_TIME);
+    connection.saId_ = DataShareSAConnection::INVALID_SA_ID;
+    sptr<IRemoteObject> token = nullptr;
+    auto proxy = connection.GetDataShareProxy(uri, token);
+    EXPECT_EQ(proxy, nullptr);
 }
 }
 }
